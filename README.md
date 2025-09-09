@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# FantasyWriter 📖✨
 
-## Project info
+Uma plataforma moderna e mágica para escritores de fantasia organizarem seus mundos, personagens e histórias.
 
-**URL**: https://lovable.dev/projects/2a3303fe-cea2-456d-be5b-bf8f2c109014
+## 🌟 Características
 
-## How can I edit this code?
+### Design System Mágico
+- **Paleta de Cores**: Neutros elegantes com toques mágicos (roxos, azuis místicos, dourado)
+- **Animações Fluidas**: Transições suaves com efeitos de brilho e movimento
+- **Tipografia Elegante**: Hierarquia visual clara inspirada em apps modernos
+- **Componentes Temáticos**: Cards, botões e elementos com estética fantástica
 
-There are several ways of editing your application.
+### Funcionalidades Principais
 
-**Use Lovable**
+#### 🏠 Tela Home
+- **Biblioteca Visual**: Grid de livros com capas estilo thumbnail
+- **Estatísticas**: Número de livros, armazenamento usado, progresso de escrita
+- **Busca e Filtros**: Encontre seus projetos rapidamente
+- **Criação Rápida**: Botão mágico para criar novos livros
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2a3303fe-cea2-456d-be5b-bf8f2c109014) and start prompting.
+#### 📘 Dashboard do Livro
+Sistema completo de abas para organizar todos os aspectos da sua história:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **📋 Overview**: Estatísticas, metas de escrita, sinopse e sticky notes
+- **🧙‍♂️ Personagens**: Galeria de personagens com roles, organizações e traços
+- **🏰 Locais**: Mapeamento de reinos, cidades, florestas e pontos importantes
+- **⚔️ Facções**: Organizações, guildas e suas hierarquias
+- **📅 Timeline**: Linha temporal visual com eventos arrastáveis
+- **✨ Sistema de Magia**: Escolas mágicas, feitiços e regras
+- **📚 Enciclopédia**: Base de conhecimento organizada por categorias
+- **🕸️ Relações**: Mapa interativo de relacionamentos entre personagens
 
-**Use your preferred IDE**
+## 🛠️ Tecnologias
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **React 18** + TypeScript
+- **Vite** para build otimizada  
+- **Tailwind CSS** com design system customizado
+- **Shadcn/ui** com componentes personalizados
+- **Lucide React** para ícones temáticos
+- **React Router** para navegação
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🎨 Design Inspiration
 
-Follow these steps:
+Inspirado em aplicativos modernos como:
+- **Notion**: Organização e hierarquia de informações
+- **Obsidian**: Conexões entre elementos e visualização de dados
+- **Linear**: Interface limpa e animações fluidas
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Como Usar
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. **Tela Inicial**: Visualize todos os seus projetos de livros
+2. **Crie um Livro**: Use o botão mágico para começar um novo projeto
+3. **Organize**: Use as abas do dashboard para estruturar sua história
+4. **Conecte**: Estabeleça relações entre personagens, locais e eventos
+5. **Escreva**: Acompanhe seu progresso e mantenha suas ideias organizadas
 
-# Step 3: Install the necessary dependencies.
-npm i
+## ✨ Características Visuais
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **Animações Mágicas**: Efeitos de glow, hover e transições suaves
+- **Cards Interativos**: Elevação ao hover com sombras dinâmicas  
+- **Gradientes Temáticos**: Cores que evocam fantasia e magia
+- **Responsive Design**: Funciona perfeitamente em desktop e mobile
+- **Dark Theme**: Interface otimizada para longas sessões de escrita
 
-**Edit a file directly in GitHub**
+## 🎯 Próximos Passos
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- [ ] Sistema de autenticação e sincronização
+- [ ] Editor de texto integrado
+- [ ] Geração de mapas interativos
+- [ ] Exportação para diferentes formatos
+- [ ] Colaboração em tempo real
+- [ ] Templates de gêneros de fantasia
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2a3303fe-cea2-456d-be5b-bf8f2c109014) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+**Criado com 💜 para escritores de fantasia que sonham com mundos épicos**

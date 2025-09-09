@@ -1,13 +1,40 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { HomePage } from "@/components/HomePage";
+import { BookDashboard } from "@/components/BookDashboard";
 
 const Index = () => {
+  const [currentView, setCurrentView] = useState<"home" | "book">("home");
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+
+  const handleBookSelect = (bookId: string) => {
+    setSelectedBookId(bookId);
+    setCurrentView("book");
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView("home");
+    setSelectedBookId(null);
+  };
+
+  const handleCreateBook = () => {
+    // Placeholder for book creation
+    console.log("Creating new book...");
+  };
+
+  if (currentView === "book" && selectedBookId) {
+    return (
+      <BookDashboard 
+        bookId={selectedBookId} 
+        onBack={handleBackToHome} 
+      />
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <HomePage 
+      onBookSelect={handleBookSelect}
+      onCreateBook={handleCreateBook}
+    />
   );
 };
 
