@@ -314,10 +314,10 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
 
           <div className="mt-6 pb-6">
             <TabsContent value="overview" className="mt-0">
-              <OverviewTab book={book} />
+              <OverviewTab book={book} bookId={bookId} />
             </TabsContent>
             <TabsContent value="characters" className="mt-0">
-              <CharactersTab />
+              <CharactersTab bookId={bookId} />
             </TabsContent>
             <TabsContent value="world" className="mt-0">
               <WorldTab />

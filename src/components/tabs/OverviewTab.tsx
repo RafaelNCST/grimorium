@@ -18,6 +18,7 @@ interface Book {
 
 interface OverviewTabProps {
   book: Book;
+  bookId: string;
 }
 
 interface StickyNote {
@@ -41,7 +42,27 @@ const noteColors = [
   'bg-purple-200 border-purple-400 text-purple-900 shadow-lg'
 ];
 
-export function OverviewTab({ book }: OverviewTabProps) {
+// Book-specific sticky notes data
+const getBookStickyNotes = (bookId: string): StickyNote[] => {
+  if (bookId === "4") {
+    // Empty book - no notes
+    return [];
+  }
+  
+  if (bookId === "1") {
+    // Book 1 - Sample notes
+    return [
+      { id: "1", content: "Adicionar mais detalhes sobre o sistema de magia no capítulo 5", color: noteColors[0], x: 20, y: 20 },
+      { id: "2", content: "Desenvolver relacionamento entre protagonista e mentor", color: noteColors[1], x: 280, y: 40 },
+      { id: "3", content: "Revisar consistência dos nomes de lugares", color: noteColors[2], x: 540, y: 60 }
+    ];
+  }
+  
+  // Other books have different notes or empty
+  return [];
+};
+
+export function OverviewTab({ book, bookId }: OverviewTabProps) {
   const { t } = useLanguage();
   const [isEditingGoals, setIsEditingGoals] = useState(false);
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
@@ -50,11 +71,7 @@ export function OverviewTab({ book }: OverviewTabProps) {
   const [authorSummary, setAuthorSummary] = useState(book.authorSummary);
   const [storySummary, setStorySummary] = useState(book.storySummary);
   
-  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
-    { id: "1", content: "Adicionar mais detalhes sobre o sistema de magia no capítulo 5", color: noteColors[0], x: 20, y: 20 },
-    { id: "2", content: "Desenvolver relacionamento entre protagonista e mentor", color: noteColors[1], x: 280, y: 40 },
-    { id: "3", content: "Revisar consistência dos nomes de lugares", color: noteColors[2], x: 540, y: 60 }
-  ]);
+  const [stickyNotes, setStickyNotes] = useState(() => getBookStickyNotes(bookId));
 const [newNote, setNewNote] = useState("");
   const [draggedNote, setDraggedNote] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState<string | null>(null);

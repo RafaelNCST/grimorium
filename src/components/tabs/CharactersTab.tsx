@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateCharacterModal } from "@/components/modals/CreateCharacterModal";
 import { StatsCard } from "@/components/StatsCard";
+import { EmptyState } from "@/components/EmptyState";
 
 interface Character {
   id: string;
@@ -26,81 +27,103 @@ interface Character {
   qualities: string[];
 }
 
-const mockCharacters: Character[] = [
-  {
-    id: "1",
-    name: "Aelric Valorheart",
-    age: 23,
-    appearance: "Jovem de estatura média com cabelos castanhos ondulados e olhos verdes penetrantes. Possui uma cicatriz no braço direito de uma batalha antiga.",
-    description: "Um jovem pastor que descobre possuir poderes mágicos ancestrais.",
-    role: "protagonista",
-    personality: "Determinado e corajoso, mas às vezes impulsivo. Possui um forte senso de justiça e não hesita em ajudar os necessitados.",
-    organization: "Ordem dos Guardiões",
-    birthPlace: "Vila Pedraverde",
-    affiliatedPlace: "Capital Elaria",
-    alignment: "bem",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor"]
-  },
-  {
-    id: "2", 
-    name: "Lyara Moonwhisper",
-    age: 247,
-    description: "Mentora élfica com conhecimento profundo sobre magia antiga.",
-    role: "secundario",
-    organization: "Ordem dos Guardiões",
-    birthPlace: "Floresta Sombria",
-    affiliatedPlace: "Capital Elaria",
-    alignment: "bem",
-    qualities: ["Sábia", "Misteriosa", "Protetora"]
-  },
-  {
-    id: "3",
-    name: "Malachar o Sombrio",
-    age: 45,
-    description: "Antigo mago que busca o poder absoluto através da magia negra.",
-    role: "antagonista",
-    organization: "Culto das Sombras",
-    birthPlace: "Montanhas do Norte",
-    affiliatedPlace: "Torre Sombria",
-    alignment: "caotico",
-    qualities: ["Ambicioso", "Cruel", "Inteligente"]
-  },
-  {
-    id: "4",
-    name: "Finn Pedraverde",
-    age: 67,
-    description: "Anão ferreiro e companheiro leal do protagonista.",
-    role: "secundario",
-    organization: "Guilda dos Ferreiros",
-    birthPlace: "Montanhas do Norte",
-    affiliatedPlace: "Vila Pedraverde",
-    alignment: "bem",
-    qualities: ["Leal", "Trabalhador", "Teimoso"]
-  },
-  {
-    id: "5",
-    name: "Seraphina Nightblade",
-    age: 28,
-    description: "Assassina habilidosa que serve aos interesses sombrios.",
-    role: "vilao",
-    organization: "Culto das Sombras",
-    birthPlace: "Capital Elaria",
-    affiliatedPlace: "Submundo",
-    alignment: "caotico",
-    qualities: ["Ágil", "Letal", "Calculista"]
+// Book-specific character data
+const getBookCharacters = (bookId: string): Character[] => {
+  if (bookId === "4") {
+    // Empty book - no characters
+    return [];
   }
-];
+  
+  if (bookId === "1") {
+    // Book 1 - Full character list
+    return [
+      {
+        id: "1",
+        name: "Aelric Valorheart",
+        age: 23,
+        appearance: "Jovem de estatura média com cabelos castanhos ondulados e olhos verdes penetrantes. Possui uma cicatriz no braço direito de uma batalha antiga.",
+        description: "Um jovem pastor que descobre possuir poderes mágicos ancestrais.",
+        role: "protagonista",
+        personality: "Determinado e corajoso, mas às vezes impulsivo. Possui um forte senso de justiça e não hesita em ajudar os necessitados.",
+        organization: "Ordem dos Guardiões",
+        birthPlace: "Vila Pedraverde",
+        affiliatedPlace: "Capital Elaria",
+        alignment: "bem",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor"]
+      },
+      {
+        id: "2", 
+        name: "Lyara Moonwhisper",
+        age: 247,
+        description: "Mentora élfica com conhecimento profundo sobre magia antiga.",
+        role: "secundario",
+        organization: "Ordem dos Guardiões",
+        birthPlace: "Floresta Sombria",
+        affiliatedPlace: "Capital Elaria",
+        alignment: "bem",
+        qualities: ["Sábia", "Misteriosa", "Protetora"]
+      },
+      {
+        id: "3",
+        name: "Malachar o Sombrio",
+        age: 45,
+        description: "Antigo mago que busca o poder absoluto através da magia negra.",
+        role: "antagonista",
+        organization: "Culto das Sombras",
+        birthPlace: "Montanhas do Norte",
+        affiliatedPlace: "Torre Sombria",
+        alignment: "caotico",
+        qualities: ["Ambicioso", "Cruel", "Inteligente"]
+      },
+      {
+        id: "4",
+        name: "Finn Pedraverde",
+        age: 67,
+        description: "Anão ferreiro e companheiro leal do protagonista.",
+        role: "secundario",
+        organization: "Guilda dos Ferreiros",
+        birthPlace: "Montanhas do Norte",
+        affiliatedPlace: "Vila Pedraverde",
+        alignment: "bem",
+        qualities: ["Leal", "Trabalhador", "Teimoso"]
+      },
+      {
+        id: "5",
+        name: "Seraphina Nightblade",
+        age: 28,
+        description: "Assassina habilidosa que serve aos interesses sombrios.",
+        role: "vilao",
+        organization: "Culto das Sombras",
+        birthPlace: "Capital Elaria",
+        affiliatedPlace: "Submundo",
+        alignment: "caotico",
+        qualities: ["Ágil", "Letal", "Calculista"]
+      }
+    ];
+  }
+  
+  // Other books have different characters or empty lists
+  return [];
+};
 
-export function CharactersTab() {
+interface CharactersTabProps {
+  bookId: string;
+}
+
+export function CharactersTab({ bookId }: CharactersTabProps) {
   const navigate = useNavigate();
-  const [characters, setCharacters] = useState(mockCharacters);
+  const [characters, setCharacters] = useState(() => getBookCharacters(bookId));
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrg, setSelectedOrg] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
 
-  const organizations = ["all", "Ordem dos Guardiões", "Culto das Sombras", "Guilda dos Ferreiros"];
-  const locations = ["all", "Vila Pedraverde", "Capital Elaria", "Floresta Sombria", "Montanhas do Norte"];
+  // Get unique organizations and locations from current book's characters
+  const organizations = ["all", ...Array.from(new Set(characters.map(c => c.organization).filter(Boolean)))];
+  const locations = ["all", ...Array.from(new Set([
+    ...characters.map(c => c.birthPlace).filter(Boolean),
+    ...characters.map(c => c.affiliatedPlace).filter(Boolean)
+  ]))];
   
   const getRoleIcon = (role: string) => {
     switch (role.toLowerCase()) {
@@ -167,7 +190,7 @@ export function CharactersTab() {
   };
 
   const handleCharacterClick = (characterId: string) => {
-    navigate(`/book/1/character/${characterId}`);
+    navigate(`/book/${bookId}/character/${characterId}`);
   };
 
   return (
@@ -180,7 +203,7 @@ export function CharactersTab() {
         </div>
         <CreateCharacterModal
           trigger={
-            <Button variant="magical">
+            <Button variant="magical" data-testid="create-character-trigger">
               <Plus className="w-4 h-4 mr-2" />
               Novo Personagem
             </Button>
@@ -330,24 +353,21 @@ export function CharactersTab() {
       </div>
 
       {filteredCharacters.length === 0 && (
-        <div className="text-center py-12">
-          <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Nenhum personagem encontrado</h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm || selectedOrg !== "all" || selectedLocation !== "all"
-              ? "Tente ajustar seus filtros" 
-              : "Comece criando seu primeiro personagem"}
-          </p>
-          <CreateCharacterModal
-            trigger={
-              <Button variant="magical">
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Personagem
-              </Button>
-            }
-            onCharacterCreated={handleCharacterCreated}
-          />
-        </div>
+        <EmptyState
+          icon={Users}
+          title={characters.length === 0 ? "Nenhum personagem criado" : "Nenhum personagem encontrado"}
+          description={
+            characters.length === 0 
+              ? "Comece criando seu primeiro personagem para dar vida à sua história"
+              : "Tente ajustar seus filtros ou criar um novo personagem"
+          }
+          actionLabel="Criar Personagem"
+          onAction={() => {
+            // Click the trigger button to open the modal
+            const trigger = document.querySelector('[data-testid="create-character-trigger"]') as HTMLButtonElement;
+            trigger?.click();
+          }}
+        />
       )}
     </div>
   );
