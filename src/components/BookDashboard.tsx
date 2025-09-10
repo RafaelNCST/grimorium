@@ -5,8 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { OverviewTab } from "@/components/tabs/OverviewTab";
 import { CharactersTab } from "@/components/tabs/CharactersTab";
-import { LocationsTab } from "@/components/tabs/LocationsTab";
-import { FactionsTab } from "@/components/tabs/FactionsTab";
+import { WorldTab } from "@/components/tabs/WorldTab";
+import { OrganizationsTab } from "@/components/tabs/OrganizationsTab";
 import { TimelineTab } from "@/components/tabs/TimelineTab";
 import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
@@ -289,10 +289,10 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <CharactersTab />
             </TabsContent>
             <TabsContent value="world" className="mt-0">
-              <LocationsTab />
+              <WorldTab />
             </TabsContent>
             <TabsContent value="organizations" className="mt-0">
-              <FactionsTab />
+              <OrganizationsTab />
             </TabsContent>
             <TabsContent value="timeline" className="mt-0">
               <TimelineTab />

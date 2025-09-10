@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus } from "lucide-react";
+import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { StatsCard } from "@/components/StatsCard";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Book {
   title: string;
@@ -17,20 +19,106 @@ interface OverviewTabProps {
   book: Book;
 }
 
+interface StickyNote {
+  id: string;
+  content: string;
+  color: string;
+  x: number;
+  y: number;
+}
+
+interface Goals {
+  wordsPerDay: number;
+  chaptersPerWeek: number;
+}
+
+const noteColors = [
+  'bg-yellow-200 border-yellow-300 text-yellow-900',
+  'bg-pink-200 border-pink-300 text-pink-900', 
+  'bg-green-200 border-green-300 text-green-900',
+  'bg-blue-200 border-blue-300 text-blue-900',
+  'bg-purple-200 border-purple-300 text-purple-900'
+];
+
 export function OverviewTab({ book }: OverviewTabProps) {
-  const [isEditingNotes, setIsEditingNotes] = useState(false);
-  const [notes, setNotes] = useState([
-    "Adicionar mais detalhes sobre o sistema de magia no capítulo 5",
-    "Desenvolver relacionamento entre protagonista e mentor",
-    "Revisar consistência dos nomes de lugares"
+  const { t } = useLanguage();
+  const [isEditingGoals, setIsEditingGoals] = useState(false);
+  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [goals, setGoals] = useState<Goals>({ wordsPerDay: 1500, chaptersPerWeek: 2 });
+  const [summary, setSummary] = useState("O protagonista descobre seus verdadeiros poderes enquanto enfrenta o primeiro grande desafio...");
+  
+  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
+    { id: "1", content: "Adicionar mais detalhes sobre o sistema de magia no capítulo 5", color: noteColors[0], x: 20, y: 20 },
+    { id: "2", content: "Desenvolver relacionamento entre protagonista e mentor", color: noteColors[1], x: 280, y: 40 },
+    { id: "3", content: "Revisar consistência dos nomes de lugares", color: noteColors[2], x: 540, y: 60 }
   ]);
   const [newNote, setNewNote] = useState("");
+  const [draggedNote, setDraggedNote] = useState<string | null>(null);
+
+  // Mock data for current arc events
+  const currentArcEvents = [
+    { id: "1", name: "Descoberta dos poderes", completed: true },
+    { id: "2", name: "Primeiro confronto", completed: true },
+    { id: "3", name: "Encontro com mentor", completed: false },
+    { id: "4", name: "Revelação do passado", completed: false }
+  ];
+
+  const completedEvents = currentArcEvents.filter(e => e.completed).length;
+  const progressPercentage = Math.round((completedEvents / currentArcEvents.length) * 100);
 
   const handleAddNote = () => {
     if (newNote.trim()) {
-      setNotes([...notes, newNote]);
+      const newStickyNote: StickyNote = {
+        id: Date.now().toString(),
+        content: newNote,
+        color: noteColors[Math.floor(Math.random() * noteColors.length)],
+        x: Math.random() * 300,
+        y: Math.random() * 200
+      };
+      setStickyNotes([...stickyNotes, newStickyNote]);
       setNewNote("");
     }
+  };
+
+  const handleDeleteNote = (id: string) => {
+    setStickyNotes(stickyNotes.filter(note => note.id !== id));
+  };
+
+  const handleDragStart = (e: React.DragEvent, noteId: string) => {
+    setDraggedNote(noteId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!draggedNote) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    setStickyNotes(notes => 
+      notes.map(note => 
+        note.id === draggedNote 
+          ? { ...note, x: Math.max(0, x - 100), y: Math.max(0, y - 25) }
+          : note
+      )
+    );
+    setDraggedNote(null);
+  };
+
+  const saveGoals = () => {
+    setIsEditingGoals(false);
+    // Here you would save to your backend/state management
+  };
+
+  const saveSummary = () => {
+    setIsEditingSummary(false);
+    // Here you would save to your backend/state management
   };
 
   return (
@@ -38,148 +126,216 @@ export function OverviewTab({ book }: OverviewTabProps) {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatsCard
-          title="Capítulos"
+          title={t('book.chapters')}
           value={book.chapters}
+          description="Meta: 15"
           icon={BookOpen}
         />
         <StatsCard
-          title="Palavras Escritas"
-          value="85,432"
+          title="Média/Semana"
+          value="2.1"
+          description="Capítulos"
+          icon={TrendingUp}
+          trend={{ value: 15.2, isPositive: true }}
+        />
+        <StatsCard
+          title="Último Capítulo"
+          value="Cap. 12"
+          description="há 2 dias"
+          icon={Target}
+        />
+        <StatsCard
+          title="Total de Palavras"
+          value="85.4k"
           description="Meta: 100k"
           icon={TrendingUp}
-        />
-        <StatsCard
-          title="Personagens"
-          value="23"
-          description="Principais: 8"
-          icon={Target}
-        />
-        <StatsCard
-          title="Locais"
-          value="12"
-          description="Principais: 5"
-          icon={Target}
+          trend={{ value: 8.1, isPositive: true }}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Current Arc */}
-        <Card className="card-magical">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>Arco Atual</CardTitle>
-              <CardDescription>Progresso da história</CardDescription>
-            </div>
-            <Button variant="ghost" size="icon">
-              <Edit2 className="w-4 h-4" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <h3 className="text-xl font-semibold mb-3">{book.currentArc}</h3>
-            <p className="text-muted-foreground">
-              O protagonista descobre seus verdadeiros poderes enquanto enfrenta o primeiro grande desafio. 
-              Este arco estabelece as bases para os conflitos futuros.
-            </p>
-            <div className="mt-4">
-              <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                <span>Progresso do Arco</span>
-                <span>65%</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-gradient-primary h-2 rounded-full" style={{ width: '65%' }}></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Writing Goals */}
         <Card className="card-magical">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle>Metas de Escrita</CardTitle>
-              <CardDescription>Objetivos do mês</CardDescription>
+              <CardDescription>Objetivos editáveis</CardDescription>
             </div>
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsEditingGoals(!isEditingGoals)}
+            >
               <Edit2 className="w-4 h-4" />
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Palavras por dia</span>
-                  <Badge variant="secondary">1,250 / 1,500</Badge>
+            {isEditingGoals ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Palavras por dia</label>
+                  <Input 
+                    type="number" 
+                    value={goals.wordsPerDay}
+                    onChange={(e) => setGoals(g => ({ ...g, wordsPerDay: parseInt(e.target.value) || 0 }))}
+                  />
                 </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-gradient-accent h-2 rounded-full" style={{ width: '83%' }}></div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Capítulos por semana</label>
+                  <Input 
+                    type="number" 
+                    value={goals.chaptersPerWeek}
+                    onChange={(e) => setGoals(g => ({ ...g, chaptersPerWeek: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="accent" size="sm" onClick={saveGoals}>Salvar</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditingGoals(false)}>Cancelar</Button>
                 </div>
               </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Palavras por dia</span>
+                    <Badge variant="secondary">1,250 / {goals.wordsPerDay.toLocaleString()}</Badge>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-gradient-accent h-2 rounded-full" style={{ width: `${Math.min(100, (1250 / goals.wordsPerDay) * 100)}%` }}></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Capítulos por semana</span>
+                    <Badge variant="secondary">2 / {goals.chaptersPerWeek}</Badge>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-gradient-primary h-2 rounded-full" style={{ width: `${Math.min(100, (2 / goals.chaptersPerWeek) * 100)}%` }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Current Arc */}
+        <Card className="card-magical">
+          <CardHeader>
+            <CardTitle>Arco Atual</CardTitle>
+            <CardDescription>{book.currentArc}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4">
+              <h4 className="font-medium mb-2">Último evento concluído:</h4>
+              <p className="text-sm text-muted-foreground mb-3">Primeiro confronto</p>
               
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Capítulos este mês</span>
-                  <Badge variant="secondary">3 / 4</Badge>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-gradient-primary h-2 rounded-full" style={{ width: '75%' }}></div>
-                </div>
+              <h4 className="font-medium mb-2">Próximos eventos:</h4>
+              <div className="space-y-2">
+                <div className="text-sm p-2 bg-muted/30 rounded">Encontro com mentor</div>
+                <div className="text-sm p-2 bg-muted/30 rounded">Revelação do passado</div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                <span>Progresso do Arco</span>
+                <span>{progressPercentage}%</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-2">
+                <div className="bg-gradient-primary h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Synopsis */}
+      {/* Summary */}
       <Card className="card-magical">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
-            <CardTitle>Sinopse</CardTitle>
-            <CardDescription>Resumo da história</CardDescription>
+            <CardTitle>Resumo</CardTitle>
+            <CardDescription>Resumo editável da história</CardDescription>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsEditingSummary(!isEditingSummary)}
+          >
             <Edit2 className="w-4 h-4" />
           </Button>
         </CardHeader>
         <CardContent>
-          <p className="text-foreground leading-relaxed">
-            {book.synopsis}
-          </p>
+          {isEditingSummary ? (
+            <div className="space-y-4">
+              <Textarea 
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                className="min-h-[100px]"
+                placeholder="Digite o resumo da história..."
+              />
+              <div className="flex gap-2">
+                <Button variant="accent" size="sm" onClick={saveSummary}>Salvar</Button>
+                <Button variant="ghost" size="sm" onClick={() => setIsEditingSummary(false)}>Cancelar</Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-foreground leading-relaxed">{summary}</p>
+          )}
         </CardContent>
       </Card>
 
-      {/* Sticky Notes */}
+      {/* Post-it Notes Board */}
       <Card className="card-magical">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle className="flex items-center gap-2">
               <StickyNote className="w-5 h-5" />
-              Lembretes Rápidos
+              Quadro de Lembretes
             </CardTitle>
-            <CardDescription>Notas e ideias importantes</CardDescription>
+            <CardDescription>Arraste as notas para organizá-las</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {notes.map((note, index) => (
+          <div 
+            className="relative min-h-[300px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
+            {stickyNotes.map((note) => (
               <div
-                key={index}
-                className="bg-accent/10 border border-accent/20 rounded-lg p-3 text-sm animate-fade-in-up"
+                key={note.id}
+                className={`absolute p-3 rounded-lg border-2 cursor-move shadow-md min-w-[180px] max-w-[200px] ${note.color}`}
+                style={{ left: note.x, top: note.y }}
+                draggable
+                onDragStart={(e) => handleDragStart(e, note.id)}
               >
-                {note}
+                <div className="flex items-start justify-between mb-2">
+                  <GripVertical className="w-4 h-4 opacity-50" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 hover:bg-black/10"
+                    onClick={() => handleDeleteNote(note.id)}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+                <p className="text-xs leading-relaxed">{note.content}</p>
               </div>
             ))}
-            
-            <div className="flex gap-2">
-              <Textarea
-                placeholder="Adicionar nova nota..."
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                className="min-h-[60px]"
-              />
-              <Button variant="outline" onClick={handleAddNote}>
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Textarea
+              placeholder="Adicionar nova nota..."
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              className="min-h-[60px]"
+            />
+            <Button variant="outline" onClick={handleAddNote}>
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </CardContent>
       </Card>
