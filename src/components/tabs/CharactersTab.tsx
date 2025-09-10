@@ -268,7 +268,7 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Organização" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="bottom">
             <SelectItem value="all">Todas organizações</SelectItem>
             {organizations.slice(1).map(org => (
               <SelectItem key={org} value={org}>{org}</SelectItem>
@@ -280,7 +280,7 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Local" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="bottom">
             <SelectItem value="all">Todos locais</SelectItem>
             {locations.slice(1).map(location => (
               <SelectItem key={location} value={location}>{location}</SelectItem>

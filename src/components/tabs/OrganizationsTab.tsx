@@ -243,7 +243,7 @@ export function OrganizationsTab() {
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Alinhamento" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="bottom">
             <SelectItem value="all">Todos</SelectItem>
             {alignments.slice(1).map(alignment => (
               <SelectItem key={alignment} value={alignment}>{alignment}</SelectItem>
@@ -255,7 +255,7 @@ export function OrganizationsTab() {
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Mundo" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side="bottom">
             <SelectItem value="all">Todos</SelectItem>
             {worlds.slice(1).map(world => (
               <SelectItem key={world} value={world}>{world}</SelectItem>

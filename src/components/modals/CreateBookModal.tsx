@@ -145,7 +145,7 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
               <SelectTrigger className={errors.genre ? 'border-destructive' : ''}>
                 <SelectValue placeholder="Selecione o gênero" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom">
                 {genres.map((genre) => (
                   <SelectItem key={genre} value={genre}>
                     {genre}
@@ -170,7 +170,7 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
               <SelectTrigger className={errors.visualStyle ? 'border-destructive' : ''}>
                 <SelectValue placeholder="Selecione o estilo visual" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom">
                 {visualStyles.map((style) => (
                   <SelectItem key={style} value={style}>
                     {style}

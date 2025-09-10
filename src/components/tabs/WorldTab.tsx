@@ -151,6 +151,21 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [activeTab, setActiveTab] = useState("all");
 
   const mockWorldEntities = getWorldEntitiesForBook(bookId);
+
+  const handleCreateWorld = () => {
+    // TODO: Implement world creation modal
+    console.log("Creating world for book:", bookId);
+  };
+
+  const handleCreateContinent = () => {
+    // TODO: Implement continent creation modal  
+    console.log("Creating continent for book:", bookId);
+  };
+
+  const handleCreateLocation = () => {
+    // TODO: Implement location creation modal
+    console.log("Creating location for book:", bookId);
+  };
   
   const typeOptions = ["all", "World", "Continent", "Location"];
   const worlds = mockWorldEntities.filter(e => e.type === "World");
@@ -339,7 +354,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
             <h2 className="text-2xl font-bold">Mundo</h2>
             <p className="text-muted-foreground">Gerencie mundos, continentes e locais</p>
           </div>
-          <Button variant="magical">
+          <Button variant="magical" onClick={handleCreateWorld}>
             <Plus className="w-4 h-4 mr-2" />
             Criar Mundo
           </Button>
@@ -350,7 +365,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
           title="Nenhum mundo criado"
           description="Comece criando o primeiro mundo da sua história para organizar continentes e locais."
           actionLabel="Criar Mundo"
-          onAction={() => console.log("Create world")}
+          onAction={handleCreateWorld}
         />
       </div>
     );
@@ -370,15 +385,15 @@ export function WorldTab({ bookId }: WorldTabProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleCreateWorld}>
             <Plus className="w-4 h-4 mr-2" />
             Mundo
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleCreateContinent}>
             <Plus className="w-4 h-4 mr-2" />
             Continente
           </Button>
-          <Button variant="magical">
+          <Button variant="magical" onClick={handleCreateLocation}>
             <Plus className="w-4 h-4 mr-2" />
             Local
           </Button>
@@ -450,7 +465,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
               title="Nenhum resultado encontrado"
               description="Tente ajustar seus filtros ou criar uma nova entidade."
               actionLabel="Criar Mundo"
-              onAction={() => console.log("Create world")}
+              onAction={handleCreateWorld}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -466,7 +481,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
               title="Nenhum mundo encontrado"
               description="Crie o primeiro mundo da sua história."
               actionLabel="Criar Mundo"
-              onAction={() => console.log("Create world")}
+              onAction={handleCreateWorld}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -482,7 +497,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
               title="Nenhum continente encontrado"
               description="Crie continentes para organizar seus locais."
               actionLabel="Criar Continente"
-              onAction={() => console.log("Create continent")}
+              onAction={handleCreateContinent}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -498,7 +513,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
               title="Nenhum local encontrado"
               description="Crie locais específicos para sua história."
               actionLabel="Criar Local"
-              onAction={() => console.log("Create location")}
+              onAction={handleCreateLocation}
             />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

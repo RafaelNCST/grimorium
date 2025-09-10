@@ -181,7 +181,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                           <SelectTrigger className="w-48">
                             <SelectValue placeholder="Gênero" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent side="bottom">
                             {genres.map((genre) => (
                               <SelectItem key={genre} value={genre}>{genre}</SelectItem>
                             ))}
@@ -191,7 +191,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                           <SelectTrigger className="w-48">
                             <SelectValue placeholder="Estilo visual" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent side="bottom">
                             {visualStyles.map((style) => (
                               <SelectItem key={style} value={style}>{style}</SelectItem>
                             ))}

@@ -48,7 +48,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom">
                 <SelectItem value="dark" className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
                     <Moon className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom">
                 <SelectItem value="pt">🇧🇷 Português</SelectItem>
                 <SelectItem value="en">🇺🇸 English</SelectItem>
               </SelectContent>

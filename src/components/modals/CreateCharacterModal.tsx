@@ -220,7 +220,7 @@ export function CreateCharacterModal({ trigger, onCharacterCreated }: CreateChar
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o papel" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent side="bottom">
                   {roles.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
@@ -237,7 +237,7 @@ export function CreateCharacterModal({ trigger, onCharacterCreated }: CreateChar
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o alinhamento" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent side="bottom">
                   {alignments.map((alignment) => (
                     <SelectItem key={alignment.value} value={alignment.value}>
                       {alignment.label}
@@ -284,7 +284,7 @@ export function CreateCharacterModal({ trigger, onCharacterCreated }: CreateChar
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a organização" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent side="bottom">
                   {mockOrganizations.map((org) => (
                     <SelectItem key={org} value={org}>
                       {org}
@@ -301,7 +301,7 @@ export function CreateCharacterModal({ trigger, onCharacterCreated }: CreateChar
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o local" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent side="bottom">
                   {mockLocations.map((location) => (
                     <SelectItem key={location} value={location}>
                       {location}
@@ -319,7 +319,7 @@ export function CreateCharacterModal({ trigger, onCharacterCreated }: CreateChar
               <SelectTrigger>
                 <SelectValue placeholder="Selecione o local afiliado" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="bottom">
                 {mockLocations.map((location) => (
                   <SelectItem key={location} value={location}>
                     {location}
