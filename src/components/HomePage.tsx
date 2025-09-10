@@ -170,7 +170,6 @@ export function HomePage({ onBookSelect }: HomePageProps) {
               key={book.id}
               {...book}
               onClick={() => onBookSelect(book.id)}
-              onEdit={() => console.log("Edit book", book.id)}
             />
           ))}
         </div>

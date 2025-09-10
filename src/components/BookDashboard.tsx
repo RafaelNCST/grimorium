@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,10 @@ import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { RelationsTab } from "@/components/tabs/RelationsTab";
 import { PlotTab } from "@/components/tabs/PlotTab";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import bookCover1 from "@/assets/book-cover-1.jpg";
 
 interface BookDashboardProps {
@@ -20,8 +24,28 @@ interface BookDashboardProps {
   onBack: () => void;
 }
 
+// Types for Plot (Enredo)
+interface PlotEvent {
+  id: string;
+  name: string;
+  description: string;
+  completed: boolean;
+  order: number;
+}
+
+interface PlotArc {
+  id: string;
+  name: string;
+  size: 'pequeno' | 'médio' | 'grande';
+  focus: string;
+  description: string;
+  events: PlotEvent[];
+  progress: number;
+  isCurrentArc: boolean;
+}
+
 // Mock book data
-const mockBook = {
+const initialBook = {
   id: "1",
   title: "As Crônicas do Reino Perdido",
   genre: "Alta Fantasia",
@@ -32,9 +56,57 @@ const mockBook = {
   synopsis: "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
 };
 
+const initialArcs: PlotArc[] = [
+  {
+    id: "1",
+    name: "A Ascensão do Herói",
+    size: "grande",
+    focus: "Desenvolvimento do protagonista",
+    description: "O jovem pastor descobre seus poderes e aprende a controlá-los enquanto enfrenta os primeiros desafios.",
+    progress: 65,
+    isCurrentArc: true,
+    events: [
+      { id: "1", name: "Descoberta dos poderes", description: "O protagonista manifesta sua magia pela primeira vez", completed: true, order: 1 },
+      { id: "2", name: "Encontro com o mentor", description: "Conhece o sábio que o guiará", completed: true, order: 2 },
+      { id: "3", name: "Primeiro desafio", description: "Enfrenta seu primeiro inimigo real", completed: false, order: 3 },
+      { id: "4", name: "Revelação sobre o passado", description: "Descobre a verdade sobre sua origem", completed: false, order: 4 },
+    ]
+  },
+  {
+    id: "2", 
+    name: "A Guerra das Sombras",
+    size: "grande",
+    focus: "Conflito principal",
+    description: "O protagonista lidera uma guerra contra as forças das trevas que ameaçam consumir o reino.",
+    progress: 0,
+    isCurrentArc: false,
+    events: [
+      { id: "5", name: "Chamado à guerra", description: "O reino pede ajuda ao protagonista", completed: false, order: 1 },
+      { id: "6", name: "Formação da aliança", description: "Reúne heróis para a batalha final", completed: false, order: 2 },
+    ]
+  },
+  {
+    id: "3",
+    name: "O Preço da Vitória", 
+    size: "médio",
+    focus: "Resolução e consequências",
+    description: "As consequências da guerra e o estabelecimento de uma nova ordem.",
+    progress: 0,
+    isCurrentArc: false,
+    events: []
+  }
+];
+
 export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
+  const [book, setBook] = useState(initialBook);
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [draftBook, setDraftBook] = useState(initialBook);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
+  const [arcs, setArcs] = useState<PlotArc[]>(initialArcs);
+  const currentArc = arcs.find((a) => a.isCurrentArc) || arcs[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,39 +129,109 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
           <div className="flex items-start gap-6">
             <div className="w-32 h-48 rounded-lg overflow-hidden shadow-lg">
               <img
-                src={mockBook.coverImage}
-                alt={mockBook.title}
+                src={book.coverImage}
+                alt={book.title}
                 className="w-full h-full object-cover"
               />
             </div>
 
             <div className="flex-1">
               <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">{mockBook.title}</h2>
-                  <div className="flex items-center gap-3 mb-3">
-                    <Badge variant="secondary">{mockBook.genre}</Badge>
-                    <Badge variant="outline">{mockBook.visualStyle}</Badge>
-                  </div>
-                  <p className="text-muted-foreground max-w-2xl">
-                    {mockBook.synopsis}
-                  </p>
+                <div className="w-full max-w-3xl">
+                  {isEditingHeader ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={draftBook.title}
+                        onChange={(e) => setDraftBook({ ...draftBook, title: e.target.value })}
+                        aria-label="Título do livro"
+                      />
+                      <div className="flex items-center gap-3">
+                        <Select value={draftBook.genre} onValueChange={(v) => setDraftBook({ ...draftBook, genre: v })}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Gênero" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Alta Fantasia">Alta Fantasia</SelectItem>
+                            <SelectItem value="Fantasia Urbana">Fantasia Urbana</SelectItem>
+                            <SelectItem value="Épico">Épico</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Select value={draftBook.visualStyle} onValueChange={(v) => setDraftBook({ ...draftBook, visualStyle: v })}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Estilo visual" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Realista">Realista</SelectItem>
+                            <SelectItem value="Anime">Anime</SelectItem>
+                            <SelectItem value="Cartoon">Cartoon</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Textarea
+                        value={draftBook.synopsis}
+                        onChange={(e) => setDraftBook({ ...draftBook, synopsis: e.target.value })}
+                        placeholder="Sinopse"
+                        rows={3}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setDraftBook(book);
+                            setIsEditingHeader(false);
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setBook(draftBook);
+                            setIsEditingHeader(false);
+                          }}
+                          className="btn-magical"
+                        >
+                          Salvar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2">{book.title}</h2>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge variant="secondary">{book.genre}</Badge>
+                        <Badge variant="outline">{book.visualStyle}</Badge>
+                      </div>
+                      <p className="text-muted-foreground max-w-2xl">
+                        {book.synopsis}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                <Button variant="outline" size="sm">
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Editar
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!isEditingHeader && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setIsEditingHeader(true)}>
+                        <Edit2 className="w-4 h-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4" />
-                  <span>{mockBook.chapters} capítulos</span>
+                  <span>{book.chapters} capítulos</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>Arco atual: {mockBook.currentArc}</span>
+                  <span>Arco atual: {currentArc?.name}</span>
                 </div>
               </div>
             </div>
@@ -141,7 +283,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
 
           <div className="mt-6 pb-6">
             <TabsContent value="overview" className="mt-0">
-              <OverviewTab book={mockBook} />
+              <OverviewTab book={book} />
             </TabsContent>
             <TabsContent value="characters" className="mt-0">
               <CharactersTab />

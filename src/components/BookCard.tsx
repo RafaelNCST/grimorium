@@ -65,17 +65,19 @@ export function BookCard({
             <Eye className="w-4 h-4 mr-1" />
             Abrir
           </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit?.();
-            }}
-            className="backdrop-blur-sm"
-          >
-            <Edit2 className="w-4 h-4" />
-          </Button>
+          {onEdit && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
+              className="backdrop-blur-sm"
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
 
         {/* Genre Badge */}
