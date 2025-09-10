@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/EmptyState";
+import { CreateWorldModal } from "@/components/modals/CreateWorldModal";
+import { CreateContinentModal } from "@/components/modals/CreateContinentModal";
+import { CreateLocationModal } from "@/components/modals/CreateLocationModal";
 
 interface WorldEntity {
   id: string;
@@ -149,22 +152,36 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedParent, setSelectedParent] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("all");
+  
+  // Modal states
+  const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
+  const [showCreateContinentModal, setShowCreateContinentModal] = useState(false);
+  const [showCreateLocationModal, setShowCreateLocationModal] = useState(false);
 
-  const mockWorldEntities = getWorldEntitiesForBook(bookId);
+  const [mockWorldEntities, setMockWorldEntities] = useState(() => getWorldEntitiesForBook(bookId));
 
   const handleCreateWorld = () => {
-    // TODO: Implement world creation modal
-    console.log("Creating world for book:", bookId);
+    setShowCreateWorldModal(true);
   };
 
   const handleCreateContinent = () => {
-    // TODO: Implement continent creation modal  
-    console.log("Creating continent for book:", bookId);
+    setShowCreateContinentModal(true);
   };
 
   const handleCreateLocation = () => {
-    // TODO: Implement location creation modal
-    console.log("Creating location for book:", bookId);
+    setShowCreateLocationModal(true);
+  };
+
+  const handleWorldCreated = (newWorld: any) => {
+    setMockWorldEntities(prev => [...prev, newWorld]);
+  };
+
+  const handleContinentCreated = (newContinent: any) => {
+    setMockWorldEntities(prev => [...prev, newContinent]);
+  };
+
+  const handleLocationCreated = (newLocation: any) => {
+    setMockWorldEntities(prev => [...prev, newLocation]);
   };
   
   const typeOptions = ["all", "World", "Continent", "Location"];
@@ -522,6 +539,33 @@ export function WorldTab({ bookId }: WorldTabProps) {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Modals */}
+      <CreateWorldModal
+        open={showCreateWorldModal}
+        onClose={() => setShowCreateWorldModal(false)}
+        onWorldCreated={handleWorldCreated}
+        bookId={bookId}
+      />
+
+      <CreateContinentModal
+        open={showCreateContinentModal}
+        onClose={() => setShowCreateContinentModal(false)}
+        onContinentCreated={handleContinentCreated}
+        bookId={bookId}
+        availableWorlds={worlds.map(w => ({ id: w.id, name: w.name }))}
+      />
+
+      <CreateLocationModal
+        open={showCreateLocationModal}
+        onClose={() => setShowCreateLocationModal(false)}
+        onLocationCreated={handleLocationCreated}
+        bookId={bookId}
+        availableParents={[
+          ...worlds.map(w => ({ id: w.id, name: w.name, type: 'Mundo' })),
+          ...continents.map(c => ({ id: c.id, name: c.name, type: 'Continente' }))
+        ]}
+      />
     </div>
   );
 }
