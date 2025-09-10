@@ -16,11 +16,6 @@ const Index = () => {
     setSelectedBookId(null);
   };
 
-  const handleCreateBook = () => {
-    // Placeholder for book creation
-    console.log("Creating new book...");
-  };
-
   if (currentView === "book" && selectedBookId) {
     return (
       <BookDashboard 
@@ -33,7 +28,6 @@ const Index = () => {
   return (
     <HomePage 
       onBookSelect={handleBookSelect}
-      onCreateBook={handleCreateBook}
     />
   );
 };

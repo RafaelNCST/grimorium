@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,8 @@ import { TimelineTab } from "@/components/tabs/TimelineTab";
 import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { RelationsTab } from "@/components/tabs/RelationsTab";
+import { PlotTab } from "@/components/tabs/PlotTab";
+import { useLanguage } from "@/contexts/LanguageContext";
 import bookCover1 from "@/assets/book-cover-1.jpg";
 
 interface BookDashboardProps {
@@ -31,6 +33,7 @@ const mockBook = {
 };
 
 export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
@@ -47,7 +50,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-2xl font-bold">Dashboard do Livro</h1>
+            <h1 className="text-2xl font-bold">{t('book.dashboard')}</h1>
           </div>
 
           {/* Book Header */}
@@ -97,38 +100,42 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 h-auto p-1 bg-muted/30 mt-6">
+          <TabsList className="grid w-full grid-cols-9 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Overview</span>
+              <span className="hidden sm:inline">{t('book.overview')}</span>
             </TabsTrigger>
             <TabsTrigger value="characters" className="flex items-center gap-2 py-3">
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Personagens</span>
+              <span className="hidden sm:inline">{t('book.characters')}</span>
             </TabsTrigger>
-            <TabsTrigger value="locations" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="world" className="flex items-center gap-2 py-3">
               <MapPin className="w-4 h-4" />
-              <span className="hidden sm:inline">Locais</span>
+              <span className="hidden sm:inline">{t('book.world')}</span>
             </TabsTrigger>
-            <TabsTrigger value="factions" className="flex items-center gap-2 py-3">
+            <TabsTrigger value="organizations" className="flex items-center gap-2 py-3">
               <Building className="w-4 h-4" />
-              <span className="hidden sm:inline">Facções</span>
+              <span className="hidden sm:inline">{t('book.organizations')}</span>
             </TabsTrigger>
             <TabsTrigger value="timeline" className="flex items-center gap-2 py-3">
               <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">Timeline</span>
+              <span className="hidden sm:inline">{t('book.timeline')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="plot" className="flex items-center gap-2 py-3">
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('book.plot')}</span>
             </TabsTrigger>
             <TabsTrigger value="magic" className="flex items-center gap-2 py-3">
               <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Magia</span>
+              <span className="hidden sm:inline">{t('book.magic_system')}</span>
             </TabsTrigger>
             <TabsTrigger value="encyclopedia" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Enciclopédia</span>
+              <span className="hidden sm:inline">{t('book.encyclopedia')}</span>
             </TabsTrigger>
             <TabsTrigger value="relations" className="flex items-center gap-2 py-3">
               <Network className="w-4 h-4" />
-              <span className="hidden sm:inline">Relações</span>
+              <span className="hidden sm:inline">{t('book.relations')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -139,14 +146,17 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             <TabsContent value="characters" className="mt-0">
               <CharactersTab />
             </TabsContent>
-            <TabsContent value="locations" className="mt-0">
+            <TabsContent value="world" className="mt-0">
               <LocationsTab />
             </TabsContent>
-            <TabsContent value="factions" className="mt-0">
+            <TabsContent value="organizations" className="mt-0">
               <FactionsTab />
             </TabsContent>
             <TabsContent value="timeline" className="mt-0">
               <TimelineTab />
+            </TabsContent>
+            <TabsContent value="plot" className="mt-0">
+              <PlotTab />
             </TabsContent>
             <TabsContent value="magic" className="mt-0">
               <MagicSystemTab />
