@@ -55,8 +55,10 @@ export function OverviewTab({ book }: OverviewTabProps) {
     { id: "2", content: "Desenvolver relacionamento entre protagonista e mentor", color: noteColors[1], x: 280, y: 40 },
     { id: "3", content: "Revisar consistência dos nomes de lugares", color: noteColors[2], x: 540, y: 60 }
   ]);
-  const [newNote, setNewNote] = useState("");
+const [newNote, setNewNote] = useState("");
   const [draggedNote, setDraggedNote] = useState<string | null>(null);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   // Mock data for current arc events
   const currentArcEvents = [
@@ -85,6 +87,14 @@ export function OverviewTab({ book }: OverviewTabProps) {
 
   const handleDeleteNote = (id: string) => {
     setStickyNotes(stickyNotes.filter(note => note.id !== id));
+  };
+
+  const handleEditNote = (id: string, newContent: string) => {
+    setStickyNotes(notes => 
+      notes.map(note => 
+        note.id === id ? { ...note, content: newContent } : note
+      )
+    );
   };
 
   const handleDragStart = (e: React.DragEvent, noteId: string) => {
@@ -348,7 +358,7 @@ export function OverviewTab({ book }: OverviewTabProps) {
             {stickyNotes.map((note) => (
               <div
                 key={note.id}
-                className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-transform ${note.color}`}
+                className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-all duration-200 ${note.color}`}
                 style={{ left: note.x, top: note.y }}
                 draggable
                 onDragStart={(e) => handleDragStart(e, note.id)}
@@ -358,16 +368,70 @@ export function OverviewTab({ book }: OverviewTabProps) {
                 
                 <div className="flex items-start justify-between mb-2">
                   <GripVertical className="w-4 h-4 opacity-50" />
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 hover:bg-black/10"
-                    onClick={() => handleDeleteNote(note.id)}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 hover:bg-black/10"
+                      onClick={() => {
+                        setEditingNote(note.id);
+                        setEditContent(note.content);
+                      }}
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 hover:bg-black/10"
+                      onClick={() => handleDeleteNote(note.id)}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-xs leading-relaxed font-handwriting">{note.content}</p>
+                
+                {editingNote === note.id ? (
+                  <div className="space-y-2">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="w-full p-2 text-xs bg-transparent border border-black/20 rounded resize-none"
+                      rows={3}
+                      autoFocus
+                    />
+                    <div className="flex gap-1">
+                      <Button 
+                        size="sm" 
+                        className="text-xs h-6"
+                        onClick={() => {
+                          handleEditNote(note.id, editContent);
+                          setEditingNote(null);
+                        }}
+                      >
+                        Salvar
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs h-6"
+                        onClick={() => setEditingNote(null)}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p 
+                    className="text-xs leading-relaxed font-handwriting cursor-pointer"
+                    onClick={() => {
+                      setEditingNote(note.id);
+                      setEditContent(note.content);
+                    }}
+                  >
+                    {note.content}
+                  </p>
+                )}
               </div>
             ))}
           </div>
