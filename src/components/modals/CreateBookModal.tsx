@@ -30,24 +30,17 @@ export interface BookFormData {
   genre: string;
   visualStyle: string;
   cover?: string;
-  synopsis?: string;
+  authorSummary?: string;
 }
 
 const genres = [
-  'Alta Fantasia / High Fantasy',
-  'Fantasia Urbana / Urban Fantasy',
-  'Épico / Epic',
-  'Fantasia Sombria / Dark Fantasy',
-  'Steampunk',
-  'Ficção Científica Fantástica / Science Fantasy',
+  "Alta Fantasia", "Fantasia Urbana", "Épico", "Romance", "Mistério", 
+  "Suspense", "Terror", "Ficção Científica", "Distopia", "Aventura",
+  "Drama", "Comédia", "Biografia", "Histórico", "Contemporâneo"
 ];
 
 const visualStyles = [
-  'Realista / Realistic',
-  'Anime',
-  'Cartoon',
-  'Semirealista / Semi-realistic',
-  'Artístico / Artistic',
+  "Cartoon", "Anime", "Realista"
 ];
 
 export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalProps) {
@@ -57,7 +50,7 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
     genre: '',
     visualStyle: '',
     cover: '',
-    synopsis: '',
+    authorSummary: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -91,7 +84,7 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
         genre: '',
         visualStyle: '',
         cover: '',
-        synopsis: '',
+        authorSummary: '',
       });
       setErrors({});
       onClose();
@@ -104,7 +97,7 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
       genre: '',
       visualStyle: '',
       cover: '',
-      synopsis: '',
+      authorSummary: '',
     });
     setErrors({});
     onClose();
@@ -206,22 +199,22 @@ export function CreateBookModal({ open, onClose, onConfirm }: CreateBookModalPro
             </div>
           </div>
 
-          {/* Synopsis */}
+          {/* Author Summary */}
           <div className="space-y-2">
-            <Label htmlFor="synopsis" className="text-sm font-medium">
-              {t('modal.book_synopsis')}
+            <Label htmlFor="authorSummary" className="text-sm font-medium">
+              {t('modal.author_summary')}
             </Label>
             <Textarea
-              id="synopsis"
-              value={formData.synopsis}
-              onChange={(e) => setFormData({ ...formData, synopsis: e.target.value })}
-              placeholder="Uma breve descrição da sua história..."
+              id="authorSummary"
+              value={formData.authorSummary}
+              onChange={(e) => setFormData({ ...formData, authorSummary: e.target.value })}
+              placeholder="Suas anotações pessoais sobre a obra..."
               rows={3}
               maxLength={500}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Opcional</span>
-              <span>{formData.synopsis?.length || 0}/500</span>
+              <span>{formData.authorSummary?.length || 0}/500</span>
             </div>
           </div>
 

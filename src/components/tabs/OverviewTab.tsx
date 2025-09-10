@@ -12,7 +12,8 @@ interface Book {
   title: string;
   chapters: number;
   currentArc: string;
-  synopsis: string;
+  authorSummary: string;
+  storySummary: string;
 }
 
 interface OverviewTabProps {
@@ -33,19 +34,21 @@ interface Goals {
 }
 
 const noteColors = [
-  'bg-yellow-200 border-yellow-300 text-yellow-900',
-  'bg-pink-200 border-pink-300 text-pink-900', 
-  'bg-green-200 border-green-300 text-green-900',
-  'bg-blue-200 border-blue-300 text-blue-900',
-  'bg-purple-200 border-purple-300 text-purple-900'
+  'bg-yellow-200 border-yellow-400 text-yellow-900 shadow-lg',
+  'bg-pink-200 border-pink-400 text-pink-900 shadow-lg', 
+  'bg-green-200 border-green-400 text-green-900 shadow-lg',
+  'bg-blue-200 border-blue-400 text-blue-900 shadow-lg',
+  'bg-purple-200 border-purple-400 text-purple-900 shadow-lg'
 ];
 
 export function OverviewTab({ book }: OverviewTabProps) {
   const { t } = useLanguage();
   const [isEditingGoals, setIsEditingGoals] = useState(false);
-  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
+  const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
   const [goals, setGoals] = useState<Goals>({ wordsPerDay: 1500, chaptersPerWeek: 2 });
-  const [summary, setSummary] = useState("O protagonista descobre seus verdadeiros poderes enquanto enfrenta o primeiro grande desafio...");
+  const [authorSummary, setAuthorSummary] = useState(book.authorSummary);
+  const [storySummary, setStorySummary] = useState(book.storySummary);
   
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
     { id: "1", content: "Adicionar mais detalhes sobre o sistema de magia no capítulo 5", color: noteColors[0], x: 20, y: 20 },
@@ -116,8 +119,13 @@ export function OverviewTab({ book }: OverviewTabProps) {
     // Here you would save to your backend/state management
   };
 
-  const saveSummary = () => {
-    setIsEditingSummary(false);
+  const saveAuthorSummary = () => {
+    setIsEditingAuthorSummary(false);
+    // Here you would save to your backend/state management
+  };
+
+  const saveStorySummary = () => {
+    setIsEditingStorySummary(false);
     // Here you would save to your backend/state management
   };
 
@@ -126,7 +134,7 @@ export function OverviewTab({ book }: OverviewTabProps) {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatsCard
-          title={t('book.chapters')}
+          title="Capítulos"
           value={book.chapters}
           description="Meta: 15"
           icon={BookOpen}
@@ -136,7 +144,6 @@ export function OverviewTab({ book }: OverviewTabProps) {
           value="2.1"
           description="Capítulos"
           icon={TrendingUp}
-          trend={{ value: 15.2, isPositive: true }}
         />
         <StatsCard
           title="Último Capítulo"
@@ -149,7 +156,6 @@ export function OverviewTab({ book }: OverviewTabProps) {
           value="85.4k"
           description="Meta: 100k"
           icon={TrendingUp}
-          trend={{ value: 8.1, isPositive: true }}
         />
       </div>
 
@@ -250,40 +256,77 @@ export function OverviewTab({ book }: OverviewTabProps) {
         </Card>
       </div>
 
-      {/* Summary */}
-      <Card className="card-magical">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <div>
-            <CardTitle>Resumo</CardTitle>
-            <CardDescription>Resumo editável da história</CardDescription>
-          </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setIsEditingSummary(!isEditingSummary)}
-          >
-            <Edit2 className="w-4 h-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {isEditingSummary ? (
-            <div className="space-y-4">
-              <Textarea 
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                className="min-h-[100px]"
-                placeholder="Digite o resumo da história..."
-              />
-              <div className="flex gap-2">
-                <Button variant="accent" size="sm" onClick={saveSummary}>Salvar</Button>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditingSummary(false)}>Cancelar</Button>
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Author Summary */}
+        <Card className="card-magical">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Resumo do Autor</CardTitle>
+              <CardDescription>Anotações pessoais para o autor</CardDescription>
             </div>
-          ) : (
-            <p className="text-foreground leading-relaxed">{summary}</p>
-          )}
-        </CardContent>
-      </Card>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsEditingAuthorSummary(!isEditingAuthorSummary)}
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isEditingAuthorSummary ? (
+              <div className="space-y-4">
+                <Textarea 
+                  value={authorSummary}
+                  onChange={(e) => setAuthorSummary(e.target.value)}
+                  className="min-h-[100px]"
+                  placeholder="Suas anotações pessoais sobre a obra..."
+                />
+                <div className="flex gap-2">
+                  <Button variant="accent" size="sm" onClick={saveAuthorSummary}>Salvar</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditingAuthorSummary(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-foreground leading-relaxed">{authorSummary}</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Story Summary */}
+        <Card className="card-magical">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle>Resumo da História</CardTitle>
+              <CardDescription>Apresentação da obra para leitores</CardDescription>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsEditingStorySummary(!isEditingStorySummary)}
+            >
+              <Edit2 className="w-4 h-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isEditingStorySummary ? (
+              <div className="space-y-4">
+                <Textarea 
+                  value={storySummary}
+                  onChange={(e) => setStorySummary(e.target.value)}
+                  className="min-h-[100px]"
+                  placeholder="Resumo da história para apresentação..."
+                />
+                <div className="flex gap-2">
+                  <Button variant="accent" size="sm" onClick={saveStorySummary}>Salvar</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditingStorySummary(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-foreground leading-relaxed">{storySummary}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Post-it Notes Board */}
       <Card className="card-magical">
@@ -305,11 +348,14 @@ export function OverviewTab({ book }: OverviewTabProps) {
             {stickyNotes.map((note) => (
               <div
                 key={note.id}
-                className={`absolute p-3 rounded-lg border-2 cursor-move shadow-md min-w-[180px] max-w-[200px] ${note.color}`}
+                className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-transform ${note.color}`}
                 style={{ left: note.x, top: note.y }}
                 draggable
                 onDragStart={(e) => handleDragStart(e, note.id)}
               >
+                {/* Pushpin effect */}
+                <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
+                
                 <div className="flex items-start justify-between mb-2">
                   <GripVertical className="w-4 h-4 opacity-50" />
                   <Button 
@@ -321,7 +367,7 @@ export function OverviewTab({ book }: OverviewTabProps) {
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
-                <p className="text-xs leading-relaxed">{note.content}</p>
+                <p className="text-xs leading-relaxed font-handwriting">{note.content}</p>
               </div>
             ))}
           </div>

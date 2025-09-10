@@ -129,7 +129,6 @@ export function HomePage({ onBookSelect }: HomePageProps) {
             value={mockBooks.length}
             description={t('home.active_projects')}
             icon={Book}
-            trend={{ value: 15.2, isPositive: true }}
           />
           <StatsCard
             title={t('home.storage_used')}
@@ -142,7 +141,6 @@ export function HomePage({ onBookSelect }: HomePageProps) {
             value={getLastEditedBook()}
             description={t('home.this_month')}
             icon={Book}
-            trend={{ value: 8.1, isPositive: true }}
           />
         </div>
       </div>

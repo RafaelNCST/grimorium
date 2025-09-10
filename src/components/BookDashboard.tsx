@@ -44,6 +44,17 @@ interface PlotArc {
   isCurrentArc: boolean;
 }
 
+// Genre and visual style options (consistent with CreateBookModal)
+const genres = [
+  "Alta Fantasia", "Fantasia Urbana", "Épico", "Romance", "Mistério", 
+  "Suspense", "Terror", "Ficção Científica", "Distopia", "Aventura",
+  "Drama", "Comédia", "Biografia", "Histórico", "Contemporâneo"
+];
+
+const visualStyles = [
+  "Cartoon", "Anime", "Realista"
+];
+
 // Mock book data
 const initialBook = {
   id: "1",
@@ -53,7 +64,8 @@ const initialBook = {
   coverImage: bookCover1,
   chapters: 12,
   currentArc: "A Ascensão do Herói",
-  synopsis: "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
+  authorSummary: "Para mim como autor: explorar temas de crescimento pessoal através da jornada do herói. Focar na dualidade luz/trevas como metáfora.",
+  storySummary: "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
 };
 
 const initialArcs: PlotArc[] = [
@@ -151,9 +163,9 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                             <SelectValue placeholder="Gênero" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Alta Fantasia">Alta Fantasia</SelectItem>
-                            <SelectItem value="Fantasia Urbana">Fantasia Urbana</SelectItem>
-                            <SelectItem value="Épico">Épico</SelectItem>
+                            {genres.map((genre) => (
+                              <SelectItem key={genre} value={genre}>{genre}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <Select value={draftBook.visualStyle} onValueChange={(v) => setDraftBook({ ...draftBook, visualStyle: v })}>
@@ -161,16 +173,16 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                             <SelectValue placeholder="Estilo visual" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Realista">Realista</SelectItem>
-                            <SelectItem value="Anime">Anime</SelectItem>
-                            <SelectItem value="Cartoon">Cartoon</SelectItem>
+                            {visualStyles.map((style) => (
+                              <SelectItem key={style} value={style}>{style}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
                       <Textarea
-                        value={draftBook.synopsis}
-                        onChange={(e) => setDraftBook({ ...draftBook, synopsis: e.target.value })}
-                        placeholder="Sinopse"
+                        value={draftBook.storySummary}
+                        onChange={(e) => setDraftBook({ ...draftBook, storySummary: e.target.value })}
+                        placeholder="Resumo da História"
                         rows={3}
                       />
                       <div className="flex gap-2">
@@ -202,7 +214,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                         <Badge variant="outline">{book.visualStyle}</Badge>
                       </div>
                       <p className="text-muted-foreground max-w-2xl">
-                        {book.synopsis}
+                        {book.storySummary}
                       </p>
                     </div>
                   )}
@@ -227,7 +239,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4" />
-                  <span>{book.chapters} capítulos</span>
+                  <span>Capítulos: {book.chapters}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
@@ -312,6 +324,46 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
           </div>
         </Tabs>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Para confirmar a exclusão, digite o nome do livro: <strong>{book.title}</strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="my-4">
+            <Input
+              value={deleteInput}
+              onChange={(e) => setDeleteInput(e.target.value)}
+              placeholder={`Digite "${book.title}" para confirmar`}
+              className="font-mono"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setDeleteInput("");
+              setShowDeleteDialog(false);
+            }}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteInput === book.title) {
+                  console.log('Deleting book:', book.title);
+                  onBack(); // Go back to home after deletion
+                }
+              }}
+              disabled={deleteInput !== book.title}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir Livro
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

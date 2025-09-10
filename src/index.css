@@ -244,4 +244,10 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
+
+  /* Handwriting font for post-it notes */
+  .font-handwriting {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-weight: 400;
+  }
 }
