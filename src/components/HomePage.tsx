@@ -41,6 +41,15 @@ const mockBooks = [
     chapters: 15,
     lastModified: "há 3 dias",
   },
+  {
+    id: "4",
+    title: "Nova História",
+    genre: "Fantasia",
+    visualStyle: "Realista",
+    coverImage: "/placeholder.svg",
+    chapters: 0,
+    lastModified: "agora",
+  },
 ];
 
 interface HomePageProps {

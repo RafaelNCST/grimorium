@@ -55,17 +55,35 @@ const visualStyles = [
   "Cartoon", "Anime", "Realista"
 ];
 
-// Mock book data
-const initialBook = {
-  id: "1",
-  title: "As Crônicas do Reino Perdido",
-  genre: "Alta Fantasia",
-  visualStyle: "Realista",
-  coverImage: bookCover1,
-  chapters: 12,
-  currentArc: "A Ascensão do Herói",
-  authorSummary: "Para mim como autor: explorar temas de crescimento pessoal através da jornada do herói. Focar na dualidade luz/trevas como metáfora.",
-  storySummary: "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
+// Mock book data - different based on bookId to show empty vs filled states
+const getBookData = (bookId: string) => {
+  if (bookId === "4") {
+    // Empty/new book with minimal required fields
+    return {
+      id: "4",
+      title: "Nova História",
+      genre: "Fantasia",
+      visualStyle: "Realista",
+      coverImage: "/placeholder.svg",
+      chapters: 0,
+      currentArc: "Ainda não definido",
+      authorSummary: "",
+      storySummary: "",
+    };
+  }
+  
+  // Default filled book
+  return {
+    id: "1",
+    title: "As Crônicas do Reino Perdido",
+    genre: "Alta Fantasia",
+    visualStyle: "Realista",
+    coverImage: bookCover1,
+    chapters: 12,
+    currentArc: "A Ascensão do Herói",
+    authorSummary: "Para mim como autor: explorar temas de crescimento pessoal através da jornada do herói. Focar na dualidade luz/trevas como metáfora.",
+    storySummary: "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
+  };
 };
 
 const initialArcs: PlotArc[] = [
@@ -112,6 +130,7 @@ const initialArcs: PlotArc[] = [
 export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("overview");
+  const initialBook = getBookData(bookId);
   const [book, setBook] = useState(initialBook);
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [draftBook, setDraftBook] = useState(initialBook);
@@ -214,7 +233,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                         <Badge variant="outline">{book.visualStyle}</Badge>
                       </div>
                       <p className="text-muted-foreground max-w-2xl">
-                        {book.storySummary}
+                        {book.storySummary || "Ainda não há resumo da história. Clique em 'Editar' para adicionar."}
                       </p>
                     </div>
                   )}
@@ -243,7 +262,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>Arco atual: {currentArc?.name}</span>
+                  <span>Arco atual: {currentArc?.name || "Nenhum arco definido"}</span>
                 </div>
               </div>
             </div>

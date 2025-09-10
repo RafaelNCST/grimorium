@@ -250,4 +250,38 @@
     font-family: 'Comic Sans MS', cursive, sans-serif;
     font-weight: 400;
   }
+
+  /* Dialog and Modal improvements */
+  .dialog-overlay {
+    backdrop-filter: blur(8px);
+    background: hsl(var(--background) / 0.8);
+  }
+
+  /* Fix modal jumping issue */
+  [data-radix-popper-content-wrapper] {
+    position: fixed !important;
+    z-index: 50 !important;
+    transform: none !important;
+  }
+
+  /* Ensure dropdowns have proper z-index and background */
+  [role="menu"],
+  [data-radix-select-content] {
+    z-index: 50 !important;
+    background: hsl(var(--popover)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+  }
+
+  /* Prevent modal content from jumping on hover */
+  [data-radix-dialog-content] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Ensure Select trigger has proper styling */
+  [data-radix-select-trigger] {
+    background: hsl(var(--background)) !important;
+  }
 }

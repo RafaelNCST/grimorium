@@ -31,13 +31,16 @@ const mockCharacters: Character[] = [
     id: "1",
     name: "Aelric Valorheart",
     age: 23,
+    appearance: "Jovem de estatura média com cabelos castanhos ondulados e olhos verdes penetrantes. Possui uma cicatriz no braço direito de uma batalha antiga.",
     description: "Um jovem pastor que descobre possuir poderes mágicos ancestrais.",
     role: "protagonista",
+    personality: "Determinado e corajoso, mas às vezes impulsivo. Possui um forte senso de justiça e não hesita em ajudar os necessitados.",
     organization: "Ordem dos Guardiões",
     birthPlace: "Vila Pedraverde",
     affiliatedPlace: "Capital Elaria",
     alignment: "bem",
-    qualities: ["Corajoso", "Determinado", "Leal"]
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor"]
   },
   {
     id: "2", 
