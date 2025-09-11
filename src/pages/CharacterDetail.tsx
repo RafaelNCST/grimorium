@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
 import { toast } from "sonner";
 
@@ -43,6 +44,23 @@ const alignments = [
   { value: "caotico", label: "Caótico", color: "text-red-600" }
 ];
 
+// Mock data for selects
+const mockOrganizations = [
+  { id: "1", name: "Ordem dos Guardiões" },
+  { id: "2", name: "Guilda dos Mercadores" },
+  { id: "3", name: "Academia Arcana" },
+  { id: "4", name: "Conselho Real" },
+  { id: "5", name: "Irmandade das Sombras" }
+];
+
+const mockLocations = [
+  { id: "1", name: "Vila Pedraverde", type: "vila" },
+  { id: "2", name: "Capital Elaria", type: "cidade" },
+  { id: "3", name: "Porto Dourado", type: "cidade" },
+  { id: "4", name: "Floresta Sombria", type: "floresta" },
+  { id: "5", name: "Montanhas Geladas", type: "montanha" }
+];
+
 export function CharacterDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,6 +68,7 @@ export function CharacterDetail() {
   const [character, setCharacter] = useState(mockCharacter);
   const [editData, setEditData] = useState(mockCharacter);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newQuality, setNewQuality] = useState("");
 
   const currentRole = roles.find(r => r.value === character.role);
   const currentAlignment = alignments.find(a => a.value === character.alignment);
@@ -69,6 +88,23 @@ export function CharacterDetail() {
   const handleCancel = () => {
     setEditData(character);
     setIsEditing(false);
+  };
+
+  const handleAddQuality = () => {
+    if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
+      setEditData(prev => ({
+        ...prev,
+        qualities: [...prev.qualities, newQuality.trim()]
+      }));
+      setNewQuality("");
+    }
+  };
+
+  const handleRemoveQuality = (qualityToRemove: string) => {
+    setEditData(prev => ({
+      ...prev,
+      qualities: prev.qualities.filter(q => q !== qualityToRemove)
+    }));
   };
 
   return (
@@ -120,83 +156,246 @@ export function CharacterDetail() {
               <CardTitle>Informações Básicas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <Avatar className="w-20 h-20">
-                    <AvatarImage src={character.image} />
-                    <AvatarFallback className="text-2xl">
-                      {character.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-2xl font-semibold">{character.name}</h2>
-                      <Badge className={currentRole?.color}>
-                        <RoleIcon className="w-4 h-4 mr-1" />
-                        {currentRole?.label}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {character.age} anos
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Shield className="w-4 h-4" />
-                        <span className={currentAlignment?.color}>
-                          {currentAlignment?.label}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <p className="text-foreground">{character.description}</p>
+              {isEditing ? (
+                <div className="space-y-4">
+                  {/* Image URL */}
+                  <div className="space-y-2">
+                    <Label htmlFor="image">URL da Imagem</Label>
+                    <Input
+                      id="image"
+                      type="url"
+                      value={editData.image}
+                      onChange={(e) => setEditData(prev => ({ ...prev, image: e.target.value }))}
+                      placeholder="https://exemplo.com/imagem.jpg"
+                    />
+                  </div>
+
+                  {/* Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nome</Label>
+                    <Input
+                      id="name"
+                      value={editData.name}
+                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Nome do personagem"
+                    />
+                  </div>
+
+                  {/* Age */}
+                  <div className="space-y-2">
+                    <Label htmlFor="age">Idade</Label>
+                    <Input
+                      id="age"
+                      type="number"
+                      value={editData.age}
+                      onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                      placeholder="Idade"
+                    />
+                  </div>
+
+                  {/* Role */}
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Papel</Label>
+                    <Select value={editData.role} onValueChange={(value) => setEditData(prev => ({ ...prev, role: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o papel" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles.map((role) => (
+                          <SelectItem key={role.value} value={role.value}>
+                            {role.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Alignment */}
+                  <div className="space-y-2">
+                    <Label htmlFor="alignment">Alinhamento</Label>
+                    <Select value={editData.alignment} onValueChange={(value) => setEditData(prev => ({ ...prev, alignment: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o alinhamento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {alignments.map((alignment) => (
+                          <SelectItem key={alignment.value} value={alignment.value}>
+                            {alignment.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Descrição</Label>
+                    <Textarea
+                      id="description"
+                      value={editData.description}
+                      onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Descrição do personagem"
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  {/* Appearance */}
+                  <div className="space-y-2">
+                    <Label htmlFor="appearance">Aparência Física</Label>
+                    <Textarea
+                      id="appearance"
+                      value={editData.appearance}
+                      onChange={(e) => setEditData(prev => ({ ...prev, appearance: e.target.value }))}
+                      placeholder="Descrição da aparência física"
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  {/* Personality */}
+                  <div className="space-y-2">
+                    <Label htmlFor="personality">Personalidade</Label>
+                    <Textarea
+                      id="personality"
+                      value={editData.personality}
+                      onChange={(e) => setEditData(prev => ({ ...prev, personality: e.target.value }))}
+                      placeholder="Descrição da personalidade"
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  {/* Organization */}
+                  <div className="space-y-2">
+                    <Label htmlFor="organization">Organização</Label>
+                    <Select value={editData.organization} onValueChange={(value) => setEditData(prev => ({ ...prev, organization: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma organização" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhuma</SelectItem>
+                        {mockOrganizations.map((org) => (
+                          <SelectItem key={org.id} value={org.name}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Birth Place */}
+                  <div className="space-y-2">
+                    <Label htmlFor="birthPlace">Local de Nascimento</Label>
+                    <Select value={editData.birthPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o local de nascimento" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {mockLocations.map((location) => (
+                          <SelectItem key={location.id} value={location.name}>
+                            {location.name} ({location.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Affiliated Place */}
+                  <div className="space-y-2">
+                    <Label htmlFor="affiliatedPlace">Local Afiliado</Label>
+                    <Select value={editData.affiliatedPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, affiliatedPlace: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o local afiliado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {mockLocations.map((location) => (
+                          <SelectItem key={location.id} value={location.name}>
+                            {location.name} ({location.type})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-
-                {character.appearance && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h4 className="font-semibold mb-2">Aparência Física</h4>
-                      <p className="text-sm text-muted-foreground">{character.appearance}</p>
-                    </div>
-                  </>
-                )}
-
-                {character.personality && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h4 className="font-semibold mb-2">Personalidade</h4>
-                      <p className="text-sm text-muted-foreground">{character.personality}</p>
-                    </div>
-                  </>
-                )}
-
-                <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {character.birthPlace && (
-                    <div>
-                      <h4 className="font-semibold mb-1 text-sm">Local de Nascimento</h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                        <span>{character.birthPlace}</span>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage src={character.image} />
+                      <AvatarFallback className="text-2xl">
+                        {character.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-2xl font-semibold">{character.name}</h2>
+                        <Badge className={currentRole?.color}>
+                          <RoleIcon className="w-4 h-4 mr-1" />
+                          {currentRole?.label}
+                        </Badge>
                       </div>
-                    </div>
-                  )}
-                  {character.affiliatedPlace && (
-                    <div>
-                      <h4 className="font-semibold mb-1 text-sm">Local Afiliado</h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                        <span>{character.affiliatedPlace}</span>
+                      
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {character.age} anos
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Shield className="w-4 h-4" />
+                          <span className={currentAlignment?.color}>
+                            {currentAlignment?.label}
+                          </span>
+                        </div>
                       </div>
+                      
+                      <p className="text-foreground">{character.description}</p>
                     </div>
+                  </div>
+
+                  {character.appearance && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-semibold mb-2">Aparência Física</h4>
+                        <p className="text-sm text-muted-foreground">{character.appearance}</p>
+                      </div>
+                    </>
                   )}
+
+                  {character.personality && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-semibold mb-2">Personalidade</h4>
+                        <p className="text-sm text-muted-foreground">{character.personality}</p>
+                      </div>
+                    </>
+                  )}
+
+                  <Separator />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {character.birthPlace && (
+                      <div>
+                        <h4 className="font-semibold mb-1 text-sm">Local de Nascimento</h4>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="w-4 h-4" />
+                          <span>{character.birthPlace}</span>
+                        </div>
+                      </div>
+                    )}
+                    {character.affiliatedPlace && (
+                      <div>
+                        <h4 className="font-semibold mb-1 text-sm">Local Afiliado</h4>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="w-4 h-4" />
+                          <span>{character.affiliatedPlace}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -209,13 +408,43 @@ export function CharacterDetail() {
               <CardTitle>Qualidades</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {character.qualities.map((quality) => (
-                  <Badge key={quality} variant="secondary">
-                    {quality}
-                  </Badge>
-                ))}
-              </div>
+              {isEditing ? (
+                <div className="space-y-4">
+                  {/* Add Quality Input */}
+                  <div className="flex gap-2">
+                    <Input
+                      value={newQuality}
+                      onChange={(e) => setNewQuality(e.target.value)}
+                      placeholder="Adicionar nova qualidade"
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddQuality()}
+                    />
+                    <Button size="sm" onClick={handleAddQuality}>
+                      Adicionar
+                    </Button>
+                  </div>
+                  
+                  {/* Quality List */}
+                  <div className="flex flex-wrap gap-2">
+                    {editData.qualities.map((quality) => (
+                      <Badge key={quality} variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => handleRemoveQuality(quality)}>
+                        {quality} ×
+                      </Badge>
+                    ))}
+                  </div>
+                  
+                  {editData.qualities.length === 0 && (
+                    <p className="text-sm text-muted-foreground">Nenhuma qualidade adicionada. Clique em "Adicionar" para incluir qualidades.</p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {character.qualities.map((quality) => (
+                    <Badge key={quality} variant="secondary">
+                      {quality}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -227,7 +456,7 @@ export function CharacterDetail() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{character.organization || "Nenhuma organização"}</span>
+                <span className="text-sm">{(isEditing ? editData : character).organization || "Nenhuma organização"}</span>
               </div>
             </CardContent>
           </Card>
