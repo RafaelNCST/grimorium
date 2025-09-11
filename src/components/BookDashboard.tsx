@@ -7,7 +7,7 @@ import { OverviewTab } from "@/components/tabs/OverviewTab";
 import { CharactersTab } from "@/components/tabs/CharactersTab";
 import { WorldTab } from "@/components/tabs/WorldTab";
 import { OrganizationsTab } from "@/components/tabs/OrganizationsTab";
-import { TimelineTab } from "@/components/tabs/TimelineTab";
+
 import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { RelationsTab } from "@/components/tabs/RelationsTab";
@@ -273,7 +273,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-9 h-auto p-1 bg-muted/30 mt-6">
+          <TabsList className="grid w-full grid-cols-8 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.overview')}</span>
@@ -289,10 +289,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             <TabsTrigger value="organizations" className="flex items-center gap-2 py-3">
               <Building className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.organizations')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="timeline" className="flex items-center gap-2 py-3">
-              <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.timeline')}</span>
             </TabsTrigger>
             <TabsTrigger value="plot" className="flex items-center gap-2 py-3">
               <Target className="w-4 h-4" />
@@ -324,9 +320,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             </TabsContent>
             <TabsContent value="organizations" className="mt-0">
               <OrganizationsTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="timeline" className="mt-0">
-              <TimelineTab />
             </TabsContent>
             <TabsContent value="plot" className="mt-0">
               <PlotTab />

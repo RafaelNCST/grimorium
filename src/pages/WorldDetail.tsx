@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { WorldTimeline } from "@/components/WorldTimeline";
 
 interface WorldEntity {
   id: string;
@@ -381,14 +382,33 @@ export function WorldDetail() {
                     )}
 
                     {(character.type === "World" || character.type === "Continent") && (
-                      <div className="space-y-2">
-                        <Label htmlFor="age">Idade</Label>
-                        <Input 
-                          id="age" 
-                          value={editData.age || ""}
-                          onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
-                        />
-                      </div>
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="age">Idade</Label>
+                          <Input 
+                            id="age" 
+                            value={editData.age || ""}
+                            onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="dominantOrganization">Organização Dominante</Label>
+                          <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione uma organização" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Nenhuma</SelectItem>
+                              {mockOrganizations.map((org) => (
+                                <SelectItem key={org.id} value={org.name}>
+                                  {org.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
                     )}
                   </div>
                 ) : (
@@ -458,6 +478,13 @@ export function WorldDetail() {
                               <p className="text-muted-foreground text-sm">{character.age}</p>
                             </div>
                           )}
+
+                          {character.dominantOrganization && (
+                            <div>
+                              <h3 className="font-semibold text-sm mb-1">Organização Dominante</h3>
+                              <p className="text-muted-foreground text-sm">{character.dominantOrganization}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -499,6 +526,15 @@ export function WorldDetail() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Timeline - only for World and Continent */}
+            {(character.type === "World" || character.type === "Continent") && (
+              <WorldTimeline 
+                worldId={character.id}
+                worldType={character.type}
+                isEditing={isEditing}
+              />
             )}
           </div>
 
