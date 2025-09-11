@@ -188,7 +188,7 @@ export function CharacterDetail() {
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
                         <div 
-                          className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                          className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors mx-auto"
                           onClick={() => fileInputRef.current?.click()}
                         >
                           {imagePreview ? (
@@ -196,7 +196,7 @@ export function CharacterDetail() {
                               <img 
                                 src={imagePreview} 
                                 alt="Preview" 
-                                className="w-full h-full object-cover rounded-lg"
+                                className="w-full h-full object-cover rounded-full"
                               />
                               <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
                                 <Upload className="w-6 h-6 text-white" />
@@ -392,9 +392,9 @@ export function CharacterDetail() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
-                    <Avatar className="w-20 h-20">
+                    <Avatar className="w-16 h-16">
                       <AvatarImage src={character.image} />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-lg">
                         {character.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
