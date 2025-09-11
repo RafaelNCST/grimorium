@@ -346,88 +346,36 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
             </CardHeader>
             
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Description and Info */}
-                <div className="lg:col-span-1">
-                  <p className="text-muted-foreground mb-4">
-                    {organization.description}
-                  </p>
-                  
-                  <div className="space-y-3">
-                    {organization.leaders.length > 0 && (
-                      <div>
-                        <h4 className="font-medium mb-2">Líderes</h4>
-                        <div className="space-y-2">
-                          {organization.leaders.map((leader, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <Avatar className="h-6 w-6">
-                                <AvatarFallback className="text-xs">
-                                  {leader.split(' ').map(n => n[0]).join('')}
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm">{leader}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {organization.baseLocation && (
-                      <div>
-                        <h4 className="font-medium mb-1">Base Principal</h4>
-                        <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Objectives */}
-                <div className="lg:col-span-1">
-                  <h4 className="font-medium mb-3">Objetivos</h4>
-                  <ul className="space-y-2">
-                    {organization.objectives.map((objective, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-primary mt-1">•</span>
-                        <span>{objective}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Members and Titles */}
-                <div className="lg:col-span-1">
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Membros ({organization.members.length})
-                  </h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {organization.members
-                      .sort((a, b) => {
-                        const titleA = organization.titles.find(t => t.id === a.titleId);
-                        const titleB = organization.titles.find(t => t.id === b.titleId);
-                        return (titleA?.level || 999) - (titleB?.level || 999);
-                      })
-                      .map((member, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-                          <div className="flex items-center gap-2">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  {organization.description}
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {organization.leaders.length > 0 && (
+                    <div>
+                      <h4 className="font-medium mb-2">Líderes</h4>
+                      <div className="space-y-2">
+                        {organization.leaders.map((leader, index) => (
+                          <div key={index} className="flex items-center gap-2">
                             <Avatar className="h-6 w-6">
                               <AvatarFallback className="text-xs">
-                                {member.characterName.split(' ').map(n => n[0]).join('')}
+                                {leader.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
-                            <div>
-                              <span className="text-sm font-medium">{member.characterName}</span>
-                              <p className="text-xs text-muted-foreground">
-                                {getTitleName(member.titleId, organization)}
-                              </p>
-                            </div>
+                            <span className="text-sm">{leader}</span>
                           </div>
-                          {organization.leaders.includes(member.characterName) && (
-                            <Badge variant="secondary" className="text-xs">Líder</Badge>
-                          )}
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {organization.baseLocation && (
+                    <div>
+                      <h4 className="font-medium mb-1">Base Principal</h4>
+                      <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
