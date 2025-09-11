@@ -332,16 +332,6 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOrganizationClick(organization.id);
-                  }}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
               </div>
             </CardHeader>
             
@@ -372,7 +362,7 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
 
                   {organization.baseLocation && (
                     <div>
-                      <h4 className="font-medium mb-1">Base Principal</h4>
+                      <h4 className="font-medium mb-2">Base Principal</h4>
                       <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
                     </div>
                   )}

@@ -93,6 +93,17 @@ export function OrganizationDetail() {
   const [newTitle, setNewTitle] = useState({ name: "", description: "", level: 1 });
 
   const organization = mockOrganizations[orgId || ""];
+  
+  const [editData, setEditData] = useState({
+    name: organization?.name || "",
+    description: organization?.description || "",
+    type: organization?.type || "",
+    alignment: organization?.alignment || "",
+    influence: organization?.influence || "",
+    baseLocation: organization?.baseLocation || "",
+    world: organization?.world || "",
+    continent: organization?.continent || ""
+  });
 
   if (!organization) {
     return (
@@ -179,14 +190,30 @@ export function OrganizationDetail() {
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-            <Edit2 className="w-4 h-4 mr-2" />
-            {isEditing ? "Cancelar" : "Editar"}
-          </Button>
-          <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-            <Trash2 className="w-4 h-4 mr-2" />
-            Excluir
-          </Button>
+          {isEditing ? (
+            <>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>
+                Cancelar
+              </Button>
+              <Button variant="magical" onClick={() => {
+                toast.success("Organização atualizada com sucesso!");
+                setIsEditing(false);
+              }}>
+                Salvar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => setIsEditing(true)}>
+                <Edit2 className="w-4 h-4 mr-2" />
+                Editar
+              </Button>
+              <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Excluir
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -204,7 +231,8 @@ export function OrganizationDetail() {
             <CardContent>
               {isEditing ? (
                 <Textarea
-                  value={organization.description}
+                  value={editData.description}
+                  onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
                   rows={4}
                   placeholder="Descrição da organização..."
                 />
@@ -244,10 +272,12 @@ export function OrganizationDetail() {
                   <Users className="w-5 h-5" />
                   Membros ({organization.members.length})
                 </CardTitle>
-                <Button variant="outline" size="sm" onClick={() => setShowAddTitleDialog(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Título
-                </Button>
+                {isEditing && (
+                  <Button variant="outline" size="sm" onClick={() => setShowAddTitleDialog(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Adicionar Título
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -261,12 +291,36 @@ export function OrganizationDetail() {
                       .map((title) => (
                         <div key={title.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                           <div>
-                            <span className="font-medium">{title.name}</span>
-                            <p className="text-xs text-muted-foreground">{title.description}</p>
+                            {isEditing ? (
+                              <div className="space-y-1">
+                                <Input 
+                                  value={title.name}
+                                  placeholder="Nome do título"
+                                  className="text-sm font-medium"
+                                />
+                                <Input 
+                                  value={title.description}
+                                  placeholder="Descrição"
+                                  className="text-xs"
+                                />
+                              </div>
+                            ) : (
+                              <>
+                                <span className="font-medium">{title.name}</span>
+                                <p className="text-xs text-muted-foreground">{title.description}</p>
+                              </>
+                            )}
                           </div>
-                          <Badge variant="outline" className="text-xs">
-                            Nível {title.level}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              Nível {title.level}
+                            </Badge>
+                            {isEditing && title.id !== "default" && (
+                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                                <X className="w-3 h-3" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       ))}
                   </div>
@@ -324,39 +378,117 @@ export function OrganizationDetail() {
             <CardContent className="space-y-4">
               <div>
                 <Label className="text-sm font-medium">Tipo</Label>
-                <p className="text-sm text-muted-foreground">{organization.type}</p>
+                {isEditing ? (
+                  <Select value={editData.type} onValueChange={(value) => setEditData(prev => ({ ...prev, type: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="Militar">Militar</SelectItem>
+                      <SelectItem value="Comercial">Comercial</SelectItem>
+                      <SelectItem value="Mágica">Mágica</SelectItem>
+                      <SelectItem value="Religiosa">Religiosa</SelectItem>
+                      <SelectItem value="Culto">Culto</SelectItem>
+                      <SelectItem value="Governamental">Governamental</SelectItem>
+                      <SelectItem value="Outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.type}</p>
+                )}
               </div>
               
               <div>
                 <Label className="text-sm font-medium">Alinhamento</Label>
-                <p className="text-sm text-muted-foreground">{organization.alignment}</p>
+                {isEditing ? (
+                  <Select value={editData.alignment} onValueChange={(value) => setEditData(prev => ({ ...prev, alignment: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o alinhamento" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="Bem">Bem</SelectItem>
+                      <SelectItem value="Neutro">Neutro</SelectItem>
+                      <SelectItem value="Caótico">Caótico</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.alignment}</p>
+                )}
               </div>
               
               <div>
                 <Label className="text-sm font-medium">Influência</Label>
-                <p className="text-sm text-muted-foreground">{organization.influence}</p>
+                {isEditing ? (
+                  <Select value={editData.influence} onValueChange={(value) => setEditData(prev => ({ ...prev, influence: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione a influência" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="Inexistente">Inexistente</SelectItem>
+                      <SelectItem value="Baixa">Baixa</SelectItem>
+                      <SelectItem value="Média">Média</SelectItem>
+                      <SelectItem value="Alta">Alta</SelectItem>
+                      <SelectItem value="Dominante">Dominante</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.influence}</p>
+                )}
               </div>
 
-              {organization.world && (
-                <div>
-                  <Label className="text-sm font-medium">Mundo</Label>
-                  <p className="text-sm text-muted-foreground">{organization.world}</p>
-                </div>
-              )}
+              <div>
+                <Label className="text-sm font-medium">Mundo</Label>
+                {isEditing ? (
+                  <Select value={editData.world} onValueChange={(value) => setEditData(prev => ({ ...prev, world: value === "none" ? "" : value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o mundo" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      <SelectItem value="Aethermoor">Aethermoor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.world || "Não especificado"}</p>
+                )}
+              </div>
               
-              {organization.continent && (
-                <div>
-                  <Label className="text-sm font-medium">Continente</Label>
-                  <p className="text-sm text-muted-foreground">{organization.continent}</p>
-                </div>
-              )}
+              <div>
+                <Label className="text-sm font-medium">Continente</Label>
+                {isEditing ? (
+                  <Select value={editData.continent} onValueChange={(value) => setEditData(prev => ({ ...prev, continent: value === "none" ? "" : value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o continente" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      <SelectItem value="Continente Central">Continente Central</SelectItem>
+                      <SelectItem value="Terras Sombrias">Terras Sombrias</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.continent || "Não especificado"}</p>
+                )}
+              </div>
               
-              {organization.baseLocation && (
-                <div>
-                  <Label className="text-sm font-medium">Base Principal</Label>
-                  <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
-                </div>
-              )}
+              <div>
+                <Label className="text-sm font-medium">Base Principal</Label>
+                {isEditing ? (
+                  <Select value={editData.baseLocation} onValueChange={(value) => setEditData(prev => ({ ...prev, baseLocation: value === "none" ? "" : value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione a base" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectItem value="none">Nenhuma</SelectItem>
+                      <SelectItem value="Cidadela da Luz">Cidadela da Luz</SelectItem>
+                      <SelectItem value="Torre Sombria">Torre Sombria</SelectItem>
+                      <SelectItem value="Aldeia de Pedraverde">Aldeia de Pedraverde</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{organization.baseLocation || "Não especificado"}</p>
+                )}
+              </div>
             </CardContent>
           </Card>
 

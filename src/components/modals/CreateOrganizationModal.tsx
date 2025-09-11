@@ -255,6 +255,28 @@ export function CreateOrganizationModal({
             </div>
           </div>
 
+          {/* Members */}
+          <div className="space-y-2">
+            <Label>Membros Iniciais</Label>
+            <div className="space-y-2">
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Adicionar membro" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  {availableCharacters.map((character) => (
+                    <SelectItem key={character.id} value={character.id}>
+                      {character.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="text-xs text-muted-foreground">
+                Membros adicionais podem ser gerenciados nos detalhes da organização
+              </div>
+            </div>
+          </div>
+
           {/* Objectives */}
           <div className="space-y-2">
             <Label>Objetivos</Label>
