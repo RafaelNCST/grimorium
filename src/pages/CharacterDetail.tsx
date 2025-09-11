@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +69,9 @@ export function CharacterDetail() {
   const [editData, setEditData] = useState(mockCharacter);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuality, setNewQuality] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(mockCharacter.image);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentRole = roles.find(r => r.value === character.role);
   const currentAlignment = alignments.find(a => a.value === character.alignment);
@@ -104,6 +107,27 @@ export function CharacterDetail() {
     setEditData(prev => ({
       ...prev,
       qualities: prev.qualities.filter(q => q !== qualityToRemove)
+    }));
+  };
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        setEditData(prev => ({ ...prev, image: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAgeChange = (increment: boolean) => {
+    setEditData(prev => ({
+      ...prev,
+      age: Math.max(0, prev.age + (increment ? 1 : -1))
     }));
   };
 
@@ -158,16 +182,42 @@ export function CharacterDetail() {
             <CardContent className="space-y-6">
               {isEditing ? (
                 <div className="space-y-4">
-                  {/* Image URL */}
+                  {/* Image Upload */}
                   <div className="space-y-2">
-                    <Label htmlFor="image">URL da Imagem</Label>
-                    <Input
-                      id="image"
-                      type="url"
-                      value={editData.image}
-                      onChange={(e) => setEditData(prev => ({ ...prev, image: e.target.value }))}
-                      placeholder="https://exemplo.com/imagem.jpg"
-                    />
+                    <Label htmlFor="image">Imagem do Personagem</Label>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <div 
+                          className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {imagePreview ? (
+                            <div className="relative w-full h-full">
+                              <img 
+                                src={imagePreview} 
+                                alt="Preview" 
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                                <Upload className="w-6 h-6 text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center">
+                              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                              <p className="text-sm text-muted-foreground">Clique para selecionar uma imagem</p>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageFileChange}
+                          className="hidden"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {/* Name */}
@@ -184,13 +234,35 @@ export function CharacterDetail() {
                   {/* Age */}
                   <div className="space-y-2">
                     <Label htmlFor="age">Idade</Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      value={editData.age}
-                      onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
-                      placeholder="Idade"
-                    />
+                    <div className="flex items-center">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-10 w-10 p-0"
+                        onClick={() => handleAgeChange(false)}
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <Input
+                        id="age"
+                        type="number"
+                        value={editData.age}
+                        onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                        className="mx-2 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        min="0"
+                        max="999"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-10 w-10 p-0"
+                        onClick={() => handleAgeChange(true)}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Role */}
