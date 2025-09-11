@@ -287,44 +287,41 @@ export function WorldDetail() {
                     {/* Image Upload */}
                     <div className="space-y-2">
                       <Label htmlFor="image">Imagem</Label>
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <div 
-                            className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors mx-auto"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            {imagePreview ? (
-                              <div className="relative w-full h-full">
-                                <img 
-                                  src={imagePreview} 
-                                  alt="Preview" 
-                                  className="w-full h-full object-cover rounded-full"
-                                />
-                              </div>
-                            ) : character.image ? (
-                              <div className="relative w-full h-full">
-                                <img 
-                                  src={character.image} 
-                                  alt="Current" 
-                                  className="w-full h-full object-cover rounded-full"
-                                />
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center">
-                                <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                                <span className="text-xs text-muted-foreground text-center">Clique para enviar</span>
-                              </div>
-                            )}
+                      <div 
+                        className="flex items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {imagePreview ? (
+                          <div className="relative w-full h-full">
+                            <img 
+                              src={imagePreview} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover rounded-lg"
+                            />
                           </div>
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
-                        </div>
+                        ) : character.image ? (
+                          <div className="relative w-full h-full">
+                            <img 
+                              src={character.image} 
+                              alt="Current" 
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Upload className="w-12 h-12 text-muted-foreground mb-3" />
+                            <span className="text-sm text-muted-foreground text-center">Clique para enviar imagem ou mapa</span>
+                            <span className="text-xs text-muted-foreground/70 text-center mt-1">Recomendado: 16:9 para melhor visualização</span>
+                          </div>
+                        )}
                       </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -396,13 +393,21 @@ export function WorldDetail() {
                   </div>
                 ) : (
                   <div className="space-y-4">
+                    {/* Full-width image */}
+                    {character.image && (
+                      <div className="w-full">
+                        <img 
+                          src={character.image} 
+                          alt={character.name}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
+                    
                     <div className="flex items-start gap-4">
-                      <Avatar className="w-16 h-16">
-                        <AvatarImage src={character.image} />
-                        <AvatarFallback className="text-lg">
-                          {character.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        {getEntityIcon()}
+                      </div>
                       
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
