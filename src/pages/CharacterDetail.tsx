@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { FamilyTreeModal } from "@/components/modals/FamilyTreeModal";
 import { toast } from "sonner";
 
 // Mock data - in real app this would come from state management
@@ -27,7 +28,18 @@ const mockCharacter = {
   affiliatedPlace: "Capital Elaria",
   alignment: "bem",
   qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor", "Carismático", "Altruísta", "Intuitivo"],
-  image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+  image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+  family: {
+    father: null,
+    mother: null,
+    children: [],
+    siblings: [],
+    spouse: null,
+    halfSiblings: [],
+    unclesAunts: [],
+    grandparents: [],
+    cousins: []
+  }
 };
 
 const roles = [
@@ -61,6 +73,32 @@ const mockLocations = [
   { id: "5", name: "Montanhas Geladas", type: "montanha" }
 ];
 
+// Mock characters for family relationships
+const mockCharacters = [
+  { id: "1", name: "Aelric Valorheart" },
+  { id: "2", name: "Elena Moonwhisper" },
+  { id: "3", name: "Marcus Ironforge" },
+  { id: "4", name: "Lyra Starweaver" },
+  { id: "5", name: "Thane Stormborn" },
+  { id: "6", name: "Aria Nightsong" },
+  { id: "7", name: "Gareth Goldshield" },
+  { id: "8", name: "Vera Shadowbane" },
+  { id: "9", name: "Duncan Firebeard" },
+  { id: "10", name: "Seraphina Dawnbringer" }
+];
+
+const familyRelations = [
+  { value: "father", label: "Pai" },
+  { value: "mother", label: "Mãe" },
+  { value: "child", label: "Filho/Filha" },
+  { value: "sibling", label: "Irmão/Irmã" },
+  { value: "spouse", label: "Cônjuge" },
+  { value: "halfSibling", label: "Meio-irmão/Meio-irmã" },
+  { value: "uncleAunt", label: "Tio/Tia" },
+  { value: "grandparent", label: "Avô/Avó" },
+  { value: "cousin", label: "Primo/Prima" }
+];
+
 export function CharacterDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -71,6 +109,7 @@ export function CharacterDetail() {
   const [newQuality, setNewQuality] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(mockCharacter.image);
+  const [showFamilyTree, setShowFamilyTree] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentRole = roles.find(r => r.value === character.role);
@@ -108,6 +147,82 @@ export function CharacterDetail() {
       ...prev,
       qualities: prev.qualities.filter(q => q !== qualityToRemove)
     }));
+  };
+
+  const handleFamilyRelationChange = (relationType: string, characterId: string | null) => {
+    setEditData(prev => {
+      const newFamily = { ...prev.family };
+      
+      // Remove previous relation if exists
+      Object.keys(newFamily).forEach(key => {
+        if (Array.isArray(newFamily[key])) {
+          newFamily[key] = newFamily[key].filter((id: string) => id !== characterId);
+        } else if (newFamily[key] === characterId) {
+          newFamily[key] = null;
+        }
+      });
+      
+      // Add new relation
+      if (characterId && characterId !== "none") {
+        switch (relationType) {
+          case "father":
+          case "mother":
+          case "spouse":
+            newFamily[relationType] = characterId;
+            break;
+          case "child":
+            if (!newFamily.children.includes(characterId)) {
+              newFamily.children.push(characterId);
+            }
+            break;
+          case "sibling":
+            if (!newFamily.siblings.includes(characterId)) {
+              newFamily.siblings.push(characterId);
+            }
+            break;
+          case "halfSibling":
+            if (!newFamily.halfSiblings.includes(characterId)) {
+              newFamily.halfSiblings.push(characterId);
+            }
+            break;
+          case "uncleAunt":
+            if (!newFamily.unclesAunts.includes(characterId)) {
+              newFamily.unclesAunts.push(characterId);
+            }
+            break;
+          case "grandparent":
+            if (!newFamily.grandparents.includes(characterId)) {
+              newFamily.grandparents.push(characterId);
+            }
+            break;
+          case "cousin":
+            if (!newFamily.cousins.includes(characterId)) {
+              newFamily.cousins.push(characterId);
+            }
+            break;
+        }
+      }
+      
+      return {
+        ...prev,
+        family: newFamily
+      };
+    });
+  };
+
+  const getFamilyRelationLabel = (relationType: string, characterName: string) => {
+    const relations = {
+      father: `Pai de ${characterName}`,
+      mother: `Mãe de ${characterName}`,
+      child: `Filho(a) de ${characterName}`,
+      sibling: `Irmão(ã) de ${characterName}`,
+      spouse: `Cônjuge de ${characterName}`,
+      halfSibling: `Meio-irmão(ã) de ${characterName}`,
+      uncleAunt: `Tio(a) de ${characterName}`,
+      grandparent: `Avô(ó) de ${characterName}`,
+      cousin: `Primo(a) de ${characterName}`
+    };
+    return relations[relationType] || "";
   };
 
   const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -368,10 +483,97 @@ export function CharacterDetail() {
                           </SelectItem>
                         ))}
                       </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              ) : (
+                     </Select>
+                   </div>
+
+                   {/* Family Relations */}
+                   <div className="space-y-4">
+                     <Label>Relações Familiares</Label>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       {familyRelations.map((relation) => (
+                         <div key={relation.value} className="space-y-2">
+                           <Label className="text-sm">{relation.label}</Label>
+                           <Select 
+                             value={
+                               relation.value === "father" ? editData.family.father || "none" :
+                               relation.value === "mother" ? editData.family.mother || "none" :
+                               relation.value === "spouse" ? editData.family.spouse || "none" :
+                               "none"
+                             }
+                             onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
+                           >
+                             <SelectTrigger>
+                               <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <SelectItem value="none">Nenhum</SelectItem>
+                               {mockCharacters
+                                 .filter(char => char.id !== editData.id)
+                                 .map((char) => (
+                                 <SelectItem key={char.id} value={char.id}>
+                                   {char.name}
+                                 </SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                         </div>
+                       ))}
+                     </div>
+                     
+                     {/* Multi-select relations */}
+                     <div className="space-y-4">
+                       {["child", "sibling", "halfSibling", "uncleAunt", "grandparent", "cousin"].map((relationType) => {
+                         const relationLabel = familyRelations.find(r => r.value === relationType)?.label || "";
+                         const currentRelations = editData.family[relationType === "child" ? "children" : 
+                                                                  relationType === "sibling" ? "siblings" :
+                                                                  relationType === "halfSibling" ? "halfSiblings" :
+                                                                  relationType === "uncleAunt" ? "unclesAunts" :
+                                                                  relationType === "grandparent" ? "grandparents" : "cousins"];
+                         
+                         return (
+                           <div key={relationType} className="space-y-2">
+                             <Label className="text-sm">{relationLabel}s</Label>
+                             <Select onValueChange={(value) => handleFamilyRelationChange(relationType, value === "none" ? null : value)}>
+                               <SelectTrigger>
+                                 <SelectValue placeholder={`Adicionar ${relationLabel.toLowerCase()}`} />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 <SelectItem value="none">Selecione para adicionar</SelectItem>
+                                 {mockCharacters
+                                   .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
+                                   .map((char) => (
+                                   <SelectItem key={char.id} value={char.id}>
+                                     {char.name}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                             
+                             {/* Display current relations */}
+                             {currentRelations.length > 0 && (
+                               <div className="flex flex-wrap gap-2 mt-2">
+                                 {currentRelations.map((charId: string) => {
+                                   const char = mockCharacters.find(c => c.id === charId);
+                                   return char ? (
+                                     <Badge 
+                                       key={charId} 
+                                       variant="secondary" 
+                                       className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                                       onClick={() => handleFamilyRelationChange(relationType, charId)}
+                                     >
+                                       {char.name} ×
+                                     </Badge>
+                                   ) : null;
+                                 })}
+                               </div>
+                             )}
+                           </div>
+                         );
+                       })}
+                     </div>
+                   </div>
+                 </div>
+               ) : (
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
                     <Avatar className="w-16 h-16">
@@ -448,6 +650,171 @@ export function CharacterDetail() {
                       </div>
                     )}
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Family Relations Card */}
+          <Card className="card-magical">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Relações Familiares</span>
+                <Button variant="outline" size="sm" onClick={() => setShowFamilyTree(true)}>
+                  <TreePine className="w-4 h-4 mr-2" />
+                  Ver Árvore
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Direct Family */}
+              {(character.family.father || character.family.mother || character.family.spouse) && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Família Direta</h4>
+                  <div className="space-y-2">
+                    {character.family.father && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Heart className="w-3 h-3 text-blue-500" />
+                        <span className="text-muted-foreground">Pai:</span>
+                        <span>{mockCharacters.find(c => c.id === character.family.father)?.name}</span>
+                      </div>
+                    )}
+                    {character.family.mother && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Heart className="w-3 h-3 text-pink-500" />
+                        <span className="text-muted-foreground">Mãe:</span>
+                        <span>{mockCharacters.find(c => c.id === character.family.mother)?.name}</span>
+                      </div>
+                    )}
+                    {character.family.spouse && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Heart className="w-3 h-3 text-red-500" />
+                        <span className="text-muted-foreground">Cônjuge:</span>
+                        <span>{mockCharacters.find(c => c.id === character.family.spouse)?.name}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Children */}
+              {character.family.children.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Filhos</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {character.family.children.map((childId: string) => {
+                      const child = mockCharacters.find(c => c.id === childId);
+                      return child ? (
+                        <Badge key={childId} variant="secondary" className="text-xs">
+                          {child.name}
+                        </Badge>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Siblings */}
+              {(character.family.siblings.length > 0 || character.family.halfSiblings.length > 0) && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Irmãos</h4>
+                  <div className="space-y-2">
+                    {character.family.siblings.length > 0 && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Irmãos:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {character.family.siblings.map((siblingId: string) => {
+                            const sibling = mockCharacters.find(c => c.id === siblingId);
+                            return sibling ? (
+                              <Badge key={siblingId} variant="secondary" className="text-xs">
+                                {sibling.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {character.family.halfSiblings.length > 0 && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Meio-irmãos:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {character.family.halfSiblings.map((halfSiblingId: string) => {
+                            const halfSibling = mockCharacters.find(c => c.id === halfSiblingId);
+                            return halfSibling ? (
+                              <Badge key={halfSiblingId} variant="outline" className="text-xs">
+                                {halfSibling.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Extended Family */}
+              {(character.family.grandparents.length > 0 || character.family.unclesAunts.length > 0 || character.family.cousins.length > 0) && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2">Família Extendida</h4>
+                  <div className="space-y-2">
+                    {character.family.grandparents.length > 0 && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Avós:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {character.family.grandparents.map((grandparentId: string) => {
+                            const grandparent = mockCharacters.find(c => c.id === grandparentId);
+                            return grandparent ? (
+                              <Badge key={grandparentId} variant="secondary" className="text-xs">
+                                {grandparent.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {character.family.unclesAunts.length > 0 && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Tios:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {character.family.unclesAunts.map((uncleAuntId: string) => {
+                            const uncleAunt = mockCharacters.find(c => c.id === uncleAuntId);
+                            return uncleAunt ? (
+                              <Badge key={uncleAuntId} variant="secondary" className="text-xs">
+                                {uncleAunt.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {character.family.cousins.length > 0 && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">Primos:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {character.family.cousins.map((cousinId: string) => {
+                            const cousin = mockCharacters.find(c => c.id === cousinId);
+                            return cousin ? (
+                              <Badge key={cousinId} variant="secondary" className="text-xs">
+                                {cousin.name}
+                              </Badge>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {!character.family.father && !character.family.mother && !character.family.spouse && 
+               character.family.children.length === 0 && character.family.siblings.length === 0 && 
+               character.family.halfSiblings.length === 0 && character.family.grandparents.length === 0 && 
+               character.family.unclesAunts.length === 0 && character.family.cousins.length === 0 && (
+                <div className="text-center text-muted-foreground text-sm py-4">
+                  <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>Nenhuma relação familiar definida</p>
+                  <p className="text-xs">Use o modo de edição para adicionar familiares</p>
                 </div>
               )}
             </CardContent>
@@ -541,6 +908,13 @@ export function CharacterDetail() {
         description={`O personagem "${character.name}" será permanentemente removido.`}
         itemName={character.name}
         itemType="personagem"
+      />
+      
+      <FamilyTreeModal
+        open={showFamilyTree}
+        onClose={() => setShowFamilyTree(false)}
+        character={character}
+        allCharacters={mockCharacters}
       />
     </div>
   );
