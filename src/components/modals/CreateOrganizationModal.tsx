@@ -207,12 +207,12 @@ export function CreateOrganizationModal({
 
             <div className="space-y-2">
               <Label htmlFor="baseLocation">Local da Base</Label>
-              <Select value={formData.baseLocation} onValueChange={(value) => setFormData(prev => ({ ...prev, baseLocation: value }))}>
+              <Select value={formData.baseLocation} onValueChange={(value) => setFormData(prev => ({ ...prev, baseLocation: value === "none" ? "" : value }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Local da base" />
                 </SelectTrigger>
                 <SelectContent side="bottom">
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="none">Nenhum</SelectItem>
                   {availableLocations.map((location) => (
                     <SelectItem key={location.id} value={location.id}>
                       {location.name} ({location.type})
