@@ -453,13 +453,29 @@ export function OrganizationDetail() {
                             {isEditing ? (
                               <div className="flex items-center gap-1">
                                 <Label className="text-xs text-muted-foreground">Nível</Label>
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  value={title.level}
-                                  onChange={(e) => handleUpdateTitleLevel(title.id, parseInt(e.target.value) || 1)}
-                                  className="w-16 h-8 text-xs text-center"
-                                />
+                                <div className="flex items-center border rounded-md">
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-none border-r"
+                                    onClick={() => handleUpdateTitleLevel(title.id, Math.max(1, title.level - 1))}
+                                  >
+                                    <span className="text-xs">-</span>
+                                  </Button>
+                                  <span className="px-2 text-xs font-medium min-w-[2rem] text-center">
+                                    {title.level}
+                                  </span>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-none border-l"
+                                    onClick={() => handleUpdateTitleLevel(title.id, title.level + 1)}
+                                  >
+                                    <span className="text-xs">+</span>
+                                  </Button>
+                                </div>
                               </div>
                             ) : (
                               <Badge variant="outline" className="text-xs">
