@@ -341,7 +341,7 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
                   {organization.description}
                 </p>
                 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {organization.leaders.length > 0 && (
                     <div>
                       <h4 className="font-medium mb-2">Líderes</h4>
@@ -362,7 +362,7 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
 
                   {organization.baseLocation && (
                     <div>
-                      <h4 className="font-medium mb-1">Base Principal</h4>
+                      <h4 className="font-medium mb-2">Base Principal</h4>
                       <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
                     </div>
                   )}
