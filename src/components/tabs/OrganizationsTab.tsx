@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState } from "react";  
+import { useNavigate } from "react-router-dom";
 import { Plus, Edit2, Search, Building, Users, Shield, Swords, Crown, Globe, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CreateOrganizationModal } from "@/components/modals/CreateOrganizationModal";
+import { EmptyState } from "@/components/EmptyState";
 
 interface OrganizationTitle {
   id: string;
@@ -132,11 +135,18 @@ const mockOrganizations: Organization[] = [
   }
 ];
 
-export function OrganizationsTab() {
+interface OrganizationsTabProps {
+  bookId: string;
+}
+
+export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAlignment, setSelectedAlignment] = useState<string>("all");
   const [selectedWorld, setSelectedWorld] = useState<string>("all");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [organizations, setOrganizations] = useState(mockOrganizations);
 
   const alignments = ["all", "Bem", "Neutro", "Caótico"];
   const worlds = ["all", "Aethermoor"];
@@ -192,7 +202,19 @@ export function OrganizationsTab() {
     return title?.name || "Membro";
   };
 
-  const filteredOrganizations = mockOrganizations.filter(org => {
+  const handleCreateOrganization = () => {
+    setShowCreateModal(true);
+  };
+
+  const handleOrganizationCreated = (newOrganization: any) => {
+    setOrganizations(prev => [...prev, newOrganization]);
+  };
+
+  const handleOrganizationClick = (orgId: string) => {
+    navigate(`/book/${bookId}/organization/${orgId}`);
+  };
+
+  const filteredOrganizations = organizations.filter(org => {
     const matchesSearch = org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          org.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesAlignment = selectedAlignment === "all" || org.alignment === selectedAlignment;
@@ -202,10 +224,23 @@ export function OrganizationsTab() {
 
   // Statistics
   const totalByAlignment = {
-    bem: mockOrganizations.filter(o => o.alignment === "Bem").length,
-    neutro: mockOrganizations.filter(o => o.alignment === "Neutro").length,
-    caotico: mockOrganizations.filter(o => o.alignment === "Caótico").length
+    bem: organizations.filter(o => o.alignment === "Bem").length,
+    neutro: organizations.filter(o => o.alignment === "Neutro").length,
+    caotico: organizations.filter(o => o.alignment === "Caótico").length
   };
+
+  // Mock data for create modal
+  const availableCharacters = [
+    { id: "c1", name: "Lyara Moonwhisper" },
+    { id: "c2", name: "Aelric Valorheart" },
+    { id: "c3", name: "Sir Marcus Lightbringer" }
+  ];
+
+  const availableLocations = [
+    { id: "l1", name: "Cidadela da Luz", type: "Fortaleza" },
+    { id: "l2", name: "Torre Sombria", type: "Torre" },
+    { id: "l3", name: "Aldeia de Pedraverde", type: "Aldeia" }
+  ];
 
   return (
     <div className="space-y-6">
@@ -215,13 +250,13 @@ export function OrganizationsTab() {
           <h2 className="text-2xl font-bold">Organizações</h2>
           <p className="text-muted-foreground">Gerencie as organizações e facções do seu mundo</p>
           <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{mockOrganizations.length} Total</Badge>
+            <Badge variant="outline">{organizations.length} Total</Badge>
             <Badge className="bg-success/10 text-success">{totalByAlignment.bem} Bem</Badge>
             <Badge className="bg-secondary/10 text-secondary-foreground">{totalByAlignment.neutro} Neutro</Badge>
             <Badge className="bg-destructive/10 text-destructive">{totalByAlignment.caotico} Caótico</Badge>
           </div>
         </div>
-        <Button variant="magical">
+        <Button variant="magical" onClick={handleCreateOrganization}>
           <Plus className="w-4 h-4 mr-2" />
           Nova Organização
         </Button>
@@ -267,7 +302,11 @@ export function OrganizationsTab() {
       {/* Organizations List */}
       <div className="space-y-6">
         {filteredOrganizations.map((organization) => (
-          <Card key={organization.id} className="card-magical animate-stagger">
+          <Card 
+            key={organization.id} 
+            className="card-magical animate-stagger cursor-pointer hover:shadow-lg transition-all"
+            onClick={() => handleOrganizationClick(organization.id)}
+          >
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -293,7 +332,14 @@ export function OrganizationsTab() {
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOrganizationClick(organization.id);
+                  }}
+                >
                   <Edit2 className="w-4 h-4" />
                 </Button>
               </div>
@@ -398,12 +444,31 @@ export function OrganizationsTab() {
               ? "Tente ajustar seus filtros" 
               : "Comece criando a primeira organização do seu mundo"}
           </p>
-          <Button variant="magical">
+          <Button variant="magical" onClick={handleCreateOrganization}>
             <Plus className="w-4 h-4 mr-2" />
             Criar Organização
           </Button>
         </div>
       )}
+
+      {organizations.length === 0 && (
+        <EmptyState
+          icon={Building}
+          title="Nenhuma organização criada"
+          description="Comece criando a primeira organização do seu mundo para gerenciar facções e grupos."
+          actionLabel="Criar Organização"
+          onAction={handleCreateOrganization}
+        />
+      )}
+
+      <CreateOrganizationModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onOrganizationCreated={handleOrganizationCreated}
+        bookId={bookId}
+        availableCharacters={availableCharacters}
+        availableLocations={availableLocations}
+      />
     </div>
   );
 }

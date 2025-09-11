@@ -323,7 +323,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <WorldTab bookId={bookId} />
             </TabsContent>
             <TabsContent value="organizations" className="mt-0">
-              <OrganizationsTab />
+              <OrganizationsTab bookId={bookId} />
             </TabsContent>
             <TabsContent value="timeline" className="mt-0">
               <TimelineTab />

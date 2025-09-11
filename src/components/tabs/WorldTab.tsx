@@ -149,9 +149,6 @@ const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => {
 export function WorldTab({ bookId }: WorldTabProps) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedParent, setSelectedParent] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState("all");
   
   // Modal states
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
@@ -184,7 +181,6 @@ export function WorldTab({ bookId }: WorldTabProps) {
     setMockWorldEntities(prev => [...prev, newLocation]);
   };
   
-  const typeOptions = ["all", "World", "Continent", "Location"];
   const worlds = mockWorldEntities.filter(e => e.type === "World");
   const continents = mockWorldEntities.filter(e => e.type === "Continent");
   const locations = mockWorldEntities.filter(e => e.type === "Location");
@@ -236,18 +232,13 @@ export function WorldTab({ bookId }: WorldTabProps) {
     return entities.filter(entity => {
       const matchesSearch = entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            entity.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesType = selectedType === "all" || entity.type === selectedType;
-      const matchesParent = selectedParent === "all" || 
-                           (selectedParent === "none" && !entity.parentId) ||
-                           entity.parentId === selectedParent;
-      return matchesSearch && matchesType && matchesParent;
+      return matchesSearch;
     });
   };
 
   const filteredWorlds = getFilteredEntities("World");
   const filteredContinents = getFilteredEntities("Continent");
   const filteredLocations = getFilteredEntities("Location");
-  const allFiltered = getFilteredEntities();
 
   // Statistics
   const totalWorlds = worlds.length;
@@ -389,35 +380,8 @@ export function WorldTab({ bookId }: WorldTabProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header with Stats */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Mundo</h2>
-          <p className="text-muted-foreground">Gerencie mundos, continentes e locais</p>
-          <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{totalWorlds} Mundos</Badge>
-            <Badge variant="outline">{totalContinents} Continentes</Badge>
-            <Badge variant="outline">{totalLocations} Locais</Badge>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleCreateWorld}>
-            <Plus className="w-4 h-4 mr-2" />
-            Mundo
-          </Button>
-          <Button variant="outline" onClick={handleCreateContinent}>
-            <Plus className="w-4 h-4 mr-2" />
-            Continente
-          </Button>
-          <Button variant="magical" onClick={handleCreateLocation}>
-            <Plus className="w-4 h-4 mr-2" />
-            Local
-          </Button>
-        </div>
-      </div>
-
-      {/* Filters */}
+    <div className="space-y-8">
+      {/* Global Search */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -428,117 +392,106 @@ export function WorldTab({ bookId }: WorldTabProps) {
             className="pl-10"
           />
         </div>
-        
-        <Select value={selectedType} onValueChange={setSelectedType}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent align="start" side="bottom">
-            <SelectItem value="all">Todos os tipos</SelectItem>
-            {typeOptions.slice(1).map(type => (
-              <SelectItem key={type} value={type}>{type}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedParent} onValueChange={setSelectedParent}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Hierarquia" />
-          </SelectTrigger>
-          <SelectContent align="start" side="bottom">
-            <SelectItem value="all">Todas hierarquias</SelectItem>
-            <SelectItem value="none">Sem hierarquia</SelectItem>
-            {worlds.map(world => (
-              <SelectItem key={world.id} value={world.id}>{world.name}</SelectItem>
-            ))}
-            {continents.map(continent => (
-              <SelectItem key={continent.id} value={continent.id}>{continent.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
-      {/* Tabbed Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">
-            Todos ({allFiltered.length})
-          </TabsTrigger>
-          <TabsTrigger value="worlds">
-            Mundos ({filteredWorlds.length})
-          </TabsTrigger>
-          <TabsTrigger value="continents">
-            Continentes ({filteredContinents.length})
-          </TabsTrigger>
-          <TabsTrigger value="locations">
-            Locais ({filteredLocations.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Mundos Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              Mundos
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {totalWorlds} mundo{totalWorlds !== 1 ? 's' : ''} criado{totalWorlds !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <Button variant="magical" onClick={handleCreateWorld}>
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Mundo
+          </Button>
+        </div>
         
-        <TabsContent value="all" className="mt-6">
-          {allFiltered.length === 0 ? (
-            <EmptyState
-              icon={Globe}
-              title="Nenhum resultado encontrado"
-              description="Tente ajustar seus filtros ou criar uma nova entidade."
-              actionLabel="Criar Mundo"
-              onAction={handleCreateWorld}
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allFiltered.map(renderEntityCard)}
-            </div>
-          )}
-        </TabsContent>
+        {filteredWorlds.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredWorlds.map(renderEntityCard)}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Globe}
+            title="Nenhum mundo criado"
+            description="Crie o primeiro mundo da sua história para organizar continentes e locais."
+            actionLabel="Criar Mundo"
+            onAction={handleCreateWorld}
+          />
+        )}
+      </div>
+
+      {/* Continentes Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <Mountain className="w-5 h-5" />
+              Continentes
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {totalContinents} continente{totalContinents !== 1 ? 's' : ''} criado{totalContinents !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <Button variant="magical" onClick={handleCreateContinent}>
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Continente
+          </Button>
+        </div>
         
-        <TabsContent value="worlds" className="mt-6">
-          {filteredWorlds.length === 0 ? (
-            <EmptyState
-              icon={Globe}
-              title="Nenhum mundo encontrado"
-              description="Crie o primeiro mundo da sua história."
-              actionLabel="Criar Mundo"
-              onAction={handleCreateWorld}
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredWorlds.map(renderEntityCard)}
-            </div>
-          )}
-        </TabsContent>
+        {filteredContinents.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredContinents.map(renderEntityCard)}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Mountain}
+            title="Nenhum continente criado"
+            description="Crie continentes para organizar melhor os locais da sua história."
+            actionLabel="Criar Continente"
+            onAction={handleCreateContinent}
+          />
+        )}
+      </div>
+
+      {/* Locais Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <MapPin className="w-5 h-5" />
+              Locais
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {totalLocations} local{totalLocations !== 1 ? 'is' : ''} criado{totalLocations !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <Button variant="magical" onClick={handleCreateLocation}>
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Local
+          </Button>
+        </div>
         
-        <TabsContent value="continents" className="mt-6">
-          {filteredContinents.length === 0 ? (
-            <EmptyState
-              icon={Mountain}
-              title="Nenhum continente encontrado"
-              description="Crie continentes para organizar seus locais."
-              actionLabel="Criar Continente"
-              onAction={handleCreateContinent}
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredContinents.map(renderEntityCard)}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="locations" className="mt-6">
-          {filteredLocations.length === 0 ? (
-            <EmptyState
-              icon={MapPin}
-              title="Nenhum local encontrado"
-              description="Crie locais específicos para sua história."
-              actionLabel="Criar Local"
-              onAction={handleCreateLocation}
-            />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredLocations.map(renderEntityCard)}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+        {filteredLocations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredLocations.map(renderEntityCard)}
+          </div>
+        ) : (
+          <EmptyState
+            icon={MapPin}
+            title="Nenhum local criado"
+            description="Crie locais específicos onde sua história acontece."
+            actionLabel="Criar Local"     
+            onAction={handleCreateLocation}
+          />
+        )}
+      </div>
 
       {/* Modals */}
       <CreateWorldModal
@@ -562,8 +515,8 @@ export function WorldTab({ bookId }: WorldTabProps) {
         onLocationCreated={handleLocationCreated}
         bookId={bookId}
         availableParents={[
-          ...worlds.map(w => ({ id: w.id, name: w.name, type: 'Mundo' })),
-          ...continents.map(c => ({ id: c.id, name: c.name, type: 'Continente' }))
+          ...worlds.map(w => ({ id: w.id, name: w.name, type: "World" })),
+          ...continents.map(c => ({ id: c.id, name: c.name, type: "Continent" }))
         ]}
       />
     </div>
