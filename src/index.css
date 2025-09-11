@@ -257,12 +257,7 @@
     background: hsl(var(--background) / 0.8);
   }
 
-  /* Fix modal jumping issue */
-  [data-radix-popper-content-wrapper] {
-    position: fixed !important;
-    z-index: 50 !important;
-    transform: none !important;
-  }
+  /* Removed global popper override to allow correct Radix positioning */
 
   /* Ensure dropdowns have proper z-index and background */
   [role="menu"],
