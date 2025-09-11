@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { CharacterDetail } from "./pages/CharacterDetail";
 import { WorldDetail } from "./pages/WorldDetail";
 import { OrganizationDetail } from "./pages/OrganizationDetail";
+import { FamilyTreePage } from "./pages/FamilyTreePage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/book/:bookId/character/:characterId" element={<CharacterDetail />} />
+              <Route path="/book/:bookId/character/:characterId/family-tree" element={<FamilyTreePage />} />
           <Route path="/book/:bookId/world/:worldId" element={<WorldDetail />} />
           <Route path="/book/:bookId/organization/:orgId" element={<OrganizationDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

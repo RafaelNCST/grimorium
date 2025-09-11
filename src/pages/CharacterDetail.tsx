@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
-import { FamilyTreeModal } from "@/components/modals/FamilyTreeModal";
 import { toast } from "sonner";
 
 // Mock data - in real app this would come from state management
@@ -87,17 +86,20 @@ const mockCharacters = [
   { id: "10", name: "Seraphina Dawnbringer" }
 ];
 
-const familyRelations = [
-  { value: "father", label: "Pai" },
-  { value: "mother", label: "Mãe" },
-  { value: "child", label: "Filho/Filha" },
-  { value: "sibling", label: "Irmão/Irmã" },
-  { value: "spouse", label: "Cônjuge" },
-  { value: "halfSibling", label: "Meio-irmão/Meio-irmã" },
-  { value: "uncleAunt", label: "Tio/Tia" },
-  { value: "grandparent", label: "Avô/Avó" },
-  { value: "cousin", label: "Primo/Prima" }
-];
+const familyRelations = {
+  single: [
+    { value: "father", label: "Pai" },
+    { value: "mother", label: "Mãe" },
+    { value: "spouse", label: "Cônjuge" }
+  ],
+  multiple: [
+    { value: "child", label: "Filho/Filha" },
+    { value: "sibling", label: "Irmão/Irmã" },
+    { value: "halfSibling", label: "Meio-irmão/Meio-irmã" },
+    { value: "uncleAunt", label: "Tio/Tia" },
+    { value: "cousin", label: "Primo/Prima" }
+  ]
+};
 
 export function CharacterDetail() {
   const { id } = useParams();
@@ -109,7 +111,7 @@ export function CharacterDetail() {
   const [newQuality, setNewQuality] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(mockCharacter.image);
-  const [showFamilyTree, setShowFamilyTree] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentRole = roles.find(r => r.value === character.role);
@@ -486,92 +488,97 @@ export function CharacterDetail() {
                      </Select>
                    </div>
 
-                   {/* Family Relations */}
-                   <div className="space-y-4">
-                     <Label>Relações Familiares</Label>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       {familyRelations.map((relation) => (
-                         <div key={relation.value} className="space-y-2">
-                           <Label className="text-sm">{relation.label}</Label>
-                           <Select 
-                             value={
-                               relation.value === "father" ? editData.family.father || "none" :
-                               relation.value === "mother" ? editData.family.mother || "none" :
-                               relation.value === "spouse" ? editData.family.spouse || "none" :
-                               "none"
-                             }
-                             onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
-                           >
-                             <SelectTrigger>
-                               <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
-                             </SelectTrigger>
-                             <SelectContent>
-                               <SelectItem value="none">Nenhum</SelectItem>
-                               {mockCharacters
-                                 .filter(char => char.id !== editData.id)
-                                 .map((char) => (
-                                 <SelectItem key={char.id} value={char.id}>
-                                   {char.name}
-                                 </SelectItem>
-                               ))}
-                             </SelectContent>
-                           </Select>
-                         </div>
-                       ))}
-                     </div>
-                     
-                     {/* Multi-select relations */}
-                     <div className="space-y-4">
-                       {["child", "sibling", "halfSibling", "uncleAunt", "grandparent", "cousin"].map((relationType) => {
-                         const relationLabel = familyRelations.find(r => r.value === relationType)?.label || "";
-                         const currentRelations = editData.family[relationType === "child" ? "children" : 
-                                                                  relationType === "sibling" ? "siblings" :
-                                                                  relationType === "halfSibling" ? "halfSiblings" :
-                                                                  relationType === "uncleAunt" ? "unclesAunts" :
-                                                                  relationType === "grandparent" ? "grandparents" : "cousins"];
-                         
-                         return (
-                           <div key={relationType} className="space-y-2">
-                             <Label className="text-sm">{relationLabel}s</Label>
-                             <Select onValueChange={(value) => handleFamilyRelationChange(relationType, value === "none" ? null : value)}>
-                               <SelectTrigger>
-                                 <SelectValue placeholder={`Adicionar ${relationLabel.toLowerCase()}`} />
-                               </SelectTrigger>
-                               <SelectContent>
-                                 <SelectItem value="none">Selecione para adicionar</SelectItem>
-                                 {mockCharacters
-                                   .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
-                                   .map((char) => (
-                                   <SelectItem key={char.id} value={char.id}>
-                                     {char.name}
-                                   </SelectItem>
-                                 ))}
-                               </SelectContent>
-                             </Select>
-                             
-                             {/* Display current relations */}
-                             {currentRelations.length > 0 && (
-                               <div className="flex flex-wrap gap-2 mt-2">
-                                 {currentRelations.map((charId: string) => {
-                                   const char = mockCharacters.find(c => c.id === charId);
-                                   return char ? (
-                                     <Badge 
-                                       key={charId} 
-                                       variant="secondary" 
-                                       className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                                       onClick={() => handleFamilyRelationChange(relationType, charId)}
-                                     >
-                                       {char.name} ×
-                                     </Badge>
-                                   ) : null;
-                                 })}
-                               </div>
-                             )}
-                           </div>
-                         );
-                       })}
-                     </div>
-                   </div>
+                    {/* Family Relations */}
+                    <div className="space-y-4">
+                      <Label>Relações Familiares</Label>
+                      
+                      {/* Single-value relations */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {familyRelations.single.map((relation) => (
+                          <div key={relation.value} className="space-y-2">
+                            <Label className="text-sm">{relation.label}</Label>
+                            <Select 
+                              value={
+                                relation.value === "father" ? editData.family.father || "none" :
+                                relation.value === "mother" ? editData.family.mother || "none" :
+                                relation.value === "spouse" ? editData.family.spouse || "none" :
+                                "none"
+                              }
+                              onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Nenhum</SelectItem>
+                                {mockCharacters
+                                  .filter(char => char.id !== editData.id)
+                                  .map((char) => (
+                                  <SelectItem key={char.id} value={char.id}>
+                                    {char.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Multi-select relations */}
+                      <div className="space-y-4">
+                        {familyRelations.multiple.map((relation) => {
+                          const currentRelations = editData.family[
+                            relation.value === "child" ? "children" : 
+                            relation.value === "sibling" ? "siblings" :
+                            relation.value === "halfSibling" ? "halfSiblings" :
+                            relation.value === "uncleAunt" ? "unclesAunts" :
+                            "cousins"
+                          ];
+                          
+                          return (
+                            <div key={relation.value} className="space-y-2">
+                              <Label className="text-sm">{relation.label}s</Label>
+                              <Select onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder={`Adicionar ${relation.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">Selecione</SelectItem>
+                                  {mockCharacters
+                                    .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
+                                    .map((char) => (
+                                    <SelectItem key={char.id} value={char.id}>
+                                      {char.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              
+                              {/* Display current relations */}
+                              {currentRelations.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {currentRelations.map((relationId: string) => {
+                                    const relatedChar = mockCharacters.find(c => c.id === relationId);
+                                    return relatedChar ? (
+                                      <Badge key={relationId} variant="secondary" className="flex items-center gap-1">
+                                        {relatedChar.name}
+                                        <button
+                                          type="button"
+                                          onClick={() => handleFamilyRelationChange(relation.value, relationId)}
+                                          className="ml-1 hover:text-destructive"
+                                        >
+                                          ×
+                                        </button>
+                                      </Badge>
+                                    ) : null;
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                  </div>
                ) : (
                 <div className="space-y-4">
@@ -660,7 +667,7 @@ export function CharacterDetail() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>Relações Familiares</span>
-                <Button variant="outline" size="sm" onClick={() => setShowFamilyTree(true)}>
+                <Button variant="outline" size="sm" onClick={() => navigate(`/book/1/character/${character.id}/family-tree`)}>
                   <TreePine className="w-4 h-4 mr-2" />
                   Ver Árvore
                 </Button>
@@ -908,13 +915,6 @@ export function CharacterDetail() {
         description={`O personagem "${character.name}" será permanentemente removido.`}
         itemName={character.name}
         itemType="personagem"
-      />
-      
-      <FamilyTreeModal
-        open={showFamilyTree}
-        onClose={() => setShowFamilyTree(false)}
-        character={character}
-        allCharacters={mockCharacters}
       />
     </div>
   );
