@@ -89,8 +89,10 @@ export function OrganizationDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAddTitleDialog, setShowAddTitleDialog] = useState(false);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
   
   const [newTitle, setNewTitle] = useState({ name: "", description: "", level: 1 });
+  const [newMember, setNewMember] = useState({ characterId: "", titleId: "", joinDate: "" });
 
   const organization = mockOrganizations[orgId || ""];
   
@@ -102,7 +104,10 @@ export function OrganizationDetail() {
     influence: organization?.influence || "",
     baseLocation: organization?.baseLocation || "",
     world: organization?.world || "",
-    continent: organization?.continent || ""
+    continent: organization?.continent || "",
+    objectives: organization?.objectives || [],
+    dominatedLocations: organization?.dominatedLocations || [],
+    titles: organization?.titles || []
   });
 
   if (!organization) {
@@ -165,6 +170,59 @@ export function OrganizationDetail() {
     toast.success("Título adicionado com sucesso!");
     setNewTitle({ name: "", description: "", level: 1 });
     setShowAddTitleDialog(false);
+  };
+
+  const handleAddMember = () => {
+    if (!newMember.characterId || !newMember.titleId) {
+      toast.error("Personagem e título são obrigatórios");
+      return;
+    }
+
+    // In real app, this would update the state
+    toast.success("Membro adicionado com sucesso!");
+    setNewMember({ characterId: "", titleId: "", joinDate: "" });
+    setShowAddMemberDialog(false);
+  };
+
+  const handleAddObjective = (newObjective: string) => {
+    if (newObjective.trim() && !editData.objectives.includes(newObjective.trim())) {
+      setEditData(prev => ({
+        ...prev,
+        objectives: [...prev.objectives, newObjective.trim()]
+      }));
+    }
+  };
+
+  const handleRemoveObjective = (objective: string) => {
+    setEditData(prev => ({
+      ...prev,
+      objectives: prev.objectives.filter(o => o !== objective)
+    }));
+  };
+
+  const handleAddDominatedLocation = (location: string) => {
+    if (location.trim() && !editData.dominatedLocations.includes(location.trim())) {
+      setEditData(prev => ({
+        ...prev,
+        dominatedLocations: [...prev.dominatedLocations, location.trim()]
+      }));
+    }
+  };
+
+  const handleRemoveDominatedLocation = (location: string) => {
+    setEditData(prev => ({
+      ...prev,
+      dominatedLocations: prev.dominatedLocations.filter(l => l !== location)
+    }));
+  };
+
+  const handleUpdateTitleLevel = (titleId: string, newLevel: number) => {
+    setEditData(prev => ({
+      ...prev,
+      titles: prev.titles.map(title => 
+        title.id === titleId ? { ...title, level: newLevel } : title
+      )
+    }));
   };
 
   return (
@@ -253,14 +311,56 @@ export function OrganizationDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {organization.objectives.map((objective, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <span className="text-primary mt-2">•</span>
-                    <span>{objective}</span>
+              {isEditing ? (
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Novo objetivo..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddObjective(e.currentTarget.value);
+                          e.currentTarget.value = "";
+                        }
+                      }}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                        handleAddObjective(input.value);
+                        input.value = "";
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
                   </div>
-                ))}
-              </div>
+                  <div className="space-y-2">
+                    {editData.objectives.map((objective, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
+                        <span>{objective}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => handleRemoveObjective(objective)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {organization.objectives.map((objective, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <span className="text-primary mt-2">•</span>
+                      <span>{objective}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -273,10 +373,16 @@ export function OrganizationDetail() {
                   Membros ({organization.members.length})
                 </CardTitle>
                 {isEditing && (
-                  <Button variant="outline" size="sm" onClick={() => setShowAddTitleDialog(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Adicionar Título
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setShowAddMemberDialog(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Adicionar Membro
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowAddTitleDialog(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Adicionar Título
+                    </Button>
+                  </div>
                 )}
               </div>
             </CardHeader>
@@ -286,11 +392,11 @@ export function OrganizationDetail() {
                 <div>
                   <h4 className="font-medium mb-3">Hierarquia de Títulos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {organization.titles
+                    {(isEditing ? editData.titles : organization.titles)
                       .sort((a, b) => a.level - b.level)
                       .map((title) => (
                         <div key={title.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                          <div>
+                          <div className="flex-1">
                             {isEditing ? (
                               <div className="space-y-1">
                                 <Input 
@@ -312,9 +418,19 @@ export function OrganizationDetail() {
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              Nível {title.level}
-                            </Badge>
+                            {isEditing ? (
+                              <Input
+                                type="number"
+                                min="1"
+                                value={title.level}
+                                onChange={(e) => handleUpdateTitleLevel(title.id, parseInt(e.target.value) || 1)}
+                                className="w-16 text-xs"
+                              />
+                            ) : (
+                              <Badge variant="outline" className="text-xs">
+                                Nível {title.level}
+                              </Badge>
+                            )}
                             {isEditing && title.id !== "default" && (
                               <Button variant="ghost" size="icon" className="h-6 w-6">
                                 <X className="w-3 h-3" />
@@ -493,7 +609,7 @@ export function OrganizationDetail() {
           </Card>
 
           {/* Dominated Territories */}
-          {organization.dominatedLocations.length > 0 && (
+          {(isEditing ? editData.dominatedLocations.length > 0 : organization.dominatedLocations.length > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -502,13 +618,57 @@ export function OrganizationDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  {organization.dominatedLocations.map((location, index) => (
-                    <Badge key={index} variant="outline" className="mr-2 mb-2">
-                      {location}
-                    </Badge>
-                  ))}
-                </div>
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Novo território..."
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddDominatedLocation(e.currentTarget.value);
+                            e.currentTarget.value = "";
+                          }
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={(e) => {
+                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                          handleAddDominatedLocation(input.value);
+                          input.value = "";
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {editData.dominatedLocations.map((location, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <Badge variant="outline" className="mr-2">
+                            {location}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => handleRemoveDominatedLocation(location)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {organization.dominatedLocations.map((location, index) => (
+                      <Badge key={index} variant="outline" className="mr-2 mb-2">
+                        {location}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -530,6 +690,67 @@ export function OrganizationDetail() {
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
               Sim, Excluir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Member Dialog */}
+      <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adicionar Novo Membro</DialogTitle>
+            <DialogDescription>
+              Adicione um personagem como membro desta organização.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="memberCharacter">Personagem</Label>
+              <Select value={newMember.characterId} onValueChange={(value) => setNewMember(prev => ({ ...prev, characterId: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um personagem" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  <SelectItem value="c1">Lyara Moonwhisper</SelectItem>
+                  <SelectItem value="c2">Aelric Valorheart</SelectItem>
+                  <SelectItem value="c3">Sir Marcus Lightbringer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="memberTitle">Título</Label>
+              <Select value={newMember.titleId} onValueChange={(value) => setNewMember(prev => ({ ...prev, titleId: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um título" />
+                </SelectTrigger>
+                <SelectContent side="bottom">
+                  {organization.titles.map((title) => (
+                    <SelectItem key={title.id} value={title.id}>
+                      {title.name} (Nível {title.level})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="joinDate">Data de Ingresso</Label>
+              <Input
+                id="joinDate"
+                placeholder="Ex: Era Atual, 1115"
+                value={newMember.joinDate}
+                onChange={(e) => setNewMember(prev => ({ ...prev, joinDate: e.target.value }))}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowAddMemberDialog(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleAddMember}>
+              Adicionar Membro
             </Button>
           </div>
         </DialogContent>

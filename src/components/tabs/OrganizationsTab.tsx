@@ -362,7 +362,7 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
 
                   {organization.baseLocation && (
                     <div>
-                      <h4 className="font-medium mb-2">Base Principal</h4>
+                      <h4 className="font-medium mb-1">Base Principal</h4>
                       <p className="text-sm text-muted-foreground">{organization.baseLocation}</p>
                     </div>
                   )}
