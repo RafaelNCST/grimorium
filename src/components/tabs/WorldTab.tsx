@@ -38,112 +38,113 @@ interface WorldTabProps {
 
 // Mock data structure - in real app this would be from state management
 const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => {
-  const allEntities: Record<string, WorldEntity[]> = {
-    "new-book": [], // Empty for new book
-    "existing-book": [
-      {
-        id: "world1",
-        bookId: "existing-book",
-        name: "Aethermoor",
-        type: "World",
-        description: "Mundo principal onde se desenrola a história. Um reino de magia e mistério.",
-        age: "5000 anos",
-        dominantOrganization: "Ordem dos Guardiões",
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "continent1", 
-        bookId: "existing-book",
-        name: "Continente Central",
-        type: "Continent",
-        description: "Continente principal de Aethermoor, rico em recursos mágicos.",
-        parentId: "world1",
-        age: "3000 anos",
-        dominantOrganization: "Reino de Aethermoor",
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "continent2",
-        bookId: "existing-book",
-        name: "Terras Sombrias",
-        type: "Continent", 
-        description: "Continente corrompido pelas trevas, lar do Culto das Sombras.",
-        parentId: "world1",
-        age: "2000 anos",
-        dominantOrganization: "Culto das Sombras",
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "continent3",
-        bookId: "existing-book",
-        name: "Ilhas Flutuantes",
-        type: "Continent", 
-        description: "Continente mágico que flutua nas nuvens, sem ligação com mundos terrestres.",
-        age: "1500 anos",
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "loc1",
-        bookId: "existing-book",
-        name: "Floresta das Lamentações",
-        type: "Location",
-        description: "Floresta sombria habitada por criaturas mágicas perigosas.",
-        parentId: "continent1",
-        classification: "Floresta Mágica",
-        climate: "Frio e Úmido",
-        location: "Norte do Continente Central",
-        terrain: "Florestal",
-        organizations: ["Culto das Sombras", "Guarda Florestal"],
-        livingEntities: ["Lobos Sombrios", "Espíritos da Floresta", "Dríades Corrompidas", "Unicórnios das Trevas", "Ents Ancestrais"],
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "loc2",
-        bookId: "existing-book",
-        name: "Aldeia de Pedraverde",
-        type: "Location", 
-        description: "Pequena aldeia de mineradores anões nas montanhas.",
-        parentId: "continent1",
-        classification: "Assentamento",
-        climate: "Montanhoso",
-        location: "Sul do Continente Central",
-        terrain: "Rochoso",
-        organizations: ["Guilda dos Artífices"],
-        livingEntities: ["Anões", "Águias Gigantes", "Cabras Montanhesas"],
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "loc3",
-        bookId: "existing-book",
-        name: "Torre de Cristal",
-        type: "Location",
-        description: "Antiga torre dos magos, agora em ruínas. Contém segredos sobre magia antiga.",
-        classification: "Ruína Mágica",
-        climate: "Temperado", 
-        terrain: "Planície",
-        organizations: [],
-        livingEntities: ["Constructos de Cristal", "Wisp de Energia"],
-        image: "/api/placeholder/300/200"
-      },
-      {
-        id: "loc4",
-        bookId: "existing-book",
-        name: "Cidade Flutuante de Nimbus",
-        type: "Location",
-        description: "Capital das Ilhas Flutuantes, cidade mágica suspensa nas nuvens.",
-        parentId: "continent3",
-        classification: "Cidade",
-        climate: "Aéreo e Fresco",
-        location: "Centro das Ilhas Flutuantes",
-        terrain: "Aéreo",
-        organizations: ["Conselho dos Ventos", "Guarda Celestial"],
-        livingEntities: ["Humanos Alados", "Pégasos", "Elementais do Ar", "Fênix Menores"],
-        image: "/api/placeholder/300/200"
-      }
-    ]
-  };
+  // Return empty for book "4" (new book)
+  if (bookId === "4") {
+    return [];
+  }
   
-  return allEntities[bookId] || [];
+  // Return sample data for other books
+  return [
+    {
+      id: "world1",
+      bookId,
+      name: "Aethermoor",
+      type: "World",
+      description: "Mundo principal onde se desenrola a história. Um reino de magia e mistério.",
+      age: "5000 anos",
+      dominantOrganization: "Ordem dos Guardiões",
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "continent1", 
+      bookId,
+      name: "Continente Central",
+      type: "Continent",
+      description: "Continente principal de Aethermoor, rico em recursos mágicos.",
+      parentId: "world1",
+      age: "3000 anos",
+      dominantOrganization: "Reino de Aethermoor",
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "continent2",
+      bookId,
+      name: "Terras Sombrias",
+      type: "Continent", 
+      description: "Continente corrompido pelas trevas, lar do Culto das Sombras.",
+      parentId: "world1",
+      age: "2000 anos",
+      dominantOrganization: "Culto das Sombras",
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "continent3",
+      bookId,
+      name: "Ilhas Flutuantes",
+      type: "Continent", 
+      description: "Continente mágico que flutua nas nuvens, sem ligação com mundos terrestres.",
+      age: "1500 anos",
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "loc1",
+      bookId,
+      name: "Floresta das Lamentações",
+      type: "Location",
+      description: "Floresta sombria habitada por criaturas mágicas perigosas.",
+      parentId: "continent1",
+      classification: "Floresta Mágica",
+      climate: "Frio e Úmido",
+      location: "Norte do Continente Central",
+      terrain: "Florestal",
+      organizations: ["Culto das Sombras", "Guarda Florestal"],
+      livingEntities: ["Lobos Sombrios", "Espíritos da Floresta", "Dríades Corrompidas", "Unicórnios das Trevas", "Ents Ancestrais"],
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "loc2",
+      bookId,
+      name: "Aldeia de Pedraverde",
+      type: "Location", 
+      description: "Pequena aldeia de mineradores anões nas montanhas.",
+      parentId: "continent1",
+      classification: "Assentamento",
+      climate: "Montanhoso",
+      location: "Sul do Continente Central",
+      terrain: "Rochoso",
+      organizations: ["Guilda dos Artífices"],
+      livingEntities: ["Anões", "Águias Gigantes", "Cabras Montanhesas"],
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "loc3",
+      bookId,
+      name: "Torre de Cristal",
+      type: "Location",
+      description: "Antiga torre dos magos, agora em ruínas. Contém segredos sobre magia antiga.",
+      classification: "Ruína Mágica",
+      climate: "Temperado", 
+      terrain: "Planície",
+      organizations: [],
+      livingEntities: ["Constructos de Cristal", "Wisp de Energia"],
+      image: "/api/placeholder/300/200"
+    },
+    {
+      id: "loc4",
+      bookId,
+      name: "Cidade Flutuante de Nimbus",
+      type: "Location",
+      description: "Capital das Ilhas Flutuantes, cidade mágica suspensa nas nuvens.",
+      parentId: "continent3",
+      classification: "Cidade",
+      climate: "Aéreo e Fresco",
+      location: "Centro das Ilhas Flutuantes",
+      terrain: "Aéreo",
+      organizations: ["Conselho dos Ventos", "Guarda Celestial"],
+      livingEntities: ["Humanos Alados", "Pégasos", "Elementais do Ar", "Fênix Menores"],
+      image: "/api/placeholder/300/200"
+    }
+  ];
 };
 
 export function WorldTab({ bookId }: WorldTabProps) {
@@ -381,6 +382,14 @@ export function WorldTab({ bookId }: WorldTabProps) {
 
   return (
     <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Mundo</h2>
+          <p className="text-muted-foreground">Gerencie mundos, continentes e locais da sua história</p>
+        </div>
+      </div>
+
       {/* Global Search */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
