@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { WorldTimeline } from "@/components/WorldTimeline";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SpeciesTab } from "@/components/tabs/SpeciesTab";
 
 interface WorldEntity {
   id: string;
@@ -274,413 +276,404 @@ export function WorldDetail() {
 
       {/* Content */}
       <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Basic Information */}
-            <Card className="card-magical">
-              <CardHeader>
-                <CardTitle>Informações Básicas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {isEditing ? (
-                  <div className="space-y-4">
-                    {/* Image Upload */}
-                    <div className="space-y-2">
-                      <Label htmlFor="image">Imagem</Label>
-                      <div 
-                        className="flex items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {imagePreview ? (
-                          <div className="relative w-full h-full">
-                            <img 
-                              src={imagePreview} 
-                              alt="Preview" 
-                              className="w-full h-full object-cover rounded-lg"
-                            />
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="species">Espécies</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="locations">Locais</TabsTrigger>
+            <TabsTrigger value="notes">Notas</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Basic Information */}
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CardTitle>Informações Básicas</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {isEditing ? (
+                      <div className="space-y-4">
+                        {/* Image Upload */}
+                        <div className="space-y-2">
+                          <Label htmlFor="image">Imagem</Label>
+                          <div 
+                            className="flex items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            {imagePreview ? (
+                              <div className="relative w-full h-full">
+                                <img 
+                                  src={imagePreview} 
+                                  alt="Preview" 
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              </div>
+                            ) : character.image ? (
+                              <div className="relative w-full h-full">
+                                <img 
+                                  src={character.image} 
+                                  alt="Current" 
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center">
+                                <Upload className="w-12 h-12 text-muted-foreground mb-3" />
+                                <span className="text-sm text-muted-foreground text-center">Clique para enviar imagem ou mapa</span>
+                                <span className="text-xs text-muted-foreground/70 text-center mt-1">Recomendado: 16:9 para melhor visualização</span>
+                              </div>
+                            )}
                           </div>
-                        ) : character.image ? (
-                          <div className="relative w-full h-full">
-                            <img 
-                              src={character.image} 
-                              alt="Current" 
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center">
-                            <Upload className="w-12 h-12 text-muted-foreground mb-3" />
-                            <span className="text-sm text-muted-foreground text-center">Clique para enviar imagem ou mapa</span>
-                            <span className="text-xs text-muted-foreground/70 text-center mt-1">Recomendado: 16:9 para melhor visualização</span>
-                          </div>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Nome</Label>
+                          <Input 
+                            id="name" 
+                            value={editData.name}
+                            onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Descrição</Label>
+                          <Textarea 
+                            id="description" 
+                            value={editData.description}
+                            onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                            className="min-h-[100px]"
+                          />
+                        </div>
+
+                        {character.type === "Location" && (
+                          <>
+                            <div className="space-y-2">
+                              <Label htmlFor="classification">Classificação</Label>
+                              <Input 
+                                id="classification" 
+                                value={editData.classification || ""}
+                                onChange={(e) => setEditData(prev => ({ ...prev, classification: e.target.value }))}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="climate">Clima</Label>
+                              <Input 
+                                id="climate" 
+                                value={editData.climate || ""}
+                                onChange={(e) => setEditData(prev => ({ ...prev, climate: e.target.value }))}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="location">Localização</Label>
+                              <Input 
+                                id="location" 
+                                value={editData.location || ""}
+                                onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="terrain">Solo</Label>
+                              <Input 
+                                id="terrain" 
+                                value={editData.terrain || ""}
+                                onChange={(e) => setEditData(prev => ({ ...prev, terrain: e.target.value }))}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {(character.type === "World" || character.type === "Continent") && (
+                          <>
+                            <div className="space-y-2">
+                              <Label htmlFor="age">Idade</Label>
+                              <Input 
+                                id="age" 
+                                value={editData.age || ""}
+                                onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="dominantOrganization">Organização Dominante</Label>
+                              <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecione uma organização" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">Nenhuma</SelectItem>
+                                  {mockOrganizations.map((org) => (
+                                    <SelectItem key={org.id} value={org.name}>
+                                      {org.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </>
                         )}
                       </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nome</Label>
-                      <Input 
-                        id="name" 
-                        value={editData.name}
-                        onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Descrição</Label>
-                      <Textarea 
-                        id="description" 
-                        value={editData.description}
-                        onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                        className="min-h-[100px]"
-                      />
-                    </div>
-
-                    {character.type === "Location" && (
-                      <>
-                        <div className="space-y-2">
-                          <Label htmlFor="classification">Classificação</Label>
-                          <Input 
-                            id="classification" 
-                            value={editData.classification || ""}
-                            onChange={(e) => setEditData(prev => ({ ...prev, classification: e.target.value }))}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="climate">Clima</Label>
-                          <Input 
-                            id="climate" 
-                            value={editData.climate || ""}
-                            onChange={(e) => setEditData(prev => ({ ...prev, climate: e.target.value }))}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="location">Localização</Label>
-                          <Input 
-                            id="location" 
-                            value={editData.location || ""}
-                            onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="terrain">Solo</Label>
-                          <Input 
-                            id="terrain" 
-                            value={editData.terrain || ""}
-                            onChange={(e) => setEditData(prev => ({ ...prev, terrain: e.target.value }))}
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {(character.type === "World" || character.type === "Continent") && (
-                      <>
-                        <div className="space-y-2">
-                          <Label htmlFor="age">Idade</Label>
-                          <Input 
-                            id="age" 
-                            value={editData.age || ""}
-                            onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="dominantOrganization">Organização Dominante</Label>
-                          <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione uma organização" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Nenhuma</SelectItem>
-                              {mockOrganizations.map((org) => (
-                                <SelectItem key={org.id} value={org.name}>
-                                  {org.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Full-width image */}
-                    {character.image && (
-                      <div className="w-full">
-                        <img 
-                          src={character.image} 
-                          alt={character.name}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="flex items-start gap-4">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        {getEntityIcon()}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h2 className="text-2xl font-semibold">{character.name}</h2>
-                          <Badge variant="outline">
-                            {character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"}
-                          </Badge>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div>
-                            <h3 className="font-semibold text-sm mb-1">Descrição</h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{character.description}</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {/* Full-width image */}
+                        {character.image && (
+                          <div className="w-full">
+                            <img 
+                              src={character.image} 
+                              alt={character.name}
+                              className="w-full h-48 object-cover rounded-lg"
+                            />
                           </div>
+                        )}
+                        
+                        <div className="flex items-start gap-4">
+                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            {getEntityIcon()}
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h2 className="text-2xl font-semibold">{character.name}</h2>
+                              <Badge variant="outline">
+                                {character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"}
+                              </Badge>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              <div>
+                                <h3 className="font-semibold text-sm mb-1">Descrição</h3>
+                                <p className="text-muted-foreground text-sm leading-relaxed">{character.description}</p>
+                              </div>
 
-                          {character.type === "Location" && (
-                            <>
-                              {character.classification && (
+                              {character.type === "Location" && character.classification && (
                                 <div>
                                   <h3 className="font-semibold text-sm mb-1">Classificação</h3>
-                                  <p className="text-muted-foreground text-sm">{character.classification}</p>
+                                  <Badge variant="secondary">{character.classification}</Badge>
                                 </div>
                               )}
-                              {character.climate && (
+
+                              {character.type === "Location" && character.climate && (
                                 <div>
                                   <h3 className="font-semibold text-sm mb-1">Clima</h3>
                                   <p className="text-muted-foreground text-sm">{character.climate}</p>
                                 </div>
                               )}
-                              {character.location && (
+
+                              {character.type === "Location" && character.location && (
                                 <div>
                                   <h3 className="font-semibold text-sm mb-1">Localização</h3>
                                   <p className="text-muted-foreground text-sm">{character.location}</p>
                                 </div>
                               )}
-                              {character.terrain && (
+
+                              {character.type === "Location" && character.terrain && (
                                 <div>
                                   <h3 className="font-semibold text-sm mb-1">Solo</h3>
                                   <p className="text-muted-foreground text-sm">{character.terrain}</p>
                                 </div>
                               )}
-                            </>
-                          )}
 
-                          {(character.type === "World" || character.type === "Continent") && character.age && (
-                            <div>
-                              <h3 className="font-semibold text-sm mb-1">Idade</h3>
-                              <p className="text-muted-foreground text-sm">{character.age}</p>
+                              {(character.type === "World" || character.type === "Continent") && character.age && (
+                                <div>
+                                  <h3 className="font-semibold text-sm mb-1">Idade</h3>
+                                  <p className="text-muted-foreground text-sm">{character.age}</p>
+                                </div>
+                              )}
                             </div>
-                          )}
-
-                          {character.dominantOrganization && (
-                            <div>
-                              <h3 className="font-semibold text-sm mb-1">Organização Dominante</h3>
-                              <p className="text-muted-foreground text-sm">{character.dominantOrganization}</p>
-                            </div>
-                          )}
+                          </div>
                         </div>
                       </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Sticky Notes */}
+                <Card className="card-magical">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <StickyNote className="w-5 h-5" />
+                        Notas
+                      </CardTitle>
+                      <Button variant="outline" size="sm" onClick={addStickyNote}>
+                        <Plus className="w-4 h-4" />
+                      </Button>
                     </div>
-                  </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative min-h-[200px] border-2 border-dashed border-border rounded-lg p-4">
+                      {stickyNotes.map((note) => (
+                        <div
+                          key={note.id}
+                          className={`absolute p-2 rounded-lg shadow-sm border cursor-move min-w-[120px] max-w-[200px] ${note.color}`}
+                          style={{ left: note.x, top: note.y }}
+                          draggable
+                        >
+                          <p className="text-xs break-words">{note.content}</p>
+                        </div>
+                      ))}
+                      
+                      {stickyNotes.length === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <p className="text-muted-foreground text-sm">Clique no + para adicionar notas</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Hierarchy */}
+                {character.worldId && (
+                  <Card className="card-magical">
+                    <CardHeader>
+                      <CardTitle>Mundo</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isEditing ? (
+                        <Select value={editData.worldId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, worldId: value === "none" ? "" : value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um mundo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Nenhum</SelectItem>
+                            {mockWorlds.map((world) => (
+                              <SelectItem key={world.id} value={world.id}>
+                                {world.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">{getWorldName(character.worldId) || "Nenhum mundo"}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 )}
-              </CardContent>
-            </Card>
 
-            {/* Sticky Notes for Locations */}
-            {character.type === "Location" && (
-              <Card className="card-magical">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <StickyNote className="w-5 h-5" />
-                      Quadro de Notas
-                    </CardTitle>
-                    <Button variant="outline" size="sm" onClick={addStickyNote}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nova Nota
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative min-h-[300px] bg-muted/20 rounded-lg p-4">
-                    {stickyNotes.map((note) => (
-                      <div
-                        key={note.id}
-                        className={`absolute w-48 p-3 rounded shadow-md ${note.color} cursor-move`}
-                        style={{ left: note.x, top: note.y }}
-                      >
-                        <Textarea 
-                          defaultValue={note.content}
-                          className="border-none bg-transparent resize-none text-sm"
-                          rows={3}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                {character.type === "Location" && (
+                  <>
+                    <Card className="card-magical">
+                      <CardHeader>
+                        <CardTitle>Continente</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {isEditing ? (
+                          <Select value={editData.continentId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, continentId: value === "none" ? "" : value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione um continente" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Nenhum</SelectItem>
+                              {mockContinents.map((continent) => (
+                                <SelectItem key={continent.id} value={continent.id}>
+                                  {continent.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Mountain className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm">{getContinentName(character.continentId) || "Nenhum continente"}</span>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
 
-            {/* Timeline - only for World and Continent */}
-            {(character.type === "World" || character.type === "Continent") && (
-              <WorldTimeline 
-                worldId={character.id}
-                worldType={character.type}
-                isEditing={isEditing}
-              />
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* World and Continent References */}
-            {character.type === "Continent" && (
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Mundo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <Select value={editData.worldId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, worldId: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um mundo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {mockWorlds.map((world) => (
-                          <SelectItem key={world.id} value={world.id}>
-                            {world.name}
-                          </SelectItem>
+                {/* Organizations */}
+                {character.organizations && character.organizations.length > 0 && (
+                  <Card className="card-magical">
+                    <CardHeader>
+                      <CardTitle>Organizações</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {character.organizations.map((org, idx) => (
+                          <Badge key={idx} variant="secondary">
+                            {org}
+                          </Badge>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{getWorldName(character.worldId) || "Nenhum mundo"}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {character.type === "Location" && (
-              <>
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CardTitle>Mundo</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Select value={editData.worldId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, worldId: value === "none" ? "" : value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um mundo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Nenhum</SelectItem>
-                          {mockWorlds.map((world) => (
-                            <SelectItem key={world.id} value={world.id}>
-                              {world.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{getWorldName(character.worldId) || "Nenhum mundo"}</span>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
 
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CardTitle>Continente</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <Select value={editData.continentId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, continentId: value === "none" ? "" : value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um continente" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Nenhum</SelectItem>
-                          {mockContinents.map((continent) => (
-                            <SelectItem key={continent.id} value={continent.id}>
-                              {continent.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <Mountain className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{getContinentName(character.continentId) || "Nenhum continente"}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
-            {/* Organizations */}
-            {character.organizations && character.organizations.length > 0 && (
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Organizações</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {character.organizations.map((org, idx) => (
-                      <Badge key={idx} variant="secondary">
-                        {org}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Dominant Organization */}
-            {(character.dominantOrganization || isEditing) && (
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Organização Dominante</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma organização" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhuma</SelectItem>
-                        {mockOrganizations.map((org) => (
-                          <SelectItem key={org.id} value={org.name}>
-                            {org.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{character.dominantOrganization || "Nenhuma organização"}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
+                {/* Dominant Organization */}
+                {(character.dominantOrganization || isEditing) && (
+                  <Card className="card-magical">
+                    <CardHeader>
+                      <CardTitle>Organização Dominante</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isEditing ? (
+                        <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma organização" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Nenhuma</SelectItem>
+                            {mockOrganizations.map((org) => (
+                              <SelectItem key={org.id} value={org.name}>
+                                {org.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">{character.dominantOrganization || "Nenhuma organização"}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="species" className="mt-6">
+            <SpeciesTab />
+          </TabsContent>
+          
+          <TabsContent value="timeline" className="mt-6">
+            <WorldTimeline 
+              worldId={character.id}
+              worldType={character.type as "World" | "Continent"}
+              isEditing={isEditing}
+            />
+          </TabsContent>
+          
+          <TabsContent value="locations" className="mt-6">
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Funcionalidade de locais em desenvolvimento</p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="notes" className="mt-6">
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Funcionalidade de notas em desenvolvimento</p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <ConfirmDeleteModal
