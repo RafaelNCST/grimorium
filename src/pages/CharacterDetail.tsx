@@ -123,17 +123,17 @@ const familyRelations = {
 };
 
 const relationshipTypes = [
-  { value: "odio", label: "Ódio", icon: Frown, color: "bg-red-500/10 text-red-600" },
-  { value: "amor", label: "Amor", icon: Heart, color: "bg-pink-500/10 text-pink-600" },
-  { value: "interesse_amoroso", label: "Interesse Amoroso", icon: HeartHandshake, color: "bg-rose-500/10 text-rose-600" },
-  { value: "mentorado", label: "Mentorado", icon: BookOpen, color: "bg-blue-500/10 text-blue-600" },
-  { value: "subordinacao", label: "Subordinação", icon: ChevronDown, color: "bg-gray-500/10 text-gray-600" },
-  { value: "rivalidade", label: "Rivalidade", icon: Target, color: "bg-orange-500/10 text-orange-600" },
-  { value: "lideranca", label: "Liderança", icon: ChevronUp, color: "bg-purple-500/10 text-purple-600" },
-  { value: "amizade", label: "Amizade", icon: Smile, color: "bg-green-500/10 text-green-600" },
-  { value: "melhores_amigos", label: "Melhores Amigos", icon: Users, color: "bg-emerald-500/10 text-emerald-600" },
-  { value: "inimizade", label: "Inimizade", icon: Sword, color: "bg-red-600/10 text-red-700" },
-  { value: "neutro", label: "Neutro", icon: Shield, color: "bg-slate-500/10 text-slate-600" }
+  { value: "odio", label: "Ódio", emoji: "😡", color: "bg-red-500/10 text-red-600" },
+  { value: "amor", label: "Amor", emoji: "❤️", color: "bg-pink-500/10 text-pink-600" },
+  { value: "interesse_amoroso", label: "Interesse Amoroso", emoji: "💕", color: "bg-rose-500/10 text-rose-600" },
+  { value: "mentorado", label: "Mentorado", emoji: "🎓", color: "bg-blue-500/10 text-blue-600" },
+  { value: "subordinacao", label: "Subordinação", emoji: "🫡", color: "bg-gray-500/10 text-gray-600" },
+  { value: "rivalidade", label: "Rivalidade", emoji: "⚔️", color: "bg-orange-500/10 text-orange-600" },
+  { value: "lideranca", label: "Liderança", emoji: "👑", color: "bg-purple-500/10 text-purple-600" },
+  { value: "amizade", label: "Amizade", emoji: "😊", color: "bg-green-500/10 text-green-600" },
+  { value: "melhores_amigos", label: "Melhores Amigos", emoji: "👥", color: "bg-emerald-500/10 text-emerald-600" },
+  { value: "inimizade", label: "Inimizade", emoji: "😤", color: "bg-red-600/10 text-red-700" },
+  { value: "neutro", label: "Neutro", emoji: "😐", color: "bg-slate-500/10 text-slate-600" }
 ];
 
 export function CharacterDetail() {
@@ -940,18 +940,24 @@ export function CharacterDetail() {
                       
                       <div className="space-y-2">
                         <Label>Tipo de Relacionamento</Label>
-                        <Select value={selectedRelationshipType} onValueChange={setSelectedRelationshipType}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {relationshipTypes.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg bg-background">
+                          {relationshipTypes.map((type) => (
+                            <div
+                              key={type.value}
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                                selectedRelationshipType === type.value
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-muted hover:border-primary/50'
+                              }`}
+                              onClick={() => setSelectedRelationshipType(type.value)}
+                            >
+                              <div className="text-center space-y-1">
+                                <div className="text-2xl">{type.emoji}</div>
+                                <div className="text-xs font-medium">{type.label}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       
                       <div className="space-y-2">
@@ -984,13 +990,12 @@ export function CharacterDetail() {
                       {editData.relationships.map((relationship) => {
                         const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
                         const typeData = getRelationshipTypeData(relationship.type);
-                        const Icon = typeData.icon;
                         
                         return relatedChar ? (
                           <div key={relationship.id} className="p-3 border rounded-lg space-y-2">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <Icon className="w-4 h-4" />
+                                <span className="text-lg">{typeData.emoji}</span>
                                 <span className="font-medium text-sm">{relatedChar.name}</span>
                                 <Badge variant="outline" className={typeData.color}>
                                   {typeData.label}
@@ -1027,12 +1032,11 @@ export function CharacterDetail() {
                     character.relationships.map((relationship) => {
                       const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
                       const typeData = getRelationshipTypeData(relationship.type);
-                      const Icon = typeData.icon;
                       
                       return relatedChar ? (
                         <div key={relationship.id} className="flex items-center justify-between p-3 border rounded-lg">
                           <div className="flex items-center gap-3">
-                            <Icon className="w-4 h-4" />
+                            <span className="text-lg">{typeData.emoji}</span>
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm">{relatedChar.name}</span>
