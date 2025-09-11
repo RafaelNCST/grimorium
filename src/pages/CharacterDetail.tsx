@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
 import { toast } from "sonner";
 
@@ -38,7 +39,27 @@ const mockCharacter = {
     unclesAunts: [],
     grandparents: [],
     cousins: []
-  }
+  },
+  relationships: [
+    {
+      id: "rel-1",
+      characterId: "2",
+      type: "amizade",
+      intensity: 85
+    },
+    {
+      id: "rel-2", 
+      characterId: "4",
+      type: "interesse_amoroso",
+      intensity: 70
+    },
+    {
+      id: "rel-3",
+      characterId: "8",
+      type: "rivalidade",
+      intensity: 60
+    }
+  ]
 };
 
 const roles = [
@@ -101,16 +122,33 @@ const familyRelations = {
   ]
 };
 
+const relationshipTypes = [
+  { value: "odio", label: "Ódio", icon: Frown, color: "bg-red-500/10 text-red-600" },
+  { value: "amor", label: "Amor", icon: Heart, color: "bg-pink-500/10 text-pink-600" },
+  { value: "interesse_amoroso", label: "Interesse Amoroso", icon: HeartHandshake, color: "bg-rose-500/10 text-rose-600" },
+  { value: "mentorado", label: "Mentorado", icon: BookOpen, color: "bg-blue-500/10 text-blue-600" },
+  { value: "subordinacao", label: "Subordinação", icon: ChevronDown, color: "bg-gray-500/10 text-gray-600" },
+  { value: "rivalidade", label: "Rivalidade", icon: Target, color: "bg-orange-500/10 text-orange-600" },
+  { value: "lideranca", label: "Liderança", icon: ChevronUp, color: "bg-purple-500/10 text-purple-600" },
+  { value: "amizade", label: "Amizade", icon: Smile, color: "bg-green-500/10 text-green-600" },
+  { value: "melhores_amigos", label: "Melhores Amigos", icon: Users, color: "bg-emerald-500/10 text-emerald-600" },
+  { value: "inimizade", label: "Inimizade", icon: Sword, color: "bg-red-600/10 text-red-700" },
+  { value: "neutro", label: "Neutro", icon: Shield, color: "bg-slate-500/10 text-slate-600" }
+];
+
 export function CharacterDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [character, setCharacter] = useState(mockCharacter);
-  const [editData, setEditData] = useState(mockCharacter);
+  const [editData, setEditData] = useState({...mockCharacter, relationships: mockCharacter.relationships || []});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuality, setNewQuality] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(mockCharacter.image);
+  const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] = useState("");
+  const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
+  const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -130,7 +168,7 @@ export function CharacterDetail() {
   };
 
   const handleCancel = () => {
-    setEditData(character);
+    setEditData({...character, relationships: character.relationships || []});
     setIsEditing(false);
   };
 
@@ -246,6 +284,48 @@ export function CharacterDetail() {
       ...prev,
       age: Math.max(0, prev.age + (increment ? 1 : -1))
     }));
+  };
+
+  const handleAddRelationship = () => {
+    if (selectedRelationshipCharacter && selectedRelationshipType) {
+      const newRelationship = {
+        id: `rel-${Date.now()}`,
+        characterId: selectedRelationshipCharacter,
+        type: selectedRelationshipType,
+        intensity: relationshipIntensity[0]
+      };
+      
+      setEditData(prev => ({
+        ...prev,
+        relationships: [...(prev.relationships || []), newRelationship]
+      }));
+      
+      setSelectedRelationshipCharacter("");
+      setSelectedRelationshipType("");
+      setRelationshipIntensity([50]);
+      toast.success("Relacionamento adicionado com sucesso!");
+    }
+  };
+
+  const handleRemoveRelationship = (relationshipId: string) => {
+    setEditData(prev => ({
+      ...prev,
+      relationships: prev.relationships?.filter(rel => rel.id !== relationshipId) || []
+    }));
+    toast.success("Relacionamento removido com sucesso!");
+  };
+
+  const handleUpdateRelationshipIntensity = (relationshipId: string, intensity: number) => {
+    setEditData(prev => ({
+      ...prev,
+      relationships: prev.relationships?.map(rel => 
+        rel.id === relationshipId ? { ...rel, intensity } : rel
+      ) || []
+    }));
+  };
+
+  const getRelationshipTypeData = (type: string) => {
+    return relationshipTypes.find(rt => rt.value === type) || relationshipTypes[0];
   };
 
   return (
@@ -822,6 +902,165 @@ export function CharacterDetail() {
                   <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>Nenhuma relação familiar definida</p>
                   <p className="text-xs">Use o modo de edição para adicionar familiares</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Relationships Card */}
+          <Card className="card-magical">
+            <CardHeader>
+              <CardTitle>Relacionamentos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isEditing ? (
+                <div className="space-y-4">
+                  {/* Add Relationship Form */}
+                  <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
+                    <h4 className="font-semibold text-sm">Adicionar Relacionamento</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-2">
+                        <Label>Personagem</Label>
+                        <Select value={selectedRelationshipCharacter} onValueChange={setSelectedRelationshipCharacter}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um personagem" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {mockCharacters
+                              .filter(char => char.id !== character.id)
+                              .filter(char => !editData.relationships?.some(rel => rel.characterId === char.id))
+                              .map((char) => (
+                                <SelectItem key={char.id} value={char.id}>
+                                  {char.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Tipo de Relacionamento</Label>
+                        <Select value={selectedRelationshipType} onValueChange={setSelectedRelationshipType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tipo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {relationshipTypes.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>Intensidade: {relationshipIntensity[0]}%</Label>
+                        <Slider
+                          value={relationshipIntensity}
+                          onValueChange={setRelationshipIntensity}
+                          max={100}
+                          min={1}
+                          step={1}
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <Button 
+                        onClick={handleAddRelationship} 
+                        disabled={!selectedRelationshipCharacter || !selectedRelationshipType}
+                        size="sm"
+                      >
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Adicionar
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Current Relationships List */}
+                  {editData.relationships && editData.relationships.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-sm">Relacionamentos Atuais</h4>
+                      {editData.relationships.map((relationship) => {
+                        const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
+                        const typeData = getRelationshipTypeData(relationship.type);
+                        const Icon = typeData.icon;
+                        
+                        return relatedChar ? (
+                          <div key={relationship.id} className="p-3 border rounded-lg space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Icon className="w-4 h-4" />
+                                <span className="font-medium text-sm">{relatedChar.name}</span>
+                                <Badge variant="outline" className={typeData.color}>
+                                  {typeData.label}
+                                </Badge>
+                              </div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleRemoveRelationship(relationship.id)}
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Intensidade: {relationship.intensity}%</Label>
+                              <Slider
+                                value={[relationship.intensity]}
+                                onValueChange={(value) => handleUpdateRelationshipIntensity(relationship.id, value[0])}
+                                max={100}
+                                min={1}
+                                step={1}
+                                className="w-full"
+                              />
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {character.relationships && character.relationships.length > 0 ? (
+                    character.relationships.map((relationship) => {
+                      const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
+                      const typeData = getRelationshipTypeData(relationship.type);
+                      const Icon = typeData.icon;
+                      
+                      return relatedChar ? (
+                        <div key={relationship.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Icon className="w-4 h-4" />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm">{relatedChar.name}</span>
+                                <Badge variant="outline" className={typeData.color}>
+                                  {typeData.label}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Intensidade: {relationship.intensity}%
+                              </div>
+                            </div>
+                          </div>
+                          <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary transition-all"
+                              style={{ width: `${relationship.intensity}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : null;
+                    })
+                  ) : (
+                    <div className="text-center text-muted-foreground text-sm py-4">
+                      <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>Nenhum relacionamento definido</p>
+                      <p className="text-xs">Use o modo de edição para adicionar relacionamentos</p>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
