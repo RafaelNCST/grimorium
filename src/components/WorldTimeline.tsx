@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Clock, Calendar, Users, Building, Info } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Plus, Clock, Calendar, Users, Building, Info, ChevronDown, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 // Interfaces
@@ -246,94 +247,167 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
       </CardHeader>
       <CardContent>
         <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary opacity-30"></div>
+          {/* Enhanced Timeline Line with Gradient and Glow */}
+          <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
+            <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm"></div>
+          </div>
           
-          <div className="space-y-8">
+          <Accordion type="multiple" className="space-y-6">
             {timeline.map((era, eraIndex) => (
-              <div key={era.id} className="relative">
-                {/* Era Header */}
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="relative">
-                    <div className="w-4 h-4 rounded-full bg-primary border-4 border-background shadow-lg z-10 relative"></div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-card/50 rounded-lg p-4 border border-border/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold">{era.name}</h3>
-                        <Badge variant="secondary" className="text-xs">
-                          {era.startDate} - {era.endDate}
-                        </Badge>
+              <AccordionItem key={era.id} value={era.id} className="border-none">
+                <div className="relative">
+                  {/* Era Marker with Enhanced Design */}
+                  <div className="absolute left-8 top-6 z-20">
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 border-4 border-background shadow-xl flex items-center justify-center">
+                        <Sparkles className="w-3 h-3 text-primary-foreground" />
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{era.description}</p>
-                      {isEditing && era.events.length === 0 && (
-                        <Button 
-                          onClick={() => {
-                            setSelectedEraId(era.id);
-                            setShowCreateEventModal(true);
-                          }}
-                          size="sm" 
-                          variant="outline" 
-                          className="mt-3"
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Primeiro Evento
-                        </Button>
-                      )}
+                      <div className="absolute inset-0 w-8 h-8 rounded-full bg-primary/20 animate-pulse"></div>
                     </div>
                   </div>
-                </div>
-
-                {/* Events */}
-                {era.events.length > 0 && (
-                  <div className="ml-8 space-y-4 pb-4">
-                    {era.events.map((event, eventIndex) => (
-                      <div key={event.id} className="relative flex items-start gap-4">
-                        <div className="relative">
-                          <div className="w-2 h-2 rounded-full bg-primary/60 border-2 border-background relative z-10"></div>
+                  
+                  {/* Era Card with Enhanced Styling */}
+                  <div className="ml-20 relative">
+                    <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg">
+                      <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
+                        <div className="flex items-center justify-between w-full">
+                          <div className="text-left">
+                            <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                              {era.name}
+                            </h3>
+                            <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary border-primary/20">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {era.startDate} - {era.endDate}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {era.events.length > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                {era.events.length} evento{era.events.length !== 1 ? 's' : ''}
+                              </Badge>
+                            )}
+                            <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <Card 
-                            className="hover:shadow-md transition-shadow cursor-pointer"
-                            onClick={() => openEventDetails(event)}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-medium">{event.name}</h4>
-                                <Badge variant="outline" className="text-xs">
-                                  {event.startDate} - {event.endDate}
-                                </Badge>
+                        <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+                          {era.description}
+                        </p>
+                      </div>
+                    </AccordionTrigger>
+                    
+                    <AccordionContent className="pt-4 pb-0">
+                      <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
+                        {era.events.length > 0 ? (
+                          <>
+                            {era.events.map((event, eventIndex) => (
+                              <div key={event.id} className="relative">
+                                {/* Event Marker */}
+                                <div className="absolute -left-8 top-3">
+                                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary/60 to-primary/40 border-2 border-background shadow-md"></div>
+                                </div>
+                                
+                                {/* Event Card */}
+                                <Card 
+                                  className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
+                                  onClick={() => openEventDetails(event)}
+                                >
+                                  <CardContent className="p-5">
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div className="flex-1">
+                                        <h4 className="font-semibold text-foreground/90 mb-1">
+                                          {event.name}
+                                        </h4>
+                                        <Badge variant="outline" className="text-xs bg-muted/50">
+                                          <Calendar className="w-3 h-3 mr-1" />
+                                          {event.startDate} - {event.endDate}
+                                        </Badge>
+                                      </div>
+                                      <Info className="w-4 h-4 text-muted-foreground/60" />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                                      {event.shortDescription}
+                                    </p>
+                                    {(event.charactersInvolved.length > 0 || event.organizationsInvolved.length > 0) && (
+                                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
+                                        {event.charactersInvolved.length > 0 && (
+                                          <div className="flex items-center gap-1">
+                                            <Users className="w-3 h-3 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">
+                                              {event.charactersInvolved.length} personagem{event.charactersInvolved.length !== 1 ? 's' : ''}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {event.organizationsInvolved.length > 0 && (
+                                          <div className="flex items-center gap-1">
+                                            <Building className="w-3 h-3 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">
+                                              {event.organizationsInvolved.length} organização{event.organizationsInvolved.length !== 1 ? 'ões' : ''}
+                                            </span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </CardContent>
+                                </Card>
                               </div>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {event.shortDescription}
-                              </p>
-                            </CardContent>
-                          </Card>
-                        </div>
+                            ))}
+                            
+                            {/* Add Event Button */}
+                            {isEditing && (
+                              <div className="relative">
+                                <div className="absolute -left-8 top-3">
+                                  <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20"></div>
+                                </div>
+                                <Button 
+                                  onClick={() => {
+                                    setSelectedEraId(era.id);
+                                    setShowCreateEventModal(true);
+                                  }}
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 border border-dashed border-muted-foreground/30 hover:border-primary/30 w-full justify-start"
+                                >
+                                  <Plus className="w-4 h-4 mr-2" />
+                                  Adicionar Evento
+                                </Button>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          isEditing && (
+                            <div className="text-center py-8">
+                              <div className="relative">
+                                <div className="absolute -left-8 top-6">
+                                  <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20"></div>
+                                </div>
+                                <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
+                                  <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                                  <p className="text-sm text-muted-foreground mb-4">
+                                    Esta era ainda não possui eventos
+                                  </p>
+                                  <Button 
+                                    onClick={() => {
+                                      setSelectedEraId(era.id);
+                                      setShowCreateEventModal(true);
+                                    }}
+                                    size="sm" 
+                                    className="btn-magical"
+                                  >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Criar Primeiro Evento
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )}
                       </div>
-                    ))}
-                    {isEditing && (
-                      <div className="relative flex items-start gap-4">
-                        <div className="w-2 h-2 rounded-full bg-dashed border-2 border-dashed border-muted-foreground/30"></div>
-                        <Button 
-                          onClick={() => {
-                            setSelectedEraId(era.id);
-                            setShowCreateEventModal(true);
-                          }}
-                          size="sm" 
-                          variant="ghost" 
-                          className="text-muted-foreground"
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Adicionar Evento
-                        </Button>
-                      </div>
-                    )}
+                    </AccordionContent>
                   </div>
-                )}
-              </div>
+                </div>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
       </CardContent>
 
