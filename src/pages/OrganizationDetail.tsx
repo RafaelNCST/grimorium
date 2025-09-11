@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, Plus, Users, Crown, MapPin, Target, Building, X } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Plus, Users, Crown, MapPin, Target, Building, X, Globe, Mountain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -128,6 +128,17 @@ export function OrganizationDetail() {
     { id: "c2", name: "Terras Sombrias", type: "Continente" }
   ];
 
+  const getLocationIcon = (type: string) => {
+    switch (type) {
+      case "Mundo":
+        return <Globe className="w-3 h-3" />;
+      case "Continente":
+        return <Mountain className="w-3 h-3" />;
+      default:
+        return <MapPin className="w-3 h-3" />;
+    }
+  };
+
   if (!organization) {
     return (
       <div className="container mx-auto p-6">
@@ -219,9 +230,9 @@ export function OrganizationDetail() {
   };
 
   const handleAddDominatedLocation = (locationId: string) => {
-    const location = [...availableLocations, ...availableWorlds, ...availableContinents]
+    const allAvailableLocations = [...availableLocations, ...availableWorlds, ...availableContinents];
+      const location = allAvailableLocations
       .find(l => l.id === locationId);
-    
     if (location && !editData.dominatedLocations.includes(location.name)) {
       setEditData(prev => ({
         ...prev,
@@ -659,51 +670,79 @@ export function OrganizationDetail() {
                             .filter(world => !editData.dominatedLocations.includes(world.name))
                             .map((world) => (
                               <SelectItem key={world.id} value={world.id}>
-                                🌍 {world.name}
+                                <div className="flex items-center gap-2">
+                                  <Globe className="w-4 h-4" />
+                                  {world.name}
+                                </div>
                               </SelectItem>
                             ))}
                           {availableContinents
                             .filter(continent => !editData.dominatedLocations.includes(continent.name))
                             .map((continent) => (
                               <SelectItem key={continent.id} value={continent.id}>
-                                🗺️ {continent.name}
+                                <div className="flex items-center gap-2">
+                                  <Mountain className="w-4 h-4" />
+                                  {continent.name}
+                                </div>
                               </SelectItem>
                             ))}
                           {availableLocations
                             .filter(location => !editData.dominatedLocations.includes(location.name))
                             .map((location) => (
                               <SelectItem key={location.id} value={location.id}>
-                                📍 {location.name} ({location.type})
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-4 h-4" />
+                                  {location.name} ({location.type})
+                                </div>
                               </SelectItem>
                             ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      {editData.dominatedLocations.map((location, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
-                          <Badge variant="outline">
-                            {location}
-                          </Badge>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => handleRemoveDominatedLocation(location)}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      ))}
+                      {editData.dominatedLocations.map((location, index) => {
+                        // Determine icon based on location type
+                        const allAvailable = [...availableWorlds, ...availableContinents, ...availableLocations];
+                        const locationData = allAvailable
+                          .find(l => l.name === location);
+                        const icon = getLocationIcon(locationData?.type || "Location");
+                        
+                        return (
+                          <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
+                            <Badge variant="outline" className="flex items-center gap-2">
+                              {icon}
+                              {location}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => handleRemoveDominatedLocation(location)}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {organization.dominatedLocations.map((location, index) => (
-                      <Badge key={index} variant="outline" className="mr-2 mb-2">
-                        {location}
-                      </Badge>
-                    ))}
+                    {organization.dominatedLocations.map((location, index) => {
+                      // Determine icon based on location type (simplified for display)
+                      const icon = location.includes("Continente") || location.includes("Terras") ? 
+                        <Mountain className="w-3 h-3" /> : 
+                        location.includes("Aethermoor") ? 
+                        <Globe className="w-3 h-3" /> : 
+                        <MapPin className="w-3 h-3" />;
+                      
+                      return (
+                        <Badge key={index} variant="outline" className="mr-2 mb-2 flex items-center gap-1 w-fit">
+                          {icon}
+                          {location}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
