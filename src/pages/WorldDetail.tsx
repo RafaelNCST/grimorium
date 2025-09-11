@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Trash2, Plus, StickyNote, MapPin, Mountain, Globe, TreePine, Castle, Home } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Plus, StickyNote, MapPin, Mountain, Globe, TreePine, Castle, Home, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface WorldEntity {
   id: string;
@@ -16,12 +19,13 @@ interface WorldEntity {
   type: "World" | "Continent" | "Location";
   description: string;
   parentId?: string;
+  worldId?: string;
+  continentId?: string;
   classification?: string;
   climate?: string;
   terrain?: string;
   location?: string;
   organizations?: string[];
-  livingEntities?: string[];
   age?: string;
   dominantOrganization?: string;
   image?: string;
@@ -51,7 +55,7 @@ const mockWorldEntities: WorldEntity[] = [
     name: "Continente Central",
     type: "Continent",
     description: "Continente principal de Aethermoor, rico em recursos mágicos e lar de diversas civilizações antigas.",
-    parentId: "world1",
+    worldId: "world1",
     age: "3000 anos",
     dominantOrganization: "Reino de Aethermoor",
     image: "/api/placeholder/400/250"
@@ -61,22 +65,48 @@ const mockWorldEntities: WorldEntity[] = [
     name: "Floresta das Lamentações",
     type: "Location",
     description: "Floresta sombria habitada por criaturas mágicas perigosas. As árvores sussurram segredos dos tempos antigos.",
-    parentId: "continent1",
+    worldId: "world1",
+    continentId: "continent1",
     classification: "Floresta Mágica",
     climate: "Frio e Úmido",
     location: "Norte do Continente Central",
     terrain: "Florestal",
     organizations: ["Culto das Sombras", "Guarda Florestal"],
-    livingEntities: ["Lobos Sombrios", "Espíritos da Floresta", "Dríades Corrompidas", "Unicórnios das Trevas", "Ents Ancestrais"],
     image: "/api/placeholder/400/250"
   }
+];
+
+// Mock data for selects
+const mockWorlds = [
+  { id: "world1", name: "Aethermoor" },
+  { id: "world2", name: "Terra Sombria" },
+  { id: "world3", name: "Reino Celestial" }
+];
+
+const mockContinents = [
+  { id: "continent1", name: "Continente Central", worldId: "world1" },
+  { id: "continent2", name: "Terras do Norte", worldId: "world1" },
+  { id: "continent3", name: "Ilhas do Sul", worldId: "world1" }
+];
+
+const mockOrganizations = [
+  { id: "1", name: "Ordem dos Guardiões" },
+  { id: "2", name: "Culto das Sombras" },
+  { id: "3", name: "Guarda Florestal" },
+  { id: "4", name: "Reino de Aethermoor" },
+  { id: "5", name: "Academia Arcana" }
 ];
 
 export function WorldDetail() {
   const { worldId } = useParams<{ worldId: string }>();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [character, setCharacter] = useState(mockWorldEntities.find(e => e.id === worldId));
+  const [editData, setEditData] = useState(mockWorldEntities.find(e => e.id === worldId) || mockWorldEntities[0]);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
     {
       id: "1",
@@ -94,9 +124,15 @@ export function WorldDetail() {
     }
   ]);
 
-  const entity = mockWorldEntities.find(e => e.id === worldId);
-  
-  if (!entity) {
+  useEffect(() => {
+    const entity = mockWorldEntities.find(e => e.id === worldId);
+    if (entity) {
+      setCharacter(entity);
+      setEditData(entity);
+    }
+  }, [worldId]);
+
+  if (!character) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="text-center">
@@ -111,10 +147,10 @@ export function WorldDetail() {
   }
 
   const getEntityIcon = () => {
-    if (entity.type === "World") return <Globe className="w-6 h-6" />;
-    if (entity.type === "Continent") return <Mountain className="w-6 h-6" />;
+    if (character.type === "World") return <Globe className="w-6 h-6" />;
+    if (character.type === "Continent") return <Mountain className="w-6 h-6" />;
     
-    switch (entity.classification?.toLowerCase()) {
+    switch (character.classification?.toLowerCase()) {
       case "floresta mágica":
         return <TreePine className="w-6 h-6" />;
       case "assentamento":
@@ -126,16 +162,52 @@ export function WorldDetail() {
     }
   };
 
-  const getParentName = (parentId?: string) => {
-    if (!parentId) return null;
-    const parent = mockWorldEntities.find(e => e.id === parentId);
-    return parent?.name;
+  const getWorldName = (worldId?: string) => {
+    if (!worldId) return null;
+    const world = mockWorlds.find(w => w.id === worldId);
+    return world?.name;
+  };
+
+  const getContinentName = (continentId?: string) => {
+    if (!continentId) return null;
+    const continent = mockContinents.find(c => c.id === continentId);
+    return continent?.name;
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        setEditData(prev => ({ ...prev, image: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = () => {
+    // In a real app, this would save to API/state
+    setCharacter(editData);
+    setIsEditing(false);
+    setImagePreview("");
+    setSelectedFile(null);
+    toast.success(`${character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"} atualizado com sucesso!`);
+  };
+
+  const handleCancel = () => {
+    setEditData(character);
+    setIsEditing(false);
+    setImagePreview("");
+    setSelectedFile(null);
   };
 
   const handleDelete = () => {
     // In a real app, this would delete from API/state
-    console.log("Deleting entity:", entity.id);
-    setShowDeleteDialog(false);
+    console.log("Deleting entity:", character.id);
+    setShowDeleteModal(false);
     navigate(-1);
   };
 
@@ -166,43 +238,34 @@ export function WorldDetail() {
                   {getEntityIcon()}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">{entity.name}</h1>
-                  <Badge variant="outline">{entity.type}</Badge>
+                  <h1 className="text-2xl font-bold">{character.name}</h1>
+                  <Badge variant="outline">{character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"}</Badge>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant={isEditing ? "default" : "outline"} 
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                {isEditing ? "Salvar" : "Editar"}
-              </Button>
-              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="destructive" size="icon">
+              {isEditing ? (
+                <>
+                  <Button variant="default" onClick={handleSave}>
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Salvar
+                  </Button>
+                  <Button variant="outline" onClick={handleCancel}>
+                    <X className="w-4 h-4 mr-2" />
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => setIsEditing(true)}>
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Editar
+                  </Button>
+                  <Button variant="destructive" size="icon" onClick={() => setShowDeleteModal(true)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Confirmar Exclusão</DialogTitle>
-                    <DialogDescription>
-                      Tem certeza que deseja excluir "{entity.name}"? Esta ação não pode ser desfeita.
-                      {entity.type !== "Location" && " Entidades vinculadas ficarão sem vínculo hierárquico."}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-                      Não
-                    </Button>
-                    <Button variant="destructive" onClick={handleDelete}>
-                      Sim, Excluir
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -213,124 +276,194 @@ export function WorldDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image */}
-            {entity.image && (
-              <Card>
-                <CardContent className="p-0">
-                  <img 
-                    src={entity.image} 
-                    alt={entity.name}
-                    className="w-full h-64 object-cover rounded-t-lg"
-                  />
-                </CardContent>
-              </Card>
-            )}
-
             {/* Basic Information */}
-            <Card>
+            <Card className="card-magical">
               <CardHeader>
                 <CardTitle>Informações Básicas</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {isEditing ? (
-                  <>
-                    <div>
-                      <Label htmlFor="name">Nome</Label>
-                      <Input id="name" defaultValue={entity.name} />
-                    </div>
-                    <div>
-                      <Label htmlFor="description">Descrição</Label>
-                      <Textarea id="description" defaultValue={entity.description} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <h3 className="font-semibold">Nome</h3>
-                      <p className="text-muted-foreground">{entity.name}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Descrição</h3>
-                      <p className="text-muted-foreground">{entity.description}</p>
-                    </div>
-                  </>
-                )}
-
-                {entity.type === "Location" && (
-                  <>
-                    {isEditing ? (
-                      <>
-                        <div>
-                          <Label htmlFor="classification">Classificação</Label>
-                          <Input id="classification" defaultValue={entity.classification} />
-                        </div>
-                        <div>
-                          <Label htmlFor="climate">Clima</Label>
-                          <Input id="climate" defaultValue={entity.climate} />
-                        </div>
-                        <div>
-                          <Label htmlFor="location">Localização</Label>
-                          <Input id="location" defaultValue={entity.location} />
-                        </div>
-                        <div>
-                          <Label htmlFor="terrain">Solo</Label>
-                          <Input id="terrain" defaultValue={entity.terrain} />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        {entity.classification && (
-                          <div>
-                            <h3 className="font-semibold">Classificação</h3>
-                            <p className="text-muted-foreground">{entity.classification}</p>
+                  <div className="space-y-4">
+                    {/* Image Upload */}
+                    <div className="space-y-2">
+                      <Label htmlFor="image">Imagem</Label>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <div 
+                            className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors mx-auto"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            {imagePreview ? (
+                              <div className="relative w-full h-full">
+                                <img 
+                                  src={imagePreview} 
+                                  alt="Preview" 
+                                  className="w-full h-full object-cover rounded-full"
+                                />
+                              </div>
+                            ) : character.image ? (
+                              <div className="relative w-full h-full">
+                                <img 
+                                  src={character.image} 
+                                  alt="Current" 
+                                  className="w-full h-full object-cover rounded-full"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center">
+                                <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                                <span className="text-xs text-muted-foreground text-center">Clique para enviar</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {entity.climate && (
-                          <div>
-                            <h3 className="font-semibold">Clima</h3>
-                            <p className="text-muted-foreground">{entity.climate}</p>
-                          </div>
-                        )}
-                        {entity.location && (
-                          <div>
-                            <h3 className="font-semibold">Localização</h3>
-                            <p className="text-muted-foreground">{entity.location}</p>
-                          </div>
-                        )}
-                        {entity.terrain && (
-                          <div>
-                            <h3 className="font-semibold">Solo</h3>
-                            <p className="text-muted-foreground">{entity.terrain}</p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-
-                {(entity.type === "World" || entity.type === "Continent") && (
-                  <>
-                    {isEditing ? (
-                      <div>
-                        <Label htmlFor="age">Idade</Label>
-                        <Input id="age" defaultValue={entity.age} />
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
+                        </div>
                       </div>
-                    ) : (
-                      entity.age && (
-                        <div>
-                          <h3 className="font-semibold">Idade</h3>
-                          <p className="text-muted-foreground">{entity.age}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome</Label>
+                      <Input 
+                        id="name" 
+                        value={editData.name}
+                        onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Descrição</Label>
+                      <Textarea 
+                        id="description" 
+                        value={editData.description}
+                        onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                        className="min-h-[100px]"
+                      />
+                    </div>
+
+                    {character.type === "Location" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="classification">Classificação</Label>
+                          <Input 
+                            id="classification" 
+                            value={editData.classification || ""}
+                            onChange={(e) => setEditData(prev => ({ ...prev, classification: e.target.value }))}
+                          />
                         </div>
-                      )
+                        <div className="space-y-2">
+                          <Label htmlFor="climate">Clima</Label>
+                          <Input 
+                            id="climate" 
+                            value={editData.climate || ""}
+                            onChange={(e) => setEditData(prev => ({ ...prev, climate: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="location">Localização</Label>
+                          <Input 
+                            id="location" 
+                            value={editData.location || ""}
+                            onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="terrain">Solo</Label>
+                          <Input 
+                            id="terrain" 
+                            value={editData.terrain || ""}
+                            onChange={(e) => setEditData(prev => ({ ...prev, terrain: e.target.value }))}
+                          />
+                        </div>
+                      </>
                     )}
-                  </>
+
+                    {(character.type === "World" || character.type === "Continent") && (
+                      <div className="space-y-2">
+                        <Label htmlFor="age">Idade</Label>
+                        <Input 
+                          id="age" 
+                          value={editData.age || ""}
+                          onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={character.image} />
+                        <AvatarFallback className="text-lg">
+                          {character.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h2 className="text-2xl font-semibold">{character.name}</h2>
+                          <Badge variant="outline">
+                            {character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <h3 className="font-semibold text-sm mb-1">Descrição</h3>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{character.description}</p>
+                          </div>
+
+                          {character.type === "Location" && (
+                            <>
+                              {character.classification && (
+                                <div>
+                                  <h3 className="font-semibold text-sm mb-1">Classificação</h3>
+                                  <p className="text-muted-foreground text-sm">{character.classification}</p>
+                                </div>
+                              )}
+                              {character.climate && (
+                                <div>
+                                  <h3 className="font-semibold text-sm mb-1">Clima</h3>
+                                  <p className="text-muted-foreground text-sm">{character.climate}</p>
+                                </div>
+                              )}
+                              {character.location && (
+                                <div>
+                                  <h3 className="font-semibold text-sm mb-1">Localização</h3>
+                                  <p className="text-muted-foreground text-sm">{character.location}</p>
+                                </div>
+                              )}
+                              {character.terrain && (
+                                <div>
+                                  <h3 className="font-semibold text-sm mb-1">Solo</h3>
+                                  <p className="text-muted-foreground text-sm">{character.terrain}</p>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {(character.type === "World" || character.type === "Continent") && character.age && (
+                            <div>
+                              <h3 className="font-semibold text-sm mb-1">Idade</h3>
+                              <p className="text-muted-foreground text-sm">{character.age}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
 
             {/* Sticky Notes for Locations */}
-            {entity.type === "Location" && (
-              <Card>
+            {character.type === "Location" && (
+              <Card className="card-magical">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
@@ -344,7 +477,7 @@ export function WorldDetail() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="relative min-h-[300px] bg-gray-50 rounded-lg p-4">
+                  <div className="relative min-h-[300px] bg-muted/20 rounded-lg p-4">
                     {stickyNotes.map((note) => (
                       <div
                         key={note.id}
@@ -366,32 +499,106 @@ export function WorldDetail() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Hierarchy */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Hierarquia</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {getParentName(entity.parentId) ? (
-                  <div>
-                    <h3 className="font-semibold text-sm">Pertence a</h3>
-                    <p className="text-muted-foreground">{getParentName(entity.parentId)}</p>
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">Sem vínculo hierárquico</p>
-                )}
-              </CardContent>
-            </Card>
+            {/* World and Continent References */}
+            {character.type === "Continent" && (
+              <Card className="card-magical">
+                <CardHeader>
+                  <CardTitle>Mundo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <Select value={editData.worldId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, worldId: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um mundo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {mockWorlds.map((world) => (
+                          <SelectItem key={world.id} value={world.id}>
+                            {world.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{getWorldName(character.worldId) || "Nenhum mundo"}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {character.type === "Location" && (
+              <>
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CardTitle>Mundo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Select value={editData.worldId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, worldId: value === "none" ? "" : value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um mundo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhum</SelectItem>
+                          {mockWorlds.map((world) => (
+                            <SelectItem key={world.id} value={world.id}>
+                              {world.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">{getWorldName(character.worldId) || "Nenhum mundo"}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CardTitle>Continente</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <Select value={editData.continentId || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, continentId: value === "none" ? "" : value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um continente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhum</SelectItem>
+                          {mockContinents.map((continent) => (
+                            <SelectItem key={continent.id} value={continent.id}>
+                              {continent.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Mountain className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm">{getContinentName(character.continentId) || "Nenhum continente"}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             {/* Organizations */}
-            {entity.organizations && entity.organizations.length > 0 && (
-              <Card>
+            {character.organizations && character.organizations.length > 0 && (
+              <Card className="card-magical">
                 <CardHeader>
                   <CardTitle>Organizações</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {entity.organizations.map((org, idx) => (
+                    {character.organizations.map((org, idx) => (
                       <Badge key={idx} variant="secondary">
                         {org}
                       </Badge>
@@ -402,39 +609,46 @@ export function WorldDetail() {
             )}
 
             {/* Dominant Organization */}
-            {entity.dominantOrganization && (
-              <Card>
+            {(character.dominantOrganization || isEditing) && (
+              <Card className="card-magical">
                 <CardHeader>
                   <CardTitle>Organização Dominante</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Badge variant="default">{entity.dominantOrganization}</Badge>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Living Entities */}
-            {entity.livingEntities && entity.livingEntities.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Entidades Viventes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {entity.livingEntities.map((entity, idx) => (
-                      <div key={idx} className="text-sm">
-                        <Badge variant="outline" className="w-full justify-start">
-                          {entity}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
+                  {isEditing ? (
+                    <Select value={editData.dominantOrganization || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, dominantOrganization: value === "none" ? "" : value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma organização" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhuma</SelectItem>
+                        {mockOrganizations.map((org) => (
+                          <SelectItem key={org.id} value={org.name}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{character.dominantOrganization || "Nenhuma organização"}</span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
           </div>
         </div>
       </div>
+
+      <ConfirmDeleteModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title={`Excluir ${character.type === "World" ? "Mundo" : character.type === "Continent" ? "Continente" : "Local"}`}
+        description={`Tem certeza que deseja excluir "${character.name}"? Esta ação não pode ser desfeita.`}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
