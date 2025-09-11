@@ -335,24 +335,6 @@ export function CharacterDetail() {
                     />
                   </div>
 
-                  {/* Organization */}
-                  <div className="space-y-2">
-                    <Label htmlFor="organization">Organização</Label>
-                    <Select value={editData.organization} onValueChange={(value) => setEditData(prev => ({ ...prev, organization: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma organização" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhuma</SelectItem>
-                        {mockOrganizations.map((org) => (
-                          <SelectItem key={org.id} value={org.name}>
-                            {org.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   {/* Birth Place */}
                   <div className="space-y-2">
                     <Label htmlFor="birthPlace">Local de Nascimento</Label>
