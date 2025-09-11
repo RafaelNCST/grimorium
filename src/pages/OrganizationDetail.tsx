@@ -110,6 +110,24 @@ export function OrganizationDetail() {
     titles: organization?.titles || []
   });
 
+  // Mock data for dropdowns
+  const availableLocations = [
+    { id: "l1", name: "Cidadela da Luz", type: "Fortaleza" },
+    { id: "l2", name: "Torre Sombria", type: "Torre" },
+    { id: "l3", name: "Aldeia de Pedraverde", type: "Aldeia" },
+    { id: "l4", name: "Floresta das Lamentações", type: "Floresta" },
+    { id: "l5", name: "Postos Avançados", type: "Posto" }
+  ];
+
+  const availableWorlds = [
+    { id: "w1", name: "Aethermoor", type: "Mundo" }
+  ];
+
+  const availableContinents = [
+    { id: "c1", name: "Continente Central", type: "Continente" },
+    { id: "c2", name: "Terras Sombrias", type: "Continente" }
+  ];
+
   if (!organization) {
     return (
       <div className="container mx-auto p-6">
@@ -200,11 +218,14 @@ export function OrganizationDetail() {
     }));
   };
 
-  const handleAddDominatedLocation = (location: string) => {
-    if (location.trim() && !editData.dominatedLocations.includes(location.trim())) {
+  const handleAddDominatedLocation = (locationId: string) => {
+    const location = [...availableLocations, ...availableWorlds, ...availableContinents]
+      .find(l => l.id === locationId);
+    
+    if (location && !editData.dominatedLocations.includes(location.name)) {
       setEditData(prev => ({
         ...prev,
-        dominatedLocations: [...prev.dominatedLocations, location.trim()]
+        dominatedLocations: [...prev.dominatedLocations, location.name]
       }));
     }
   };
@@ -395,10 +416,10 @@ export function OrganizationDetail() {
                     {(isEditing ? editData.titles : organization.titles)
                       .sort((a, b) => a.level - b.level)
                       .map((title) => (
-                        <div key={title.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                          <div className="flex-1">
+                        <div key={title.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 gap-3">
+                          <div className="flex-1 min-w-0">
                             {isEditing ? (
-                              <div className="space-y-1">
+                              <div className="space-y-2">
                                 <Input 
                                   value={title.name}
                                   placeholder="Nome do título"
@@ -417,22 +438,25 @@ export function OrganizationDetail() {
                               </>
                             )}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
                             {isEditing ? (
-                              <Input
-                                type="number"
-                                min="1"
-                                value={title.level}
-                                onChange={(e) => handleUpdateTitleLevel(title.id, parseInt(e.target.value) || 1)}
-                                className="w-16 text-xs"
-                              />
+                              <div className="flex items-center gap-1">
+                                <Label className="text-xs text-muted-foreground">Nível</Label>
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={title.level}
+                                  onChange={(e) => handleUpdateTitleLevel(title.id, parseInt(e.target.value) || 1)}
+                                  className="w-16 h-8 text-xs text-center"
+                                />
+                              </div>
                             ) : (
                               <Badge variant="outline" className="text-xs">
                                 Nível {title.level}
                               </Badge>
                             )}
                             {isEditing && title.id !== "default" && (
-                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0">
                                 <X className="w-3 h-3" />
                               </Button>
                             )}
@@ -445,7 +469,7 @@ export function OrganizationDetail() {
                 {/* Members */}
                 <div>
                   <h4 className="font-medium mb-3">Lista de Membros</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {organization.members
                       .sort((a, b) => {
                         const titleA = organization.titles.find(t => t.id === a.titleId);
@@ -453,9 +477,9 @@ export function OrganizationDetail() {
                         return (titleA?.level || 999) - (titleB?.level || 999);
                       })
                       .map((member, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                        <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10">
                               <AvatarFallback className="text-sm">
                                 {member.characterName.split(' ').map(n => n[0]).join('')}
                               </AvatarFallback>
@@ -473,6 +497,11 @@ export function OrganizationDetail() {
                                 <Crown className="w-3 h-3 mr-1" />
                                 Líder
                               </Badge>
+                            )}
+                            {isEditing && (
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <X className="w-4 h-4" />
+                              </Button>
                             )}
                           </div>
                         </div>
@@ -621,31 +650,42 @@ export function OrganizationDetail() {
                 {isEditing ? (
                   <div className="space-y-3">
                     <div className="flex gap-2">
-                      <Input
-                        placeholder="Novo território..."
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleAddDominatedLocation(e.currentTarget.value);
-                            e.currentTarget.value = "";
-                          }
-                        }}
-                      />
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={(e) => {
-                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                          handleAddDominatedLocation(input.value);
-                          input.value = "";
-                        }}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                      <Select onValueChange={handleAddDominatedLocation}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Adicionar território..." />
+                        </SelectTrigger>
+                        <SelectContent side="bottom">
+                          <SelectItem value="" disabled>Mundos</SelectItem>
+                          {availableWorlds
+                            .filter(world => !editData.dominatedLocations.includes(world.name))
+                            .map((world) => (
+                              <SelectItem key={world.id} value={world.id}>
+                                🌍 {world.name}
+                              </SelectItem>
+                            ))}
+                          <SelectItem value="" disabled>Continentes</SelectItem>
+                          {availableContinents
+                            .filter(continent => !editData.dominatedLocations.includes(continent.name))
+                            .map((continent) => (
+                              <SelectItem key={continent.id} value={continent.id}>
+                                🗺️ {continent.name}
+                              </SelectItem>
+                            ))}
+                          <SelectItem value="" disabled>Locais</SelectItem>
+                          {availableLocations
+                            .filter(location => !editData.dominatedLocations.includes(location.name))
+                            .map((location) => (
+                              <SelectItem key={location.id} value={location.id}>
+                                📍 {location.name} ({location.type})
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       {editData.dominatedLocations.map((location, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <Badge variant="outline" className="mr-2">
+                        <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
+                          <Badge variant="outline">
                             {location}
                           </Badge>
                           <Button
