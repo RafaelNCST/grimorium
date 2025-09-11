@@ -655,7 +655,6 @@ export function OrganizationDetail() {
                           <SelectValue placeholder="Adicionar território..." />
                         </SelectTrigger>
                         <SelectContent side="bottom">
-                          <SelectItem value="" disabled>Mundos</SelectItem>
                           {availableWorlds
                             .filter(world => !editData.dominatedLocations.includes(world.name))
                             .map((world) => (
@@ -663,7 +662,6 @@ export function OrganizationDetail() {
                                 🌍 {world.name}
                               </SelectItem>
                             ))}
-                          <SelectItem value="" disabled>Continentes</SelectItem>
                           {availableContinents
                             .filter(continent => !editData.dominatedLocations.includes(continent.name))
                             .map((continent) => (
@@ -671,7 +669,6 @@ export function OrganizationDetail() {
                                 🗺️ {continent.name}
                               </SelectItem>
                             ))}
-                          <SelectItem value="" disabled>Locais</SelectItem>
                           {availableLocations
                             .filter(location => !editData.dominatedLocations.includes(location.name))
                             .map((location) => (
