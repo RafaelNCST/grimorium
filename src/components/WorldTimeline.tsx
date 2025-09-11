@@ -372,7 +372,7 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
                   
                   {/* Era Card with Enhanced Styling */}
                   <div className="ml-20 relative">
-                    <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg">
+                    <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden">
                       <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
                          <div className="flex items-center justify-between w-full">
                           <div className="text-left">
