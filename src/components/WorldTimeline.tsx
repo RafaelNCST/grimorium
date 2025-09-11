@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Plus, Clock, Calendar, Users, Building, Info, ChevronDown, Sparkles } from "lucide-react";
+import { Plus, Clock, Calendar, Users, Building, Info, ChevronDown, Sparkles, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 // Interfaces
@@ -118,8 +118,11 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showCreateEraModal, setShowCreateEraModal] = useState(false);
+  const [showEditEraModal, setShowEditEraModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [selectedEraId, setSelectedEraId] = useState<string>("");
+  const [editingEra, setEditingEra] = useState<TimelineEra | null>(null);
+  const [editingEvent, setEditingEvent] = useState<boolean>(false);
   
   const [newEra, setNewEra] = useState({
     name: "",
@@ -138,6 +141,13 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
     endDate: "",
     charactersInvolved: [] as string[],
     organizationsInvolved: [] as string[]
+  });
+
+  const [editEra, setEditEra] = useState({
+    name: "",
+    description: "",
+    startDate: "",
+    endDate: ""
   });
 
   const handleCreateEra = () => {
@@ -191,9 +201,103 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
     toast.success("Evento criado com sucesso!");
   };
 
-  const openEventDetails = (event: TimelineEvent) => {
+  const openEventDetails = (event: TimelineEvent, edit: boolean = false) => {
     setSelectedEvent(event);
+    setEditingEvent(edit);
+    if (edit) {
+      setNewEvent({
+        name: event.name,
+        description: event.description,
+        shortDescription: event.shortDescription,
+        reason: event.reason,
+        outcome: event.outcome,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        charactersInvolved: [...event.charactersInvolved],
+        organizationsInvolved: [...event.organizationsInvolved]
+      });
+    }
     setShowEventModal(true);
+  };
+
+  const handleEditEra = (era: TimelineEra) => {
+    setEditingEra(era);
+    setEditEra({
+      name: era.name,
+      description: era.description,
+      startDate: era.startDate,
+      endDate: era.endDate
+    });
+    setShowEditEraModal(true);
+  };
+
+  const handleUpdateEra = () => {
+    if (!editEra.name.trim() || !editingEra) {
+      toast.error("Nome da era é obrigatório");
+      return;
+    }
+
+    setTimeline(prev => prev.map(era => 
+      era.id === editingEra.id 
+        ? { ...era, ...editEra }
+        : era
+    ));
+
+    setEditEra({ name: "", description: "", startDate: "", endDate: "" });
+    setEditingEra(null);
+    setShowEditEraModal(false);
+    toast.success("Era atualizada com sucesso!");
+  };
+
+  const handleUpdateEvent = () => {
+    if (!newEvent.name.trim() || !selectedEvent) {
+      toast.error("Nome do evento é obrigatório");
+      return;
+    }
+
+    const updatedEvent: TimelineEvent = {
+      ...selectedEvent,
+      ...newEvent
+    };
+
+    setTimeline(prev => prev.map(era => ({
+      ...era,
+      events: era.events.map(event => 
+        event.id === selectedEvent.id ? updatedEvent : event
+      )
+    })));
+
+    setNewEvent({
+      name: "",
+      description: "", 
+      shortDescription: "",
+      reason: "",
+      outcome: "",
+      startDate: "",
+      endDate: "",
+      charactersInvolved: [],
+      organizationsInvolved: []
+    });
+    setSelectedEvent(null);
+    setEditingEvent(false);
+    setShowEventModal(false);
+    toast.success("Evento atualizado com sucesso!");
+  };
+
+  const handleDeleteEra = (eraId: string) => {
+    setTimeline(prev => prev.filter(era => era.id !== eraId));
+    toast.success("Era excluída com sucesso!");
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    setTimeline(prev => prev.map(era => ({
+      ...era,
+      events: era.events.filter(event => event.id !== eventId)
+    })));
+    setSelectedEvent(null);
+    setEditingEvent(false);
+    setShowEventModal(false);
+    toast.success("Evento excluído com sucesso!");
   };
 
   const getCharacterName = (id: string) => {
@@ -270,7 +374,7 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
                   <div className="ml-20 relative">
                     <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg">
                       <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
-                        <div className="flex items-center justify-between w-full">
+                         <div className="flex items-center justify-between w-full">
                           <div className="text-left">
                             <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                               {era.name}
@@ -281,6 +385,32 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
                             </Badge>
                           </div>
                           <div className="flex items-center gap-2">
+                            {isEditing && (
+                              <>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditEra(era);
+                                  }}
+                                  className="h-8 w-8 p-0 hover:bg-primary/10"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteEra(era.id);
+                                  }}
+                                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </>
+                            )}
                             {era.events.length > 0 && (
                               <Badge variant="outline" className="text-xs">
                                 {era.events.length} evento{era.events.length !== 1 ? 's' : ''}
@@ -307,7 +437,7 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
                                 </div>
                                 
                                 {/* Event Card */}
-                                <Card 
+                                 <Card 
                                   className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
                                   onClick={() => openEventDetails(event)}
                                 >
@@ -322,7 +452,35 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
                                           {event.startDate} - {event.endDate}
                                         </Badge>
                                       </div>
-                                      <Info className="w-4 h-4 text-muted-foreground/60" />
+                                      <div className="flex items-center gap-1">
+                                        {isEditing && (
+                                          <>
+                                            <Button 
+                                              size="sm" 
+                                              variant="ghost" 
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openEventDetails(event, true);
+                                              }}
+                                              className="h-6 w-6 p-0 hover:bg-primary/10"
+                                            >
+                                              <Edit className="w-3 h-3" />
+                                            </Button>
+                                            <Button 
+                                              size="sm" 
+                                              variant="ghost" 
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteEvent(event.id);
+                                              }}
+                                              className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                            >
+                                              <Trash2 className="w-3 h-3" />
+                                            </Button>
+                                          </>
+                                        )}
+                                        <Info className="w-4 h-4 text-muted-foreground/60" />
+                                      </div>
                                     </div>
                                     <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
                                       {event.shortDescription}
@@ -411,75 +569,266 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
         </div>
       </CardContent>
 
-      {/* Event Details Modal */}
+      {/* Event Details/Edit Modal */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              {selectedEvent?.name}
+              {editingEvent ? "Editar Evento" : selectedEvent?.name}
             </DialogTitle>
             <DialogDescription>
-              {selectedEvent?.startDate} - {selectedEvent?.endDate}
+              {editingEvent ? "Modifique as informações do evento" : `${selectedEvent?.startDate} - ${selectedEvent?.endDate}`}
             </DialogDescription>
           </DialogHeader>
           
           {selectedEvent && (
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">Descrição</h4>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {selectedEvent.description}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Motivo</h4>
-                  <p className="text-muted-foreground text-sm">
-                    {selectedEvent.reason}
-                  </p>
+            editingEvent ? (
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-event-name">Nome do Evento *</Label>
+                  <Input
+                    id="edit-event-name"
+                    value={newEvent.name}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Ex: A Grande Convergência"
+                  />
                 </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Como Terminou</h4>
-                  <p className="text-muted-foreground text-sm">
-                    {selectedEvent.outcome}
-                  </p>
-                </div>
-              </div>
 
-              {selectedEvent.charactersInvolved.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Personagens Envolvidos
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedEvent.charactersInvolved.map(id => (
-                      <Badge key={id} variant="secondary">
-                        {getCharacterName(id)}
-                      </Badge>
-                    ))}
+                <div className="space-y-2">
+                  <Label htmlFor="edit-event-short-desc">Descrição Resumida *</Label>
+                  <Textarea
+                    id="edit-event-short-desc"
+                    value={newEvent.shortDescription}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, shortDescription: e.target.value }))}
+                    placeholder="Descrição breve que aparece no card da timeline"
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-event-desc">Descrição Completa</Label>
+                  <Textarea
+                    id="edit-event-desc"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Descrição detalhada que aparece no modal"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-event-reason">Motivo</Label>
+                    <Textarea
+                      id="edit-event-reason"
+                      value={newEvent.reason}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, reason: e.target.value }))}
+                      placeholder="Por que aconteceu?"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-event-outcome">Como Terminou</Label>
+                    <Textarea
+                      id="edit-event-outcome"
+                      value={newEvent.outcome}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, outcome: e.target.value }))}
+                      placeholder="Qual foi o resultado?"
+                      rows={2}
+                    />
                   </div>
                 </div>
-              )}
 
-              {selectedEvent.organizationsInvolved.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2 flex items-center gap-2">
-                    <Building className="w-4 h-4" />
-                    Organizações Envolvidas
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedEvent.organizationsInvolved.map(id => (
-                      <Badge key={id} variant="outline">
-                        {getOrganizationName(id)}
-                      </Badge>
-                    ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-event-start">Data Início</Label>
+                    <Input
+                      id="edit-event-start"
+                      value={newEvent.startDate}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, startDate: e.target.value }))}
+                      placeholder="Ex: 50 EP"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-event-end">Data Fim</Label>
+                    <Input
+                      id="edit-event-end"
+                      value={newEvent.endDate}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, endDate: e.target.value }))}
+                      placeholder="Ex: 52 EP"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-event-characters">Personagens Envolvidos</Label>
+                  <Select 
+                    value={""} 
+                    onValueChange={(value) => {
+                      if (!newEvent.charactersInvolved.includes(value)) {
+                        setNewEvent(prev => ({ 
+                          ...prev, 
+                          charactersInvolved: [...prev.charactersInvolved, value] 
+                        }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar personagens" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockCharacters.map(char => (
+                        <SelectItem key={char.id} value={char.id}>
+                          {char.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {newEvent.charactersInvolved.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {newEvent.charactersInvolved.map(id => (
+                        <Badge 
+                          key={id} 
+                          variant="secondary"
+                          className="cursor-pointer"
+                          onClick={() => setNewEvent(prev => ({
+                            ...prev,
+                            charactersInvolved: prev.charactersInvolved.filter(cid => cid !== id)
+                          }))}
+                        >
+                          {getCharacterName(id)} ×
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-event-organizations">Organizações Envolvidas</Label>
+                  <Select 
+                    value={""} 
+                    onValueChange={(value) => {
+                      if (!newEvent.organizationsInvolved.includes(value)) {
+                        setNewEvent(prev => ({ 
+                          ...prev, 
+                          organizationsInvolved: [...prev.organizationsInvolved, value] 
+                        }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar organizações" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockOrganizations.map(org => (
+                        <SelectItem key={org.id} value={org.id}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {newEvent.organizationsInvolved.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {newEvent.organizationsInvolved.map(id => (
+                        <Badge 
+                          key={id} 
+                          variant="outline"
+                          className="cursor-pointer"
+                          onClick={() => setNewEvent(prev => ({
+                            ...prev,
+                            organizationsInvolved: prev.organizationsInvolved.filter(oid => oid !== id)
+                          }))}
+                        >
+                          {getOrganizationName(id)} ×
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => {
+                    setEditingEvent(false);
+                    setShowEventModal(false);
+                  }}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleUpdateEvent} className="btn-magical">
+                    Salvar Alterações
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Descrição</h4>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {selectedEvent.description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">Motivo</h4>
+                    <p className="text-muted-foreground text-sm">
+                      {selectedEvent.reason}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">Como Terminou</h4>
+                    <p className="text-muted-foreground text-sm">
+                      {selectedEvent.outcome}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedEvent.charactersInvolved.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Personagens Envolvidos
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEvent.charactersInvolved.map(id => (
+                        <Badge key={id} variant="secondary">
+                          {getCharacterName(id)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEvent.organizationsInvolved.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Building className="w-4 h-4" />
+                      Organizações Envolvidas
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEvent.organizationsInvolved.map(id => (
+                        <Badge key={id} variant="outline">
+                          {getOrganizationName(id)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {isEditing && (
+                  <div className="flex justify-end gap-2 pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => openEventDetails(selectedEvent, true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Editar Evento
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )
           )}
         </DialogContent>
       </Dialog>
@@ -729,6 +1078,71 @@ export function WorldTimeline({ worldId, worldType, isEditing }: WorldTimelinePr
             </Button>
             <Button onClick={handleCreateEvent} className="btn-magical">
               Criar Evento
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Era Modal */}
+      <Dialog open={showEditEraModal} onOpenChange={setShowEditEraModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Era</DialogTitle>
+            <DialogDescription>
+              Modifique as informações da era.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-era-name">Nome da Era *</Label>
+              <Input
+                id="edit-era-name"
+                value={editEra.name}
+                onChange={(e) => setEditEra(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Ex: Era dos Primórdios"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-era-description">Descrição</Label>
+              <Textarea
+                id="edit-era-description"
+                value={editEra.description}
+                onChange={(e) => setEditEra(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Breve descrição da era (máximo 2 linhas)"
+                rows={2}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-era-start">Início</Label>
+                <Input
+                  id="edit-era-start"
+                  value={editEra.startDate}
+                  onChange={(e) => setEditEra(prev => ({ ...prev, startDate: e.target.value }))}
+                  placeholder="Ex: 0 EP"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-era-end">Fim</Label>
+                <Input
+                  id="edit-era-end"
+                  value={editEra.endDate}
+                  onChange={(e) => setEditEra(prev => ({ ...prev, endDate: e.target.value }))}
+                  placeholder="Ex: 1000 EP"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={() => setShowEditEraModal(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdateEra} className="btn-magical">
+              Salvar Alterações
             </Button>
           </div>
         </DialogContent>
