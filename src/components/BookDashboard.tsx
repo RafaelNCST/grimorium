@@ -10,7 +10,7 @@ import { OrganizationsTab } from "@/components/tabs/OrganizationsTab";
 
 import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
-import { RelationsTab } from "@/components/tabs/RelationsTab";
+
 import { PlotTab } from "@/components/tabs/PlotTab";
 import { BookSpeciesTab } from "@/components/tabs/BookSpeciesTab";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -274,7 +274,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-9 h-auto p-1 bg-muted/30 mt-6">
+          <TabsList className="grid w-full grid-cols-8 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.overview')}</span>
@@ -303,10 +303,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.encyclopedia')}</span>
             </TabsTrigger>
-            <TabsTrigger value="relations" className="flex items-center gap-2 py-3">
-              <Network className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.relations')}</span>
-            </TabsTrigger>
             <TabsTrigger value="species" className="flex items-center gap-2 py-3">
               <Dna className="w-4 h-4" />
               <span className="hidden sm:inline">Espécies</span>
@@ -334,9 +330,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             </TabsContent>
             <TabsContent value="encyclopedia" className="mt-0">
               <EncyclopediaTab />
-            </TabsContent>
-            <TabsContent value="relations" className="mt-0">
-              <RelationsTab />
             </TabsContent>
             <TabsContent value="species" className="mt-0">
               <BookSpeciesTab bookId={bookId} />

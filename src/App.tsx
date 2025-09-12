@@ -13,6 +13,8 @@ import { OrganizationDetail } from "./pages/OrganizationDetail";
 import { FamilyTreePage } from "./pages/FamilyTreePage";
 import { SpeciesDetail } from "./pages/SpeciesDetail";
 import { RaceDetail } from "./pages/RaceDetail";
+import { PlotArcDetail } from "./pages/PlotArcDetail";
+import { PlotTimeline } from "./pages/PlotTimeline";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/book/:bookId/world/:worldId/species/:speciesId" element={<SpeciesDetail />} />
           <Route path="/book/:bookId/world/:worldId/race/:raceId" element={<RaceDetail />} />
           <Route path="/book/:bookId/organization/:orgId" element={<OrganizationDetail />} />
+          <Route path="/plot-arc/:id" element={<PlotArcDetail />} />
+          <Route path="/plot-timeline" element={<PlotTimeline />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
