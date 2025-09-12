@@ -14,6 +14,7 @@ interface PlotArc {
   events: PlotEvent[];
   progress: number;
   status: 'planejamento' | 'andamento' | 'finalizado';
+  order: number;
 }
 
 interface PlotEvent {
@@ -34,6 +35,7 @@ const mockArcs: PlotArc[] = [
     description: "As consequências da guerra e o estabelecimento de uma nova ordem.",
     progress: 100,
     status: "finalizado",
+    order: 0,
     events: [
       { id: "7", name: "Reconstrução do reino", description: "Início da reconstrução", completed: true, order: 1 },
       { id: "8", name: "Nova liderança", description: "Estabelecimento de nova ordem", completed: true, order: 2 },
@@ -47,6 +49,7 @@ const mockArcs: PlotArc[] = [
     description: "O jovem pastor descobre seus poderes e aprende a controlá-los enquanto enfrenta os primeiros desafios.",
     progress: 65,
     status: "andamento",
+    order: 1,
     events: [
       { id: "1", name: "Descoberta dos poderes", description: "O protagonista manifesta sua magia pela primeira vez", completed: true, order: 1 },
       { id: "2", name: "Encontro com o mentor", description: "Conhece o sábio que o guiará", completed: true, order: 2 },
@@ -62,6 +65,7 @@ const mockArcs: PlotArc[] = [
     description: "O protagonista lidera uma guerra contra as forças das trevas que ameaçam consumir o reino.",
     progress: 0,
     status: "planejamento",
+    order: 2,
     events: [
       { id: "5", name: "Chamado à guerra", description: "O reino pede ajuda ao protagonista", completed: false, order: 1 },
       { id: "6", name: "Formação da aliança", description: "Reúne heróis para a batalha final", completed: false, order: 2 },
@@ -73,9 +77,8 @@ export function PlotTimeline() {
   const navigate = useNavigate();
   const [arcs] = useState<PlotArc[]>(mockArcs);
 
-  const finishedArcs = arcs.filter(arc => arc.status === 'finalizado');
-  const currentArc = arcs.find(arc => arc.status === 'andamento');
-  const plannedArcs = arcs.filter(arc => arc.status === 'planejamento');
+  // Sort all arcs by order for the timeline
+  const sortedArcs = [...arcs].sort((a, b) => a.order - b.order);
 
   const getSizeColor = (size: string) => {
     switch (size) {
@@ -86,17 +89,10 @@ export function PlotTimeline() {
     }
   };
 
-  const ArcCard = ({ arc, position }: { arc: PlotArc; position: 'left' | 'center' | 'right' }) => {
-    const baseClasses = "cursor-pointer transition-all duration-300 hover:scale-105";
-    const positionClasses = {
-      left: "opacity-75 scale-90",
-      center: "scale-110 z-10",
-      right: "opacity-75 scale-90"
-    };
-
+  const ArcCard = ({ arc }: { arc: PlotArc }) => {
     return (
       <Card 
-        className={`card-magical ${baseClasses} ${positionClasses[position]}`}
+        className="card-magical cursor-pointer transition-all duration-300 hover:scale-105"
         onClick={() => navigate(`/plot-arc/${arc.id}`)}
       >
         <CardHeader>
@@ -105,6 +101,13 @@ export function PlotTimeline() {
             {arc.status === 'andamento' && <Target className="w-5 h-5 text-blue-400" />}
             {arc.status === 'planejamento' && <Clock className="w-5 h-5 text-orange-400" />}
             {arc.name}
+            <Badge 
+              className={arc.status === 'finalizado' ? 'bg-green-500/20 text-green-400 border-green-400/30' :
+                        arc.status === 'andamento' ? 'bg-blue-500/20 text-blue-400 border-blue-400/30' :
+                        'bg-orange-500/20 text-orange-400 border-orange-400/30'}
+            >
+              {arc.status}
+            </Badge>
           </CardTitle>
           <CardDescription className="line-clamp-2">
             {arc.description}
@@ -115,9 +118,12 @@ export function PlotTimeline() {
             <Badge className={getSizeColor(arc.size)}>
               {arc.size}
             </Badge>
-            <span className="text-sm font-medium">
-              {arc.progress.toFixed(0)}%
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">#{arc.order + 1}</span>
+              <span className="text-sm font-medium">
+                {arc.progress.toFixed(0)}%
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -147,69 +153,63 @@ export function PlotTimeline() {
       </div>
 
       <div className="px-6 py-8">
-        {/* Timeline visualization */}
+        {/* Timeline visualization - showing all arcs in order */}
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-blue-400 to-orange-400 transform -translate-y-1/2 z-0"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary-glow to-primary transform -translate-y-1/2 z-0"></div>
 
-          {/* Timeline content */}
-          <div className="grid grid-cols-3 gap-8 relative z-10">
-            {/* Finished Arcs */}
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-green-400 mb-2">Finalizados</h3>
-                <p className="text-sm text-muted-foreground">Arcos já concluídos</p>
-              </div>
-              {finishedArcs.map((arc, index) => (
-                <div key={arc.id} className={index > 0 ? 'mt-4' : ''}>
-                  <ArcCard arc={arc} position="left" />
+          {/* Timeline content - horizontal layout */}
+          <div className="flex gap-6 justify-center items-center min-h-[400px] relative z-10 overflow-x-auto pb-4">
+            {sortedArcs.map((arc, index) => (
+              <div key={arc.id} className="flex-shrink-0 w-80 relative">
+                {/* Position indicator */}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                    {index + 1}
+                  </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Current Arc */}
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-blue-400 mb-2">Em Andamento</h3>
-                <p className="text-sm text-muted-foreground">Arco atual da história</p>
-              </div>
-              {currentArc && (
-                <ArcCard arc={currentArc} position="center" />
-              )}
-            </div>
-
-            {/* Planned Arcs */}
-            <div className="space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">Em Planejamento</h3>
-                <p className="text-sm text-muted-foreground">Próximos arcos</p>
-              </div>
-              {plannedArcs.map((arc, index) => (
-                <div key={arc.id} className={index > 0 ? 'mt-4' : ''}>
-                  <ArcCard arc={arc} position="right" />
+                
+                {/* Arc card */}
+                <div className={arc.status === 'andamento' ? 'transform scale-110' : ''}>
+                  <ArcCard arc={arc} />
                 </div>
-              ))}
-            </div>
+                
+                {/* Status indicator below */}
+                <div className="text-center mt-2">
+                  <Badge 
+                    className={arc.status === 'finalizado' ? 'bg-green-500/20 text-green-400 border-green-400/30' :
+                              arc.status === 'andamento' ? 'bg-blue-500/20 text-blue-400 border-blue-400/30' :
+                              'bg-orange-500/20 text-orange-400 border-orange-400/30'}
+                  >
+                    {arc.status === 'finalizado' ? 'Finalizado' :
+                     arc.status === 'andamento' ? 'Em Andamento' : 'Planejamento'}
+                  </Badge>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Legend */}
         <div className="mt-12 bg-card rounded-lg p-6 border border-border">
           <h4 className="font-semibold mb-4">Legenda</h4>
-          <div className="grid grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-green-400" />
-              <span>Arcos finalizados aparecem à esquerda</span>
+              <span>Arcos finalizados</span>
             </div>
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-blue-400" />
-              <span>O arco em andamento fica destacado no centro</span>
+              <span>Arco em andamento (destacado)</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-orange-400" />
-              <span>Arcos em planejamento aparecem à direita</span>
+              <span>Arcos em planejamento</span>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            Os números mostram a ordem cronológica dos arcos na sua história. Use as setas na aba Plot para reordenar.
+          </p>
         </div>
       </div>
     </div>

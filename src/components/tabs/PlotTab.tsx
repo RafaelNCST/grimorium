@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Plus, Target, Clock, CheckCircle2, Circle, Edit2, Trash2, Star, GitBranch } from "lucide-react";
+import { Plus, Target, Clock, CheckCircle2, Circle, Edit2, Trash2, Star, GitBranch, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { CreatePlotArcModal } from "@/components/modals/CreatePlotArcModal";
 
 interface PlotArc {
   id: string;
@@ -16,6 +17,7 @@ interface PlotArc {
   events: PlotEvent[];
   progress: number;
   status: 'planejamento' | 'andamento' | 'finalizado';
+  order: number;
 }
 
 interface PlotEvent {
@@ -36,6 +38,7 @@ const mockArcs: PlotArc[] = [
     description: "O jovem pastor descobre seus poderes e aprende a controlá-los enquanto enfrenta os primeiros desafios.",
     progress: 65,
     status: "andamento",
+    order: 1,
     events: [
       { id: "1", name: "Descoberta dos poderes", description: "O protagonista manifesta sua magia pela primeira vez", completed: true, order: 1 },
       { id: "2", name: "Encontro com o mentor", description: "Conhece o sábio que o guiará", completed: true, order: 2 },
@@ -51,6 +54,7 @@ const mockArcs: PlotArc[] = [
     description: "O protagonista lidera uma guerra contra as forças das trevas que ameaçam consumir o reino.",
     progress: 0,
     status: "planejamento",
+    order: 2,
     events: [
       { id: "5", name: "Chamado à guerra", description: "O reino pede ajuda ao protagonista", completed: false, order: 1 },
       { id: "6", name: "Formação da aliança", description: "Reúne heróis para a batalha final", completed: false, order: 2 },
@@ -64,6 +68,7 @@ const mockArcs: PlotArc[] = [
     description: "As consequências da guerra e o estabelecimento de uma nova ordem.",
     progress: 100,
     status: "finalizado",
+    order: 0,
     events: []
   }
 ];
@@ -72,6 +77,7 @@ export function PlotTab() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<PlotArc[]>(mockArcs);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getSizeColor = (size: string) => {
     switch (size) {
@@ -90,6 +96,57 @@ export function PlotTab() {
       default: return 'bg-muted';
     }
   };
+
+  const createArc = (arcData: Omit<PlotArc, 'id' | 'events' | 'progress'>) => {
+    const newArc: PlotArc = {
+      ...arcData,
+      id: Date.now().toString(),
+      events: [],
+      progress: 0
+    };
+
+    setArcs(prev => {
+      // Adjust orders of existing arcs if needed
+      const updatedArcs = prev.map(arc => {
+        if (arc.order >= newArc.order) {
+          return { ...arc, order: arc.order + 1 };
+        }
+        return arc;
+      });
+      
+      return [...updatedArcs, newArc].sort((a, b) => a.order - b.order);
+    });
+  };
+
+  const moveArc = (arcId: string, direction: 'up' | 'down') => {
+    setArcs(prev => {
+      const sortedArcs = [...prev].sort((a, b) => a.order - b.order);
+      const arcIndex = sortedArcs.findIndex(arc => arc.id === arcId);
+      
+      if (arcIndex === -1) return prev;
+      
+      const targetIndex = direction === 'up' ? arcIndex - 1 : arcIndex + 1;
+      
+      if (targetIndex < 0 || targetIndex >= sortedArcs.length) return prev;
+      
+      // Swap orders
+      const currentArc = sortedArcs[arcIndex];
+      const targetArc = sortedArcs[targetIndex];
+      
+      return prev.map(arc => {
+        if (arc.id === currentArc.id) {
+          return { ...arc, order: targetArc.order };
+        }
+        if (arc.id === targetArc.id) {
+          return { ...arc, order: currentArc.order };
+        }
+        return arc;
+      });
+    });
+  };
+
+  // Sort arcs by order for display
+  const sortedArcs = [...arcs].sort((a, b) => a.order - b.order);
 
   const getVisibleEvents = (events: PlotEvent[]) => {
     const sortedEvents = events.sort((a, b) => a.order - b.order);
@@ -117,7 +174,7 @@ export function PlotTab() {
             <GitBranch className="w-4 h-4 mr-2" />
             Árvore Visual
           </Button>
-          <Button className="btn-magical">
+          <Button className="btn-magical" onClick={() => setShowCreateModal(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Criar Arco
           </Button>
@@ -126,7 +183,7 @@ export function PlotTab() {
 
       {/* Arc Cards */}
       <div className="grid gap-6">
-        {arcs.map((arc) => (
+        {sortedArcs.map((arc, index) => (
           <Card 
             key={arc.id} 
             className="card-magical cursor-pointer"
@@ -151,6 +208,32 @@ export function PlotTab() {
                   <Badge className={getSizeColor(arc.size)}>
                     {arc.size}
                   </Badge>
+                  <div className="flex flex-col gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        moveArc(arc.id, 'up');
+                      }}
+                      disabled={index === 0}
+                      className="h-6 w-6 p-0"
+                    >
+                      <ArrowUp className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        moveArc(arc.id, 'down');
+                      }}
+                      disabled={index === sortedArcs.length - 1}
+                      className="h-6 w-6 p-0"
+                    >
+                      <ArrowDown className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -192,6 +275,13 @@ export function PlotTab() {
           </Card>
         ))}
       </div>
+
+      <CreatePlotArcModal 
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+        onCreateArc={createArc}
+        existingArcs={arcs}
+      />
     </div>
   );
 }
