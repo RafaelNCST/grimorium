@@ -1,0 +1,412 @@
+import { useState } from "react";
+import { FileText, FolderOpen, Plus, Edit2, Trash2, Folder, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+
+interface NotesTabProps {
+  bookId: string;
+}
+
+interface NoteFile {
+  id: string;
+  name: string;
+  content: string;
+  type: 'file';
+  parentId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface NoteFolder {
+  id: string;
+  name: string;
+  type: 'folder';
+  parentId?: string;
+  createdAt: Date;
+}
+
+interface TextStyle {
+  bold: boolean;
+  italic: boolean;
+  heading: 'none' | 'h1' | 'h2' | 'h3';
+  quote: boolean;
+}
+
+type NoteItem = NoteFile | NoteFolder;
+
+const mockNotes: NoteItem[] = [
+  {
+    id: '1',
+    name: 'Ideias Principais',
+    type: 'folder',
+    createdAt: new Date('2024-01-15'),
+  },
+  {
+    id: '2',
+    name: 'Personagens Secundários',
+    content: '# Personagens Secundários\n\n## Elena Thornfield\n*Comerciante de especiarias*\n\n> "O segredo dos negócios é saber quando dobrar a aposta."\n\nPersonagem importante para o desenvolvimento do mercado negro.\n\n**Características:**\n- Astuta\n- Corajosa\n- Misteriosa',
+    type: 'file',
+    parentId: '1',
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-20'),
+  },
+  {
+    id: '3',
+    name: 'Notas Gerais',
+    type: 'folder',
+    createdAt: new Date('2024-01-10'),
+  },
+  {
+    id: '4',
+    name: 'Sistema de Magia',
+    content: '# Sistema de Magia\n\nO sistema de magia é baseado em *elementos naturais*.\n\n## Elementos Principais:\n- **Fogo**: Destruição e energia\n- **Água**: Cura e fluidez\n- **Terra**: Proteção e estabilidade\n\n> "A magia flui como um rio, nunca forçada, sempre natural."',
+    type: 'file',
+    parentId: '3',
+    createdAt: new Date('2024-01-12'),
+    updatedAt: new Date('2024-01-18'),
+  },
+];
+
+export function NotesTab({ bookId }: NotesTabProps) {
+  const [notes, setNotes] = useState<NoteItem[]>(mockNotes);
+  const [currentPath, setCurrentPath] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<NoteFile | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
+  const [showCreateFile, setShowCreateFile] = useState(false);
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
+  const [newFolderName, setNewFolderName] = useState('');
+
+  const getCurrentFolderId = () => {
+    if (currentPath.length === 0) return undefined;
+    return currentPath[currentPath.length - 1];
+  };
+
+  const getCurrentItems = () => {
+    const currentFolderId = getCurrentFolderId();
+    return notes.filter(item => item.parentId === currentFolderId);
+  };
+
+  const getFolderPath = () => {
+    const path = ['Anotações'];
+    currentPath.forEach(folderId => {
+      const folder = notes.find(item => item.id === folderId && item.type === 'folder');
+      if (folder) path.push(folder.name);
+    });
+    return path;
+  };
+
+  const handleFolderClick = (folderId: string) => {
+    setCurrentPath([...currentPath, folderId]);
+    setSelectedFile(null);
+  };
+
+  const handleBackClick = () => {
+    if (selectedFile) {
+      setSelectedFile(null);
+      setIsEditing(false);
+    } else if (currentPath.length > 0) {
+      setCurrentPath(currentPath.slice(0, -1));
+    }
+  };
+
+  const handleFileClick = (file: NoteFile) => {
+    setSelectedFile(file);
+    setEditContent(file.content);
+    setIsEditing(false);
+  };
+
+  const handleSaveFile = () => {
+    if (!selectedFile) return;
+    
+    setNotes(notes.map(item => 
+      item.id === selectedFile.id 
+        ? { ...item, content: editContent, updatedAt: new Date() } as NoteFile
+        : item
+    ));
+    
+    setSelectedFile({ ...selectedFile, content: editContent, updatedAt: new Date() });
+    setIsEditing(false);
+    toast({
+      title: "Arquivo salvo",
+      description: "Suas alterações foram salvas com sucesso.",
+    });
+  };
+
+  const handleCreateFile = () => {
+    if (!newFileName.trim()) return;
+
+    const newFile: NoteFile = {
+      id: Date.now().toString(),
+      name: newFileName,
+      content: `# ${newFileName}\n\nEscreva suas anotações aqui...`,
+      type: 'file',
+      parentId: getCurrentFolderId(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setNotes([...notes, newFile]);
+    setNewFileName('');
+    setShowCreateFile(false);
+    toast({
+      title: "Arquivo criado",
+      description: `O arquivo "${newFileName}" foi criado com sucesso.`,
+    });
+  };
+
+  const handleCreateFolder = () => {
+    if (!newFolderName.trim()) return;
+
+    const newFolder: NoteFolder = {
+      id: Date.now().toString(),
+      name: newFolderName,
+      type: 'folder',
+      parentId: getCurrentFolderId(),
+      createdAt: new Date(),
+    };
+
+    setNotes([...notes, newFolder]);
+    setNewFolderName('');
+    setShowCreateFolder(false);
+    toast({
+      title: "Pasta criada",
+      description: `A pasta "${newFolderName}" foi criada com sucesso.`,
+    });
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    setNotes(notes.filter(item => item.id !== itemId && item.parentId !== itemId));
+    if (selectedFile?.id === itemId) {
+      setSelectedFile(null);
+    }
+    toast({
+      title: "Item excluído",
+      description: "O item foi excluído com sucesso.",
+    });
+  };
+
+  const formatText = (text: string) => {
+    return text
+      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mb-4 text-foreground">$1</h1>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mb-3 text-foreground">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-medium mb-2 text-foreground">$1</h3>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-foreground">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-primary pl-4 italic text-muted-foreground bg-muted/50 p-3 rounded-r-md mb-4">$1</blockquote>')
+      .replace(/\n/g, '<br />');
+  };
+
+  if (selectedFile) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={handleBackClick}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h2 className="text-xl font-semibold">{selectedFile.name}</h2>
+              <p className="text-sm text-muted-foreground">
+                Última edição: {selectedFile.updatedAt.toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <>
+                <Button onClick={handleSaveFile}>Salvar</Button>
+                <Button variant="outline" onClick={() => setIsEditing(false)}>Cancelar</Button>
+              </>
+            ) : (
+              <Button onClick={() => setIsEditing(true)}>
+                <Edit2 className="w-4 h-4 mr-2" />
+                Editar
+              </Button>
+            )}
+            <Button variant="destructive" onClick={() => handleDeleteItem(selectedFile.id)}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              Excluir
+            </Button>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="p-6">
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="text-sm text-muted-foreground">
+                  <p><strong>Formatação:</strong></p>
+                  <p># Título 1 | ## Título 2 | ### Título 3</p>
+                  <p>**negrito** | *itálico* | &gt; citação</p>
+                </div>
+                <Textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  rows={20}
+                  className="font-mono"
+                  placeholder="Escreva suas anotações aqui..."
+                />
+              </div>
+            ) : (
+              <div 
+                className="prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: formatText(selectedFile.content) }}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Anotações</h2>
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            {getFolderPath().map((folder, index) => (
+              <span key={index}>
+                {folder}
+                {index < getFolderPath().length - 1 && ' / '}
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {currentPath.length > 0 && (
+            <Button variant="outline" onClick={handleBackClick}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          )}
+          
+          <Dialog open={showCreateFile} onOpenChange={setShowCreateFile}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <FileText className="w-4 h-4 mr-2" />
+                Novo Arquivo
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Novo Arquivo</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="fileName">Nome do arquivo</Label>
+                  <Input
+                    id="fileName"
+                    value={newFileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    placeholder="Nome do arquivo"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setShowCreateFile(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleCreateFile}>Criar</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <FolderOpen className="w-4 h-4 mr-2" />
+                Nova Pasta
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Criar Nova Pasta</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="folderName">Nome da pasta</Label>
+                  <Input
+                    id="folderName"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    placeholder="Nome da pasta"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setShowCreateFolder(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleCreateFolder}>Criar</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {getCurrentItems().map((item) => (
+          <Card key={item.id} className="hover:shadow-md transition-shadow cursor-pointer group">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div 
+                  className="flex items-center gap-3 flex-1"
+                  onClick={() => item.type === 'folder' ? handleFolderClick(item.id) : handleFileClick(item as NoteFile)}
+                >
+                  {item.type === 'folder' ? (
+                    <Folder className="w-8 h-8 text-amber-600" />
+                  ) : (
+                    <FileText className="w-8 h-8 text-blue-600" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base truncate">{item.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {item.createdAt.toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteItem(item.id);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            
+            {item.type === 'file' && (
+              <CardContent className="pt-0">
+                <div className="text-xs text-muted-foreground line-clamp-3">
+                  {(item as NoteFile).content.substring(0, 100)}...
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        ))}
+        
+        {getCurrentItems().length === 0 && (
+          <div className="col-span-full text-center py-12">
+            <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Nenhuma anotação encontrada</p>
+            <p className="text-sm text-muted-foreground">Crie seu primeiro arquivo ou pasta</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

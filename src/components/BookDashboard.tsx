@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 
 import { PlotTab } from "@/components/tabs/PlotTab";
 import { BookSpeciesTab } from "@/components/tabs/BookSpeciesTab";
+import { NotesTab } from "@/components/tabs/NotesTab";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -274,7 +275,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 h-auto p-1 bg-muted/30 mt-6">
+          <TabsList className="grid w-full grid-cols-9 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.overview')}</span>
@@ -307,6 +308,10 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <Dna className="w-4 h-4" />
               <span className="hidden sm:inline">Espécies</span>
             </TabsTrigger>
+            <TabsTrigger value="notes" className="flex items-center gap-2 py-3">
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Anotações</span>
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6 pb-6">
@@ -333,6 +338,9 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             </TabsContent>
             <TabsContent value="species" className="mt-0">
               <BookSpeciesTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="notes" className="mt-0">
+              <NotesTab bookId={bookId} />
             </TabsContent>
           </div>
         </Tabs>
