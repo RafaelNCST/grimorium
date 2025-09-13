@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { toast } from "@/hooks/use-toast";
 
 interface NotesTabProps {
@@ -50,7 +50,7 @@ const mockNotes: NoteItem[] = [
   {
     id: '2',
     name: 'Personagens Secundários',
-    content: '# Personagens Secundários\n\n## Elena Thornfield\n*Comerciante de especiarias*\n\n> "O segredo dos negócios é saber quando dobrar a aposta."\n\nPersonagem importante para o desenvolvimento do mercado negro.\n\n**Características:**\n- Astuta\n- Corajosa\n- Misteriosa',
+    content: '<h1>Personagens Secundários</h1><h2>Elena Thornfield</h2><p><em>Comerciante de especiarias</em></p><blockquote>"O segredo dos negócios é saber quando dobrar a aposta."</blockquote><p>Personagem importante para o desenvolvimento do mercado negro.</p><p><strong>Características:</strong></p><div>• Astuta</div><div>• Corajosa</div><div>• Misteriosa</div>',
     type: 'file',
     parentId: '1',
     createdAt: new Date('2024-01-15'),
@@ -65,7 +65,7 @@ const mockNotes: NoteItem[] = [
   {
     id: '4',
     name: 'Sistema de Magia',
-    content: '# Sistema de Magia\n\nO sistema de magia é baseado em *elementos naturais*.\n\n## Elementos Principais:\n- **Fogo**: Destruição e energia\n- **Água**: Cura e fluidez\n- **Terra**: Proteção e estabilidade\n\n> "A magia flui como um rio, nunca forçada, sempre natural."',
+    content: '<h1>Sistema de Magia</h1><p>O sistema de magia é baseado em <em>elementos naturais</em>.</p><h2>Elementos Principais:</h2><div>• <strong>Fogo</strong>: Destruição e energia</div><div>• <strong>Água</strong>: Cura e fluidez</div><div>• <strong>Terra</strong>: Proteção e estabilidade</div><blockquote>"A magia flui como um rio, nunca forçada, sempre natural."</blockquote>',
     type: 'file',
     parentId: '3',
     createdAt: new Date('2024-01-12'),
@@ -125,7 +125,7 @@ export function NotesTab({ bookId }: NotesTabProps) {
     const newFile: NoteFile = {
       id: Date.now().toString(),
       name: newFileName,
-      content: `# ${newFileName}\n\nEscreva suas anotações aqui...`,
+      content: '<div>Comece a escrever suas anotações aqui...</div>',
       type: 'file',
       parentId: getCurrentFolderId(),
       createdAt: new Date(),
@@ -295,7 +295,11 @@ export function NotesTab({ bookId }: NotesTabProps) {
             {item.type === 'file' && (
               <CardContent className="pt-0">
                 <div className="text-xs text-muted-foreground line-clamp-3">
-                  {(item as NoteFile).content.substring(0, 100)}...
+                  <RichTextEditor 
+                    content={(item as NoteFile).content} 
+                    onChange={() => {}} 
+                    readOnly 
+                  />
                 </div>
               </CardContent>
             )}

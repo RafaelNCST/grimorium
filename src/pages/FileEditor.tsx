@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit2, Trash2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -18,12 +18,11 @@ interface NoteFile {
   updatedAt: Date;
 }
 
-// Mock data - in real app this would come from API/database
 const mockFiles: NoteFile[] = [
   {
     id: '2',
     name: 'Personagens Secundários',
-    content: '# Personagens Secundários\n\n## Elena Thornfield\n*Comerciante de especiarias*\n\n> "O segredo dos negócios é saber quando dobrar a aposta."\n\nPersonagem importante para o desenvolvimento do mercado negro.\n\n**Características:**\n- Astuta\n- Corajosa\n- Misteriosa',
+    content: '<h1>Personagens Secundários</h1><h2>Elena Thornfield</h2><p><em>Comerciante de especiarias</em></p><blockquote>"O segredo dos negócios é saber quando dobrar a aposta."</blockquote><p>Personagem importante para o desenvolvimento do mercado negro.</p><p><strong>Características:</strong></p><div>• Astuta</div><div>• Corajosa</div><div>• Misteriosa</div>',
     type: 'file',
     parentId: '1',
     createdAt: new Date('2024-01-15'),
@@ -32,7 +31,7 @@ const mockFiles: NoteFile[] = [
   {
     id: '4',
     name: 'Sistema de Magia',
-    content: '# Sistema de Magia\n\nO sistema de magia é baseado em *elementos naturais*.\n\n## Elementos Principais:\n- **Fogo**: Destruição e energia\n- **Água**: Cura e fluidez\n- **Terra**: Proteção e estabilidade\n\n> "A magia flui como um rio, nunca forçada, sempre natural."',
+    content: '<h1>Sistema de Magia</h1><p>O sistema de magia é baseado em <em>elementos naturais</em>.</p><h2>Elementos Principais:</h2><div>• <strong>Fogo</strong>: Destruição e energia</div><div>• <strong>Água</strong>: Cura e fluidez</div><div>• <strong>Terra</strong>: Proteção e estabilidade</div><blockquote>"A magia flui como um rio, nunca forçada, sempre natural."</blockquote>',
     type: 'file',
     parentId: '3',
     createdAt: new Date('2024-01-12'),
@@ -107,16 +106,8 @@ export default function FileEditor() {
   };
 
   const formatText = (text: string) => {
-    return text
-      .replace(/^# (.*$)/gm, '<h1 class="text-3xl font-bold mb-6 text-foreground border-b border-border pb-2">$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-2xl font-semibold mb-4 text-foreground mt-8">$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3 class="text-xl font-medium mb-3 text-foreground mt-6">$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-foreground">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic text-muted-foreground">$1</em>')
-      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-primary pl-6 py-3 italic text-muted-foreground bg-muted/50 rounded-r-lg mb-4 shadow-sm">$1</blockquote>')
-      .replace(/^- (.*$)/gm, '<li class="ml-4 mb-1">• $1</li>')
-      .replace(/\n\n/g, '<div class="mb-4"></div>')
-      .replace(/\n/g, '<br />');
+    // No longer needed - content is already in HTML format for rich text editor
+    return text;
   };
 
   if (!file) {
@@ -195,43 +186,13 @@ export default function FileEditor() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <Card className="min-h-[600px]">
-          <CardContent className="p-8">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-lg">
-                  <p className="font-medium mb-2">Guia de Formatação:</p>
-                  <div className="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                      <p><code># Título 1</code></p>
-                      <p><code>## Título 2</code></p>
-                      <p><code>### Título 3</code></p>
-                    </div>
-                    <div>
-                      <p><code>**negrito**</code></p>
-                      <p><code>*itálico*</code></p>
-                      <p><code>&gt; citação</code></p>
-                    </div>
-                  </div>
-                </div>
-                <Textarea
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  rows={25}
-                  className="min-h-[500px] font-mono text-sm resize-none"
-                  placeholder="Escreva suas anotações aqui..."
-                />
-              </div>
-            ) : (
-              <div 
-                className="prose prose-lg max-w-none leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: formatText(file.content) }}
-                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
-              />
-            )}
-          </CardContent>
-        </Card>
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <RichTextEditor
+          content={editContent}
+          onChange={setEditContent}
+          readOnly={!isEditing}
+          placeholder="Comece a escrever suas anotações..."
+        />
       </div>
 
       {/* Delete Confirmation Dialog */}
