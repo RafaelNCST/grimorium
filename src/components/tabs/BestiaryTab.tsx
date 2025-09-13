@@ -172,15 +172,11 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
         </div>
 
         <EmptyState
-          icon={<Skull className="w-12 h-12" />}
+          icon={Skull}
           title="Nenhuma besta cadastrada"
           description="Comece criando sua primeira criatura para popular o bestiário do seu mundo."
-          action={
-            <Button onClick={() => setShowCreateModal(true)} className="btn-magical">
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Primeira Besta
-            </Button>
-          }
+          actionLabel="Criar Primeira Besta"
+          onAction={() => setShowCreateModal(true)}
         />
 
         <CreateBeastModal
@@ -212,22 +208,22 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
         <StatsCard
           title="Total de Bestas"
           value={beasts.length}
-          icon={<Skull className="w-4 h-4" />}
+          icon={Skull}
         />
         <StatsCard
           title="Ameaça Mortal+"
           value={beasts.filter(b => ['mortal', 'apocalíptico'].includes(b.threatLevel.name)).length}
-          icon={<Skull className="w-4 h-4" />}
+          icon={Skull}
         />
         <StatsCard
           title="Criaturas Diurnas"
           value={beasts.filter(b => b.habit === 'diurno').length}
-          icon={<Sun className="w-4 h-4" />}
+          icon={Sun}
         />
         <StatsCard
           title="Criaturas Noturnas"
           value={beasts.filter(b => b.habit === 'noturno').length}
-          icon={<Moon className="w-4 h-4" />}
+          icon={Moon}
         />
       </div>
 
@@ -358,7 +354,7 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
 
         {filteredBeasts.length === 0 && beasts.length > 0 && (
         <EmptyState
-          icon={<Search className="w-12 h-12" />}
+          icon={Search}
           title="Nenhuma besta encontrada"
           description="Tente ajustar os filtros ou o termo de busca."
         />
