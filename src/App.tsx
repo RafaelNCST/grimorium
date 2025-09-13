@@ -15,7 +15,8 @@ import { SpeciesDetail } from "./pages/SpeciesDetail";
 import { RaceDetail } from "./pages/RaceDetail";
 import { PlotArcDetail } from "./pages/PlotArcDetail";
 import { PlotTimeline } from "./pages/PlotTimeline";
-import FileEditor from "./pages/FileEditor";
+import FileEditor from "@/pages/FileEditor";
+import { BeastDetail } from "@/pages/BeastDetail";
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,8 @@ const App = () => (
           <Route path="/book/:bookId/organization/:orgId" element={<OrganizationDetail />} />
           <Route path="/plot-arc/:id" element={<PlotArcDetail />} />
           <Route path="/plot-timeline" element={<PlotTimeline />} />
-          <Route path="/book/:bookId/file/:fileId" element={<FileEditor />} />
+              <Route path="/book/:bookId/file/:fileId" element={<FileEditor />} />
+              <Route path="/beast/:id" element={<BeastDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
