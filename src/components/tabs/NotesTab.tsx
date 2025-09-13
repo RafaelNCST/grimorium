@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FileText, FolderOpen, Plus, Edit2, Trash2, Folder, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,11 +74,9 @@ const mockNotes: NoteItem[] = [
 ];
 
 export function NotesTab({ bookId }: NotesTabProps) {
+  const navigate = useNavigate();
   const [notes, setNotes] = useState<NoteItem[]>(mockNotes);
   const [currentPath, setCurrentPath] = useState<string[]>([]);
-  const [selectedFile, setSelectedFile] = useState<NoteFile | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState('');
   const [showCreateFile, setShowCreateFile] = useState(false);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [newFileName, setNewFileName] = useState('');
@@ -108,35 +107,17 @@ export function NotesTab({ bookId }: NotesTabProps) {
   };
 
   const handleBackClick = () => {
-    if (selectedFile) {
-      setSelectedFile(null);
-      setIsEditing(false);
-    } else if (currentPath.length > 0) {
+    if (currentPath.length > 0) {
       setCurrentPath(currentPath.slice(0, -1));
     }
   };
 
   const handleFileClick = (file: NoteFile) => {
-    setSelectedFile(file);
-    setEditContent(file.content);
-    setIsEditing(false);
+    navigate(`/book/${bookId}/file/${file.id}`);
   };
 
   const handleSaveFile = () => {
-    if (!selectedFile) return;
-    
-    setNotes(notes.map(item => 
-      item.id === selectedFile.id 
-        ? { ...item, content: editContent, updatedAt: new Date() } as NoteFile
-        : item
-    ));
-    
-    setSelectedFile({ ...selectedFile, content: editContent, updatedAt: new Date() });
-    setIsEditing(false);
-    toast({
-      title: "Arquivo salvo",
-      description: "Suas alterações foram salvas com sucesso.",
-    });
+    // This function is no longer needed since editing happens on separate page
   };
 
   const handleCreateFile = () => {
@@ -183,88 +164,13 @@ export function NotesTab({ bookId }: NotesTabProps) {
 
   const handleDeleteItem = (itemId: string) => {
     setNotes(notes.filter(item => item.id !== itemId && item.parentId !== itemId));
-    if (selectedFile?.id === itemId) {
-      setSelectedFile(null);
-    }
     toast({
       title: "Item excluído",
       description: "O item foi excluído com sucesso.",
     });
   };
 
-  const formatText = (text: string) => {
-    return text
-      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mb-4 text-foreground">$1</h1>')
-      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mb-3 text-foreground">$1</h2>')
-      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-medium mb-2 text-foreground">$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-foreground">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      .replace(/^> (.*$)/gm, '<blockquote class="border-l-4 border-primary pl-4 italic text-muted-foreground bg-muted/50 p-3 rounded-r-md mb-4">$1</blockquote>')
-      .replace(/\n/g, '<br />');
   };
-
-  if (selectedFile) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleBackClick}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h2 className="text-xl font-semibold">{selectedFile.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                Última edição: {selectedFile.updatedAt.toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {isEditing ? (
-              <>
-                <Button onClick={handleSaveFile}>Salvar</Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>Cancelar</Button>
-              </>
-            ) : (
-              <Button onClick={() => setIsEditing(true)}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Editar
-              </Button>
-            )}
-            <Button variant="destructive" onClick={() => handleDeleteItem(selectedFile.id)}>
-              <Trash2 className="w-4 h-4 mr-2" />
-              Excluir
-            </Button>
-          </div>
-        </div>
-
-        <Card>
-          <CardContent className="p-6">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">
-                  <p><strong>Formatação:</strong></p>
-                  <p># Título 1 | ## Título 2 | ### Título 3</p>
-                  <p>**negrito** | *itálico* | &gt; citação</p>
-                </div>
-                <Textarea
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  rows={20}
-                  className="font-mono"
-                  placeholder="Escreva suas anotações aqui..."
-                />
-              </div>
-            ) : (
-              <div 
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: formatText(selectedFile.content) }}
-              />
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
