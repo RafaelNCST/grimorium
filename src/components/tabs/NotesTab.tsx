@@ -103,7 +103,6 @@ export function NotesTab({ bookId }: NotesTabProps) {
 
   const handleFolderClick = (folderId: string) => {
     setCurrentPath([...currentPath, folderId]);
-    setSelectedFile(null);
   };
 
   const handleBackClick = () => {
@@ -168,8 +167,6 @@ export function NotesTab({ bookId }: NotesTabProps) {
       title: "Item excluído",
       description: "O item foi excluído com sucesso.",
     });
-  };
-
   };
 
   return (
