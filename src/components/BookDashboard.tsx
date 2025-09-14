@@ -277,7 +277,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-11 h-auto p-1 bg-muted/30 mt-6">
+          <TabsList className="grid w-full grid-cols-12 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.overview')}</span>
@@ -309,6 +309,10 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             <TabsTrigger value="species" className="flex items-center gap-2 py-3">
               <Dna className="w-4 h-4" />
               <span className="hidden sm:inline">Espécies</span>
+            </TabsTrigger>
+            <TabsTrigger value="bestiary" className="flex items-center gap-2 py-3">
+              <Skull className="w-4 h-4" />
+              <span className="hidden sm:inline">Bestiário</span>
             </TabsTrigger>
             <TabsTrigger value="items" className="flex items-center gap-2 py-3">
               <Package className="w-4 h-4" />
