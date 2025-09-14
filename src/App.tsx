@@ -17,6 +17,8 @@ import { PlotArcDetail } from "./pages/PlotArcDetail";
 import { PlotTimeline } from "./pages/PlotTimeline";
 import FileEditor from "@/pages/FileEditor";
 import { BeastDetail } from "@/pages/BeastDetail";
+import ItemDetail from "@/pages/ItemDetail";
+import ItemTimeline from "@/pages/ItemTimeline";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/plot-timeline" element={<PlotTimeline />} />
               <Route path="/book/:bookId/file/:fileId" element={<FileEditor />} />
               <Route path="/beast/:id" element={<BeastDetail />} />
+              <Route path="/item/:id" element={<ItemDetail />} />
+              <Route path="/item/:id/timeline" element={<ItemTimeline />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
