@@ -17,8 +17,76 @@ import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
 import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
 import { toast } from "sonner";
 
+// Custom field interfaces
+interface BaseCustomField {
+  id: string;
+  type: string;
+  name: string;
+  order: number;
+}
+
+interface TextCustomField extends BaseCustomField {
+  type: 'text';
+  value: string;
+}
+
+interface SelectCustomField extends BaseCustomField {
+  type: 'select';
+  value: string;
+  options: string[];
+}
+
+interface MultiSelectCustomField extends BaseCustomField {
+  type: 'multiselect';
+  value: string[];
+  options: string[];
+}
+
+interface IconPickerCustomField extends BaseCustomField {
+  type: 'iconpicker';
+  value: string;
+  options: string[];
+}
+
+type CustomField = TextCustomField | SelectCustomField | MultiSelectCustomField | IconPickerCustomField;
+
+interface Character {
+  id: string;
+  name: string;
+  age: number;
+  gender: string;
+  appearance: string;
+  role: string;
+  personality: string;
+  description: string;
+  organization: string;
+  birthPlace: string;
+  affiliatedPlace: string;
+  alignment: string;
+  qualities: string[];
+  image: string;
+  customFields?: CustomField[];
+  family: {
+    father: string | null;
+    mother: string | null;
+    children: string[];
+    siblings: string[];
+    spouse: string | null;
+    halfSiblings: string[];
+    unclesAunts: string[];
+    grandparents: string[];
+    cousins: string[];
+  };
+  relationships: {
+    id: string;
+    characterId: string;
+    type: string;
+    intensity: number;
+  }[];
+}
+
 // Mock data - in real app this would come from state management
-const mockCharacter = {
+const mockCharacter: Character = {
   id: "1",
   name: "Aelric Valorheart",
   age: 23,
@@ -160,8 +228,8 @@ export function CharacterDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [character, setCharacter] = useState(mockCharacter);
-  const [editData, setEditData] = useState({...mockCharacter, relationships: mockCharacter.relationships || []});
+  const [character, setCharacter] = useState<Character>(mockCharacter);
+  const [editData, setEditData] = useState<Character>({...mockCharacter, relationships: mockCharacter.relationships || []});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuality, setNewQuality] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -202,14 +270,14 @@ export function CharacterDetail() {
 
   const handleAddCustomField = () => {
     if (newField.name.trim()) {
-      const field = {
+      const field: CustomField = {
         id: `cf-${Date.now()}`,
-        type: newField.type,
+        type: newField.type as any,
         name: newField.name,
         value: newField.type === 'multiselect' ? [] : '',
         options: newField.options,
         order: (editData.customFields?.length || 0)
-      };
+      } as CustomField;
       
       setEditData(prev => ({
         ...prev,
@@ -1199,7 +1267,7 @@ export function CharacterDetail() {
         onConfirm={handleDelete}
         title="Excluir Personagem"
         description="Esta ação não pode ser desfeita. Todos os dados do personagem serão perdidos permanentemente."
-        confirmText={character.name}
+        itemName={character.name}
       />
     </div>
   );
