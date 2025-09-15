@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -141,7 +141,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
   const [arcs, setArcs] = useState<PlotArc[]>(initialArcs);
-  const [headerCollapsed, setHeaderCollapsed] = useState(false);
   const currentArc = arcs.find((a) => a.isCurrentArc) || arcs[0];
 
   return (
@@ -149,149 +148,136 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       {/* Header */}
       <div className="bg-card border-b border-border">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onBack}
-                className="hover:bg-muted"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <h1 className="text-2xl font-bold">{t('book.dashboard')}</h1>
-            </div>
+          <div className="flex items-center gap-4 mb-4">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setHeaderCollapsed(!headerCollapsed)}
-              className="flex items-center gap-2"
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="hover:bg-muted"
             >
-              {headerCollapsed ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-              {headerCollapsed ? 'Mostrar' : 'Ocultar'} Cabeçalho
+              <ArrowLeft className="w-5 h-5" />
             </Button>
+            <h1 className="text-2xl font-bold">{t('book.dashboard')}</h1>
           </div>
 
           {/* Book Header */}
-          {!headerCollapsed && (
-            <div className="flex items-start gap-6">
-              <div className="w-32 h-48 rounded-lg overflow-hidden shadow-lg">
-                <img
-                  src={book.coverImage}
-                  alt={book.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          <div className="flex items-start gap-6">
+            <div className="w-32 h-48 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src={book.coverImage}
+                alt={book.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div className="w-full max-w-3xl">
-                    {isEditingHeader ? (
-                      <div className="space-y-3">
-                        <Input
-                          value={draftBook.title}
-                          onChange={(e) => setDraftBook({ ...draftBook, title: e.target.value })}
-                          aria-label="Título do livro"
-                        />
-                        <div className="flex items-center gap-3">
-                          <Select value={draftBook.genre} onValueChange={(v) => setDraftBook({ ...draftBook, genre: v })}>
-                            <SelectTrigger className="w-48">
-                              <SelectValue placeholder="Gênero" />
-                            </SelectTrigger>
-                            <SelectContent side="bottom">
-                              {genres.map((genre) => (
-                                <SelectItem key={genre} value={genre}>{genre}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select value={draftBook.visualStyle} onValueChange={(v) => setDraftBook({ ...draftBook, visualStyle: v })}>
-                            <SelectTrigger className="w-48">
-                              <SelectValue placeholder="Estilo visual" />
-                            </SelectTrigger>
-                            <SelectContent side="bottom">
-                              {visualStyles.map((style) => (
-                                <SelectItem key={style} value={style}>{style}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Textarea
-                          value={draftBook.storySummary}
-                          onChange={(e) => setDraftBook({ ...draftBook, storySummary: e.target.value })}
-                          placeholder="Resumo da História"
-                          rows={3}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setDraftBook(book);
-                              setIsEditingHeader(false);
-                            }}
-                          >
-                            Cancelar
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setBook(draftBook);
-                              setIsEditingHeader(false);
-                            }}
-                            className="btn-magical"
-                          >
-                            Salvar
-                          </Button>
-                        </div>
+            <div className="flex-1">
+              <div className="flex items-start justify-between">
+                <div className="w-full max-w-3xl">
+                  {isEditingHeader ? (
+                    <div className="space-y-3">
+                      <Input
+                        value={draftBook.title}
+                        onChange={(e) => setDraftBook({ ...draftBook, title: e.target.value })}
+                        aria-label="Título do livro"
+                      />
+                      <div className="flex items-center gap-3">
+                        <Select value={draftBook.genre} onValueChange={(v) => setDraftBook({ ...draftBook, genre: v })}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Gênero" />
+                          </SelectTrigger>
+                          <SelectContent side="bottom">
+                            {genres.map((genre) => (
+                              <SelectItem key={genre} value={genre}>{genre}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select value={draftBook.visualStyle} onValueChange={(v) => setDraftBook({ ...draftBook, visualStyle: v })}>
+                          <SelectTrigger className="w-48">
+                            <SelectValue placeholder="Estilo visual" />
+                          </SelectTrigger>
+                          <SelectContent side="bottom">
+                            {visualStyles.map((style) => (
+                              <SelectItem key={style} value={style}>{style}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                    ) : (
-                      <div>
-                        <h2 className="text-3xl font-bold mb-2">{book.title}</h2>
-                        <div className="flex items-center gap-3 mb-3">
-                          <Badge variant="secondary">{book.genre}</Badge>
-                          <Badge variant="outline">{book.visualStyle}</Badge>
-                        </div>
-                        <p className="text-muted-foreground max-w-2xl">
-                          {book.storySummary || "Ainda não há resumo da história. Clique em 'Editar' para adicionar."}
-                        </p>
+                      <Textarea
+                        value={draftBook.storySummary}
+                        onChange={(e) => setDraftBook({ ...draftBook, storySummary: e.target.value })}
+                        placeholder="Resumo da História"
+                        rows={3}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setDraftBook(book);
+                            setIsEditingHeader(false);
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setBook(draftBook);
+                            setIsEditingHeader(false);
+                          }}
+                          className="btn-magical"
+                        >
+                          Salvar
+                        </Button>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {!isEditingHeader && (
-                      <>
-                        <Button variant="outline" size="sm" onClick={() => setIsEditingHeader(true)}>
-                          <Edit2 className="w-4 h-4 mr-2" />
-                          Editar
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Excluir
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2">{book.title}</h2>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge variant="secondary">{book.genre}</Badge>
+                        <Badge variant="outline">{book.visualStyle}</Badge>
+                      </div>
+                      <p className="text-muted-foreground max-w-2xl">
+                        {book.storySummary || "Ainda não há resumo da história. Clique em 'Editar' para adicionar."}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4" />
-                    <span>Capítulos: {book.chapters}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Arco atual: {currentArc?.name || "Nenhum arco definido"}</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  {!isEditingHeader && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setIsEditingHeader(true)}>
+                        <Edit2 className="w-4 h-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Capítulos: {book.chapters}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>Arco atual: {currentArc?.name || "Nenhum arco definido"}</span>
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <div className="px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full grid-cols-12 h-auto p-1 bg-muted/30 ${headerCollapsed ? 'mt-4' : 'mt-6'}`}>
+          <TabsList className="grid w-full grid-cols-12 h-auto p-1 bg-muted/30 mt-6">
             <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">{t('book.overview')}</span>
