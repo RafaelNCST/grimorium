@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Search, Menu, X, GripVertical, FileText, List, Tags, Palette, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
 import { toast } from "sonner";
 
 // Mock data - in real app this would come from state management
@@ -19,6 +22,7 @@ const mockCharacter = {
   id: "1",
   name: "Aelric Valorheart",
   age: 23,
+  gender: "Masculino",
   appearance: "Jovem de estatura média com cabelos castanhos ondulados e olhos verdes penetrantes. Possui uma cicatriz no braço direito de uma batalha antiga. Veste sempre uma armadura de couro reforçado com detalhes em bronze, e carrega uma espada élfica herdada de seus antepassados. Seus olhos brilham com uma luz sobrenatural quando usa magia.",
   role: "protagonista",
   personality: "Determinado e corajoso, mas às vezes impulsivo. Possui um forte senso de justiça e não hesita em ajudar os necessitados. É naturalmente carismático e inspira confiança nos outros. Tem tendência a se sacrificar pelos outros, o que às vezes o coloca em situações perigosas. Apesar de sua juventude, demonstra uma sabedoria além de seus anos.",
@@ -29,6 +33,11 @@ const mockCharacter = {
   alignment: "bem",
   qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor", "Carismático", "Altruísta", "Intuitivo"],
   image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+  customFields: [
+    { id: 'cf1', type: 'text', name: 'Profissão Anterior', value: 'Pastor', order: 0 },
+    { id: 'cf2', type: 'select', name: 'Classe Social', value: 'Plebeu', options: ['Plebeu', 'Nobre', 'Mercador', 'Artesão'], order: 1 },
+    { id: 'cf3', type: 'multiselect', name: 'Idiomas', value: ['Comum', 'Élfico'] as string[], options: ['Comum', 'Élfico', 'Anão', 'Dracônico', 'Celestial'], order: 2 }
+  ],
   family: {
     father: null,
     mother: null,
@@ -95,16 +104,16 @@ const mockLocations = [
 
 // Mock characters for family relationships
 const mockCharacters = [
-  { id: "1", name: "Aelric Valorheart" },
-  { id: "2", name: "Elena Moonwhisper" },
-  { id: "3", name: "Marcus Ironforge" },
-  { id: "4", name: "Lyra Starweaver" },
-  { id: "5", name: "Thane Stormborn" },
-  { id: "6", name: "Aria Nightsong" },
-  { id: "7", name: "Gareth Goldshield" },
-  { id: "8", name: "Vera Shadowbane" },
-  { id: "9", name: "Duncan Firebeard" },
-  { id: "10", name: "Seraphina Dawnbringer" }
+  { id: "1", name: "Aelric Valorheart", role: "protagonista", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face" },
+  { id: "2", name: "Elena Moonwhisper", role: "secundario", image: "https://images.unsplash.com/photo-1494790108755-2616b612b732?w=300&h=300&fit=crop&crop=face" },
+  { id: "3", name: "Marcus Ironforge", role: "secundario", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face" },
+  { id: "4", name: "Lyra Starweaver", role: "protagonista", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face" },
+  { id: "5", name: "Thane Stormborn", role: "antagonista", image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=300&h=300&fit=crop&crop=face" },
+  { id: "6", name: "Aria Nightsong", role: "secundario" },
+  { id: "7", name: "Gareth Goldshield", role: "figurante" },
+  { id: "8", name: "Vera Shadowbane", role: "antagonista" },
+  { id: "9", name: "Duncan Firebeard", role: "secundario" },
+  { id: "10", name: "Seraphina Dawnbringer", role: "secundario" }
 ];
 
 const familyRelations = {
@@ -136,6 +145,17 @@ const relationshipTypes = [
   { value: "neutro", label: "Neutro", emoji: "😐", color: "bg-slate-500/10 text-slate-600" }
 ];
 
+// Custom field types
+const fieldTypes = [
+  { value: 'text', label: 'Texto', icon: FileText },
+  { value: 'select', label: 'Dropdown', icon: List },
+  { value: 'multiselect', label: 'Multi-seleção', icon: Tags },
+  { value: 'iconpicker', label: 'Picker de Ícone', icon: Palette }
+];
+
+// Required field order
+const requiredFields = ['image', 'name', 'role', 'description', 'gender', 'age'];
+
 export function CharacterDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -149,6 +169,10 @@ export function CharacterDetail() {
   const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] = useState("");
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
+  const [showCharacterNav, setShowCharacterNav] = useState(false);
+  const [showAddFieldDialog, setShowAddFieldDialog] = useState(false);
+  const [newField, setNewField] = useState({ name: '', type: 'text', options: [] as string[] });
+  const [newOption, setNewOption] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -164,7 +188,7 @@ export function CharacterDetail() {
 
   const handleDelete = () => {
     toast.success("Personagem excluído com sucesso!");
-    navigate("/book/1/characters");
+    navigate("/book/1");
   };
 
   const handleCancel = () => {
@@ -172,575 +196,560 @@ export function CharacterDetail() {
     setIsEditing(false);
   };
 
-  const handleAddQuality = () => {
-    if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
-      setEditData(prev => ({
-        ...prev,
-        qualities: [...prev.qualities, newQuality.trim()]
-      }));
-      setNewQuality("");
-    }
+  const handleBack = () => {
+    navigate("/book/1");
   };
 
-  const handleRemoveQuality = (qualityToRemove: string) => {
-    setEditData(prev => ({
-      ...prev,
-      qualities: prev.qualities.filter(q => q !== qualityToRemove)
-    }));
-  };
-
-  const handleFamilyRelationChange = (relationType: string, characterId: string | null) => {
-    setEditData(prev => {
-      const newFamily = { ...prev.family };
-      
-      // Remove previous relation if exists
-      Object.keys(newFamily).forEach(key => {
-        if (Array.isArray(newFamily[key])) {
-          newFamily[key] = newFamily[key].filter((id: string) => id !== characterId);
-        } else if (newFamily[key] === characterId) {
-          newFamily[key] = null;
-        }
-      });
-      
-      // Add new relation
-      if (characterId && characterId !== "none") {
-        switch (relationType) {
-          case "father":
-          case "mother":
-          case "spouse":
-            newFamily[relationType] = characterId;
-            break;
-          case "child":
-            if (!newFamily.children.includes(characterId)) {
-              newFamily.children.push(characterId);
-            }
-            break;
-          case "sibling":
-            if (!newFamily.siblings.includes(characterId)) {
-              newFamily.siblings.push(characterId);
-            }
-            break;
-          case "halfSibling":
-            if (!newFamily.halfSiblings.includes(characterId)) {
-              newFamily.halfSiblings.push(characterId);
-            }
-            break;
-          case "uncleAunt":
-            if (!newFamily.unclesAunts.includes(characterId)) {
-              newFamily.unclesAunts.push(characterId);
-            }
-            break;
-          case "grandparent":
-            if (!newFamily.grandparents.includes(characterId)) {
-              newFamily.grandparents.push(characterId);
-            }
-            break;
-          case "cousin":
-            if (!newFamily.cousins.includes(characterId)) {
-              newFamily.cousins.push(characterId);
-            }
-            break;
-        }
-      }
-      
-      return {
-        ...prev,
-        family: newFamily
-      };
-    });
-  };
-
-  const getFamilyRelationLabel = (relationType: string, characterName: string) => {
-    const relations = {
-      father: `Pai de ${characterName}`,
-      mother: `Mãe de ${characterName}`,
-      child: `Filho(a) de ${characterName}`,
-      sibling: `Irmão(ã) de ${characterName}`,
-      spouse: `Cônjuge de ${characterName}`,
-      halfSibling: `Meio-irmão(ã) de ${characterName}`,
-      uncleAunt: `Tio(a) de ${characterName}`,
-      grandparent: `Avô(ó) de ${characterName}`,
-      cousin: `Primo(a) de ${characterName}`
-    };
-    return relations[relationType] || "";
-  };
-
-  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setEditData(prev => ({ ...prev, image: result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAgeChange = (increment: boolean) => {
-    setEditData(prev => ({
-      ...prev,
-      age: Math.max(0, prev.age + (increment ? 1 : -1))
-    }));
-  };
-
-  const handleAddRelationship = () => {
-    if (selectedRelationshipCharacter && selectedRelationshipType) {
-      const newRelationship = {
-        id: `rel-${Date.now()}`,
-        characterId: selectedRelationshipCharacter,
-        type: selectedRelationshipType,
-        intensity: relationshipIntensity[0]
+  const handleAddCustomField = () => {
+    if (newField.name.trim()) {
+      const field = {
+        id: `cf-${Date.now()}`,
+        type: newField.type,
+        name: newField.name,
+        value: newField.type === 'multiselect' ? [] : '',
+        options: newField.options,
+        order: (editData.customFields?.length || 0)
       };
       
       setEditData(prev => ({
         ...prev,
-        relationships: [...(prev.relationships || []), newRelationship]
+        customFields: [...(prev.customFields || []), field]
       }));
       
-      setSelectedRelationshipCharacter("");
-      setSelectedRelationshipType("");
-      setRelationshipIntensity([50]);
-      toast.success("Relacionamento adicionado com sucesso!");
+      setNewField({ name: '', type: 'text', options: [] });
+      setShowAddFieldDialog(false);
+      toast.success("Campo adicionado com sucesso!");
     }
   };
 
-  const handleRemoveRelationship = (relationshipId: string) => {
+  const handleRemoveCustomField = (fieldId: string) => {
     setEditData(prev => ({
       ...prev,
-      relationships: prev.relationships?.filter(rel => rel.id !== relationshipId) || []
+      customFields: prev.customFields?.filter(f => f.id !== fieldId) || []
     }));
-    toast.success("Relacionamento removido com sucesso!");
+    toast.success("Campo removido com sucesso!");
   };
 
-  const handleUpdateRelationshipIntensity = (relationshipId: string, intensity: number) => {
+  const handleCustomFieldChange = (fieldId: string, value: any) => {
     setEditData(prev => ({
       ...prev,
-      relationships: prev.relationships?.map(rel => 
-        rel.id === relationshipId ? { ...rel, intensity } : rel
+      customFields: prev.customFields?.map(f => 
+        f.id === fieldId ? { ...f, value } : f
       ) || []
     }));
   };
 
-  const getRelationshipTypeData = (type: string) => {
-    return relationshipTypes.find(rt => rt.value === type) || relationshipTypes[0];
+  const handleAddOption = () => {
+    if (newOption.trim() && !newField.options.includes(newOption.trim())) {
+      setNewField(prev => ({
+        ...prev,
+        options: [...prev.options, newOption.trim()]
+      }));
+      setNewOption('');
+    }
+  };
+
+  const handleRemoveOption = (option: string) => {
+    setNewField(prev => ({
+      ...prev,
+      options: prev.options.filter(o => o !== option)
+    }));
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{character.name}</h1>
-            <p className="text-muted-foreground">Detalhes do personagem</p>
-          </div>
-        </div>
-        
-        <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <Button variant="outline" onClick={handleCancel}>
-                Cancelar
-              </Button>
-              <Button variant="magical" onClick={handleSave}>
-                Salvar
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Editar
-              </Button>
-              <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
-                <Trash2 className="w-4 h-4 mr-2" />
-                Excluir
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+    <div className="flex min-h-screen bg-background">
+      {/* Character Navigation Sidebar */}
+      <CharacterNavigationSidebar
+        characters={mockCharacters}
+        currentCharacterId={character.id}
+        isOpen={showCharacterNav}
+        onClose={() => setShowCharacterNav(false)}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Basic Info Card */}
-          <Card className="card-magical">
-            <CardHeader>
-              <CardTitle>Informações Básicas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="container mx-auto py-8 px-4 max-w-6xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={handleBack}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar ao Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowCharacterNav(true)}
+                className="flex items-center gap-2"
+              >
+                <Menu className="w-4 h-4" />
+                Personagens
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold">{character.name}</h1>
+                <p className="text-muted-foreground">Detalhes do personagem</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
               {isEditing ? (
-                <div className="space-y-4">
-                  {/* Image Upload */}
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Imagem do Personagem</Label>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div 
-                          className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors mx-auto"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          {imagePreview ? (
-                            <div className="relative w-full h-full">
-                              <img 
-                                src={imagePreview} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover rounded-full"
-                              />
-                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
-                                <Upload className="w-6 h-6 text-white" />
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-center">
-                              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                              <p className="text-sm text-muted-foreground">Clique para selecionar uma imagem</p>
-                            </div>
-                          )}
-                        </div>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageFileChange}
-                          className="hidden"
+                <>
+                  <Button variant="outline" onClick={handleCancel}>
+                    Cancelar
+                  </Button>
+                  <Button variant="magical" onClick={handleSave}>
+                    Salvar
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => setIsEditing(true)}>
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Editar
+                  </Button>
+                  <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Excluir
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Required Fields Card */}
+          <Card className="card-magical mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Informações Básicas (Obrigatórias)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Photo */}
+              <div className="space-y-2">
+                <Label>Foto do Personagem</Label>
+                {isEditing ? (
+                  <div 
+                    className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {imagePreview ? (
+                      <div className="relative w-full h-full">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover rounded-lg"
                         />
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                          <Upload className="w-6 h-6 text-white" />
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">Clique para selecionar</p>
+                      </div>
+                    )}
                   </div>
-
-                  {/* Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome</Label>
-                    <Input
-                      id="name"
-                      value={editData.name}
-                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Nome do personagem"
+                ) : (
+                  <div className="w-full h-32 rounded-lg overflow-hidden border">
+                    <img 
+                      src={character.image} 
+                      alt={character.name}
+                      className="w-full h-full object-cover"
                     />
                   </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImageFile(file);
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const result = event.target?.result as string;
+                        setImagePreview(result);
+                        setEditData(prev => ({ ...prev, image: result }));
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+              </div>
 
-                  {/* Age */}
-                  <div className="space-y-2">
-                    <Label htmlFor="age">Idade</Label>
-                    <div className="flex items-center">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-10 w-10 p-0"
-                        onClick={() => handleAgeChange(false)}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      <Input
-                        id="age"
-                        type="number"
-                        value={editData.age}
-                        onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
-                        className="mx-2 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        min="0"
-                        max="999"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-10 w-10 p-0"
-                        onClick={() => handleAgeChange(true)}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
+              {/* Name */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome *</Label>
+                {isEditing ? (
+                  <Input
+                    id="name"
+                    value={editData.name}
+                    onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Nome do personagem"
+                  />
+                ) : (
+                  <p className="text-lg font-semibold">{character.name}</p>
+                )}
+              </div>
 
-                  {/* Role */}
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Papel</Label>
-                    <Select value={editData.role} onValueChange={(value) => setEditData(prev => ({ ...prev, role: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o papel" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.value} value={role.value}>
+              {/* Role */}
+              <div className="space-y-2">
+                <Label htmlFor="role">Papel *</Label>
+                {isEditing ? (
+                  <Select value={editData.role} onValueChange={(value) => setEditData(prev => ({ ...prev, role: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar papel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          <div className="flex items-center gap-2">
+                            <role.icon className="w-4 h-4" />
                             {role.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Badge className={currentRole?.color}>
+                    {currentRole && <currentRole.icon className="w-3 h-3 mr-1" />}
+                    {currentRole?.label}
+                  </Badge>
+                )}
+              </div>
 
-                  {/* Alignment */}
-                  <div className="space-y-2">
-                    <Label htmlFor="alignment">Alinhamento</Label>
-                    <Select value={editData.alignment} onValueChange={(value) => setEditData(prev => ({ ...prev, alignment: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o alinhamento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {alignments.map((alignment) => (
-                          <SelectItem key={alignment.value} value={alignment.value}>
-                            {alignment.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+              {/* Description */}
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="description">Descrição Básica *</Label>
+                {isEditing ? (
+                  <Textarea
+                    id="description"
+                    value={editData.description}
+                    onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Descrição básica do personagem"
+                    rows={3}
+                  />
+                ) : (
+                  <p className="text-muted-foreground">{character.description}</p>
+                )}
+              </div>
 
-                  {/* Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Descrição</Label>
-                    <Textarea
-                      id="description"
-                      value={editData.description}
-                      onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Descrição do personagem"
-                      className="min-h-[100px]"
+              {/* Gender */}
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gênero *</Label>
+                {isEditing ? (
+                  <Select value={editData.gender} onValueChange={(value) => setEditData(prev => ({ ...prev, gender: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar gênero" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Masculino">Masculino</SelectItem>
+                      <SelectItem value="Feminino">Feminino</SelectItem>
+                      <SelectItem value="Não-binário">Não-binário</SelectItem>
+                      <SelectItem value="Outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p>{character.gender}</p>
+                )}
+              </div>
+
+              {/* Age */}
+              <div className="space-y-2">
+                <Label htmlFor="age">Idade *</Label>
+                {isEditing ? (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditData(prev => ({ ...prev, age: Math.max(0, prev.age - 1) }))}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
+                    <Input
+                      id="age"
+                      type="number"
+                      value={editData.age}
+                      onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                      className="text-center"
+                      min="0"
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditData(prev => ({ ...prev, age: prev.age + 1 }))}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
                   </div>
+                ) : (
+                  <p>{character.age} anos</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-                  {/* Appearance */}
-                  <div className="space-y-2">
-                    <Label htmlFor="appearance">Aparência Física</Label>
-                    <Textarea
-                      id="appearance"
-                      value={editData.appearance}
-                      onChange={(e) => setEditData(prev => ({ ...prev, appearance: e.target.value }))}
-                      placeholder="Descrição da aparência física"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  {/* Personality */}
-                  <div className="space-y-2">
-                    <Label htmlFor="personality">Personalidade</Label>
-                    <Textarea
-                      id="personality"
-                      value={editData.personality}
-                      onChange={(e) => setEditData(prev => ({ ...prev, personality: e.target.value }))}
-                      placeholder="Descrição da personalidade"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  {/* Birth Place */}
-                  <div className="space-y-2">
-                    <Label htmlFor="birthPlace">Local de Nascimento</Label>
-                    <Select value={editData.birthPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o local de nascimento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {mockLocations.map((location) => (
-                          <SelectItem key={location.id} value={location.name}>
-                            {location.name} ({location.type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Affiliated Place */}
-                  <div className="space-y-2">
-                    <Label htmlFor="affiliatedPlace">Local Afiliado</Label>
-                    <Select value={editData.affiliatedPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, affiliatedPlace: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o local afiliado" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {mockLocations.map((location) => (
-                          <SelectItem key={location.id} value={location.name}>
-                            {location.name} ({location.type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                     </Select>
-                   </div>
-
-                    {/* Family Relations */}
-                    <div className="space-y-4">
-                      <Label>Relações Familiares</Label>
-                      
-                      {/* Single-value relations */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {familyRelations.single.map((relation) => (
-                          <div key={relation.value} className="space-y-2">
-                            <Label className="text-sm">{relation.label}</Label>
-                            <Select 
-                              value={
-                                relation.value === "father" ? editData.family.father || "none" :
-                                relation.value === "mother" ? editData.family.mother || "none" :
-                                relation.value === "spouse" ? editData.family.spouse || "none" :
-                                "none"
+          {/* Custom Fields */}
+          {(editData.customFields && editData.customFields.length > 0) && (
+            <Card className="card-magical mb-6">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Campos Personalizados
+                  </CardTitle>
+                  {isEditing && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowAddFieldDialog(true)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Adicionar Campo
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {editData.customFields
+                  ?.filter(field => field.value && (Array.isArray(field.value) ? field.value.length > 0 : field.value.toString().trim() !== ''))
+                  .map((field) => (
+                  <div key={field.id} className="space-y-2 relative group">
+                    {isEditing && (
+                      <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveCustomField(field.id)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
+                    
+                    <Label>{field.name}</Label>
+                    {isEditing ? (
+                      <>
+                        {field.type === 'text' && (
+                          <Input
+                            value={field.value as string}
+                            onChange={(e) => handleCustomFieldChange(field.id, e.target.value)}
+                          />
+                        )}
+                        {field.type === 'select' && (
+                          <Select 
+                            value={field.value as string} 
+                            onValueChange={(value) => handleCustomFieldChange(field.id, value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.options?.map(option => (
+                                <SelectItem key={option} value={option}>{option}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        {field.type === 'multiselect' && (
+                          <div className="space-y-2">
+                            <Select onValueChange={(value) => {
+                              const currentValues = Array.isArray(field.value) ? field.value : [];
+                              if (!currentValues.includes(value)) {
+                                handleCustomFieldChange(field.id, [...currentValues, value]);
                               }
-                              onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
-                            >
+                            }}>
                               <SelectTrigger>
-                                <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
+                                <SelectValue placeholder="Adicionar opção" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="none">Nenhum</SelectItem>
-                                {mockCharacters
-                                  .filter(char => char.id !== editData.id)
-                                  .map((char) => (
-                                  <SelectItem key={char.id} value={char.id}>
-                                    {char.name}
-                                  </SelectItem>
+                                {field.options?.map(option => (
+                                  <SelectItem key={option} value={option}>{option}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Multi-select relations */}
-                      <div className="space-y-4">
-                        {familyRelations.multiple.map((relation) => {
-                          const currentRelations = editData.family[
-                            relation.value === "child" ? "children" : 
-                            relation.value === "sibling" ? "siblings" :
-                            relation.value === "halfSibling" ? "halfSiblings" :
-                            relation.value === "uncleAunt" ? "unclesAunts" :
-                            "cousins"
-                          ];
-                          
-                          return (
-                            <div key={relation.value} className="space-y-2">
-                              <Label className="text-sm">{relation.label}s</Label>
-                              <Select onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder={`Adicionar ${relation.label.toLowerCase()}`} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="none">Selecione</SelectItem>
-                                  {mockCharacters
-                                    .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
-                                    .map((char) => (
-                                    <SelectItem key={char.id} value={char.id}>
-                                      {char.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              
-                              {/* Display current relations */}
-                              {currentRelations.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                  {currentRelations.map((relationId: string) => {
-                                    const relatedChar = mockCharacters.find(c => c.id === relationId);
-                                    return relatedChar ? (
-                                      <Badge key={relationId} variant="secondary" className="flex items-center gap-1">
-                                        {relatedChar.name}
-                                        <button
-                                          type="button"
-                                          onClick={() => handleFamilyRelationChange(relation.value, relationId)}
-                                          className="ml-1 hover:text-destructive"
-                                        >
-                                          ×
-                                        </button>
-                                      </Badge>
-                                    ) : null;
-                                  })}
-                                </div>
-                              )}
+                            <div className="flex flex-wrap gap-1">
+                              {Array.isArray(field.value) && field.value.map(value => (
+                                <Badge key={value} variant="secondary" className="text-xs">
+                                  {value}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-auto p-0 ml-1"
+                                    onClick={() => {
+                                      const newValues = (field.value as string[]).filter((v: string) => v !== value);
+                                      handleCustomFieldChange(field.id, newValues);
+                                    }}
+                                  >
+                                    <X className="w-2 h-2" />
+                                  </Button>
+                                </Badge>
+                              ))}
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                 </div>
-               ) : (
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="w-16 h-16">
-                      <AvatarImage src={character.image} />
-                      <AvatarFallback className="text-lg">
-                        {character.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-2xl font-semibold">{character.name}</h2>
-                        <Badge className={currentRole?.color}>
-                          <RoleIcon className="w-4 h-4 mr-1" />
-                          {currentRole?.label}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {character.age} anos
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Shield className="w-4 h-4" />
-                          <span className={currentAlignment?.color}>
-                            {currentAlignment?.label}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-foreground">{character.description}</p>
-                    </div>
-                  </div>
-
-                  {character.appearance && (
-                    <>
-                      <Separator />
+                          </div>
+                        )}
+                      </>
+                    ) : (
                       <div>
-                        <h4 className="font-semibold mb-2">Aparência Física</h4>
-                        <p className="text-sm text-muted-foreground">{character.appearance}</p>
-                      </div>
-                    </>
-                  )}
-
-                  {character.personality && (
-                    <>
-                      <Separator />
-                      <div>
-                        <h4 className="font-semibold mb-2">Personalidade</h4>
-                        <p className="text-sm text-muted-foreground">{character.personality}</p>
-                      </div>
-                    </>
-                  )}
-
-                  <Separator />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {character.birthPlace && (
-                      <div>
-                        <h4 className="font-semibold mb-1 text-sm">Local de Nascimento</h4>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="w-4 h-4" />
-                          <span>{character.birthPlace}</span>
-                        </div>
-                      </div>
-                    )}
-                    {character.affiliatedPlace && (
-                      <div>
-                        <h4 className="font-semibold mb-1 text-sm">Local Afiliado</h4>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="w-4 h-4" />
-                          <span>{character.affiliatedPlace}</span>
-                        </div>
+                        {field.type === 'multiselect' && Array.isArray(field.value) ? (
+                          <div className="flex flex-wrap gap-1">
+                            {field.value.map(value => (
+                              <Badge key={value} variant="secondary" className="text-xs">
+                                {value}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <p>{field.value as string}</p>
+                        )}
                       </div>
                     )}
                   </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Add Custom Field Button for editing mode when no fields */}
+          {isEditing && (!editData.customFields || editData.customFields.length === 0) && (
+            <Card className="card-magical mb-6">
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground mb-4">Nenhum campo personalizado ainda</p>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowAddFieldDialog(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Primeiro Campo
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Appearance */}
+          {(!isEditing && character.appearance) && (
+            <>
+              <Separator />
+              <div>
+                <h4 className="font-semibold mb-2">Aparência Física</h4>
+                <p className="text-sm text-muted-foreground">{character.appearance}</p>
+              </div>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <Label htmlFor="appearance">Aparência Física</Label>
+                <Textarea
+                  id="appearance"
+                  value={editData.appearance}
+                  onChange={(e) => setEditData(prev => ({ ...prev, appearance: e.target.value }))}
+                  placeholder="Descrição da aparência física"
+                  className="min-h-[100px]"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Personality */}
+          {(!isEditing && character.personality) && (
+            <>
+              <Separator />
+              <div>
+                <h4 className="font-semibold mb-2">Personalidade</h4>
+                <p className="text-sm text-muted-foreground">{character.personality}</p>
+              </div>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <Label htmlFor="personality">Personalidade</Label>
+                <Textarea
+                  id="personality"
+                  value={editData.personality}
+                  onChange={(e) => setEditData(prev => ({ ...prev, personality: e.target.value }))}
+                  placeholder="Descrição da personalidade"
+                  className="min-h-[100px]"
+                />
+              </div>
+            </>
+          )}
+
+          {/* Birth Place and Affiliated Place */}
+          {(!isEditing && (character.birthPlace || character.affiliatedPlace)) && (
+            <>
+              <Separator />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {character.birthPlace && (
+                  <div>
+                    <h4 className="font-semibold mb-1 text-sm">Local de Nascimento</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      <span>{character.birthPlace}</span>
+                    </div>
+                  </div>
+                )}
+                {character.affiliatedPlace && (
+                  <div>
+                    <h4 className="font-semibold mb-1 text-sm">Local Afiliado</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      <span>{character.affiliatedPlace}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="birthPlace">Local de Nascimento</Label>
+                  <Select value={editData.birthPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value === "none" ? "" : value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o local de nascimento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {mockLocations.map((location) => (
+                        <SelectItem key={location.id} value={location.name}>
+                          {location.name} ({location.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="affiliatedPlace">Local Afiliado</Label>
+                  <Select value={editData.affiliatedPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, affiliatedPlace: value === "none" ? "" : value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o local afiliado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {mockLocations.map((location) => (
+                        <SelectItem key={location.id} value={location.name}>
+                          {location.name} ({location.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Family Relations Card */}
           <Card className="card-magical">
@@ -973,7 +982,26 @@ export function CharacterDetail() {
                       </div>
                       
                       <Button 
-                        onClick={handleAddRelationship} 
+                        onClick={() => {
+                          if (selectedRelationshipCharacter && selectedRelationshipType) {
+                            const newRelationship = {
+                              id: `rel-${Date.now()}`,
+                              characterId: selectedRelationshipCharacter,
+                              type: selectedRelationshipType,
+                              intensity: relationshipIntensity[0]
+                            };
+                            
+                            setEditData(prev => ({
+                              ...prev,
+                              relationships: [...(prev.relationships || []), newRelationship]
+                            }));
+                            
+                            setSelectedRelationshipCharacter("");
+                            setSelectedRelationshipType("");
+                            setRelationshipIntensity([50]);
+                            toast.success("Relacionamento adicionado com sucesso!");
+                          }
+                        }} 
                         disabled={!selectedRelationshipCharacter || !selectedRelationshipType}
                         size="sm"
                       >
@@ -989,7 +1017,7 @@ export function CharacterDetail() {
                       <h4 className="font-semibold text-sm">Relacionamentos Atuais</h4>
                       {editData.relationships.map((relationship) => {
                         const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
-                        const typeData = getRelationshipTypeData(relationship.type);
+                        const typeData = relationshipTypes.find(rt => rt.value === relationship.type) || relationshipTypes[0];
                         
                         return relatedChar ? (
                           <div key={relationship.id} className="p-3 border rounded-lg space-y-2">
@@ -1004,7 +1032,13 @@ export function CharacterDetail() {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleRemoveRelationship(relationship.id)}
+                                onClick={() => {
+                                  setEditData(prev => ({
+                                    ...prev,
+                                    relationships: prev.relationships?.filter(rel => rel.id !== relationship.id) || []
+                                  }));
+                                  toast.success("Relacionamento removido com sucesso!");
+                                }}
                               >
                                 <Minus className="w-3 h-3" />
                               </Button>
@@ -1013,7 +1047,14 @@ export function CharacterDetail() {
                               <Label className="text-xs">Intensidade: {relationship.intensity}%</Label>
                               <Slider
                                 value={[relationship.intensity]}
-                                onValueChange={(value) => handleUpdateRelationshipIntensity(relationship.id, value[0])}
+                                onValueChange={(value) => {
+                                  setEditData(prev => ({
+                                    ...prev,
+                                    relationships: prev.relationships?.map(rel => 
+                                      rel.id === relationship.id ? { ...rel, intensity: value[0] } : rel
+                                    ) || []
+                                  }));
+                                }}
                                 max={100}
                                 min={1}
                                 step={1}
@@ -1031,7 +1072,7 @@ export function CharacterDetail() {
                   {character.relationships && character.relationships.length > 0 ? (
                     character.relationships.map((relationship) => {
                       const relatedChar = mockCharacters.find(c => c.id === relationship.characterId);
-                      const typeData = getRelationshipTypeData(relationship.type);
+                      const typeData = relationshipTypes.find(rt => rt.value === relationship.type) || relationshipTypes[0];
                       
                       return relatedChar ? (
                         <div key={relationship.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -1070,94 +1111,95 @@ export function CharacterDetail() {
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Qualities */}
-          <Card className="card-magical">
-            <CardHeader>
-              <CardTitle>Qualidades</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <div className="space-y-4">
-                  {/* Add Quality Input */}
-                  <div className="flex gap-2">
-                    <Input
-                      value={newQuality}
-                      onChange={(e) => setNewQuality(e.target.value)}
-                      placeholder="Adicionar nova qualidade"
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddQuality()}
-                    />
-                    <Button size="sm" onClick={handleAddQuality}>
-                      Adicionar
-                    </Button>
-                  </div>
-                  
-                  {/* Quality List */}
-                  <div className="flex flex-wrap gap-2">
-                    {editData.qualities.map((quality) => (
-                      <Badge key={quality} variant="secondary" className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" onClick={() => handleRemoveQuality(quality)}>
-                        {quality} ×
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  {editData.qualities.length === 0 && (
-                    <p className="text-sm text-muted-foreground">Nenhuma qualidade adicionada. Clique em "Adicionar" para incluir qualidades.</p>
-                  )}
+      {/* Add Field Dialog */}
+      <Dialog open={showAddFieldDialog} onOpenChange={setShowAddFieldDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adicionar Campo Personalizado</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome do Campo</Label>
+              <Input
+                value={newField.name}
+                onChange={(e) => setNewField(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Ex: Classe Social, Profissão, etc."
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Tipo de Campo</Label>
+              <Select value={newField.type} onValueChange={(value) => setNewField(prev => ({ ...prev, type: value, options: [] }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {fieldTypes.map(type => (
+                    <SelectItem key={type.value} value={type.value}>
+                      <div className="flex items-center gap-2">
+                        <type.icon className="w-4 h-4" />
+                        {type.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(newField.type === 'select' || newField.type === 'multiselect') && (
+              <div className="space-y-2">
+                <Label>Opções</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newOption}
+                    onChange={(e) => setNewOption(e.target.value)}
+                    placeholder="Digite uma opção"
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddOption()}
+                  />
+                  <Button type="button" onClick={handleAddOption}>
+                    <Plus className="w-4 h-4" />
+                  </Button>
                 </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {character.qualities.map((quality) => (
-                    <Badge key={quality} variant="secondary">
-                      {quality}
+                <div className="flex flex-wrap gap-1">
+                  {newField.options.map(option => (
+                    <Badge key={option} variant="secondary">
+                      {option}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 ml-1"
+                        onClick={() => handleRemoveOption(option)}
+                      >
+                        <X className="w-2 h-2" />
+                      </Button>
                     </Badge>
                   ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
 
-          {/* Organization */}
-          <Card className="card-magical">
-            <CardHeader>
-              <CardTitle>Organização</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <Select value={editData.organization} onValueChange={(value) => setEditData(prev => ({ ...prev, organization: value === "none" ? "" : value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione uma organização" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Nenhuma</SelectItem>
-                    {mockOrganizations.map((org) => (
-                      <SelectItem key={org.id} value={org.name}>
-                        {org.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm">{character.organization || "Nenhuma organização"}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            <div className="flex gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowAddFieldDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleAddCustomField} disabled={!newField.name.trim()}>
+                Adicionar Campo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
+      {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
         title="Excluir Personagem"
-        description={`O personagem "${character.name}" será permanentemente removido.`}
-        itemName={character.name}
-        itemType="personagem"
+        description="Esta ação não pode ser desfeita. Todos os dados do personagem serão perdidos permanentemente."
+        confirmText={character.name}
       />
     </div>
   );
