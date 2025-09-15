@@ -267,9 +267,8 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                           Excluir
                         </Button>
                       </>
-          )}
-        </div>
-      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
