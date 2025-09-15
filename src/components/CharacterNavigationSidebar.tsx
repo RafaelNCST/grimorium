@@ -43,15 +43,15 @@ export function CharacterNavigationSidebar({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+    <div className="fixed inset-0 z-[9999]">
       {/* Overlay for mobile */}
       <div 
-        className="fixed inset-0 bg-black/50 lg:hidden"
+        className="fixed inset-0 bg-black/50"
         onClick={onClose}
       />
       
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-80 bg-card border-r border-border shadow-lg lg:relative lg:shadow-none">
+      <div className="fixed left-0 top-0 h-full w-80 bg-card border-r border-border shadow-lg flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="font-semibold">Personagens</h3>
           <Button variant="ghost" size="icon" onClick={onClose}>

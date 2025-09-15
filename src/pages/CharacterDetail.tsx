@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit3, Save, X, Plus, Upload, Trash2, 
   Crown, Sword, Shield, Users, Heart, Star, 
-  MapPin, Building, Calendar, Camera, Menu, UserPlus } from "lucide-react";
+  MapPin, Building, Calendar, Camera, Menu, GitBranch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -153,6 +153,7 @@ const familyRelations = {
     { value: "sibling", label: "Irmão/Irmã" },
     { value: "halfSibling", label: "Meio-irmão/Meio-irmã" },
     { value: "uncleAunt", label: "Tio/Tia" },
+    { value: "grandparent", label: "Avô/Avó" },
     { value: "cousin", label: "Primo/Prima" }
   ]
 };
@@ -172,7 +173,7 @@ const relationshipTypes = [
 ];
 
 export function CharacterDetail() {
-  const { id } = useParams();
+  const { bookId } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [character, setCharacter] = useState<Character>(mockCharacter);
@@ -623,10 +624,19 @@ export function CharacterDetail() {
             {/* Family Tree */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Árvore Genealógica
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Árvore Genealógica
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/book/${bookId || '1'}/character/${character.id}/family-tree`)}
+                  >
+                    <GitBranch className="w-4 h-4 mr-2" /> Ver árvore
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Grandparents */}
