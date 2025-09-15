@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit3, Save, X, Plus, Upload, Trash2, 
   Crown, Sword, Shield, Users, Heart, Star, 
-  MapPin, Building, Calendar, Camera, Menu } from "lucide-react";
+  MapPin, Building, Calendar, Camera, Menu, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -128,6 +128,20 @@ const genders = [
   { value: "outro", label: "Outro" }
 ];
 
+const mockOrganizations = [
+  "Ordem dos Guardiões",
+  "Culto das Sombras", 
+  "Guilda dos Mercadores",
+  "Academia de Magia"
+];
+
+const mockLocations = [
+  "Capital Elaria",
+  "Vila Pedraverde", 
+  "Floresta Sombria",
+  "Montanhas do Norte"
+];
+
 const familyRelations = {
   single: [
     { value: "father", label: "Pai" },
@@ -171,6 +185,8 @@ export function CharacterDetail() {
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [showCharacterNav, setShowCharacterNav] = useState(false);
+  const [editingFamilyType, setEditingFamilyType] = useState<string | null>(null);
+  const [familyCharacterSearch, setFamilyCharacterSearch] = useState("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -247,6 +263,58 @@ export function CharacterDetail() {
       relationships: prev.relationships.filter(r => r.id !== relationshipId)
     }));
     toast.success("Relacionamento removido!");
+  };
+
+  const addFamilyMember = (familyType: string, characterId: string) => {
+    const characterName = mockCharacters.find(c => c.id === characterId)?.name || "";
+    
+    setEditData(prev => {
+      const newFamily = { ...prev.family };
+      
+      if (familyType === 'father' || familyType === 'mother' || familyType === 'spouse') {
+        (newFamily as any)[familyType] = characterName;
+      } else {
+        const arrayKey = familyType === 'child' ? 'children' : 
+                        familyType === 'sibling' ? 'siblings' :
+                        familyType === 'halfSibling' ? 'halfSiblings' :
+                        familyType === 'uncleAunt' ? 'unclesAunts' :
+                        familyType === 'grandparent' ? 'grandparents' : 'cousins';
+        
+        const currentArray = newFamily[arrayKey as keyof typeof newFamily] as string[];
+        if (!currentArray.includes(characterName)) {
+          newFamily[arrayKey as keyof typeof newFamily] = [...currentArray, characterName] as any;
+        }
+      }
+      
+      return { ...prev, family: newFamily };
+    });
+    
+    setEditingFamilyType(null);
+    setFamilyCharacterSearch("");
+    toast.success("Membro da família adicionado!");
+  };
+
+  const removeFamilyMember = (familyType: string, characterName?: string) => {
+    setEditData(prev => {
+      const newFamily = { ...prev.family };
+      
+      if (familyType === 'father' || familyType === 'mother' || familyType === 'spouse') {
+        newFamily[familyType as keyof typeof newFamily] = null as any;
+      } else if (characterName) {
+        const arrayKey = familyType === 'children' ? 'children' : 
+                        familyType === 'siblings' ? 'siblings' :
+                        familyType === 'halfSiblings' ? 'halfSiblings' :
+                        familyType === 'unclesAunts' ? 'unclesAunts' :
+                        familyType === 'grandparents' ? 'grandparents' : 'cousins';
+        
+        const currentArray = newFamily[arrayKey as keyof typeof newFamily] as string[];
+        newFamily[arrayKey as keyof typeof newFamily] = currentArray.filter(name => name !== characterName) as any;
+      }
+      
+      return { ...prev, family: newFamily };
+    });
+    
+    toast.success("Membro da família removido!");
   };
 
   if (!character) {
@@ -368,7 +436,7 @@ export function CharacterDetail() {
                   </div>
                 </div>
 
-                {/* Role and Alignment */}
+                {/* Role, Alignment, Location, Organization */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">Papel</label>
@@ -415,6 +483,46 @@ export function CharacterDetail() {
                       <Badge variant="outline" className={currentAlignment?.color}>
                         {currentAlignment?.label}
                       </Badge>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Local de Nascimento</label>
+                    {isEditing ? (
+                      <Select value={editData.birthPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o local" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockLocations.map((location) => (
+                            <SelectItem key={location} value={location}>
+                              {location}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{character.birthPlace || "Não definido"}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Organização</label>
+                    {isEditing ? (
+                      <Select value={editData.organization} onValueChange={(value) => setEditData(prev => ({ ...prev, organization: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a organização" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockOrganizations.map((org) => (
+                            <SelectItem key={org} value={org}>
+                              {org}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{character.organization || "Não definido"}</p>
                     )}
                   </div>
                 </div>
@@ -511,79 +619,260 @@ export function CharacterDetail() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Family Tree */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Árvore Genealógica
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Grandparents */}
+                <div className="text-center">
+                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">Avós</h4>
+                  <div className="flex justify-center gap-2 flex-wrap">
+                    {(isEditing ? editData.family.grandparents : character.family.grandparents).map((grandparent, index) => (
+                      <Badge key={index} variant="outline" className="relative">
+                        {grandparent}
+                        {isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="ml-1 h-4 w-4 p-0"
+                            onClick={() => removeFamilyMember('grandparents', grandparent)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </Badge>
+                    ))}
+                    {isEditing && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingFamilyType('grandparent')}
+                        className="h-6"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Parents */}
+                <div className="flex justify-center gap-8">
+                  <div className="text-center">
+                    <h4 className="text-xs font-medium mb-1 text-muted-foreground">Pai</h4>
+                    {(isEditing ? editData.family.father : character.family.father) ? (
+                      <Badge variant="secondary" className="relative">
+                        {isEditing ? editData.family.father : character.family.father}
+                        {isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="ml-1 h-4 w-4 p-0"
+                            onClick={() => removeFamilyMember('father')}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </Badge>
+                    ) : isEditing ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingFamilyType('father')}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-xs font-medium mb-1 text-muted-foreground">Mãe</h4>
+                    {(isEditing ? editData.family.mother : character.family.mother) ? (
+                      <Badge variant="secondary" className="relative">
+                        {isEditing ? editData.family.mother : character.family.mother}
+                        {isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="ml-1 h-4 w-4 p-0"
+                            onClick={() => removeFamilyMember('mother')}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </Badge>
+                    ) : isEditing ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingFamilyType('mother')}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Current Character */}
+                <div className="text-center">
+                  <Badge className="bg-primary text-primary-foreground font-semibold px-4 py-1">
+                    {character.name}
+                  </Badge>
+                </div>
+
+                {/* Spouse */}
+                <div className="text-center">
+                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">Cônjuge</h4>
+                  {(isEditing ? editData.family.spouse : character.family.spouse) ? (
+                    <Badge variant="outline" className="relative">
+                      {isEditing ? editData.family.spouse : character.family.spouse}
+                      {isEditing && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="ml-1 h-4 w-4 p-0"
+                          onClick={() => removeFamilyMember('spouse')}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </Badge>
+                  ) : isEditing ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingFamilyType('spouse')}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">-</span>
+                  )}
+                </div>
+
+                {/* Siblings */}
+                <div className="text-center">
+                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">Irmãos</h4>
+                  <div className="flex justify-center gap-2 flex-wrap">
+                    {(isEditing ? editData.family.siblings : character.family.siblings).map((sibling, index) => (
+                      <Badge key={index} variant="secondary" className="relative">
+                        {sibling}
+                        {isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="ml-1 h-4 w-4 p-0"
+                            onClick={() => removeFamilyMember('siblings', sibling)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </Badge>
+                    ))}
+                    {isEditing && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingFamilyType('sibling')}
+                        className="h-6"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Children */}
+                <div className="text-center">
+                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">Filhos</h4>
+                  <div className="flex justify-center gap-2 flex-wrap">
+                    {(isEditing ? editData.family.children : character.family.children).map((child, index) => (
+                      <Badge key={index} variant="outline" className="relative">
+                        {child}
+                        {isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="ml-1 h-4 w-4 p-0"
+                            onClick={() => removeFamilyMember('children', child)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </Badge>
+                    ))}
+                    {isEditing && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingFamilyType('child')}
+                        className="h-6"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Family Selection Modal */}
+                {isEditing && editingFamilyType && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-background border rounded-lg p-4 max-w-sm w-full mx-4">
+                      <h3 className="font-semibold mb-3">
+                        Adicionar {familyRelations.single.find(r => r.value === editingFamilyType)?.label || 
+                                  familyRelations.multiple.find(r => r.value === editingFamilyType)?.label}
+                      </h3>
+                      <Select onValueChange={(value) => addFamilyMember(editingFamilyType, value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecionar personagem" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {mockCharacters.filter(c => c.id !== character.id).map(char => (
+                            <SelectItem key={char.id} value={char.id}>
+                              {char.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-2 mt-3">
+                        <Button variant="outline" onClick={() => setEditingFamilyType(null)} className="flex-1">
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Location Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Localizações
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Local de Nascimento</label>
-                  {isEditing ? (
-                    <Input
-                      value={editData.birthPlace}
-                      onChange={(e) => setEditData(prev => ({ ...prev, birthPlace: e.target.value }))}
-                      placeholder="Local de nascimento..."
-                    />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">{character.birthPlace}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Local Afiliado</label>
-                  {isEditing ? (
-                    <Input
-                      value={editData.affiliatedPlace}
-                      onChange={(e) => setEditData(prev => ({ ...prev, affiliatedPlace: e.target.value }))}
-                      placeholder="Local afiliado..."
-                    />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">{character.affiliatedPlace}</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Organization */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="w-4 h-4" />
-                  Organização
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <Input
-                    value={editData.organization}
-                    onChange={(e) => setEditData(prev => ({ ...prev, organization: e.target.value }))}
-                    placeholder="Organização..."
-                  />
-                ) : (
-                  <p className="text-sm text-muted-foreground">{character.organization}</p>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Relationships */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="w-4 h-4" />
                   Relacionamentos
+                  {isEditing && (
+                    <Badge variant="secondary" className="ml-auto">
+                      {(isEditing ? editData.relationships : character.relationships).length}
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isEditing && (
-                  <div className="space-y-3 p-3 border rounded-lg">
+                  <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                    <div className="text-sm font-medium">Novo Relacionamento</div>
                     <Select value={selectedRelationshipCharacter} onValueChange={setSelectedRelationshipCharacter}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecionar personagem" />
@@ -591,7 +880,13 @@ export function CharacterDetail() {
                       <SelectContent>
                         {mockCharacters.filter(c => c.id !== character.id).map(char => (
                           <SelectItem key={char.id} value={char.id}>
-                            {char.name}
+                            <div className="flex items-center gap-2">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage src={char.image} alt={char.name} />
+                                <AvatarFallback>{char.name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              {char.name}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -605,8 +900,8 @@ export function CharacterDetail() {
                         {relationshipTypes.map(type => (
                           <SelectItem key={type.value} value={type.value}>
                             <div className="flex items-center gap-2">
-                              <span>{type.emoji}</span>
-                              {type.label}
+                              <span className="text-lg">{type.emoji}</span>
+                              <span>{type.label}</span>
                             </div>
                           </SelectItem>
                         ))}
@@ -614,57 +909,108 @@ export function CharacterDetail() {
                     </Select>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Intensidade: {relationshipIntensity[0]}%</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Intensidade</label>
+                        <Badge variant="outline">{relationshipIntensity[0]}%</Badge>
+                      </div>
                       <Slider
                         value={relationshipIntensity}
                         onValueChange={setRelationshipIntensity}
                         max={100}
-                        step={1}
+                        step={5}
+                        className="w-full"
                       />
                     </div>
 
-                    <Button onClick={addRelationship} className="w-full" size="sm">
+                    <Button onClick={addRelationship} className="w-full" size="sm" disabled={!selectedRelationshipCharacter || !selectedRelationshipType}>
                       <Plus className="w-4 h-4 mr-2" />
-                      Adicionar
+                      Adicionar Relacionamento
                     </Button>
                   </div>
                 )}
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {(isEditing ? editData.relationships : character.relationships).map((rel) => {
                     const relType = relationshipTypes.find(t => t.value === rel.type);
                     const relChar = mockCharacters.find(c => c.id === rel.characterId);
                     
                     return (
-                      <div key={rel.id} className={`p-2 rounded-lg border ${relType?.color || 'bg-muted'}`}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span>{relType?.emoji}</span>
-                            <span className="text-sm font-medium">{relChar?.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs">{rel.intensity}%</span>
-                            {isEditing && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => removeRelationship(rel.id)}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            )}
+                      <div key={rel.id} className={`p-3 rounded-lg border-2 ${relType?.color || 'bg-muted border-muted'} transition-all hover:shadow-sm`}>
+                        <div className="flex items-start gap-3">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={relChar?.image} alt={relChar?.name} />
+                            <AvatarFallback>{relChar?.name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg">{relType?.emoji}</span>
+                              <span className="font-medium text-sm">{relChar?.name}</span>
+                              {isEditing && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0 ml-auto"
+                                  onClick={() => removeRelationship(rel.id)}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                {relType?.label}
+                              </Badge>
+                              <div className="flex items-center gap-1">
+                                <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-primary rounded-full transition-all"
+                                    style={{ width: `${rel.intensity}%` }}
+                                  />
+                                </div>
+                                <span className="text-xs text-muted-foreground">{rel.intensity}%</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{relType?.label}</p>
                       </div>
                     );
                   })}
                 </div>
 
                 {(!character.relationships.length && !isEditing) && (
-                  <p className="text-sm text-muted-foreground">Nenhum relacionamento definido.</p>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Nenhum relacionamento definido</p>
+                  </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  Estatísticas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Qualidades</span>
+                  <Badge variant="secondary">{character.qualities.length}</Badge>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Relacionamentos</span>
+                  <Badge variant="secondary">{character.relationships.length}</Badge>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Membros da Família</span>
+                  <Badge variant="secondary">
+                    {Object.values(character.family).flat().filter(Boolean).length}
+                  </Badge>
+                </div>
               </CardContent>
             </Card>
           </div>
