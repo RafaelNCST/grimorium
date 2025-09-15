@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu } from "lucide-react";
+import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -149,6 +150,7 @@ export function CharacterDetail() {
   const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] = useState("");
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
+  const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -328,20 +330,46 @@ export function CharacterDetail() {
     return relationshipTypes.find(rt => rt.value === type) || relationshipTypes[0];
   };
 
+  const handleCharacterSelect = (characterId: string) => {
+    // Navigate directly without adding to history stack
+    window.location.replace(`/book/1/character/${characterId}`);
+  };
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{character.name}</h1>
-            <p className="text-muted-foreground">Detalhes do personagem</p>
+    <>
+      <CharacterNavigationSidebar
+        isOpen={isNavigationSidebarOpen}
+        onClose={() => setIsNavigationSidebarOpen(false)}
+        characters={mockCharacters.map(char => ({ 
+          id: char.id, 
+          name: char.name, 
+          image: char.id === "1" ? mockCharacter.image : `https://images.unsplash.com/photo-150700321${char.id}?w=300&h=300&fit=crop&crop=face`
+        }))}
+        currentCharacterId={character.id}
+        onCharacterSelect={handleCharacterSelect}
+      />
+      
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setIsNavigationSidebarOpen(true)}
+              className="hover:bg-muted"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">{character.name}</h1>
+              <p className="text-muted-foreground">Detalhes do personagem</p>
+            </div>
           </div>
-        </div>
         
         <div className="flex gap-2">
           {isEditing ? (
@@ -1160,5 +1188,6 @@ export function CharacterDetail() {
         itemType="personagem"
       />
     </div>
+    </>
   );
 }
