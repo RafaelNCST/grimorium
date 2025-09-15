@@ -336,7 +336,7 @@ export function CharacterDetail() {
   };
 
   return (
-    <>
+    <div className="flex min-h-screen">
       <CharacterNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={() => setIsNavigationSidebarOpen(false)}
@@ -349,7 +349,8 @@ export function CharacterDetail() {
         onCharacterSelect={handleCharacterSelect}
       />
       
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="flex-1 overflow-hidden">
+        <div className="container mx-auto py-8 px-4 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -1186,8 +1187,9 @@ export function CharacterDetail() {
         description={`O personagem "${character.name}" será permanentemente removido.`}
         itemName={character.name}
         itemType="personagem"
-      />
+       />
+        </div>
+      </div>
     </div>
-    </>
   );
 }
