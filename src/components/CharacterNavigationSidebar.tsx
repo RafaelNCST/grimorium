@@ -4,6 +4,7 @@ import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Character {
   id: string;
@@ -70,32 +71,34 @@ export function CharacterNavigationSidebar({
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {filteredCharacters.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              {searchTerm ? "Nenhum personagem encontrado" : "Não há outros personagens"}
-            </p>
-          ) : (
-            filteredCharacters.map((char) => (
-              <button
-                key={char.id}
-                onClick={() => handleCharacterSelect(char.id)}
-                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors text-left"
-              >
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={char.image} alt={char.name} />
-                  <AvatarFallback>{char.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{char.name}</p>
-                  {char.role && (
-                    <p className="text-sm text-muted-foreground capitalize">{char.role}</p>
-                  )}
-                </div>
-              </button>
-            ))
-          )}
-        </div>
+        <ScrollArea className="flex-1 h-[calc(100vh-140px)]">
+          <div className="p-4 space-y-2">
+            {filteredCharacters.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                {searchTerm ? "Nenhum personagem encontrado" : "Não há outros personagens"}
+              </p>
+            ) : (
+              filteredCharacters.map((char) => (
+                <button
+                  key={char.id}
+                  onClick={() => handleCharacterSelect(char.id)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                >
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={char.image} alt={char.name} />
+                    <AvatarFallback>{char.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{char.name}</p>
+                    {char.role && (
+                      <p className="text-sm text-muted-foreground capitalize">{char.role}</p>
+                    )}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );
