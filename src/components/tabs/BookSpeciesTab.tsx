@@ -199,9 +199,20 @@ export function BookSpeciesTab({ bookId }: BookSpeciesTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Espécies</h2>
-          <p className="text-muted-foreground">
-            {totalSpecies} espécie{totalSpecies !== 1 ? 's' : ''} • {totalRaces} raça{totalRaces !== 1 ? 's' : ''}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+              {totalSpecies} Total
+            </Badge>
+            <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400">
+              {species.reduce((sum, s) => sum + s.races.filter(r => r.type === 'Aquática').length, 0)} Aquática
+            </Badge>
+            <Badge variant="secondary" className="bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400">
+              {species.reduce((sum, s) => sum + s.races.filter(r => r.type === 'Terrestre').length, 0)} Terrestre
+            </Badge>
+            <Badge variant="secondary" className="bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400">
+              {species.reduce((sum, s) => sum + s.races.filter(r => r.type === 'Voadora').length, 0)} Voadora
+            </Badge>
+          </div>
         </div>
         <Button variant="magical" onClick={() => setIsCreateSpeciesOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
