@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2 } from "lucide-react";
+import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2, FileText, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { StatsCard } from "@/components/StatsCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -32,6 +33,13 @@ interface StickyNote {
 interface Goals {
   wordsPerDay: number;
   chaptersPerWeek: number;
+}
+
+interface StoryProgress {
+  estimatedArcs: number;
+  estimatedChapters: number;
+  completedArcs: number;
+  currentArcProgress: number;
 }
 
 const noteColors = [
@@ -67,15 +75,34 @@ export function OverviewTab({ book, bookId }: OverviewTabProps) {
   const [isEditingGoals, setIsEditingGoals] = useState(false);
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
   const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
+  const [isEditingProgress, setIsEditingProgress] = useState(false);
   const [goals, setGoals] = useState<Goals>({ wordsPerDay: 1500, chaptersPerWeek: 2 });
   const [authorSummary, setAuthorSummary] = useState(book.authorSummary);
   const [storySummary, setStorySummary] = useState(book.storySummary);
+  const [storyProgress, setStoryProgress] = useState<StoryProgress>({
+    estimatedArcs: 5,
+    estimatedChapters: 25,
+    completedArcs: 1,
+    currentArcProgress: 50
+  });
   
   const [stickyNotes, setStickyNotes] = useState(() => getBookStickyNotes(bookId));
 const [newNote, setNewNote] = useState("");
   const [draggedNote, setDraggedNote] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+
+  // Mock data for statistics
+  const totalWords = 85400;
+  const totalCharacters = 487230;
+  const lastChapterNumber = 12;
+  const lastChapterName = "A Grande Revelação";
+
+  // Calculate story progress percentage
+  const calculateStoryProgress = () => {
+    const totalProgress = storyProgress.completedArcs + (storyProgress.currentArcProgress / 100);
+    return Math.round((totalProgress / storyProgress.estimatedArcs) * 100);
+  };
 
   // Mock data for current arc events
   const currentArcEvents = [
@@ -146,6 +173,11 @@ const [newNote, setNewNote] = useState("");
     // Here you would save to your backend/state management
   };
 
+  const saveProgress = () => {
+    setIsEditingProgress(false);
+    // Here you would save to your backend/state management
+  };
+
   const saveAuthorSummary = () => {
     setIsEditingAuthorSummary(false);
     // Here you would save to your backend/state management
@@ -157,95 +189,194 @@ const [newNote, setNewNote] = useState("");
   };
 
   return (
-    <div className="space-y-6">
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatsCard
-          title="Capítulos"
-          value={book.chapters}
-          description="Meta: 15"
-          icon={BookOpen}
-        />
-        <StatsCard
-          title="Média/Semana"
-          value="2.1"
-          description="Capítulos"
-          icon={TrendingUp}
-        />
-        <StatsCard
-          title="Último Capítulo"
-          value="Cap. 12"
-          description="há 2 dias"
-          icon={Target}
-        />
-        <StatsCard
-          title="Total de Palavras"
-          value="85.4k"
-          description="Meta: 100k"
-          icon={TrendingUp}
-        />
+    <div className="space-y-0">
+      {/* Stats Overview - Compact sections without gaps */}
+      <div className="flex flex-wrap">
+        {/* Média por Semana */}
+        <Card className="card-magical flex-shrink-0 m-1">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Média/Semana</p>
+                <p className="text-xl font-bold text-foreground">2.1</p>
+                <p className="text-xs text-muted-foreground">Capítulos</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Último Capítulo */}
+        <Card className="card-magical flex-shrink-0 m-1">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Último Capítulo</p>
+                <p className="text-xl font-bold text-foreground">Cap. {lastChapterNumber}</p>
+                <p className="text-xs text-muted-foreground">{lastChapterName}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total de Palavras */}
+        <Card className="card-magical flex-shrink-0 m-1">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total de Palavras</p>
+                <p className="text-xl font-bold text-foreground">{(totalWords / 1000).toFixed(1)}k</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Total de Caracteres */}
+        <Card className="card-magical flex-shrink-0 m-1">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total de Caracteres</p>
+                <p className="text-xl font-bold text-foreground">{(totalCharacters / 1000).toFixed(0)}k</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Progressão da História */}
+        <Card className="card-magical flex-shrink-0 m-1 min-w-[280px]">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+            <div>
+              <CardTitle className="text-base">Progressão da História</CardTitle>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsEditingProgress(!isEditingProgress)}
+              className="h-6 w-6"
+            >
+              <Edit2 className="w-3 h-3" />
+            </Button>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {isEditingProgress ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Estimativa de arcos</label>
+                  <Input 
+                    type="number" 
+                    value={storyProgress.estimatedArcs}
+                    onChange={(e) => setStoryProgress(s => ({ ...s, estimatedArcs: parseInt(e.target.value) || 0 }))}
+                    className="h-7 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Estimativa de capítulos</label>
+                  <Input 
+                    type="number" 
+                    value={storyProgress.estimatedChapters}
+                    onChange={(e) => setStoryProgress(s => ({ ...s, estimatedChapters: parseInt(e.target.value) || 0 }))}
+                    className="h-7 text-xs"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="accent" size="sm" className="h-6 text-xs" onClick={saveProgress}>Salvar</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setIsEditingProgress(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                  <span>Progresso Geral</span>
+                  <span>{calculateStoryProgress()}%</span>
+                </div>
+                <Progress value={calculateStoryProgress()} className="h-2" />
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Arcos: </span>
+                    <span className="font-medium">{storyProgress.completedArcs}/{storyProgress.estimatedArcs}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Capítulos: </span>
+                    <span className="font-medium">{lastChapterNumber}/{storyProgress.estimatedChapters}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-wrap">
         {/* Writing Goals */}
-        <Card className="card-magical">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <Card className="card-magical flex-1 min-w-[300px] m-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
-              <CardTitle>Metas de Escrita</CardTitle>
+              <CardTitle className="text-base">Metas de Escrita</CardTitle>
               <CardDescription>Objetivos editáveis</CardDescription>
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsEditingGoals(!isEditingGoals)}
+              className="h-6 w-6"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-3 h-3" />
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {isEditingGoals ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Palavras por dia</label>
+                  <label className="text-xs font-medium mb-1 block">Palavras por dia</label>
                   <Input 
                     type="number" 
                     value={goals.wordsPerDay}
                     onChange={(e) => setGoals(g => ({ ...g, wordsPerDay: parseInt(e.target.value) || 0 }))}
+                    className="h-7 text-xs"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Capítulos por semana</label>
+                  <label className="text-xs font-medium mb-1 block">Capítulos por semana</label>
                   <Input 
                     type="number" 
                     value={goals.chaptersPerWeek}
                     onChange={(e) => setGoals(g => ({ ...g, chaptersPerWeek: parseInt(e.target.value) || 0 }))}
+                    className="h-7 text-xs"
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="accent" size="sm" onClick={saveGoals}>Salvar</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setIsEditingGoals(false)}>Cancelar</Button>
+                  <Button variant="accent" size="sm" className="h-6 text-xs" onClick={saveGoals}>Salvar</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setIsEditingGoals(false)}>Cancelar</Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Palavras por dia</span>
-                    <Badge variant="secondary">1,250 / {goals.wordsPerDay.toLocaleString()}</Badge>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-medium">Palavras por dia</span>
+                    <Badge variant="secondary" className="text-xs">1,250 / {goals.wordsPerDay.toLocaleString()}</Badge>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-gradient-accent h-2 rounded-full" style={{ width: `${Math.min(100, (1250 / goals.wordsPerDay) * 100)}%` }}></div>
-                  </div>
+                  <Progress value={Math.min(100, (1250 / goals.wordsPerDay) * 100)} className="h-1.5" />
                 </div>
                 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Capítulos por semana</span>
-                    <Badge variant="secondary">2 / {goals.chaptersPerWeek}</Badge>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-medium">Capítulos por semana</span>
+                    <Badge variant="secondary" className="text-xs">2 / {goals.chaptersPerWeek}</Badge>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-gradient-primary h-2 rounded-full" style={{ width: `${Math.min(100, (2 / goals.chaptersPerWeek) * 100)}%` }}></div>
-                  </div>
+                  <Progress value={Math.min(100, (2 / goals.chaptersPerWeek) * 100)} className="h-1.5" />
                 </div>
               </div>
             )}
@@ -253,103 +384,103 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Current Arc */}
-        <Card className="card-magical">
-          <CardHeader>
-            <CardTitle>Arco Atual</CardTitle>
+        <Card className="card-magical flex-1 min-w-[300px] m-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Arco Atual</CardTitle>
             <CardDescription>{book.currentArc}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <h4 className="font-medium mb-2">Último evento concluído:</h4>
-              <p className="text-sm text-muted-foreground mb-3">Primeiro confronto</p>
+          <CardContent className="pt-0">
+            <div className="mb-3">
+              <h4 className="font-medium mb-1 text-sm">Último evento concluído:</h4>
+              <p className="text-xs text-muted-foreground mb-2">Primeiro confronto</p>
               
-              <h4 className="font-medium mb-2">Próximos eventos:</h4>
-              <div className="space-y-2">
-                <div className="text-sm p-2 bg-muted/30 rounded">Encontro com mentor</div>
-                <div className="text-sm p-2 bg-muted/30 rounded">Revelação do passado</div>
+              <h4 className="font-medium mb-1 text-sm">Próximos eventos:</h4>
+              <div className="space-y-1">
+                <div className="text-xs p-2 bg-muted/30 rounded">Encontro com mentor</div>
+                <div className="text-xs p-2 bg-muted/30 rounded">Revelação do passado</div>
               </div>
             </div>
             
             <div>
-              <div className="flex justify-between text-sm text-muted-foreground mb-2">
+              <div className="flex justify-between text-xs text-muted-foreground mb-1">
                 <span>Progresso do Arco</span>
-                <span>{progressPercentage}%</span>
+                <span>{storyProgress.currentArcProgress}%</span>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-gradient-primary h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
-              </div>
+              <Progress value={storyProgress.currentArcProgress} className="h-1.5" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-wrap">
         {/* Author Summary */}
-        <Card className="card-magical">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <Card className="card-magical flex-1 min-w-[300px] m-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
-              <CardTitle>Resumo do Autor</CardTitle>
+              <CardTitle className="text-base">Resumo do Autor</CardTitle>
               <CardDescription>Anotações pessoais para o autor</CardDescription>
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsEditingAuthorSummary(!isEditingAuthorSummary)}
+              className="h-6 w-6"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-3 h-3" />
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {isEditingAuthorSummary ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <Textarea 
                   value={authorSummary}
                   onChange={(e) => setAuthorSummary(e.target.value)}
-                  className="min-h-[100px]"
+                  className="min-h-[80px] text-xs"
                   placeholder="Suas anotações pessoais sobre a obra..."
                 />
                 <div className="flex gap-2">
-                  <Button variant="accent" size="sm" onClick={saveAuthorSummary}>Salvar</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setIsEditingAuthorSummary(false)}>Cancelar</Button>
+                  <Button variant="accent" size="sm" className="h-6 text-xs" onClick={saveAuthorSummary}>Salvar</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setIsEditingAuthorSummary(false)}>Cancelar</Button>
                 </div>
               </div>
             ) : (
-              <p className="text-foreground leading-relaxed">{authorSummary}</p>
+              <p className="text-xs text-foreground leading-relaxed">{authorSummary}</p>
             )}
           </CardContent>
         </Card>
 
         {/* Story Summary */}
-        <Card className="card-magical">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <Card className="card-magical flex-1 min-w-[300px] m-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
-              <CardTitle>Resumo da História</CardTitle>
+              <CardTitle className="text-base">Resumo da História</CardTitle>
               <CardDescription>Apresentação da obra para leitores</CardDescription>
             </div>
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsEditingStorySummary(!isEditingStorySummary)}
+              className="h-6 w-6"
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-3 h-3" />
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {isEditingStorySummary ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <Textarea 
                   value={storySummary}
                   onChange={(e) => setStorySummary(e.target.value)}
-                  className="min-h-[100px]"
+                  className="min-h-[80px] text-xs"
                   placeholder="Resumo da história para apresentação..."
                 />
                 <div className="flex gap-2">
-                  <Button variant="accent" size="sm" onClick={saveStorySummary}>Salvar</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setIsEditingStorySummary(false)}>Cancelar</Button>
+                  <Button variant="accent" size="sm" className="h-6 text-xs" onClick={saveStorySummary}>Salvar</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setIsEditingStorySummary(false)}>Cancelar</Button>
                 </div>
               </div>
             ) : (
-              <p className="text-foreground leading-relaxed">{storySummary}</p>
+              <p className="text-xs text-foreground leading-relaxed">{storySummary}</p>
             )}
           </CardContent>
         </Card>
