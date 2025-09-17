@@ -20,6 +20,7 @@ const mockCharacter = {
   id: "1",
   name: "Aelric Valorheart",
   age: 23,
+  gender: "masculino",
   appearance: "Jovem de estatura média com cabelos castanhos ondulados e olhos verdes penetrantes. Possui uma cicatriz no braço direito de uma batalha antiga. Veste sempre uma armadura de couro reforçado com detalhes em bronze, e carrega uma espada élfica herdada de seus antepassados. Seus olhos brilham com uma luz sobrenatural quando usa magia.",
   role: "protagonista",
   personality: "Determinado e corajoso, mas às vezes impulsivo. Possui um forte senso de justiça e não hesita em ajudar os necessitados. É naturalmente carismático e inspira confiança nos outros. Tem tendência a se sacrificar pelos outros, o que às vezes o coloca em situações perigosas. Apesar de sua juventude, demonstra uma sabedoria além de seus anos.",
@@ -30,6 +31,9 @@ const mockCharacter = {
   alignment: "bem",
   qualities: ["Corajoso", "Determinado", "Leal", "Otimista", "Protetor", "Carismático", "Altruísta", "Intuitivo"],
   image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+  chapterMentions: 12,
+  firstAppearance: "Capítulo 1",
+  lastAppearance: "Capítulo 12",
   family: {
     father: null,
     mother: null,
@@ -72,9 +76,17 @@ const roles = [
 ];
 
 const alignments = [
-  { value: "bem", label: "Bem", color: "text-green-600" },
-  { value: "neutro", label: "Neutro", color: "text-yellow-600" },
-  { value: "caotico", label: "Caótico", color: "text-red-600" }
+  { value: "bem", label: "Bem", icon: Shield, color: "text-green-600", bgColor: "bg-green-500/10 border-green-500/20" },
+  { value: "neutro", label: "Neutro", icon: Target, color: "text-yellow-600", bgColor: "bg-yellow-500/10 border-yellow-500/20" },
+  { value: "caotico", label: "Caótico", icon: Sword, color: "text-red-600", bgColor: "bg-red-500/10 border-red-500/20" }
+];
+
+const genders = [
+  { value: "masculino", label: "Masculino", icon: "♂️" },
+  { value: "feminino", label: "Feminino", icon: "♀️" },
+  { value: "transgenero", label: "Transgênero", icon: "⚧️" },
+  { value: "assexuado", label: "Assexuado", icon: "🚫" },
+  { value: "outro", label: "Outro", icon: "❓" }
 ];
 
 // Mock data for selects
@@ -156,6 +168,7 @@ export function CharacterDetail() {
 
   const currentRole = roles.find(r => r.value === character.role);
   const currentAlignment = alignments.find(a => a.value === character.alignment);
+  const currentGender = genders.find(g => g.value === character.gender);
   const RoleIcon = currentRole?.icon || Users;
 
   const handleSave = () => {
@@ -405,139 +418,235 @@ export function CharacterDetail() {
             <CardHeader>
               <CardTitle>Informações Básicas</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               {isEditing ? (
-                <div className="space-y-4">
-                  {/* Image Upload */}
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Imagem do Personagem</Label>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div 
-                          className="flex items-center justify-center w-20 h-20 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors mx-auto"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          {imagePreview ? (
-                            <div className="relative w-full h-full">
-                              <img 
-                                src={imagePreview} 
-                                alt="Preview" 
-                                className="w-full h-full object-cover rounded-full"
-                              />
-                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
-                                <Upload className="w-6 h-6 text-white" />
-                              </div>
+                <div className="space-y-6">
+                  {/* Image and Name Section */}
+                  <div className="flex items-start gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="image">Imagem</Label>
+                      <div 
+                        className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {imagePreview ? (
+                          <div className="relative w-full h-full">
+                            <img 
+                              src={imagePreview} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                              <Upload className="w-4 h-4 text-white" />
                             </div>
-                          ) : (
-                            <div className="text-center">
-                              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                              <p className="text-sm text-muted-foreground">Clique para selecionar uma imagem</p>
-                            </div>
-                          )}
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
+                            <p className="text-xs text-muted-foreground">Clique para selecionar</p>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageFileChange}
+                        className="hidden"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 space-y-4">
+                      {/* Name */}
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Nome *</Label>
+                        <Input
+                          id="name"
+                          value={editData.name}
+                          onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Nome do personagem"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Age */}
+                        <div className="space-y-2">
+                          <Label htmlFor="age">Idade *</Label>
+                          <div className="flex items-center max-w-32">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-9 w-9 p-0"
+                              onClick={() => handleAgeChange(false)}
+                            >
+                              <Minus className="w-3 h-3" />
+                            </Button>
+                            <Input
+                              id="age"
+                              type="number"
+                              value={editData.age}
+                              onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                              className="mx-1 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              min="0"
+                              max="999"
+                              required
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-9 w-9 p-0"
+                              onClick={() => handleAgeChange(true)}
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageFileChange}
-                          className="hidden"
+
+                        {/* Gender */}
+                        <div className="space-y-2">
+                          <Label htmlFor="gender">Gênero *</Label>
+                          <Select value={editData.gender || ""} onValueChange={(value) => setEditData(prev => ({ ...prev, gender: value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o gênero" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {genders.map((gender) => (
+                                <SelectItem key={gender.value} value={gender.value}>
+                                  <div className="flex items-center gap-2">
+                                    <span>{gender.icon}</span>
+                                    <span>{gender.label}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Role */}
+                        <div className="space-y-2">
+                          <Label htmlFor="role">Papel *</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {roles.map((role) => {
+                              const RoleIcon = role.icon;
+                              return (
+                                <div
+                                  key={role.value}
+                                  className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:scale-105 ${
+                                    editData.role === role.value
+                                      ? 'border-primary bg-primary/10'
+                                      : 'border-muted hover:border-primary/50'
+                                  }`}
+                                  onClick={() => setEditData(prev => ({ ...prev, role: role.value }))}
+                                >
+                                  <div className="text-center space-y-1">
+                                    <RoleIcon className="w-5 h-5 mx-auto" />
+                                    <div className="text-xs font-medium">{role.label}</div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Alignment */}
+                        <div className="space-y-2">
+                          <Label htmlFor="alignment">Alinhamento *</Label>
+                          <div className="space-y-2">
+                            {alignments.map((alignment) => {
+                              const AlignmentIcon = alignment.icon;
+                              return (
+                                <div
+                                  key={alignment.value}
+                                  className={`cursor-pointer p-2 rounded-lg border-2 transition-all hover:scale-105 ${
+                                    editData.alignment === alignment.value
+                                      ? 'border-primary bg-primary/10'
+                                      : 'border-muted hover:border-primary/50'
+                                  }`}
+                                  onClick={() => setEditData(prev => ({ ...prev, alignment: alignment.value }))}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <AlignmentIcon className="w-4 h-4" />
+                                    <span className="text-sm font-medium">{alignment.label}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Descrição Básica *</Label>
+                        <Textarea
+                          id="description"
+                          value={editData.description}
+                          onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                          placeholder="Descrição do personagem"
+                          className="min-h-[80px]"
+                          required
                         />
                       </div>
                     </div>
                   </div>
-
-                  {/* Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nome</Label>
-                    <Input
-                      id="name"
-                      value={editData.name}
-                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Nome do personagem"
-                    />
-                  </div>
-
-                  {/* Age */}
-                  <div className="space-y-2">
-                    <Label htmlFor="age">Idade</Label>
-                    <div className="flex items-center">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-10 w-10 p-0"
-                        onClick={() => handleAgeChange(false)}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-                      <Input
-                        id="age"
-                        type="number"
-                        value={editData.age}
-                        onChange={(e) => setEditData(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
-                        className="mx-2 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        min="0"
-                        max="999"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-10 w-10 p-0"
-                        onClick={() => handleAgeChange(true)}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                 </div>
+               ) : (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-6">
+                    <Avatar className="w-24 h-24">
+                      <AvatarImage src={character.image} />
+                      <AvatarFallback className="text-xl">
+                        {character.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h2 className="text-3xl font-bold">{character.name}</h2>
+                        <Badge className={currentRole?.color}>
+                          <RoleIcon className="w-4 h-4 mr-1" />
+                          {currentRole?.label}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>{character.age} anos</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{currentGender?.icon}</span>
+                          <span>{currentGender?.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className={currentAlignment?.bgColor + " " + currentAlignment?.color}>
+                            <Shield className="w-3 h-3 mr-1" />
+                            {currentAlignment?.label}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <p className="text-foreground text-base">{character.description}</p>
                     </div>
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-                  {/* Role */}
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Papel</Label>
-                    <Select value={editData.role} onValueChange={(value) => setEditData(prev => ({ ...prev, role: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o papel" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role.value} value={role.value}>
-                            {role.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Alignment */}
-                  <div className="space-y-2">
-                    <Label htmlFor="alignment">Alinhamento</Label>
-                    <Select value={editData.alignment} onValueChange={(value) => setEditData(prev => ({ ...prev, alignment: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o alinhamento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {alignments.map((alignment) => (
-                          <SelectItem key={alignment.value} value={alignment.value}>
-                            {alignment.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Descrição</Label>
-                    <Textarea
-                      id="description"
-                      value={editData.description}
-                      onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Descrição do personagem"
-                      className="min-h-[100px]"
-                    />
-                  </div>
-
-                  {/* Appearance */}
+          {/* Physical Appearance Card */}
+          {character.appearance && (
+            <Card className="card-magical">
+              <CardHeader>
+                <CardTitle>Aparência Física</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isEditing ? (
                   <div className="space-y-2">
                     <Label htmlFor="appearance">Aparência Física</Label>
                     <Textarea
@@ -548,8 +657,21 @@ export function CharacterDetail() {
                       className="min-h-[100px]"
                     />
                   </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{character.appearance}</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-                  {/* Personality */}
+          {/* Personality Card */}
+          {character.personality && (
+            <Card className="card-magical">
+              <CardHeader>
+                <CardTitle>Personalidade</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isEditing ? (
                   <div className="space-y-2">
                     <Label htmlFor="personality">Personalidade</Label>
                     <Textarea
@@ -560,228 +682,86 @@ export function CharacterDetail() {
                       className="min-h-[100px]"
                     />
                   </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{character.personality}</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-                  {/* Birth Place */}
-                  <div className="space-y-2">
-                    <Label htmlFor="birthPlace">Local de Nascimento</Label>
-                    <Select value={editData.birthPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o local de nascimento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {mockLocations.map((location) => (
-                          <SelectItem key={location.id} value={location.name}>
-                            {location.name} ({location.type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Affiliated Place */}
-                  <div className="space-y-2">
-                    <Label htmlFor="affiliatedPlace">Local Afiliado</Label>
-                    <Select value={editData.affiliatedPlace} onValueChange={(value) => setEditData(prev => ({ ...prev, affiliatedPlace: value === "none" ? "" : value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o local afiliado" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {mockLocations.map((location) => (
-                          <SelectItem key={location.id} value={location.name}>
-                            {location.name} ({location.type})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                     </Select>
-                   </div>
-
-                    {/* Family Relations */}
-                    <div className="space-y-4">
-                      <Label>Relações Familiares</Label>
-                      
-                      {/* Single-value relations */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {familyRelations.single.map((relation) => (
-                          <div key={relation.value} className="space-y-2">
-                            <Label className="text-sm">{relation.label}</Label>
-                            <Select 
-                              value={
-                                relation.value === "father" ? editData.family.father || "none" :
-                                relation.value === "mother" ? editData.family.mother || "none" :
-                                relation.value === "spouse" ? editData.family.spouse || "none" :
-                                "none"
-                              }
-                              onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Nenhum</SelectItem>
-                                {mockCharacters
-                                  .filter(char => char.id !== editData.id)
-                                  .map((char) => (
-                                  <SelectItem key={char.id} value={char.id}>
-                                    {char.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Multi-select relations */}
-                      <div className="space-y-4">
-                        {familyRelations.multiple.map((relation) => {
-                          const currentRelations = editData.family[
-                            relation.value === "child" ? "children" : 
-                            relation.value === "sibling" ? "siblings" :
-                            relation.value === "halfSibling" ? "halfSiblings" :
-                            relation.value === "uncleAunt" ? "unclesAunts" :
-                            "cousins"
-                          ];
-                          
-                          return (
-                            <div key={relation.value} className="space-y-2">
-                              <Label className="text-sm">{relation.label}s</Label>
-                              <Select onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder={`Adicionar ${relation.label.toLowerCase()}`} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="none">Selecione</SelectItem>
-                                  {mockCharacters
-                                    .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
-                                    .map((char) => (
-                                    <SelectItem key={char.id} value={char.id}>
-                                      {char.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              
-                              {/* Display current relations */}
-                              {currentRelations.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                  {currentRelations.map((relationId: string) => {
-                                    const relatedChar = mockCharacters.find(c => c.id === relationId);
-                                    return relatedChar ? (
-                                      <Badge key={relationId} variant="secondary" className="flex items-center gap-1">
-                                        {relatedChar.name}
-                                        <button
-                                          type="button"
-                                          onClick={() => handleFamilyRelationChange(relation.value, relationId)}
-                                          className="ml-1 hover:text-destructive"
-                                        >
-                                          ×
-                                        </button>
-                                      </Badge>
-                                    ) : null;
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                 </div>
-               ) : (
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <Avatar className="w-16 h-16">
-                      <AvatarImage src={character.image} />
-                      <AvatarFallback className="text-lg">
-                        {character.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-2xl font-semibold">{character.name}</h2>
-                        <Badge className={currentRole?.color}>
-                          <RoleIcon className="w-4 h-4 mr-1" />
-                          {currentRole?.label}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {character.age} anos
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Shield className="w-4 h-4" />
-                          <span className={currentAlignment?.color}>
-                            {currentAlignment?.label}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <p className="text-foreground">{character.description}</p>
-                    </div>
-                  </div>
-
-                  {character.appearance && (
-                    <>
-                      <Separator />
-                      <div>
-                        <h4 className="font-semibold mb-2">Aparência Física</h4>
-                        <p className="text-sm text-muted-foreground">{character.appearance}</p>
-                      </div>
-                    </>
-                  )}
-
-                  {character.personality && (
-                    <>
-                      <Separator />
-                      <div>
-                        <h4 className="font-semibold mb-2">Personalidade</h4>
-                        <p className="text-sm text-muted-foreground">{character.personality}</p>
-                      </div>
-                    </>
-                  )}
-
-                  <Separator />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {character.birthPlace && (
-                      <div>
-                        <h4 className="font-semibold mb-1 text-sm">Local de Nascimento</h4>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="w-4 h-4" />
-                          <span>{character.birthPlace}</span>
-                        </div>
-                      </div>
-                    )}
-                    {character.affiliatedPlace && (
-                      <div>
-                        <h4 className="font-semibold mb-1 text-sm">Local Afiliado</h4>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="w-4 h-4" />
-                          <span>{character.affiliatedPlace}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+          {/* Birth Place Card */}
+          <Card className="card-magical">
+            <CardHeader>
+              <CardTitle>Local de Nascimento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label htmlFor="birthPlace">Local de Nascimento</Label>
+                  <Select value={editData.birthPlace || "none"} onValueChange={(value) => setEditData(prev => ({ ...prev, birthPlace: value === "none" ? "" : value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o local de nascimento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {mockLocations.map((location) => (
+                        <SelectItem key={location.id} value={location.name}>
+                          {location.name} ({location.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{character.birthPlace || "Não definido"}</span>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Family Relations Card */}
+          {/* Chapter Mentions Card */}
           <Card className="card-magical">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Relações Familiares</span>
-                <Button variant="outline" size="sm" onClick={() => navigate(`/book/1/character/${character.id}/family-tree`)}>
-                  <TreePine className="w-4 h-4 mr-2" />
-                  Ver Árvore
-                </Button>
-              </CardTitle>
+              <CardTitle>Aparições na História</CardTitle>
             </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="text-center p-4 bg-muted/20 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">{character.chapterMentions || 0}</div>
+                  <div className="text-sm text-muted-foreground">Capítulos mencionado</div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 border rounded-lg">
+                    <BookOpen className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
+                    <div className="text-sm font-medium">Primeira aparição</div>
+                    <div className="text-xs text-muted-foreground">{character.firstAppearance || "N/A"}</div>
+                  </div>
+                  
+                  <div className="text-center p-3 border rounded-lg">
+                    <BookOpen className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
+                    <div className="text-sm font-medium">Última aparição</div>
+                    <div className="text-xs text-muted-foreground">{character.lastAppearance || "N/A"}</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Family Relations Card - Only show family tree button in view mode */}
+          {!isEditing && (
+            <Card className="card-magical">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Relações Familiares</span>
+                  <Button variant="outline" size="sm" onClick={() => navigate(`/book/1/character/${character.id}/family-tree`)}>
+                    <TreePine className="w-4 h-4 mr-2" />
+                    Ver Árvore
+                  </Button>
+                </CardTitle>
+              </CardHeader>
             <CardContent className="space-y-4">
               {/* Direct Family */}
               {(character.family.father || character.family.mother || character.family.spouse) && (
@@ -935,6 +915,106 @@ export function CharacterDetail() {
               )}
             </CardContent>
           </Card>
+          )}
+
+          {/* Family Relations Edit Card - Only show in edit mode */}
+          {isEditing && (
+            <Card className="card-magical">
+              <CardHeader>
+                <CardTitle>Editar Relações Familiares</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Single-value relations */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {familyRelations.single.map((relation) => (
+                      <div key={relation.value} className="space-y-2">
+                        <Label className="text-sm">{relation.label}</Label>
+                        <Select 
+                          value={
+                            relation.value === "father" ? editData.family.father || "none" :
+                            relation.value === "mother" ? editData.family.mother || "none" :
+                            relation.value === "spouse" ? editData.family.spouse || "none" :
+                            "none"
+                          }
+                          onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Selecione ${relation.label.toLowerCase()}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Nenhum</SelectItem>
+                            {mockCharacters
+                              .filter(char => char.id !== editData.id)
+                              .map((char) => (
+                              <SelectItem key={char.id} value={char.id}>
+                                {char.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Multi-select relations */}
+                  <div className="space-y-4">
+                    {familyRelations.multiple.map((relation) => {
+                      const currentRelations = editData.family[
+                        relation.value === "child" ? "children" : 
+                        relation.value === "sibling" ? "siblings" :
+                        relation.value === "halfSibling" ? "halfSiblings" :
+                        relation.value === "uncleAunt" ? "unclesAunts" :
+                        "cousins"
+                      ];
+                      
+                      return (
+                        <div key={relation.value} className="space-y-2">
+                          <Label className="text-sm">{relation.label}s</Label>
+                          <Select onValueChange={(value) => handleFamilyRelationChange(relation.value, value === "none" ? null : value)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={`Adicionar ${relation.label.toLowerCase()}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Selecione</SelectItem>
+                              {mockCharacters
+                                .filter(char => char.id !== editData.id && !currentRelations.includes(char.id))
+                                .map((char) => (
+                                <SelectItem key={char.id} value={char.id}>
+                                  {char.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          {/* Display current relations */}
+                          {currentRelations.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {currentRelations.map((relationId: string) => {
+                                const relatedChar = mockCharacters.find(c => c.id === relationId);
+                                return relatedChar ? (
+                                  <Badge key={relationId} variant="secondary" className="flex items-center gap-1">
+                                    {relatedChar.name}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleFamilyRelationChange(relation.value, relationId)}
+                                      className="ml-1 hover:text-destructive"
+                                    >
+                                      ×
+                                    </button>
+                                  </Badge>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Relationships Card */}
           <Card className="card-magical">

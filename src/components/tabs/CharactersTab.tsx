@@ -267,9 +267,9 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
           >
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={character.image} />
-                  <AvatarFallback>
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={character.image} className="object-cover" />
+                  <AvatarFallback className="text-lg">
                     {character.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
