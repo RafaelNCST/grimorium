@@ -1,5 +1,24 @@
-import { useState } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye, Settings, GripVertical, Edit3 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -7,10 +26,8 @@ import { OverviewTab } from "@/components/tabs/OverviewTab";
 import { CharactersTab } from "@/components/tabs/CharactersTab";
 import { WorldTab } from "@/components/tabs/WorldTab";
 import { OrganizationsTab } from "@/components/tabs/OrganizationsTab";
-
 import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
-
 import { PlotTab } from "@/components/tabs/PlotTab";
 import { BookSpeciesTab } from "@/components/tabs/BookSpeciesTab";
 import { BestiaryTab } from "@/components/tabs/BestiaryTab";
@@ -26,6 +43,120 @@ import bookCover1 from "@/assets/book-cover-1.jpg";
 interface BookDashboardProps {
   bookId: string;
   onBack: () => void;
+}
+
+interface TabConfig {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  visible: boolean;
+  customName?: string;
+  isDefault?: boolean;
+}
+
+interface SortableTabProps {
+  tab: TabConfig;
+  isCustomizing: boolean;
+  onToggleVisibility: (tabId: string) => void;
+  onRename: (tabId: string, newName: string) => void;
+}
+
+function SortableTab({ tab, isCustomizing, onToggleVisibility, onRename }: SortableTabProps) {
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [tempName, setTempName] = useState(tab.customName || tab.label);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: tab.id, disabled: !isCustomizing || tab.isDefault });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  if (isCustomizing) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`flex items-center gap-2 p-3 bg-card border rounded-md ${
+          tab.isDefault ? 'opacity-75' : ''
+        }`}
+      >
+        {!tab.isDefault && (
+          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
+          </div>
+        )}
+        <tab.icon className="w-4 h-4" />
+        {isRenaming ? (
+          <div className="flex items-center gap-2 flex-1">
+            <input
+              type="text"
+              value={tempName}
+              onChange={(e) => setTempName(e.target.value)}
+              onBlur={() => {
+                onRename(tab.id, tempName);
+                setIsRenaming(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  onRename(tab.id, tempName);
+                  setIsRenaming(false);
+                }
+                if (e.key === 'Escape') {
+                  setTempName(tab.customName || tab.label);
+                  setIsRenaming(false);
+                }
+              }}
+              className="flex-1 px-2 py-1 text-sm border rounded"
+              autoFocus
+            />
+          </div>
+        ) : (
+          <span className="flex-1">{tab.customName || tab.label}</span>
+        )}
+        <div className="flex items-center gap-1">
+          {!tab.isDefault && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsRenaming(true)}
+                className="h-6 w-6 p-0"
+              >
+                <Edit3 className="w-3 h-3" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggleVisibility(tab.id)}
+                className="h-6 w-6 p-0"
+              >
+                {tab.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Normal tab trigger
+  if (!tab.visible) return null;
+  
+  return (
+    <TabsTrigger value={tab.id} className="flex items-center gap-2 py-3">
+      <tab.icon className="w-4 h-4" />
+      <span className="hidden sm:inline">{tab.customName || tab.label}</span>
+    </TabsTrigger>
+  );
 }
 
 // Types for Plot (Enredo)
@@ -57,6 +188,21 @@ const genres = [
 
 const visualStyles = [
   "Cartoon", "Anime", "Realista"
+];
+
+// Default tab configuration
+const defaultTabs: TabConfig[] = [
+  { id: "overview", label: "Visão Geral", icon: BookOpen, visible: true, isDefault: true },
+  { id: "characters", label: "Personagens", icon: Users, visible: true },
+  { id: "world", label: "Mundo", icon: MapPin, visible: true },
+  { id: "organizations", label: "Organizações", icon: Building, visible: true },
+  { id: "plot", label: "Enredo", icon: Target, visible: true },
+  { id: "magic", label: "Sistema Mágico", icon: Sparkles, visible: true },
+  { id: "encyclopedia", label: "Enciclopédia", icon: BookOpen, visible: true },
+  { id: "species", label: "Espécies", icon: Dna, visible: true },
+  { id: "bestiary", label: "Bestiário", icon: Skull, visible: true },
+  { id: "items", label: "Itens", icon: Package, visible: true },
+  { id: "notes", label: "Anotações", icon: FileText, visible: true },
 ];
 
 // Mock book data - different based on bookId to show empty vs filled states
@@ -142,7 +288,67 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
   const [deleteInput, setDeleteInput] = useState("");
   const [arcs, setArcs] = useState<PlotArc[]>(initialArcs);
   const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  
+  // Tab customization state
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [tabs, setTabs] = useState<TabConfig[]>(defaultTabs);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const currentArc = arcs.find((a) => a.isCurrentArc) || arcs[0];
+
+  // Close customize mode when navigating
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setIsCustomizing(false);
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  // Close customize mode when activeTab changes (navigation)
+  useEffect(() => {
+    if (isCustomizing && activeTab !== "overview") {
+      setIsCustomizing(false);
+    }
+  }, [activeTab, isCustomizing]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setTabs((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  const handleToggleVisibility = (tabId: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === tabId ? { ...tab, visible: !tab.visible } : tab
+      )
+    );
+  };
+
+  const handleRename = (tabId: string, newName: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === tabId ? { ...tab, customName: newName } : tab
+      )
+    );
+  };
+
+  const visibleTabs = tabs.filter((tab) => tab.visible);
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,14 +367,25 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               </Button>
               <h1 className="text-2xl font-bold">{t('book.dashboard')}</h1>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsHeaderHidden(!isHeaderHidden)}
-              className="hover:bg-muted"
-            >
-              {isHeaderHidden ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsCustomizing(!isCustomizing)}
+                className={`hover:bg-muted ${isCustomizing ? 'bg-primary/10 text-primary' : ''}`}
+                title={isCustomizing ? 'Sair do modo personalizar' : 'Personalizar abas'}
+              >
+                <Settings className={`w-5 h-5 ${isCustomizing ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsHeaderHidden(!isHeaderHidden)}
+                className="hover:bg-muted"
+              >
+                {isHeaderHidden ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
 
           {/* Book Header */}
@@ -289,90 +506,89 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
 
       {/* Navigation Tabs */}
       <div className="px-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full grid-cols-12 h-auto p-1 bg-muted/30 ${isHeaderHidden ? 'mt-0' : 'mt-6'}`}>
-            <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.overview')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="characters" className="flex items-center gap-2 py-3">
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.characters')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="world" className="flex items-center gap-2 py-3">
-              <MapPin className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.world')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="organizations" className="flex items-center gap-2 py-3">
-              <Building className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.organizations')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="plot" className="flex items-center gap-2 py-3">
-              <Target className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.plot')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="magic" className="flex items-center gap-2 py-3">
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.magic_system')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="encyclopedia" className="flex items-center gap-2 py-3">
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('book.encyclopedia')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="species" className="flex items-center gap-2 py-3">
-              <Dna className="w-4 h-4" />
-              <span className="hidden sm:inline">Espécies</span>
-            </TabsTrigger>
-            <TabsTrigger value="bestiary" className="flex items-center gap-2 py-3">
-              <Skull className="w-4 h-4" />
-              <span className="hidden sm:inline">Bestiário</span>
-            </TabsTrigger>
-            <TabsTrigger value="items" className="flex items-center gap-2 py-3">
-              <Package className="w-4 h-4" />
-              <span className="hidden sm:inline">Itens</span>
-            </TabsTrigger>
-            <TabsTrigger value="notes" className="flex items-center gap-2 py-3">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Anotações</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="mt-6 pb-6">
-            <TabsContent value="overview" className="mt-0">
-              <OverviewTab book={book} bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="characters" className="mt-0">
-              <CharactersTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="world" className="mt-0">
-              <WorldTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="organizations" className="mt-0">
-              <OrganizationsTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="plot" className="mt-0">
-              <PlotTab />
-            </TabsContent>
-            <TabsContent value="magic" className="mt-0">
-              <MagicSystemTab />
-            </TabsContent>
-            <TabsContent value="encyclopedia" className="mt-0">
-              <EncyclopediaTab />
-            </TabsContent>
-            <TabsContent value="species" className="mt-0">
-              <BookSpeciesTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="bestiary" className="mt-0">
-              <BestiaryTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="items" className="mt-0">
-              <ItemsTab />
-            </TabsContent>
-            <TabsContent value="notes" className="mt-0">
-              <NotesTab bookId={bookId} />
-            </TabsContent>
+        {isCustomizing ? (
+          <div className={`${isHeaderHidden ? 'mt-0' : 'mt-6'}`}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Personalizar Abas
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Arraste para reordenar, clique no olho para mostrar/ocultar, ou clique no lápis para renomear.
+                A aba "Visão Geral" não pode ser movida ou ocultada.
+              </p>
+            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={tabs.map(tab => tab.id)} strategy={horizontalListSortingStrategy}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {tabs.map((tab) => (
+                    <SortableTab
+                      key={tab.id}
+                      tab={tab}
+                      isCustomizing={isCustomizing}
+                      onToggleVisibility={handleToggleVisibility}
+                      onRename={handleRename}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
-        </Tabs>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className={`inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto ${isHeaderHidden ? 'mt-0' : 'mt-6'}`}>
+              {visibleTabs.map((tab) => (
+                <SortableTab
+                  key={tab.id}
+                  tab={tab}
+                  isCustomizing={isCustomizing}
+                  onToggleVisibility={handleToggleVisibility}
+                  onRename={handleRename}
+                />
+              ))}
+            </TabsList>
+
+            <div className="mt-6 pb-6">
+              <TabsContent value="overview" className="mt-0">
+                <OverviewTab book={book} bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="characters" className="mt-0">
+                <CharactersTab bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="world" className="mt-0">
+                <WorldTab bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="organizations" className="mt-0">
+                <OrganizationsTab bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="plot" className="mt-0">
+                <PlotTab />
+              </TabsContent>
+              <TabsContent value="magic" className="mt-0">
+                <MagicSystemTab />
+              </TabsContent>
+              <TabsContent value="encyclopedia" className="mt-0">
+                <EncyclopediaTab />
+              </TabsContent>
+              <TabsContent value="species" className="mt-0">
+                <BookSpeciesTab bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="bestiary" className="mt-0">
+                <BestiaryTab bookId={bookId} />
+              </TabsContent>
+              <TabsContent value="items" className="mt-0">
+                <ItemsTab />
+              </TabsContent>
+              <TabsContent value="notes" className="mt-0">
+                <NotesTab bookId={bookId} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
