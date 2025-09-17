@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2, FileText, BarChart3 } from "lucide-react";
+import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2, FileText, BarChart3, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -274,21 +274,51 @@ const [newNote, setNewNote] = useState("");
               <div className="space-y-3">
                 <div>
                   <label className="text-xs font-medium mb-1 block">Estimativa de arcos</label>
-                  <Input 
-                    type="number" 
-                    value={storyProgress.estimatedArcs}
-                    onChange={(e) => setStoryProgress(s => ({ ...s, estimatedArcs: parseInt(e.target.value) || 0 }))}
-                    className="h-7 text-xs"
-                  />
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 w-7 p-0"
+                      onClick={() => setStoryProgress(s => ({ ...s, estimatedArcs: Math.max(1, s.estimatedArcs - 1) }))}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <div className="flex-1 text-center">
+                      <span className="text-sm font-medium">{storyProgress.estimatedArcs}</span>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 w-7 p-0"
+                      onClick={() => setStoryProgress(s => ({ ...s, estimatedArcs: s.estimatedArcs + 1 }))}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs font-medium mb-1 block">Estimativa de capítulos</label>
-                  <Input 
-                    type="number" 
-                    value={storyProgress.estimatedChapters}
-                    onChange={(e) => setStoryProgress(s => ({ ...s, estimatedChapters: parseInt(e.target.value) || 0 }))}
-                    className="h-7 text-xs"
-                  />
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 w-7 p-0"
+                      onClick={() => setStoryProgress(s => ({ ...s, estimatedChapters: Math.max(1, s.estimatedChapters - 1) }))}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <div className="flex-1 text-center">
+                      <span className="text-sm font-medium">{storyProgress.estimatedChapters}</span>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-7 w-7 p-0"
+                      onClick={() => setStoryProgress(s => ({ ...s, estimatedChapters: s.estimatedChapters + 1 }))}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="accent" size="sm" className="h-6 text-xs" onClick={saveProgress}>Salvar</Button>
