@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu, User, UserCheck, Users2, Ban, HelpCircle } from "lucide-react";
 import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,6 +69,7 @@ const mockCharacter = {
 
 const roles = [
   { value: "protagonista", label: "Protagonista", icon: Crown, color: "bg-accent text-accent-foreground" },
+  { value: "co-protagonista", label: "Co-protagonista", icon: UserCheck, color: "bg-accent/80 text-accent-foreground" },
   { value: "antagonista", label: "Antagonista", icon: Sword, color: "bg-destructive text-destructive-foreground" },
   { value: "vilao", label: "Vilão", icon: Sword, color: "bg-destructive text-destructive-foreground" },
   { value: "secundario", label: "Secundário", icon: Users, color: "bg-secondary text-secondary-foreground" },
@@ -82,11 +83,11 @@ const alignments = [
 ];
 
 const genders = [
-  { value: "masculino", label: "Masculino", icon: "♂️" },
-  { value: "feminino", label: "Feminino", icon: "♀️" },
-  { value: "transgenero", label: "Transgênero", icon: "⚧️" },
-  { value: "assexuado", label: "Assexuado", icon: "🚫" },
-  { value: "outro", label: "Outro", icon: "❓" }
+  { value: "masculino", label: "Masculino", icon: User },
+  { value: "feminino", label: "Feminino", icon: Users2 },
+  { value: "transgenero", label: "Transgênero", icon: UserCheck },
+  { value: "assexuado", label: "Assexuado", icon: Ban },
+  { value: "outro", label: "Outro", icon: HelpCircle }
 ];
 
 // Mock data for selects
@@ -426,7 +427,7 @@ export function CharacterDetail() {
                     <div className="space-y-2">
                       <Label htmlFor="image">Imagem</Label>
                       <div 
-                        className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                        className="flex items-center justify-center w-24 h-24 aspect-square border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {imagePreview ? (
@@ -434,7 +435,7 @@ export function CharacterDetail() {
                             <img 
                               src={imagePreview} 
                               alt="Preview" 
-                              className="w-full h-full object-cover rounded-lg"
+                              className="w-full h-full aspect-square object-cover rounded-lg"
                             />
                             <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
                               <Upload className="w-4 h-4 text-white" />
@@ -513,14 +514,17 @@ export function CharacterDetail() {
                               <SelectValue placeholder="Selecione o gênero" />
                             </SelectTrigger>
                             <SelectContent>
-                              {genders.map((gender) => (
-                                <SelectItem key={gender.value} value={gender.value}>
-                                  <div className="flex items-center gap-2">
-                                    <span>{gender.icon}</span>
-                                    <span>{gender.label}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
+                              {genders.map((gender) => {
+                                const GenderIcon = gender.icon;
+                                return (
+                                  <SelectItem key={gender.value} value={gender.value}>
+                                    <div className="flex items-center gap-2">
+                                      <GenderIcon className="w-4 h-4" />
+                                      <span>{gender.label}</span>
+                                    </div>
+                                  </SelectItem>
+                                );
+                              })}
                             </SelectContent>
                           </Select>
                         </div>
@@ -598,8 +602,8 @@ export function CharacterDetail() {
                ) : (
                 <div className="space-y-4">
                   <div className="flex items-start gap-6">
-                    <Avatar className="w-24 h-24">
-                      <AvatarImage src={character.image} />
+                    <Avatar className="w-24 h-24 aspect-square">
+                      <AvatarImage src={character.image} className="object-cover" />
                       <AvatarFallback className="text-xl">
                         {character.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
@@ -620,7 +624,10 @@ export function CharacterDetail() {
                           <span>{character.age} anos</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{currentGender?.icon}</span>
+                          {(() => {
+                            const GenderIcon = currentGender?.icon;
+                            return GenderIcon ? <GenderIcon className="w-4 h-4" /> : null;
+                          })()}
                           <span>{currentGender?.label}</span>
                         </div>
                         <div className="flex items-center gap-2">
