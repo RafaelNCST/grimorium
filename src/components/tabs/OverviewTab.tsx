@@ -193,7 +193,7 @@ const [newNote, setNewNote] = useState("");
       {/* Stats Overview - Compact sections without gaps */}
       <div className="flex flex-wrap">
         {/* Média por Semana */}
-        <Card className="card-magical flex-shrink-0 m-1">
+        <Card className="card-magical flex-shrink-0 m-1 h-fit">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -209,7 +209,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Último Capítulo */}
-        <Card className="card-magical flex-shrink-0 m-1">
+        <Card className="card-magical flex-shrink-0 m-1 h-fit">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -225,7 +225,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Total de Palavras */}
-        <Card className="card-magical flex-shrink-0 m-1">
+        <Card className="card-magical flex-shrink-0 m-1 h-fit">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -240,7 +240,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Total de Caracteres */}
-        <Card className="card-magical flex-shrink-0 m-1">
+        <Card className="card-magical flex-shrink-0 m-1 h-fit">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -255,7 +255,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Progressão da História */}
-        <Card className="card-magical flex-shrink-0 m-1 min-w-[280px]">
+        <Card className="card-magical flex-shrink-0 m-1 min-w-[280px] h-fit">
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle className="text-base">Progressão da História</CardTitle>
@@ -358,7 +358,7 @@ const [newNote, setNewNote] = useState("");
 
       <div className="flex flex-wrap">
         {/* Writing Goals */}
-        <Card className="card-magical flex-1 min-w-[300px] m-1">
+        <Card className="card-magical flex-1 min-w-[300px] m-1 h-fit">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
               <CardTitle className="text-base">Metas de Escrita</CardTitle>
@@ -422,7 +422,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Current Arc */}
-        <Card className="card-magical flex-1 min-w-[300px] m-1">
+        <Card className="card-magical flex-1 min-w-[300px] m-1 h-fit">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Arco Atual</CardTitle>
             <CardDescription>{book.currentArc}</CardDescription>
@@ -452,7 +452,7 @@ const [newNote, setNewNote] = useState("");
 
       <div className="flex flex-wrap">
         {/* Author Summary */}
-        <Card className="card-magical flex-1 min-w-[300px] m-1">
+        <Card className="card-magical flex-1 min-w-[300px] m-1 h-fit">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
               <CardTitle className="text-base">Resumo do Autor</CardTitle>
@@ -488,7 +488,7 @@ const [newNote, setNewNote] = useState("");
         </Card>
 
         {/* Story Summary */}
-        <Card className="card-magical flex-1 min-w-[300px] m-1">
+        <Card className="card-magical flex-1 min-w-[300px] m-1 h-fit">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div>
               <CardTitle className="text-base">Resumo da História</CardTitle>
@@ -525,7 +525,7 @@ const [newNote, setNewNote] = useState("");
       </div>
 
       {/* Post-it Notes Board */}
-      <Card className="card-magical">
+      <Card className="card-magical m-1 h-fit">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <div>
             <CardTitle className="flex items-center gap-2">
