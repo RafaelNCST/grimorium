@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Plus, Target, Clock, CheckCircle2, Circle, Edit2, Trash2, Star, GitBranch, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Target, Clock, CheckCircle2, Circle, Edit2, Trash2, Star, GitBranch, ArrowUp, ArrowDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { CreatePlotArcModal } from "@/components/modals/CreatePlotArcModal";
@@ -78,6 +79,17 @@ export function PlotTab() {
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<PlotArc[]>(mockArcs);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("todos");
+
+  // Status priority for sorting: andamento > planejamento > finalizado
+  const getStatusPriority = (status: string) => {
+    switch (status) {
+      case 'andamento': return 1;
+      case 'planejamento': return 2;
+      case 'finalizado': return 3;
+      default: return 4;
+    }
+  };
 
   const getSizeColor = (size: string) => {
     switch (size) {
@@ -145,8 +157,21 @@ export function PlotTab() {
     });
   };
 
-  // Sort arcs by order for display
-  const sortedArcs = [...arcs].sort((a, b) => a.order - b.order);
+  // Sort arcs by status priority first, then by order
+  const filteredAndSortedArcs = arcs
+    .filter(arc => statusFilter === "todos" || arc.status === statusFilter)
+    .sort((a, b) => {
+      // First sort by status priority
+      const statusPriorityA = getStatusPriority(a.status);
+      const statusPriorityB = getStatusPriority(b.status);
+      
+      if (statusPriorityA !== statusPriorityB) {
+        return statusPriorityA - statusPriorityB;
+      }
+      
+      // If same status, sort by order
+      return a.order - b.order;
+    });
 
   const getVisibleEvents = (events: PlotEvent[]) => {
     const sortedEvents = events.sort((a, b) => a.order - b.order);
@@ -170,6 +195,18 @@ export function PlotTab() {
           <p className="text-muted-foreground">Gerencie a estrutura da sua história</p>
         </div>
         <div className="flex gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48">
+              <Filter className="w-4 h-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os status</SelectItem>
+              <SelectItem value="andamento">Em andamento</SelectItem>
+              <SelectItem value="planejamento">Em planejamento</SelectItem>
+              <SelectItem value="finalizado">Finalizados</SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="outline" onClick={() => navigate('/plot-timeline')}>
             <GitBranch className="w-4 h-4 mr-2" />
             Árvore Visual
@@ -183,7 +220,7 @@ export function PlotTab() {
 
       {/* Arc Cards */}
       <div className="grid gap-6">
-        {sortedArcs.map((arc, index) => (
+        {filteredAndSortedArcs.map((arc, index) => (
           <Card 
             key={arc.id} 
             className="card-magical cursor-pointer"
@@ -228,7 +265,7 @@ export function PlotTab() {
                         e.stopPropagation();
                         moveArc(arc.id, 'down');
                       }}
-                      disabled={index === sortedArcs.length - 1}
+                      disabled={index === filteredAndSortedArcs.length - 1}
                       className="h-6 w-6 p-0"
                     >
                       <ArrowDown className="w-3 h-3" />
