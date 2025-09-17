@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye, Settings, GripVertical, Edit3 } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye, Palette, GripVertical } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -50,7 +50,6 @@ interface TabConfig {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   visible: boolean;
-  customName?: string;
   isDefault?: boolean;
 }
 
@@ -58,13 +57,9 @@ interface SortableTabProps {
   tab: TabConfig;
   isCustomizing: boolean;
   onToggleVisibility: (tabId: string) => void;
-  onRename: (tabId: string, newName: string) => void;
 }
 
-function SortableTab({ tab, isCustomizing, onToggleVisibility, onRename }: SortableTabProps) {
-  const [isRenaming, setIsRenaming] = useState(false);
-  const [tempName, setTempName] = useState(tab.customName || tab.label);
-
+function SortableTab({ tab, isCustomizing, onToggleVisibility }: SortableTabProps) {
   const {
     attributes,
     listeners,
@@ -85,9 +80,9 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility, onRename }: Sorta
       <div
         ref={setNodeRef}
         style={style}
-        className={`flex items-center gap-2 p-3 bg-card border rounded-md ${
+        className={`flex items-center gap-2 px-4 py-2 bg-muted border border-border rounded-md ${
           tab.isDefault ? 'opacity-75' : ''
-        }`}
+        } ${!tab.visible ? 'opacity-50' : ''}`}
       >
         {!tab.isDefault && (
           <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
@@ -95,55 +90,17 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility, onRename }: Sorta
           </div>
         )}
         <tab.icon className="w-4 h-4" />
-        {isRenaming ? (
-          <div className="flex items-center gap-2 flex-1">
-            <input
-              type="text"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onBlur={() => {
-                onRename(tab.id, tempName);
-                setIsRenaming(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  onRename(tab.id, tempName);
-                  setIsRenaming(false);
-                }
-                if (e.key === 'Escape') {
-                  setTempName(tab.customName || tab.label);
-                  setIsRenaming(false);
-                }
-              }}
-              className="flex-1 px-2 py-1 text-sm border rounded"
-              autoFocus
-            />
-          </div>
-        ) : (
-          <span className="flex-1">{tab.customName || tab.label}</span>
+        <span className="flex-1 text-sm">{tab.label}</span>
+        {!tab.isDefault && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onToggleVisibility(tab.id)}
+            className="h-6 w-6 p-0"
+          >
+            {tab.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+          </Button>
         )}
-        <div className="flex items-center gap-1">
-          {!tab.isDefault && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsRenaming(true)}
-                className="h-6 w-6 p-0"
-              >
-                <Edit3 className="w-3 h-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onToggleVisibility(tab.id)}
-                className="h-6 w-6 p-0"
-              >
-                {tab.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-              </Button>
-            </>
-          )}
-        </div>
       </div>
     );
   }
@@ -154,7 +111,7 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility, onRename }: Sorta
   return (
     <TabsTrigger value={tab.id} className="flex items-center gap-2 py-3">
       <tab.icon className="w-4 h-4" />
-      <span className="hidden sm:inline">{tab.customName || tab.label}</span>
+      <span className="hidden sm:inline">{tab.label}</span>
     </TabsTrigger>
   );
 }
@@ -340,13 +297,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
     );
   };
 
-  const handleRename = (tabId: string, newName: string) => {
-    setTabs((prev) =>
-      prev.map((tab) =>
-        tab.id === tabId ? { ...tab, customName: newName } : tab
-      )
-    );
-  };
 
   const visibleTabs = tabs.filter((tab) => tab.visible);
 
@@ -375,7 +325,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                 className={`hover:bg-muted ${isCustomizing ? 'bg-primary/10 text-primary' : ''}`}
                 title={isCustomizing ? 'Sair do modo personalizar' : 'Personalizar abas'}
               >
-                <Settings className={`w-5 h-5 ${isCustomizing ? 'animate-spin' : ''}`} />
+                <Palette className={`w-5 h-5`} />
               </Button>
               <Button
                 variant="ghost"
@@ -505,57 +455,58 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="px-6">
-        {isCustomizing ? (
-          <div className={`${isHeaderHidden ? 'mt-0' : 'mt-6'}`}>
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                Personalizar Abas
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Arraste para reordenar, clique no olho para mostrar/ocultar, ou clique no lápis para renomear.
-                A aba "Visão Geral" não pode ser movida ou ocultada.
-              </p>
+      <div className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {isCustomizing ? (
+            <div className={`px-6 ${isHeaderHidden ? 'pt-4' : 'pt-10'}`}>
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <Palette className="w-5 h-5" />
+                  Personalizar Abas
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Arraste para reordenar ou clique no olho para mostrar/ocultar.
+                  A aba "Visão Geral" não pode ser movida ou ocultada.
+                </p>
+              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={tabs.map(tab => tab.id)} strategy={horizontalListSortingStrategy}>
+                  <div className="flex flex-wrap gap-2 p-1 bg-muted/50 rounded-md border">
+                    {tabs.map((tab) => (
+                      <SortableTab
+                        key={tab.id}
+                        tab={tab}
+                        isCustomizing={isCustomizing}
+                        onToggleVisibility={handleToggleVisibility}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext items={tabs.map(tab => tab.id)} strategy={horizontalListSortingStrategy}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {tabs.map((tab) => (
-                    <SortableTab
-                      key={tab.id}
-                      tab={tab}
-                      isCustomizing={isCustomizing}
-                      onToggleVisibility={handleToggleVisibility}
-                      onRename={handleRename}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className={`inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto ${isHeaderHidden ? 'mt-0' : 'mt-6'}`}>
-              {visibleTabs.map((tab) => (
-                <SortableTab
-                  key={tab.id}
-                  tab={tab}
-                  isCustomizing={isCustomizing}
-                  onToggleVisibility={handleToggleVisibility}
-                  onRename={handleRename}
-                />
-              ))}
-            </TabsList>
+          ) : (
+            <div className="px-6">
+              <TabsList className={`w-full h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground ${isHeaderHidden ? 'mt-4' : 'mt-6'}`}>
+                {visibleTabs.map((tab) => (
+                  <SortableTab
+                    key={tab.id}
+                    tab={tab}
+                    isCustomizing={isCustomizing}
+                    onToggleVisibility={handleToggleVisibility}
+                  />
+                ))}
+              </TabsList>
+            </div>
+          )}
 
-            <div className="mt-6 pb-6">
-              <TabsContent value="overview" className="mt-0">
-                <OverviewTab book={book} bookId={bookId} />
-              </TabsContent>
+          <div className="px-6 mt-6 pb-6">
+            <TabsContent value="overview" className="mt-0">
+              <OverviewTab book={book} bookId={bookId} />
+            </TabsContent>
               <TabsContent value="characters" className="mt-0">
                 <CharactersTab bookId={bookId} />
               </TabsContent>
@@ -583,12 +534,11 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <TabsContent value="items" className="mt-0">
                 <ItemsTab />
               </TabsContent>
-              <TabsContent value="notes" className="mt-0">
-                <NotesTab bookId={bookId} />
-              </TabsContent>
-            </div>
-          </Tabs>
-        )}
+            <TabsContent value="notes" className="mt-0">
+              <NotesTab bookId={bookId} />
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
 
       {/* Delete Confirmation Dialog */}
