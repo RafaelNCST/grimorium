@@ -180,122 +180,109 @@ export function ItemsTab() {
         </Button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Filters Sidebar */}
-        <div className="lg:w-64 space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Buscar</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Nome ou alternativo..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Categoria</label>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Todas as categorias" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as categorias</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Raridade</label>
-            <Select value={selectedRarity} onValueChange={setSelectedRarity}>
-              <SelectTrigger>
-                <SelectValue placeholder="Todas as raridades" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as raridades</SelectItem>
-                {mockRarities.map(rarity => (
-                  <SelectItem key={rarity.id} value={rarity.id}>
-                    <div className="flex items-center gap-2">
-                      <span>{rarity.icon}</span>
-                      <span>{rarity.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Filters */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar itens..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
         </div>
-
-        {/* Items Grid */}
-        <div className="flex-1">
-          {filteredItems.length === 0 && items.length > 0 && (
-            <EmptyState
-              icon={Search}
-              title="Nenhum item encontrado"
-              description="Tente ajustar os filtros ou o termo de busca."
-            />
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <Card 
-                key={item.id} 
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-                onClick={() => handleItemClick(item.id)}
-              >
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge 
-                        variant="secondary" 
-                        className="text-xs"
-                        style={{ 
-                          backgroundColor: item.rarity.color + '20',
-                          color: item.rarity.color,
-                          border: `1px solid ${item.rarity.color}40`
-                        }}
-                      >
-                        <span className="mr-1">{item.rarity.icon}</span>
-                        {item.rarity.name}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-lg leading-tight">{item.name}</h3>
-                      <div className="flex items-center gap-1 text-sm">
-                        <span className="text-lg">{item.status.icon}</span>
-                        <span className="text-muted-foreground text-xs">{item.status.name}</span>
-                      </div>
-                    </div>
-                    
-                    <Badge variant="outline" className="text-xs">
-                      {item.category}
-                    </Badge>
-                    
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {item.basicDescription}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+        
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent side="bottom">
+            <SelectItem value="all">Todas as categorias</SelectItem>
+            {categories.map(category => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
             ))}
-          </div>
-        </div>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedRarity} onValueChange={setSelectedRarity}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Raridade" />
+          </SelectTrigger>
+          <SelectContent side="bottom">
+            <SelectItem value="all">Todas as raridades</SelectItem>
+            {mockRarities.map(rarity => (
+              <SelectItem key={rarity.id} value={rarity.id}>
+                <div className="flex items-center gap-2">
+                  <span>{rarity.icon}</span>
+                  <span>{rarity.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Items Grid */}
+      {filteredItems.length === 0 && items.length > 0 && (
+        <EmptyState
+          icon={Search}
+          title="Nenhum item encontrado"
+          description="Tente ajustar os filtros ou o termo de busca."
+        />
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredItems.map((item) => (
+          <Card 
+            key={item.id} 
+            className="cursor-pointer hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+            onClick={() => handleItemClick(item.id)}
+          >
+            <CardContent className="p-0">
+              <div className="relative">
+                <img 
+                  src={item.image} 
+                  alt={item.name}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                />
+                <div className="absolute top-2 right-2">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs"
+                    style={{ 
+                      backgroundColor: item.rarity.color + '20',
+                      color: item.rarity.color,
+                      border: `1px solid ${item.rarity.color}40`
+                    }}
+                  >
+                    <span className="mr-1">{item.rarity.icon}</span>
+                    {item.rarity.name}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <h3 className="font-semibold text-lg leading-tight">{item.name}</h3>
+                  <div className="flex items-center gap-1 text-sm">
+                    <span className="text-lg">{item.status.icon}</span>
+                    <span className="text-muted-foreground text-xs">{item.status.name}</span>
+                  </div>
+                </div>
+                
+                <Badge variant="outline" className="text-xs">
+                  {item.category}
+                </Badge>
+                
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {item.basicDescription}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <CreateItemModal

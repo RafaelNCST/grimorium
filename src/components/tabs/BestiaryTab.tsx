@@ -207,10 +207,10 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+      {/* Filters */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Buscar bestas..."
             value={searchQuery}
@@ -219,48 +219,46 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
           />
         </div>
         
-        <div className="flex gap-2">
-          <Select value={selectedRace} onValueChange={setSelectedRace}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Raça" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as raças</SelectItem>
-              {uniqueRaces.map((race) => (
-                <SelectItem key={race} value={race}>{race}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Select value={selectedRace} onValueChange={setSelectedRace}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Raça" />
+          </SelectTrigger>
+          <SelectContent side="bottom">
+            <SelectItem value="all">Todas as raças</SelectItem>
+            {uniqueRaces.map((race) => (
+              <SelectItem key={race} value={race}>{race}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select value={selectedThreatLevel} onValueChange={setSelectedThreatLevel}>
-            <SelectTrigger className="w-44">
-              <SelectValue placeholder="Nível de ameaça" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as ameaças</SelectItem>
-              {threatLevels.map((level) => (
-                <SelectItem key={level.name} value={level.name}>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full bg-${level.color}-500`} />
-                    {level.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Select value={selectedThreatLevel} onValueChange={setSelectedThreatLevel}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Nível de ameaça" />
+          </SelectTrigger>
+          <SelectContent side="bottom">
+            <SelectItem value="all">Todas as ameaças</SelectItem>
+            {threatLevels.map((level) => (
+              <SelectItem key={level.name} value={level.name}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full bg-${level.color}-500`} />
+                  {level.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select value={selectedHabit} onValueChange={setSelectedHabit}>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Hábito" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os hábitos</SelectItem>
-              {habits.map((habit) => (
-                <SelectItem key={habit} value={habit}>{habit}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={selectedHabit} onValueChange={setSelectedHabit}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Hábito" />
+          </SelectTrigger>
+          <SelectContent side="bottom">
+            <SelectItem value="all">Todos os hábitos</SelectItem>
+            {habits.map((habit) => (
+              <SelectItem key={habit} value={habit}>{habit}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Beasts Grid */}
