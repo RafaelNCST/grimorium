@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateCharacterModal } from "@/components/modals/CreateCharacterModal";
-import { StatsCard } from "@/components/StatsCard";
 import { EmptyState } from "@/components/EmptyState";
 
 interface Character {
@@ -178,12 +177,13 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
     return matchesSearch && matchesOrg && matchesLocation;
   });
 
-  // Statistics
-  const totalCharacters = characters.length;
-  const roleStats = characters.reduce((acc, char) => {
-    acc[char.role] = (acc[char.role] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Statistics - by alignment instead of role
+  const alignmentStats = {
+    total: characters.length,
+    bem: characters.filter(c => c.alignment === "bem").length,
+    neutro: characters.filter(c => c.alignment === "neutro").length,
+    caotico: characters.filter(c => c.alignment === "caotico").length
+  };
 
   const handleCharacterCreated = (newCharacter: any) => {
     setCharacters(prev => [...prev, newCharacter]);
@@ -195,11 +195,17 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with compact alignment stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Personagens</h2>
           <p className="text-muted-foreground">Gerencie os personagens da sua história</p>
+          <div className="flex items-center gap-4 mt-2">
+            <Badge variant="outline">{alignmentStats.total} Total</Badge>
+            <Badge className="bg-success/10 text-success">{alignmentStats.bem} Bem</Badge>
+            <Badge className="bg-secondary/10 text-secondary-foreground">{alignmentStats.neutro} Neutro</Badge>
+            <Badge className="bg-destructive/10 text-destructive">{alignmentStats.caotico} Caótico</Badge>
+          </div>
         </div>
         <CreateCharacterModal
           trigger={
@@ -209,46 +215,6 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
             </Button>
           }
           onCharacterCreated={handleCharacterCreated}
-        />
-      </div>
-
-      {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatsCard
-          title="Total"
-          value={totalCharacters}
-          description="personagens"
-          icon={Users}
-        />
-        <StatsCard
-          title="Protagonistas"
-          value={roleStats.protagonista || 0}
-          description="principais"
-          icon={Crown}
-        />
-        <StatsCard
-          title="Antagonistas"
-          value={roleStats.antagonista || 0}
-          description="oponentes"
-          icon={Sword}
-        />
-        <StatsCard
-          title="Vilões"
-          value={roleStats.vilao || 0}
-          description="malvados"
-          icon={Shield}
-        />
-        <StatsCard
-          title="Secundários"
-          value={roleStats.secundario || 0}
-          description="apoio"
-          icon={Users}
-        />
-        <StatsCard
-          title="Figurantes"
-          value={roleStats.figurante || 0}
-          description="extras"
-          icon={Heart}
         />
       </div>
 
