@@ -94,7 +94,7 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility }: SortableTabProp
             variant="ghost"
             size="sm"
             onClick={() => onToggleVisibility(tab.id)}
-            className="h-6 w-6 p-0"
+            className="h-6 w-6 p-0 relative z-10"
           >
             {tab.visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
           </Button>
