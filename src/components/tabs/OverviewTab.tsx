@@ -283,9 +283,13 @@ const [newNote, setNewNote] = useState("");
                     >
                       <Minus className="w-3 h-3" />
                     </Button>
-                    <div className="flex-1 text-center">
-                      <span className="text-sm font-medium">{storyProgress.estimatedArcs}</span>
-                    </div>
+                    <Input 
+                      type="number" 
+                      value={storyProgress.estimatedArcs}
+                      onChange={(e) => setStoryProgress(s => ({ ...s, estimatedArcs: Math.max(1, parseInt(e.target.value) || 1) }))}
+                      className="h-7 text-xs text-center"
+                      min="1"
+                    />
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -307,9 +311,13 @@ const [newNote, setNewNote] = useState("");
                     >
                       <Minus className="w-3 h-3" />
                     </Button>
-                    <div className="flex-1 text-center">
-                      <span className="text-sm font-medium">{storyProgress.estimatedChapters}</span>
-                    </div>
+                    <Input 
+                      type="number" 
+                      value={storyProgress.estimatedChapters}
+                      onChange={(e) => setStoryProgress(s => ({ ...s, estimatedChapters: Math.max(1, parseInt(e.target.value) || 1) }))}
+                      className="h-7 text-xs text-center"
+                      min="1"
+                    />
                     <Button 
                       variant="outline" 
                       size="sm" 
