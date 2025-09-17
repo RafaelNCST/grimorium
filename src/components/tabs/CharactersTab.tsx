@@ -177,12 +177,13 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
     return matchesSearch && matchesOrg && matchesLocation;
   });
 
-  // Statistics - by alignment instead of role
-  const alignmentStats = {
+  // Statistics - by role
+  const roleStats = {
     total: characters.length,
-    bem: characters.filter(c => c.alignment === "bem").length,
-    neutro: characters.filter(c => c.alignment === "neutro").length,
-    caotico: characters.filter(c => c.alignment === "caotico").length
+    protagonista: characters.filter(c => c.role === "protagonista").length,
+    antagonista: characters.filter(c => c.role === "antagonista").length,
+    secundario: characters.filter(c => c.role === "secundario").length,
+    vilao: characters.filter(c => c.role === "vilao").length
   };
 
   const handleCharacterCreated = (newCharacter: any) => {
@@ -195,16 +196,17 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header with compact alignment stats */}
+      {/* Header with compact role stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Personagens</h2>
           <p className="text-muted-foreground">Gerencie os personagens da sua história</p>
           <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{alignmentStats.total} Total</Badge>
-            <Badge className="bg-success/10 text-success">{alignmentStats.bem} Bem</Badge>
-            <Badge className="bg-secondary/10 text-secondary-foreground">{alignmentStats.neutro} Neutro</Badge>
-            <Badge className="bg-destructive/10 text-destructive">{alignmentStats.caotico} Caótico</Badge>
+            <Badge variant="outline">{roleStats.total} Total</Badge>
+            <Badge className="bg-accent/10 text-accent">{roleStats.protagonista} Protagonista</Badge>
+            <Badge className="bg-destructive/10 text-destructive">{roleStats.antagonista} Antagonista</Badge>
+            <Badge className="bg-primary/10 text-primary">{roleStats.secundario} Secundário</Badge>
+            <Badge className="bg-muted/50 text-muted-foreground">{roleStats.vilao} Vilão</Badge>
           </div>
         </div>
         <CreateCharacterModal

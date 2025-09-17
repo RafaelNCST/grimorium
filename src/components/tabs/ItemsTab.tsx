@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Package, Sword, Shield, Zap, Gem, Star } from "lucide-react";
-import { StatsCard } from "@/components/StatsCard";
 import { EmptyState } from "@/components/EmptyState";
 import { CreateItemModal } from "@/components/modals/CreateItemModal";
 import { useNavigate } from "react-router-dom";
@@ -161,41 +160,24 @@ export function ItemsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Header with compact rarity stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Itens</h2>
           <p className="text-muted-foreground">
             Gerencie armas, artefatos e itens importantes da sua história
           </p>
+          <div className="flex items-center gap-4 mt-2">
+            <Badge variant="outline">{items.length} Total</Badge>
+            <Badge className="bg-gray-100 text-gray-700">{items.filter(i => i.rarity.name === 'Comum').length} Comum</Badge>
+            <Badge className="bg-blue-100 text-blue-700">{items.filter(i => i.rarity.name === 'Raro').length} Raro</Badge>
+            <Badge className="bg-yellow-100 text-yellow-700">{items.filter(i => i.rarity.name === 'Lendário').length} Lendário</Badge>
+          </div>
         </div>
         <Button onClick={() => setShowCreateModal(true)} className="btn-magical">
           <Plus className="w-4 h-4 mr-2" />
           Novo Item
         </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="Total de Itens"
-          value={items.length}
-          icon={Package}
-        />
-        <StatsCard
-          title="Armas"
-          value={items.filter(i => i.category === 'Arma').length}
-          icon={Sword}
-        />
-        <StatsCard
-          title="Armaduras"
-          value={items.filter(i => i.category === 'Armadura').length}
-          icon={Shield}
-        />
-        <StatsCard
-          title="Lendários"
-          value={items.filter(i => i.rarity.name === 'Lendário').length}
-          icon={Star}
-        />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

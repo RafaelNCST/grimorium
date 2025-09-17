@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreateBeastModal } from "@/components/modals/CreateBeastModal";
-import { StatsCard } from "@/components/StatsCard";
 import { EmptyState } from "@/components/EmptyState";
 
 interface Beast {
@@ -190,41 +189,22 @@ export function BestiaryTab({ bookId }: { bookId: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header with compact threat level stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Bestiário</h2>
           <p className="text-muted-foreground">Gerencie as criaturas do seu mundo</p>
+          <div className="flex items-center gap-4 mt-2">
+            <Badge variant="outline">{beasts.length} Total</Badge>
+            <Badge className="bg-green-100 text-green-700">{beasts.filter(b => b.threatLevel.name === 'inexistente').length} Inofensivo</Badge>
+            <Badge className="bg-yellow-100 text-yellow-700">{beasts.filter(b => b.threatLevel.name === 'médio').length} Médio</Badge>
+            <Badge className="bg-red-100 text-red-700">{beasts.filter(b => ['mortal', 'apocalíptico'].includes(b.threatLevel.name)).length} Letal</Badge>
+          </div>
         </div>
         <Button onClick={() => setShowCreateModal(true)} className="btn-magical">
           <Plus className="w-4 h-4 mr-2" />
           Nova Besta
         </Button>
-      </div>
-
-      {/* Stats */}
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatsCard
-          title="Total de Bestas"
-          value={beasts.length}
-          icon={Skull}
-        />
-        <StatsCard
-          title="Ameaça Mortal+"
-          value={beasts.filter(b => ['mortal', 'apocalíptico'].includes(b.threatLevel.name)).length}
-          icon={Skull}
-        />
-        <StatsCard
-          title="Criaturas Diurnas"
-          value={beasts.filter(b => b.habit === 'diurno').length}
-          icon={Sun}
-        />
-        <StatsCard
-          title="Criaturas Noturnas"
-          value={beasts.filter(b => b.habit === 'noturno').length}
-          icon={Moon}
-        />
       </div>
 
       {/* Search and Filters */}
