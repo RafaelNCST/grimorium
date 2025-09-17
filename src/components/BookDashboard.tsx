@@ -80,14 +80,12 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility }: SortableTabProp
       <div
         ref={setNodeRef}
         style={style}
-        className={`flex items-center gap-2 px-4 py-2 bg-muted border border-border rounded-md ${
+        className={`relative flex items-center gap-2 px-4 py-2 bg-muted border border-border rounded-md flex-1 min-w-0 ${
           tab.isDefault ? 'opacity-75' : ''
         } ${!tab.visible ? 'opacity-50' : ''}`}
       >
         {!tab.isDefault && (
-          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-            <GripVertical className="w-4 h-4 text-muted-foreground" />
-          </div>
+          <div {...attributes} {...listeners} className="absolute inset-0 cursor-grab active:cursor-grabbing" />
         )}
         <tab.icon className="w-4 h-4" />
         <span className="flex-1 text-sm">{tab.label}</span>
@@ -109,7 +107,7 @@ function SortableTab({ tab, isCustomizing, onToggleVisibility }: SortableTabProp
   if (!tab.visible) return null;
   
   return (
-    <TabsTrigger value={tab.id} className="flex items-center gap-2 py-3">
+    <TabsTrigger value={tab.id} className="flex items-center gap-2 py-3 flex-1">
       <tab.icon className="w-4 h-4" />
       <span className="hidden sm:inline">{tab.label}</span>
     </TabsTrigger>
@@ -475,7 +473,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext items={tabs.map(tab => tab.id)} strategy={horizontalListSortingStrategy}>
-                  <div className="flex flex-wrap gap-2 p-1 bg-muted/50 rounded-md border">
+                  <div className="flex gap-2 p-1 bg-muted/50 rounded-md border overflow-x-auto">
                     {tabs.map((tab) => (
                       <SortableTab
                         key={tab.id}
@@ -490,7 +488,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
             </div>
           ) : (
             <div className="px-6">
-              <TabsList className={`w-full h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground ${isHeaderHidden ? 'mt-4' : 'mt-6'}`}>
+              <TabsList className={`w-full h-10 flex items-center justify-start rounded-md bg-muted p-1 text-muted-foreground ${isHeaderHidden ? 'mt-4' : 'mt-6'}`}>
                 {visibleTabs.map((tab) => (
                   <SortableTab
                     key={tab.id}
