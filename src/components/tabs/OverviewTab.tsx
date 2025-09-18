@@ -20,6 +20,7 @@ interface Book {
 interface OverviewTabProps {
   book: Book;
   bookId: string;
+  isCustomizing?: boolean;
 }
 
 interface StickyNote {
@@ -70,7 +71,7 @@ const getBookStickyNotes = (bookId: string): StickyNote[] => {
   return [];
 };
 
-export function OverviewTab({ book, bookId }: OverviewTabProps) {
+export function OverviewTab({ book, bookId, isCustomizing = false }: OverviewTabProps) {
   const { t } = useLanguage();
   const [isEditingGoals, setIsEditingGoals] = useState(false);
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
@@ -265,6 +266,7 @@ const [newNote, setNewNote] = useState("");
               size="icon" 
               onClick={() => setIsEditingProgress(!isEditingProgress)}
               className="h-6 w-6"
+              disabled={isCustomizing}
             >
               <Edit2 className="w-3 h-3" />
             </Button>
@@ -369,6 +371,7 @@ const [newNote, setNewNote] = useState("");
               size="icon" 
               onClick={() => setIsEditingGoals(!isEditingGoals)}
               className="h-6 w-6"
+              disabled={isCustomizing}
             >
               <Edit2 className="w-3 h-3" />
             </Button>
@@ -463,6 +466,7 @@ const [newNote, setNewNote] = useState("");
               size="icon" 
               onClick={() => setIsEditingAuthorSummary(!isEditingAuthorSummary)}
               className="h-6 w-6"
+              disabled={isCustomizing}
             >
               <Edit2 className="w-3 h-3" />
             </Button>
@@ -499,6 +503,7 @@ const [newNote, setNewNote] = useState("");
               size="icon" 
               onClick={() => setIsEditingStorySummary(!isEditingStorySummary)}
               className="h-6 w-6"
+              disabled={isCustomizing}
             >
               <Edit2 className="w-3 h-3" />
             </Button>
@@ -538,16 +543,16 @@ const [newNote, setNewNote] = useState("");
         <CardContent>
           <div 
             className="relative min-h-[300px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4"
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
+            onDragOver={isCustomizing ? undefined : handleDragOver}
+            onDrop={isCustomizing ? undefined : handleDrop}
           >
             {stickyNotes.map((note) => (
               <div
                 key={note.id}
                 className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-all duration-200 ${note.color}`}
                 style={{ left: note.x, top: note.y }}
-                draggable
-                onDragStart={(e) => handleDragStart(e, note.id)}
+                draggable={!isCustomizing}
+                onDragStart={(e) => !isCustomizing && handleDragStart(e, note.id)}
               >
                 {/* Pushpin effect */}
                 <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
@@ -563,6 +568,7 @@ const [newNote, setNewNote] = useState("");
                         setEditingNote(note.id);
                         setEditContent(note.content);
                       }}
+                      disabled={isCustomizing}
                     >
                       <Edit2 className="w-3 h-3" />
                     </Button>
@@ -571,6 +577,7 @@ const [newNote, setNewNote] = useState("");
                       size="icon" 
                       className="h-6 w-6 hover:bg-black/10"
                       onClick={() => handleDeleteNote(note.id)}
+                      disabled={isCustomizing}
                     >
                       <Trash2 className="w-3 h-3" />
                     </Button>
@@ -609,10 +616,12 @@ const [newNote, setNewNote] = useState("");
                   </div>
                 ) : (
                   <p 
-                    className="text-xs leading-relaxed font-handwriting cursor-pointer"
+                    className={`text-xs leading-relaxed font-handwriting ${isCustomizing ? 'cursor-default' : 'cursor-pointer'}`}
                     onClick={() => {
-                      setEditingNote(note.id);
-                      setEditContent(note.content);
+                      if (!isCustomizing) {
+                        setEditingNote(note.id);
+                        setEditContent(note.content);
+                      }
                     }}
                   >
                     {note.content}
@@ -628,8 +637,9 @@ const [newNote, setNewNote] = useState("");
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               className="min-h-[60px]"
+              disabled={isCustomizing}
             />
-            <Button variant="outline" onClick={handleAddNote}>
+            <Button variant="outline" onClick={handleAddNote} disabled={isCustomizing}>
               <Plus className="w-4 h-4" />
             </Button>
           </div>

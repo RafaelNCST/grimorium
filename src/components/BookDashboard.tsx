@@ -508,7 +508,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
 
           <div className="px-6 mt-6 pb-6">
             <TabsContent value="overview" className="mt-0">
-              <OverviewTab book={book} bookId={bookId} />
+              <OverviewTab book={book} bookId={bookId} isCustomizing={isCustomizing} />
             </TabsContent>
               <TabsContent value="characters" className="mt-0">
                 <CharactersTab bookId={bookId} />
