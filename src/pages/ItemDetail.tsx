@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Edit, Save, X, Plus, Trash, Clock, BookOpen } from "lucide-react";
+import { ArrowLeft, Edit, Save, X, Plus, Trash, Clock, BookOpen, FileText } from "lucide-react";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { LinkedNotesModal } from "@/components/annotations/LinkedNotesModal";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { useToast } from "@/hooks/use-toast";
 
@@ -99,6 +100,7 @@ export default function ItemDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newMythologyPeople, setNewMythologyPeople] = useState("");
   const [newMythologyVersion, setNewMythologyVersion] = useState("");
+  const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
   if (!item) {
     return (
@@ -159,6 +161,18 @@ export default function ItemDetail() {
     navigate(`/item/${id}/timeline`);
   };
 
+  // Mock linked notes - in real app would come from API/state
+  const linkedNotes = [
+    {
+      id: "note-1",
+      name: "Lendas sobre Excalibur",
+      content: "Compilação das diferentes versões da lenda de Excalibur encontradas em diversos textos antigos...",
+      createdAt: new Date('2024-01-12'),
+      updatedAt: new Date('2024-01-18'),
+      linkCreatedAt: new Date('2024-01-14')
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -170,6 +184,10 @@ export default function ItemDetail() {
           </Button>
           
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setIsLinkedNotesModalOpen(true)}>
+              <FileText className="w-4 h-4 mr-2" />
+              Anotações ({linkedNotes.length})
+            </Button>
             <Button variant="outline" onClick={handleOpenTimeline}>
               <Clock className="w-4 h-4 mr-2" />
               Timeline

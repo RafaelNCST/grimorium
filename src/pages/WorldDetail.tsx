@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, Plus, StickyNote, MapPin, Mountain, Globe, TreePine, Castle, Home, Upload, X } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Plus, StickyNote, MapPin, Mountain, Globe, TreePine, Castle, Home, Upload, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { LinkedNotesModal } from "@/components/annotations/LinkedNotesModal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -126,6 +127,7 @@ export function WorldDetail() {
       color: "bg-blue-200"
     }
   ]);
+  const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
   useEffect(() => {
     const entity = mockWorldEntities.find(e => e.id === worldId);
@@ -225,6 +227,32 @@ export function WorldDetail() {
     setStickyNotes([...stickyNotes, newNote]);
   };
 
+  // Mock linked notes - in real app would come from API/state  
+  const linkedNotes = [
+    {
+      id: "note-1",
+      name: "História Antiga de Aethermoor",
+      content: "Detalhes sobre a fundação do mundo e os eventos que moldaram sua história ao longo dos milênios...",
+      createdAt: new Date('2024-01-05'),
+      updatedAt: new Date('2024-01-10'),
+      linkCreatedAt: new Date('2024-01-07')
+    },
+    {
+      id: "note-2",
+      name: "Geografia e Clima",
+      content: "Análise detalhada dos biomas, sistemas climáticos e características geográficas do mundo...",
+      createdAt: new Date('2024-01-08'),
+      updatedAt: new Date('2024-01-12'),
+      linkCreatedAt: new Date('2024-01-09')
+    }
+  ];
+
+  const getEntityTypeForModal = () => {
+    if (character.type === "World") return "world";
+    if (character.type === "Continent") return "continent";
+    return "location";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -260,6 +288,10 @@ export function WorldDetail() {
                 </>
               ) : (
                 <>
+                  <Button variant="outline" onClick={() => setIsLinkedNotesModalOpen(true)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Anotações ({linkedNotes.length})
+                  </Button>
                   <Button variant="outline" onClick={() => setIsEditing(true)}>
                     <Edit2 className="w-4 h-4 mr-2" />
                     Editar

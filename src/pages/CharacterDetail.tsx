@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu, User, UserCheck, Users2, Ban, HelpCircle } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu, User, UserCheck, Users2, Ban, HelpCircle, FileText } from "lucide-react";
 import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { LinkedNotesModal } from "@/components/annotations/LinkedNotesModal";
 import { toast } from "sonner";
 
 // Mock data - in real app this would come from state management
@@ -164,6 +165,7 @@ export function CharacterDetail() {
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
+  const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -349,6 +351,26 @@ export function CharacterDetail() {
     window.location.replace(`/book/1/character/${characterId}`);
   };
 
+  // Mock linked notes - in real app would come from API/state
+  const linkedNotes = [
+    {
+      id: "note-1",
+      name: "Análise Psicológica do Aelric",
+      content: "Análise detalhada da personalidade e motivações do personagem Aelric. Suas características heróicas contrastam com sua impulsividade...",
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-20'),
+      linkCreatedAt: new Date('2024-01-16')
+    },
+    {
+      id: "note-2", 
+      name: "Arco Narrativo - Primeira Jornada",
+      content: "Desenvolvimento do personagem durante sua primeira aventura. Como ele evolui de pastor simples para herói...",
+      createdAt: new Date('2024-01-10'),
+      updatedAt: new Date('2024-01-18'),
+      linkCreatedAt: new Date('2024-01-12')
+    }
+  ];
+
   return (
     <div className="flex min-h-screen">
       <CharacterNavigationSidebar
@@ -398,6 +420,10 @@ export function CharacterDetail() {
             </>
           ) : (
             <>
+              <Button variant="outline" onClick={() => setIsLinkedNotesModalOpen(true)}>
+                <FileText className="w-4 h-4 mr-2" />
+                Anotações ({linkedNotes.length})
+              </Button>
               <Button variant="outline" onClick={() => setIsEditing(true)}>
                 <Edit2 className="w-4 h-4 mr-2" />
                 Editar

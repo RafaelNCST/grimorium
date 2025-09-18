@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, FolderOpen, Plus, Edit2, Trash2, Folder, ArrowLeft, AlertTriangle } from "lucide-react";
+import { FileText, FolderOpen, Plus, Edit2, Trash2, Folder, ArrowLeft, AlertTriangle, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { toast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { EntityLinksModal } from "@/components/annotations/EntityLinksModal";
+import { AnnotationLink } from "@/types/annotations";
 
 interface NotesTabProps {
   bookId: string;
@@ -22,6 +24,7 @@ interface NoteFile {
   parentId?: string;
   createdAt: Date;
   updatedAt: Date;
+  links?: AnnotationLink[];
 }
 
 interface NoteFolder {
@@ -87,6 +90,8 @@ export function NotesTab({ bookId }: NotesTabProps) {
   const [newFolderName, setNewFolderName] = useState('');
   const [editingFolder, setEditingFolder] = useState<string | null>(null);
   const [editFolderName, setEditFolderName] = useState('');
+  const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
+  const [selectedFileForLinks, setSelectedFileForLinks] = useState<NoteFile | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<NoteItem | null>(null);
 
@@ -252,6 +257,23 @@ export function NotesTab({ bookId }: NotesTabProps) {
     });
   };
 
+  const handleOpenLinksModal = (file: NoteFile) => {
+    setSelectedFileForLinks(file);
+    setIsLinksModalOpen(true);
+  };
+
+  const handleLinksChange = (links: AnnotationLink[]) => {
+    if (selectedFileForLinks) {
+      setNotes(prevNotes => 
+        prevNotes.map(note => 
+          note.id === selectedFileForLinks.id && note.type === 'file'
+            ? { ...note, links }
+            : note
+        )
+      );
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -385,14 +407,18 @@ export function NotesTab({ bookId }: NotesTabProps) {
                     ) : (
                       <>
                         <CardTitle className="text-base truncate">{item.name}</CardTitle>
-                        <p className="text-xs text-muted-foreground">
-                          Criado: {item.createdAt.toLocaleDateString()}
-                          <br />
-                          Modificado: {item.type === 'folder' 
-                            ? (item as NoteFolder).updatedAt.toLocaleDateString()
-                            : (item as NoteFile).updatedAt.toLocaleDateString()
-                          }
-                        </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <span>Criado: {new Date(item.createdAt).toLocaleDateString('pt-BR')}</span>
+                      <span>Editado: {new Date(item.updatedAt).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    {item.type === 'file' && (item as NoteFile).links && (item as NoteFile).links!.length > 0 && (
+                      <div className="flex items-center gap-1 text-primary">
+                        <Link className="w-3 h-3" />
+                        <span>{(item as NoteFile).links!.length}</span>
+                      </div>
+                    )}
+                  </div>
                       </>
                     )}
                   </div>
@@ -467,6 +493,21 @@ export function NotesTab({ bookId }: NotesTabProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Entity Links Modal */}
+      {selectedFileForLinks && (
+        <EntityLinksModal
+          isOpen={isLinksModalOpen}
+          onClose={() => {
+            setIsLinksModalOpen(false);
+            setSelectedFileForLinks(null);
+          }}
+          noteId={selectedFileForLinks.id}
+          noteName={selectedFileForLinks.name}
+          currentLinks={selectedFileForLinks.links || []}
+          onLinksChange={handleLinksChange}
+        />
+      )}
     </div>
   );
 }

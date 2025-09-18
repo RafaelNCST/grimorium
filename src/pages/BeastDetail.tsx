@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, Upload, Plus, Minus, Shield, Skull, Sun, Moon, TreePine, Sword, Camera } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Upload, Plus, Minus, Shield, Skull, Sun, Moon, TreePine, Sword, Camera, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { LinkedNotesModal } from "@/components/annotations/LinkedNotesModal";
 import { toast } from "sonner";
 
 // Mock beast data
@@ -77,6 +78,7 @@ export function BeastDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newMythology, setNewMythology] = useState({ people: "", version: "" });
   const [isAddingMythology, setIsAddingMythology] = useState(false);
+  const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
   const getThreatLevelIcon = (threatLevel: string) => {
     switch (threatLevel) {
@@ -174,6 +176,18 @@ export function BeastDetail() {
 
   const currentData = isEditing ? editedBeast : beast;
 
+  // Mock linked notes - in real app would come from API/state
+  const linkedNotes = [
+    {
+      id: "note-1",
+      name: "Comportamento Noturno dos Dragões",
+      content: "Observações sobre os padrões de comportamento dos dragões durante a noite. O Dragão Sombrio mostra características únicas...",
+      createdAt: new Date('2024-01-10'),
+      updatedAt: new Date('2024-01-15'),
+      linkCreatedAt: new Date('2024-01-12')
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -197,6 +211,10 @@ export function BeastDetail() {
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <>
+                <Button variant="outline" onClick={() => setIsLinkedNotesModalOpen(true)}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Anotações ({linkedNotes.length})
+                </Button>
                 <Button variant="outline" onClick={() => setIsEditing(true)}>
                   <Edit2 className="w-4 h-4 mr-2" />
                   Editar

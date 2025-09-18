@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Save, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EntityLinksModal } from "@/components/annotations/EntityLinksModal";
+import { AnnotationLink } from "@/types/annotations";
 
 interface NoteFile {
   id: string;
@@ -16,6 +18,7 @@ interface NoteFile {
   parentId?: string;
   createdAt: Date;
   updatedAt: Date;
+  links?: AnnotationLink[];
 }
 
 const mockFiles: NoteFile[] = [
@@ -27,6 +30,7 @@ const mockFiles: NoteFile[] = [
     parentId: '1',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-20'),
+    links: []
   },
   {
     id: '4',
@@ -36,6 +40,7 @@ const mockFiles: NoteFile[] = [
     parentId: '3',
     createdAt: new Date('2024-01-12'),
     updatedAt: new Date('2024-01-18'),
+    links: []
   },
 ];
 
@@ -48,6 +53,7 @@ export default function FileEditor() {
   const [editName, setEditName] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
   useEffect(() => {
     // Find the file by ID
@@ -95,14 +101,15 @@ export default function FileEditor() {
     navigate(`/book/${bookId}`);
   };
 
-  const handleBack = () => {
-    if (hasUnsavedChanges && isEditing) {
-      if (confirm("Você tem alterações não salvas. Deseja sair mesmo assim?")) {
-        navigate(`/book/${bookId}`);
-      }
-    } else {
-      navigate(`/book/${bookId}`);
+  const handleLinksChange = (links: AnnotationLink[]) => {
+    if (file) {
+      const updatedFile = { ...file, links };
+      setFile(updatedFile);
     }
+  };
+
+  const handleBackToNotes = () => {
+    navigate(`/book/${bookId || '1'}`);
   };
 
   const formatText = (text: string) => {
@@ -131,7 +138,7 @@ export default function FileEditor() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={handleBack}>
+              <Button variant="ghost" size="icon" onClick={handleBackToNotes}>
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex-1">
@@ -153,6 +160,12 @@ export default function FileEditor() {
             </div>
             
             <div className="flex items-center gap-2">
+              {!isEditing && (
+                <Button variant="outline" onClick={() => setIsLinksModalOpen(true)}>
+                  <Link className="w-4 h-4 mr-2" />
+                  Links ({file.links?.length || 0})
+                </Button>
+              )}
               {isEditing ? (
                 <>
                   <Button onClick={handleSave} disabled={!hasUnsavedChanges}>
@@ -216,6 +229,16 @@ export default function FileEditor() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Entity Links Modal */}
+      <EntityLinksModal
+        isOpen={isLinksModalOpen}
+        onClose={() => setIsLinksModalOpen(false)}
+        noteId={file.id}
+        noteName={file.name}
+        currentLinks={file.links || []}
+        onLinksChange={handleLinksChange}
+      />
     </div>
   );
 }
