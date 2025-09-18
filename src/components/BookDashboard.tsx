@@ -319,7 +319,12 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsCustomizing(!isCustomizing)}
+                onClick={() => {
+                  if (!isCustomizing) {
+                    setActiveTab("overview");
+                  }
+                  setIsCustomizing(!isCustomizing);
+                }}
                 className={`hover:bg-muted ${isCustomizing ? 'bg-primary/10 text-primary' : ''}`}
                 title={isCustomizing ? 'Sair do modo personalizar' : 'Personalizar abas'}
               >
