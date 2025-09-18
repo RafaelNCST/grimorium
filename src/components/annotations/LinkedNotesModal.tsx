@@ -70,7 +70,7 @@ export function LinkedNotesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh]" aria-describedby="linked-notes-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {getEntityIcon()}
@@ -78,6 +78,10 @@ export function LinkedNotesModal({
             <Badge variant="outline">{getEntityTypeName()}</Badge>
           </DialogTitle>
         </DialogHeader>
+        
+        <div id="linked-notes-description" className="sr-only">
+          Modal para visualizar e gerenciar anotações linkadas à entidade {entityName}
+        </div>
 
         <ScrollArea className="h-[60vh] pr-4">
           {linkedNotes.length === 0 ? (

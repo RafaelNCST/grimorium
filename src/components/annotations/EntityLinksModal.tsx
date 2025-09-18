@@ -120,13 +120,17 @@ export function EntityLinksModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh]" aria-describedby="entity-links-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Link className="w-5 h-5" />
             Gerenciar Links - {noteName}
           </DialogTitle>
         </DialogHeader>
+        
+        <div id="entity-links-description" className="sr-only">
+          Modal para gerenciar links entre a anotação {noteName} e outras entidades do projeto
+        </div>
 
         <div className="space-y-4">
           {/* Current Links Summary */}

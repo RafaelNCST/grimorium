@@ -363,9 +363,9 @@ export function NotesTab({ bookId }: NotesTabProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {getCurrentItems().map((item) => (
-          <Card key={item.id} className="hover:shadow-md transition-shadow cursor-pointer group">
+          <Card key={item.id} className="hover:shadow-md transition-shadow cursor-pointer group relative">
             <CardHeader className="pb-3">
-              <div className="flex flex-col items-center justify-center text-center gap-3">
+              <div className="flex flex-col items-center justify-center text-center gap-3 relative">
                 <div 
                   className="flex flex-col items-center gap-2 flex-1 w-full"
                   onClick={() => {
@@ -405,27 +405,65 @@ export function NotesTab({ bookId }: NotesTabProps) {
                         </div>
                       </div>
                     ) : (
-                      <>
+                      <div className="space-y-2">
                         <CardTitle className="text-base truncate">{item.name}</CardTitle>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <span>Criado: {new Date(item.createdAt).toLocaleDateString('pt-BR')}</span>
-                      <span>Editado: {new Date(item.updatedAt).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                    {item.type === 'file' && (item as NoteFile).links && (item as NoteFile).links!.length > 0 && (
-                      <div className="flex items-center gap-1 text-primary">
-                        <Link className="w-3 h-3" />
-                        <span>{(item as NoteFile).links!.length}</span>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <div className="flex flex-col gap-1">
+                            <span>Criado: {new Date(item.createdAt).toLocaleDateString('pt-BR')}</span>
+                            <span>Editado: {new Date(item.updatedAt).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                          {item.type === 'file' && (item as NoteFile).links && (item as NoteFile).links!.length > 0 && (
+                            <div className="flex items-center gap-1 text-primary">
+                              <Link className="w-3 h-3" />
+                              <span>{(item as NoteFile).links!.length}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                      </>
                     )}
                   </div>
                 </div>
                 
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {item.type === 'folder' && editingFolder !== item.id && (
+                {/* Overlay para arquivos */}
+                {item.type === 'file' && (
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/book/${bookId}/file/${item.id}`);
+                      }}
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenLinksModal(item);
+                      }}
+                      className="text-white hover:bg-white/20"
+                    >
+                      <Link className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmDelete(item);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+                
+                {/* Botões para pastas */}
+                {item.type === 'folder' && editingFolder !== item.id && (
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -433,22 +471,23 @@ export function NotesTab({ bookId }: NotesTabProps) {
                         e.stopPropagation();
                         handleEditFolder(item as NoteFolder);
                       }}
+                      className="h-8 w-8"
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
-                  )}
-                  
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      confirmDelete(item);
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        confirmDelete(item);
+                      }}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardHeader>
           </Card>

@@ -420,7 +420,10 @@ export function CharacterDetail() {
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsLinkedNotesModalOpen(true)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsLinkedNotesModalOpen(true)}
+              >
                 <FileText className="w-4 h-4 mr-2" />
                 Anotações ({linkedNotes.length})
               </Button>
@@ -1301,6 +1304,15 @@ export function CharacterDetail() {
         itemName={character.name}
         itemType="personagem"
        />
+
+      <LinkedNotesModal
+        isOpen={isLinkedNotesModalOpen}
+        onClose={() => setIsLinkedNotesModalOpen(false)}
+        entityId={character.id}
+        entityName={character.name}
+        entityType="character"
+        linkedNotes={linkedNotes}
+      />
         </div>
       </div>
     </div>
