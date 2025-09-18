@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Edit, Save, X, Plus, Trash, Clock, BookOpen } from "lucide-react";
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
 import { RichTextEditor } from "@/components/RichTextEditor";
@@ -201,93 +200,189 @@ export default function ItemDetail() {
           </div>
         </div>
 
-        {/* Item Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-1">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Image and Quick Info */}
+          <div className="space-y-6">
+            {/* Image */}
+            <Card>
+              <CardContent className="p-0">
+                <div className="aspect-square w-full overflow-hidden rounded-lg">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Informações Rápidas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Categoria:</span>
+                  <Badge variant="outline">{item.category}</Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Raridade:</span>
+                  <Badge 
+                    variant="secondary"
+                    style={{ 
+                      backgroundColor: item.rarity.color + '20',
+                      color: item.rarity.color,
+                      border: `1px solid ${item.rarity.color}40`
+                    }}
+                  >
+                    <span className="mr-1">{item.rarity.icon}</span>
+                    {item.rarity.name}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Status:</span>
+                  <Badge variant="outline">
+                    <span className="mr-1 text-lg">{item.status.icon}</span>
+                    {item.status.name}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          
-          <div className="lg:col-span-2 space-y-4">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nome</Label>
-                  <Input
-                    id="name"
-                    value={item.name}
-                    onChange={(e) => setItem({ ...item, name: e.target.value })}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="alternativeNames">Nomes Alternativos</Label>
-                  <Input
-                    id="alternativeNames"
-                    value={item.alternativeNames.join(", ")}
-                    onChange={(e) => setItem({ 
-                      ...item, 
-                      alternativeNames: e.target.value.split(", ").filter(n => n.trim()) 
-                    })}
-                    placeholder="Separados por vírgula"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{item.name}</h1>
-                {item.alternativeNames.length > 0 && (
-                  <p className="text-lg text-muted-foreground mb-4">
-                    Também conhecido como: {item.alternativeNames.join(", ")}
-                  </p>
+
+          {/* Right Column - Detailed Information */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Basic Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações Básicas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Nome</Label>
+                      <Input
+                        id="name"
+                        value={item.name}
+                        onChange={(e) => setItem({ ...item, name: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="alternativeNames">Nomes Alternativos</Label>
+                      <Input
+                        id="alternativeNames"
+                        value={item.alternativeNames.join(", ")}
+                        onChange={(e) => setItem({ 
+                          ...item, 
+                          alternativeNames: e.target.value.split(", ").filter(n => n.trim()) 
+                        })}
+                        placeholder="Separados por vírgula"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <div>
+                        <Label>Categoria</Label>
+                        <Select 
+                          value={item.category} 
+                          onValueChange={(value) => setItem({ ...item, category: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map(category => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>Raridade</Label>
+                        <Select 
+                          value={item.rarity.id} 
+                          onValueChange={(value) => {
+                            const rarity = mockRarities.find(r => r.id === value);
+                            if (rarity) setItem({ ...item, rarity });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {mockRarities.map(rarity => (
+                              <SelectItem key={rarity.id} value={rarity.id}>
+                                <div className="flex items-center gap-2">
+                                  <span>{rarity.icon}</span>
+                                  <span>{rarity.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>Status</Label>
+                        <Select 
+                          value={item.status.id} 
+                          onValueChange={(value) => {
+                            const status = mockStatuses.find(s => s.id === value);
+                            if (status) setItem({ ...item, status });
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {mockStatuses.map(status => (
+                              <SelectItem key={status.id} value={status.id}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">{status.icon}</span>
+                                  <span>{status.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="basicDescription">Descrição Básica</Label>
+                      <Textarea
+                        id="basicDescription"
+                        value={item.basicDescription}
+                        onChange={(e) => setItem({ ...item, basicDescription: e.target.value })}
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-2xl">{item.name}</h3>
+                      {item.alternativeNames.length > 0 && (
+                        <p className="text-muted-foreground mt-1">
+                          Também conhecido como: {item.alternativeNames.join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground">{item.basicDescription}</p>
+                  </div>
                 )}
-              </div>
-            )}
+              </CardContent>
+            </Card>
 
-            <div className="flex flex-wrap gap-3">
-              <Badge variant="outline">{item.category}</Badge>
-              <Badge 
-                variant="secondary"
-                style={{ 
-                  backgroundColor: item.rarity.color + '20',
-                  color: item.rarity.color,
-                  border: `1px solid ${item.rarity.color}40`
-                }}
-              >
-                <span className="mr-1">{item.rarity.icon}</span>
-                {item.rarity.name}
-              </Badge>
-              <Badge variant="outline">
-                <span className="mr-1 text-lg">{item.status.icon}</span>
-                {item.status.name}
-              </Badge>
-            </div>
-
-            {isEditing ? (
-              <Textarea
-                value={item.basicDescription}
-                onChange={(e) => setItem({ ...item, basicDescription: e.target.value })}
-                rows={3}
-              />
-            ) : (
-              <p className="text-lg">{item.basicDescription}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Detailed Information */}
-        <Tabs defaultValue="details" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="details">Detalhes</TabsTrigger>
-            <TabsTrigger value="powers">Poderes & Fraquezas</TabsTrigger>
-            <TabsTrigger value="mythology">Mitologia</TabsTrigger>
-            <TabsTrigger value="notes">Anotações</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details" className="space-y-6">
+            {/* Appearance and Origin */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -301,7 +396,7 @@ export default function ItemDetail() {
                       rows={4}
                     />
                   ) : (
-                    <p>{item.appearanceDescription}</p>
+                    <p className="text-muted-foreground">{item.appearanceDescription}</p>
                   )}
                 </CardContent>
               </Card>
@@ -318,87 +413,13 @@ export default function ItemDetail() {
                       rows={4}
                     />
                   ) : (
-                    <p>{item.origin}</p>
+                    <p className="text-muted-foreground">{item.origin}</p>
                   )}
                 </CardContent>
               </Card>
             </div>
 
-            {isEditing && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label>Categoria</Label>
-                  <Select 
-                    value={item.category} 
-                    onValueChange={(value) => setItem({ ...item, category: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Raridade</Label>
-                  <Select 
-                    value={item.rarity.id} 
-                    onValueChange={(value) => {
-                      const rarity = mockRarities.find(r => r.id === value);
-                      if (rarity) setItem({ ...item, rarity });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockRarities.map(rarity => (
-                        <SelectItem key={rarity.id} value={rarity.id}>
-                          <div className="flex items-center gap-2">
-                            <span>{rarity.icon}</span>
-                            <span>{rarity.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Status</Label>
-                  <Select 
-                    value={item.status.id} 
-                    onValueChange={(value) => {
-                      const status = mockStatuses.find(s => s.id === value);
-                      if (status) setItem({ ...item, status });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockStatuses.map(status => (
-                        <SelectItem key={status.id} value={status.id}>
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{status.icon}</span>
-                            <span>{status.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="powers" className="space-y-6">
+            {/* Powers and Weaknesses */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -412,7 +433,7 @@ export default function ItemDetail() {
                       rows={6}
                     />
                   ) : (
-                    <p className="whitespace-pre-wrap">{item.powers}</p>
+                    <p className="whitespace-pre-wrap text-muted-foreground">{item.powers}</p>
                   )}
                 </CardContent>
               </Card>
@@ -429,14 +450,13 @@ export default function ItemDetail() {
                       rows={6}
                     />
                   ) : (
-                    <p className="whitespace-pre-wrap">{item.weaknesses}</p>
+                    <p className="whitespace-pre-wrap text-muted-foreground">{item.weaknesses}</p>
                   )}
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
 
-          <TabsContent value="mythology" className="space-y-6">
+            {/* Mythology */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -459,7 +479,7 @@ export default function ItemDetail() {
                         </Button>
                       )}
                     </div>
-                    <p className="text-sm">{entry.version}</p>
+                    <p className="text-sm text-muted-foreground">{entry.version}</p>
                   </div>
                 ))}
 
@@ -487,30 +507,37 @@ export default function ItemDetail() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="notes" className="space-y-6">
+            {/* Notes */}
             <Card>
               <CardHeader>
-                <CardTitle>Inspirações & Anotações</CardTitle>
+                <CardTitle>Anotações</CardTitle>
               </CardHeader>
               <CardContent>
                 {isEditing ? (
                   <RichTextEditor
                     content={item.inspirations}
                     onChange={(content) => setItem({ ...item, inspirations: content })}
-                    placeholder="Adicione suas inspirações, links, referências e ideias..."
+                    placeholder="Adicione suas anotações sobre este item..."
                   />
                 ) : (
-                  <div 
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: item.inspirations }}
-                  />
+                  <div className="min-h-[200px] p-4 border rounded-lg bg-muted/20">
+                    {item.inspirations ? (
+                      <div 
+                        className="prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ __html: item.inspirations }}
+                      />
+                    ) : (
+                      <p className="text-muted-foreground text-center">
+                        Nenhuma anotação ainda. Clique em "Editar" para adicionar.
+                      </p>
+                    )}
+                  </div>
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
         <ConfirmDeleteModal
           open={showDeleteModal}
