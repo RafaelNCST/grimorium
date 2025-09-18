@@ -273,7 +273,13 @@ export function NotesTab({ bookId }: NotesTabProps) {
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base truncate">{item.name}</CardTitle>
                     <p className="text-xs text-muted-foreground">
-                      {item.createdAt.toLocaleDateString()}
+                      Criado: {item.createdAt.toLocaleDateString()}
+                      {item.type === 'file' && (
+                        <>
+                          <br />
+                          Modificado: {(item as NoteFile).updatedAt.toLocaleDateString()}
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -291,18 +297,6 @@ export function NotesTab({ bookId }: NotesTabProps) {
                 </Button>
               </div>
             </CardHeader>
-            
-            {item.type === 'file' && (
-              <CardContent className="pt-0">
-                <div className="text-xs text-muted-foreground line-clamp-3">
-                  <RichTextEditor 
-                    content={(item as NoteFile).content} 
-                    onChange={() => {}} 
-                    readOnly 
-                  />
-                </div>
-              </CardContent>
-            )}
           </Card>
         ))}
         
