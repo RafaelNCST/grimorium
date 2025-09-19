@@ -16,6 +16,8 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
+  DragStartEvent,
+  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -78,6 +80,116 @@ const noteColors = [
   'bg-purple-200 border-purple-400 text-purple-900 shadow-lg',
   'bg-orange-200 border-orange-400 text-orange-900 shadow-lg'
 ];
+
+// SortableNote component for draggable sticky notes
+function SortableNote({ note, editingNote, editContent, setEditingNote, setEditContent, handleEditNote, handleDeleteNote, isCustomizing }: {
+  note: StickyNote;
+  editingNote: string | null;
+  editContent: string;
+  setEditingNote: (id: string | null) => void;
+  setEditContent: (content: string) => void;
+  handleEditNote: (id: string, content: string) => void;
+  handleDeleteNote: (id: string) => void;
+  isCustomizing: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useSortable({ id: `note-${note.id}` });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    left: note.x,
+    top: note.y,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...(!isCustomizing ? listeners : {})}
+      className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-all duration-200 ${note.color} ${isCustomizing ? 'pointer-events-none' : ''} ${isDragging ? 'z-50 shadow-2xl scale-105' : ''}`}
+    >
+      {/* Pushpin effect */}
+      <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
+      
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex gap-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6 hover:bg-black/10"
+            onClick={() => {
+              setEditingNote(note.id);
+              setEditContent(note.content);
+            }}
+            disabled={isCustomizing}
+          >
+            <Edit2 className="w-3 h-3" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6 hover:bg-black/10"
+            onClick={() => handleDeleteNote(note.id)}
+            disabled={isCustomizing}
+          >
+            <Trash2 className="w-3 h-3" />
+          </Button>
+        </div>
+      </div>
+      
+      {editingNote === note.id ? (
+        <div className="space-y-2">
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            className="w-full p-2 text-xs bg-transparent border border-black/20 rounded resize-none"
+            rows={3}
+            autoFocus
+          />
+          <div className="flex gap-1">
+            <Button 
+              size="sm" 
+              className="text-xs h-6"
+              onClick={() => {
+                handleEditNote(note.id, editContent);
+                setEditingNote(null);
+              }}
+            >
+              Salvar
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-6"
+              onClick={() => setEditingNote(null)}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <p 
+          className={`text-xs leading-relaxed font-handwriting ${isCustomizing ? 'cursor-default' : 'cursor-pointer'}`}
+          onClick={() => {
+            if (!isCustomizing) {
+              setEditingNote(note.id);
+              setEditContent(note.content);
+            }
+          }}
+        >
+          {note.content}
+        </p>
+      )}
+    </div>
+  );
+}
 
 function SortableSection({ section, isCustomizing, children, onToggleVisibility }: { 
   section: Section; 
@@ -181,10 +293,11 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
-  const [draggedNote, setDraggedNote] = useState<string | null>(null);
+  const [draggedNoteData, setDraggedNoteData] = useState<StickyNote | null>(null);
 
   // Section management
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   
   // Mock stats
   const totalWords = 45678;
@@ -325,29 +438,41 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
     );
   };
 
-  const handleNoteDragStart = (e: React.DragEvent, noteId: string) => {
-    setDraggedNote(noteId);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleNoteDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleNoteDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (draggedNote) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      setStickyNotes(notes => 
-        notes.map(note => 
-          note.id === draggedNote ? { ...note, x, y } : note
-        )
-      );
-      setDraggedNote(null);
+  const handleNoteDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    if (active && active.id.toString().startsWith('note-')) {
+      const noteId = active.id.toString().replace('note-', '');
+      const note = stickyNotes.find(n => n.id === noteId);
+      if (note) {
+        setActiveNoteId(noteId);
+        setDraggedNoteData(note);
+      }
     }
+  };
+
+  const handleNoteDragEnd = (event: DragEndEvent) => {
+    const { active, over, delta } = event;
+    
+    if (active && active.id.toString().startsWith('note-')) {
+      const noteId = active.id.toString().replace('note-', '');
+      
+      if (over && over.id === 'notes-drop-area') {
+        // Update position based on drag delta
+        setStickyNotes(notes =>
+          notes.map(note => {
+            if (note.id === noteId) {
+              const newX = Math.max(0, note.x + delta.x);
+              const newY = Math.max(0, note.y + delta.y);
+              return { ...note, x: newX, y: newY };
+            }
+            return note;
+          })
+        );
+      }
+    }
+    
+    setActiveNoteId(null);
+    setDraggedNoteData(null);
   };
 
   // Render section components
@@ -600,94 +725,42 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div 
-          className="relative min-h-[300px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4"
-          onDragOver={isCustomizing ? undefined : handleNoteDragOver}
-          onDrop={isCustomizing ? undefined : handleNoteDrop}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleNoteDragStart}
+          onDragEnd={handleNoteDragEnd}
         >
-          {stickyNotes.map((note) => (
-            <div
-              key={note.id}
-              className={`absolute p-4 rounded-lg border-2 cursor-move min-w-[180px] max-w-[200px] transform rotate-1 hover:rotate-0 transition-all duration-200 ${note.color} ${isCustomizing ? 'pointer-events-none' : ''}`}
-              style={{ left: note.x, top: note.y }}
-              draggable={!isCustomizing}
-              onDragStart={(e) => !isCustomizing && handleNoteDragStart(e, note.id)}
+          <SortableContext items={stickyNotes.map(note => `note-${note.id}`)} strategy={verticalListSortingStrategy}>
+            <div 
+              id="notes-drop-area"
+              className="relative min-h-[300px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4"
             >
-              {/* Pushpin effect */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
-              
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex gap-1">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 hover:bg-black/10"
-                    onClick={() => {
-                      setEditingNote(note.id);
-                      setEditContent(note.content);
-                    }}
-                    disabled={isCustomizing}
-                  >
-                    <Edit2 className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 hover:bg-black/10"
-                    onClick={() => handleDeleteNote(note.id)}
-                    disabled={isCustomizing}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-              
-              {editingNote === note.id ? (
-                <div className="space-y-2">
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full p-2 text-xs bg-transparent border border-black/20 rounded resize-none"
-                    rows={3}
-                    autoFocus
-                  />
-                  <div className="flex gap-1">
-                    <Button 
-                      size="sm" 
-                      className="text-xs h-6"
-                      onClick={() => {
-                        handleEditNote(note.id, editContent);
-                        setEditingNote(null);
-                      }}
-                    >
-                      Salvar
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-xs h-6"
-                      onClick={() => setEditingNote(null)}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <p 
-                  className={`text-xs leading-relaxed font-handwriting ${isCustomizing ? 'cursor-default' : 'cursor-pointer'}`}
-                  onClick={() => {
-                    if (!isCustomizing) {
-                      setEditingNote(note.id);
-                      setEditContent(note.content);
-                    }
-                  }}
-                >
-                  {note.content}
-                </p>
-              )}
+              {stickyNotes.map((note) => (
+                <SortableNote
+                  key={note.id}
+                  note={note}
+                  editingNote={editingNote}
+                  editContent={editContent}
+                  setEditingNote={setEditingNote}
+                  setEditContent={setEditContent}
+                  handleEditNote={handleEditNote}
+                  handleDeleteNote={handleDeleteNote}
+                  isCustomizing={isCustomizing}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+          
+          <DragOverlay>
+            {activeNoteId && draggedNoteData ? (
+              <div className={`p-4 rounded-lg border-2 min-w-[180px] max-w-[200px] transform rotate-3 shadow-2xl ${draggedNoteData.color} opacity-90 animate-pulse`}>
+                <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
+                <p className="text-xs leading-relaxed font-handwriting">{draggedNoteData.content}</p>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
         
         <div className="flex gap-2">
           <Textarea
