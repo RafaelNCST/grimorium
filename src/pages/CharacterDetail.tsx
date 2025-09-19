@@ -541,14 +541,16 @@ export function CharacterDetail() {
       </div>
 
       {/* Character Version Manager */}
-      <CharacterVersionManager
-        versions={versions}
-        currentVersion={currentVersion}
-        onVersionChange={handleVersionChange}
-        onVersionSave={handleVersionSave}
-        onVersionDelete={handleVersionDelete}
-        onVersionUpdate={handleVersionUpdate}
-      />
+      <div className="mb-6">
+        <CharacterVersionManager
+          versions={versions}
+          currentVersion={currentVersion}
+          onVersionChange={handleVersionChange}
+          onVersionSave={handleVersionSave}
+          onVersionDelete={handleVersionDelete}
+          onVersionUpdate={handleVersionUpdate}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Info */}
