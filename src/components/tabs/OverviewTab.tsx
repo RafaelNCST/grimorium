@@ -753,8 +753,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={sections.filter(s => s.visible).map(s => s.id)} strategy={verticalListSortingStrategy}>
-          {sectionsWithComponents.filter(section => section.visible).map(section => (
+        <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
+          {sectionsWithComponents.map(section => (
             <SortableSection
               key={section.id}
               section={section}
