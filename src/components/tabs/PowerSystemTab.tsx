@@ -164,7 +164,7 @@ export function PowerSystemTab() {
   }, []);
 
   // Submap navigation
-  const openSubmap = useCallback((element: PowerElement) => {
+  const handleSubmapOpen = useCallback((element: PowerElement) => {
     if (!element.submapId) {
       // Create new submap
       const newSubmapId = `submap-${Date.now()}`;
@@ -281,7 +281,7 @@ export function PowerSystemTab() {
               if (isEditMode) {
                 setSelectedElement(element.id);
               } else if (element.canOpenSubmap) {
-                openSubmap(element);
+                handleSubmapOpen(element);
               }
             }}
           >
@@ -322,7 +322,7 @@ export function PowerSystemTab() {
               if (isEditMode) {
                 setSelectedElement(element.id);
               } else if (element.canOpenSubmap) {
-                openSubmap(element);
+                handleSubmapOpen(element);
               }
             }}
           >
