@@ -32,7 +32,7 @@ import {
   Upload
 } from "lucide-react";
 
-type ElementType = 'section-card' | 'submap-card' | 'visual-submap-card' | 'text-box';
+type ElementType = 'section-card' | 'details-card' | 'visual-card' | 'text-box';
 type ConnectionType = 'arrow' | 'line';
 
 interface PowerElement {
@@ -136,7 +136,7 @@ export function PowerSystemTab() {
       title: type === 'text-box' ? '' : 'Novo Elemento',
       content: type === 'text-box' ? 'Texto...' : 'Descrição...',
       color: DEFAULT_COLORS[0],
-      canOpenSubmap: type.includes('submap'),
+      canOpenSubmap: type === 'details-card' || type === 'visual-card',
       showHover: true,
       compressed: false
     };
@@ -162,6 +162,47 @@ export function PowerSystemTab() {
       connections: prev.connections.filter(conn => conn.fromId !== id && conn.toId !== id)
     }));
   }, []);
+
+  // Submap navigation
+  const openSubmap = useCallback((element: PowerElement) => {
+    if (!element.submapId) {
+      // Create new submap
+      const newSubmapId = `submap-${Date.now()}`;
+      const newSubmap: PowerMap = {
+        id: newSubmapId,
+        name: element.title || 'Novo Sub Mapa',
+        elements: [],
+        connections: [],
+        parentMapId: currentMap.id
+      };
+      
+      setMaps(prev => [...prev, newSubmap]);
+      updateElement(element.id, { submapId: newSubmapId });
+      setCurrentMap(newSubmap);
+    } else {
+      // Open existing submap
+      const existingSubmap = maps.find(map => map.id === element.submapId);
+      if (existingSubmap) {
+        setCurrentMap(existingSubmap);
+      }
+    }
+  }, [currentMap.id, maps, updateElement]);
+
+  const goBackToParent = useCallback(() => {
+    if (currentMap.parentMapId) {
+      const parentMap = maps.find(map => map.id === currentMap.parentMapId);
+      if (parentMap) {
+        setCurrentMap(parentMap);
+      } else if (currentMap.parentMapId === 'main') {
+        setCurrentMap({
+          id: 'main',
+          name: 'Sistema de Poder Principal',
+          elements: [],
+          connections: []
+        });
+      }
+    }
+  }, [currentMap.parentMapId, maps]);
 
   // Handle keyboard events
   useEffect(() => {
@@ -223,7 +264,7 @@ export function PowerSystemTab() {
           </Card>
         );
 
-      case 'submap-card':
+      case 'details-card':
         return (
           <Card 
             key={element.id}
@@ -240,7 +281,7 @@ export function PowerSystemTab() {
               if (isEditMode) {
                 setSelectedElement(element.id);
               } else if (element.canOpenSubmap) {
-                // Open submap logic here
+                openSubmap(element);
               }
             }}
           >
@@ -266,7 +307,7 @@ export function PowerSystemTab() {
           </Card>
         );
 
-      case 'visual-submap-card':
+      case 'visual-card':
         return (
           <div
             key={element.id}
@@ -281,7 +322,7 @@ export function PowerSystemTab() {
               if (isEditMode) {
                 setSelectedElement(element.id);
               } else if (element.canOpenSubmap) {
-                // Open submap logic here
+                openSubmap(element);
               }
             }}
           >
@@ -350,7 +391,7 @@ export function PowerSystemTab() {
           </div>
           
           {currentMap.parentMapId && (
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={goBackToParent}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -392,18 +433,18 @@ export function PowerSystemTab() {
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('submap-card', 100, 100)}
+                      onClick={() => createElement('details-card', 100, 100)}
                     >
                       <BookOpen className="w-6 h-6 mb-2" />
-                      Sub Mapa
+                      Card de Detalhes
                     </Button>
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('visual-submap-card', 100, 100)}
+                      onClick={() => createElement('visual-card', 100, 100)}
                     >
                       <Image className="w-6 h-6 mb-2" />
-                      Sub Mapa Visual
+                      Card Visual
                     </Button>
                     <Button
                       variant="outline"
@@ -502,15 +543,15 @@ export function PowerSystemTab() {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Sub Mapas</h4>
+              <h4 className="font-semibold mb-2">Cards de Detalhes</h4>
               <p className="text-sm text-muted-foreground">
-                Criam novos mapas quando clicados, permitindo organização hierárquica do sistema.
+                Criam novos mapas quando clicados, permitindo organização hierárquica do sistema. Incluem título, imagem opcional e descrição.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Sub Mapas Visuais</h4>
+              <h4 className="font-semibold mb-2">Cards Visuais</h4>
               <p className="text-sm text-muted-foreground">
-                Focados em imagens, ideais para representações visuais com informações no hover.
+                Focados em imagens, ideais para representações visuais. Abrem novos mapas quando clicados e mostram informações no hover.
               </p>
             </div>
             <div>
