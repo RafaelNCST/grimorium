@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit2, Trash2, MapPin, Users, Calendar, Heart, Crown, Sword, Shield, Upload, Plus, Minus, TreePine, Target, Frown, Smile, HeartHandshake, BookOpen, ChevronUp, ChevronDown, UserPlus, Menu, User, UserCheck, Users2, Ban, HelpCircle, FileText } from "lucide-react";
 import { CharacterNavigationSidebar } from "@/components/CharacterNavigationSidebar";
+import { CharacterVersionManager, type CharacterVersion } from "@/components/CharacterVersionManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -167,6 +168,19 @@ export function CharacterDetail() {
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
   
+  // Character versions state
+  const [versions, setVersions] = useState<CharacterVersion[]>([
+    {
+      id: "version-1",
+      name: "Versão Original",
+      description: "Estado inicial do personagem",
+      createdAt: new Date(),
+      isActive: true,
+      data: mockCharacter
+    }
+  ]);
+  const [currentVersion, setCurrentVersion] = useState(versions[0]);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentRole = roles.find(r => r.value === character.role);
@@ -174,8 +188,94 @@ export function CharacterDetail() {
   const currentGender = genders.find(g => g.value === character.gender);
   const RoleIcon = currentRole?.icon || Users;
 
+  // Version management functions
+  const handleVersionChange = (version: CharacterVersion) => {
+    // Update all versions to set the selected one as active
+    const updatedVersions = versions.map(v => ({
+      ...v,
+      isActive: v.id === version.id
+    }));
+    setVersions(updatedVersions);
+    setCurrentVersion(version);
+    
+    // Load the character data from the selected version
+    setCharacter(version.data);
+    setEditData({...version.data, relationships: version.data.relationships || []});
+    setImagePreview(version.data.image);
+    
+    toast.success(`Versão "${version.name}" ativada`);
+  };
+
+  const handleVersionSave = (name: string, description?: string) => {
+    // Save current character data as a new version
+    const newVersion: CharacterVersion = {
+      id: `version-${Date.now()}`,
+      name,
+      description,
+      createdAt: new Date(),
+      isActive: false,
+      data: { ...character }
+    };
+    
+    setVersions(prev => [...prev, newVersion]);
+    toast.success(`Versão "${name}" salva com sucesso!`);
+  };
+
+  const handleVersionDelete = (versionId: string) => {
+    // Don't allow deleting the last version
+    if (versions.length <= 1) {
+      toast.error("Não é possível excluir a última versão");
+      return;
+    }
+    
+    const versionToDelete = versions.find(v => v.id === versionId);
+    const updatedVersions = versions.filter(v => v.id !== versionId);
+    
+    // If deleting the active version, activate the first remaining version
+    if (versionToDelete?.isActive && updatedVersions.length > 0) {
+      updatedVersions[0].isActive = true;
+      setCurrentVersion(updatedVersions[0]);
+      setCharacter(updatedVersions[0].data);
+      setEditData({...updatedVersions[0].data, relationships: updatedVersions[0].data.relationships || []});
+      setImagePreview(updatedVersions[0].data.image);
+    }
+    
+    setVersions(updatedVersions);
+  };
+
+  const handleVersionUpdate = (versionId: string, name: string, description?: string) => {
+    const updatedVersions = versions.map(v => 
+      v.id === versionId 
+        ? { ...v, name, description }
+        : v
+    );
+    setVersions(updatedVersions);
+    
+    // Update current version if it's the one being edited
+    if (currentVersion.id === versionId) {
+      setCurrentVersion({ ...currentVersion, name, description });
+    }
+  };
+
   const handleSave = () => {
-    setCharacter(editData);
+    // Save to current version
+    const updatedCharacter = { ...editData };
+    setCharacter(updatedCharacter);
+    
+    // Update the current version's data
+    const updatedVersions = versions.map(v => 
+      v.isActive 
+        ? { ...v, data: updatedCharacter }
+        : v
+    );
+    setVersions(updatedVersions);
+    
+    // Update current version
+    const activeVersion = updatedVersions.find(v => v.isActive);
+    if (activeVersion) {
+      setCurrentVersion(activeVersion);
+    }
+    
     setIsEditing(false);
     toast.success("Personagem atualizado com sucesso!");
   };
@@ -439,6 +539,16 @@ export function CharacterDetail() {
           )}
         </div>
       </div>
+
+      {/* Character Version Manager */}
+      <CharacterVersionManager
+        versions={versions}
+        currentVersion={currentVersion}
+        onVersionChange={handleVersionChange}
+        onVersionSave={handleVersionSave}
+        onVersionDelete={handleVersionDelete}
+        onVersionUpdate={handleVersionUpdate}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Info */}
