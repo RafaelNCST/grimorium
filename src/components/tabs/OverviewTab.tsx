@@ -123,6 +123,8 @@ function SortableSection({ section, isCustomizing, children, onToggleVisibility 
             variant="outline"
             size="sm"
             className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
+            onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
             onClick={(e) => {
               e.stopPropagation();
               onToggleVisibility(section.id);
@@ -751,8 +753,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-          {sectionsWithComponents.map(section => (
+        <SortableContext items={sections.filter(s => s.visible).map(s => s.id)} strategy={verticalListSortingStrategy}>
+          {sectionsWithComponents.filter(section => section.visible).map(section => (
             <SortableSection
               key={section.id}
               section={section}
