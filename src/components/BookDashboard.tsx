@@ -26,7 +26,7 @@ import { OverviewTab } from "@/components/tabs/OverviewTab";
 import { CharactersTab } from "@/components/tabs/CharactersTab";
 import { WorldTab } from "@/components/tabs/WorldTab";
 import { OrganizationsTab } from "@/components/tabs/OrganizationsTab";
-import { MagicSystemTab } from "@/components/tabs/MagicSystemTab";
+import { PowerSystemTab } from "@/components/tabs/PowerSystemTab";
 import { EncyclopediaTab } from "@/components/tabs/EncyclopediaTab";
 import { PlotTab } from "@/components/tabs/PlotTab";
 import { BookSpeciesTab } from "@/components/tabs/BookSpeciesTab";
@@ -152,7 +152,7 @@ const defaultTabs: TabConfig[] = [
   { id: "world", label: "Mundo", icon: MapPin, visible: true },
   { id: "organizations", label: "Organizações", icon: Building, visible: true },
   { id: "plot", label: "Enredo", icon: Target, visible: true },
-  { id: "magic", label: "Sistema Mágico", icon: Sparkles, visible: true },
+  { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
   { id: "encyclopedia", label: "Enciclopédia", icon: BookOpen, visible: true },
   { id: "species", label: "Espécies", icon: Dna, visible: true },
   { id: "bestiary", label: "Bestiário", icon: Skull, visible: true },
@@ -523,7 +523,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
                 <PlotTab />
               </TabsContent>
               <TabsContent value="magic" className="mt-0">
-                <MagicSystemTab />
+                <PowerSystemTab />
               </TabsContent>
               <TabsContent value="encyclopedia" className="mt-0">
                 <EncyclopediaTab />
