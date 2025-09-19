@@ -456,19 +456,17 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
     if (active && active.id.toString().startsWith('note-')) {
       const noteId = active.id.toString().replace('note-', '');
       
-      if (over && over.id === 'notes-drop-area') {
-        // Update position based on drag delta
-        setStickyNotes(notes =>
-          notes.map(note => {
-            if (note.id === noteId) {
-              const newX = Math.max(0, note.x + delta.x);
-              const newY = Math.max(0, note.y + delta.y);
-              return { ...note, x: newX, y: newY };
-            }
-            return note;
-          })
-        );
-      }
+      // Update position based on drag delta
+      setStickyNotes(notes =>
+        notes.map(note => {
+          if (note.id === noteId) {
+            const newX = Math.max(0, note.x + delta.x);
+            const newY = Math.max(0, note.y + delta.y);
+            return { ...note, x: newX, y: newY };
+          }
+          return note;
+        })
+      );
     }
     
     setActiveNoteId(null);
@@ -752,14 +750,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
             </div>
           </SortableContext>
           
-          <DragOverlay>
-            {activeNoteId && draggedNoteData ? (
-              <div className={`p-4 rounded-lg border-2 min-w-[180px] max-w-[200px] transform rotate-3 shadow-2xl ${draggedNoteData.color} opacity-90 animate-pulse`}>
-                <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
-                <p className="text-xs leading-relaxed font-handwriting">{draggedNoteData.content}</p>
-              </div>
-            ) : null}
-          </DragOverlay>
         </DndContext>
         
         <div className="flex gap-2">
