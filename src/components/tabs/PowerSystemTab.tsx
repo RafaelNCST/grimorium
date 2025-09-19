@@ -126,6 +126,7 @@ export function PowerSystemTab() {
 
   // Element creation
   const createElement = useCallback((type: ElementType, x?: number, y?: number) => {
+    console.log('[PowerSystem] createElement clicked', { type, x, y });
     const width = type === 'text-box' ? 200 : 250;
     const height = type === 'text-box' ? 100 : 150;
 
@@ -138,9 +139,11 @@ export function PowerSystemTab() {
         const rect = canvas.getBoundingClientRect();
         posX = -viewOffset.x + rect.width / 2 - width / 2;
         posY = -viewOffset.y + rect.height / 2 - height / 2;
+        console.log('[PowerSystem] computed center position', { rect, viewOffset, posX, posY });
       } else {
         posX = 100;
         posY = 100;
+        console.log('[PowerSystem] canvas not ready, using fallback', { posX, posY });
       }
     }
 
@@ -167,6 +170,7 @@ export function PowerSystemTab() {
     }));
     setSelectedElement(id);
     setShowCreateDialog(false);
+    console.log('[PowerSystem] element added', { id, type, posX, posY });
   }, [viewOffset]);
 
   const updateElement = useCallback((id: string, updates: Partial<PowerElement>) => {
@@ -506,7 +510,7 @@ export function PowerSystemTab() {
       {/* Canvas */}
       <div 
         ref={canvasRef}
-        className="flex-1 relative overflow-hidden bg-muted/20 cursor-grab active:cursor-grabbing"
+        className="flex-1 min-h-[60vh] relative overflow-hidden bg-muted/20 cursor-grab active:cursor-grabbing"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
