@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, GripVertical, Trash2, FileText, BarChart3, Minus, Eye, EyeOff } from "lucide-react";
+import { Edit2, Target, BookOpen, TrendingUp, StickyNote, Plus, Trash2, FileText, BarChart3, Minus, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -118,7 +118,7 @@ function SortableSection({ section, isCustomizing, children, onToggleVisibility 
       {...(isCustomizing ? listeners : {})}
     >
       {isCustomizing && (
-        <div className="absolute -top-2 -right-2 z-10 flex gap-1">
+        <div className="absolute -top-2 -right-2 z-10">
           <Button
             variant="outline"
             size="sm"
@@ -130,9 +130,6 @@ function SortableSection({ section, isCustomizing, children, onToggleVisibility 
           >
             {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
           </Button>
-          <div className="flex items-center justify-center h-8 w-8 rounded-md border bg-background/90 backdrop-blur-sm">
-            <GripVertical className="w-4 h-4" />
-          </div>
         </div>
       )}
       {children}
@@ -618,7 +615,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
               <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full shadow-md border border-red-600"></div>
               
               <div className="flex items-start justify-between mb-2">
-                <GripVertical className="w-4 h-4 opacity-50" />
                 <div className="flex gap-1">
                   <Button 
                     variant="ghost" 
