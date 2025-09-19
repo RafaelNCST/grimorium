@@ -125,14 +125,34 @@ export function PowerSystemTab() {
   }, []);
 
   // Element creation
-  const createElement = useCallback((type: ElementType, x: number, y: number) => {
+  const createElement = useCallback((type: ElementType, x?: number, y?: number) => {
+    const width = type === 'text-box' ? 200 : 250;
+    const height = type === 'text-box' ? 100 : 150;
+
+    let posX = x ?? 0;
+    let posY = y ?? 0;
+
+    if (x == null || y == null) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        posX = -viewOffset.x + rect.width / 2 - width / 2;
+        posY = -viewOffset.y + rect.height / 2 - height / 2;
+      } else {
+        posX = 100;
+        posY = 100;
+      }
+    }
+
+    const id = `element-${Date.now()}`;
+
     const newElement: PowerElement = {
-      id: `element-${Date.now()}`,
+      id,
       type,
-      x,
-      y,
-      width: type === 'text-box' ? 200 : 250,
-      height: type === 'text-box' ? 100 : 150,
+      x: posX,
+      y: posY,
+      width,
+      height,
       title: type === 'text-box' ? '' : 'Novo Elemento',
       content: type === 'text-box' ? 'Texto...' : 'Descrição...',
       color: DEFAULT_COLORS[0],
@@ -145,8 +165,9 @@ export function PowerSystemTab() {
       ...prev,
       elements: [...prev.elements, newElement]
     }));
+    setSelectedElement(id);
     setShowCreateDialog(false);
-  }, []);
+  }, [viewOffset]);
 
   const updateElement = useCallback((id: string, updates: Partial<PowerElement>) => {
     setCurrentMap(prev => ({
@@ -425,7 +446,7 @@ export function PowerSystemTab() {
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('section-card', 100, 100)}
+                      onClick={() => createElement('section-card')}
                     >
                       <Square className="w-6 h-6 mb-2" />
                       Card de Seção
@@ -433,7 +454,7 @@ export function PowerSystemTab() {
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('details-card', 100, 100)}
+                      onClick={() => createElement('details-card')}
                     >
                       <BookOpen className="w-6 h-6 mb-2" />
                       Card de Detalhes
@@ -441,7 +462,7 @@ export function PowerSystemTab() {
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('visual-card', 100, 100)}
+                      onClick={() => createElement('visual-card')}
                     >
                       <Image className="w-6 h-6 mb-2" />
                       Card Visual
@@ -449,7 +470,7 @@ export function PowerSystemTab() {
                     <Button
                       variant="outline"
                       className="h-20 flex-col"
-                      onClick={() => createElement('text-box', 100, 100)}
+                      onClick={() => createElement('text-box')}
                     >
                       <Type className="w-6 h-6 mb-2" />
                       Caixa de Texto
