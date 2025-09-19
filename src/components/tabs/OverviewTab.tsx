@@ -79,10 +79,11 @@ const noteColors = [
   'bg-orange-200 border-orange-400 text-orange-900 shadow-lg'
 ];
 
-function SortableSection({ section, isCustomizing, children }: { 
+function SortableSection({ section, isCustomizing, children, onToggleVisibility }: { 
   section: Section; 
   isCustomizing: boolean; 
   children: React.ReactNode;
+  onToggleVisibility: (sectionId: string) => void;
 }) {
   const {
     attributes,
@@ -106,14 +107,15 @@ function SortableSection({ section, isCustomizing, children }: {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative transition-all duration-200 ${
-        isDragging ? 'opacity-50 scale-105 z-50' : ''
+      className={`relative transition-all duration-200 w-fit ${
+        isDragging ? 'opacity-50 z-50' : ''
       } ${
         !section.visible ? 'opacity-50 border-2 border-dashed border-muted-foreground/30' : ''
       } ${
-        isCustomizing ? 'hover:scale-[1.02] hover:shadow-lg' : ''
+        isCustomizing ? 'hover:shadow-lg cursor-grab active:cursor-grabbing' : ''
       }`}
       {...attributes}
+      {...(isCustomizing ? listeners : {})}
     >
       {isCustomizing && (
         <div className="absolute -top-2 -right-2 z-10 flex gap-1">
@@ -121,14 +123,14 @@ function SortableSection({ section, isCustomizing, children }: {
             variant="outline"
             size="sm"
             className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
-            onClick={() => {/* Toggle visibility */}}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisibility(section.id);
+            }}
           >
             {section.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
           </Button>
-          <div
-            className="flex items-center justify-center h-8 w-8 rounded-md border bg-background/90 backdrop-blur-sm cursor-grab active:cursor-grabbing hover:bg-accent"
-            {...listeners}
-          >
+          <div className="flex items-center justify-center h-8 w-8 rounded-md border bg-background/90 backdrop-blur-sm">
             <GripVertical className="w-4 h-4" />
           </div>
         </div>
@@ -759,11 +761,9 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
               key={section.id}
               section={section}
               isCustomizing={isCustomizing}
+              onToggleVisibility={toggleSectionVisibility}
             >
-              <div 
-                className="animate-fade-in hover-scale"
-                onClick={() => toggleSectionVisibility(section.id)}
-              >
+              <div className="animate-fade-in">
                 {section.component}
               </div>
             </SortableSection>
@@ -772,7 +772,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: OverviewTabProps) {
 
         <DragOverlay>
           {activeId ? (
-            <div className="opacity-80 rotate-3 scale-105 animate-scale-in">
+            <div className="opacity-80 animate-scale-in">
               {sectionsWithComponents.find(s => s.id === activeId)?.component}
             </div>
           ) : null}
