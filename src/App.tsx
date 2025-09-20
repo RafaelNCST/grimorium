@@ -19,6 +19,8 @@ import FileEditor from "@/pages/FileEditor";
 import { BeastDetail } from "@/pages/BeastDetail";
 import ItemDetail from "@/pages/ItemDetail";
 import ItemTimeline from "@/pages/ItemTimeline";
+import { ChaptersPage } from "@/pages/ChaptersPage";
+import { ChapterEditor } from "@/pages/ChapterEditor";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,8 @@ const App = () => (
               <Route path="/beast/:id" element={<BeastDetail />} />
               <Route path="/item/:id" element={<ItemDetail />} />
               <Route path="/item/:id/timeline" element={<ItemTimeline />} />
+              <Route path="/book/:bookId/chapters" element={<ChaptersPage />} />
+              <Route path="/book/:bookId/chapter/:chapterId" element={<ChapterEditor />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

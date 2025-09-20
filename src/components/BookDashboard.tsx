@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye, Palette, GripVertical } from "lucide-react";
+import { ArrowLeft, Edit2, Users, MapPin, Building, Clock, Sparkles, BookOpen, Network, Target, Trash2, Dna, FileText, Skull, Package, EyeOff, Eye, Palette, GripVertical, Book } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   DndContext,
   closestCenter,
@@ -234,6 +235,7 @@ const initialArcs: PlotArc[] = [
 
 export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const initialBook = getBookData(bookId);
   const [book, setBook] = useState(initialBook);
@@ -316,6 +318,15 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
               <h1 className="text-2xl font-bold">{t('book.dashboard')}</h1>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/book/${bookId}/chapters`)}
+                className="hover:bg-muted"
+              >
+                <Book className="w-4 h-4 mr-2" />
+                Capítulos
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
