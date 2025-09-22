@@ -110,6 +110,7 @@ export function ChaptersPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(false);
 
   const filteredChapters = chapters.filter(chapter => 
     statusFilter === 'all' || chapter.status === statusFilter
@@ -123,12 +124,14 @@ export function ChaptersPage() {
     );
   };
 
-  const handleSelectAll = () => {
-    if (selectedChapters.length === filteredChapters.length) {
-      setSelectedChapters([]);
-    } else {
-      setSelectedChapters(filteredChapters.map(ch => ch.id));
-    }
+  const handleEnterSelectMode = () => {
+    setIsSelectMode(true);
+    setSelectedChapters([]);
+  };
+
+  const handleExitSelectMode = () => {
+    setIsSelectMode(false);
+    setSelectedChapters([]);
   };
 
   const handleDeleteChapter = (chapterId: string) => {
@@ -141,6 +144,7 @@ export function ChaptersPage() {
     setChapters(prev => prev.filter(ch => !selectedChapters.includes(ch.id)));
     setSelectedChapters([]);
     setShowBulkDeleteDialog(false);
+    setIsSelectMode(false);
   };
 
   const handleCreateChapter = () => {
@@ -212,40 +216,46 @@ export function ChaptersPage() {
               {showDetails ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
               {showDetails ? 'Ocultar' : 'Mostrar'} Detalhes
             </Button>
+
+            {!isSelectMode && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleEnterSelectMode}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Excluir Múltiplos
+              </Button>
+            )}
           </div>
 
-          {selectedChapters.length > 0 && (
+          {isSelectMode && (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
                 {selectedChapters.length} selecionado{selectedChapters.length > 1 ? 's' : ''}
               </span>
               <Button
-                variant="destructive"
+                variant="outline"
                 size="sm"
-                onClick={() => setShowBulkDeleteDialog(true)}
+                onClick={handleExitSelectMode}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Excluir Selecionados
+                Cancelar
               </Button>
+              {selectedChapters.length > 0 && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowBulkDeleteDialog(true)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Excluir Selecionados
+                </Button>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Bulk Select */}
-      {filteredChapters.length > 0 && (
-        <div className="px-6 py-2 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={selectedChapters.length === filteredChapters.length}
-              onCheckedChange={handleSelectAll}
-            />
-            <span className="text-sm text-muted-foreground">
-              Selecionar todos os capítulos visíveis
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Chapters List */}
       <div className="px-6 py-6">
@@ -255,10 +265,12 @@ export function ChaptersPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <Checkbox
-                      checked={selectedChapters.includes(chapter.id)}
-                      onCheckedChange={() => handleSelectChapter(chapter.id)}
-                    />
+                    {isSelectMode && (
+                      <Checkbox
+                        checked={selectedChapters.includes(chapter.id)}
+                        onCheckedChange={() => handleSelectChapter(chapter.id)}
+                      />
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-sm font-medium text-muted-foreground">
