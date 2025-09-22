@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "sonner";
+import { LinkTooltip } from "@/components/LinkTooltip";
 
 type ChapterStatus = 'draft' | 'in-progress' | 'review' | 'finished';
 
@@ -226,36 +227,105 @@ export function ChapterEditor() {
   const renderAnnotatedText = () => {
     if (!chapter.content) return chapter.content;
 
-    let result = chapter.content;
+    let content = chapter.content;
     const sortedAnnotations = [...chapter.annotations].sort((a, b) => b.startOffset - a.startOffset);
 
-    sortedAnnotations.forEach(annotation => {
-      const beforeText = result.substring(0, annotation.startOffset);
-      const annotatedText = result.substring(annotation.startOffset, annotation.endOffset);
-      const afterText = result.substring(annotation.endOffset);
+    // For React rendering with proper tooltips
+    let elements: (string | JSX.Element)[] = [content];
+    
+    sortedAnnotations.forEach((annotation, index) => {
+      const newElements: (string | JSX.Element)[] = [];
+      
+      elements.forEach((element, elemIndex) => {
+        if (typeof element === 'string') {
+          const beforeText = element.substring(0, annotation.startOffset);
+          const annotatedText = element.substring(annotation.startOffset, annotation.endOffset);
+          const afterText = element.substring(annotation.endOffset);
 
-      if (annotation.type === 'comment') {
-        const comments = getAnnotationComments(annotation.id);
-        const commentCount = comments.length;
-        result = beforeText + 
-          `<span class="comment-annotation" data-annotation-id="${annotation.id}" style="background-color: rgba(255, 193, 7, 0.2); position: relative; cursor: pointer;">
-            ${annotatedText}
-            <span class="comment-badge" style="position: absolute; top: -8px; right: -8px; background: #ffc107; color: #000; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10;">${commentCount}</span>
-          </span>` + 
-          afterText;
-      } else if (annotation.type === 'link') {
-        const link = getAnnotationLink(annotation.id);
-        if (link) {
-          result = beforeText + 
-            `<span class="link-annotation" data-annotation-id="${annotation.id}" data-entity-type="${link.type}" data-entity-id="${link.entityId}" style="color: #0066cc; font-weight: bold; cursor: pointer; text-decoration: underline;" title="${link.type}: ${link.entityId}">
-              ${annotatedText}
-            </span>` + 
-            afterText;
+          if (annotation.type === 'comment') {
+            const comments = getAnnotationComments(annotation.id);
+            const commentCount = comments.length;
+            
+            newElements.push(beforeText);
+            newElements.push(
+              <span key={`comment-${annotation.id}`} className="comment-annotation-wrapper" style={{ position: 'relative', display: 'inline' }}>
+                <span className="comment-text" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '2px', padding: '1px 2px' }}>
+                  {annotatedText}
+                </span>
+                <span 
+                  className="comment-badge" 
+                  data-annotation-id={annotation.id}
+                  style={{ 
+                    marginLeft: '4px', 
+                    background: '#3b82f6', 
+                    color: 'white', 
+                    borderRadius: '50%', 
+                    width: '16px', 
+                    height: '16px', 
+                    fontSize: '9px', 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontWeight: 'bold', 
+                    cursor: 'pointer', 
+                    verticalAlign: 'super', 
+                    lineHeight: '1' 
+                  }}
+                >
+                  {commentCount}
+                </span>
+              </span>
+            );
+            newElements.push(afterText);
+          } else if (annotation.type === 'link') {
+            const link = getAnnotationLink(annotation.id);
+            if (link) {
+              newElements.push(beforeText);
+              newElements.push(
+                <LinkTooltip 
+                  key={`link-${annotation.id}`}
+                  entityType={link.type}
+                  entityId={link.entityId}
+                  text={link.text}
+                >
+                  <span 
+                    className="link-annotation" 
+                    data-annotation-id={annotation.id}
+                    data-entity-type={link.type}
+                    data-entity-id={link.entityId}
+                    style={{ 
+                      color: '#059669', 
+                      backgroundColor: 'rgba(5, 150, 105, 0.08)', 
+                      borderRadius: '2px', 
+                      padding: '1px 2px', 
+                      cursor: 'pointer', 
+                      textDecoration: 'none', 
+                      borderBottom: '1px solid #059669', 
+                      transition: 'all 0.2s' 
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(5, 150, 105, 0.15)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(5, 150, 105, 0.08)';
+                    }}
+                  >
+                    {annotatedText}
+                  </span>
+                </LinkTooltip>
+              );
+              newElements.push(afterText);
+            }
+          }
+        } else {
+          newElements.push(element);
         }
-      }
+      });
+      
+      elements = newElements;
     });
 
-    return result;
+    return elements;
   };
 
   const getWordCount = () => {
@@ -523,19 +593,22 @@ export function ChapterEditor() {
               onKeyUp={handleTextSelection}
               onClick={(e) => {
                 const target = e.target as HTMLElement;
-                if (target.classList.contains('comment-annotation')) {
+                if (target.classList.contains('comment-badge')) {
+                  e.preventDefault();
+                  e.stopPropagation();
                   const annotationId = target.getAttribute('data-annotation-id');
                   setSelectedAnnotation(annotationId);
                 } else if (target.classList.contains('link-annotation')) {
+                  e.preventDefault();
                   const entityType = target.getAttribute('data-entity-type');
                   const entityId = target.getAttribute('data-entity-id');
                   // Navigate to entity page
                   navigate(`/${entityType}/${entityId}`);
                 }
               }}
-              dangerouslySetInnerHTML={{ __html: renderAnnotatedText() }}
-              suppressContentEditableWarning
-            />
+            >
+              {renderAnnotatedText()}
+            </div>
 
           </div>
         </div>
