@@ -287,12 +287,12 @@ export function ChaptersPage() {
                       </div>
                     )}
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-medium text-muted-foreground">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold bg-primary/10 text-primary border-primary/20">
                           Cap. {chapter.number}
-                        </span>
+                        </Badge>
                         <CardTitle 
-                          className={`text-lg transition-colors ${
+                          className={`text-xl font-bold transition-colors ${
                             isSelectMode 
                               ? "cursor-default text-muted-foreground" 
                               : "cursor-pointer hover:text-primary"
@@ -302,17 +302,25 @@ export function ChaptersPage() {
                           {chapter.title}
                         </CardTitle>
                       </div>
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <Badge className={statusConfig[chapter.status].color}>
                           {createElement(statusConfig[chapter.status].icon, { className: "w-3 h-3 mr-1" })}
                           {statusConfig[chapter.status].label}
                         </Badge>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>{chapter.wordCount.toLocaleString()} palavras</span>
-                          <span>•</span>
-                          <span>{chapter.characterCount.toLocaleString()} caracteres</span>
-                          <span>•</span>
-                          <span>Editado em {chapter.lastEdited.toLocaleDateString()}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{chapter.wordCount.toLocaleString()}</span>
+                            <span className="text-xs text-muted-foreground">palavras</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
+                            <span className="text-sm font-mono font-medium">{chapter.characterCount.toLocaleString()}</span>
+                            <span className="text-xs text-muted-foreground">chars</span>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">{chapter.lastEdited.toLocaleDateString()}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
