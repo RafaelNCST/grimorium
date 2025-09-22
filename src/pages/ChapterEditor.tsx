@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Save, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Quote, Link, MessageCircle, Palette, Type, Plus } from "lucide-react";
+import { ArrowLeft, Save, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Quote, Link, MessageCircle, Palette, Type, Plus, FileText } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +74,7 @@ export function ChapterEditor() {
   const [selectedText, setSelectedText] = useState('');
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isAutoSaving, setIsAutoSaving] = useState(false);
 
@@ -202,6 +203,14 @@ export function ChapterEditor() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowSummaryModal(true)}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Resumo
+              </Button>
+
               <Select
                 value={chapter.status}
                 onValueChange={(value: ChapterStatus) => 
@@ -417,23 +426,6 @@ export function ChapterEditor() {
               suppressContentEditableWarning
             />
 
-            {/* Summary */}
-            <div className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Resumo do Capítulo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    value={chapter.summary}
-                    onChange={(e) => setChapter(prev => ({ ...prev, summary: e.target.value }))}
-                    placeholder="Escreva um resumo do que acontece neste capítulo..."
-                    rows={3}
-                    disabled={isReadOnly}
-                  />
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
 
@@ -536,6 +528,31 @@ export function ChapterEditor() {
                   onClick={() => setShowCommentModal(false)}
                 >
                   Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Summary Modal */}
+      {showSummaryModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-[600px]">
+            <CardHeader>
+              <CardTitle>Resumo do Capítulo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={chapter.summary}
+                onChange={(e) => setChapter(prev => ({ ...prev, summary: e.target.value }))}
+                placeholder="Escreva um resumo do que acontece neste capítulo..."
+                rows={6}
+                disabled={isReadOnly}
+              />
+              <div className="flex gap-2">
+                <Button onClick={() => setShowSummaryModal(false)} className="flex-1">
+                  Fechar
                 </Button>
               </div>
             </CardContent>
