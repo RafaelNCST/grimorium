@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Save, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Quote, Link, MessageCircle, Palette, Type, Plus, FileText } from "lucide-react";
+import { ArrowLeft, Save, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered, Quote, Link, MessageCircle, Palette, Type, Plus, FileText, Edit, Trash2 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -749,7 +749,7 @@ export function ChapterEditor() {
                             onClick={() => editComment(comment.id)}
                             className="p-1 h-6 w-6"
                           >
-                            ✏️
+                            <Edit className="w-3 h-3" />
                           </Button>
                           <Button
                             size="sm"
@@ -757,7 +757,7 @@ export function ChapterEditor() {
                             onClick={() => deleteComment(comment.id)}
                             className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
                           >
-                            🗑️
+                            <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
                       )}
