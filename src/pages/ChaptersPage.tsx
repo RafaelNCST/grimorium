@@ -1,11 +1,10 @@
 import { useState, createElement } from "react";
-import { ArrowLeft, Plus, Filter, Download, Trash2, Eye, EyeOff, Edit3, CheckCircle, Clock, FileText, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Plus, Filter, Download, Trash2, Eye, EyeOff, Edit3, CheckCircle, Clock, FileText, AlertTriangle, X } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -270,14 +269,21 @@ export function ChaptersPage() {
             <Card key={chapter.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-0 flex-1">
                     {isSelectMode && (
-                      <div className="flex items-center justify-center w-8 h-8 mt-1 rounded-lg border-2 border-muted hover:border-primary/50 transition-colors">
-                        <Checkbox
-                          checked={selectedChapters.includes(chapter.id)}
-                          onCheckedChange={() => handleSelectChapter(chapter.id)}
-                          className="w-5 h-5 border-2 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground rounded-md shadow-sm hover:border-primary/50 transition-all duration-200"
-                        />
+                      <div 
+                        className={`flex items-center justify-center w-12 h-16 -ml-6 mr-3 rounded-r-lg cursor-pointer transition-all duration-200 ${
+                          selectedChapters.includes(chapter.id)
+                            ? "bg-destructive/90 hover:bg-destructive text-destructive-foreground shadow-lg"
+                            : "bg-muted/50 hover:bg-muted border-2 border-dashed border-muted-foreground/30 hover:border-muted-foreground/50"
+                        }`}
+                        onClick={() => handleSelectChapter(chapter.id)}
+                      >
+                        {selectedChapters.includes(chapter.id) ? (
+                          <X className="w-5 h-5" />
+                        ) : (
+                          <div className="w-5 h-5 rounded border-2 border-muted-foreground/50" />
+                        )}
                       </div>
                     )}
                     <div className="flex-1">
