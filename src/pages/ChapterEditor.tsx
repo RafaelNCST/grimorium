@@ -308,11 +308,20 @@ export function ChapterEditor() {
           if (annotation.type === 'comment') {
             const comments = getAnnotationComments(annotation.id);
             const commentCount = comments.length;
+            const isSelected = selectedAnnotation === annotation.id && showCommentSidebar;
             
             newElements.push(beforeText);
             newElements.push(
               <span key={`comment-${annotation.id}`} className="comment-annotation-wrapper" style={{ position: 'relative', display: 'inline' }}>
-                <span className="comment-text" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '2px', padding: '1px 2px' }}>
+                <span 
+                  className="comment-text" 
+                  style={{ 
+                    backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.3)' : 'rgba(59, 130, 246, 0.1)', 
+                    borderRadius: '2px', 
+                    padding: '1px 2px',
+                    transition: 'background-color 0.2s'
+                  }}
+                >
                   {annotatedText}
                 </span>
                 <span 
@@ -320,7 +329,7 @@ export function ChapterEditor() {
                   data-annotation-id={annotation.id}
                   style={{ 
                     marginLeft: '4px', 
-                    background: '#3b82f6', 
+                    background: isSelected ? '#1d4ed8' : '#3b82f6', 
                     color: 'white', 
                     borderRadius: '50%', 
                     width: '16px', 
@@ -332,7 +341,8 @@ export function ChapterEditor() {
                     fontWeight: 'bold', 
                     cursor: 'pointer', 
                     verticalAlign: 'super', 
-                    lineHeight: '1' 
+                    lineHeight: '1',
+                    transition: 'background-color 0.2s'
                   }}
                 >
                   {commentCount}
@@ -696,12 +706,6 @@ export function ChapterEditor() {
                 >
                   ✕
                 </Button>
-              </div>
-              
-              <div className="mb-3 p-2 bg-card rounded border">
-                <p className="text-sm font-medium">
-                  "{chapter.annotations.find(a => a.id === selectedAnnotation)?.text}"
-                </p>
               </div>
 
               <div className="space-y-3 mb-4">
