@@ -272,11 +272,11 @@ export function ChaptersPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     {isSelectMode && (
-                      <div className="flex items-center justify-center w-6 h-6 mt-1">
+                      <div className="flex items-center justify-center w-8 h-8 mt-1 rounded-lg border-2 border-muted hover:border-primary/50 transition-colors">
                         <Checkbox
                           checked={selectedChapters.includes(chapter.id)}
                           onCheckedChange={() => handleSelectChapter(chapter.id)}
-                          className="w-5 h-5 border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          className="w-5 h-5 border-2 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground rounded-md shadow-sm hover:border-primary/50 transition-all duration-200"
                         />
                       </div>
                     )}
@@ -286,8 +286,12 @@ export function ChaptersPage() {
                           Cap. {chapter.number}
                         </span>
                         <CardTitle 
-                          className="text-lg cursor-pointer hover:text-primary transition-colors"
-                          onClick={() => navigate(`/book/${bookId}/chapter/${chapter.id}`)}
+                          className={`text-lg transition-colors ${
+                            isSelectMode 
+                              ? "cursor-default text-muted-foreground" 
+                              : "cursor-pointer hover:text-primary"
+                          }`}
+                          onClick={() => !isSelectMode && navigate(`/book/${bookId}/chapter/${chapter.id}`)}
                         >
                           {chapter.title}
                         </CardTitle>
@@ -308,37 +312,39 @@ export function ChaptersPage() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Download className="w-4 h-4 mr-2" />
-                          Exportar
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem>
-                          <FileText className="w-4 h-4 mr-2" />
-                          Exportar como Word
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <FileText className="w-4 h-4 mr-2" />
-                          Exportar como PDF
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setChapterToDelete(chapter.id);
-                        setShowDeleteDialog(true);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  {!isSelectMode && (
+                    <div className="flex items-center gap-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Download className="w-4 h-4 mr-2" />
+                            Exportar
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>
+                            <FileText className="w-4 h-4 mr-2" />
+                            Exportar como Word
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <FileText className="w-4 h-4 mr-2" />
+                            Exportar como PDF
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setChapterToDelete(chapter.id);
+                          setShowDeleteDialog(true);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               
