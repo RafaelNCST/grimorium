@@ -59,17 +59,50 @@ export function ChapterEditor() {
   const { bookId, chapterId } = useParams();
   const navigate = useNavigate();
   const editorRef = useRef<HTMLDivElement>(null);
-  const [chapter, setChapter] = useState<Chapter>({
-    id: chapterId || '1',
-    number: 1,
-    title: 'O Chamado da Aventura',
-    content: '<p>Era uma vez, em uma terra distante...</p>',
-    status: 'draft',
-    summary: '',
-    lastSaved: new Date(),
-    comments: [],
-    entityLinks: []
-  });
+  const [showSummary, setShowSummary] = useState(false);
+  
+  // Mock chapter data - in real app would fetch from API
+  const getChapterData = () => {
+    const chapters = [
+      {
+        id: '1',
+        number: 1,
+        title: 'O Chamado da Aventura',
+        content: '<p>Era uma vez, em uma terra distante, um jovem hobbit chamado Frodo que vivia pacificamente no Condado. Até que um dia, o mago Gandalf chegou com notícias que mudaram sua vida para sempre...</p><p>O Anel do Poder havia sido encontrado, e Frodo descobriu que era o escolhido para destruí-lo nas chamas do Monte da Perdição.</p>',
+        status: 'finished' as ChapterStatus,
+        summary: 'O protagonista descobre seus poderes mágicos e recebe o chamado para a jornada.',
+        lastSaved: new Date(),
+        comments: [],
+        entityLinks: []
+      },
+      {
+        id: '2',
+        number: 2,
+        title: 'Através da Floresta Sombria',
+        content: '<p>A jornada começou pela perigosa Floresta Sombria, onde criaturas sinistras espreitavam entre as árvores...</p>',
+        status: 'review' as ChapterStatus,
+        summary: 'A jornada pela floresta perigosa revela os primeiros desafios.',
+        lastSaved: new Date(),
+        comments: [],
+        entityLinks: []
+      },
+      {
+        id: '3',
+        number: 3,
+        title: 'O Encontro com o Mentor',
+        content: '<p>Na Torre de Minas Tirith, Gandalf revelou os segredos do passado...</p>',
+        status: 'in-progress' as ChapterStatus,
+        summary: 'O mentor revela informações cruciais sobre a missão.',
+        lastSaved: new Date(),
+        comments: [],
+        entityLinks: []
+      }
+    ];
+    
+    return chapters.find(ch => ch.id === chapterId) || chapters[0];
+  };
+  
+  const [chapter, setChapter] = useState<Chapter>(getChapterData());
 
   const [selectedText, setSelectedText] = useState('');
   const [showLinkModal, setShowLinkModal] = useState(false);
@@ -202,6 +235,14 @@ export function ChapterEditor() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSummary(!showSummary)}
+              >
+                {showSummary ? 'Ocultar Resumo' : 'Mostrar Resumo'}
+              </Button>
+              
               <Select
                 value={chapter.status}
                 onValueChange={(value: ChapterStatus) => 
@@ -400,6 +441,26 @@ export function ChapterEditor() {
         {/* Main Editor */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
+            {/* Summary */}
+            {showSummary && (
+              <div className="mb-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Resumo do Capítulo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={chapter.summary}
+                      onChange={(e) => setChapter(prev => ({ ...prev, summary: e.target.value }))}
+                      placeholder="Escreva um resumo do que acontece neste capítulo..."
+                      rows={3}
+                      disabled={isReadOnly}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            
             <div
               ref={editorRef}
               contentEditable={!isReadOnly}
@@ -416,24 +477,6 @@ export function ChapterEditor() {
               dangerouslySetInnerHTML={{ __html: chapter.content }}
               suppressContentEditableWarning
             />
-
-            {/* Summary */}
-            <div className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Resumo do Capítulo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    value={chapter.summary}
-                    onChange={(e) => setChapter(prev => ({ ...prev, summary: e.target.value }))}
-                    placeholder="Escreva um resumo do que acontece neste capítulo..."
-                    rows={3}
-                    disabled={isReadOnly}
-                  />
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
 
