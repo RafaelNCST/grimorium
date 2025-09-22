@@ -19,6 +19,7 @@ interface Chapter {
   title: string;
   status: ChapterStatus;
   wordCount: number;
+  characterCount: number;
   lastEdited: Date;
   summary?: string;
   characters?: string[];
@@ -63,6 +64,7 @@ const mockChapters: Chapter[] = [
     title: 'O Chamado da Aventura',
     status: 'finished',
     wordCount: 3245,
+    characterCount: 18670,
     lastEdited: new Date('2024-01-15'),
     summary: 'O protagonista descobre seus poderes mágicos e recebe o chamado para a jornada.',
     characters: ['Aragorn', 'Gandalf'],
@@ -75,6 +77,7 @@ const mockChapters: Chapter[] = [
     title: 'Através da Floresta Sombria',
     status: 'review',
     wordCount: 2890,
+    characterCount: 16125,
     lastEdited: new Date('2024-01-20'),
     summary: 'A jornada pela floresta perigosa revela os primeiros desafios.',
     characters: ['Aragorn', 'Legolas'],
@@ -86,6 +89,7 @@ const mockChapters: Chapter[] = [
     title: 'O Encontro com o Mentor',
     status: 'in-progress',
     wordCount: 1560,
+    characterCount: 8934,
     lastEdited: new Date('2024-01-25'),
     characters: ['Gandalf'],
     locations: ['Torre de Minas Tirith']
@@ -96,6 +100,7 @@ const mockChapters: Chapter[] = [
     title: 'A Primeira Batalha',
     status: 'draft',
     wordCount: 0,
+    characterCount: 0,
     lastEdited: new Date('2024-01-26')
   }
 ];
@@ -154,6 +159,7 @@ export function ChaptersPage() {
       title: `Capítulo ${chapters.length + 1}`,
       status: 'draft',
       wordCount: 0,
+      characterCount: 0,
       lastEdited: new Date()
     };
     setChapters(prev => [...prev, newChapter]);
@@ -266,10 +272,13 @@ export function ChaptersPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     {isSelectMode && (
-                      <Checkbox
-                        checked={selectedChapters.includes(chapter.id)}
-                        onCheckedChange={() => handleSelectChapter(chapter.id)}
-                      />
+                      <div className="flex items-center justify-center w-6 h-6 mt-1">
+                        <Checkbox
+                          checked={selectedChapters.includes(chapter.id)}
+                          onCheckedChange={() => handleSelectChapter(chapter.id)}
+                          className="w-5 h-5 border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                      </div>
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -288,12 +297,13 @@ export function ChaptersPage() {
                           {createElement(statusConfig[chapter.status].icon, { className: "w-3 h-3 mr-1" })}
                           {statusConfig[chapter.status].label}
                         </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {chapter.wordCount.toLocaleString()} palavras
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          • Editado em {chapter.lastEdited.toLocaleDateString()}
-                        </span>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>{chapter.wordCount.toLocaleString()} palavras</span>
+                          <span>•</span>
+                          <span>{chapter.characterCount.toLocaleString()} caracteres</span>
+                          <span>•</span>
+                          <span>Editado em {chapter.lastEdited.toLocaleDateString()}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
