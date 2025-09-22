@@ -89,7 +89,10 @@ export function ChapterEditor() {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
+  const [showCommentSidebar, setShowCommentSidebar] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState('');
   const [isAutoSaving, setIsAutoSaving] = useState(false);
 
   const isReadOnly = chapter.status === 'finished' || chapter.status === 'review';
@@ -214,6 +217,66 @@ export function ChapterEditor() {
     setSelectedRange(null);
     setSelectedAnnotation(null);
     toast.success('Comentário adicionado!');
+  };
+
+  const addCommentToAnnotation = () => {
+    if (!newComment.trim() || !selectedAnnotation) return;
+
+    const comment: Comment = {
+      id: String(Date.now()),
+      text: newComment,
+      annotationId: selectedAnnotation,
+      timestamp: new Date()
+    };
+
+    setChapter(prev => ({
+      ...prev,
+      comments: [...prev.comments, comment]
+    }));
+
+    setNewComment('');
+    toast.success('Comentário adicionado!');
+  };
+
+  const editComment = (commentId: string) => {
+    const comment = chapter.comments.find(c => c.id === commentId);
+    if (comment) {
+      setEditingComment(commentId);
+      setEditCommentText(comment.text);
+    }
+  };
+
+  const saveEditedComment = () => {
+    if (!editCommentText.trim() || !editingComment) return;
+
+    setChapter(prev => ({
+      ...prev,
+      comments: prev.comments.map(comment =>
+        comment.id === editingComment
+          ? { ...comment, text: editCommentText, timestamp: new Date() }
+          : comment
+      )
+    }));
+
+    setEditingComment(null);
+    setEditCommentText('');
+    toast.success('Comentário editado!');
+  };
+
+  const deleteComment = (commentId: string) => {
+    setChapter(prev => ({
+      ...prev,
+      comments: prev.comments.filter(comment => comment.id !== commentId)
+    }));
+    toast.success('Comentário excluído!');
+  };
+
+  const closeSidebar = () => {
+    setShowCommentSidebar(false);
+    setSelectedAnnotation(null);
+    setEditingComment(null);
+    setEditCommentText('');
+    setNewComment('');
   };
 
   const getAnnotationComments = (annotationId: string) => {
@@ -362,6 +425,12 @@ export function ChapterEditor() {
                   <span className="text-sm text-muted-foreground">
                     {getWordCount()} palavras
                   </span>
+                  <Badge variant="outline" className="text-xs">
+                    {chapter.comments.length} comentários
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {chapter.entityLinks.length} links
+                  </Badge>
                   {isAutoSaving && (
                     <span className="text-sm text-muted-foreground">
                       Salvando...
@@ -598,6 +667,7 @@ export function ChapterEditor() {
                   e.stopPropagation();
                   const annotationId = target.getAttribute('data-annotation-id');
                   setSelectedAnnotation(annotationId);
+                  setShowCommentSidebar(true);
                 } else if (target.classList.contains('link-annotation')) {
                   e.preventDefault();
                   const entityType = target.getAttribute('data-entity-type');
@@ -613,16 +683,16 @@ export function ChapterEditor() {
           </div>
         </div>
 
-        {/* Comments Sidebar */}
-        <div className="w-80 border-l border-border p-4 bg-muted/20">
-          {selectedAnnotation ? (
+        {/* Comments Sidebar - Only when annotation is selected */}
+        {showCommentSidebar && selectedAnnotation && (
+          <div className="w-80 border-l border-border p-4 bg-muted/20">
             <div className="mb-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold">Comentários</h3>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedAnnotation(null)}
+                  onClick={closeSidebar}
                 >
                   ✕
                 </Button>
@@ -637,67 +707,84 @@ export function ChapterEditor() {
               <div className="space-y-3 mb-4">
                 {getAnnotationComments(selectedAnnotation).map((comment) => (
                   <Card key={comment.id} className="p-3">
-                    <p className="text-sm">{comment.text}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        {editingComment === comment.id ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              value={editCommentText}
+                              onChange={(e) => setEditCommentText(e.target.value)}
+                              className="text-sm"
+                            />
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={saveEditedComment}>
+                                Salvar
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => {
+                                  setEditingComment(null);
+                                  setEditCommentText('');
+                                }}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm">{comment.text}</p>
+                        )}
+                      </div>
+                      
+                      {editingComment !== comment.id && (
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => editComment(comment.id)}
+                            className="p-1 h-6 w-6"
+                          >
+                            ✏️
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteComment(comment.id)}
+                            className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
+                          >
+                            🗑️
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
                       {comment.timestamp.toLocaleString()}
                     </p>
                   </Card>
                 ))}
               </div>
 
-              {!isReadOnly && (
+              <div className="space-y-2">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Adicione um novo comentário..."
+                  rows={3}
+                />
                 <Button
-                  variant="outline"
+                  onClick={addCommentToAnnotation}
                   size="sm"
-                  onClick={() => setShowCommentModal(true)}
                   className="w-full"
+                  disabled={!newComment.trim()}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Novo Comentário
+                  Adicionar Comentário
                 </Button>
-              )}
-            </div>
-          ) : (
-            <div className="mb-4">
-              <h3 className="font-semibold mb-2">Comentários</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Clique em um texto comentado ou selecione texto para adicionar comentários.
-              </p>
-              
-              {chapter.annotations.filter(a => a.type === 'comment').length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Textos com comentários:</h4>
-                  {chapter.annotations
-                    .filter(a => a.type === 'comment')
-                    .map((annotation) => (
-                      <div
-                        key={annotation.id}
-                        className="p-2 bg-card rounded border cursor-pointer hover:bg-muted/50"
-                        onClick={() => setSelectedAnnotation(annotation.id)}
-                      >
-                        <p className="text-sm">"{annotation.text}"</p>
-                        <p className="text-xs text-muted-foreground">
-                          {getAnnotationComments(annotation.id).length} comentário(s)
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Entity Links */}
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2">Links de Entidades</h3>
-            <div className="space-y-2">
-              {chapter.entityLinks.map((link, index) => (
-                <Badge key={index} variant="outline" className="block text-xs p-2">
-                  "{link.text}" → {link.type}: {link.entityId}
-                </Badge>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Link Modal */}
