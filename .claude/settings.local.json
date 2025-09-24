@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(__NEW_LINE__ echo \"=== REMAINING PROPS INTERFACES THAT NEED RENAMING ===\" grep -r \"interface.*Props\" src --include=\"*.tsx\" --include=\"*.ts\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

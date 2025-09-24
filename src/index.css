@@ -49,10 +49,27 @@
     --success-foreground: 240 5% 96%;
 
     /* Magical gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(280 70% 60%));
-    --gradient-secondary: linear-gradient(135deg, hsl(217 32.6% 17.5%), hsl(240 30% 25%));
-    --gradient-accent: linear-gradient(135deg, hsl(45 93% 58%), hsl(38 92% 50%));
-    --gradient-magical: linear-gradient(135deg, hsl(263 70% 50%) 0%, hsl(280 70% 60%) 50%, hsl(45 93% 58%) 100%);
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(263 70% 50%),
+      hsl(280 70% 60%)
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      hsl(217 32.6% 17.5%),
+      hsl(240 30% 25%)
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      hsl(45 93% 58%),
+      hsl(38 92% 50%)
+    );
+    --gradient-magical: linear-gradient(
+      135deg,
+      hsl(263 70% 50%) 0%,
+      hsl(280 70% 60%) 50%,
+      hsl(45 93% 58%) 100%
+    );
 
     /* Shadows with magical glow */
     --shadow-sm: 0 1px 2px hsl(240 10% 3.9% / 0.5);
@@ -127,11 +144,61 @@
     @apply border-border;
   }
 
+  html,
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image: 
-      radial-gradient(circle at 25% 25%, hsl(263 70% 50% / 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, hsl(45 93% 58% / 0.03) 0%, transparent 50%);
+    background-image:
+      radial-gradient(
+        circle at 25% 25%,
+        hsl(263 70% 50% / 0.05) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 75% 75%,
+        hsl(45 93% 58% / 0.03) 0%,
+        transparent 50%
+      );
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  #root {
+    @apply bg-background;
+    min-height: 100vh;
+    width: 100vw;
+    overflow: auto;
+  }
+
+  /* Tauri specific optimizations */
+  html {
+    background-color: hsl(var(--background));
+  }
+
+  /* Performance optimizations */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Disable text selection for better desktop feel */
+  body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Re-enable text selection for inputs and content */
+  input,
+  textarea,
+  [contenteditable],
+  .selectable {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 
   /* Scrollbar styling for webkit browsers */
@@ -163,7 +230,9 @@
 
   .btn-magical:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-glow), 0 8px 25px hsl(263 70% 50% / 0.4);
+    box-shadow:
+      var(--shadow-glow),
+      0 8px 25px hsl(263 70% 50% / 0.4);
   }
 
   .btn-magical:active {
@@ -216,12 +285,24 @@
     animation: fadeInUp 0.5s ease-out forwards;
   }
 
-  .animate-stagger:nth-child(1) { animation-delay: 0.1s; }
-  .animate-stagger:nth-child(2) { animation-delay: 0.2s; }
-  .animate-stagger:nth-child(3) { animation-delay: 0.3s; }
-  .animate-stagger:nth-child(4) { animation-delay: 0.4s; }
-  .animate-stagger:nth-child(5) { animation-delay: 0.5s; }
-  .animate-stagger:nth-child(6) { animation-delay: 0.6s; }
+  .animate-stagger:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .animate-stagger:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .animate-stagger:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .animate-stagger:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .animate-stagger:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  .animate-stagger:nth-child(6) {
+    animation-delay: 0.6s;
+  }
 
   /* Line clamp utilities */
   .line-clamp-1 {
@@ -247,7 +328,7 @@
 
   /* Handwriting font for post-it notes */
   .font-handwriting {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-family: "Comic Sans MS", cursive, sans-serif;
     font-weight: 400;
   }
 

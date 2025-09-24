@@ -1,27 +1,33 @@
 // Types for the annotation links system
 
-export interface AnnotationLink {
+export interface IAnnotationLink {
   id: string;
   noteId: string;
-  entityType: 'character' | 'beast' | 'world' | 'continent' | 'location' | 'item';
+  entityType:
+    | "character"
+    | "beast"
+    | "world"
+    | "continent"
+    | "location"
+    | "item";
   entityId: string;
   createdAt: Date;
 }
 
-export interface LinkedEntity {
+export interface ILinkedEntity {
   id: string;
   name: string;
-  type: 'character' | 'beast' | 'world' | 'continent' | 'location' | 'item';
+  type: "character" | "beast" | "world" | "continent" | "location" | "item";
 }
 
 // Extended NoteFile with links
-export interface NoteFileWithLinks {
+export interface INoteFileWithLinks {
   id: string;
   name: string;
   content: string;
-  type: 'file';
+  type: "file";
   parentId?: string;
   createdAt: Date;
   updatedAt: Date;
-  links: AnnotationLink[];
+  links: IAnnotationLink[];
 }
