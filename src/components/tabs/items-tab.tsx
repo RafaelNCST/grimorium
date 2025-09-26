@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -10,7 +11,6 @@ import {
   Gem,
   Star,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateItemModal } from "@/components/modals/create-item-modal";
@@ -146,7 +146,7 @@ export function ItemsTab() {
   });
 
   const handleItemClick = (itemId: string) => {
-    navigate(`/item/${itemId}`);
+    navigate({ to: "/item/$id", params: { id: itemId } });
   };
 
   const handleCreateItem = (itemData: any) => {

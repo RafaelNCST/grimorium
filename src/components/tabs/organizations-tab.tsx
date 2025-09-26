@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Edit2,
@@ -12,7 +13,6 @@ import {
   Globe,
   Filter,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateOrganizationModal } from "@/components/modals/create-organization-modal";
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLanguage } from "@/contexts/language-context";
+import { useLanguageStore } from "@/stores/language-store";
 
 interface OrganizationTitle {
   id: string;
@@ -270,7 +270,7 @@ interface PropsOrganizationsTab {
 }
 
 export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
-  const { t } = useLanguage();
+  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAlignment, setSelectedAlignment] = useState<string>("all");
@@ -341,7 +341,10 @@ export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
   };
 
   const handleOrganizationClick = (orgId: string) => {
-    navigate(`/book/${bookId}/organization/${orgId}`);
+    navigate({
+      to: "/book/$bookId/organization/$orgId",
+      params: { bookId, orgId },
+    });
   };
 
   const filteredOrganizations = organizations.filter((org) => {

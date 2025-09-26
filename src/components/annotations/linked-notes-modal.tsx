@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   FileText,
   ExternalLink,
@@ -11,7 +12,6 @@ import {
   MapPin,
   Package,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -97,7 +97,10 @@ export function LinkedNotesModal({
 
   const handleOpenNote = (noteId: string) => {
     // Assuming we have a route for file editor
-    navigate(`/book/1/file/${noteId}`);
+    navigate({
+      to: "/book/$bookId/file/$fileId",
+      params: { bookId: "1", fileId: noteId },
+    });
   };
 
   const truncateContent = (content: string, maxLength: number = 120) => {

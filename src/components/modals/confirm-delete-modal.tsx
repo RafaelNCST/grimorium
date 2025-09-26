@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLanguage } from "@/contexts/language-context";
+import { useLanguageStore } from "@/stores/language-store";
 
 interface PropsConfirmDeleteModal {
   open: boolean;
@@ -34,7 +34,7 @@ export function ConfirmDeleteModal({
   itemName,
   itemType = "item",
 }: PropsConfirmDeleteModal) {
-  const { t } = useLanguage();
+  const { t } = useLanguageStore();
   const [confirmText, setConfirmText] = useState("");
 
   const handleConfirm = () => {

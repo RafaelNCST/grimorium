@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useLanguage } from "@/contexts/language-context";
+import { useLanguageStore } from "@/stores/language-store";
 
 interface PropsCreateBookModal {
   open: boolean;
@@ -60,7 +60,7 @@ export function CreateBookModal({
   onClose,
   onConfirm,
 }: PropsCreateBookModal) {
-  const { t } = useLanguage();
+  const { t } = useLanguageStore();
   const [formData, setFormData] = useState<BookFormData>({
     title: "",
     genre: "",

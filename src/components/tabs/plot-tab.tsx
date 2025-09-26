@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Target,
@@ -14,7 +15,6 @@ import {
   ArrowDown,
   Filter,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLanguage } from "@/contexts/language-context";
+import { useLanguageStore } from "@/stores/language-store";
 
 interface IPlotArc {
   id: string;
@@ -141,7 +141,7 @@ const mockArcs: IPlotArc[] = [
 ];
 
 export function PlotTab() {
-  const { t } = useLanguage();
+  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<IPlotArc[]>(mockArcs);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -287,7 +287,10 @@ export function PlotTab() {
               <SelectItem value="finalizado">Finalizados</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={() => navigate("/plot-timeline")}>
+          <Button
+            variant="outline"
+            onClick={() => navigate({ to: "/plot-timeline" })}
+          >
             <GitBranch className="w-4 h-4 mr-2" />
             Árvore Visual
           </Button>
@@ -307,7 +310,9 @@ export function PlotTab() {
           <Card
             key={arc.id}
             className="card-magical cursor-pointer"
-            onClick={() => navigate(`/plot-arc/${arc.id}`)}
+            onClick={() =>
+              navigate({ to: "/plot-arc/$id", params: { id: arc.id } })
+            }
           >
             <CardHeader>
               <div className="flex items-start justify-between">

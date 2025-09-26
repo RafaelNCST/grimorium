@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -13,7 +14,6 @@ import {
   StickyNote,
   Edit2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateContinentModal } from "@/components/modals/create-continent-modal";
@@ -63,14 +63,9 @@ interface PropsWorldTab {
 }
 
 // Mock data structure - in real app this would be from state management
-const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => {
-  // Return empty for book "4" (new book)
-  if (bookId === "4") {
-    return [];
-  }
-
+const getWorldEntitiesForBook = (bookId: string): WorldEntity[] =>
   // Return sample data for other books
-  return [
+  [
     {
       id: "world1",
       bookId,
@@ -188,8 +183,6 @@ const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => {
       image: "/api/placeholder/300/200",
     },
   ];
-};
-
 export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -294,7 +287,10 @@ export function WorldTab({ bookId }: PropsWorldTab) {
   const totalLocations = locations.length;
 
   const handleEntityClick = (entity: WorldEntity) => {
-    navigate(`/book/${bookId}/world/${entity.id}`);
+    navigate({
+      to: "/book/$bookId/world/$worldId",
+      params: { bookId, worldId: entity.id },
+    });
   };
 
   const renderEntityCard = (entity: WorldEntity) => (

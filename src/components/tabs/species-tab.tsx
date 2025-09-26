@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { Plus, ChevronRight } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
 
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
 import { CreateSpeciesModal } from "@/components/modals/create-species-modal";
@@ -54,7 +54,9 @@ const typeColors = {
 
 export function SpeciesTab() {
   const navigate = useNavigate();
-  const { bookId, worldId } = useParams<{ bookId: string; worldId: string }>();
+  const { bookId, worldId } = useParams({
+    from: "/book/$bookId/world/$worldId",
+  });
   const { toast } = useToast();
   const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
@@ -161,11 +163,17 @@ export function SpeciesTab() {
   };
 
   const handleSpeciesClick = (speciesId: string) => {
-    navigate(`/book/${bookId}/world/${worldId}/species/${speciesId}`);
+    navigate({
+      to: "/book/$bookId/world/$worldId/species/$speciesId",
+      params: { bookId, worldId, speciesId },
+    });
   };
 
   const handleRaceClick = (raceId: string) => {
-    navigate(`/book/${bookId}/world/${worldId}/race/${raceId}`);
+    navigate({
+      to: "/book/$bookId/world/$worldId/race/$raceId",
+      params: { bookId, worldId, raceId },
+    });
   };
 
   const openCreateRaceModal = (speciesId: string) => {

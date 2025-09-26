@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -10,7 +11,6 @@ import {
   Shield,
   MapPin,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
@@ -45,11 +45,6 @@ interface ICharacter {
 
 // Book-specific character data
 const getBookCharacters = (bookId: string): ICharacter[] => {
-  if (bookId === "4") {
-    // Empty book - no characters
-    return [];
-  }
-
   if (bookId === "1") {
     // Book 1 - Full character list
     return [
@@ -236,7 +231,10 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
   };
 
   const handleCharacterClick = (characterId: string) => {
-    navigate(`/book/${bookId}/character/${characterId}`);
+    navigate({
+      to: "/book/$bookId/character/$characterId",
+      params: { bookId, characterId },
+    });
   };
 
   return (

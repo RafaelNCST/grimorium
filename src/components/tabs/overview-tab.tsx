@@ -47,7 +47,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { useLanguage } from "@/contexts/language-context";
+import { useLanguageStore } from "@/stores/language-store";
 
 interface Book {
   title: string;
@@ -299,7 +299,7 @@ function SortableSection({
 }
 
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
-  const { t } = useLanguage();
+  const { t } = useLanguageStore();
 
   // Stats state
   const [goals, setGoals] = useState<Goals>({

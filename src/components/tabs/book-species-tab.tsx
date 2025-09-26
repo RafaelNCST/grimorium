@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import { Plus, ChevronRight, Search, Dna } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
@@ -182,11 +182,17 @@ export function BookSpeciesTab({ bookId }: PropsBookSpeciesTab) {
   };
 
   const handleSpeciesClick = (speciesId: string, worldId: string) => {
-    navigate(`/book/${bookId}/world/${worldId}/species/${speciesId}`);
+    navigate({
+      to: "/book/$bookId/world/$worldId/species/$speciesId",
+      params: { bookId, worldId, speciesId },
+    });
   };
 
   const handleRaceClick = (raceId: string, worldId: string) => {
-    navigate(`/book/${bookId}/world/${worldId}/race/${raceId}`);
+    navigate({
+      to: "/book/$bookId/world/$worldId/race/$raceId",
+      params: { bookId, worldId, raceId },
+    });
   };
 
   const openCreateRaceModal = (speciesId: string) => {

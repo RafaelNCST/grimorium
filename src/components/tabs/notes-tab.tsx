@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   FileText,
   FolderOpen,
@@ -11,7 +12,6 @@ import {
   AlertTriangle,
   Link,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import { RichTextEditor } from "@/components/rich-text-editor";
@@ -157,7 +157,10 @@ export function NotesTab({ bookId }: PropsNotesTab) {
   };
 
   const handleFileClick = (file: NoteFile) => {
-    navigate(`/book/${bookId}/file/${file.id}`);
+    navigate({
+      to: "/book/$bookId/file/$fileId",
+      params: { bookId, fileId: file.id },
+    });
   };
 
   const handleSaveFile = () => {
@@ -512,7 +515,10 @@ export function NotesTab({ bookId }: PropsNotesTab) {
                       variant="secondary"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/book/${bookId}/file/${item.id}`);
+                        navigate({
+                          to: "/book/$bookId/file/$fileId",
+                          params: { bookId, fileId: item.id },
+                        });
                       }}
                     >
                       <Edit2 className="w-3 h-3" />

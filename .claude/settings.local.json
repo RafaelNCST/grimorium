@@ -1,7 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(__NEW_LINE__ echo \"=== REMAINING PROPS INTERFACES THAT NEED RENAMING ===\" grep -r \"interface.*Props\" src --include=\"*.tsx\" --include=\"*.ts\")"
+      "Bash(npm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm run:*)",
+      "Bash(xargs:*)",
+      "mcp__context7__resolve-library-id",
+      "WebSearch",
+      "WebFetch(domain:tanstack.com)",
+      "Bash(VITE_PORT=3001 pnpm run dev)",
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(VITE_PORT=3001 npm run dev)",
+      "Bash(npx vite:*)"
     ],
     "deny": [],
     "ask": []
