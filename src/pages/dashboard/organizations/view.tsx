@@ -215,7 +215,10 @@ export function OrganizationsView({
           />
         </div>
 
-        <Select value={selectedAlignment} onValueChange={onSelectedAlignmentChange}>
+        <Select
+          value={selectedAlignment}
+          onValueChange={onSelectedAlignmentChange}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Alinhamento" />
           </SelectTrigger>

@@ -17,7 +17,9 @@
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
       "Bash(VITE_PORT=3001 npm run dev)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prettier:*)"
     ],
     "deny": [],
     "ask": []

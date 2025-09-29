@@ -180,7 +180,10 @@ export function BookSpeciesView({
             </Badge>
           </div>
         </div>
-        <Button variant="magical" onClick={() => onCreateSpeciesOpenChange(true)}>
+        <Button
+          variant="magical"
+          onClick={() => onCreateSpeciesOpenChange(true)}
+        >
           <Plus className="mr-2 h-4 w-4" />
           Nova Espécie
         </Button>

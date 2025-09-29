@@ -15,10 +15,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { type CharacterVersion } from "@/components/character-version-manager";
 import {
-  type CharacterVersion,
-} from "@/components/character-version-manager";
-import { mockCharacters, mockLocations, mockOrganizations } from "@/mocks/global";
+  mockCharacters,
+  mockLocations,
+  mockOrganizations,
+} from "@/mocks/global";
 
 import { mockCharacterDetail } from "@/mocks/local/character-data";
 import { CharacterDetailView } from "./view";
@@ -529,9 +531,12 @@ export function CharacterDetail() {
     setEditData((prev) => ({ ...prev, [field]: value }));
   };
   const handleNewQualityChange = (value: string) => setNewQuality(value);
-  const handleRelationshipCharacterChange = (characterId: string) => setSelectedRelationshipCharacter(characterId);
-  const handleRelationshipTypeChange = (type: string) => setSelectedRelationshipType(type);
-  const handleRelationshipIntensityChange = (intensity: number[]) => setRelationshipIntensity(intensity);
+  const handleRelationshipCharacterChange = (characterId: string) =>
+    setSelectedRelationshipCharacter(characterId);
+  const handleRelationshipTypeChange = (type: string) =>
+    setSelectedRelationshipType(type);
+  const handleRelationshipIntensityChange = (intensity: number[]) =>
+    setRelationshipIntensity(intensity);
   const handleNavigateToFamilyTree = () => {
     navigate({
       to: "/book/$bookId/character/$characterId/family-tree",

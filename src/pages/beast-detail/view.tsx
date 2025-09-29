@@ -62,7 +62,10 @@ interface BeastDetailViewProps {
   onEditedBeastChange: (updates: Partial<Beast>) => void;
   onAddMythology: () => void;
   onRemoveMythology: (mythId: string) => void;
-  onNewMythologyChange: (mythology: { people: string; version: string }) => void;
+  onNewMythologyChange: (mythology: {
+    people: string;
+    version: string;
+  }) => void;
 
   // Modal handlers
   setShowDeleteModal: (show: boolean) => void;

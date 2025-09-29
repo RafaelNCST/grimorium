@@ -523,7 +523,9 @@ export function PowerSystemView({
               <PropertiesPanel
                 element={selectedElementData}
                 defaultColors={DEFAULT_COLORS}
-                onUpdate={(updates) => onUpdateElement(selectedElementData.id, updates)}
+                onUpdate={(updates) =>
+                  onUpdateElement(selectedElementData.id, updates)
+                }
                 onDelete={onPropertiesDelete}
                 onClose={onPropertiesClose}
               />
@@ -542,10 +544,7 @@ export function PowerSystemView({
         onClose={onTutorialClose}
       />
 
-      <HelpDialog
-        isOpen={showHelpDialog}
-        onOpenChange={onSetShowHelpDialog}
-      />
+      <HelpDialog isOpen={showHelpDialog} onOpenChange={onSetShowHelpDialog} />
 
       <TemplateDialog
         isOpen={showTemplateDialog}

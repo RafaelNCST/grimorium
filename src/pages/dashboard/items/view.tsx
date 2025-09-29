@@ -176,7 +176,10 @@ export function ItemsView({
           />
         </div>
 
-        <Select value={selectedCategory} onValueChange={onSelectedCategoryChange}>
+        <Select
+          value={selectedCategory}
+          onValueChange={onSelectedCategoryChange}
+        >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Categoria" />
           </SelectTrigger>

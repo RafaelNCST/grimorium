@@ -302,7 +302,8 @@ export function ChapterEditor() {
   };
 
   const handleNewCommentChange = (comment: string) => setNewComment(comment);
-  const handleEditCommentTextChange = (text: string) => setEditCommentText(text);
+  const handleEditCommentTextChange = (text: string) =>
+    setEditCommentText(text);
   const handleCancelEditComment = () => {
     setEditingComment(null);
     setEditCommentText("");

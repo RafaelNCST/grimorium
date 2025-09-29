@@ -401,7 +401,10 @@ export function NotesView({
         )}
       </div>
 
-      <AlertDialog open={showDeleteConfirm} onOpenChange={onSetShowDeleteConfirm}>
+      <AlertDialog
+        open={showDeleteConfirm}
+        onOpenChange={onSetShowDeleteConfirm}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">

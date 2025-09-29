@@ -92,23 +92,36 @@ interface CharacterDetailViewProps {
   onVersionChange: (version: CharacterVersion) => void;
   onVersionSave: (name: string, description?: string) => void;
   onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
+  onVersionUpdate: (
+    versionId: string,
+    name: string,
+    description?: string
+  ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onAgeChange: (increment: boolean) => void;
   onEditDataChange: (field: string, value: any) => void;
   onQualityAdd: () => void;
   onQualityRemove: (quality: string) => void;
   onNewQualityChange: (value: string) => void;
-  onFamilyRelationChange: (relationType: string, characterId: string | null) => void;
+  onFamilyRelationChange: (
+    relationType: string,
+    characterId: string | null
+  ) => void;
   onRelationshipAdd: () => void;
   onRelationshipRemove: (relationshipId: string) => void;
-  onRelationshipIntensityUpdate: (relationshipId: string, intensity: number) => void;
+  onRelationshipIntensityUpdate: (
+    relationshipId: string,
+    intensity: number
+  ) => void;
   onRelationshipCharacterChange: (characterId: string) => void;
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
   onNavigateToFamilyTree: () => void;
   getRelationshipTypeData: (type: string) => any;
-  getFamilyRelationLabel: (relationType: string, characterName: string) => string;
+  getFamilyRelationLabel: (
+    relationType: string,
+    characterName: string
+  ) => string;
 }
 
 export function CharacterDetailView({
@@ -335,7 +348,10 @@ export function CharacterDetailView({
                                   type="number"
                                   value={editData.age}
                                   onChange={(e) =>
-                                    onEditDataChange("age", parseInt(e.target.value) || 0)
+                                    onEditDataChange(
+                                      "age",
+                                      parseInt(e.target.value) || 0
+                                    )
                                   }
                                   className="mx-1 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                   min="0"
@@ -432,7 +448,10 @@ export function CharacterDetailView({
                                           : "border-muted hover:border-primary/50"
                                       }`}
                                       onClick={() =>
-                                        onEditDataChange("alignment", alignment.value)
+                                        onEditDataChange(
+                                          "alignment",
+                                          alignment.value
+                                        )
                                       }
                                     >
                                       <div className="flex items-center gap-2">
@@ -601,7 +620,10 @@ export function CharacterDetailView({
                       <Select
                         value={editData.birthPlace || "none"}
                         onValueChange={(value) =>
-                          onEditDataChange("birthPlace", value === "none" ? "" : value)
+                          onEditDataChange(
+                            "birthPlace",
+                            value === "none" ? "" : value
+                          )
                         }
                       >
                         <SelectTrigger>
@@ -1212,9 +1234,7 @@ export function CharacterDetailView({
                                       variant="destructive"
                                       size="sm"
                                       onClick={() =>
-                                        onRelationshipRemove(
-                                          relationship.id
-                                        )
+                                        onRelationshipRemove(relationship.id)
                                       }
                                     >
                                       <Minus className="w-3 h-3" />
@@ -1376,7 +1396,10 @@ export function CharacterDetailView({
                     <Select
                       value={editData.organization}
                       onValueChange={(value) =>
-                        onEditDataChange("organization", value === "none" ? "" : value)
+                        onEditDataChange(
+                          "organization",
+                          value === "none" ? "" : value
+                        )
                       }
                     >
                       <SelectTrigger>

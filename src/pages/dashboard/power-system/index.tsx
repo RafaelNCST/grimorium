@@ -371,15 +371,12 @@ export function PowerSystemTab() {
       showHelpDialog={showHelpDialog}
       showPropertiesPanel={showPropertiesPanel}
       selectedElementData={selectedElementData}
-
       // Constants
       ELEMENT_TYPES={ELEMENT_TYPES}
       DEFAULT_COLORS={DEFAULT_COLORS}
       TUTORIAL_STEPS={TUTORIAL_STEPS}
-
       // Refs
       canvasRef={canvasRef}
-
       // Handlers
       onToggleEditMode={handleToggleEditMode}
       onSave={handleSave}

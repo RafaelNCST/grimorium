@@ -13,7 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { mockArcs, type IPlotArc, type IPlotEvent } from "@/mocks/local/plot-arcs";
+import {
+  mockArcs,
+  type IPlotArc,
+  type IPlotEvent,
+} from "@/mocks/local/plot-arcs";
 
 export function PlotTimeline() {
   const navigate = useNavigate();

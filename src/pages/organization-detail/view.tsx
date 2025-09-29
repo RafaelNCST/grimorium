@@ -140,11 +140,7 @@ export function OrganizationDetailView({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-          >
+          <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
@@ -201,7 +197,9 @@ export function OrganizationDetailView({
               {isEditing ? (
                 <Textarea
                   value={editData.description}
-                  onChange={(e) => onEditDataChange("description", e.target.value)}
+                  onChange={(e) =>
+                    onEditDataChange("description", e.target.value)
+                  }
                   rows={4}
                   placeholder="Descrição da organização..."
                 />
@@ -515,7 +513,9 @@ export function OrganizationDetailView({
                 {isEditing ? (
                   <Select
                     value={editData.alignment}
-                    onValueChange={(value) => onEditDataChange("alignment", value)}
+                    onValueChange={(value) =>
+                      onEditDataChange("alignment", value)
+                    }
                   >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Selecione o alinhamento" />
@@ -538,7 +538,9 @@ export function OrganizationDetailView({
                 {isEditing ? (
                   <Select
                     value={editData.influence}
-                    onValueChange={(value) => onEditDataChange("influence", value)}
+                    onValueChange={(value) =>
+                      onEditDataChange("influence", value)
+                    }
                   >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Selecione a influência" />
@@ -588,7 +590,10 @@ export function OrganizationDetailView({
                   <Select
                     value={editData.continent}
                     onValueChange={(value) =>
-                      onEditDataChange("continent", value === "none" ? "" : value)
+                      onEditDataChange(
+                        "continent",
+                        value === "none" ? "" : value
+                      )
                     }
                   >
                     <SelectTrigger className="mt-1">
@@ -617,7 +622,10 @@ export function OrganizationDetailView({
                   <Select
                     value={editData.baseLocation}
                     onValueChange={(value) =>
-                      onEditDataChange("baseLocation", value === "none" ? "" : value)
+                      onEditDataChange(
+                        "baseLocation",
+                        value === "none" ? "" : value
+                      )
                     }
                   >
                     <SelectTrigger className="mt-1">
@@ -826,7 +834,9 @@ export function OrganizationDetailView({
               <Label htmlFor="memberCharacter">Personagem</Label>
               <Select
                 value={newMember.characterId}
-                onValueChange={(value) => onNewMemberChange("characterId", value)}
+                onValueChange={(value) =>
+                  onNewMemberChange("characterId", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um personagem" />
@@ -903,7 +913,9 @@ export function OrganizationDetailView({
                 id="titleDescription"
                 placeholder="Descrição do título..."
                 value={newTitle.description}
-                onChange={(e) => onNewTitleChange("description", e.target.value)}
+                onChange={(e) =>
+                  onNewTitleChange("description", e.target.value)
+                }
               />
             </div>
 

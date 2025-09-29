@@ -544,7 +544,10 @@ export function OverviewView(props: OverviewViewProps) {
                   onClick={() =>
                     onStoryProgressChange({
                       ...storyProgress,
-                      estimatedArcs: Math.max(1, storyProgress.estimatedArcs - 1),
+                      estimatedArcs: Math.max(
+                        1,
+                        storyProgress.estimatedArcs - 1
+                      ),
                     })
                   }
                 >
@@ -636,7 +639,9 @@ export function OverviewView(props: OverviewViewProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onEditingAuthorSummaryChange(!isEditingAuthorSummary)}
+            onClick={() =>
+              onEditingAuthorSummaryChange(!isEditingAuthorSummary)
+            }
             className="h-6 w-6"
           >
             <Edit2 className="w-3 h-3" />

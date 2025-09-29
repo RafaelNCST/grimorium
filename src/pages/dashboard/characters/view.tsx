@@ -183,7 +183,10 @@ export function CharactersView({
           </SelectContent>
         </Select>
 
-        <Select value={selectedLocation} onValueChange={onSelectedLocationChange}>
+        <Select
+          value={selectedLocation}
+          onValueChange={onSelectedLocationChange}
+        >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Local" />
           </SelectTrigger>

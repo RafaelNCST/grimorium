@@ -1,14 +1,7 @@
 import { useState, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import {
-  Shield,
-  Skull,
-  Sun,
-  Moon,
-  TreePine,
-  Sword,
-} from "lucide-react";
+import { Shield, Skull, Sun, Moon, TreePine, Sword } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -150,7 +143,10 @@ export function BeastDetail() {
     setEditedBeast({ ...editedBeast, ...updates });
   };
 
-  const handleNewMythologyChange = (mythology: { people: string; version: string }) => {
+  const handleNewMythologyChange = (mythology: {
+    people: string;
+    version: string;
+  }) => {
     setNewMythology(mythology);
   };
 

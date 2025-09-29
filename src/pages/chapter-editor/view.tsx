@@ -370,11 +370,7 @@ export function ChapterEditorView({
                 <span className="text-sm text-muted-foreground">
                   Texto selecionado: "{selectedText}"
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onShowLinkModal}
-                >
+                <Button variant="outline" size="sm" onClick={onShowLinkModal}>
                   <Link className="w-4 h-4 mr-1" />
                   Linkar
                 </Button>

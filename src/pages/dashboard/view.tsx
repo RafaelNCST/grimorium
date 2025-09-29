@@ -662,12 +662,6 @@ export function DashboardView({
               <TabsContent value="species" className="mt-0">
                 <SpeciesTab bookId={bookId} />
               </TabsContent>
-              <TabsContent value="book-species" className="mt-0">
-                <BookSpeciesTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="relations" className="mt-0">
-                <RelationsTab bookId={bookId} />
-              </TabsContent>
               <TabsContent value="bestiary" className="mt-0">
                 <BestiaryTab bookId={bookId} />
               </TabsContent>

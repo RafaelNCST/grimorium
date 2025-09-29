@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { SpeciesView } from "./view";
 import { useToast } from "@/hooks/use-toast";
@@ -35,11 +35,12 @@ const typeColors = {
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
 };
 
-export function SpeciesTab() {
+interface SpeciesTabProps {
+  bookId: string;
+}
+
+export function SpeciesTab({ bookId }: SpeciesTabProps) {
   const navigate = useNavigate();
-  const { bookId, worldId } = useParams({
-    from: "/book/$bookId/world/$worldId",
-  });
   const { toast } = useToast();
   const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
@@ -146,17 +147,23 @@ export function SpeciesTab() {
   };
 
   const handleSpeciesClick = (speciesId: string) => {
-    navigate({
-      to: "/book/$bookId/world/$worldId/species/$speciesId",
-      params: { bookId, worldId, speciesId },
+    const worldId = "world1"; // Default world - Aethermoor
+    const speciesUrl = `/book/${bookId}/world/${worldId}/species/${speciesId}`;
+    console.log("Navigating to species detail:", {
+      bookId,
+      worldId,
+      speciesId,
     });
+    console.log("Route URL:", speciesUrl);
+    window.location.href = speciesUrl;
   };
 
   const handleRaceClick = (raceId: string) => {
-    navigate({
-      to: "/book/$bookId/world/$worldId/race/$raceId",
-      params: { bookId, worldId, raceId },
-    });
+    const worldId = "world1"; // Default world - Aethermoor
+    const raceUrl = `/book/${bookId}/world/${worldId}/race/${raceId}`;
+    console.log("Navigating to race detail:", { bookId, worldId, raceId });
+    console.log("Route URL:", raceUrl);
+    window.location.href = raceUrl;
   };
 
   const openCreateRaceModal = (speciesId: string) => {

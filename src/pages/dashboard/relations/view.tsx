@@ -260,7 +260,10 @@ export function RelationsView({
                 Funcionalidade em desenvolvimento - Visualize as relações como
                 um grafo interativo
               </p>
-              <Button variant="outline" onClick={() => onViewModeChange("list")}>
+              <Button
+                variant="outline"
+                onClick={() => onViewModeChange("list")}
+              >
                 Voltar para Lista
               </Button>
             </div>

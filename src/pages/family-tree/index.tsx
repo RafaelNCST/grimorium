@@ -8,7 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { TreeNode, mockCharacter, mockCharacters } from "@/mocks/local/family-data";
+import {
+  TreeNode,
+  mockCharacter,
+  mockCharacters,
+} from "@/mocks/local/family-data";
 
 export function FamilyTreePage() {
   const { bookId, characterId } = useParams({
