@@ -327,8 +327,8 @@ export function NotesView({
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate({
-                          to: "/book/$bookId/file/$fileId",
-                          params: { bookId, fileId: item.id },
+                          to: "/dashboard/$dashboardId/file/$fileId",
+                          params: { dashboardId: bookId, fileId: item.id },
                         });
                       }}
                     >

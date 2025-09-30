@@ -289,7 +289,7 @@ export function PlotTab() {
           </Select>
           <Button
             variant="outline"
-            onClick={() => navigate({ to: "/plot-timeline" })}
+            onClick={() => navigate({ to: "/dashboard/$dashboardId/plot/plot-timeline/plot-timeline" })}
           >
             <GitBranch className="w-4 h-4 mr-2" />
             Árvore Visual
@@ -311,7 +311,7 @@ export function PlotTab() {
             key={arc.id}
             className="card-magical cursor-pointer"
             onClick={() =>
-              navigate({ to: "/plot-arc/$id", params: { id: arc.id } })
+              navigate({ to: "/dashboard/$dashboardId/plot/$plotId", params: { plotId: arc.id } })
             }
           >
             <CardHeader>

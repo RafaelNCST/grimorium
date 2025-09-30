@@ -158,8 +158,8 @@ export function NotesTab({ bookId }: PropsNotesTab) {
 
   const handleFileClick = (file: NoteFile) => {
     navigate({
-      to: "/book/$bookId/file/$fileId",
-      params: { bookId, fileId: file.id },
+      to: "/dashboard/$dashboardId/file/$fileId",
+      params: { dashboardId: bookId, fileId: file.id },
     });
   };
 
@@ -516,8 +516,8 @@ export function NotesTab({ bookId }: PropsNotesTab) {
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate({
-                          to: "/book/$bookId/file/$fileId",
-                          params: { bookId, fileId: item.id },
+                          to: "/dashboard/$dashboardId/file/$fileId",
+                          params: { dashboardId: bookId, fileId: item.id },
                         });
                       }}
                     >

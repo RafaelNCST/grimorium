@@ -9,30 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PlotTimelineRouteImport } from './routes/plot-timeline'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlotArcIdRouteImport } from './routes/plot-arc/$id'
-import { Route as BeastIdRouteImport } from './routes/beast/$id'
 import { Route as ItemIdIndexRouteImport } from './routes/item/$id/index'
-import { Route as BookBookIdIndexRouteImport } from './routes/book/$bookId/index'
+import { Route as DashboardDashboardIdIndexRouteImport } from './routes/dashboard/$dashboardId/index'
 import { Route as ItemIdTimelineRouteImport } from './routes/item/$id/timeline'
-import { Route as BookBookIdDashboardRouteImport } from './routes/book/$bookId/dashboard'
-import { Route as BookBookIdChaptersRouteImport } from './routes/book/$bookId/chapters'
-import { Route as BookBookIdWorldWorldIdRouteImport } from './routes/book/$bookId/world/$worldId'
-import { Route as BookBookIdOrganizationOrgIdRouteImport } from './routes/book/$bookId/organization/$orgId'
-import { Route as BookBookIdFileFileIdRouteImport } from './routes/book/$bookId/file/$fileId'
-import { Route as BookBookIdCharacterCharacterIdRouteImport } from './routes/book/$bookId/character/$characterId'
-import { Route as BookBookIdChapterChapterIdRouteImport } from './routes/book/$bookId/chapter/$chapterId'
-import { Route as BookBookIdCharacterCharacterIdFamilyTreeRouteImport } from './routes/book/$bookId/character/$characterId/family-tree'
-import { Route as BookBookIdWorldWorldIdSpeciesSpeciesIdRouteImport } from './routes/book/$bookId/world/$worldId/species/$speciesId'
-import { Route as BookBookIdWorldWorldIdRaceRaceIdRouteImport } from './routes/book/$bookId/world/$worldId/race/$raceId'
+import { Route as DashboardDashboardIdWorldWorldIdRouteImport } from './routes/dashboard/$dashboardId/world/$worldId'
+import { Route as DashboardDashboardIdRaceRaceIdRouteImport } from './routes/dashboard/$dashboardId/race/$raceId'
+import { Route as DashboardDashboardIdPlotPlotIdRouteImport } from './routes/dashboard/$dashboardId/plot/$plotId'
+import { Route as DashboardDashboardIdOrganizationOrgIdRouteImport } from './routes/dashboard/$dashboardId/organization/$orgId'
+import { Route as DashboardDashboardIdNotesNotesRouteImport } from './routes/dashboard/$dashboardId/notes/notes'
+import { Route as DashboardDashboardIdItemItemIdRouteImport } from './routes/dashboard/$dashboardId/item/$itemId'
+import { Route as DashboardDashboardIdCharacterCharacterIdRouteImport } from './routes/dashboard/$dashboardId/character/$characterId'
+import { Route as DashboardDashboardIdChapterChaptersRouteImport } from './routes/dashboard/$dashboardId/chapter/chapters'
+import { Route as DashboardDashboardIdBeastIdRouteImport } from './routes/dashboard/$dashboardId/beast/$id'
+import { Route as DashboardDashboardIdPlotPlotTimelinePlotTimelineRouteImport } from './routes/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
+import { Route as DashboardDashboardIdNotesFileNotesFileNotesIdRouteImport } from './routes/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+import { Route as DashboardDashboardIdNotesEditorNotesEditorNotesIdRouteImport } from './routes/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+import { Route as DashboardDashboardIdCharacterCharacterIdFamilyTreeRouteImport } from './routes/dashboard/$dashboardId/character/$characterId/family-tree'
+import { Route as DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRouteImport } from './routes/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
 
-const PlotTimelineRoute = PlotTimelineRouteImport.update({
-  id: '/plot-timeline',
-  path: '/plot-timeline',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -43,239 +39,260 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlotArcIdRoute = PlotArcIdRouteImport.update({
-  id: '/plot-arc/$id',
-  path: '/plot-arc/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BeastIdRoute = BeastIdRouteImport.update({
-  id: '/beast/$id',
-  path: '/beast/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ItemIdIndexRoute = ItemIdIndexRouteImport.update({
   id: '/item/$id/',
   path: '/item/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BookBookIdIndexRoute = BookBookIdIndexRouteImport.update({
-  id: '/book/$bookId/',
-  path: '/book/$bookId/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const DashboardDashboardIdIndexRoute =
+  DashboardDashboardIdIndexRouteImport.update({
+    id: '/dashboard/$dashboardId/',
+    path: '/dashboard/$dashboardId/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ItemIdTimelineRoute = ItemIdTimelineRouteImport.update({
   id: '/item/$id/timeline',
   path: '/item/$id/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BookBookIdDashboardRoute = BookBookIdDashboardRouteImport.update({
-  id: '/book/$bookId/dashboard',
-  path: '/book/$bookId/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookBookIdChaptersRoute = BookBookIdChaptersRouteImport.update({
-  id: '/book/$bookId/chapters',
-  path: '/book/$bookId/chapters',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookBookIdWorldWorldIdRoute = BookBookIdWorldWorldIdRouteImport.update({
-  id: '/book/$bookId/world/$worldId',
-  path: '/book/$bookId/world/$worldId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookBookIdOrganizationOrgIdRoute =
-  BookBookIdOrganizationOrgIdRouteImport.update({
-    id: '/book/$bookId/organization/$orgId',
-    path: '/book/$bookId/organization/$orgId',
+const DashboardDashboardIdWorldWorldIdRoute =
+  DashboardDashboardIdWorldWorldIdRouteImport.update({
+    id: '/dashboard/$dashboardId/world/$worldId',
+    path: '/dashboard/$dashboardId/world/$worldId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const BookBookIdFileFileIdRoute = BookBookIdFileFileIdRouteImport.update({
-  id: '/book/$bookId/file/$fileId',
-  path: '/book/$bookId/file/$fileId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookBookIdCharacterCharacterIdRoute =
-  BookBookIdCharacterCharacterIdRouteImport.update({
-    id: '/book/$bookId/character/$characterId',
-    path: '/book/$bookId/character/$characterId',
+const DashboardDashboardIdRaceRaceIdRoute =
+  DashboardDashboardIdRaceRaceIdRouteImport.update({
+    id: '/dashboard/$dashboardId/race/$raceId',
+    path: '/dashboard/$dashboardId/race/$raceId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const BookBookIdChapterChapterIdRoute =
-  BookBookIdChapterChapterIdRouteImport.update({
-    id: '/book/$bookId/chapter/$chapterId',
-    path: '/book/$bookId/chapter/$chapterId',
+const DashboardDashboardIdPlotPlotIdRoute =
+  DashboardDashboardIdPlotPlotIdRouteImport.update({
+    id: '/dashboard/$dashboardId/plot/$plotId',
+    path: '/dashboard/$dashboardId/plot/$plotId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const BookBookIdCharacterCharacterIdFamilyTreeRoute =
-  BookBookIdCharacterCharacterIdFamilyTreeRouteImport.update({
+const DashboardDashboardIdOrganizationOrgIdRoute =
+  DashboardDashboardIdOrganizationOrgIdRouteImport.update({
+    id: '/dashboard/$dashboardId/organization/$orgId',
+    path: '/dashboard/$dashboardId/organization/$orgId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdNotesNotesRoute =
+  DashboardDashboardIdNotesNotesRouteImport.update({
+    id: '/dashboard/$dashboardId/notes/notes',
+    path: '/dashboard/$dashboardId/notes/notes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdItemItemIdRoute =
+  DashboardDashboardIdItemItemIdRouteImport.update({
+    id: '/dashboard/$dashboardId/item/$itemId',
+    path: '/dashboard/$dashboardId/item/$itemId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdCharacterCharacterIdRoute =
+  DashboardDashboardIdCharacterCharacterIdRouteImport.update({
+    id: '/dashboard/$dashboardId/character/$characterId',
+    path: '/dashboard/$dashboardId/character/$characterId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdChapterChaptersRoute =
+  DashboardDashboardIdChapterChaptersRouteImport.update({
+    id: '/dashboard/$dashboardId/chapter/chapters',
+    path: '/dashboard/$dashboardId/chapter/chapters',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdBeastIdRoute =
+  DashboardDashboardIdBeastIdRouteImport.update({
+    id: '/dashboard/$dashboardId/beast/$id',
+    path: '/dashboard/$dashboardId/beast/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute =
+  DashboardDashboardIdPlotPlotTimelinePlotTimelineRouteImport.update({
+    id: '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline',
+    path: '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdNotesFileNotesFileNotesIdRoute =
+  DashboardDashboardIdNotesFileNotesFileNotesIdRouteImport.update({
+    id: '/dashboard/$dashboardId/notes/file-notes/$file-notesId',
+    path: '/dashboard/$dashboardId/notes/file-notes/$file-notesId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute =
+  DashboardDashboardIdNotesEditorNotesEditorNotesIdRouteImport.update({
+    id: '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId',
+    path: '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute =
+  DashboardDashboardIdCharacterCharacterIdFamilyTreeRouteImport.update({
     id: '/family-tree',
     path: '/family-tree',
-    getParentRoute: () => BookBookIdCharacterCharacterIdRoute,
+    getParentRoute: () => DashboardDashboardIdCharacterCharacterIdRoute,
   } as any)
-const BookBookIdWorldWorldIdSpeciesSpeciesIdRoute =
-  BookBookIdWorldWorldIdSpeciesSpeciesIdRouteImport.update({
-    id: '/species/$speciesId',
-    path: '/species/$speciesId',
-    getParentRoute: () => BookBookIdWorldWorldIdRoute,
-  } as any)
-const BookBookIdWorldWorldIdRaceRaceIdRoute =
-  BookBookIdWorldWorldIdRaceRaceIdRouteImport.update({
-    id: '/race/$raceId',
-    path: '/race/$raceId',
-    getParentRoute: () => BookBookIdWorldWorldIdRoute,
+const DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute =
+  DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRouteImport.update({
+    id: '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId',
+    path: '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/plot-timeline': typeof PlotTimelineRoute
-  '/beast/$id': typeof BeastIdRoute
-  '/plot-arc/$id': typeof PlotArcIdRoute
-  '/book/$bookId/chapters': typeof BookBookIdChaptersRoute
-  '/book/$bookId/dashboard': typeof BookBookIdDashboardRoute
   '/item/$id/timeline': typeof ItemIdTimelineRoute
-  '/book/$bookId': typeof BookBookIdIndexRoute
+  '/dashboard/$dashboardId': typeof DashboardDashboardIdIndexRoute
   '/item/$id': typeof ItemIdIndexRoute
-  '/book/$bookId/chapter/$chapterId': typeof BookBookIdChapterChapterIdRoute
-  '/book/$bookId/character/$characterId': typeof BookBookIdCharacterCharacterIdRouteWithChildren
-  '/book/$bookId/file/$fileId': typeof BookBookIdFileFileIdRoute
-  '/book/$bookId/organization/$orgId': typeof BookBookIdOrganizationOrgIdRoute
-  '/book/$bookId/world/$worldId': typeof BookBookIdWorldWorldIdRouteWithChildren
-  '/book/$bookId/character/$characterId/family-tree': typeof BookBookIdCharacterCharacterIdFamilyTreeRoute
-  '/book/$bookId/world/$worldId/race/$raceId': typeof BookBookIdWorldWorldIdRaceRaceIdRoute
-  '/book/$bookId/world/$worldId/species/$speciesId': typeof BookBookIdWorldWorldIdSpeciesSpeciesIdRoute
+  '/dashboard/$dashboardId/beast/$id': typeof DashboardDashboardIdBeastIdRoute
+  '/dashboard/$dashboardId/chapter/chapters': typeof DashboardDashboardIdChapterChaptersRoute
+  '/dashboard/$dashboardId/character/$characterId': typeof DashboardDashboardIdCharacterCharacterIdRouteWithChildren
+  '/dashboard/$dashboardId/item/$itemId': typeof DashboardDashboardIdItemItemIdRoute
+  '/dashboard/$dashboardId/notes/notes': typeof DashboardDashboardIdNotesNotesRoute
+  '/dashboard/$dashboardId/organization/$orgId': typeof DashboardDashboardIdOrganizationOrgIdRoute
+  '/dashboard/$dashboardId/plot/$plotId': typeof DashboardDashboardIdPlotPlotIdRoute
+  '/dashboard/$dashboardId/race/$raceId': typeof DashboardDashboardIdRaceRaceIdRoute
+  '/dashboard/$dashboardId/world/$worldId': typeof DashboardDashboardIdWorldWorldIdRoute
+  '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId': typeof DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute
+  '/dashboard/$dashboardId/character/$characterId/family-tree': typeof DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute
+  '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId': typeof DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute
+  '/dashboard/$dashboardId/notes/file-notes/$file-notesId': typeof DashboardDashboardIdNotesFileNotesFileNotesIdRoute
+  '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline': typeof DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/plot-timeline': typeof PlotTimelineRoute
-  '/beast/$id': typeof BeastIdRoute
-  '/plot-arc/$id': typeof PlotArcIdRoute
-  '/book/$bookId/chapters': typeof BookBookIdChaptersRoute
-  '/book/$bookId/dashboard': typeof BookBookIdDashboardRoute
   '/item/$id/timeline': typeof ItemIdTimelineRoute
-  '/book/$bookId': typeof BookBookIdIndexRoute
+  '/dashboard/$dashboardId': typeof DashboardDashboardIdIndexRoute
   '/item/$id': typeof ItemIdIndexRoute
-  '/book/$bookId/chapter/$chapterId': typeof BookBookIdChapterChapterIdRoute
-  '/book/$bookId/character/$characterId': typeof BookBookIdCharacterCharacterIdRouteWithChildren
-  '/book/$bookId/file/$fileId': typeof BookBookIdFileFileIdRoute
-  '/book/$bookId/organization/$orgId': typeof BookBookIdOrganizationOrgIdRoute
-  '/book/$bookId/world/$worldId': typeof BookBookIdWorldWorldIdRouteWithChildren
-  '/book/$bookId/character/$characterId/family-tree': typeof BookBookIdCharacterCharacterIdFamilyTreeRoute
-  '/book/$bookId/world/$worldId/race/$raceId': typeof BookBookIdWorldWorldIdRaceRaceIdRoute
-  '/book/$bookId/world/$worldId/species/$speciesId': typeof BookBookIdWorldWorldIdSpeciesSpeciesIdRoute
+  '/dashboard/$dashboardId/beast/$id': typeof DashboardDashboardIdBeastIdRoute
+  '/dashboard/$dashboardId/chapter/chapters': typeof DashboardDashboardIdChapterChaptersRoute
+  '/dashboard/$dashboardId/character/$characterId': typeof DashboardDashboardIdCharacterCharacterIdRouteWithChildren
+  '/dashboard/$dashboardId/item/$itemId': typeof DashboardDashboardIdItemItemIdRoute
+  '/dashboard/$dashboardId/notes/notes': typeof DashboardDashboardIdNotesNotesRoute
+  '/dashboard/$dashboardId/organization/$orgId': typeof DashboardDashboardIdOrganizationOrgIdRoute
+  '/dashboard/$dashboardId/plot/$plotId': typeof DashboardDashboardIdPlotPlotIdRoute
+  '/dashboard/$dashboardId/race/$raceId': typeof DashboardDashboardIdRaceRaceIdRoute
+  '/dashboard/$dashboardId/world/$worldId': typeof DashboardDashboardIdWorldWorldIdRoute
+  '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId': typeof DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute
+  '/dashboard/$dashboardId/character/$characterId/family-tree': typeof DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute
+  '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId': typeof DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute
+  '/dashboard/$dashboardId/notes/file-notes/$file-notesId': typeof DashboardDashboardIdNotesFileNotesFileNotesIdRoute
+  '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline': typeof DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/plot-timeline': typeof PlotTimelineRoute
-  '/beast/$id': typeof BeastIdRoute
-  '/plot-arc/$id': typeof PlotArcIdRoute
-  '/book/$bookId/chapters': typeof BookBookIdChaptersRoute
-  '/book/$bookId/dashboard': typeof BookBookIdDashboardRoute
   '/item/$id/timeline': typeof ItemIdTimelineRoute
-  '/book/$bookId/': typeof BookBookIdIndexRoute
+  '/dashboard/$dashboardId/': typeof DashboardDashboardIdIndexRoute
   '/item/$id/': typeof ItemIdIndexRoute
-  '/book/$bookId/chapter/$chapterId': typeof BookBookIdChapterChapterIdRoute
-  '/book/$bookId/character/$characterId': typeof BookBookIdCharacterCharacterIdRouteWithChildren
-  '/book/$bookId/file/$fileId': typeof BookBookIdFileFileIdRoute
-  '/book/$bookId/organization/$orgId': typeof BookBookIdOrganizationOrgIdRoute
-  '/book/$bookId/world/$worldId': typeof BookBookIdWorldWorldIdRouteWithChildren
-  '/book/$bookId/character/$characterId/family-tree': typeof BookBookIdCharacterCharacterIdFamilyTreeRoute
-  '/book/$bookId/world/$worldId/race/$raceId': typeof BookBookIdWorldWorldIdRaceRaceIdRoute
-  '/book/$bookId/world/$worldId/species/$speciesId': typeof BookBookIdWorldWorldIdSpeciesSpeciesIdRoute
+  '/dashboard/$dashboardId/beast/$id': typeof DashboardDashboardIdBeastIdRoute
+  '/dashboard/$dashboardId/chapter/chapters': typeof DashboardDashboardIdChapterChaptersRoute
+  '/dashboard/$dashboardId/character/$characterId': typeof DashboardDashboardIdCharacterCharacterIdRouteWithChildren
+  '/dashboard/$dashboardId/item/$itemId': typeof DashboardDashboardIdItemItemIdRoute
+  '/dashboard/$dashboardId/notes/notes': typeof DashboardDashboardIdNotesNotesRoute
+  '/dashboard/$dashboardId/organization/$orgId': typeof DashboardDashboardIdOrganizationOrgIdRoute
+  '/dashboard/$dashboardId/plot/$plotId': typeof DashboardDashboardIdPlotPlotIdRoute
+  '/dashboard/$dashboardId/race/$raceId': typeof DashboardDashboardIdRaceRaceIdRoute
+  '/dashboard/$dashboardId/world/$worldId': typeof DashboardDashboardIdWorldWorldIdRoute
+  '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId': typeof DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute
+  '/dashboard/$dashboardId/character/$characterId/family-tree': typeof DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute
+  '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId': typeof DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute
+  '/dashboard/$dashboardId/notes/file-notes/$file-notesId': typeof DashboardDashboardIdNotesFileNotesFileNotesIdRoute
+  '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline': typeof DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$'
-    | '/plot-timeline'
-    | '/beast/$id'
-    | '/plot-arc/$id'
-    | '/book/$bookId/chapters'
-    | '/book/$bookId/dashboard'
     | '/item/$id/timeline'
-    | '/book/$bookId'
+    | '/dashboard/$dashboardId'
     | '/item/$id'
-    | '/book/$bookId/chapter/$chapterId'
-    | '/book/$bookId/character/$characterId'
-    | '/book/$bookId/file/$fileId'
-    | '/book/$bookId/organization/$orgId'
-    | '/book/$bookId/world/$worldId'
-    | '/book/$bookId/character/$characterId/family-tree'
-    | '/book/$bookId/world/$worldId/race/$raceId'
-    | '/book/$bookId/world/$worldId/species/$speciesId'
+    | '/dashboard/$dashboardId/beast/$id'
+    | '/dashboard/$dashboardId/chapter/chapters'
+    | '/dashboard/$dashboardId/character/$characterId'
+    | '/dashboard/$dashboardId/item/$itemId'
+    | '/dashboard/$dashboardId/notes/notes'
+    | '/dashboard/$dashboardId/organization/$orgId'
+    | '/dashboard/$dashboardId/plot/$plotId'
+    | '/dashboard/$dashboardId/race/$raceId'
+    | '/dashboard/$dashboardId/world/$worldId'
+    | '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+    | '/dashboard/$dashboardId/character/$characterId/family-tree'
+    | '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+    | '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+    | '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
-    | '/plot-timeline'
-    | '/beast/$id'
-    | '/plot-arc/$id'
-    | '/book/$bookId/chapters'
-    | '/book/$bookId/dashboard'
     | '/item/$id/timeline'
-    | '/book/$bookId'
+    | '/dashboard/$dashboardId'
     | '/item/$id'
-    | '/book/$bookId/chapter/$chapterId'
-    | '/book/$bookId/character/$characterId'
-    | '/book/$bookId/file/$fileId'
-    | '/book/$bookId/organization/$orgId'
-    | '/book/$bookId/world/$worldId'
-    | '/book/$bookId/character/$characterId/family-tree'
-    | '/book/$bookId/world/$worldId/race/$raceId'
-    | '/book/$bookId/world/$worldId/species/$speciesId'
+    | '/dashboard/$dashboardId/beast/$id'
+    | '/dashboard/$dashboardId/chapter/chapters'
+    | '/dashboard/$dashboardId/character/$characterId'
+    | '/dashboard/$dashboardId/item/$itemId'
+    | '/dashboard/$dashboardId/notes/notes'
+    | '/dashboard/$dashboardId/organization/$orgId'
+    | '/dashboard/$dashboardId/plot/$plotId'
+    | '/dashboard/$dashboardId/race/$raceId'
+    | '/dashboard/$dashboardId/world/$worldId'
+    | '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+    | '/dashboard/$dashboardId/character/$characterId/family-tree'
+    | '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+    | '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+    | '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
   id:
     | '__root__'
     | '/'
     | '/$'
-    | '/plot-timeline'
-    | '/beast/$id'
-    | '/plot-arc/$id'
-    | '/book/$bookId/chapters'
-    | '/book/$bookId/dashboard'
     | '/item/$id/timeline'
-    | '/book/$bookId/'
+    | '/dashboard/$dashboardId/'
     | '/item/$id/'
-    | '/book/$bookId/chapter/$chapterId'
-    | '/book/$bookId/character/$characterId'
-    | '/book/$bookId/file/$fileId'
-    | '/book/$bookId/organization/$orgId'
-    | '/book/$bookId/world/$worldId'
-    | '/book/$bookId/character/$characterId/family-tree'
-    | '/book/$bookId/world/$worldId/race/$raceId'
-    | '/book/$bookId/world/$worldId/species/$speciesId'
+    | '/dashboard/$dashboardId/beast/$id'
+    | '/dashboard/$dashboardId/chapter/chapters'
+    | '/dashboard/$dashboardId/character/$characterId'
+    | '/dashboard/$dashboardId/item/$itemId'
+    | '/dashboard/$dashboardId/notes/notes'
+    | '/dashboard/$dashboardId/organization/$orgId'
+    | '/dashboard/$dashboardId/plot/$plotId'
+    | '/dashboard/$dashboardId/race/$raceId'
+    | '/dashboard/$dashboardId/world/$worldId'
+    | '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+    | '/dashboard/$dashboardId/character/$characterId/family-tree'
+    | '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+    | '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+    | '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
-  PlotTimelineRoute: typeof PlotTimelineRoute
-  BeastIdRoute: typeof BeastIdRoute
-  PlotArcIdRoute: typeof PlotArcIdRoute
-  BookBookIdChaptersRoute: typeof BookBookIdChaptersRoute
-  BookBookIdDashboardRoute: typeof BookBookIdDashboardRoute
   ItemIdTimelineRoute: typeof ItemIdTimelineRoute
-  BookBookIdIndexRoute: typeof BookBookIdIndexRoute
+  DashboardDashboardIdIndexRoute: typeof DashboardDashboardIdIndexRoute
   ItemIdIndexRoute: typeof ItemIdIndexRoute
-  BookBookIdChapterChapterIdRoute: typeof BookBookIdChapterChapterIdRoute
-  BookBookIdCharacterCharacterIdRoute: typeof BookBookIdCharacterCharacterIdRouteWithChildren
-  BookBookIdFileFileIdRoute: typeof BookBookIdFileFileIdRoute
-  BookBookIdOrganizationOrgIdRoute: typeof BookBookIdOrganizationOrgIdRoute
-  BookBookIdWorldWorldIdRoute: typeof BookBookIdWorldWorldIdRouteWithChildren
+  DashboardDashboardIdBeastIdRoute: typeof DashboardDashboardIdBeastIdRoute
+  DashboardDashboardIdChapterChaptersRoute: typeof DashboardDashboardIdChapterChaptersRoute
+  DashboardDashboardIdCharacterCharacterIdRoute: typeof DashboardDashboardIdCharacterCharacterIdRouteWithChildren
+  DashboardDashboardIdItemItemIdRoute: typeof DashboardDashboardIdItemItemIdRoute
+  DashboardDashboardIdNotesNotesRoute: typeof DashboardDashboardIdNotesNotesRoute
+  DashboardDashboardIdOrganizationOrgIdRoute: typeof DashboardDashboardIdOrganizationOrgIdRoute
+  DashboardDashboardIdPlotPlotIdRoute: typeof DashboardDashboardIdPlotPlotIdRoute
+  DashboardDashboardIdRaceRaceIdRoute: typeof DashboardDashboardIdRaceRaceIdRoute
+  DashboardDashboardIdWorldWorldIdRoute: typeof DashboardDashboardIdWorldWorldIdRoute
+  DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute: typeof DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute
+  DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute: typeof DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute
+  DashboardDashboardIdNotesFileNotesFileNotesIdRoute: typeof DashboardDashboardIdNotesFileNotesFileNotesIdRoute
+  DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute: typeof DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/plot-timeline': {
-      id: '/plot-timeline'
-      path: '/plot-timeline'
-      fullPath: '/plot-timeline'
-      preLoaderRoute: typeof PlotTimelineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -290,20 +307,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/plot-arc/$id': {
-      id: '/plot-arc/$id'
-      path: '/plot-arc/$id'
-      fullPath: '/plot-arc/$id'
-      preLoaderRoute: typeof PlotArcIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/beast/$id': {
-      id: '/beast/$id'
-      path: '/beast/$id'
-      fullPath: '/beast/$id'
-      preLoaderRoute: typeof BeastIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/item/$id/': {
       id: '/item/$id/'
       path: '/item/$id'
@@ -311,11 +314,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ItemIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/': {
-      id: '/book/$bookId/'
-      path: '/book/$bookId'
-      fullPath: '/book/$bookId'
-      preLoaderRoute: typeof BookBookIdIndexRouteImport
+    '/dashboard/$dashboardId/': {
+      id: '/dashboard/$dashboardId/'
+      path: '/dashboard/$dashboardId'
+      fullPath: '/dashboard/$dashboardId'
+      preLoaderRoute: typeof DashboardDashboardIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/item/$id/timeline': {
@@ -325,129 +328,148 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ItemIdTimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/dashboard': {
-      id: '/book/$bookId/dashboard'
-      path: '/book/$bookId/dashboard'
-      fullPath: '/book/$bookId/dashboard'
-      preLoaderRoute: typeof BookBookIdDashboardRouteImport
+    '/dashboard/$dashboardId/world/$worldId': {
+      id: '/dashboard/$dashboardId/world/$worldId'
+      path: '/dashboard/$dashboardId/world/$worldId'
+      fullPath: '/dashboard/$dashboardId/world/$worldId'
+      preLoaderRoute: typeof DashboardDashboardIdWorldWorldIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/chapters': {
-      id: '/book/$bookId/chapters'
-      path: '/book/$bookId/chapters'
-      fullPath: '/book/$bookId/chapters'
-      preLoaderRoute: typeof BookBookIdChaptersRouteImport
+    '/dashboard/$dashboardId/race/$raceId': {
+      id: '/dashboard/$dashboardId/race/$raceId'
+      path: '/dashboard/$dashboardId/race/$raceId'
+      fullPath: '/dashboard/$dashboardId/race/$raceId'
+      preLoaderRoute: typeof DashboardDashboardIdRaceRaceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/world/$worldId': {
-      id: '/book/$bookId/world/$worldId'
-      path: '/book/$bookId/world/$worldId'
-      fullPath: '/book/$bookId/world/$worldId'
-      preLoaderRoute: typeof BookBookIdWorldWorldIdRouteImport
+    '/dashboard/$dashboardId/plot/$plotId': {
+      id: '/dashboard/$dashboardId/plot/$plotId'
+      path: '/dashboard/$dashboardId/plot/$plotId'
+      fullPath: '/dashboard/$dashboardId/plot/$plotId'
+      preLoaderRoute: typeof DashboardDashboardIdPlotPlotIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/organization/$orgId': {
-      id: '/book/$bookId/organization/$orgId'
-      path: '/book/$bookId/organization/$orgId'
-      fullPath: '/book/$bookId/organization/$orgId'
-      preLoaderRoute: typeof BookBookIdOrganizationOrgIdRouteImport
+    '/dashboard/$dashboardId/organization/$orgId': {
+      id: '/dashboard/$dashboardId/organization/$orgId'
+      path: '/dashboard/$dashboardId/organization/$orgId'
+      fullPath: '/dashboard/$dashboardId/organization/$orgId'
+      preLoaderRoute: typeof DashboardDashboardIdOrganizationOrgIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/file/$fileId': {
-      id: '/book/$bookId/file/$fileId'
-      path: '/book/$bookId/file/$fileId'
-      fullPath: '/book/$bookId/file/$fileId'
-      preLoaderRoute: typeof BookBookIdFileFileIdRouteImport
+    '/dashboard/$dashboardId/notes/notes': {
+      id: '/dashboard/$dashboardId/notes/notes'
+      path: '/dashboard/$dashboardId/notes/notes'
+      fullPath: '/dashboard/$dashboardId/notes/notes'
+      preLoaderRoute: typeof DashboardDashboardIdNotesNotesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/character/$characterId': {
-      id: '/book/$bookId/character/$characterId'
-      path: '/book/$bookId/character/$characterId'
-      fullPath: '/book/$bookId/character/$characterId'
-      preLoaderRoute: typeof BookBookIdCharacterCharacterIdRouteImport
+    '/dashboard/$dashboardId/item/$itemId': {
+      id: '/dashboard/$dashboardId/item/$itemId'
+      path: '/dashboard/$dashboardId/item/$itemId'
+      fullPath: '/dashboard/$dashboardId/item/$itemId'
+      preLoaderRoute: typeof DashboardDashboardIdItemItemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/chapter/$chapterId': {
-      id: '/book/$bookId/chapter/$chapterId'
-      path: '/book/$bookId/chapter/$chapterId'
-      fullPath: '/book/$bookId/chapter/$chapterId'
-      preLoaderRoute: typeof BookBookIdChapterChapterIdRouteImport
+    '/dashboard/$dashboardId/character/$characterId': {
+      id: '/dashboard/$dashboardId/character/$characterId'
+      path: '/dashboard/$dashboardId/character/$characterId'
+      fullPath: '/dashboard/$dashboardId/character/$characterId'
+      preLoaderRoute: typeof DashboardDashboardIdCharacterCharacterIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/book/$bookId/character/$characterId/family-tree': {
-      id: '/book/$bookId/character/$characterId/family-tree'
+    '/dashboard/$dashboardId/chapter/chapters': {
+      id: '/dashboard/$dashboardId/chapter/chapters'
+      path: '/dashboard/$dashboardId/chapter/chapters'
+      fullPath: '/dashboard/$dashboardId/chapter/chapters'
+      preLoaderRoute: typeof DashboardDashboardIdChapterChaptersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/beast/$id': {
+      id: '/dashboard/$dashboardId/beast/$id'
+      path: '/dashboard/$dashboardId/beast/$id'
+      fullPath: '/dashboard/$dashboardId/beast/$id'
+      preLoaderRoute: typeof DashboardDashboardIdBeastIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline': {
+      id: '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
+      path: '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
+      fullPath: '/dashboard/$dashboardId/plot/plot-timeline/plot-timeline'
+      preLoaderRoute: typeof DashboardDashboardIdPlotPlotTimelinePlotTimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/notes/file-notes/$file-notesId': {
+      id: '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+      path: '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+      fullPath: '/dashboard/$dashboardId/notes/file-notes/$file-notesId'
+      preLoaderRoute: typeof DashboardDashboardIdNotesFileNotesFileNotesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId': {
+      id: '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+      path: '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+      fullPath: '/dashboard/$dashboardId/notes/editor-notes/$editor-notesId'
+      preLoaderRoute: typeof DashboardDashboardIdNotesEditorNotesEditorNotesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/character/$characterId/family-tree': {
+      id: '/dashboard/$dashboardId/character/$characterId/family-tree'
       path: '/family-tree'
-      fullPath: '/book/$bookId/character/$characterId/family-tree'
-      preLoaderRoute: typeof BookBookIdCharacterCharacterIdFamilyTreeRouteImport
-      parentRoute: typeof BookBookIdCharacterCharacterIdRoute
+      fullPath: '/dashboard/$dashboardId/character/$characterId/family-tree'
+      preLoaderRoute: typeof DashboardDashboardIdCharacterCharacterIdFamilyTreeRouteImport
+      parentRoute: typeof DashboardDashboardIdCharacterCharacterIdRoute
     }
-    '/book/$bookId/world/$worldId/species/$speciesId': {
-      id: '/book/$bookId/world/$worldId/species/$speciesId'
-      path: '/species/$speciesId'
-      fullPath: '/book/$bookId/world/$worldId/species/$speciesId'
-      preLoaderRoute: typeof BookBookIdWorldWorldIdSpeciesSpeciesIdRouteImport
-      parentRoute: typeof BookBookIdWorldWorldIdRoute
-    }
-    '/book/$bookId/world/$worldId/race/$raceId': {
-      id: '/book/$bookId/world/$worldId/race/$raceId'
-      path: '/race/$raceId'
-      fullPath: '/book/$bookId/world/$worldId/race/$raceId'
-      preLoaderRoute: typeof BookBookIdWorldWorldIdRaceRaceIdRouteImport
-      parentRoute: typeof BookBookIdWorldWorldIdRoute
+    '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId': {
+      id: '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+      path: '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+      fullPath: '/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId'
+      preLoaderRoute: typeof DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface BookBookIdCharacterCharacterIdRouteChildren {
-  BookBookIdCharacterCharacterIdFamilyTreeRoute: typeof BookBookIdCharacterCharacterIdFamilyTreeRoute
+interface DashboardDashboardIdCharacterCharacterIdRouteChildren {
+  DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute: typeof DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute
 }
 
-const BookBookIdCharacterCharacterIdRouteChildren: BookBookIdCharacterCharacterIdRouteChildren =
+const DashboardDashboardIdCharacterCharacterIdRouteChildren: DashboardDashboardIdCharacterCharacterIdRouteChildren =
   {
-    BookBookIdCharacterCharacterIdFamilyTreeRoute:
-      BookBookIdCharacterCharacterIdFamilyTreeRoute,
+    DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute:
+      DashboardDashboardIdCharacterCharacterIdFamilyTreeRoute,
   }
 
-const BookBookIdCharacterCharacterIdRouteWithChildren =
-  BookBookIdCharacterCharacterIdRoute._addFileChildren(
-    BookBookIdCharacterCharacterIdRouteChildren,
-  )
-
-interface BookBookIdWorldWorldIdRouteChildren {
-  BookBookIdWorldWorldIdRaceRaceIdRoute: typeof BookBookIdWorldWorldIdRaceRaceIdRoute
-  BookBookIdWorldWorldIdSpeciesSpeciesIdRoute: typeof BookBookIdWorldWorldIdSpeciesSpeciesIdRoute
-}
-
-const BookBookIdWorldWorldIdRouteChildren: BookBookIdWorldWorldIdRouteChildren =
-  {
-    BookBookIdWorldWorldIdRaceRaceIdRoute:
-      BookBookIdWorldWorldIdRaceRaceIdRoute,
-    BookBookIdWorldWorldIdSpeciesSpeciesIdRoute:
-      BookBookIdWorldWorldIdSpeciesSpeciesIdRoute,
-  }
-
-const BookBookIdWorldWorldIdRouteWithChildren =
-  BookBookIdWorldWorldIdRoute._addFileChildren(
-    BookBookIdWorldWorldIdRouteChildren,
+const DashboardDashboardIdCharacterCharacterIdRouteWithChildren =
+  DashboardDashboardIdCharacterCharacterIdRoute._addFileChildren(
+    DashboardDashboardIdCharacterCharacterIdRouteChildren,
   )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
-  PlotTimelineRoute: PlotTimelineRoute,
-  BeastIdRoute: BeastIdRoute,
-  PlotArcIdRoute: PlotArcIdRoute,
-  BookBookIdChaptersRoute: BookBookIdChaptersRoute,
-  BookBookIdDashboardRoute: BookBookIdDashboardRoute,
   ItemIdTimelineRoute: ItemIdTimelineRoute,
-  BookBookIdIndexRoute: BookBookIdIndexRoute,
+  DashboardDashboardIdIndexRoute: DashboardDashboardIdIndexRoute,
   ItemIdIndexRoute: ItemIdIndexRoute,
-  BookBookIdChapterChapterIdRoute: BookBookIdChapterChapterIdRoute,
-  BookBookIdCharacterCharacterIdRoute:
-    BookBookIdCharacterCharacterIdRouteWithChildren,
-  BookBookIdFileFileIdRoute: BookBookIdFileFileIdRoute,
-  BookBookIdOrganizationOrgIdRoute: BookBookIdOrganizationOrgIdRoute,
-  BookBookIdWorldWorldIdRoute: BookBookIdWorldWorldIdRouteWithChildren,
+  DashboardDashboardIdBeastIdRoute: DashboardDashboardIdBeastIdRoute,
+  DashboardDashboardIdChapterChaptersRoute:
+    DashboardDashboardIdChapterChaptersRoute,
+  DashboardDashboardIdCharacterCharacterIdRoute:
+    DashboardDashboardIdCharacterCharacterIdRouteWithChildren,
+  DashboardDashboardIdItemItemIdRoute: DashboardDashboardIdItemItemIdRoute,
+  DashboardDashboardIdNotesNotesRoute: DashboardDashboardIdNotesNotesRoute,
+  DashboardDashboardIdOrganizationOrgIdRoute:
+    DashboardDashboardIdOrganizationOrgIdRoute,
+  DashboardDashboardIdPlotPlotIdRoute: DashboardDashboardIdPlotPlotIdRoute,
+  DashboardDashboardIdRaceRaceIdRoute: DashboardDashboardIdRaceRaceIdRoute,
+  DashboardDashboardIdWorldWorldIdRoute: DashboardDashboardIdWorldWorldIdRoute,
+  DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute:
+    DashboardDashboardIdChapterEditorChaptersEditorChaptersIdRoute,
+  DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute:
+    DashboardDashboardIdNotesEditorNotesEditorNotesIdRoute,
+  DashboardDashboardIdNotesFileNotesFileNotesIdRoute:
+    DashboardDashboardIdNotesFileNotesFileNotesIdRoute,
+  DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute:
+    DashboardDashboardIdPlotPlotTimelinePlotTimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

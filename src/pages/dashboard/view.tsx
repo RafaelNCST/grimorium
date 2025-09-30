@@ -17,6 +17,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { UseNavigateResult } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Edit2,
@@ -36,21 +37,9 @@ import {
   Eye,
   Palette,
   Book,
+  NotebookTabs,
 } from "lucide-react";
 
-import { BestiaryTab } from "./bestiary";
-import { BookSpeciesTab } from "./book-species";
-import { CharactersTab } from "./characters";
-import { EncyclopediaTab } from "./encyclopedia";
-import { ItemsTab } from "./items";
-import { NotesTab } from "./notes";
-import { OrganizationsTab } from "./organizations";
-import { OverviewTab } from "./overview";
-import { PlotTab } from "./plot";
-import { PowerSystemTab } from "./power-system";
-import { RelationsTab } from "./relations";
-import { SpeciesTab } from "./species";
-import { WorldTab } from "./world";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,12 +62,27 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NotesTab } from "./notes";
+import { BestiaryTab } from "./tabs/bestiary";
+import { BookSpeciesTab } from "./tabs/book-species";
+import { CharactersTab } from "./tabs/characters";
+import { EncyclopediaTab } from "./tabs/encyclopedia";
+import { ItemsTab } from "./tabs/items";
+import { OrganizationsTab } from "./tabs/organizations";
+import { OverviewTab } from "./tabs/overview";
+import { PlotTab } from "./tabs/plot";
+import { PowerSystemTab } from "./tabs/power-system";
+import { RelationsTab } from "./tabs/characters/character-detail/relations";
+import { SpeciesTab } from "./tabs/species";
+import { WorldTab } from "./tabs/world";
+
 import { Book as BookType } from "@/stores/book-store";
 import { useLanguageStore } from "@/stores/language-store";
 
@@ -191,7 +195,7 @@ interface DashboardViewProps {
   onToggleTabVisibility: (tabId: string) => void;
   onUpdateBook: (updates: Partial<BookType>) => void;
   onDeleteBook: () => void;
-  onNavigateToChapters: () => void;
+  navigate: UseNavigateResult<string>;
 }
 
 const genres = [
@@ -227,11 +231,10 @@ const defaultTabs: TabConfig[] = [
   { id: "organizations", label: "Organizações", icon: Building, visible: true },
   { id: "plot", label: "Enredo", icon: Target, visible: true },
   { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
-  { id: "encyclopedia", label: "Enciclopédia", icon: BookOpen, visible: true },
   { id: "species", label: "Espécies", icon: Dna, visible: true },
   { id: "bestiary", label: "Bestiário", icon: Skull, visible: true },
   { id: "items", label: "Itens", icon: Package, visible: true },
-  { id: "notes", label: "Anotações", icon: FileText, visible: true },
+  { id: "encyclopedia", label: "Enciclopédia", icon: BookOpen, visible: true },
 ];
 
 export function DashboardView({
@@ -252,7 +255,7 @@ export function DashboardView({
   onToggleTabVisibility,
   onUpdateBook,
   onDeleteBook,
-  onNavigateToChapters,
+  navigate,
 }: DashboardViewProps) {
   const { t } = useLanguageStore();
   const [draftBook, setDraftBook] = useState(book);
@@ -380,14 +383,40 @@ export function DashboardView({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={onNavigateToChapters}
+                      onClick={() =>
+                        navigate({
+                          to: "/dashboard/$dashboardId/chapter/chapters",
+                          params: { dashboardId: bookId },
+                        })
+                      }
                       className="hover:bg-muted"
                     >
                       <Book className="w-5 h-5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-sm font-medium">Gerenciar capítulos</p>
+                    <p className="text-sm font-medium">Capítulos</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() =>
+                        navigate({
+                          to: "/dashboard/$dashboardId/notes/notes",
+                          params: { dashboardId: bookId },
+                        })
+                      }
+                      className="hover:bg-muted"
+                    >
+                      <NotebookTabs className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm font-medium">Anotações</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -666,10 +695,7 @@ export function DashboardView({
                 <BestiaryTab bookId={bookId} />
               </TabsContent>
               <TabsContent value="items" className="mt-0">
-                <ItemsTab />
-              </TabsContent>
-              <TabsContent value="notes" className="mt-0">
-                <NotesTab bookId={bookId} />
+                <ItemsTab bookId={bookId} />
               </TabsContent>
             </div>
           </Tabs>

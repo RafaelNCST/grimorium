@@ -54,8 +54,8 @@ const typeColors = {
 
 export function SpeciesTab() {
   const navigate = useNavigate();
-  const { bookId, worldId } = useParams({
-    from: "/book/$bookId/world/$worldId",
+  const { dashboardId: bookId, worldId } = useParams({
+    from: "/dashboard/$dashboardId/world/$worldId",
   });
   const { toast } = useToast();
   const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
@@ -164,15 +164,15 @@ export function SpeciesTab() {
 
   const handleSpeciesClick = (speciesId: string) => {
     navigate({
-      to: "/book/$bookId/world/$worldId/species/$speciesId",
-      params: { bookId, worldId, speciesId },
+      to: "/dashboard/$dashboardId/world/$worldId/species/$speciesId",
+      params: { dashboardId: bookId, worldId, speciesId },
     });
   };
 
   const handleRaceClick = (raceId: string) => {
     navigate({
-      to: "/book/$bookId/world/$worldId/race/$raceId",
-      params: { bookId, worldId, raceId },
+      to: "/dashboard/$dashboardId/world/$worldId/race/$raceId",
+      params: { dashboardId: bookId, worldId, raceId },
     });
   };
 

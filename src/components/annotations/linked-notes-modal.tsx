@@ -98,8 +98,8 @@ export function LinkedNotesModal({
   const handleOpenNote = (noteId: string) => {
     // Assuming we have a route for file editor
     navigate({
-      to: "/book/$bookId/file/$fileId",
-      params: { bookId: "1", fileId: noteId },
+      to: "/dashboard/$dashboardId/file/$fileId",
+      params: { dashboardId: "1", fileId: noteId },
     });
   };
 

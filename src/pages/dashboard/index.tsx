@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, ParamsOptions } from "@tanstack/react-router";
 
 import { useBookStore } from "@/stores/book-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
@@ -88,9 +88,7 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       onToggleTabVisibility={toggleTabVisibility}
       onUpdateBook={handleUpdateBook}
       onDeleteBook={handleDeleteBook}
-      onNavigateToChapters={() =>
-        navigate({ to: "/book/$bookId/chapters", params: { bookId } })
-      }
+      navigate={navigate}
     />
   );
 }

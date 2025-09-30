@@ -232,8 +232,8 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
 
   const handleCharacterClick = (characterId: string) => {
     navigate({
-      to: "/book/$bookId/character/$characterId",
-      params: { bookId, characterId },
+      to: "/dashboard/$dashboardId/character/$characterId",
+      params: { dashboardId: bookId, characterId },
     });
   };
 

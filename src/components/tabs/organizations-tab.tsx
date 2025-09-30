@@ -342,8 +342,8 @@ export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
 
   const handleOrganizationClick = (orgId: string) => {
     navigate({
-      to: "/book/$bookId/organization/$orgId",
-      params: { bookId, orgId },
+      to: "/dashboard/$dashboardId/organization/$orgId",
+      params: { dashboardId: bookId, orgId },
     });
   };
 

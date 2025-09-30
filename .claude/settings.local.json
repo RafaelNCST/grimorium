@@ -19,7 +19,19 @@
       "Bash(VITE_PORT=3001 npm run dev)",
       "Bash(npx vite:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(ls:*)",
+      "Bash(npm run build:routes:*)",
+      "Bash(npm run:*)",
+      "Bash(timeout:*)",
+      "Bash(mv:*)",
+      "Bash(git mv:*)",
+      "Bash(grep:*)",
+      "Bash(python:*)",
+      "Bash(powershell:*)",
+      "Bash(cat:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

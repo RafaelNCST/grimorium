@@ -183,15 +183,15 @@ export function BookSpeciesTab({ bookId }: PropsBookSpeciesTab) {
 
   const handleSpeciesClick = (speciesId: string, worldId: string) => {
     navigate({
-      to: "/book/$bookId/world/$worldId/species/$speciesId",
-      params: { bookId, worldId, speciesId },
+      to: "/dashboard/$dashboardId/world/$worldId/species/$speciesId",
+      params: { dashboardId: bookId, worldId, speciesId },
     });
   };
 
   const handleRaceClick = (raceId: string, worldId: string) => {
     navigate({
-      to: "/book/$bookId/world/$worldId/race/$raceId",
-      params: { bookId, worldId, raceId },
+      to: "/dashboard/$dashboardId/world/$worldId/race/$raceId",
+      params: { dashboardId: bookId, worldId, raceId },
     });
   };
 

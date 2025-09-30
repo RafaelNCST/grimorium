@@ -2,11 +2,12 @@ import { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { NotesView } from "./view";
-import { AnnotationLink } from "@/types/annotations";
 import { toast } from "@/hooks/use-toast";
+import { AnnotationLink } from "@/types/annotations";
 
-interface PropsNotesTab {
+import { NotesView } from "./view";
+
+interface PropsNotes {
   bookId: string;
 }
 
@@ -69,7 +70,7 @@ const mockNotes: NoteItem[] = [
   },
 ];
 
-export function NotesTab({ bookId }: PropsNotesTab) {
+export function Notes({ bookId }: PropsNotes) {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<NoteItem[]>(mockNotes);
   const [currentPath, setCurrentPath] = useState<string[]>([]);
@@ -118,8 +119,8 @@ export function NotesTab({ bookId }: PropsNotesTab) {
 
   const handleFileClick = (file: NoteFile) => {
     navigate({
-      to: "/book/$bookId/file/$fileId",
-      params: { bookId, fileId: file.id },
+      to: "/dashboard/$dashboardId/notes/file-notes/$file-notesId",
+      params: { dashboardId: bookId, "file-notesId": file.id },
     });
   };
 

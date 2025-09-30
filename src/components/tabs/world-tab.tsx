@@ -288,8 +288,8 @@ export function WorldTab({ bookId }: PropsWorldTab) {
 
   const handleEntityClick = (entity: WorldEntity) => {
     navigate({
-      to: "/book/$bookId/world/$worldId",
-      params: { bookId, worldId: entity.id },
+      to: "/dashboard/$dashboardId/world/$worldId",
+      params: { dashboardId: bookId, worldId: entity.id },
     });
   };
 
