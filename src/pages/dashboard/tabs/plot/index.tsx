@@ -110,7 +110,11 @@ const mockArcs: IPlotArc[] = [
   },
 ];
 
-export function PlotTab() {
+interface PlotTabProps {
+  bookId: string;
+}
+
+export function PlotTab({ bookId }: PlotTabProps) {
   const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<IPlotArc[]>(mockArcs);
@@ -234,16 +238,17 @@ export function PlotTab() {
     return sortedEvents.slice(currentIndex, currentIndex + 3);
   };
 
-  const handlePlotTimelineClick = () => {
+  const handlePlotTimelineClick = (bookId: string) => {
     navigate({
-      to: "/dashboard/$dashboardId/plot/plot-timeline/plot-timeline",
+      to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
+      params: { dashboardId: bookId },
     });
   };
 
-  const handleArcClick = (arcId: string) => {
+  const handleArcClick = (arcId: string, bookId: string) => {
     navigate({
-      to: "/dashboard/$dashboardId/plot/$plotId",
-      params: { plotId: arcId },
+      to: "/dashboard/$dashboardId/tabs/plot/$plotId",
+      params: { dashboardId: bookId, plotId: arcId },
     });
   };
 
@@ -262,6 +267,7 @@ export function PlotTab() {
       onMoveArc={moveArc}
       onPlotTimelineClick={handlePlotTimelineClick}
       onArcClick={handleArcClick}
+      bookId={bookId}
     />
   );
 }

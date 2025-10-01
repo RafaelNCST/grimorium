@@ -108,8 +108,8 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
 
   const handleOrganizationClick = (orgId: string) => {
     navigate({
-      to: "/dashboard/$dashboardId/organization/$orgId",
-      params: { dashboardId: bookId, orgId },
+      to: "/dashboard/$dashboardId/tabs/organization/$orgId",
+      params: { dashboardId: bookId, orgId: orgId },
     });
   };
 

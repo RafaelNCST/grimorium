@@ -119,8 +119,8 @@ export function Notes({ bookId }: PropsNotes) {
 
   const handleFileClick = (file: NoteFile) => {
     navigate({
-      to: "/dashboard/$dashboardId/notes/file-notes/$file-notesId",
-      params: { dashboardId: bookId, "file-notesId": file.id },
+      to: "/dashboard/$dashboardId/notes/file-notes/$file-notes-id",
+      params: { dashboardId: bookId, "file-notes-id": file.id },
     });
   };
 

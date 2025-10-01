@@ -52,8 +52,8 @@ const statusConfig = {
 };
 
 export function ChapterEditor() {
-  const { dashboardId, editorChaptersId } = useParams({
-    from: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId",
+  const { dashboardId, "editor-chapters-id": editorChaptersId } = useParams({
+    from: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chapters-id",
   });
   const navigate = useNavigate();
   const editorRef = useRef<HTMLDivElement>(null);

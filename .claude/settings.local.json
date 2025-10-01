@@ -31,7 +31,8 @@
       "Bash(python:*)",
       "Bash(powershell:*)",
       "Bash(cat:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

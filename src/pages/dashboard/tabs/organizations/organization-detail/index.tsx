@@ -15,8 +15,8 @@ import {
 import { OrganizationDetailView } from "./view";
 
 export function OrganizationDetail() {
-  const { bookId, orgId } = useParams({
-    from: "/dashboard/$dashboardId/organization/$orgId",
+  const { dashboardId, orgId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/organization/$orgId",
   });
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -107,8 +107,8 @@ export function OrganizationDetail() {
   const handleDelete = () => {
     toast.success("Organização excluída com sucesso!");
     navigate({
-      to: "/dashboard/$dashboardId/organizations",
-      params: { bookId: bookId! },
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: dashboardId! },
     });
   };
 

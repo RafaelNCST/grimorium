@@ -183,8 +183,8 @@ const relationshipTypes = [
 ];
 
 export function CharacterDetail() {
-  const { bookId, characterId } = useParams({
-    from: "/dashboard/$dashboardId/character/$characterId",
+  const { dashboardId, characterId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/character/$characterId/",
   });
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -317,7 +317,7 @@ export function CharacterDetail() {
 
   const handleDelete = () => {
     toast.success("Personagem excluído com sucesso!");
-    navigate({ to: "/dashboard/$dashboardId/characters", params: { bookId: "1" } });
+    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: dashboardId } });
   };
 
   const handleCancel = () => {
@@ -539,8 +539,8 @@ export function CharacterDetail() {
     setRelationshipIntensity(intensity);
   const handleNavigateToFamilyTree = () => {
     navigate({
-      to: "/dashboard/$dashboardId/character/$characterId/family-tree",
-      params: { dashboardId: bookId, characterId },
+      to: "/dashboard/$dashboardId/tabs/character/$characterId/family-tree",
+      params: { dashboardId: dashboardId, characterId: characterId },
     });
   };
 

@@ -111,8 +111,8 @@ export function BestiaryTab({ bookId }: BestiaryTabProps) {
 
   const handleNavigateToBeast = (beastId: string) => {
     navigate({
-      to: "/dashboard/$dashboardId/beast/$id",
-      params: { dashboardId: bookId, id: beastId }
+      to: "/dashboard/$dashboardId/tabs/beast/$beastId",
+      params: { dashboardId: bookId, beastId: beastId }
     });
   };
 

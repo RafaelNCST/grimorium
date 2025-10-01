@@ -160,7 +160,7 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
   };
 
   const handleRaceClick = (raceId: string) => {
-    navigate({ to: "/dashboard/$dashboardId/race/$raceId", params: { dashboardId: bookId, raceId } });
+    navigate({ to: "/dashboard/$dashboardId/tabs/race/$raceId", params: { dashboardId: bookId, raceId: raceId } });
   };
 
   const openCreateRaceModal = (speciesId: string) => {

@@ -14,8 +14,8 @@ import {
 } from "@/mocks/local/family-data";
 
 export function FamilyTreePage() {
-  const { bookId, characterId } = useParams({
-    from: "/dashboard/$dashboardId/character/$characterId/family-tree",
+  const { dashboardId, characterId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/character/$characterId/family-tree",
   });
   const navigate = useNavigate();
   const [zoom, setZoom] = useState(1);
@@ -168,8 +168,8 @@ export function FamilyTreePage() {
             variant="ghost"
             onClick={() =>
               navigate({
-                to: "/dashboard/$dashboardId/character/$characterId",
-                params: { bookId: bookId!, characterId: characterId! },
+                to: "/dashboard/$dashboardId/tabs/character/$characterId/",
+                params: { dashboardId: dashboardId!, characterId: characterId! },
               })
             }
           >
@@ -206,8 +206,8 @@ export function FamilyTreePage() {
             variant="ghost"
             onClick={() =>
               navigate({
-                to: "/dashboard/$dashboardId/character/$characterId",
-                params: { bookId: bookId!, characterId: characterId! },
+                to: "/dashboard/$dashboardId/tabs/character/$characterId/",
+                params: { dashboardId: dashboardId!, characterId: characterId! },
               })
             }
           >

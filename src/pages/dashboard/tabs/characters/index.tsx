@@ -163,7 +163,7 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
 
   const handleCharacterClick = (characterId: string) => {
     navigate({
-      to: "/dashboard/$dashboardId/character/$characterId",
+      to: "/dashboard/$dashboardId/tabs/character/$characterId/",
       params: { dashboardId: bookId, characterId },
     });
   };

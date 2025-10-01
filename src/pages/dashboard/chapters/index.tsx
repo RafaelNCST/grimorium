@@ -121,8 +121,8 @@ export function ChaptersPage() {
     };
     setChapters((prev) => [...prev, newChapter]);
     navigate({
-      to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId",
-      params: { dashboardId: dashboardId, "editor-chaptersId": newChapter.id },
+      to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chapters-id",
+      params: { dashboardId: dashboardId, "editor-chapters-id": newChapter.id },
     });
   };
 
@@ -276,8 +276,8 @@ export function ChaptersPage() {
                           onClick={() =>
                             !isSelectMode &&
                             navigate({
-                              to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chaptersId",
-                              params: { dashboardId: dashboardId, "editor-chaptersId": chapter.id },
+                              to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chapters-id",
+                              params: { dashboardId: dashboardId, "editor-chapters-id": chapter.id },
                             })
                           }
                         >

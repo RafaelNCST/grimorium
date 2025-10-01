@@ -128,7 +128,7 @@ export function ItemsTab({ bookId }: ItemsTabProps) {
   });
 
   const handleItemClick = (itemId: string) => {
-    navigate({ to: "/dashboard/$dashboardId/item/$itemId", params: { dashboardId: bookId, itemId } });
+    navigate({ to: "/dashboard/$dashboardId/tabs/item/$itemId/", params: { dashboardId: bookId, itemId: itemId } });
   };
 
   const handleCreateItem = (itemData: any) => {

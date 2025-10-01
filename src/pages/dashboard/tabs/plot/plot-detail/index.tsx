@@ -46,7 +46,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { IPlotArc, mockPlotArcs } from "@/mocks/local/plot-arc-data";
 
 export function PlotArcDetail() {
-  const { plotId } = useParams({ from: "/dashboard/$dashboardId/plot/$plotId" });
+  const { plotId } = useParams({ from: "/dashboard/$dashboardId/tabs/plot/$plotId" });
   const navigate = useNavigate();
   const [arc, setArc] = useState<IPlotArc | null>(null);
   const [isEditing, setIsEditing] = useState(false);

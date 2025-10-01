@@ -33,7 +33,7 @@ import {
 } from "@/mocks/local/timeline-data";
 
 export default function ItemTimeline() {
-  const { id } = useParams({ from: "/item/$id/timeline" });
+  const { itemId } = useParams({ from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -121,7 +121,7 @@ export default function ItemTimeline() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => navigate({ to: "/item/$id", params: { id: id! } })}
+              onClick={() => window.history.back()}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar para {itemName}

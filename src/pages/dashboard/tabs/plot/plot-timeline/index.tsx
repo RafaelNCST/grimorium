@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Clock, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import {
 } from "@/mocks/local/plot-arcs";
 
 export function PlotTimeline() {
+  const { dashboardId } = useParams({ from: "/dashboard/$dashboardId/tabs/plot/plot-timeline" });
   const navigate = useNavigate();
   const [arcs] = useState<IPlotArc[]>(mockArcs);
 
@@ -43,8 +44,8 @@ export function PlotTimeline() {
       className="card-magical cursor-pointer transition-all duration-300 hover:scale-105"
       onClick={() =>
         navigate({
-          to: "/dashboard/$dashboardId/plot/$plotId",
-          params: { plotId: arc.id },
+          to: "/dashboard/$dashboardId/tabs/plot/$plotId",
+          params: { dashboardId: dashboardId!, plotId: arc.id },
         })
       }
     >

@@ -64,8 +64,9 @@ interface PlotViewProps {
   onSetStatusFilter: (filter: string) => void;
   onCreateArc: (arcData: Omit<IPlotArc, "id" | "events" | "progress">) => void;
   onMoveArc: (arcId: string, direction: "up" | "down") => void;
-  onPlotTimelineClick: () => void;
-  onArcClick: (arcId: string) => void;
+  onPlotTimelineClick: (bookId: string) => void;
+  onArcClick: (arcId: string, bookId: string) => void;
+  bookId: string;
 }
 
 export function PlotView({
@@ -82,6 +83,7 @@ export function PlotView({
   onMoveArc,
   onPlotTimelineClick,
   onArcClick,
+  bookId,
 }: PlotViewProps) {
   return (
     <div className="space-y-6">
@@ -105,7 +107,7 @@ export function PlotView({
               <SelectItem value="finalizado">Finalizados</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={onPlotTimelineClick}>
+          <Button variant="outline" onClick={() => onPlotTimelineClick(bookId)}>
             <GitBranch className="w-4 h-4 mr-2" />
             Árvore Visual
           </Button>
@@ -125,7 +127,7 @@ export function PlotView({
           <Card
             key={arc.id}
             className="card-magical cursor-pointer"
-            onClick={() => onArcClick(arc.id)}
+            onClick={() => onArcClick(arc.id, bookId)}
           >
             <CardHeader>
               <div className="flex items-start justify-between">

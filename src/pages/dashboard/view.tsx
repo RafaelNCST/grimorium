@@ -680,7 +680,7 @@ export function DashboardView({
                 <OrganizationsTab bookId={bookId} />
               </TabsContent>
               <TabsContent value="plot" className="mt-0">
-                <PlotTab />
+                <PlotTab bookId={bookId} />
               </TabsContent>
               <TabsContent value="magic" className="mt-0">
                 <PowerSystemTab />

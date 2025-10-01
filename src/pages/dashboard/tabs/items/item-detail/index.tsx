@@ -40,8 +40,7 @@ import {
 } from "@/mocks/local/item-data";
 
 export default function ItemDetail() {
-  const params = useParams({ strict: false });
-  const itemId = (params as any).itemId || (params as any).id;
+  const { itemId, dashboardId } = useParams({ from: "/dashboard/$dashboardId/tabs/item/$itemId" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -110,7 +109,7 @@ export default function ItemDetail() {
   };
 
   const handleOpenTimeline = () => {
-    navigate({ to: "/item/$id/timeline", params: { id: itemId! } });
+    navigate({ to: "/dashboard/$dashboardId/tabs/item/$itemId/timeline", params: { dashboardId: dashboardId!, itemId: itemId! } });
   };
 
   // Mock linked notes - in real app would come from API/state

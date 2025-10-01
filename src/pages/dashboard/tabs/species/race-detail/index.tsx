@@ -49,8 +49,8 @@ const typeColors = {
 };
 
 export function RaceDetail() {
-  const { bookId, raceId } = useParams({
-    from: "/dashboard/$dashboardId/race/$raceId",
+  const { dashboardId, raceId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/race/$raceId",
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -130,9 +130,8 @@ export function RaceDetail() {
       description: `${race.name} foi excluída com sucesso.`,
     });
     navigate({
-      to: "/dashboard/$dashboardId/dashboard",
-      params: { bookId: bookId! },
-      search: { tab: "species" },
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: dashboardId! },
     });
   };
 
@@ -145,9 +144,8 @@ export function RaceDetail() {
             size="sm"
             onClick={() =>
               navigate({
-                to: "/dashboard/$dashboardId/dashboard",
-                params: { bookId: bookId! },
-                search: { tab: "species" },
+                to: "/dashboard/$dashboardId",
+                params: { dashboardId: dashboardId! },
               })
             }
           >

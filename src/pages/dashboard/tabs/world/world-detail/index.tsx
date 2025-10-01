@@ -133,7 +133,9 @@ const mockOrganizations = [
 ];
 
 export function WorldDetail() {
-  const { worldId } = useParams({ from: "/dashboard/$dashboardId/world/$worldId" });
+  const { worldId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/world/$worldId",
+  });
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
