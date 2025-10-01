@@ -41,7 +41,10 @@ export function HomePage() {
   };
 
   const handleBookSelect = (bookId: string) => {
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: bookId } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: bookId },
+    });
   };
 
   return (
