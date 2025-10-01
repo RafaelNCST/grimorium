@@ -19,6 +19,7 @@
 - Sempre evite implementações de soluções com gambiarra
 - Sempre siga inicialmente as melhores práticas para qualquer implementação
 - Navegações que precisam ser passadas pra view, devem ser funções que encapsulam a função de navegação do hook de navegação
+- Não distribua comentários e consoles.logs pelo código
 
 ## Organização de Pastas
 

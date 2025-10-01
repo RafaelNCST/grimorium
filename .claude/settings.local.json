@@ -32,7 +32,12 @@
       "Bash(powershell:*)",
       "Bash(cat:*)",
       "Bash(test:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(pnpm exec tsc:*)",
+      "Bash(pnpm exec eslint:*)",
+      "Bash(tree:*)",
+      "Bash(npx eslint:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

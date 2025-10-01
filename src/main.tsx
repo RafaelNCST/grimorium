@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { routeTree } from "./routeTree.gen";
 
 import "./index.css";
+import "./lib/i18n";
 
 // Create a new router instance
 const router = createRouter({ routeTree });

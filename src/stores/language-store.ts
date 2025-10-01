@@ -1,3 +1,4 @@
+import i18n from "@/lib/i18n";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -52,7 +53,10 @@ export const useLanguageStore = create<LanguageState>()(
   persist(
     (set, get) => ({
       language: "pt",
-      setLanguage: (language) => set({ language }),
+      setLanguage: (language) => {
+        set({ language });
+        i18n.changeLanguage(language);
+      },
       t: (key: string) => {
         const { language } = get();
         return (

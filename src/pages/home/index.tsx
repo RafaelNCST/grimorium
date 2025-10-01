@@ -1,7 +1,11 @@
+import { useCallback, useMemo, useState } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 
+import { IBookFormData } from "@/components/modals/create-book-modal";
 import { useBookStore } from "@/stores/book-store";
 
+import { getLastEditedBook } from "./utils/get-last-edited-book";
 import { HomeView } from "./view";
 
 export function HomePage() {
@@ -9,53 +13,73 @@ export function HomePage() {
   const { getFilteredBooks, searchTerm, setSearchTerm, addBook, books } =
     useBookStore();
 
-  const filteredBooks = getFilteredBooks();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  const getLastEditedBook = () => {
-    const sorted = [...books].sort((a, b) => {
-      const getValue = (text: string) => {
-        if (text.includes("dias"))
-          return parseInt(text.match(/\d+/)?.[0] || "0");
-        if (text.includes("semana"))
-          return parseInt(text.match(/\d+/)?.[0] || "0") * 7;
-        return 0;
+  const filteredBooks = useMemo(() => getFilteredBooks(), [getFilteredBooks]);
+
+  const lastEditedBook = useMemo(() => getLastEditedBook(books), [books]);
+
+  const handleOpenCreateModal = useCallback(() => {
+    setShowCreateModal(true);
+  }, []);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setShowCreateModal(false);
+  }, []);
+
+  const handleOpenSettingsModal = useCallback(() => {
+    setShowSettingsModal(true);
+  }, []);
+
+  const handleCloseSettingsModal = useCallback(() => {
+    setShowSettingsModal(false);
+  }, []);
+
+  const handleCreateBook = useCallback(
+    (bookData: IBookFormData) => {
+      const newBook = {
+        id: Date.now().toString(),
+        title: bookData.title,
+        genre: bookData.genre,
+        visualStyle: bookData.visualStyle,
+        coverImage: "/placeholder.svg",
+        chapters: 0,
+        lastModified: "agora",
+        storySummary: bookData.authorSummary || "",
+        authorSummary: bookData.authorSummary || "",
       };
-      return getValue(a.lastModified) - getValue(b.lastModified);
-    });
-    return sorted[0]?.title || "Nenhum";
-  };
+      addBook(newBook);
+      setShowCreateModal(false);
+    },
+    [addBook]
+  );
 
-  const handleCreateBook = (bookData: any) => {
-    const newBook = {
-      id: Date.now().toString(),
-      title: bookData.title,
-      genre: bookData.genre,
-      visualStyle: bookData.visualStyle,
-      coverImage: "/placeholder.svg",
-      chapters: 0,
-      lastModified: "agora",
-      storySummary: bookData.storySummary || "",
-      authorSummary: bookData.authorSummary || "",
-    };
-    addBook(newBook);
-  };
-
-  const handleBookSelect = (bookId: string) => {
-    navigate({
-      to: "/dashboard/$dashboardId",
-      params: { dashboardId: bookId },
-    });
-  };
+  const handleBookSelect = useCallback(
+    (bookId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId",
+        params: { dashboardId: bookId },
+      });
+    },
+    [navigate]
+  );
 
   return (
     <HomeView
       filteredBooks={filteredBooks}
       searchTerm={searchTerm}
-      setSearchTerm={setSearchTerm}
+      totalBooks={books.length}
+      lastEditedBook={lastEditedBook}
+      showCreateModal={showCreateModal}
+      showSettingsModal={showSettingsModal}
+      onSearchTermChange={setSearchTerm}
       onBookSelect={handleBookSelect}
       onCreateBook={handleCreateBook}
-      totalBooks={books.length}
-      lastEditedBook={getLastEditedBook()}
+      onOpenCreateModal={handleOpenCreateModal}
+      onCloseCreateModal={handleCloseCreateModal}
+      onOpenSettingsModal={handleOpenSettingsModal}
+      onCloseSettingsModal={handleCloseSettingsModal}
     />
   );
 }
