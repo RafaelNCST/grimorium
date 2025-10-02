@@ -59,7 +59,9 @@ import {
 } from "@/mocks/local/chapters-data";
 
 export function ChaptersPage() {
-  const { dashboardId } = useParams({ from: "/dashboard/$dashboardId/chapter/chapters" });
+  const { dashboardId } = useParams({
+    from: "/dashboard/$dashboardId/chapters/",
+  });
   const navigate = useNavigate();
   const [chapters, setChapters] = useState<Chapter[]>(mockChapters);
   const [showDetails, setShowDetails] = useState(true);
@@ -122,7 +124,7 @@ export function ChaptersPage() {
     setChapters((prev) => [...prev, newChapter]);
     navigate({
       to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chapters-id",
-      params: { dashboardId: dashboardId, "editor-chapters-id": newChapter.id },
+      params: { dashboardId, "editor-chapters-id": newChapter.id },
     });
   };
 
@@ -277,7 +279,10 @@ export function ChaptersPage() {
                             !isSelectMode &&
                             navigate({
                               to: "/dashboard/$dashboardId/chapter/editor-chapters/$editor-chapters-id",
-                              params: { dashboardId: dashboardId, "editor-chapters-id": chapter.id },
+                              params: {
+                                dashboardId,
+                                "editor-chapters-id": chapter.id,
+                              },
                             })
                           }
                         >

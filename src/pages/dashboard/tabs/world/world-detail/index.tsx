@@ -1,14 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import {
-  Globe,
-  Mountain,
-  TreePine,
-  Castle,
-  Home,
-  MapPin,
-} from "lucide-react";
+import { Globe, Mountain, TreePine, Castle, Home, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 import { WorldDetailView } from "./view";
@@ -231,19 +224,22 @@ export function WorldDetail() {
   }, [character]);
 
   // Event handlers with useCallback
-  const handleImageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        setEditData((prev) => ({ ...prev, image: result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+  const handleImageChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        setSelectedFile(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          setImagePreview(result);
+          setEditData((prev) => ({ ...prev, image: result }));
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    []
+  );
 
   const handleEditDataChange = useCallback((field: string, value: any) => {
     setEditData((prev) => ({ ...prev, [field]: value }));

@@ -186,7 +186,11 @@ export function WorldDetailView({
                     <Edit2 className="w-4 h-4 mr-2" />
                     Editar
                   </Button>
-                  <Button variant="destructive" size="icon" onClick={onDeleteModalOpen}>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={onDeleteModalOpen}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </>
@@ -258,7 +262,9 @@ export function WorldDetailView({
                       <Input
                         id="name"
                         value={editData.name}
-                        onChange={(e) => onEditDataChange("name", e.target.value)}
+                        onChange={(e) =>
+                          onEditDataChange("name", e.target.value)
+                        }
                       />
                     </div>
 
@@ -267,7 +273,9 @@ export function WorldDetailView({
                       <Textarea
                         id="description"
                         value={editData.description}
-                        onChange={(e) => onEditDataChange("description", e.target.value)}
+                        onChange={(e) =>
+                          onEditDataChange("description", e.target.value)
+                        }
                         className="min-h-[100px]"
                       />
                     </div>
@@ -289,7 +297,9 @@ export function WorldDetailView({
                           <Input
                             id="climate"
                             value={editData.climate || ""}
-                            onChange={(e) => onEditDataChange("climate", e.target.value)}
+                            onChange={(e) =>
+                              onEditDataChange("climate", e.target.value)
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -297,7 +307,9 @@ export function WorldDetailView({
                           <Input
                             id="location"
                             value={editData.location || ""}
-                            onChange={(e) => onEditDataChange("location", e.target.value)}
+                            onChange={(e) =>
+                              onEditDataChange("location", e.target.value)
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -305,20 +317,25 @@ export function WorldDetailView({
                           <Input
                             id="terrain"
                             value={editData.terrain || ""}
-                            onChange={(e) => onEditDataChange("terrain", e.target.value)}
+                            onChange={(e) =>
+                              onEditDataChange("terrain", e.target.value)
+                            }
                           />
                         </div>
                       </>
                     )}
 
-                    {(character.type === "World" || character.type === "Continent") && (
+                    {(character.type === "World" ||
+                      character.type === "Continent") && (
                       <>
                         <div className="space-y-2">
                           <Label htmlFor="age">Idade</Label>
                           <Input
                             id="age"
                             value={editData.age || ""}
-                            onChange={(e) => onEditDataChange("age", e.target.value)}
+                            onChange={(e) =>
+                              onEditDataChange("age", e.target.value)
+                            }
                           />
                         </div>
 
@@ -365,7 +382,9 @@ export function WorldDetailView({
                     )}
 
                     <div>
-                      <h2 className="text-xl font-semibold mb-2">{character.name}</h2>
+                      <h2 className="text-xl font-semibold mb-2">
+                        {character.name}
+                      </h2>
                       <p className="text-muted-foreground leading-relaxed">
                         {character.description}
                       </p>
@@ -381,7 +400,9 @@ export function WorldDetailView({
                     {character.classification && (
                       <div className="flex items-center gap-2 text-sm">
                         <span className="font-medium">Classificação:</span>
-                        <Badge variant="secondary">{character.classification}</Badge>
+                        <Badge variant="secondary">
+                          {character.classification}
+                        </Badge>
                       </div>
                     )}
                   </div>
@@ -400,7 +421,9 @@ export function WorldDetailView({
                         <CardTitle>Clima</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground">{character.climate}</p>
+                        <p className="text-muted-foreground">
+                          {character.climate}
+                        </p>
                       </CardContent>
                     </Card>
                   )}
@@ -411,29 +434,32 @@ export function WorldDetailView({
                         <CardTitle>Terreno</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground">{character.terrain}</p>
+                        <p className="text-muted-foreground">
+                          {character.terrain}
+                        </p>
                       </CardContent>
                     </Card>
                   )}
                 </div>
 
                 {/* Organizations */}
-                {character.organizations && character.organizations.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Organizações Presentes</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap gap-2">
-                        {character.organizations.map((org, idx) => (
-                          <Badge key={idx} variant="secondary">
-                            {org}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                {character.organizations &&
+                  character.organizations.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Organizações Presentes</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-2">
+                          {character.organizations.map((org, idx) => (
+                            <Badge key={idx} variant="secondary">
+                              {org}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
               </>
             )}
 

@@ -118,12 +118,16 @@ export function PlotArcDetailView({
                     />
                     <Input
                       value={editForm.focus || ""}
-                      onChange={(e) => onEditFormChange("focus", e.target.value)}
+                      onChange={(e) =>
+                        onEditFormChange("focus", e.target.value)
+                      }
                       placeholder="Foco do arco"
                     />
                     <Textarea
                       value={editForm.description || ""}
-                      onChange={(e) => onEditFormChange("description", e.target.value)}
+                      onChange={(e) =>
+                        onEditFormChange("description", e.target.value)
+                      }
                       placeholder="Descrição do arco"
                       rows={3}
                     />
@@ -149,8 +153,12 @@ export function PlotArcDetailView({
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="planejamento">Em Planejamento</SelectItem>
-                          <SelectItem value="andamento">Em Andamento</SelectItem>
+                          <SelectItem value="planejamento">
+                            Em Planejamento
+                          </SelectItem>
+                          <SelectItem value="andamento">
+                            Em Andamento
+                          </SelectItem>
                           <SelectItem value="finalizado">Finalizado</SelectItem>
                         </SelectContent>
                       </Select>
@@ -161,7 +169,9 @@ export function PlotArcDetailView({
                     <CardTitle className="flex items-center gap-2 mb-2">
                       {arc.name}
                       <Badge className={getStatusColor(arc.status)}>
-                        {arc.status === "andamento" && <Star className="w-3 h-3 mr-1" />}
+                        {arc.status === "andamento" && (
+                          <Star className="w-3 h-3 mr-1" />
+                        )}
                         {arc.status}
                       </Badge>
                     </CardTitle>
@@ -208,10 +218,14 @@ export function PlotArcDetailView({
                   <label className="text-sm font-medium text-muted-foreground">
                     Tamanho
                   </label>
-                  <Badge className={`mt-1 ${getSizeColor(arc.size)}`}>{arc.size}</Badge>
+                  <Badge className={`mt-1 ${getSizeColor(arc.size)}`}>
+                    {arc.size}
+                  </Badge>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Foco</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Foco
+                  </label>
                   <p className="mt-1">{arc.focus}</p>
                 </div>
               </div>
@@ -294,13 +308,17 @@ export function PlotArcDetailView({
       </div>
 
       {/* Delete Arc Dialog */}
-      <AlertDialog open={showDeleteArcDialog} onOpenChange={onDeleteArcDialogChange}>
+      <AlertDialog
+        open={showDeleteArcDialog}
+        onOpenChange={onDeleteArcDialogChange}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão do Arco</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir o arco "{arc.name}"? Esta ação não pode ser
-              desfeita e todos os eventos do arco também serão excluídos.
+              Tem certeza que deseja excluir o arco "{arc.name}"? Esta ação não
+              pode ser desfeita e todos os eventos do arco também serão
+              excluídos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -316,12 +334,16 @@ export function PlotArcDetailView({
       </AlertDialog>
 
       {/* Delete Event Dialog */}
-      <AlertDialog open={showDeleteEventDialog} onOpenChange={onDeleteEventDialogChange}>
+      <AlertDialog
+        open={showDeleteEventDialog}
+        onOpenChange={onDeleteEventDialogChange}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão do Evento</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este evento? Esta ação não pode ser
+              desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

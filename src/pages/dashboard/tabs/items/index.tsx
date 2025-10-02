@@ -113,25 +113,33 @@ export function ItemsTab({ bookId }: ItemsTabProps) {
   const [selectedRarity, setSelectedRarity] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
-      const matchesSearch =
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.alternativeNames.some((name) =>
-          name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      const matchesCategory =
-        selectedCategory === "all" || item.category === selectedCategory;
-      const matchesRarity =
-        selectedRarity === "all" || item.rarity.id === selectedRarity;
+  const filteredItems = useMemo(
+    () =>
+      items.filter((item) => {
+        const matchesSearch =
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.alternativeNames.some((name) =>
+            name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        const matchesCategory =
+          selectedCategory === "all" || item.category === selectedCategory;
+        const matchesRarity =
+          selectedRarity === "all" || item.rarity.id === selectedRarity;
 
-      return matchesSearch && matchesCategory && matchesRarity;
-    });
-  }, [items, searchTerm, selectedCategory, selectedRarity]);
+        return matchesSearch && matchesCategory && matchesRarity;
+      }),
+    [items, searchTerm, selectedCategory, selectedRarity]
+  );
 
-  const handleItemClick = useCallback((itemId: string) => {
-    navigate({ to: "/dashboard/$dashboardId/tabs/item/$itemId/", params: { dashboardId: bookId, itemId: itemId } });
-  }, [navigate, bookId]);
+  const handleItemClick = useCallback(
+    (itemId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/item/$itemId/",
+        params: { dashboardId: bookId, itemId },
+      });
+    },
+    [navigate, bookId]
+  );
 
   const handleCreateItem = useCallback((itemData: any) => {
     console.log("Creating item:", itemData);

@@ -95,21 +95,29 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
   const alignments = useMemo(() => ["all", "Bem", "Neutro", "Caótico"], []);
   const worlds = useMemo(() => ["all", "Aethermoor"], []);
 
-  const filteredOrganizations = useMemo(() => organizations.filter((org) => {
-    const matchesSearch =
-      org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      org.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesAlignment =
-      selectedAlignment === "all" || org.alignment === selectedAlignment;
-    const matchesWorld = selectedWorld === "all" || org.world === selectedWorld;
-    return matchesSearch && matchesAlignment && matchesWorld;
-  }), [organizations, searchTerm, selectedAlignment, selectedWorld]);
+  const filteredOrganizations = useMemo(
+    () =>
+      organizations.filter((org) => {
+        const matchesSearch =
+          org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          org.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesAlignment =
+          selectedAlignment === "all" || org.alignment === selectedAlignment;
+        const matchesWorld =
+          selectedWorld === "all" || org.world === selectedWorld;
+        return matchesSearch && matchesAlignment && matchesWorld;
+      }),
+    [organizations, searchTerm, selectedAlignment, selectedWorld]
+  );
 
-  const totalByAlignment = useMemo(() => ({
-    bem: organizations.filter((o) => o.alignment === "Bem").length,
-    neutro: organizations.filter((o) => o.alignment === "Neutro").length,
-    caotico: organizations.filter((o) => o.alignment === "Caótico").length,
-  }), [organizations]);
+  const totalByAlignment = useMemo(
+    () => ({
+      bem: organizations.filter((o) => o.alignment === "Bem").length,
+      neutro: organizations.filter((o) => o.alignment === "Neutro").length,
+      caotico: organizations.filter((o) => o.alignment === "Caótico").length,
+    }),
+    [organizations]
+  );
 
   const handleCreateOrganization = useCallback(() => {
     setShowCreateModal(true);
@@ -119,12 +127,15 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
     setOrganizations((prev) => [...prev, newOrganization]);
   }, []);
 
-  const handleOrganizationClick = useCallback((orgId: string) => {
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/organization/$orgId",
-      params: { dashboardId: bookId, orgId: orgId },
-    });
-  }, [navigate, bookId]);
+  const handleOrganizationClick = useCallback(
+    (orgId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/organization/$orgId",
+        params: { dashboardId: bookId, orgId },
+      });
+    },
+    [navigate, bookId]
+  );
 
   return (
     <OrganizationsView

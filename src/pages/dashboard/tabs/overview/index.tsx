@@ -8,9 +8,9 @@ import { OverviewView } from "./view";
 interface Book {
   title: string;
   chapters: number;
-  currentArc: string;
-  authorSummary: string;
-  storySummary: string;
+  currentArc?: string;
+  authorSummary?: string;
+  storySummary?: string;
 }
 
 interface PropsOverviewTab {

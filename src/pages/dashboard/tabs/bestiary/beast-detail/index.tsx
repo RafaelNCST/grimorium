@@ -16,7 +16,9 @@ import {
 import { BeastDetailView } from "./view";
 
 export function BeastDetail() {
-  const { beastId } = useParams({ from: "/dashboard/$dashboardId/tabs/beast/$beastId" });
+  const { beastId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/beast/$beastId",
+  });
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

@@ -1,6 +1,7 @@
-import i18n from "@/lib/i18n";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+import i18n from "@/lib/i18n";
 
 type Language = "pt" | "en";
 

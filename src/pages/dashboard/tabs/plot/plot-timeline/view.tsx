@@ -67,7 +67,9 @@ export function PlotTimelineView({
 
                 {/* Arc card */}
                 <div
-                  className={arc.status === "andamento" ? "transform scale-110" : ""}
+                  className={
+                    arc.status === "andamento" ? "transform scale-110" : ""
+                  }
                 >
                   <Card
                     className="card-magical cursor-pointer transition-all duration-300 hover:scale-105"
@@ -103,7 +105,9 @@ export function PlotTimelineView({
                     </CardHeader>
                     <CardContent>
                       <div className="flex justify-between items-center">
-                        <Badge className={getSizeColor(arc.size)}>{arc.size}</Badge>
+                        <Badge className={getSizeColor(arc.size)}>
+                          {arc.size}
+                        </Badge>
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">
                             #{arc.order + 1}
@@ -158,8 +162,8 @@ export function PlotTimelineView({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            Os números mostram a ordem cronológica dos arcos na sua história. Use as setas na
-            aba Plot para reordenar.
+            Os números mostram a ordem cronológica dos arcos na sua história.
+            Use as setas na aba Plot para reordenar.
           </p>
         </div>
       </div>

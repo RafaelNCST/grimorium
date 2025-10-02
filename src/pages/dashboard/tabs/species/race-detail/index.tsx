@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { RaceDetailView } from "./view";
-
 import { useToast } from "@/hooks/use-toast";
+
+import { RaceDetailView } from "./view";
 
 interface IRace {
   id: string;

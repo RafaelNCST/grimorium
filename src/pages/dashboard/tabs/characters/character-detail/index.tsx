@@ -317,7 +317,10 @@ export function CharacterDetail() {
 
   const handleDelete = () => {
     toast.success("Personagem excluído com sucesso!");
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: dashboardId } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId },
+    });
   };
 
   const handleCancel = () => {
@@ -540,7 +543,7 @@ export function CharacterDetail() {
   const handleNavigateToFamilyTree = () => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/character/$characterId/family-tree",
-      params: { dashboardId: dashboardId, characterId: characterId },
+      params: { dashboardId, characterId },
     });
   };
 

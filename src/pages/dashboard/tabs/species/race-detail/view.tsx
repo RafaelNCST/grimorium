@@ -189,7 +189,9 @@ export function RaceDetailView({
                 {isEditing ? (
                   <Textarea
                     value={editForm.history}
-                    onChange={(e) => onEditFormChange("history", e.target.value)}
+                    onChange={(e) =>
+                      onEditFormChange("history", e.target.value)
+                    }
                     placeholder="História da raça"
                     className="min-h-[120px]"
                   />
@@ -231,7 +233,9 @@ export function RaceDetailView({
                   {isEditing ? (
                     <Textarea
                       value={editForm.culture}
-                      onChange={(e) => onEditFormChange("culture", e.target.value)}
+                      onChange={(e) =>
+                        onEditFormChange("culture", e.target.value)
+                      }
                       placeholder="Cultura da raça (opcional)"
                       className="min-h-[100px]"
                     />

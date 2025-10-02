@@ -8,6 +8,7 @@ export interface Book {
   coverImage: string;
   chapters: number;
   lastModified: string;
+  currentArc?: string;
   authorSummary?: string;
   storySummary?: string;
 }

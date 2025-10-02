@@ -2,16 +2,18 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { ItemTimelineView } from "./view";
-
 import { useToast } from "@/hooks/use-toast";
 import {
   ITimelineEvent,
   mockTimelineEvents,
 } from "@/mocks/local/timeline-data";
 
+import { ItemTimelineView } from "./view";
+
 export default function ItemTimeline() {
-  const { itemId } = useParams({ from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline" });
+  const { itemId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline",
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
 

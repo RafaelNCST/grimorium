@@ -110,13 +110,24 @@ export function FamilyTreePage() {
   }, [character, allCharacters]);
 
   const treeNodes = useMemo(() => buildFamilyTree(), [buildFamilyTree]);
-  const generations = useMemo(() => {
-    return [...new Set(treeNodes.map((n) => n.generation))].sort((a, b) => b - a);
-  }, [treeNodes]);
+  const generations = useMemo(
+    () =>
+      [...new Set(treeNodes.map((n) => n.generation))].sort((a, b) => b - a),
+    [treeNodes]
+  );
 
-  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.2, 2)), []);
-  const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.2, 0.5)), []);
-  const handleToggleFullscreen = useCallback(() => setIsFullscreen((prev) => !prev), []);
+  const handleZoomIn = useCallback(
+    () => setZoom((prev) => Math.min(prev + 0.2, 2)),
+    []
+  );
+  const handleZoomOut = useCallback(
+    () => setZoom((prev) => Math.max(prev - 0.2, 0.5)),
+    []
+  );
+  const handleToggleFullscreen = useCallback(
+    () => setIsFullscreen((prev) => !prev),
+    []
+  );
 
   const getGenerationLabel = useCallback((generation: number) => {
     switch (generation) {
@@ -172,10 +183,7 @@ export function FamilyTreePage() {
     return (
       <div className="container mx-auto py-8 px-4 max-w-4xl">
         <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-          >
+          <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
@@ -205,10 +213,7 @@ export function FamilyTreePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-          >
+          <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
@@ -237,11 +242,7 @@ export function FamilyTreePage() {
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleToggleFullscreen}
-          >
+          <Button variant="outline" size="sm" onClick={handleToggleFullscreen}>
             <Maximize2 className="w-4 h-4" />
           </Button>
         </div>

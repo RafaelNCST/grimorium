@@ -90,35 +90,43 @@ export function BestiaryTab({ bookId }: BestiaryTabProps) {
   const beasts = useMemo(() => getBookBeasts(bookId), [bookId]);
 
   // Filter beasts based on search and filters
-  const filteredBeasts = useMemo(() => {
-    return beasts.filter((beast) => {
-      const matchesSearch =
-        beast.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        beast.basicDescription.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesRace = selectedRace === "all" || beast.race === selectedRace;
-      const matchesThreat =
-        selectedThreatLevel === "all" ||
-        beast.threatLevel.name === selectedThreatLevel;
-      const matchesHabit =
-        selectedHabit === "all" || beast.habit === selectedHabit;
+  const filteredBeasts = useMemo(
+    () =>
+      beasts.filter((beast) => {
+        const matchesSearch =
+          beast.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          beast.basicDescription
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+        const matchesRace =
+          selectedRace === "all" || beast.race === selectedRace;
+        const matchesThreat =
+          selectedThreatLevel === "all" ||
+          beast.threatLevel.name === selectedThreatLevel;
+        const matchesHabit =
+          selectedHabit === "all" || beast.habit === selectedHabit;
 
-      return matchesSearch && matchesRace && matchesThreat && matchesHabit;
-    });
-  }, [beasts, searchQuery, selectedRace, selectedThreatLevel, selectedHabit]);
+        return matchesSearch && matchesRace && matchesThreat && matchesHabit;
+      }),
+    [beasts, searchQuery, selectedRace, selectedThreatLevel, selectedHabit]
+  );
 
   // Get unique races from beasts
-  const uniqueRaces = useMemo(() => {
-    return Array.from(
-      new Set(beasts.map((beast) => beast.race).filter(Boolean))
-    );
-  }, [beasts]);
+  const uniqueRaces = useMemo(
+    () =>
+      Array.from(new Set(beasts.map((beast) => beast.race).filter(Boolean))),
+    [beasts]
+  );
 
-  const handleNavigateToBeast = useCallback((beastId: string) => {
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/beast/$beastId",
-      params: { dashboardId: bookId, beastId: beastId }
-    });
-  }, [navigate, bookId]);
+  const handleNavigateToBeast = useCallback(
+    (beastId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/beast/$beastId",
+        params: { dashboardId: bookId, beastId },
+      });
+    },
+    [navigate, bookId]
+  );
 
   return (
     <BestiaryView

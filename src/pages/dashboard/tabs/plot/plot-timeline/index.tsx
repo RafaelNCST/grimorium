@@ -14,9 +14,10 @@ export function PlotTimeline() {
   const [arcs] = useState<IPlotArc[]>(mockArcs);
 
   // Sort all arcs by order for the timeline - memoized
-  const sortedArcs = useMemo(() => {
-    return [...arcs].sort((a, b) => a.order - b.order);
-  }, [arcs]);
+  const sortedArcs = useMemo(
+    () => [...arcs].sort((a, b) => a.order - b.order),
+    [arcs]
+  );
 
   // Memoized color function
   const getSizeColor = useCallback((size: string) => {

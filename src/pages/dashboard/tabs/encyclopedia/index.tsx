@@ -67,16 +67,19 @@ export function EncyclopediaTab() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("browse");
 
-  const categories = useMemo(() => [
-    "all",
-    "História",
-    "Geografia",
-    "Cultura",
-    "Política",
-    "Economia",
-    "Religião",
-    "Outros",
-  ], []);
+  const categories = useMemo(
+    () => [
+      "all",
+      "História",
+      "Geografia",
+      "Cultura",
+      "Política",
+      "Economia",
+      "Religião",
+      "Outros",
+    ],
+    []
+  );
 
   const getCategoryColor = useCallback((category: string) => {
     switch (category) {
@@ -93,27 +96,32 @@ export function EncyclopediaTab() {
     }
   }, []);
 
-  const filteredEntries = useMemo(() => {
-    return mockEntries.filter((entry) => {
-      const matchesSearch =
-        entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        entry.tags.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      const matchesCategory =
-        selectedCategory === "all" || entry.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchTerm, selectedCategory]);
+  const filteredEntries = useMemo(
+    () =>
+      mockEntries.filter((entry) => {
+        const matchesSearch =
+          entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.tags.some((tag) =>
+            tag.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        const matchesCategory =
+          selectedCategory === "all" || entry.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      }),
+    [searchTerm, selectedCategory]
+  );
 
-  const entriesByCategory = useMemo(() => {
-    return categories.slice(1).map((category) => ({
-      category,
-      entries: mockEntries.filter((entry) => entry.category === category),
-      count: mockEntries.filter((entry) => entry.category === category).length,
-    }));
-  }, [categories]);
+  const entriesByCategory = useMemo(
+    () =>
+      categories.slice(1).map((category) => ({
+        category,
+        entries: mockEntries.filter((entry) => entry.category === category),
+        count: mockEntries.filter((entry) => entry.category === category)
+          .length,
+      })),
+    [categories]
+  );
 
   const handleCreateEntry = useCallback(() => {
     console.log("Create new encyclopedia entry");

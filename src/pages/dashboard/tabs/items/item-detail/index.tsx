@@ -2,14 +2,10 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { ItemDetailView } from "./view";
-
 import { useToast } from "@/hooks/use-toast";
-import {
-  Item,
-  mockItems,
-  mockLinkedNotes,
-} from "@/mocks/local/item-data";
+import { Item, mockItems, mockLinkedNotes } from "@/mocks/local/item-data";
+
+import { ItemDetailView } from "./view";
 
 interface MythologyEntry {
   id: string;
@@ -18,7 +14,9 @@ interface MythologyEntry {
 }
 
 export default function ItemDetail() {
-  const { itemId, dashboardId } = useParams({ from: "/dashboard/$dashboardId/tabs/item/$itemId" });
+  const { itemId, dashboardId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/item/$itemId",
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
 

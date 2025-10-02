@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { PlotArcDetail } from "@/pages/dashboard/tabs/plot/plot-detail";
 
-export const Route = createFileRoute("/dashboard/$dashboardId/tabs/plot/$plotId")({
+export const Route = createFileRoute(
+  "/dashboard/$dashboardId/tabs/plot/$plotId"
+)({
   component: PlotArcDetail,
 });

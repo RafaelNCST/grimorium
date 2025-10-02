@@ -152,15 +152,25 @@ export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
-  const [showCreateContinentModal, setShowCreateContinentModal] = useState(false);
+  const [showCreateContinentModal, setShowCreateContinentModal] =
+    useState(false);
   const [showCreateLocationModal, setShowCreateLocationModal] = useState(false);
   const [mockWorldEntities, setMockWorldEntities] = useState(() =>
     getWorldEntitiesForBook(bookId)
   );
 
-  const worlds = useMemo(() => mockWorldEntities.filter((e) => e.type === "World"), [mockWorldEntities]);
-  const continents = useMemo(() => mockWorldEntities.filter((e) => e.type === "Continent"), [mockWorldEntities]);
-  const locations = useMemo(() => mockWorldEntities.filter((e) => e.type === "Location"), [mockWorldEntities]);
+  const worlds = useMemo(
+    () => mockWorldEntities.filter((e) => e.type === "World"),
+    [mockWorldEntities]
+  );
+  const continents = useMemo(
+    () => mockWorldEntities.filter((e) => e.type === "Continent"),
+    [mockWorldEntities]
+  );
+  const locations = useMemo(
+    () => mockWorldEntities.filter((e) => e.type === "Location"),
+    [mockWorldEntities]
+  );
 
   const getTypeColor = useCallback((type: string) => {
     switch (type) {
@@ -173,30 +183,45 @@ export function WorldTab({ bookId }: PropsWorldTab) {
     }
   }, []);
 
-  const getParentName = useCallback((parentId?: string) => {
-    if (!parentId) return "";
-    const parent = mockWorldEntities.find((e) => e.id === parentId);
-    return parent?.name || "";
-  }, [mockWorldEntities]);
+  const getParentName = useCallback(
+    (parentId?: string) => {
+      if (!parentId) return "";
+      const parent = mockWorldEntities.find((e) => e.id === parentId);
+      return parent?.name || "";
+    },
+    [mockWorldEntities]
+  );
 
-  const getFilteredEntities = useCallback((typeFilter?: string) => {
-    let entities = mockWorldEntities;
+  const getFilteredEntities = useCallback(
+    (typeFilter?: string) => {
+      let entities = mockWorldEntities;
 
-    if (typeFilter && typeFilter !== "all") {
-      entities = entities.filter((e) => e.type === typeFilter);
-    }
+      if (typeFilter && typeFilter !== "all") {
+        entities = entities.filter((e) => e.type === typeFilter);
+      }
 
-    return entities.filter((entity) => {
-      const matchesSearch =
-        entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        entity.description.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesSearch;
-    });
-  }, [mockWorldEntities, searchTerm]);
+      return entities.filter((entity) => {
+        const matchesSearch =
+          entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entity.description.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesSearch;
+      });
+    },
+    [mockWorldEntities, searchTerm]
+  );
 
-  const filteredWorlds = useMemo(() => getFilteredEntities("World"), [getFilteredEntities]);
-  const filteredContinents = useMemo(() => getFilteredEntities("Continent"), [getFilteredEntities]);
-  const filteredLocations = useMemo(() => getFilteredEntities("Location"), [getFilteredEntities]);
+  const filteredWorlds = useMemo(
+    () => getFilteredEntities("World"),
+    [getFilteredEntities]
+  );
+  const filteredContinents = useMemo(
+    () => getFilteredEntities("Continent"),
+    [getFilteredEntities]
+  );
+  const filteredLocations = useMemo(
+    () => getFilteredEntities("Location"),
+    [getFilteredEntities]
+  );
 
   const totalWorlds = useMemo(() => worlds.length, [worlds]);
   const totalContinents = useMemo(() => continents.length, [continents]);
@@ -226,12 +251,15 @@ export function WorldTab({ bookId }: PropsWorldTab) {
     setMockWorldEntities((prev) => [...prev, newLocation]);
   }, []);
 
-  const handleEntityClick = useCallback((entity: WorldEntity) => {
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/world/$worldId",
-      params: { dashboardId: bookId, worldId: entity.id },
-    });
-  }, [navigate, bookId]);
+  const handleEntityClick = useCallback(
+    (entity: WorldEntity) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/world/$worldId",
+        params: { dashboardId: bookId, worldId: entity.id },
+      });
+    },
+    [navigate, bookId]
+  );
 
   return (
     <WorldView

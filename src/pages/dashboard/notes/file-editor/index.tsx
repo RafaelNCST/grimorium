@@ -19,7 +19,9 @@ import { NoteFile, mockFiles } from "@/mocks/local/files-data";
 import { AnnotationLink } from "@/types/annotations";
 
 export default function FileEditor() {
-  const { bookId, fileId } = useParams({ from: "/dashboard/$dashboardId/file/$fileId" });
+  const { bookId, fileId } = useParams({
+    from: "/dashboard/$dashboardId/file/$fileId",
+  });
   const navigate = useNavigate();
   const [file, setFile] = useState<NoteFile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -72,7 +74,10 @@ export default function FileEditor() {
       title: "Arquivo excluído",
       description: `O arquivo "${file?.name}" foi excluído com sucesso.`,
     });
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: bookId! } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: bookId! },
+    });
   };
 
   const handleLinksChange = (links: AnnotationLink[]) => {
@@ -83,7 +88,10 @@ export default function FileEditor() {
   };
 
   const handleBackToNotes = () => {
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: bookId || "1" } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: bookId || "1" },
+    });
   };
 
   const formatText = (text: string) =>
@@ -96,7 +104,10 @@ export default function FileEditor() {
           <h1 className="text-2xl font-bold mb-4">Arquivo não encontrado</h1>
           <Button
             onClick={() =>
-              navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: bookId! } })
+              navigate({
+                to: "/dashboard/$dashboardId",
+                params: { dashboardId: bookId! },
+              })
             }
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
