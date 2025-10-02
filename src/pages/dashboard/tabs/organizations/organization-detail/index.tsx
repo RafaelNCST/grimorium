@@ -1,16 +1,20 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { Globe, Mountain, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
+import { IOrganization, IOrganizationTitle } from "@/types/organization-types";
+
 import {
-  Organization,
-  mockOrganizations,
-  availableLocations,
-  availableWorlds,
-  availableContinents,
-} from "@/mocks/local/organization-data";
+  MOCK_LOCATIONS,
+  MOCK_WORLDS,
+  MOCK_CONTINENTS,
+} from "../mocks/mock-locations";
+import { MOCK_ORGANIZATIONS_DETAIL } from "../mocks/mock-organization-detail";
+import { getAlignmentColor } from "../utils/formatters/get-alignment-color";
+import { getInfluenceColor } from "../utils/formatters/get-influence-color";
+import { getLocationIcon } from "../utils/formatters/get-location-icon";
+import { getTitleName } from "../utils/formatters/get-title-name";
 
 import { OrganizationDetailView } from "./view";
 
@@ -19,6 +23,12 @@ export function OrganizationDetail() {
     from: "/dashboard/$dashboardId/tabs/organization/$orgId",
   });
   const navigate = useNavigate();
+
+  const organization = useMemo(
+    () => MOCK_ORGANIZATIONS_DETAIL[orgId || ""],
+    [orgId]
+  );
+
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showAddTitleDialog, setShowAddTitleDialog] = useState(false);
@@ -35,8 +45,6 @@ export function OrganizationDetail() {
     joinDate: "",
   });
 
-  const organization = mockOrganizations[orgId || ""];
-
   const [editData, setEditData] = useState({
     name: organization?.name || "",
     description: organization?.description || "",
@@ -51,159 +59,181 @@ export function OrganizationDetail() {
     titles: organization?.titles || [],
   });
 
-  const getLocationIcon = (type: string) => {
-    switch (type) {
-      case "Mundo":
-        return <Globe className="w-3 h-3" />;
-      case "Continente":
-        return <Mountain className="w-3 h-3" />;
-      default:
-        return <MapPin className="w-3 h-3" />;
-    }
-  };
+  const handleBack = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: dashboardId! },
+    });
+  }, [navigate, dashboardId]);
 
-  const getAlignmentColor = (alignment: string) => {
-    switch (alignment) {
-      case "Bem":
-        return "bg-success text-success-foreground";
-      case "Caótico":
-        return "bg-destructive text-destructive-foreground";
-      default:
-        return "bg-secondary text-secondary-foreground";
-    }
-  };
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
 
-  const getInfluenceColor = (influence: string) => {
-    switch (influence) {
-      case "Dominante":
-        return "bg-destructive text-destructive-foreground";
-      case "Alta":
-        return "bg-accent text-accent-foreground";
-      case "Média":
-        return "bg-primary text-primary-foreground";
-      case "Baixa":
-        return "bg-secondary text-secondary-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
-
-  const getTitleName = (titleId: string) => {
-    const title = organization.titles.find((t) => t.id === titleId);
-    return title?.name || "Membro";
-  };
-
-  const handleBack = () => window.history.back();
-
-  const handleEdit = () => setIsEditing(true);
-
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     toast.success("Organização atualizada com sucesso!");
     setIsEditing(false);
-  };
+  }, []);
 
-  const handleCancel = () => setIsEditing(false);
+  const handleCancel = useCallback(() => {
+    setIsEditing(false);
+  }, []);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     toast.success("Organização excluída com sucesso!");
     navigate({
       to: "/dashboard/$dashboardId",
       params: { dashboardId: dashboardId! },
     });
-  };
+  }, [navigate, dashboardId]);
 
-  const handleDeleteDialogOpen = () => setShowDeleteDialog(true);
-  const handleDeleteDialogClose = () => setShowDeleteDialog(false);
-  const handleAddTitleDialogOpen = () => setShowAddTitleDialog(true);
-  const handleAddTitleDialogClose = () => setShowAddTitleDialog(false);
-  const handleAddMemberDialogOpen = () => setShowAddMemberDialog(true);
-  const handleAddMemberDialogClose = () => setShowAddMemberDialog(false);
+  const handleDeleteDialogOpen = useCallback(() => {
+    setShowDeleteDialog(true);
+  }, []);
 
-  const handleEditDataChange = (field: string, value: any) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
+  const handleDeleteDialogClose = useCallback(() => {
+    setShowDeleteDialog(false);
+  }, []);
 
-  const handleNewTitleChange = (field: string, value: any) => {
-    setNewTitle((prev) => ({ ...prev, [field]: value }));
-  };
+  const handleAddTitleDialogOpen = useCallback(() => {
+    setShowAddTitleDialog(true);
+  }, []);
 
-  const handleNewMemberChange = (field: string, value: any) => {
+  const handleAddTitleDialogClose = useCallback(() => {
+    setShowAddTitleDialog(false);
+  }, []);
+
+  const handleAddMemberDialogOpen = useCallback(() => {
+    setShowAddMemberDialog(true);
+  }, []);
+
+  const handleAddMemberDialogClose = useCallback(() => {
+    setShowAddMemberDialog(false);
+  }, []);
+
+  const handleEditDataChange = useCallback(
+    (field: string, value: string | string[] | IOrganizationTitle[]) => {
+      setEditData((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const handleNewTitleChange = useCallback(
+    (field: string, value: string | number) => {
+      setNewTitle((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const handleNewMemberChange = useCallback((field: string, value: string) => {
     setNewMember((prev) => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
-  const handleAddTitle = () => {
+  const handleAddTitle = useCallback(() => {
     if (!newTitle.name.trim()) {
       toast.error("Nome do título é obrigatório");
       return;
     }
 
-    // In real app, this would update the state
     toast.success("Título adicionado com sucesso!");
     setNewTitle({ name: "", description: "", level: 1 });
     setShowAddTitleDialog(false);
-  };
+  }, [newTitle]);
 
-  const handleAddMember = () => {
+  const handleAddMember = useCallback(() => {
     if (!newMember.characterId || !newMember.titleId) {
       toast.error("Personagem e título são obrigatórios");
       return;
     }
 
-    // In real app, this would update the state
     toast.success("Membro adicionado com sucesso!");
     setNewMember({ characterId: "", titleId: "", joinDate: "" });
     setShowAddMemberDialog(false);
-  };
+  }, [newMember]);
 
-  const handleAddObjective = (newObjective: string) => {
-    if (
-      newObjective.trim() &&
-      !editData.objectives.includes(newObjective.trim())
-    ) {
-      setEditData((prev) => ({
-        ...prev,
-        objectives: [...prev.objectives, newObjective.trim()],
-      }));
-    }
-  };
+  const handleAddObjective = useCallback(
+    (newObjective: string) => {
+      if (
+        newObjective.trim() &&
+        !editData.objectives.includes(newObjective.trim())
+      ) {
+        setEditData((prev) => ({
+          ...prev,
+          objectives: [...prev.objectives, newObjective.trim()],
+        }));
+      }
+    },
+    [editData.objectives]
+  );
 
-  const handleRemoveObjective = (objective: string) => {
+  const handleRemoveObjective = useCallback((objective: string) => {
     setEditData((prev) => ({
       ...prev,
       objectives: prev.objectives.filter((o) => o !== objective),
     }));
-  };
+  }, []);
 
-  const handleAddDominatedLocation = (locationId: string) => {
-    const allAvailableLocations = [
-      ...availableLocations,
-      ...availableWorlds,
-      ...availableContinents,
-    ];
-    const location = allAvailableLocations.find((l) => l.id === locationId);
-    if (location && !editData.dominatedLocations.includes(location.name)) {
-      setEditData((prev) => ({
-        ...prev,
-        dominatedLocations: [...prev.dominatedLocations, location.name],
-      }));
-    }
-  };
+  const handleAddDominatedLocation = useCallback(
+    (locationId: string) => {
+      const allAvailableLocations = [
+        ...MOCK_LOCATIONS,
+        ...MOCK_WORLDS,
+        ...MOCK_CONTINENTS,
+      ];
+      const location = allAvailableLocations.find((l) => l.id === locationId);
+      if (location && !editData.dominatedLocations.includes(location.name)) {
+        setEditData((prev) => ({
+          ...prev,
+          dominatedLocations: [...prev.dominatedLocations, location.name],
+        }));
+      }
+    },
+    [editData.dominatedLocations]
+  );
 
-  const handleRemoveDominatedLocation = (location: string) => {
+  const handleRemoveDominatedLocation = useCallback((location: string) => {
     setEditData((prev) => ({
       ...prev,
       dominatedLocations: prev.dominatedLocations.filter((l) => l !== location),
     }));
-  };
+  }, []);
 
-  const handleUpdateTitleLevel = (titleId: string, newLevel: number) => {
-    setEditData((prev) => ({
-      ...prev,
-      titles: prev.titles.map((title) =>
-        title.id === titleId ? { ...title, level: newLevel } : title
-      ),
-    }));
-  };
+  const handleUpdateTitleLevel = useCallback(
+    (titleId: string, newLevel: number) => {
+      setEditData((prev) => ({
+        ...prev,
+        titles: prev.titles.map((title) =>
+          title.id === titleId ? { ...title, level: newLevel } : title
+        ),
+      }));
+    },
+    []
+  );
+
+  const getAlignmentColorCallback = useCallback(
+    (alignment: string) =>
+      getAlignmentColor(alignment as IOrganization["alignment"]),
+    []
+  );
+
+  const getInfluenceColorCallback = useCallback(
+    (influence: string) =>
+      getInfluenceColor(influence as IOrganization["influence"]),
+    []
+  );
+
+  const getTitleNameCallback = useCallback(
+    (titleId: string) => {
+      if (!organization) return "Membro";
+      return getTitleName(titleId, organization);
+    },
+    [organization]
+  );
+
+  const getLocationIconCallback = useCallback(
+    (type: string) => getLocationIcon(type),
+    []
+  );
 
   return (
     <OrganizationDetailView
@@ -215,9 +245,9 @@ export function OrganizationDetail() {
       showAddMemberDialog={showAddMemberDialog}
       newTitle={newTitle}
       newMember={newMember}
-      availableLocations={availableLocations}
-      availableWorlds={availableWorlds}
-      availableContinents={availableContinents}
+      availableLocations={MOCK_LOCATIONS}
+      availableWorlds={MOCK_WORLDS}
+      availableContinents={MOCK_CONTINENTS}
       onBack={handleBack}
       onEdit={handleEdit}
       onSave={handleSave}
@@ -239,10 +269,10 @@ export function OrganizationDetail() {
       onUpdateTitleLevel={handleUpdateTitleLevel}
       onAddTitle={handleAddTitle}
       onAddMember={handleAddMember}
-      getAlignmentColor={getAlignmentColor}
-      getInfluenceColor={getInfluenceColor}
-      getTitleName={getTitleName}
-      getLocationIcon={getLocationIcon}
+      getAlignmentColor={getAlignmentColorCallback}
+      getInfluenceColor={getInfluenceColorCallback}
+      getTitleName={getTitleNameCallback}
+      getLocationIcon={getLocationIconCallback}
     />
   );
 }

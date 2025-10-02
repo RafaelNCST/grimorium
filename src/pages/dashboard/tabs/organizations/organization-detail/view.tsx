@@ -15,16 +15,10 @@ import {
   Mountain,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -42,19 +36,46 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  IOrganization,
+  IOrganizationTitle,
+  ILocation,
+  IWorld,
+  IContinent,
+} from "@/types/organization-types";
 
-interface OrganizationDetailViewProps {
-  organization: any;
-  editData: any;
+interface PropsOrganizationDetailView {
+  organization: IOrganization | undefined;
+  editData: {
+    name: string;
+    description: string;
+    type: string;
+    alignment: string;
+    influence: string;
+    baseLocation: string;
+    world: string;
+    continent: string;
+    objectives: string[];
+    dominatedLocations: string[];
+    titles: IOrganizationTitle[];
+  };
   isEditing: boolean;
   showDeleteDialog: boolean;
   showAddTitleDialog: boolean;
   showAddMemberDialog: boolean;
-  newTitle: any;
-  newMember: any;
-  availableLocations: any[];
-  availableWorlds: any[];
-  availableContinents: any[];
+  newTitle: {
+    name: string;
+    description: string;
+    level: number;
+  };
+  newMember: {
+    characterId: string;
+    titleId: string;
+    joinDate: string;
+  };
+  availableLocations: ILocation[];
+  availableWorlds: IWorld[];
+  availableContinents: IContinent[];
   onBack: () => void;
   onEdit: () => void;
   onSave: () => void;
@@ -66,9 +87,12 @@ interface OrganizationDetailViewProps {
   onAddTitleDialogClose: () => void;
   onAddMemberDialogOpen: () => void;
   onAddMemberDialogClose: () => void;
-  onEditDataChange: (field: string, value: any) => void;
-  onNewTitleChange: (field: string, value: any) => void;
-  onNewMemberChange: (field: string, value: any) => void;
+  onEditDataChange: (
+    field: string,
+    value: string | string[] | IOrganizationTitle[]
+  ) => void;
+  onNewTitleChange: (field: string, value: string | number) => void;
+  onNewMemberChange: (field: string, value: string) => void;
   onAddObjective: (objective: string) => void;
   onRemoveObjective: (objective: string) => void;
   onAddDominatedLocation: (locationId: string) => void;
@@ -119,7 +143,7 @@ export function OrganizationDetailView({
   getInfluenceColor,
   getTitleName,
   getLocationIcon,
-}: OrganizationDetailViewProps) {
+}: PropsOrganizationDetailView) {
   if (!organization) {
     return (
       <div className="container mx-auto p-6">
@@ -138,7 +162,6 @@ export function OrganizationDetailView({
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
@@ -184,9 +207,7 @@ export function OrganizationDetailView({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Description */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -212,7 +233,6 @@ export function OrganizationDetailView({
             </CardContent>
           </Card>
 
-          {/* Objectives */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -278,7 +298,6 @@ export function OrganizationDetailView({
             </CardContent>
           </Card>
 
-          {/* Members and Titles */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -310,7 +329,6 @@ export function OrganizationDetailView({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Titles */}
                 <div>
                   <h4 className="font-medium mb-3">Hierarquia de Títulos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -406,7 +424,6 @@ export function OrganizationDetailView({
                   </div>
                 </div>
 
-                {/* Members */}
                 <div>
                   <h4 className="font-medium mb-3">Lista de Membros</h4>
                   <div className="space-y-3">
@@ -472,9 +489,7 @@ export function OrganizationDetailView({
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Basic Info */}
           <Card>
             <CardHeader>
               <CardTitle>Informações Básicas</CardTitle>
@@ -654,7 +669,6 @@ export function OrganizationDetailView({
             </CardContent>
           </Card>
 
-          {/* Dominated Territories */}
           {(isEditing
             ? editData.dominatedLocations.length > 0
             : organization.dominatedLocations.length > 0) && (
@@ -727,7 +741,6 @@ export function OrganizationDetailView({
                     </div>
                     <div className="space-y-2">
                       {editData.dominatedLocations.map((location, index) => {
-                        // Determine icon based on location type
                         const allAvailable = [
                           ...availableWorlds,
                           ...availableContinents,
@@ -770,7 +783,6 @@ export function OrganizationDetailView({
                 ) : (
                   <div className="space-y-2">
                     {organization.dominatedLocations.map((location, index) => {
-                      // Determine icon based on location type (simplified for display)
                       const icon =
                         location.includes("Continente") ||
                         location.includes("Terras") ? (
@@ -800,14 +812,13 @@ export function OrganizationDetailView({
         </div>
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={onDeleteDialogClose}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Excluir Organização</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir "{organization.name}"? Esta ação
-              não pode ser desfeita.
+              Tem certeza que deseja excluir &quot;{organization.name}&quot;?
+              Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -821,7 +832,6 @@ export function OrganizationDetailView({
         </DialogContent>
       </Dialog>
 
-      {/* Add Member Dialog */}
       <Dialog open={showAddMemberDialog} onOpenChange={onAddMemberDialogClose}>
         <DialogContent>
           <DialogHeader>
@@ -888,7 +898,6 @@ export function OrganizationDetailView({
         </DialogContent>
       </Dialog>
 
-      {/* Add Title Dialog */}
       <Dialog open={showAddTitleDialog} onOpenChange={onAddTitleDialogClose}>
         <DialogContent>
           <DialogHeader>

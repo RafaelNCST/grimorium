@@ -1,26 +1,11 @@
-import {
-  Plus,
-  Search,
-  Building,
-  Users,
-  Shield,
-  Swords,
-  Crown,
-  Globe,
-} from "lucide-react";
+import { Plus, Search, Building, Globe } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateOrganizationModal } from "@/components/modals/create-organization-modal";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -29,50 +14,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { IOrganization } from "@/types/organization-types";
 
-interface OrganizationTitle {
-  id: string;
-  name: string;
-  description: string;
-  level: number; // 1 = highest rank, higher numbers = lower ranks
-}
+import { MOCK_CHARACTERS } from "./mocks/mock-characters";
+import { MOCK_LOCATIONS } from "./mocks/mock-locations";
+import { getAlignmentColor } from "./utils/formatters/get-alignment-color";
+import { getInfluenceColor } from "./utils/formatters/get-influence-color";
+import { getOrganizationIcon } from "./utils/formatters/get-organization-icon";
 
-interface OrganizationMember {
-  characterId: string;
-  characterName: string;
-  titleId: string;
-  joinDate: string;
-}
-
-interface Organization {
-  id: string;
-  name: string;
-  photo?: string;
-  alignment: "Bem" | "Neutro" | "Caótico";
-  description: string;
-  type:
-    | "Militar"
-    | "Comercial"
-    | "Mágica"
-    | "Religiosa"
-    | "Culto"
-    | "Governamental"
-    | "Outros";
-  influence: "Inexistente" | "Baixa" | "Média" | "Alta" | "Dominante";
-  leaders: string[];
-  objectives: string[];
-  members: OrganizationMember[];
-  titles: OrganizationTitle[];
-  dominatedLocations: string[];
-  baseLocation?: string;
-  world?: string;
-  continent?: string;
-}
-
-interface OrganizationsViewProps {
+interface PropsOrganizationsView {
   bookId: string;
-  organizations: Organization[];
-  filteredOrganizations: Organization[];
+  organizations: IOrganization[];
+  filteredOrganizations: IOrganization[];
   totalByAlignment: {
     bem: number;
     neutro: number;
@@ -89,59 +42,9 @@ interface OrganizationsViewProps {
   onSelectedWorldChange: (world: string) => void;
   onShowCreateModalChange: (show: boolean) => void;
   onCreateOrganization: () => void;
-  onOrganizationCreated: (organization: any) => void;
+  onOrganizationCreated: (organization: IOrganization) => void;
   onOrganizationClick: (orgId: string) => void;
 }
-
-const getOrganizationIcon = (type: string) => {
-  switch (type.toLowerCase()) {
-    case "militar":
-      return <Shield className="w-4 h-4" />;
-    case "culto":
-      return <Swords className="w-4 h-4" />;
-    case "comercial":
-      return <Crown className="w-4 h-4" />;
-    case "mágica":
-      return <Swords className="w-4 h-4" />;
-    case "religiosa":
-      return <Crown className="w-4 h-4" />;
-    case "governamental":
-      return <Building className="w-4 h-4" />;
-    default:
-      return <Building className="w-4 h-4" />;
-  }
-};
-
-const getAlignmentColor = (alignment: string) => {
-  switch (alignment) {
-    case "Bem":
-      return "bg-success text-success-foreground";
-    case "Caótico":
-      return "bg-destructive text-destructive-foreground";
-    default:
-      return "bg-secondary text-secondary-foreground";
-  }
-};
-
-const getInfluenceColor = (influence: string) => {
-  switch (influence) {
-    case "Dominante":
-      return "bg-destructive text-destructive-foreground";
-    case "Alta":
-      return "bg-accent text-accent-foreground";
-    case "Média":
-      return "bg-primary text-primary-foreground";
-    case "Baixa":
-      return "bg-secondary text-secondary-foreground";
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-};
-
-const getTitleName = (titleId: string, organization: Organization) => {
-  const title = organization.titles.find((t) => t.id === titleId);
-  return title?.name || "Membro";
-};
 
 export function OrganizationsView({
   bookId,
@@ -161,23 +64,9 @@ export function OrganizationsView({
   onCreateOrganization,
   onOrganizationCreated,
   onOrganizationClick,
-}: OrganizationsViewProps) {
-  // Mock data for create modal
-  const availableCharacters = [
-    { id: "c1", name: "Lyara Moonwhisper" },
-    { id: "c2", name: "Aelric Valorheart" },
-    { id: "c3", name: "Sir Marcus Lightbringer" },
-  ];
-
-  const availableLocations = [
-    { id: "l1", name: "Cidadela da Luz", type: "Fortaleza" },
-    { id: "l2", name: "Torre Sombria", type: "Torre" },
-    { id: "l3", name: "Aldeia de Pedraverde", type: "Aldeia" },
-  ];
-
+}: PropsOrganizationsView) {
   return (
     <div className="space-y-6">
-      {/* Header with Stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Organizações</h2>
@@ -203,7 +92,6 @@ export function OrganizationsView({
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -247,7 +135,6 @@ export function OrganizationsView({
         </Select>
       </div>
 
-      {/* Organizations List */}
       <div className="space-y-6">
         {filteredOrganizations.map((organization) => (
           <Card
@@ -365,8 +252,8 @@ export function OrganizationsView({
         onClose={() => onShowCreateModalChange(false)}
         onOrganizationCreated={onOrganizationCreated}
         bookId={bookId}
-        availableCharacters={availableCharacters}
-        availableLocations={availableLocations}
+        availableCharacters={MOCK_CHARACTERS}
+        availableLocations={MOCK_LOCATIONS}
       />
     </div>
   );
