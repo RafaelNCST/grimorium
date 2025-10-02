@@ -40,7 +40,8 @@
       "Bash(findstr:*)",
       "Bash(for dir in \"world-detail\" \"plot-detail\" \"plot-timeline\" \"race-detail\" \"item-detail\" \"item-timeline\")",
       "Bash(do echo \"=== $dir ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pnpm exec prettier:*)"
     ],
     "deny": [],
     "ask": []

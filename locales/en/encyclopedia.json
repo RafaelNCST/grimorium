@@ -1,0 +1,32 @@
+{
+  "title": "World Encyclopedia",
+  "description": "Organize all knowledge about your universe",
+  "new_entry": "New Entry",
+  "tabs": {
+    "browse": "Browse",
+    "categories": "Categories"
+  },
+  "search": {
+    "placeholder": "Search in encyclopedia...",
+    "all_categories": "All categories"
+  },
+  "categories": {
+    "history": "History",
+    "geography": "Geography",
+    "culture": "Culture",
+    "politics": "Politics",
+    "economy": "Economy",
+    "religion": "Religion",
+    "others": "Others"
+  },
+  "related_entries": "Related entries:",
+  "modified": "Modified",
+  "entries": "entries",
+  "more": "more...",
+  "empty_state": {
+    "title": "No entries found",
+    "adjust_search": "Try adjusting your search",
+    "create_first": "Start by creating your first encyclopedia entry",
+    "create_entry": "Create Entry"
+  }
+}

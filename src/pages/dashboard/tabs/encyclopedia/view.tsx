@@ -5,10 +5,10 @@ import {
   Book,
   Scroll,
   Globe,
-  Sword,
   Crown,
   Users,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,37 +21,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { IEncyclopediaEntry, ICategoryGroup } from "@/types/encyclopedia";
 
-interface EncyclopediaEntry {
-  id: string;
-  title: string;
-  category:
-    | "História"
-    | "Geografia"
-    | "Cultura"
-    | "Política"
-    | "Economia"
-    | "Religião"
-    | "Outros";
-  content: string;
-  relatedEntries: string[];
-  tags: string[];
-  lastModified: string;
-}
-
-interface CategoryGroup {
-  category: string;
-  entries: EncyclopediaEntry[];
-  count: number;
-}
-
-interface EncyclopediaViewProps {
+interface PropsEncyclopediaView {
   searchTerm: string;
   selectedCategory: string;
   activeTab: string;
-  categories: string[];
-  filteredEntries: EncyclopediaEntry[];
-  entriesByCategory: CategoryGroup[];
+  categories: readonly string[];
+  filteredEntries: IEncyclopediaEntry[];
+  entriesByCategory: ICategoryGroup[];
   onSearchTermChange: (term: string) => void;
   onSelectedCategoryChange: (category: string) => void;
   onActiveTabChange: (tab: string) => void;
@@ -92,37 +70,34 @@ export function EncyclopediaView({
   onRelatedEntryClick,
   onCategoryClick,
   getCategoryColor,
-}: EncyclopediaViewProps) {
+}: PropsEncyclopediaView) {
+  const { t } = useTranslation("encyclopedia");
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Enciclopédia do Mundo</h2>
-          <p className="text-muted-foreground">
-            Organize todo o conhecimento sobre seu universo
-          </p>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("description")}</p>
         </div>
         <Button variant="magical" onClick={onCreateEntry}>
           <Plus className="w-4 h-4 mr-2" />
-          Nova Entrada
+          {t("new_entry")}
         </Button>
       </div>
 
-      {/* Navigation */}
       <Tabs value={activeTab} onValueChange={onActiveTabChange}>
         <TabsList>
-          <TabsTrigger value="browse">Navegar</TabsTrigger>
-          <TabsTrigger value="categories">Categorias</TabsTrigger>
+          <TabsTrigger value="browse">{t("tabs.browse")}</TabsTrigger>
+          <TabsTrigger value="categories">{t("tabs.categories")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="browse">
-          {/* Search and Filter */}
           <div className="flex items-center gap-4 mb-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar na enciclopédia..."
+                placeholder={t("search.placeholder")}
                 value={searchTerm}
                 onChange={(e) => onSearchTermChange(e.target.value)}
                 className="pl-10"
@@ -134,7 +109,7 @@ export function EncyclopediaView({
               onChange={(e) => onSelectedCategoryChange(e.target.value)}
               className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
             >
-              <option value="all">Todas as categorias</option>
+              <option value="all">{t("search.all_categories")}</option>
               {categories.slice(1).map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -143,7 +118,6 @@ export function EncyclopediaView({
             </select>
           </div>
 
-          {/* Entries Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredEntries.map((entry) => (
               <Card key={entry.id} className="card-magical animate-stagger">
@@ -196,7 +170,7 @@ export function EncyclopediaView({
                   {entry.relatedEntries.length > 0 && (
                     <div className="mb-3">
                       <span className="text-xs font-medium text-muted-foreground">
-                        Entradas relacionadas:
+                        {t("related_entries")}
                       </span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {entry.relatedEntries.map((related, index) => (
@@ -214,7 +188,7 @@ export function EncyclopediaView({
                   )}
 
                   <div className="text-xs text-muted-foreground">
-                    Modificado {entry.lastModified}
+                    {t("modified")} {entry.lastModified}
                   </div>
                 </CardContent>
               </Card>
@@ -223,7 +197,6 @@ export function EncyclopediaView({
         </TabsContent>
 
         <TabsContent value="categories">
-          {/* Categories Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {entriesByCategory.map(({ category, entries, count }) => (
               <Card
@@ -238,7 +211,9 @@ export function EncyclopediaView({
                     </div>
                     <div>
                       <CardTitle className="text-lg">{category}</CardTitle>
-                      <CardDescription>{count} entradas</CardDescription>
+                      <CardDescription>
+                        {count} {t("entries")}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -254,7 +229,7 @@ export function EncyclopediaView({
                     ))}
                     {entries.length > 3 && (
                       <div className="text-xs text-muted-foreground">
-                        +{entries.length - 3} mais...
+                        +{entries.length - 3} {t("more")}
                       </div>
                     )}
                   </div>
@@ -269,16 +244,16 @@ export function EncyclopediaView({
         <div className="text-center py-12">
           <Book className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">
-            Nenhuma entrada encontrada
+            {t("empty_state.title")}
           </h3>
           <p className="text-muted-foreground mb-4">
             {searchTerm || selectedCategory !== "all"
-              ? "Tente ajustar sua busca"
-              : "Comece criando a primeira entrada da sua enciclopédia"}
+              ? t("empty_state.adjust_search")
+              : t("empty_state.create_first")}
           </p>
           <Button variant="magical" onClick={onCreateEntry}>
             <Plus className="w-4 h-4 mr-2" />
-            Criar Entrada
+            {t("empty_state.create_entry")}
           </Button>
         </div>
       )}

@@ -1,15 +1,19 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enEncyclopedia from "../../locales/en/encyclopedia.json";
 import enHome from "../../locales/en/home.json";
+import ptEncyclopedia from "../../locales/pt/encyclopedia.json";
 import ptHome from "../../locales/pt/home.json";
 
 const resources = {
   en: {
     home: enHome,
+    encyclopedia: enEncyclopedia,
   },
   pt: {
     home: ptHome,
+    encyclopedia: ptEncyclopedia,
   },
 };
 

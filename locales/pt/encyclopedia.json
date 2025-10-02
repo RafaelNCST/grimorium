@@ -1,0 +1,32 @@
+{
+  "title": "Enciclopédia do Mundo",
+  "description": "Organize todo o conhecimento sobre seu universo",
+  "new_entry": "Nova Entrada",
+  "tabs": {
+    "browse": "Navegar",
+    "categories": "Categorias"
+  },
+  "search": {
+    "placeholder": "Buscar na enciclopédia...",
+    "all_categories": "Todas as categorias"
+  },
+  "categories": {
+    "history": "História",
+    "geography": "Geografia",
+    "culture": "Cultura",
+    "politics": "Política",
+    "economy": "Economia",
+    "religion": "Religião",
+    "others": "Outros"
+  },
+  "related_entries": "Entradas relacionadas:",
+  "modified": "Modificado",
+  "entries": "entradas",
+  "more": "mais...",
+  "empty_state": {
+    "title": "Nenhuma entrada encontrada",
+    "adjust_search": "Tente ajustar sua busca",
+    "create_first": "Comece criando a primeira entrada da sua enciclopédia",
+    "create_entry": "Criar Entrada"
+  }
+}
