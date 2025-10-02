@@ -1,7 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 
-import { useParams, useNavigate } from "@tanstack/react-router";
-import { Shield, Skull, Sun, Moon, TreePine, Sword } from "lucide-react";
+import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import {
@@ -9,9 +8,12 @@ import {
   mockBeast,
   habits,
   humanComparisons,
-  threatLevels,
   mockLinkedNotes,
 } from "@/mocks/local/beast-data";
+
+import { getComparisonColorWithBg } from "../utils/get-comparison-color-with-bg";
+import { getHabitIcon } from "../utils/get-habit-icon";
+import { getThreatLevelIcon } from "../utils/get-threat-level-icon";
 
 import { BeastDetailView } from "./view";
 
@@ -19,7 +21,6 @@ export function BeastDetail() {
   const { beastId } = useParams({
     from: "/dashboard/$dashboardId/tabs/beast/$beastId",
   });
-  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [beast, setBeast] = useState(mockBeast);
@@ -30,86 +31,63 @@ export function BeastDetail() {
   const [isAddingMythology, setIsAddingMythology] = useState(false);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
-  const getThreatLevelIcon = (threatLevel: string) => {
-    switch (threatLevel) {
-      case "inexistente":
-        return Shield;
-      case "baixo":
-        return Shield;
-      case "médio":
-        return Sword;
-      case "mortal":
-        return Skull;
-      case "apocalíptico":
-        return Skull;
-      default:
-        return Shield;
-    }
-  };
+  const currentData = useMemo(
+    () => (isEditing ? editedBeast : beast),
+    [isEditing, editedBeast, beast]
+  );
 
-  const getHabitIcon = (habit: string) => {
-    switch (habit) {
-      case "diurno":
-        return Sun;
-      case "noturno":
-        return Moon;
-      case "subterrâneo":
-        return TreePine;
-      default:
-        return Sun;
-    }
-  };
+  const handleBack = useCallback(() => {
+    window.history.back();
+  }, []);
 
-  const getComparisonColor = (comparison: string) => {
-    switch (comparison) {
-      case "impotente":
-        return "text-green-600 bg-green-50";
-      case "mais fraco":
-        return "text-green-500 bg-green-50";
-      case "ligeiramente mais fraco":
-        return "text-blue-500 bg-blue-50";
-      case "igual":
-        return "text-gray-500 bg-gray-50";
-      case "ligeiramente mais forte":
-        return "text-yellow-600 bg-yellow-50";
-      case "mais forte":
-        return "text-orange-500 bg-orange-50";
-      case "impossível de ganhar":
-        return "text-red-500 bg-red-50";
-      default:
-        return "text-gray-500 bg-gray-50";
-    }
-  };
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     setBeast(editedBeast);
     setIsEditing(false);
     toast.success("Besta atualizada com sucesso!");
-  };
+  }, [editedBeast]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setEditedBeast(beast);
     setIsEditing(false);
-  };
+  }, [beast]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        if (isEditing) {
-          setEditedBeast({ ...editedBeast, image: imageUrl });
-        } else {
-          setBeast({ ...beast, image: imageUrl });
-          toast.success("Imagem atualizada!");
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleDelete = useCallback(() => {
+    toast.success("Besta excluída com sucesso!");
+    window.history.back();
+  }, []);
 
-  const addMythology = () => {
+  const handleImageUpload = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          if (isEditing) {
+            setEditedBeast({ ...editedBeast, image: imageUrl });
+          } else {
+            setBeast({ ...beast, image: imageUrl });
+            toast.success("Imagem atualizada!");
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [isEditing, editedBeast, beast]
+  );
+
+  const handleEditedBeastChange = useCallback(
+    (updates: Partial<Beast>) => {
+      setEditedBeast({ ...editedBeast, ...updates });
+    },
+    [editedBeast]
+  );
+
+  const handleAddMythology = useCallback(() => {
     if (!newMythology.people.trim() || !newMythology.version.trim()) {
       toast.error("Povo e versão são obrigatórios");
       return;
@@ -128,33 +106,36 @@ export function BeastDetail() {
 
     setNewMythology({ people: "", version: "" });
     setIsAddingMythology(false);
-  };
+  }, [newMythology, editedBeast]);
 
-  const removeMythology = (mythId: string) => {
-    setEditedBeast({
-      ...editedBeast,
-      mythologies: editedBeast.mythologies.filter((m) => m.id !== mythId),
-    });
-  };
+  const handleRemoveMythology = useCallback(
+    (mythId: string) => {
+      setEditedBeast({
+        ...editedBeast,
+        mythologies: editedBeast.mythologies.filter((m) => m.id !== mythId),
+      });
+    },
+    [editedBeast]
+  );
 
-  const handleDelete = () => {
-    toast.success("Besta excluída com sucesso!");
-    window.history.back();
-  };
+  const handleNewMythologyChange = useCallback(
+    (mythology: { people: string; version: string }) => {
+      setNewMythology(mythology);
+    },
+    []
+  );
 
-  const handleEditedBeastChange = (updates: Partial<Beast>) => {
-    setEditedBeast({ ...editedBeast, ...updates });
-  };
+  const handleShowDeleteModalChange = useCallback((show: boolean) => {
+    setShowDeleteModal(show);
+  }, []);
 
-  const handleNewMythologyChange = (mythology: {
-    people: string;
-    version: string;
-  }) => {
-    setNewMythology(mythology);
-  };
+  const handleIsAddingMythologyChange = useCallback((adding: boolean) => {
+    setIsAddingMythology(adding);
+  }, []);
 
-  const currentData = isEditing ? editedBeast : beast;
-  const linkedNotes = mockLinkedNotes;
+  const handleLinkedNotesModalOpenChange = useCallback((open: boolean) => {
+    setIsLinkedNotesModalOpen(open);
+  }, []);
 
   return (
     <BeastDetailView
@@ -165,24 +146,24 @@ export function BeastDetail() {
       newMythology={newMythology}
       isAddingMythology={isAddingMythology}
       isLinkedNotesModalOpen={isLinkedNotesModalOpen}
-      linkedNotes={linkedNotes}
+      linkedNotes={mockLinkedNotes}
       fileInputRef={fileInputRef}
       getThreatLevelIcon={getThreatLevelIcon}
       getHabitIcon={getHabitIcon}
-      getComparisonColor={getComparisonColor}
-      onBack={() => window.history.back()}
-      onEdit={() => setIsEditing(true)}
+      getComparisonColor={getComparisonColorWithBg}
+      onBack={handleBack}
+      onEdit={handleEdit}
       onSave={handleSave}
       onCancel={handleCancel}
       onDelete={handleDelete}
       onImageUpload={handleImageUpload}
       onEditedBeastChange={handleEditedBeastChange}
-      onAddMythology={addMythology}
-      onRemoveMythology={removeMythology}
+      onAddMythology={handleAddMythology}
+      onRemoveMythology={handleRemoveMythology}
       onNewMythologyChange={handleNewMythologyChange}
-      setShowDeleteModal={setShowDeleteModal}
-      setIsAddingMythology={setIsAddingMythology}
-      setIsLinkedNotesModalOpen={setIsLinkedNotesModalOpen}
+      onShowDeleteModalChange={handleShowDeleteModalChange}
+      onIsAddingMythologyChange={handleIsAddingMythologyChange}
+      onLinkedNotesModalOpenChange={handleLinkedNotesModalOpenChange}
       habits={habits}
       humanComparisons={humanComparisons}
     />

@@ -35,8 +35,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Beast } from "@/mocks/local/beast-data";
 
-interface BeastDetailViewProps {
-  // Data
+interface PropsBeastDetailView {
   currentData: Beast;
   isEditing: boolean;
   editedBeast: Beast;
@@ -46,13 +45,9 @@ interface BeastDetailViewProps {
   isLinkedNotesModalOpen: boolean;
   linkedNotes: any[];
   fileInputRef: React.RefObject<HTMLInputElement>;
-
-  // Helper functions
   getThreatLevelIcon: (threatLevel: string) => any;
   getHabitIcon: (habit: string) => any;
   getComparisonColor: (comparison: string) => string;
-
-  // Handlers
   onBack: () => void;
   onEdit: () => void;
   onSave: () => void;
@@ -66,13 +61,9 @@ interface BeastDetailViewProps {
     people: string;
     version: string;
   }) => void;
-
-  // Modal handlers
-  setShowDeleteModal: (show: boolean) => void;
-  setIsAddingMythology: (adding: boolean) => void;
-  setIsLinkedNotesModalOpen: (open: boolean) => void;
-
-  // Options
+  onShowDeleteModalChange: (show: boolean) => void;
+  onIsAddingMythologyChange: (adding: boolean) => void;
+  onLinkedNotesModalOpenChange: (open: boolean) => void;
   habits: string[];
   humanComparisons: string[];
 }
@@ -100,12 +91,12 @@ export function BeastDetailView({
   onAddMythology,
   onRemoveMythology,
   onNewMythologyChange,
-  setShowDeleteModal,
-  setIsAddingMythology,
-  setIsLinkedNotesModalOpen,
+  onShowDeleteModalChange,
+  onIsAddingMythologyChange,
+  onLinkedNotesModalOpenChange,
   habits,
   humanComparisons,
-}: BeastDetailViewProps) {
+}: PropsBeastDetailView) {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -131,7 +122,7 @@ export function BeastDetailView({
               <>
                 <Button
                   variant="outline"
-                  onClick={() => setIsLinkedNotesModalOpen(true)}
+                  onClick={() => onLinkedNotesModalOpenChange(true)}
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   Anotações ({linkedNotes.length})
@@ -142,7 +133,7 @@ export function BeastDetailView({
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setShowDeleteModal(true)}
+                  onClick={() => onShowDeleteModalChange(true)}
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
@@ -557,7 +548,7 @@ export function BeastDetailView({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsAddingMythology(true)}
+                    onClick={() => onIsAddingMythologyChange(true)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Adicionar
@@ -597,7 +588,7 @@ export function BeastDetailView({
                           size="sm"
                           variant="outline"
                           onClick={() => {
-                            setIsAddingMythology(false);
+                            onIsAddingMythologyChange(false);
                             onNewMythologyChange({ people: "", version: "" });
                           }}
                         >
@@ -655,7 +646,7 @@ export function BeastDetailView({
 
         <ConfirmDeleteModal
           open={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
+          onClose={() => onShowDeleteModalChange(false)}
           title="Excluir Besta"
           description="Esta ação não pode ser desfeita. A besta será permanentemente removida do bestiário."
           onConfirm={onDelete}
@@ -663,7 +654,7 @@ export function BeastDetailView({
 
         <LinkedNotesModal
           isOpen={isLinkedNotesModalOpen}
-          onClose={() => setIsLinkedNotesModalOpen(false)}
+          onClose={() => onLinkedNotesModalOpenChange(false)}
           linkedNotes={linkedNotes}
         />
       </div>

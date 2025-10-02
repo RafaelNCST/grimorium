@@ -2,121 +2,39 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import { MOCK_BEASTS } from "./mocks/mock-beasts";
+import { filterBeasts } from "./utils/filter-beasts";
+import { getUniqueRaces } from "./utils/get-unique-races";
 import { BestiaryView } from "./view";
 
-interface Beast {
-  id: string;
-  name: string;
-  race?: string;
-  species?: string;
-  basicDescription: string;
-  habit: string;
-  threatLevel: {
-    name: string;
-    color: string;
-  };
-  image?: string;
-  humanComparison: string;
-}
-
-interface BestiaryTabProps {
+interface PropsBestiaryTab {
   bookId: string;
 }
 
-// Mock data for beasts
-const getBookBeasts = (bookId: string): Beast[] => [
-  {
-    id: "1",
-    name: "Dragão Sombrio",
-    race: "Dracônico",
-    species: "Reptiliano",
-    basicDescription:
-      "Criatura ancestral de escamas negras que domina as artes da magia sombria.",
-    habit: "noturno",
-    threatLevel: { name: "apocalíptico", color: "red" },
-    image:
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-    humanComparison: "impossível de ganhar",
-  },
-  {
-    id: "2",
-    name: "Lobo das Névoas",
-    race: "Lupino",
-    species: "Mamífero",
-    basicDescription:
-      "Predador fantasmagórico que se materializa através da névoa matinal.",
-    habit: "crepuscular",
-    threatLevel: { name: "médio", color: "yellow" },
-    image:
-      "https://images.unsplash.com/photo-1553830591-fddf9c6aab9e?w=400&h=300&fit=crop",
-    humanComparison: "mais forte",
-  },
-  {
-    id: "3",
-    name: "Pixie Luminoso",
-    race: "Feérico",
-    species: "Espírito",
-    basicDescription:
-      "Pequena criatura mágica que emite luz própria e possui natureza brincalhona.",
-    habit: "diurno",
-    threatLevel: { name: "inexistente", color: "green" },
-    image:
-      "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop",
-    humanComparison: "impotente",
-  },
-  {
-    id: "4",
-    name: "Basilisco Venenoso",
-    race: "Serpentino",
-    species: "Reptiliano",
-    basicDescription:
-      "Serpente gigante cujo olhar pode petrificar e cujo veneno é letal.",
-    habit: "subterrâneo",
-    threatLevel: { name: "mortal", color: "orange" },
-    image:
-      "https://images.unsplash.com/photo-1516301617588-4c7a8b6c4a6e?w=400&h=300&fit=crop",
-    humanComparison: "impossível de ganhar",
-  },
-];
-
-export function BestiaryTab({ bookId }: BestiaryTabProps) {
+export function BestiaryTab({ bookId }: PropsBestiaryTab) {
   const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRace, setSelectedRace] = useState<string>("all");
   const [selectedThreatLevel, setSelectedThreatLevel] = useState<string>("all");
   const [selectedHabit, setSelectedHabit] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const beasts = useMemo(() => getBookBeasts(bookId), [bookId]);
+  const beasts = useMemo(() => MOCK_BEASTS, []);
 
-  // Filter beasts based on search and filters
   const filteredBeasts = useMemo(
     () =>
-      beasts.filter((beast) => {
-        const matchesSearch =
-          beast.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          beast.basicDescription
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-        const matchesRace =
-          selectedRace === "all" || beast.race === selectedRace;
-        const matchesThreat =
-          selectedThreatLevel === "all" ||
-          beast.threatLevel.name === selectedThreatLevel;
-        const matchesHabit =
-          selectedHabit === "all" || beast.habit === selectedHabit;
-
-        return matchesSearch && matchesRace && matchesThreat && matchesHabit;
+      filterBeasts({
+        beasts,
+        searchQuery,
+        selectedRace,
+        selectedThreatLevel,
+        selectedHabit,
       }),
     [beasts, searchQuery, selectedRace, selectedThreatLevel, selectedHabit]
   );
 
-  // Get unique races from beasts
-  const uniqueRaces = useMemo(
-    () =>
-      Array.from(new Set(beasts.map((beast) => beast.race).filter(Boolean))),
-    [beasts]
-  );
+  const uniqueRaces = useMemo(() => getUniqueRaces(beasts), [beasts]);
 
   const handleNavigateToBeast = useCallback(
     (beastId: string) => {
@@ -127,6 +45,26 @@ export function BestiaryTab({ bookId }: BestiaryTabProps) {
     },
     [navigate, bookId]
   );
+
+  const handleSearchQueryChange = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  const handleSelectedRaceChange = useCallback((race: string) => {
+    setSelectedRace(race);
+  }, []);
+
+  const handleSelectedThreatLevelChange = useCallback((level: string) => {
+    setSelectedThreatLevel(level);
+  }, []);
+
+  const handleSelectedHabitChange = useCallback((habit: string) => {
+    setSelectedHabit(habit);
+  }, []);
+
+  const handleShowCreateModalChange = useCallback((show: boolean) => {
+    setShowCreateModal(show);
+  }, []);
 
   return (
     <BestiaryView
@@ -139,11 +77,11 @@ export function BestiaryTab({ bookId }: BestiaryTabProps) {
       selectedThreatLevel={selectedThreatLevel}
       selectedHabit={selectedHabit}
       showCreateModal={showCreateModal}
-      onSearchQueryChange={setSearchQuery}
-      onSelectedRaceChange={setSelectedRace}
-      onSelectedThreatLevelChange={setSelectedThreatLevel}
-      onSelectedHabitChange={setSelectedHabit}
-      onShowCreateModalChange={setShowCreateModal}
+      onSearchQueryChange={handleSearchQueryChange}
+      onSelectedRaceChange={handleSelectedRaceChange}
+      onSelectedThreatLevelChange={handleSelectedThreatLevelChange}
+      onSelectedHabitChange={handleSelectedHabitChange}
+      onShowCreateModalChange={handleShowCreateModalChange}
       onNavigateToBeast={handleNavigateToBeast}
     />
   );

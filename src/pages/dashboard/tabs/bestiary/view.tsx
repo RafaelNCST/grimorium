@@ -1,15 +1,6 @@
 import React from "react";
 
-import {
-  Plus,
-  Search,
-  Shield,
-  Sword,
-  Moon,
-  Sun,
-  TreePine,
-  Skull,
-} from "lucide-react";
+import { Plus, Search, Skull } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateBeastModal } from "@/components/modals/create-beast-modal";
@@ -24,21 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Beast } from "@/mocks/local/beast-data";
 
-interface Beast {
-  id: string;
-  name: string;
-  race?: string;
-  species?: string;
-  basicDescription: string;
-  habit: string;
-  threatLevel: {
-    name: string;
-    color: string;
-  };
-  image?: string;
-  humanComparison: string;
-}
+import {
+  HABITS_CONSTANT,
+  THREAT_LEVELS_CONSTANT,
+} from "./constants/beast-constants";
+import { getComparisonColor } from "./utils/get-comparison-color";
+import { getHabitIcon } from "./utils/get-habit-icon";
+import { getThreatLevelIcon } from "./utils/get-threat-level-icon";
 
 interface BestiaryViewProps {
   bookId: string;
@@ -57,74 +42,6 @@ interface BestiaryViewProps {
   onShowCreateModalChange: (show: boolean) => void;
   onNavigateToBeast: (beastId: string) => void;
 }
-
-const threatLevels = [
-  { name: "inexistente", color: "green" },
-  { name: "baixo", color: "blue" },
-  { name: "médio", color: "yellow" },
-  { name: "mortal", color: "orange" },
-  { name: "apocalíptico", color: "red" },
-];
-
-const habits = [
-  "diurno",
-  "noturno",
-  "crepuscular",
-  "migratório",
-  "caótico",
-  "subterrâneo",
-];
-
-const getThreatLevelIcon = (threatLevel: string) => {
-  switch (threatLevel) {
-    case "inexistente":
-      return Shield;
-    case "baixo":
-      return Shield;
-    case "médio":
-      return Sword;
-    case "mortal":
-      return Skull;
-    case "apocalíptico":
-      return Skull;
-    default:
-      return Shield;
-  }
-};
-
-const getHabitIcon = (habit: string) => {
-  switch (habit) {
-    case "diurno":
-      return Sun;
-    case "noturno":
-      return Moon;
-    case "subterrâneo":
-      return TreePine;
-    default:
-      return Sun;
-  }
-};
-
-const getComparisonColor = (comparison: string) => {
-  switch (comparison) {
-    case "impotente":
-      return "text-green-600";
-    case "mais fraco":
-      return "text-green-500";
-    case "ligeiramente mais fraco":
-      return "text-blue-500";
-    case "igual":
-      return "text-gray-500";
-    case "ligeiramente mais forte":
-      return "text-yellow-500";
-    case "mais forte":
-      return "text-orange-500";
-    case "impossível de ganhar":
-      return "text-red-500";
-    default:
-      return "text-gray-500";
-  }
-};
 
 export function BestiaryView({
   bookId,
@@ -255,7 +172,7 @@ export function BestiaryView({
           </SelectTrigger>
           <SelectContent side="bottom">
             <SelectItem value="all">Todas as ameaças</SelectItem>
-            {threatLevels.map((level) => (
+            {THREAT_LEVELS_CONSTANT.map((level) => (
               <SelectItem key={level.name} value={level.name}>
                 <div className="flex items-center gap-2">
                   <div
@@ -274,7 +191,7 @@ export function BestiaryView({
           </SelectTrigger>
           <SelectContent side="bottom">
             <SelectItem value="all">Todos os hábitos</SelectItem>
-            {habits.map((habit) => (
+            {HABITS_CONSTANT.map((habit) => (
               <SelectItem key={habit} value={habit}>
                 {habit}
               </SelectItem>
