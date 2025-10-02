@@ -1,108 +1,51 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 
+import { MOCK_SPECIES } from "./mocks/mock-species";
+import { ISpecies, IRace, IRaceTypeStats, RaceType } from "./types/species-types";
 import { SpeciesView } from "./view";
 
-interface IRace {
-  id: string;
-  name: string;
-  description: string;
-  history: string;
-  type: "Aquática" | "Terrestre" | "Voadora" | "Espacial" | "Espiritual";
-  physicalCharacteristics?: string;
-  culture?: string;
-  speciesId: string;
-}
-
-interface ISpecies {
-  id: string;
-  knownName: string;
-  scientificName?: string;
-  description: string;
-  races: IRace[];
-}
-
-const typeColors = {
-  Aquática: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  Terrestre:
-    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  Voadora: "bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200",
-  Espacial:
-    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  Espiritual:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-};
-
-interface SpeciesTabProps {
+interface PropsSpeciesTab {
   bookId: string;
 }
 
-export function SpeciesTab({ bookId }: SpeciesTabProps) {
+export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const [species, setSpecies] = useState<ISpecies[]>(MOCK_SPECIES);
   const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>("");
 
-  // Mock data - replace with actual data management
-  const [species, setSpecies] = useState<ISpecies[]>([
-    {
-      id: "1",
-      knownName: "Elfos",
-      scientificName: "Homo elvensis",
-      description:
-        "Seres mágicos de longa vida com orelhas pontiagudas e grande afinidade com a natureza.",
-      races: [
-        {
-          id: "1",
-          name: "Elfos da Floresta",
-          description: "Elfos que vivem em harmonia com as florestas antigas.",
-          history:
-            "Os Elfos da Floresta são os guardiões ancestrais das florestas sagradas...",
-          type: "Terrestre",
-          physicalCharacteristics:
-            "Pele clara com tons esverdeados, cabelos longos...",
-          culture:
-            "Vivem em comunidades arbóreas, respeitando os ciclos naturais...",
-          speciesId: "1",
-        },
-        {
-          id: "2",
-          name: "Elfos do Mar",
-          description:
-            "Elfos adaptados à vida aquática com habilidades marinhas.",
-          history:
-            "Descendentes dos primeiros elfos que migraram para os oceanos...",
-          type: "Aquática",
-          physicalCharacteristics: "Pele azulada, guelras funcionais...",
-          culture:
-            "Sociedade baseada na harmonia com as correntes oceânicas...",
-          speciesId: "1",
-        },
-      ],
-    },
-    {
-      id: "2",
-      knownName: "Dragões",
-      scientificName: "Draco magnus",
-      description: "Criaturas ancestrais de grande poder mágico e sabedoria.",
-      races: [
-        {
-          id: "3",
-          name: "Dragão de Fogo",
-          description: "Dragões que dominam o elemento fogo.",
-          history: "Nascidos das chamas primordiais do mundo...",
-          type: "Voadora",
-          physicalCharacteristics: "Escamas vermelhas, hálito de fogo...",
-          culture: "Territorialistas, vivem em cavernas vulcânicas...",
-          speciesId: "2",
-        },
-      ],
-    },
-  ]);
+  const raceTypeStats = useMemo<IRaceTypeStats>(
+    () => ({
+      Aquática: species.reduce(
+        (sum, s) => sum + s.races.filter((r) => r.type === "Aquática").length,
+        0
+      ),
+      Terrestre: species.reduce(
+        (sum, s) => sum + s.races.filter((r) => r.type === "Terrestre").length,
+        0
+      ),
+      Voadora: species.reduce(
+        (sum, s) => sum + s.races.filter((r) => r.type === "Voadora").length,
+        0
+      ),
+      Espacial: species.reduce(
+        (sum, s) => sum + s.races.filter((r) => r.type === "Espacial").length,
+        0
+      ),
+      Espiritual: species.reduce(
+        (sum, s) => sum + s.races.filter((r) => r.type === "Espiritual").length,
+        0
+      ),
+    }),
+    [species]
+  );
 
   const handleCreateSpecies = useCallback(
     (data: {
@@ -129,7 +72,7 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
       name: string;
       description: string;
       history: string;
-      type: IRace["type"];
+      type: RaceType;
       physicalCharacteristics?: string;
       culture?: string;
     }) => {
@@ -157,14 +100,8 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
 
   const handleSpeciesClick = useCallback(
     (speciesId: string) => {
-      const worldId = "world1"; // Default world - Aethermoor
+      const worldId = "world1";
       const speciesUrl = `/book/${bookId}/world/${worldId}/species/${speciesId}`;
-      console.log("Navigating to species detail:", {
-        bookId,
-        worldId,
-        speciesId,
-      });
-      console.log("Route URL:", speciesUrl);
       window.location.href = speciesUrl;
     },
     [bookId]
@@ -185,41 +122,22 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
     setIsCreateRaceOpen(true);
   }, []);
 
-  const raceTypeStats = useMemo(
-    () => ({
-      Aquática: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Aquática").length,
-        0
-      ),
-      Terrestre: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Terrestre").length,
-        0
-      ),
-      Voadora: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Voadora").length,
-        0
-      ),
-      Espacial: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Espacial").length,
-        0
-      ),
-      Espiritual: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Espiritual").length,
-        0
-      ),
-    }),
-    [species]
-  );
+  const handleSetIsCreateSpeciesOpen = useCallback((open: boolean) => {
+    setIsCreateSpeciesOpen(open);
+  }, []);
+
+  const handleSetIsCreateRaceOpen = useCallback((open: boolean) => {
+    setIsCreateRaceOpen(open);
+  }, []);
 
   return (
     <SpeciesView
       species={species}
       isCreateSpeciesOpen={isCreateSpeciesOpen}
       isCreateRaceOpen={isCreateRaceOpen}
-      typeColors={typeColors}
       raceTypeStats={raceTypeStats}
-      onSetIsCreateSpeciesOpen={setIsCreateSpeciesOpen}
-      onSetIsCreateRaceOpen={setIsCreateRaceOpen}
+      onSetIsCreateSpeciesOpen={handleSetIsCreateSpeciesOpen}
+      onSetIsCreateRaceOpen={handleSetIsCreateRaceOpen}
       onCreateSpecies={handleCreateSpecies}
       onCreateRace={handleCreateRace}
       onSpeciesClick={handleSpeciesClick}
