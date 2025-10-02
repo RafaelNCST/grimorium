@@ -1,142 +1,24 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
 import { PowerSystemView } from "./view";
-
-type ElementType = "section-card" | "details-card" | "visual-card" | "text-box";
-type ConnectionType = "arrow" | "line";
-
-interface PowerElement {
-  id: string;
-  type: ElementType;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  title?: string;
-  content?: string;
-  imageUrl?: string;
-  color: string;
-  textColor: string;
-  canOpenSubmap: boolean;
-  showHover: boolean;
-  compressed?: boolean;
-  submapId?: string;
-}
-
-interface Connection {
-  id: string;
-  type: ConnectionType;
-  fromId: string;
-  toId: string;
-  text?: string;
-  color: string;
-}
-
-interface PowerMap {
-  id: string;
-  name: string;
-  elements: PowerElement[];
-  connections: Connection[];
-  parentMapId?: string;
-}
-
-interface Template {
-  id: string;
-  name: string;
-  map: Omit<PowerMap, "id" | "name">;
-}
-
-const DEFAULT_COLORS = [
-  "#3B82F6",
-  "#EF4444",
-  "#10B981",
-  "#F59E0B",
-  "#8B5CF6",
-  "#EC4899",
-  "#14B8A6",
-  "#F97316",
-  "#84CC16",
-  "#6366F1",
-];
-
-const ELEMENT_TYPES = [
-  {
-    type: "section-card" as ElementType,
-    name: "Card de Seção",
-    description: "Para seções principais do sistema",
-  },
-  {
-    type: "details-card" as ElementType,
-    name: "Card de Detalhes",
-    description: "Cria submapas navegáveis",
-  },
-  {
-    type: "visual-card" as ElementType,
-    name: "Card Visual",
-    description: "Focado em representações visuais",
-  },
-  {
-    type: "text-box" as ElementType,
-    name: "Caixa de Texto",
-    description: "Anotações e descrições livres",
-  },
-];
-
-const TUTORIAL_STEPS = [
-  {
-    title: "Bem-vindo ao Sistema de Poder!",
-    content:
-      "Crie mapas visuais interativos para organizar seu sistema de mundo.",
-    target: null,
-  },
-  {
-    title: "Modo de Edição",
-    content:
-      "Clique em 'Visualizando' para entrar no modo de edição e acessar as ferramentas.",
-    target: ".edit-button",
-  },
-  {
-    title: "Barra de Elementos",
-    content:
-      "Use a barra lateral para adicionar diferentes tipos de elementos ao seu mapa.",
-    target: ".sidebar-toolbox",
-  },
-  {
-    title: "Cards de Seção",
-    content:
-      "Ideais para seções principais do seu sistema. Podem ser comprimidos para economizar espaço.",
-    target: "[data-element-type='section-card']",
-  },
-  {
-    title: "Cards de Detalhes",
-    content:
-      "Criam submapas navegáveis para organizar informações hierarquicamente.",
-    target: "[data-element-type='details-card']",
-  },
-  {
-    title: "Cards Visuais",
-    content:
-      "Focados em imagens, perfeitos para representações visuais do seu sistema.",
-    target: "[data-element-type='visual-card']",
-  },
-  {
-    title: "Caixas de Texto",
-    content: "Elementos livres para anotações e descrições adicionais.",
-    target: "[data-element-type='text-box']",
-  },
-];
+import { DEFAULT_COLORS_CONSTANT } from "./constants/colors-constant";
+import { ELEMENT_TYPES_CONSTANT } from "./constants/element-types-constant";
+import { TUTORIAL_STEPS_CONSTANT } from "./constants/tutorial-steps-constant";
+import { MOCK_POWER_MAPS } from "./mocks/mock-power-maps";
+import {
+  IPowerElement,
+  IPowerMap,
+  ITemplate,
+  ElementType,
+} from "./types/power-system-types";
 
 export function PowerSystemTab() {
   const canvasRef = useRef<HTMLDivElement>(null);
+
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentMap, setCurrentMap] = useState<PowerMap>({
-    id: "main",
-    name: "Sistema de Poder Principal",
-    elements: [],
-    connections: [],
-  });
-  const [maps, setMaps] = useState<PowerMap[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [currentMap, setCurrentMap] = useState<IPowerMap>(MOCK_POWER_MAPS[0]);
+  const [maps, setMaps] = useState<IPowerMap[]>([]);
+  const [templates, setTemplates] = useState<ITemplate[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -152,7 +34,11 @@ export function PowerSystemTab() {
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [showPropertiesPanel, setShowPropertiesPanel] = useState(false);
 
-  // Canvas panning for view mode
+  const selectedElementData = useMemo(
+    () => currentMap.elements.find((el) => el.id === selectedElement) || null,
+    [selectedElement, currentMap.elements]
+  );
+
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (!isEditMode) {
@@ -182,8 +68,7 @@ export function PowerSystemTab() {
     setIsViewDragging(false);
   }, []);
 
-  // Element creation
-  const createElement = useCallback(
+  const handleCreateElement = useCallback(
     (type: ElementType, x?: number, y?: number) => {
       const width = type === "text-box" ? 200 : 250;
       const height = type === "text-box" ? 100 : 150;
@@ -205,7 +90,7 @@ export function PowerSystemTab() {
 
       const id = `element-${Date.now()}`;
 
-      const newElement: PowerElement = {
+      const newElement: IPowerElement = {
         id,
         type,
         x: posX,
@@ -214,7 +99,7 @@ export function PowerSystemTab() {
         height,
         title: type === "text-box" ? "" : "Novo Elemento",
         content: type === "text-box" ? "Texto..." : "Descrição...",
-        color: DEFAULT_COLORS[0],
+        color: DEFAULT_COLORS_CONSTANT[0],
         textColor: "#ffffff",
         canOpenSubmap: type === "details-card" || type === "visual-card",
         showHover: true,
@@ -231,8 +116,8 @@ export function PowerSystemTab() {
     [viewOffset]
   );
 
-  const updateElement = useCallback(
-    (id: string, updates: Partial<PowerElement>) => {
+  const handleUpdateElement = useCallback(
+    (id: string, updates: Partial<IPowerElement>) => {
       setCurrentMap((prev) => ({
         ...prev,
         elements: prev.elements.map((el) =>
@@ -243,7 +128,7 @@ export function PowerSystemTab() {
     []
   );
 
-  const deleteElement = useCallback((id: string) => {
+  const handleDeleteElement = useCallback((id: string) => {
     setCurrentMap((prev) => ({
       ...prev,
       elements: prev.elements.filter((el) => el.id !== id),
@@ -253,13 +138,11 @@ export function PowerSystemTab() {
     }));
   }, []);
 
-  // Submap navigation
   const handleSubmapOpen = useCallback(
-    (element: PowerElement) => {
+    (element: IPowerElement) => {
       if (!element.submapId) {
-        // Create new submap
         const newSubmapId = `submap-${Date.now()}`;
-        const newSubmap: PowerMap = {
+        const newSubmap: IPowerMap = {
           id: newSubmapId,
           name: element.title || "Novo Sub Mapa",
           elements: [],
@@ -268,20 +151,19 @@ export function PowerSystemTab() {
         };
 
         setMaps((prev) => [...prev, newSubmap]);
-        updateElement(element.id, { submapId: newSubmapId });
+        handleUpdateElement(element.id, { submapId: newSubmapId });
         setCurrentMap(newSubmap);
       } else {
-        // Open existing submap
         const existingSubmap = maps.find((map) => map.id === element.submapId);
         if (existingSubmap) {
           setCurrentMap(existingSubmap);
         }
       }
     },
-    [currentMap.id, maps, updateElement]
+    [currentMap.id, maps, handleUpdateElement]
   );
 
-  const goBackToParent = useCallback(() => {
+  const handleGoBackToParent = useCallback(() => {
     if (currentMap.parentMapId) {
       const parentMap = maps.find((map) => map.id === currentMap.parentMapId);
       if (parentMap) {
@@ -297,66 +179,68 @@ export function PowerSystemTab() {
     }
   }, [currentMap.parentMapId, maps]);
 
-  // Handle keyboard events
+  const handleToggleEditMode = useCallback(() => {
+    setIsEditMode((prev) => !prev);
+    setShowPropertiesPanel(false);
+    setSelectedElement(null);
+  }, []);
+
+  const handleElementClick = useCallback(
+    (element: IPowerElement) => {
+      if (isEditMode) {
+        setSelectedElement(element.id);
+        setShowPropertiesPanel(true);
+      } else if (element.canOpenSubmap) {
+        handleSubmapOpen(element);
+      }
+    },
+    [isEditMode, handleSubmapOpen]
+  );
+
+  const handleSave = useCallback(() => {}, []);
+
+  const handleTutorialNext = useCallback(
+    () => setTutorialStep((prev) => prev + 1),
+    []
+  );
+
+  const handleTutorialPrev = useCallback(
+    () => setTutorialStep((prev) => prev - 1),
+    []
+  );
+
+  const handleTutorialClose = useCallback(() => {
+    setShowTutorialDialog(false);
+    setTutorialStep(0);
+  }, []);
+
+  const handlePropertiesClose = useCallback(() => {
+    setShowPropertiesPanel(false);
+    setSelectedElement(null);
+  }, []);
+
+  const handlePropertiesDelete = useCallback(() => {
+    if (selectedElement) {
+      handleDeleteElement(selectedElement);
+      setSelectedElement(null);
+      setShowPropertiesPanel(false);
+    }
+  }, [selectedElement, handleDeleteElement]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Delete" && selectedElement && isEditMode) {
-        deleteElement(selectedElement);
+        handleDeleteElement(selectedElement);
         setSelectedElement(null);
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedElement, isEditMode, deleteElement]);
-
-  const handleToggleEditMode = () => {
-    setIsEditMode(!isEditMode);
-    setShowPropertiesPanel(false);
-    setSelectedElement(null);
-  };
-
-  const handleElementClick = (element: PowerElement) => {
-    if (isEditMode) {
-      setSelectedElement(element.id);
-      setShowPropertiesPanel(true);
-    } else if (element.canOpenSubmap) {
-      handleSubmapOpen(element);
-    }
-  };
-
-  const handleSave = () => {
-    // Save functionality would go here
-    console.log("Saving power system...");
-  };
-
-  const handleTutorialNext = () => setTutorialStep((prev) => prev + 1);
-  const handleTutorialPrev = () => setTutorialStep((prev) => prev - 1);
-  const handleTutorialClose = () => {
-    setShowTutorialDialog(false);
-    setTutorialStep(0);
-  };
-
-  const handlePropertiesClose = () => {
-    setShowPropertiesPanel(false);
-    setSelectedElement(null);
-  };
-
-  const handlePropertiesDelete = () => {
-    if (selectedElement) {
-      deleteElement(selectedElement);
-      setSelectedElement(null);
-      setShowPropertiesPanel(false);
-    }
-  };
-
-  const selectedElementData = selectedElement
-    ? currentMap.elements.find((el) => el.id === selectedElement)
-    : null;
+  }, [selectedElement, isEditMode, handleDeleteElement]);
 
   return (
     <PowerSystemView
-      // State
       isEditMode={isEditMode}
       currentMap={currentMap}
       maps={maps}
@@ -371,28 +255,25 @@ export function PowerSystemTab() {
       showHelpDialog={showHelpDialog}
       showPropertiesPanel={showPropertiesPanel}
       selectedElementData={selectedElementData}
-      // Constants
-      ELEMENT_TYPES={ELEMENT_TYPES}
-      DEFAULT_COLORS={DEFAULT_COLORS}
-      TUTORIAL_STEPS={TUTORIAL_STEPS}
-      // Refs
+      elementTypes={ELEMENT_TYPES_CONSTANT}
+      defaultColors={DEFAULT_COLORS_CONSTANT}
+      tutorialSteps={TUTORIAL_STEPS_CONSTANT}
       canvasRef={canvasRef}
-      // Handlers
       onToggleEditMode={handleToggleEditMode}
       onSave={handleSave}
       onSetShowHelpDialog={setShowHelpDialog}
-      onGoBackToParent={goBackToParent}
+      onGoBackToParent={handleGoBackToParent}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onElementClick={handleElementClick}
       onSetShowCreateDialog={setShowCreateDialog}
       onSetNewElementType={setNewElementType}
-      onCreateElement={createElement}
+      onCreateElement={handleCreateElement}
       onSetShowTutorialDialog={setShowTutorialDialog}
       onSetShowTemplateDialog={setShowTemplateDialog}
-      onUpdateElement={updateElement}
-      onDeleteElement={deleteElement}
+      onUpdateElement={handleUpdateElement}
+      onDeleteElement={handleDeleteElement}
       onTutorialNext={handleTutorialNext}
       onTutorialPrev={handleTutorialPrev}
       onTutorialClose={handleTutorialClose}
