@@ -2,136 +2,39 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import { mockRarities, mockStatuses } from "@/mocks/local/item-data";
+
+import { ITEM_CATEGORIES_CONSTANT } from "./constants/item-categories-constant";
+import { MOCK_ITEMS } from "./mocks/mock-items";
+import { filterItems } from "./utils/filter-items";
 import { ItemsView } from "./view";
 
-// Mock data structures
-interface Rarity {
-  id: string;
-  name: string;
-  color: string;
-  icon: string;
-}
-
-interface ItemStatus {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  image: string;
-  alternativeNames: string[];
-  basicDescription: string;
-  appearanceDescription: string;
-  category: string;
-  rarity: Rarity;
-  status: ItemStatus;
-  origin: string;
-  weaknesses: string;
-  powers: string;
-  mythology: Array<{
-    id: string;
-    people: string;
-    version: string;
-  }>;
-  inspirations: string;
-}
-
-// Mock data
-const mockRarities: Rarity[] = [
-  { id: "1", name: "Comum", color: "#6B7280", icon: "⚪" },
-  { id: "2", name: "Incomum", color: "#10B981", icon: "🟢" },
-  { id: "3", name: "Raro", color: "#3B82F6", icon: "🔵" },
-  { id: "4", name: "Lendário", color: "#F59E0B", icon: "🟡" },
-];
-
-const mockStatuses: ItemStatus[] = [
-  { id: "1", name: "Destruído", icon: "💥" },
-  { id: "2", name: "Completa", icon: "✨" },
-  { id: "3", name: "Incompleta", icon: "🪓" },
-  { id: "4", name: "Selada", icon: "🔒" },
-  { id: "5", name: "Enfraquecida", icon: "⚡" },
-];
-
-const mockItems: Item[] = [
-  {
-    id: "1",
-    name: "Excalibur",
-    image: "/placeholder.svg",
-    alternativeNames: ["A Espada do Rei", "Caliburn"],
-    basicDescription: "Lendária espada do Rei Arthur",
-    appearanceDescription:
-      "Uma espada de lâmina prateada com punho dourado ornamentado",
-    category: "Arma",
-    rarity: mockRarities[3],
-    status: mockStatuses[1],
-    origin: "Forjada por Merlim nas forjas celestiais",
-    weaknesses: "Só pode ser empunhada por alguém puro de coração",
-    powers: "Corta qualquer material, emite luz divina",
-    mythology: [],
-    inspirations: "Lenda Arturiana, mitologia celta",
-  },
-  {
-    id: "2",
-    name: "Poção de Cura Menor",
-    image: "/placeholder.svg",
-    alternativeNames: ["Elixir Básico"],
-    basicDescription: "Poção que restaura ferimentos leves",
-    appearanceDescription: "Líquido vermelho em frasco de vidro pequeno",
-    category: "Consumível",
-    rarity: mockRarities[0],
-    status: mockStatuses[1],
-    origin: "Alquimistas da Torre de Marfim",
-    weaknesses: "Efeito limitado, não funciona em ferimentos mágicos",
-    powers: "Regeneração acelerada de tecidos",
-    mythology: [],
-    inspirations: "RPGs clássicos, alquimia medieval",
-  },
-];
-
-const categories = [
-  "Arma",
-  "Armadura",
-  "Consumível",
-  "Recurso",
-  "Artefato",
-  "Relíquia",
-  "Outro",
-];
-
-interface ItemsTabProps {
+interface PropsItemsTab {
   bookId: string;
 }
 
-export function ItemsTab({ bookId }: ItemsTabProps) {
+export function ItemsTab({ bookId }: PropsItemsTab) {
   const navigate = useNavigate();
-  const [items] = useState<Item[]>(mockItems);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedRarity, setSelectedRarity] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
+  const items = useMemo(() => MOCK_ITEMS, []);
+
   const filteredItems = useMemo(
     () =>
-      items.filter((item) => {
-        const matchesSearch =
-          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.alternativeNames.some((name) =>
-            name.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        const matchesCategory =
-          selectedCategory === "all" || item.category === selectedCategory;
-        const matchesRarity =
-          selectedRarity === "all" || item.rarity.id === selectedRarity;
-
-        return matchesSearch && matchesCategory && matchesRarity;
+      filterItems({
+        items,
+        searchTerm,
+        selectedCategory,
+        selectedRarity,
       }),
     [items, searchTerm, selectedCategory, selectedRarity]
   );
 
-  const handleItemClick = useCallback(
+  const handleNavigateToItem = useCallback(
     (itemId: string) => {
       navigate({
         to: "/dashboard/$dashboardId/tabs/item/$itemId/",
@@ -141,8 +44,23 @@ export function ItemsTab({ bookId }: ItemsTabProps) {
     [navigate, bookId]
   );
 
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleSelectedCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+  }, []);
+
+  const handleSelectedRarityChange = useCallback((rarity: string) => {
+    setSelectedRarity(rarity);
+  }, []);
+
+  const handleShowCreateModalChange = useCallback((show: boolean) => {
+    setShowCreateModal(show);
+  }, []);
+
   const handleCreateItem = useCallback((itemData: any) => {
-    console.log("Creating item:", itemData);
     setShowCreateModal(false);
   }, []);
 
@@ -150,18 +68,18 @@ export function ItemsTab({ bookId }: ItemsTabProps) {
     <ItemsView
       items={items}
       filteredItems={filteredItems}
-      categories={categories}
+      categories={ITEM_CATEGORIES_CONSTANT}
       mockRarities={mockRarities}
       mockStatuses={mockStatuses}
       searchTerm={searchTerm}
       selectedCategory={selectedCategory}
       selectedRarity={selectedRarity}
       showCreateModal={showCreateModal}
-      onSearchTermChange={setSearchTerm}
-      onSelectedCategoryChange={setSelectedCategory}
-      onSelectedRarityChange={setSelectedRarity}
-      onShowCreateModalChange={setShowCreateModal}
-      onItemClick={handleItemClick}
+      onSearchTermChange={handleSearchTermChange}
+      onSelectedCategoryChange={handleSelectedCategoryChange}
+      onSelectedRarityChange={handleSelectedRarityChange}
+      onShowCreateModalChange={handleShowCreateModalChange}
+      onNavigateToItem={handleNavigateToItem}
       onCreateItem={handleCreateItem}
     />
   );

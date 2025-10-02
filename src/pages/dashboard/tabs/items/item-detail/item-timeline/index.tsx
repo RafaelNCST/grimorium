@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -14,7 +14,6 @@ export default function ItemTimeline() {
   const { itemId } = useParams({
     from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline",
   });
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const [events, setEvents] = useState<ITimelineEvent[]>(mockTimelineEvents);
@@ -24,10 +23,8 @@ export default function ItemTimeline() {
     eventType: "other",
   });
 
-  // In real app, fetch from item data
   const itemName = useMemo(() => "Excalibur", []);
 
-  // Navigation handlers with useCallback
   const handleBack = useCallback(() => {
     window.history.back();
   }, []);
@@ -36,13 +33,13 @@ export default function ItemTimeline() {
     setShowCreateModal(true);
   }, []);
 
-  const handleCloseModal = useCallback(() => {
+  const handleCreateModalClose = useCallback(() => {
     setShowCreateModal(false);
     setEditingEvent(null);
     setNewEvent({ eventType: "other" });
   }, []);
 
-  const handleCreateEvent = useCallback(() => {
+  const handleCreateEventAndShowToast = useCallback(() => {
     if (!newEvent.title || !newEvent.description) return;
 
     const event: ITimelineEvent = {
@@ -71,7 +68,7 @@ export default function ItemTimeline() {
     setShowCreateModal(true);
   }, []);
 
-  const handleUpdateEvent = useCallback(() => {
+  const handleUpdateEventAndShowToast = useCallback(() => {
     if (!editingEvent || !newEvent.title || !newEvent.description) return;
 
     const updatedEvent: ITimelineEvent = {
@@ -97,7 +94,7 @@ export default function ItemTimeline() {
     });
   }, [editingEvent, newEvent, toast]);
 
-  const handleDeleteEvent = useCallback(
+  const handleDeleteEventAndShowToast = useCallback(
     (eventId: string) => {
       setEvents((prev) => prev.filter((e) => e.id !== eventId));
       toast({
@@ -121,11 +118,11 @@ export default function ItemTimeline() {
       newEvent={newEvent}
       onBack={handleBack}
       onCreateModalOpen={handleCreateModalOpen}
-      onCreateModalClose={handleCloseModal}
-      onCreateEvent={handleCreateEvent}
-      onUpdateEvent={handleUpdateEvent}
+      onCreateModalClose={handleCreateModalClose}
+      onCreateEvent={handleCreateEventAndShowToast}
+      onUpdateEvent={handleUpdateEventAndShowToast}
       onEditEvent={handleEditEvent}
-      onDeleteEvent={handleDeleteEvent}
+      onDeleteEvent={handleDeleteEventAndShowToast}
       onNewEventChange={handleNewEventChange}
     />
   );

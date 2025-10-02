@@ -3,19 +3,18 @@ import { useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
-import { Item, mockItems, mockLinkedNotes } from "@/mocks/local/item-data";
+import {
+  Item,
+  mockItems,
+  mockLinkedNotes,
+  MythologyEntry,
+} from "@/mocks/local/item-data";
 
 import { ItemDetailView } from "./view";
 
-interface MythologyEntry {
-  id: string;
-  people: string;
-  version: string;
-}
-
 export default function ItemDetail() {
   const { itemId, dashboardId } = useParams({
-    from: "/dashboard/$dashboardId/tabs/item/$itemId",
+    from: "/dashboard/$dashboardId/tabs/item/$itemId/",
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -29,10 +28,8 @@ export default function ItemDetail() {
   const [newMythologyVersion, setNewMythologyVersion] = useState("");
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
-  // Mock linked notes - in real app would come from API/state
   const linkedNotes = useMemo(() => mockLinkedNotes, []);
 
-  // Navigation handlers with useCallback
   const handleBack = useCallback(() => {
     window.history.back();
   }, []);
@@ -45,7 +42,7 @@ export default function ItemDetail() {
     setIsLinkedNotesModalOpen(false);
   }, []);
 
-  const handleOpenTimeline = useCallback(() => {
+  const handleNavigateToTimeline = useCallback(() => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/item/$itemId/timeline",
       params: { dashboardId: dashboardId!, itemId: itemId! },
@@ -56,7 +53,7 @@ export default function ItemDetail() {
     setIsEditing(true);
   }, []);
 
-  const handleSave = useCallback(() => {
+  const handleSaveAndShowToast = useCallback(() => {
     setIsEditing(false);
     toast({
       title: "Item salvo",
@@ -76,7 +73,7 @@ export default function ItemDetail() {
     setShowDeleteModal(false);
   }, []);
 
-  const handleDelete = useCallback(
+  const handleDeleteAndNavigateBack = useCallback(
     (itemName: string) => {
       if (item && itemName === item.name) {
         toast({
@@ -157,13 +154,13 @@ export default function ItemDetail() {
       onBack={handleBack}
       onLinkedNotesModalOpen={handleLinkedNotesModalOpen}
       onLinkedNotesModalClose={handleLinkedNotesModalClose}
-      onOpenTimeline={handleOpenTimeline}
+      onNavigateToTimeline={handleNavigateToTimeline}
       onEdit={handleEdit}
-      onSave={handleSave}
+      onSave={handleSaveAndShowToast}
       onCancel={handleCancel}
       onDeleteModalOpen={handleDeleteModalOpen}
       onDeleteModalClose={handleDeleteModalClose}
-      onDelete={handleDelete}
+      onDelete={handleDeleteAndNavigateBack}
       onItemChange={handleItemChange}
       onAddMythology={handleAddMythology}
       onRemoveMythology={handleRemoveMythology}

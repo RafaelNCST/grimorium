@@ -35,17 +35,6 @@ import {
   categories,
 } from "@/mocks/local/item-data";
 
-interface MythologyEntry {
-  id: string;
-  people: string;
-  version: string;
-}
-
-interface Organization {
-  id: string;
-  name: string;
-}
-
 interface PropsItemDetailView {
   item: Item;
   isEditing: boolean;
@@ -57,7 +46,7 @@ interface PropsItemDetailView {
   onBack: () => void;
   onLinkedNotesModalOpen: () => void;
   onLinkedNotesModalClose: () => void;
-  onOpenTimeline: () => void;
+  onNavigateToTimeline: () => void;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
@@ -82,7 +71,7 @@ export function ItemDetailView({
   onBack,
   onLinkedNotesModalOpen,
   onLinkedNotesModalClose,
-  onOpenTimeline,
+  onNavigateToTimeline,
   onEdit,
   onSave,
   onCancel,
@@ -98,7 +87,6 @@ export function ItemDetailView({
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" onClick={onBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -110,7 +98,7 @@ export function ItemDetailView({
               <FileText className="w-4 h-4 mr-2" />
               Anotações ({linkedNotes.length})
             </Button>
-            <Button variant="outline" onClick={onOpenTimeline}>
+            <Button variant="outline" onClick={onNavigateToTimeline}>
               <Clock className="w-4 h-4 mr-2" />
               Timeline
             </Button>
@@ -141,9 +129,7 @@ export function ItemDetailView({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Image and Quick Info */}
           <div className="space-y-6">
-            {/* Image */}
             <Card>
               <CardContent className="p-0">
                 <div className="aspect-square w-full overflow-hidden rounded-lg">
@@ -156,7 +142,6 @@ export function ItemDetailView({
               </CardContent>
             </Card>
 
-            {/* Quick Stats */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Informações Rápidas</CardTitle>
@@ -193,9 +178,7 @@ export function ItemDetailView({
             </Card>
           </div>
 
-          {/* Right Column - Detailed Information */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Basic Information */}
             <Card>
               <CardHeader>
                 <CardTitle>Informações Básicas</CardTitle>
@@ -502,8 +485,8 @@ export function ItemDetailView({
                       />
                     ) : (
                       <p className="text-muted-foreground text-center">
-                        Nenhuma anotação ainda. Clique em "Editar" para
-                        adicionar.
+                        {`Nenhuma anotação ainda. Clique em "Editar" para
+                        adicionar.`}
                       </p>
                     )}
                   </div>

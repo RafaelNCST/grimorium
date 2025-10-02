@@ -63,7 +63,6 @@ export function ItemTimelineView({
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack}>
@@ -78,7 +77,6 @@ export function ItemTimelineView({
           </Button>
         </div>
 
-        {/* Timeline Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
             <Clock className="w-8 h-8" />
@@ -89,22 +87,18 @@ export function ItemTimelineView({
           </p>
         </div>
 
-        {/* Timeline */}
         <div className="relative">
-          {/* Timeline line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
 
           <div className="space-y-8">
             {events.map((event, index) => (
               <div key={event.id} className="relative flex items-start gap-6">
-                {/* Timeline dot */}
                 <div className="relative z-10 flex items-center justify-center w-16 h-16 bg-background border-4 border-primary rounded-full">
                   <span className="text-2xl">
                     {eventTypeIcons[event.eventType]}
                   </span>
                 </div>
 
-                {/* Event card */}
                 <Card className="flex-1">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -170,7 +164,6 @@ export function ItemTimelineView({
           </div>
         </div>
 
-        {/* Create/Edit Event Modal */}
         <Dialog open={showCreateModal} onOpenChange={onCreateModalClose}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>

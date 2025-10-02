@@ -1,15 +1,6 @@
 import React from "react";
 
-import {
-  Plus,
-  Search,
-  Package,
-  Sword,
-  Shield,
-  Zap,
-  Gem,
-  Star,
-} from "lucide-react";
+import { Plus, Search, Package } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateItemModal } from "@/components/modals/create-item-modal";
@@ -24,42 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Item, Rarity, ItemStatus } from "@/mocks/local/item-data";
 
-interface Rarity {
-  id: string;
-  name: string;
-  color: string;
-  icon: string;
-}
-
-interface ItemStatus {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  image: string;
-  alternativeNames: string[];
-  basicDescription: string;
-  appearanceDescription: string;
-  category: string;
-  rarity: Rarity;
-  status: ItemStatus;
-  origin: string;
-  weaknesses: string;
-  powers: string;
-  mythology: Array<{
-    id: string;
-    people: string;
-    version: string;
-  }>;
-  inspirations: string;
-}
-
-interface ItemsViewProps {
+interface PropsItemsView {
   items: Item[];
   filteredItems: Item[];
   categories: string[];
@@ -73,7 +31,7 @@ interface ItemsViewProps {
   onSelectedCategoryChange: (category: string) => void;
   onSelectedRarityChange: (rarity: string) => void;
   onShowCreateModalChange: (show: boolean) => void;
-  onItemClick: (itemId: string) => void;
+  onNavigateToItem: (itemId: string) => void;
   onCreateItem: (itemData: any) => void;
 }
 
@@ -91,9 +49,9 @@ export function ItemsView({
   onSelectedCategoryChange,
   onSelectedRarityChange,
   onShowCreateModalChange,
-  onItemClick,
+  onNavigateToItem,
   onCreateItem,
-}: ItemsViewProps) {
+}: PropsItemsView) {
   if (items.length === 0) {
     return (
       <div className="space-y-6">
@@ -134,7 +92,6 @@ export function ItemsView({
 
   return (
     <div className="space-y-6">
-      {/* Header with compact rarity stats */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Itens</h2>
@@ -164,7 +121,6 @@ export function ItemsView({
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -211,7 +167,6 @@ export function ItemsView({
         </Select>
       </div>
 
-      {/* Items Grid */}
       {filteredItems.length === 0 && items.length > 0 && (
         <EmptyState
           icon={Search}
@@ -225,7 +180,7 @@ export function ItemsView({
           <Card
             key={item.id}
             className="cursor-pointer hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-            onClick={() => onItemClick(item.id)}
+            onClick={() => onNavigateToItem(item.id)}
           >
             <CardContent className="p-0">
               <div className="relative">
