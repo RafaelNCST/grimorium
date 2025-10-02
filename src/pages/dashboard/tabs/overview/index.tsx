@@ -1,96 +1,56 @@
 import { useState, useCallback, useMemo } from "react";
 
-import { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
+import {
+  DragStartEvent,
+  DragEndEvent,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
+import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
+import { MOCK_OVERVIEW_STATS } from "./mocks/mock-overview-data";
+import {
+  PropsOverviewTab,
+  IStickyNote,
+  IGoals,
+  IStoryProgress,
+  ISection,
+} from "./types/overview-types";
 import { OverviewView } from "./view";
 
-interface Book {
-  title: string;
-  chapters: number;
-  currentArc?: string;
-  authorSummary?: string;
-  storySummary?: string;
-}
-
-interface PropsOverviewTab {
-  book: Book;
-  bookId: string;
-  isCustomizing?: boolean;
-}
-
-interface StickyNote {
-  id: string;
-  content: string;
-  color: string;
-  x: number;
-  y: number;
-}
-
-interface Goals {
-  wordsPerDay: number;
-  chaptersPerWeek: number;
-}
-
-interface StoryProgress {
-  estimatedArcs: number;
-  estimatedChapters: number;
-  completedArcs: number;
-  currentArcProgress: number;
-}
-
-interface Section {
-  id: string;
-  type:
-    | "stats"
-    | "progress"
-    | "author-summary"
-    | "story-summary"
-    | "notes-board";
-  title: string;
-  visible: boolean;
-  component: React.ReactNode;
-}
-
-const noteColors = [
-  "bg-yellow-200 border-yellow-400 text-yellow-900 shadow-lg",
-  "bg-pink-200 border-pink-400 text-pink-900 shadow-lg",
-  "bg-green-200 border-green-400 text-green-900 shadow-lg",
-  "bg-blue-200 border-blue-400 text-blue-900 shadow-lg",
-  "bg-purple-200 border-purple-400 text-purple-900 shadow-lg",
-  "bg-orange-200 border-orange-400 text-orange-900 shadow-lg",
-];
-
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
-  const [goals, setGoals] = useState<Goals>({
+  const [goals, setGoals] = useState<IGoals>({
     wordsPerDay: 500,
     chaptersPerWeek: 2,
   });
   const [isEditingGoals, setIsEditingGoals] = useState(false);
-  const [storyProgress, setStoryProgress] = useState<StoryProgress>({
+  const [storyProgress, setStoryProgress] = useState<IStoryProgress>({
     estimatedArcs: 3,
     estimatedChapters: 25,
     completedArcs: 1,
     currentArcProgress: 45,
   });
   const [isEditingProgress, setIsEditingProgress] = useState(false);
-  const [authorSummary, setAuthorSummary] = useState(book.authorSummary);
+  const [authorSummary, setAuthorSummary] = useState(book.authorSummary || "");
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
-  const [storySummary, setStorySummary] = useState(book.storySummary);
+  const [storySummary, setStorySummary] = useState(book.storySummary || "");
   const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
-  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
+  const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([
     {
       id: "1",
       content:
         "Desenvolver melhor o relacionamento entre protagonista e mentor",
-      color: noteColors[0],
+      color: NOTE_COLORS_CONSTANT[0],
       x: 20,
       y: 20,
     },
     {
       id: "2",
       content: "Adicionar mais detalhes sobre o sistema de magia",
-      color: noteColors[1],
+      color: NOTE_COLORS_CONSTANT[1],
       x: 250,
       y: 80,
     },
@@ -98,12 +58,12 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
-  const [draggedNoteData, setDraggedNoteData] = useState<StickyNote | null>(
+  const [draggedNoteData, setDraggedNoteData] = useState<IStickyNote | null>(
     null
   );
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
-  const [sections, setSections] = useState<Section[]>([
+  const [sections, setSections] = useState<ISection[]>([
     {
       id: "stats",
       type: "stats",
@@ -140,6 +100,31 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       component: null,
     },
   ]);
+
+  const overviewStats = useMemo(
+    () => ({
+      ...MOCK_OVERVIEW_STATS,
+      lastChapterNumber: book.chapters,
+    }),
+    [book.chapters]
+  );
+
+  const storyProgressPercentage = useMemo(() => {
+    const totalProgress =
+      storyProgress.completedArcs + storyProgress.currentArcProgress / 100;
+    return Math.round((totalProgress / storyProgress.estimatedArcs) * 100);
+  }, [
+    storyProgress.completedArcs,
+    storyProgress.currentArcProgress,
+    storyProgress.estimatedArcs,
+  ]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleToggleSectionVisibility = useCallback((sectionId: string) => {
     setSections((sections) =>
@@ -184,10 +169,13 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
   const handleAddNote = useCallback(() => {
     if (newNote.trim()) {
-      const newStickyNote: StickyNote = {
+      const newStickyNote: IStickyNote = {
         id: Date.now().toString(),
         content: newNote,
-        color: noteColors[Math.floor(Math.random() * noteColors.length)],
+        color:
+          NOTE_COLORS_CONSTANT[
+            Math.floor(Math.random() * NOTE_COLORS_CONSTANT.length)
+          ],
         x: Math.random() * 300,
         y: Math.random() * 200,
       };
@@ -266,6 +254,9 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       activeId={activeId}
       activeNoteId={activeNoteId}
       draggedNoteData={draggedNoteData}
+      overviewStats={overviewStats}
+      storyProgressPercentage={storyProgressPercentage}
+      sensors={sensors}
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
       onStoryProgressChange={setStoryProgress}
