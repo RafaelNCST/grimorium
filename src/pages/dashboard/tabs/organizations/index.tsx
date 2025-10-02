@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-
-import { useLanguageStore } from "@/stores/language-store";
 
 import { OrganizationsView } from "./view";
 
@@ -87,7 +85,6 @@ const mockOrganizations: Organization[] = [
 ];
 
 export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
-  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAlignment, setSelectedAlignment] = useState<string>("all");
@@ -95,25 +92,10 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [organizations, setOrganizations] = useState(mockOrganizations);
 
-  const alignments = ["all", "Bem", "Neutro", "Caótico"];
-  const worlds = ["all", "Aethermoor"];
+  const alignments = useMemo(() => ["all", "Bem", "Neutro", "Caótico"], []);
+  const worlds = useMemo(() => ["all", "Aethermoor"], []);
 
-  const handleCreateOrganization = () => {
-    setShowCreateModal(true);
-  };
-
-  const handleOrganizationCreated = (newOrganization: any) => {
-    setOrganizations((prev) => [...prev, newOrganization]);
-  };
-
-  const handleOrganizationClick = (orgId: string) => {
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/organization/$orgId",
-      params: { dashboardId: bookId, orgId: orgId },
-    });
-  };
-
-  const filteredOrganizations = organizations.filter((org) => {
+  const filteredOrganizations = useMemo(() => organizations.filter((org) => {
     const matchesSearch =
       org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       org.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -121,14 +103,28 @@ export function OrganizationsTab({ bookId }: OrganizationsTabProps) {
       selectedAlignment === "all" || org.alignment === selectedAlignment;
     const matchesWorld = selectedWorld === "all" || org.world === selectedWorld;
     return matchesSearch && matchesAlignment && matchesWorld;
-  });
+  }), [organizations, searchTerm, selectedAlignment, selectedWorld]);
 
-  // Statistics
-  const totalByAlignment = {
+  const totalByAlignment = useMemo(() => ({
     bem: organizations.filter((o) => o.alignment === "Bem").length,
     neutro: organizations.filter((o) => o.alignment === "Neutro").length,
     caotico: organizations.filter((o) => o.alignment === "Caótico").length,
-  };
+  }), [organizations]);
+
+  const handleCreateOrganization = useCallback(() => {
+    setShowCreateModal(true);
+  }, []);
+
+  const handleOrganizationCreated = useCallback((newOrganization: any) => {
+    setOrganizations((prev) => [...prev, newOrganization]);
+  }, []);
+
+  const handleOrganizationClick = useCallback((orgId: string) => {
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/organization/$orgId",
+      params: { dashboardId: bookId, orgId: orgId },
+    });
+  }, [navigate, bookId]);
 
   return (
     <OrganizationsView

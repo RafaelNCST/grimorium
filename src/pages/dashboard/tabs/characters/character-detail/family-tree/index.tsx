@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
@@ -25,7 +25,7 @@ export function FamilyTreePage() {
   const allCharacters = mockCharacters;
 
   // Build family tree data structure
-  const buildFamilyTree = () => {
+  const buildFamilyTree = useCallback(() => {
     const treeNodes: TreeNode[] = [];
     const processedIds = new Set<string>();
 
@@ -107,17 +107,18 @@ export function FamilyTreePage() {
       if (a.generation !== b.generation) return b.generation - a.generation; // Higher generations first
       return a.position - b.position;
     });
-  };
+  }, [character, allCharacters]);
 
-  const treeNodes = buildFamilyTree();
-  const generations = [...new Set(treeNodes.map((n) => n.generation))].sort(
-    (a, b) => b - a
-  );
+  const treeNodes = useMemo(() => buildFamilyTree(), [buildFamilyTree]);
+  const generations = useMemo(() => {
+    return [...new Set(treeNodes.map((n) => n.generation))].sort((a, b) => b - a);
+  }, [treeNodes]);
 
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.2, 2));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.2, 0.5));
+  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.2, 2)), []);
+  const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.2, 0.5)), []);
+  const handleToggleFullscreen = useCallback(() => setIsFullscreen((prev) => !prev), []);
 
-  const getGenerationLabel = (generation: number) => {
+  const getGenerationLabel = useCallback((generation: number) => {
     switch (generation) {
       case -2:
         return "Bisavós";
@@ -132,9 +133,9 @@ export function FamilyTreePage() {
       default:
         return generation < 0 ? "Ancestrais" : "Descendentes";
     }
-  };
+  }, []);
 
-  const getRelationColor = (relation: string) => {
+  const getRelationColor = useCallback((relation: string) => {
     switch (relation) {
       case "main":
         return "bg-primary text-primary-foreground";
@@ -158,7 +159,14 @@ export function FamilyTreePage() {
       default:
         return "bg-secondary text-secondary-foreground";
     }
-  };
+  }, []);
+
+  const handleBack = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/character/$characterId/",
+      params: { dashboardId: dashboardId!, characterId: characterId! },
+    });
+  }, [navigate, dashboardId, characterId]);
 
   if (treeNodes.length === 0) {
     return (
@@ -166,12 +174,7 @@ export function FamilyTreePage() {
         <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
-            onClick={() =>
-              navigate({
-                to: "/dashboard/$dashboardId/tabs/character/$characterId/",
-                params: { dashboardId: dashboardId!, characterId: characterId! },
-              })
-            }
+            onClick={handleBack}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
@@ -204,12 +207,7 @@ export function FamilyTreePage() {
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            onClick={() =>
-              navigate({
-                to: "/dashboard/$dashboardId/tabs/character/$characterId/",
-                params: { dashboardId: dashboardId!, characterId: characterId! },
-              })
-            }
+            onClick={handleBack}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
@@ -242,7 +240,7 @@ export function FamilyTreePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setIsFullscreen(!isFullscreen)}
+            onClick={handleToggleFullscreen}
           >
             <Maximize2 className="w-4 h-4" />
           </Button>

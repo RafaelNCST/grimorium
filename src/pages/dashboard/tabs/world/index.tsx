@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -151,49 +151,18 @@ const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => [
 export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Modal states
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
-  const [showCreateContinentModal, setShowCreateContinentModal] =
-    useState(false);
+  const [showCreateContinentModal, setShowCreateContinentModal] = useState(false);
   const [showCreateLocationModal, setShowCreateLocationModal] = useState(false);
-
   const [mockWorldEntities, setMockWorldEntities] = useState(() =>
     getWorldEntitiesForBook(bookId)
   );
 
-  const handleCreateWorld = () => {
-    setShowCreateWorldModal(true);
-  };
+  const worlds = useMemo(() => mockWorldEntities.filter((e) => e.type === "World"), [mockWorldEntities]);
+  const continents = useMemo(() => mockWorldEntities.filter((e) => e.type === "Continent"), [mockWorldEntities]);
+  const locations = useMemo(() => mockWorldEntities.filter((e) => e.type === "Location"), [mockWorldEntities]);
 
-  const handleCreateContinent = () => {
-    setShowCreateContinentModal(true);
-  };
-
-  const handleCreateLocation = () => {
-    setShowCreateLocationModal(true);
-  };
-
-  const handleWorldCreated = (newWorld: any) => {
-    setMockWorldEntities((prev) => [...prev, newWorld]);
-  };
-
-  const handleContinentCreated = (newContinent: any) => {
-    setMockWorldEntities((prev) => [...prev, newContinent]);
-  };
-
-  const handleLocationCreated = (newLocation: any) => {
-    setMockWorldEntities((prev) => [...prev, newLocation]);
-  };
-
-  const worlds = mockWorldEntities.filter((e) => e.type === "World");
-  const continents = mockWorldEntities.filter((e) => e.type === "Continent");
-  const locations = mockWorldEntities.filter((e) => e.type === "Location");
-
-  const getEntityIcon = (type: string, classification?: string) =>
-    // This will be implemented in view component
-    ({ type, classification });
-  const getTypeColor = (type: string) => {
+  const getTypeColor = useCallback((type: string) => {
     switch (type) {
       case "World":
         return "bg-primary text-primary-foreground";
@@ -202,15 +171,15 @@ export function WorldTab({ bookId }: PropsWorldTab) {
       default:
         return "bg-secondary text-secondary-foreground";
     }
-  };
+  }, []);
 
-  const getParentName = (parentId?: string) => {
+  const getParentName = useCallback((parentId?: string) => {
     if (!parentId) return "";
     const parent = mockWorldEntities.find((e) => e.id === parentId);
     return parent?.name || "";
-  };
+  }, [mockWorldEntities]);
 
-  const getFilteredEntities = (typeFilter?: string) => {
+  const getFilteredEntities = useCallback((typeFilter?: string) => {
     let entities = mockWorldEntities;
 
     if (typeFilter && typeFilter !== "all") {
@@ -223,23 +192,46 @@ export function WorldTab({ bookId }: PropsWorldTab) {
         entity.description.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesSearch;
     });
-  };
+  }, [mockWorldEntities, searchTerm]);
 
-  const filteredWorlds = getFilteredEntities("World");
-  const filteredContinents = getFilteredEntities("Continent");
-  const filteredLocations = getFilteredEntities("Location");
+  const filteredWorlds = useMemo(() => getFilteredEntities("World"), [getFilteredEntities]);
+  const filteredContinents = useMemo(() => getFilteredEntities("Continent"), [getFilteredEntities]);
+  const filteredLocations = useMemo(() => getFilteredEntities("Location"), [getFilteredEntities]);
 
-  // Statistics
-  const totalWorlds = worlds.length;
-  const totalContinents = continents.length;
-  const totalLocations = locations.length;
+  const totalWorlds = useMemo(() => worlds.length, [worlds]);
+  const totalContinents = useMemo(() => continents.length, [continents]);
+  const totalLocations = useMemo(() => locations.length, [locations]);
 
-  const handleEntityClick = (entity: WorldEntity) => {
+  const handleCreateWorld = useCallback(() => {
+    setShowCreateWorldModal(true);
+  }, []);
+
+  const handleCreateContinent = useCallback(() => {
+    setShowCreateContinentModal(true);
+  }, []);
+
+  const handleCreateLocation = useCallback(() => {
+    setShowCreateLocationModal(true);
+  }, []);
+
+  const handleWorldCreated = useCallback((newWorld: any) => {
+    setMockWorldEntities((prev) => [...prev, newWorld]);
+  }, []);
+
+  const handleContinentCreated = useCallback((newContinent: any) => {
+    setMockWorldEntities((prev) => [...prev, newContinent]);
+  }, []);
+
+  const handleLocationCreated = useCallback((newLocation: any) => {
+    setMockWorldEntities((prev) => [...prev, newLocation]);
+  }, []);
+
+  const handleEntityClick = useCallback((entity: WorldEntity) => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/world/$worldId",
       params: { dashboardId: bookId, worldId: entity.id },
     });
-  };
+  }, [navigate, bookId]);
 
   return (
     <WorldView

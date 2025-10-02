@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-
-import { useLanguageStore } from "@/stores/language-store";
 
 import { OverviewView } from "./view";
 
@@ -64,16 +62,11 @@ const noteColors = [
 ];
 
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
-  const { t } = useLanguageStore();
-
-  // Stats state
   const [goals, setGoals] = useState<Goals>({
     wordsPerDay: 500,
     chaptersPerWeek: 2,
   });
   const [isEditingGoals, setIsEditingGoals] = useState(false);
-
-  // Story progress state
   const [storyProgress, setStoryProgress] = useState<StoryProgress>({
     estimatedArcs: 3,
     estimatedChapters: 25,
@@ -81,14 +74,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     currentArcProgress: 45,
   });
   const [isEditingProgress, setIsEditingProgress] = useState(false);
-
-  // Summary states
   const [authorSummary, setAuthorSummary] = useState(book.authorSummary);
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
   const [storySummary, setStorySummary] = useState(book.storySummary);
   const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
-
-  // Sticky notes state
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([
     {
       id: "1",
@@ -112,12 +101,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [draggedNoteData, setDraggedNoteData] = useState<StickyNote | null>(
     null
   );
-
-  // Section management
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
-
-  // Section management functions
   const [sections, setSections] = useState<Section[]>([
     {
       id: "stats",
@@ -156,7 +141,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     },
   ]);
 
-  const toggleSectionVisibility = (sectionId: string) => {
+  const handleToggleSectionVisibility = useCallback((sectionId: string) => {
     setSections((sections) =>
       sections.map((section) =>
         section.id === sectionId
@@ -164,13 +149,13 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
           : section
       )
     );
-  };
+  }, []);
 
-  const handleSectionDragStart = (event: any) => {
+  const handleSectionDragStart = useCallback((event: any) => {
     setActiveId(event.active.id);
-  };
+  }, []);
 
-  const handleSectionDragEnd = (event: any) => {
+  const handleSectionDragEnd = useCallback((event: any) => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
@@ -183,23 +168,21 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     }
 
     setActiveId(null);
-  };
+  }, []);
 
-  // Save functions
-  const saveGoals = () => {
+  const handleSaveGoals = useCallback(() => {
     setIsEditingGoals(false);
-  };
+  }, []);
 
-  const saveAuthorSummary = () => {
+  const handleSaveAuthorSummary = useCallback(() => {
     setIsEditingAuthorSummary(false);
-  };
+  }, []);
 
-  const saveStorySummary = () => {
+  const handleSaveStorySummary = useCallback(() => {
     setIsEditingStorySummary(false);
-  };
+  }, []);
 
-  // Sticky notes functions
-  const handleAddNote = () => {
+  const handleAddNote = useCallback(() => {
     if (newNote.trim()) {
       const newStickyNote: StickyNote = {
         id: Date.now().toString(),
@@ -208,42 +191,44 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         x: Math.random() * 300,
         y: Math.random() * 200,
       };
-      setStickyNotes([...stickyNotes, newStickyNote]);
+      setStickyNotes((prev) => [...prev, newStickyNote]);
       setNewNote("");
     }
-  };
+  }, [newNote]);
 
-  const handleDeleteNote = (id: string) => {
-    setStickyNotes(stickyNotes.filter((note) => note.id !== id));
-  };
+  const handleDeleteNote = useCallback((id: string) => {
+    setStickyNotes((notes) => notes.filter((note) => note.id !== id));
+  }, []);
 
-  const handleEditNote = (id: string, newContent: string) => {
+  const handleEditNote = useCallback((id: string, newContent: string) => {
     setStickyNotes((notes) =>
       notes.map((note) =>
         note.id === id ? { ...note, content: newContent } : note
       )
     );
-  };
+  }, []);
 
-  const handleNoteDragStart = (event: DragStartEvent) => {
+  const handleNoteDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     if (active && active.id.toString().startsWith("note-")) {
       const noteId = active.id.toString().replace("note-", "");
-      const note = stickyNotes.find((n) => n.id === noteId);
-      if (note) {
-        setActiveNoteId(noteId);
-        setDraggedNoteData(note);
-      }
+      setStickyNotes((notes) => {
+        const note = notes.find((n) => n.id === noteId);
+        if (note) {
+          setActiveNoteId(noteId);
+          setDraggedNoteData(note);
+        }
+        return notes;
+      });
     }
-  };
+  }, []);
 
-  const handleNoteDragEnd = (event: DragEndEvent) => {
-    const { active, over, delta } = event;
+  const handleNoteDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, delta } = event;
 
     if (active && active.id.toString().startsWith("note-")) {
       const noteId = active.id.toString().replace("note-", "");
 
-      // Update position based on drag delta
       setStickyNotes((notes) =>
         notes.map((note) => {
           if (note.id === noteId) {
@@ -258,7 +243,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
     setActiveNoteId(null);
     setDraggedNoteData(null);
-  };
+  }, []);
 
   return (
     <OverviewView
@@ -299,10 +284,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onAddNote={handleAddNote}
       onDeleteNote={handleDeleteNote}
       onEditNote={handleEditNote}
-      onSaveGoals={saveGoals}
-      onSaveAuthorSummary={saveAuthorSummary}
-      onSaveStorySummary={saveStorySummary}
-      onToggleSectionVisibility={toggleSectionVisibility}
+      onSaveGoals={handleSaveGoals}
+      onSaveAuthorSummary={handleSaveAuthorSummary}
+      onSaveStorySummary={handleSaveStorySummary}
+      onToggleSectionVisibility={handleToggleSectionVisibility}
       onNoteDragStart={handleNoteDragStart}
       onNoteDragEnd={handleNoteDragEnd}
       onSectionDragStart={handleSectionDragStart}

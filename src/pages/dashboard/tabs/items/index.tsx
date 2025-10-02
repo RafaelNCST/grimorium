@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -113,28 +113,30 @@ export function ItemsTab({ bookId }: ItemsTabProps) {
   const [selectedRarity, setSelectedRarity] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const filteredItems = items.filter((item) => {
-    const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.alternativeNames.some((name) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    const matchesCategory =
-      selectedCategory === "all" || item.category === selectedCategory;
-    const matchesRarity =
-      selectedRarity === "all" || item.rarity.id === selectedRarity;
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const matchesSearch =
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.alternativeNames.some((name) =>
+          name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      const matchesCategory =
+        selectedCategory === "all" || item.category === selectedCategory;
+      const matchesRarity =
+        selectedRarity === "all" || item.rarity.id === selectedRarity;
 
-    return matchesSearch && matchesCategory && matchesRarity;
-  });
+      return matchesSearch && matchesCategory && matchesRarity;
+    });
+  }, [items, searchTerm, selectedCategory, selectedRarity]);
 
-  const handleItemClick = (itemId: string) => {
+  const handleItemClick = useCallback((itemId: string) => {
     navigate({ to: "/dashboard/$dashboardId/tabs/item/$itemId/", params: { dashboardId: bookId, itemId: itemId } });
-  };
+  }, [navigate, bookId]);
 
-  const handleCreateItem = (itemData: any) => {
+  const handleCreateItem = useCallback((itemData: any) => {
     console.log("Creating item:", itemData);
     setShowCreateModal(false);
-  };
+  }, []);
 
   return (
     <ItemsView

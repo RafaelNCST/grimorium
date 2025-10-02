@@ -37,7 +37,10 @@
       "Bash(pnpm exec eslint:*)",
       "Bash(tree:*)",
       "Bash(npx eslint:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(for dir in \"world-detail\" \"plot-detail\" \"plot-timeline\" \"race-detail\" \"item-detail\" \"item-timeline\")",
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

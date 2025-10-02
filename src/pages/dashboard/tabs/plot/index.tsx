@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-
-import { useLanguageStore } from "@/stores/language-store";
 
 import { PlotView } from "./view";
 
@@ -115,14 +113,13 @@ interface PlotTabProps {
 }
 
 export function PlotTab({ bookId }: PlotTabProps) {
-  const { t } = useLanguageStore();
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<IPlotArc[]>(mockArcs);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("todos");
 
   // Status priority for sorting: andamento > planejamento > finalizado
-  const getStatusPriority = (status: string) => {
+  const getStatusPriority = useCallback((status: string) => {
     switch (status) {
       case "andamento":
         return 1;
@@ -133,9 +130,9 @@ export function PlotTab({ bookId }: PlotTabProps) {
       default:
         return 4;
     }
-  };
+  }, []);
 
-  const getSizeColor = (size: string) => {
+  const getSizeColor = useCallback((size: string) => {
     switch (size) {
       case "pequeno":
         return "bg-blue-500/20 text-blue-400 border-blue-400/30";
@@ -146,9 +143,9 @@ export function PlotTab({ bookId }: PlotTabProps) {
       default:
         return "bg-muted";
     }
-  };
+  }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useCallback((status: string) => {
     switch (status) {
       case "finalizado":
         return "bg-green-500/20 text-green-400 border-green-400/30";
@@ -159,9 +156,9 @@ export function PlotTab({ bookId }: PlotTabProps) {
       default:
         return "bg-muted";
     }
-  };
+  }, []);
 
-  const createArc = (arcData: Omit<IPlotArc, "id" | "events" | "progress">) => {
+  const createArc = useCallback((arcData: Omit<IPlotArc, "id" | "events" | "progress">) => {
     const newArc: IPlotArc = {
       ...arcData,
       id: Date.now().toString(),
@@ -180,9 +177,9 @@ export function PlotTab({ bookId }: PlotTabProps) {
 
       return [...updatedArcs, newArc].sort((a, b) => a.order - b.order);
     });
-  };
+  }, []);
 
-  const moveArc = (arcId: string, direction: "up" | "down") => {
+  const moveArc = useCallback((arcId: string, direction: "up" | "down") => {
     setArcs((prev) => {
       const sortedArcs = [...prev].sort((a, b) => a.order - b.order);
       const arcIndex = sortedArcs.findIndex((arc) => arc.id === arcId);
@@ -207,25 +204,27 @@ export function PlotTab({ bookId }: PlotTabProps) {
         return arc;
       });
     });
-  };
+  }, []);
 
   // Sort arcs by status priority first, then by order
-  const filteredAndSortedArcs = arcs
-    .filter((arc) => statusFilter === "todos" || arc.status === statusFilter)
-    .sort((a, b) => {
-      // First sort by status priority
-      const statusPriorityA = getStatusPriority(a.status);
-      const statusPriorityB = getStatusPriority(b.status);
+  const filteredAndSortedArcs = useMemo(() => {
+    return arcs
+      .filter((arc) => statusFilter === "todos" || arc.status === statusFilter)
+      .sort((a, b) => {
+        // First sort by status priority
+        const statusPriorityA = getStatusPriority(a.status);
+        const statusPriorityB = getStatusPriority(b.status);
 
-      if (statusPriorityA !== statusPriorityB) {
-        return statusPriorityA - statusPriorityB;
-      }
+        if (statusPriorityA !== statusPriorityB) {
+          return statusPriorityA - statusPriorityB;
+        }
 
-      // If same status, sort by order
-      return a.order - b.order;
-    });
+        // If same status, sort by order
+        return a.order - b.order;
+      });
+  }, [arcs, statusFilter, getStatusPriority]);
 
-  const getVisibleEvents = (events: IPlotEvent[]) => {
+  const getVisibleEvents = useCallback((events: IPlotEvent[]) => {
     const sortedEvents = events.sort((a, b) => a.order - b.order);
     const currentIndex = sortedEvents.findIndex((e) => !e.completed);
 
@@ -236,21 +235,21 @@ export function PlotTab({ bookId }: PlotTabProps) {
 
     // Show current + next 2
     return sortedEvents.slice(currentIndex, currentIndex + 3);
-  };
+  }, []);
 
-  const handlePlotTimelineClick = (bookId: string) => {
+  const handlePlotTimelineClick = useCallback((bookId: string) => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
       params: { dashboardId: bookId },
     });
-  };
+  }, [navigate]);
 
-  const handleArcClick = (arcId: string, bookId: string) => {
+  const handleArcClick = useCallback((arcId: string, bookId: string) => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/plot/$plotId",
       params: { dashboardId: bookId, plotId: arcId },
     });
-  };
+  }, [navigate]);
 
   return (
     <PlotView

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -87,34 +87,38 @@ export function BestiaryTab({ bookId }: BestiaryTabProps) {
   const [selectedHabit, setSelectedHabit] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const beasts = getBookBeasts(bookId);
+  const beasts = useMemo(() => getBookBeasts(bookId), [bookId]);
 
   // Filter beasts based on search and filters
-  const filteredBeasts = beasts.filter((beast) => {
-    const matchesSearch =
-      beast.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      beast.basicDescription.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRace = selectedRace === "all" || beast.race === selectedRace;
-    const matchesThreat =
-      selectedThreatLevel === "all" ||
-      beast.threatLevel.name === selectedThreatLevel;
-    const matchesHabit =
-      selectedHabit === "all" || beast.habit === selectedHabit;
+  const filteredBeasts = useMemo(() => {
+    return beasts.filter((beast) => {
+      const matchesSearch =
+        beast.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        beast.basicDescription.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRace = selectedRace === "all" || beast.race === selectedRace;
+      const matchesThreat =
+        selectedThreatLevel === "all" ||
+        beast.threatLevel.name === selectedThreatLevel;
+      const matchesHabit =
+        selectedHabit === "all" || beast.habit === selectedHabit;
 
-    return matchesSearch && matchesRace && matchesThreat && matchesHabit;
-  });
+      return matchesSearch && matchesRace && matchesThreat && matchesHabit;
+    });
+  }, [beasts, searchQuery, selectedRace, selectedThreatLevel, selectedHabit]);
 
   // Get unique races from beasts
-  const uniqueRaces = Array.from(
-    new Set(beasts.map((beast) => beast.race).filter(Boolean))
-  );
+  const uniqueRaces = useMemo(() => {
+    return Array.from(
+      new Set(beasts.map((beast) => beast.race).filter(Boolean))
+    );
+  }, [beasts]);
 
-  const handleNavigateToBeast = (beastId: string) => {
+  const handleNavigateToBeast = useCallback((beastId: string) => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/beast/$beastId",
       params: { dashboardId: bookId, beastId: beastId }
     });
-  };
+  }, [navigate, bookId]);
 
   return (
     <BestiaryView

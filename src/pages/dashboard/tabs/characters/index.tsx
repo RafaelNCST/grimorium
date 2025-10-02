@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -118,14 +118,14 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
   const [selectedOrg, setSelectedOrg] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
 
-  // Get unique organizations and locations from current book's characters
-  const organizations = [
+  const organizations = useMemo(() => [
     "all",
     ...Array.from(
       new Set(characters.map((c) => c.organization).filter(Boolean))
     ),
-  ];
-  const locations = [
+  ], [characters]);
+
+  const locations = useMemo(() => [
     "all",
     ...Array.from(
       new Set([
@@ -133,9 +133,9 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
         ...characters.map((c) => c.affiliatedPlace).filter(Boolean),
       ])
     ),
-  ];
+  ], [characters]);
 
-  const filteredCharacters = characters.filter((character) => {
+  const filteredCharacters = useMemo(() => characters.filter((character) => {
     const matchesSearch =
       character.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       character.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -146,27 +146,26 @@ export function CharactersTab({ bookId }: CharactersTabProps) {
       character.birthPlace === selectedLocation ||
       character.affiliatedPlace === selectedLocation;
     return matchesSearch && matchesOrg && matchesLocation;
-  });
+  }), [characters, searchTerm, selectedOrg, selectedLocation]);
 
-  // Statistics - by role
-  const roleStats = {
+  const roleStats = useMemo(() => ({
     total: characters.length,
     protagonista: characters.filter((c) => c.role === "protagonista").length,
     antagonista: characters.filter((c) => c.role === "antagonista").length,
     secundario: characters.filter((c) => c.role === "secundario").length,
     vilao: characters.filter((c) => c.role === "vilao").length,
-  };
+  }), [characters]);
 
-  const handleCharacterCreated = (newCharacter: any) => {
+  const handleCharacterCreated = useCallback((newCharacter: any) => {
     setCharacters((prev) => [...prev, newCharacter]);
-  };
+  }, []);
 
-  const handleCharacterClick = (characterId: string) => {
+  const handleCharacterClick = useCallback((characterId: string) => {
     navigate({
       to: "/dashboard/$dashboardId/tabs/character/$characterId/",
       params: { dashboardId: bookId, characterId },
     });
-  };
+  }, [navigate, bookId]);
 
   return (
     <CharactersView

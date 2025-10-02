@@ -52,6 +52,7 @@ Home
 ├── utils/ (opcional)
 ├── components/ (opcional)
 └── mocks/ (opcional)
+└── constants/ (opcional)
 
 ## Regras Gerais de Pastas
 - Existem arquivos **globais** (em `/src`) e **locais** (dentro de uma página)
@@ -100,6 +101,14 @@ Home
 - Arquivos em `kebab-case` (ex: `user-store.ts`)
 - O hook exportado do store deve estar em **camelCase** começando com `use` (ex: `useUserStore`)
 - Stores globais ficam em `/src/stores`, stores locais ficam dentro da respectiva página
+
+---
+
+## Constants 
+- Organizado na pasta constants quando há valores constantes que não se enquadram em mocks, já que são valores constantes que subirão para produção
+- Arquivos em `kebab-case` (ex: `user-names.ts`)
+- A constant exportado do store deve estar em **UPPER_SNAKE_CASE** com o sufixo `CONSTANT`
+- Constants globais ficam em `/src/constants`, constants locais ficam dentro da respectiva página
 
 ---
 

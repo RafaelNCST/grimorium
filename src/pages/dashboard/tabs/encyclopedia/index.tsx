@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { EncyclopediaView } from "./view";
 
@@ -67,7 +67,7 @@ export function EncyclopediaTab() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("browse");
 
-  const categories = [
+  const categories = useMemo(() => [
     "all",
     "História",
     "Geografia",
@@ -76,12 +76,9 @@ export function EncyclopediaTab() {
     "Economia",
     "Religião",
     "Outros",
-  ];
+  ], []);
 
-  const getCategoryIcon = (category: string) =>
-    // This will be implemented in the view component
-    category;
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = useCallback((category: string) => {
     switch (category) {
       case "História":
         return "bg-accent text-accent-foreground";
@@ -94,42 +91,46 @@ export function EncyclopediaTab() {
       default:
         return "bg-secondary text-secondary-foreground";
     }
-  };
+  }, []);
 
-  const filteredEntries = mockEntries.filter((entry) => {
-    const matchesSearch =
-      entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.tags.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    const matchesCategory =
-      selectedCategory === "all" || entry.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredEntries = useMemo(() => {
+    return mockEntries.filter((entry) => {
+      const matchesSearch =
+        entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.tags.some((tag) =>
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      const matchesCategory =
+        selectedCategory === "all" || entry.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchTerm, selectedCategory]);
 
-  const entriesByCategory = categories.slice(1).map((category) => ({
-    category,
-    entries: mockEntries.filter((entry) => entry.category === category),
-    count: mockEntries.filter((entry) => entry.category === category).length,
-  }));
+  const entriesByCategory = useMemo(() => {
+    return categories.slice(1).map((category) => ({
+      category,
+      entries: mockEntries.filter((entry) => entry.category === category),
+      count: mockEntries.filter((entry) => entry.category === category).length,
+    }));
+  }, [categories]);
 
-  const handleCreateEntry = () => {
+  const handleCreateEntry = useCallback(() => {
     console.log("Create new encyclopedia entry");
-  };
+  }, []);
 
-  const handleEditEntry = (entryId: string) => {
+  const handleEditEntry = useCallback((entryId: string) => {
     console.log("Edit entry:", entryId);
-  };
+  }, []);
 
-  const handleRelatedEntryClick = (relatedEntry: string) => {
+  const handleRelatedEntryClick = useCallback((relatedEntry: string) => {
     console.log("Navigate to related entry:", relatedEntry);
-  };
+  }, []);
 
-  const handleCategoryClick = (category: string) => {
+  const handleCategoryClick = useCallback((category: string) => {
     setSelectedCategory(category);
     setActiveTab("browse");
-  };
+  }, []);
 
   return (
     <EncyclopediaView

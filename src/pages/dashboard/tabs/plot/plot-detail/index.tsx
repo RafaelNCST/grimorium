@@ -1,49 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Plus,
-  Edit2,
-  Trash2,
-  Star,
-  CheckCircle2,
-  Circle,
-  Save,
-  X,
-} from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { IPlotArc, mockPlotArcs } from "@/mocks/local/plot-arc-data";
+
+import { PlotArcDetailView } from "./view";
 
 export function PlotArcDetail() {
   const { plotId } = useParams({ from: "/dashboard/$dashboardId/tabs/plot/$plotId" });
@@ -63,18 +25,8 @@ export function PlotArcDetail() {
     }
   }, [plotId]);
 
-  if (!arc) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Arco não encontrado</h2>
-          <Button onClick={() => window.history.back()}>Voltar</Button>
-        </div>
-      </div>
-    );
-  }
-
-  const getSizeColor = (size: string) => {
+  // Memoized color functions
+  const getSizeColor = useCallback((size: string) => {
     switch (size) {
       case "pequeno":
         return "bg-blue-500/20 text-blue-400 border-blue-400/30";
@@ -85,9 +37,9 @@ export function PlotArcDetail() {
       default:
         return "bg-muted";
     }
-  };
+  }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useCallback((status: string) => {
     switch (status) {
       case "finalizado":
         return "bg-green-500/20 text-green-400 border-green-400/30";
@@ -98,9 +50,29 @@ export function PlotArcDetail() {
       default:
         return "bg-muted";
     }
-  };
+  }, []);
 
-  const toggleEventCompletion = (eventId: string) => {
+  // Navigation handlers
+  const handleBack = useCallback(() => {
+    window.history.back();
+  }, []);
+
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    if (!arc) return;
+    setEditForm(arc);
+    setIsEditing(false);
+  }, [arc]);
+
+  // Event handlers
+  const handleEditFormChange = useCallback((field: string, value: any) => {
+    setEditForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const toggleEventCompletion = useCallback((eventId: string) => {
     setArc((prev) => {
       if (!prev) return prev;
       const updatedEvents = prev.events.map((event) =>
@@ -114,9 +86,10 @@ export function PlotArcDetail() {
 
       return { ...prev, events: updatedEvents, progress };
     });
-  };
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
+    if (!arc) return;
     if (
       editForm.name &&
       editForm.focus &&
@@ -128,14 +101,14 @@ export function PlotArcDetail() {
       setIsEditing(false);
       toast("Arco atualizado com sucesso!");
     }
-  };
+  }, [arc, editForm]);
 
-  const handleDeleteArc = () => {
+  const handleDeleteArc = useCallback(() => {
     toast("Arco excluído com sucesso!");
     window.history.back();
-  };
+  }, []);
 
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = useCallback(() => {
     if (eventToDelete) {
       setArc((prev) => {
         if (!prev) return prev;
@@ -152,301 +125,57 @@ export function PlotArcDetail() {
       setShowDeleteEventDialog(false);
       toast("Evento excluído com sucesso!");
     }
-  };
+  }, [eventToDelete]);
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-card border-b border-border">
-        <div className="px-6 py-4">
-          <div className="flex items-center gap-4 mb-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => window.history.back()}
-              className="hover:bg-muted"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-2xl font-bold">Detalhes do Arco</h1>
-          </div>
+  const handleEventDeleteRequest = useCallback((eventId: string) => {
+    setEventToDelete(eventId);
+    setShowDeleteEventDialog(true);
+  }, []);
+
+  const handleDeleteArcDialogChange = useCallback((open: boolean) => {
+    setShowDeleteArcDialog(open);
+  }, []);
+
+  const handleDeleteEventDialogChange = useCallback((open: boolean) => {
+    setShowDeleteEventDialog(open);
+    if (!open) {
+      setEventToDelete(null);
+    }
+  }, []);
+
+  if (!arc) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Arco não encontrado</h2>
+          <button onClick={handleBack} className="btn btn-primary">
+            Voltar
+          </button>
         </div>
       </div>
+    );
+  }
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Arc Details */}
-        <Card className="card-magical">
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                {isEditing ? (
-                  <div className="space-y-4">
-                    <Input
-                      value={editForm.name || ""}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, name: e.target.value })
-                      }
-                      placeholder="Nome do arco"
-                    />
-                    <Input
-                      value={editForm.focus || ""}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, focus: e.target.value })
-                      }
-                      placeholder="Foco do arco"
-                    />
-                    <Textarea
-                      value={editForm.description || ""}
-                      onChange={(e) =>
-                        setEditForm({
-                          ...editForm,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Descrição do arco"
-                      rows={3}
-                    />
-                    <div className="flex gap-4">
-                      <Select
-                        value={editForm.size}
-                        onValueChange={(v) =>
-                          setEditForm({ ...editForm, size: v as any })
-                        }
-                      >
-                        <SelectTrigger className="w-48">
-                          <SelectValue placeholder="Tamanho" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pequeno">Pequeno</SelectItem>
-                          <SelectItem value="médio">Médio</SelectItem>
-                          <SelectItem value="grande">Grande</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={editForm.status}
-                        onValueChange={(v) =>
-                          setEditForm({ ...editForm, status: v as any })
-                        }
-                      >
-                        <SelectTrigger className="w-48">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="planejamento">
-                            Em Planejamento
-                          </SelectItem>
-                          <SelectItem value="andamento">
-                            Em Andamento
-                          </SelectItem>
-                          <SelectItem value="finalizado">Finalizado</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <CardTitle className="flex items-center gap-2 mb-2">
-                      {arc.name}
-                      <Badge className={getStatusColor(arc.status)}>
-                        {arc.status === "andamento" && (
-                          <Star className="w-3 h-3 mr-1" />
-                        )}
-                        {arc.status}
-                      </Badge>
-                    </CardTitle>
-                    <CardDescription>{arc.description}</CardDescription>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                {isEditing ? (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Cancelar
-                    </Button>
-                    <Button onClick={handleSave}>
-                      <Save className="w-4 h-4 mr-2" />
-                      Salvar
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <Edit2 className="w-4 h-4 mr-2" />
-                      Editar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => setShowDeleteArcDialog(true)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Excluir Arco
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-
-          {!isEditing && (
-            <CardContent>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Tamanho
-                  </label>
-                  <Badge className={`mt-1 ${getSizeColor(arc.size)}`}>
-                    {arc.size}
-                  </Badge>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Foco
-                  </label>
-                  <p className="mt-1">{arc.focus}</p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">Progresso</span>
-                  <span className="text-sm text-muted-foreground">
-                    {arc.progress.toFixed(0)}%
-                  </span>
-                </div>
-                <Progress value={arc.progress} className="h-3" />
-              </div>
-            </CardContent>
-          )}
-        </Card>
-
-        {/* Events Chain */}
-        <Card className="card-magical">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>Cadeia de Eventos</CardTitle>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Evento
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {arc.events.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
-                >
-                  <button
-                    onClick={() => toggleEventCompletion(event.id)}
-                    className="mt-1 text-primary hover:text-primary-glow transition-colors"
-                  >
-                    {event.completed ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : (
-                      <Circle className="w-5 h-5" />
-                    )}
-                  </button>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm text-muted-foreground">
-                        #{event.order}
-                      </span>
-                      <h4
-                        className={`font-medium ${event.completed ? "line-through text-muted-foreground" : ""}`}
-                      >
-                        {event.name}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {event.description}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm">
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEventToDelete(event.id);
-                        setShowDeleteEventDialog(true);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Delete Arc Dialog */}
-      <AlertDialog
-        open={showDeleteArcDialog}
-        onOpenChange={setShowDeleteArcDialog}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão do Arco</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir o arco "{arc.name}"? Esta ação não
-              pode ser desfeita e todos os eventos do arco também serão
-              excluídos.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteArc}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Delete Event Dialog */}
-      <AlertDialog
-        open={showDeleteEventDialog}
-        onOpenChange={setShowDeleteEventDialog}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão do Evento</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir este evento? Esta ação não pode ser
-              desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setEventToDelete(null)}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteEvent}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+  return (
+    <PlotArcDetailView
+      arc={arc}
+      isEditing={isEditing}
+      editForm={editForm}
+      showDeleteArcDialog={showDeleteArcDialog}
+      showDeleteEventDialog={showDeleteEventDialog}
+      onBack={handleBack}
+      onEdit={handleEdit}
+      onSave={handleSave}
+      onCancel={handleCancel}
+      onDeleteArc={handleDeleteArc}
+      onDeleteEvent={handleDeleteEvent}
+      onDeleteArcDialogChange={handleDeleteArcDialogChange}
+      onDeleteEventDialogChange={handleDeleteEventDialogChange}
+      onEditFormChange={handleEditFormChange}
+      onToggleEventCompletion={toggleEventCompletion}
+      onEventDeleteRequest={handleEventDeleteRequest}
+      getSizeColor={getSizeColor}
+      getStatusColor={getStatusColor}
+    />
   );
 }

@@ -1,18 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 
-import { useNavigate, ParamsOptions } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { useBookStore } from "@/stores/book-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
 import { DashboardView } from "./view";
 
-interface BookDashboardProps {
+interface PropsDashboard {
   bookId: string;
   onBack: () => void;
 }
 
-export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
+export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const navigate = useNavigate();
   const { books, updateBook, deleteBook, setCurrentBook } = useBookStore();
   const {
@@ -21,7 +21,6 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
     isHeaderHidden,
     isCustomizing,
     tabs,
-    arcs,
     setActiveTab,
     setIsEditingHeader,
     setIsHeaderHidden,
@@ -31,7 +30,11 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
     getCurrentArc,
   } = useDashboardStore();
 
-  const book = books.find((b) => b.id === bookId);
+  const book = useMemo(
+    () => books.find((b) => b.id === bookId),
+    [books, bookId]
+  );
+  const currentArc = useMemo(() => getCurrentArc(), [getCurrentArc]);
 
   useEffect(() => {
     if (book) {
@@ -54,32 +57,47 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
     }
   }, [activeTab, isCustomizing, setIsCustomizing]);
 
+  const handleUpdateBook = useCallback(
+    (updates: Partial<typeof book>) => {
+      updateBook(bookId, updates);
+    },
+    [updateBook, bookId]
+  );
+
+  const handleDeleteBook = useCallback(() => {
+    deleteBook(bookId);
+    onBack();
+  }, [deleteBook, bookId, onBack]);
+
+  const handleNavigateToChapters = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/chapter/chapters",
+      params: { dashboardId: bookId },
+    });
+  }, [navigate, bookId]);
+
+  const handleNavigateToNotes = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/notes/notes",
+      params: { dashboardId: bookId },
+    });
+  }, [navigate, bookId]);
+
   if (!book) {
     return <div>Livro não encontrado</div>;
   }
-
-  const handleUpdateBook = (updates: Partial<typeof book>) => {
-    updateBook(bookId, updates);
-  };
-
-  const handleDeleteBook = () => {
-    deleteBook(bookId);
-    onBack();
-  };
-
-  const currentArc = getCurrentArc();
 
   return (
     <DashboardView
       book={book}
       bookId={bookId}
-      onBack={onBack}
       activeTab={activeTab}
       isEditingHeader={isEditingHeader}
       isHeaderHidden={isHeaderHidden}
       isCustomizing={isCustomizing}
       tabs={tabs}
       currentArc={currentArc}
+      onBack={onBack}
       onActiveTabChange={setActiveTab}
       onEditingHeaderChange={setIsEditingHeader}
       onHeaderHiddenChange={setIsHeaderHidden}
@@ -88,7 +106,8 @@ export function BookDashboard({ bookId, onBack }: BookDashboardProps) {
       onToggleTabVisibility={toggleTabVisibility}
       onUpdateBook={handleUpdateBook}
       onDeleteBook={handleDeleteBook}
-      navigate={navigate}
+      onNavigateToChapters={handleNavigateToChapters}
+      onNavigateToNotes={handleNavigateToNotes}
     />
   );
 }

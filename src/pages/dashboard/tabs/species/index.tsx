@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -104,7 +104,7 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
     },
   ]);
 
-  const handleCreateSpecies = (data: {
+  const handleCreateSpecies = useCallback((data: {
     knownName: string;
     scientificName?: string;
     description: string;
@@ -119,9 +119,9 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
       title: "Espécie criada",
       description: `${data.knownName} foi criada com sucesso.`,
     });
-  };
+  }, [species, toast]);
 
-  const handleCreateRace = (data: {
+  const handleCreateRace = useCallback((data: {
     name: string;
     description: string;
     history: string;
@@ -145,9 +145,9 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
       title: "Raça criada",
       description: `${data.name} foi criada com sucesso.`,
     });
-  };
+  }, [species, selectedSpeciesId, toast]);
 
-  const handleSpeciesClick = (speciesId: string) => {
+  const handleSpeciesClick = useCallback((speciesId: string) => {
     const worldId = "world1"; // Default world - Aethermoor
     const speciesUrl = `/book/${bookId}/world/${worldId}/species/${speciesId}`;
     console.log("Navigating to species detail:", {
@@ -157,18 +157,18 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
     });
     console.log("Route URL:", speciesUrl);
     window.location.href = speciesUrl;
-  };
+  }, [bookId]);
 
-  const handleRaceClick = (raceId: string) => {
+  const handleRaceClick = useCallback((raceId: string) => {
     navigate({ to: "/dashboard/$dashboardId/tabs/race/$raceId", params: { dashboardId: bookId, raceId: raceId } });
-  };
+  }, [navigate, bookId]);
 
-  const openCreateRaceModal = (speciesId: string) => {
+  const handleOpenCreateRaceModal = useCallback((speciesId: string) => {
     setSelectedSpeciesId(speciesId);
     setIsCreateRaceOpen(true);
-  };
+  }, []);
 
-  const calculateRaceTypeStats = () => ({
+  const raceTypeStats = useMemo(() => ({
     Aquática: species.reduce(
       (sum, s) => sum + s.races.filter((r) => r.type === "Aquática").length,
       0
@@ -189,7 +189,7 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
       (sum, s) => sum + s.races.filter((r) => r.type === "Espiritual").length,
       0
     ),
-  });
+  }), [species]);
 
   return (
     <SpeciesView
@@ -197,14 +197,14 @@ export function SpeciesTab({ bookId }: SpeciesTabProps) {
       isCreateSpeciesOpen={isCreateSpeciesOpen}
       isCreateRaceOpen={isCreateRaceOpen}
       typeColors={typeColors}
-      raceTypeStats={calculateRaceTypeStats()}
+      raceTypeStats={raceTypeStats}
       onSetIsCreateSpeciesOpen={setIsCreateSpeciesOpen}
       onSetIsCreateRaceOpen={setIsCreateRaceOpen}
       onCreateSpecies={handleCreateSpecies}
       onCreateRace={handleCreateRace}
       onSpeciesClick={handleSpeciesClick}
       onRaceClick={handleRaceClick}
-      onOpenCreateRaceModal={openCreateRaceModal}
+      onOpenCreateRaceModal={handleOpenCreateRaceModal}
     />
   );
 }

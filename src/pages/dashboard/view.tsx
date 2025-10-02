@@ -17,7 +17,6 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { UseNavigateResult } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Edit2,
@@ -177,16 +176,16 @@ function SortableTab({
   );
 }
 
-interface DashboardViewProps {
+interface PropsDashboardView {
   book: BookType;
   bookId: string;
-  onBack: () => void;
   activeTab: string;
   isEditingHeader: boolean;
   isHeaderHidden: boolean;
   isCustomizing: boolean;
   tabs: TabConfig[];
   currentArc?: PlotArc;
+  onBack: () => void;
   onActiveTabChange: (tab: string) => void;
   onEditingHeaderChange: (editing: boolean) => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
@@ -195,7 +194,8 @@ interface DashboardViewProps {
   onToggleTabVisibility: (tabId: string) => void;
   onUpdateBook: (updates: Partial<BookType>) => void;
   onDeleteBook: () => void;
-  navigate: UseNavigateResult<string>;
+  onNavigateToChapters: () => void;
+  onNavigateToNotes: () => void;
 }
 
 const genres = [
@@ -240,13 +240,13 @@ const defaultTabs: TabConfig[] = [
 export function DashboardView({
   book,
   bookId,
-  onBack,
   activeTab,
   isEditingHeader,
   isHeaderHidden,
   isCustomizing,
   tabs: propsTabs,
   currentArc,
+  onBack,
   onActiveTabChange,
   onEditingHeaderChange,
   onHeaderHiddenChange,
@@ -255,8 +255,9 @@ export function DashboardView({
   onToggleTabVisibility,
   onUpdateBook,
   onDeleteBook,
-  navigate,
-}: DashboardViewProps) {
+  onNavigateToChapters,
+  onNavigateToNotes,
+}: PropsDashboardView) {
   const { t } = useLanguageStore();
   const [draftBook, setDraftBook] = useState(book);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -383,12 +384,7 @@ export function DashboardView({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() =>
-                        navigate({
-                          to: "/dashboard/$dashboardId/chapter/chapters",
-                          params: { dashboardId: bookId },
-                        })
-                      }
+                      onClick={onNavigateToChapters}
                       className="hover:bg-muted"
                     >
                       <Book className="w-5 h-5" />
@@ -404,12 +400,7 @@ export function DashboardView({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() =>
-                        navigate({
-                          to: "/dashboard/$dashboardId/notes/notes",
-                          params: { dashboardId: bookId },
-                        })
-                      }
+                      onClick={onNavigateToNotes}
                       className="hover:bg-muted"
                     >
                       <NotebookTabs className="w-5 h-5" />
