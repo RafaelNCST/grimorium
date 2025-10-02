@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { IPlotArc, mockPlotArcs } from "@/mocks/local/plot-arc-data";
+import type { IPlotArc } from "@/types/plot-types";
 
+import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
+import { getSizeColor } from "../utils/get-size-color";
+import { getStatusColor } from "../utils/get-status-color";
 import { PlotArcDetailView } from "./view";
 
 export function PlotArcDetail() {
@@ -20,44 +23,16 @@ export function PlotArcDetail() {
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    const foundArc = mockPlotArcs.find((a) => a.id === plotId);
+    const foundArc = MOCK_PLOT_ARCS.find((a) => a.id === plotId);
     if (foundArc) {
       setArc(foundArc);
       setEditForm(foundArc);
     }
   }, [plotId]);
 
-  // Memoized color functions
-  const getSizeColor = useCallback((size: string) => {
-    switch (size) {
-      case "pequeno":
-        return "bg-blue-500/20 text-blue-400 border-blue-400/30";
-      case "médio":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-400/30";
-      case "grande":
-        return "bg-red-500/20 text-red-400 border-red-400/30";
-      default:
-        return "bg-muted";
-    }
-  }, []);
-
-  const getStatusColor = useCallback((status: string) => {
-    switch (status) {
-      case "finalizado":
-        return "bg-green-500/20 text-green-400 border-green-400/30";
-      case "andamento":
-        return "bg-blue-500/20 text-blue-400 border-blue-400/30";
-      case "planejamento":
-        return "bg-orange-500/20 text-orange-400 border-orange-400/30";
-      default:
-        return "bg-muted";
-    }
-  }, []);
-
-  // Navigation handlers
   const handleBack = useCallback(() => {
-    window.history.back();
-  }, []);
+    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: plotId } });
+  }, [navigate, plotId]);
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
@@ -69,12 +44,11 @@ export function PlotArcDetail() {
     setIsEditing(false);
   }, [arc]);
 
-  // Event handlers
-  const handleEditFormChange = useCallback((field: string, value: any) => {
+  const handleEditFormChange = useCallback((field: string, value: string) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const toggleEventCompletion = useCallback((eventId: string) => {
+  const handleToggleEventCompletion = useCallback((eventId: string) => {
     setArc((prev) => {
       if (!prev) return prev;
       const updatedEvents = prev.events.map((event) =>
@@ -107,8 +81,8 @@ export function PlotArcDetail() {
 
   const handleDeleteArc = useCallback(() => {
     toast("Arco excluído com sucesso!");
-    window.history.back();
-  }, []);
+    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: plotId } });
+  }, [navigate, plotId]);
 
   const handleDeleteEvent = useCallback(() => {
     if (eventToDelete) {
@@ -174,7 +148,7 @@ export function PlotArcDetail() {
       onDeleteArcDialogChange={handleDeleteArcDialogChange}
       onDeleteEventDialogChange={handleDeleteEventDialogChange}
       onEditFormChange={handleEditFormChange}
-      onToggleEventCompletion={toggleEventCompletion}
+      onToggleEventCompletion={handleToggleEventCompletion}
       onEventDeleteRequest={handleEventDeleteRequest}
       getSizeColor={getSizeColor}
       getStatusColor={getStatusColor}

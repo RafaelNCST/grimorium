@@ -21,26 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
-interface IPlotArc {
-  id: string;
-  name: string;
-  size: "pequeno" | "médio" | "grande";
-  focus: string;
-  description: string;
-  events: IPlotEvent[];
-  progress: number;
-  status: "planejamento" | "andamento" | "finalizado";
-  order: number;
-}
-
-interface IPlotEvent {
-  id: string;
-  name: string;
-  description: string;
-  completed: boolean;
-  order: number;
-}
+import type { IPlotArc, PlotArcSize, PlotArcStatus } from "@/types/plot-types";
 
 interface PropsCreatePlotArcModal {
   open: boolean;
@@ -57,10 +38,10 @@ export function CreatePlotArcModal({
 }: PropsCreatePlotArcModal) {
   const [formData, setFormData] = useState({
     name: "",
-    size: "" as "pequeno" | "médio" | "grande" | "",
+    size: "" as PlotArcSize | "",
     focus: "",
     description: "",
-    status: "" as "planejamento" | "andamento" | "finalizado" | "",
+    status: "" as PlotArcStatus | "",
     order: existingArcs.length + 1,
   });
 

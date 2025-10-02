@@ -1,11 +1,8 @@
 import {
   Plus,
-  Target,
   Clock,
   CheckCircle2,
   Circle,
-  Edit2,
-  Trash2,
   Star,
   GitBranch,
   ArrowUp,
@@ -31,42 +28,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type {
+  IPlotArc,
+  IPlotEvent,
+  PlotArcSize,
+  PlotArcStatus,
+} from "@/types/plot-types";
 
-interface IPlotArc {
-  id: string;
-  name: string;
-  size: "pequeno" | "médio" | "grande";
-  focus: string;
-  description: string;
-  events: IPlotEvent[];
-  progress: number;
-  status: "planejamento" | "andamento" | "finalizado";
-  order: number;
-}
-
-interface IPlotEvent {
-  id: string;
-  name: string;
-  description: string;
-  completed: boolean;
-  order: number;
-}
-
-interface PlotViewProps {
+interface PropsPlotView {
   arcs: IPlotArc[];
   showCreateModal: boolean;
   statusFilter: string;
   filteredAndSortedArcs: IPlotArc[];
-  getSizeColor: (size: string) => string;
-  getStatusColor: (status: string) => string;
-  getVisibleEvents: (events: IPlotEvent[]) => IPlotEvent[];
+  bookId: string;
   onSetShowCreateModal: (show: boolean) => void;
   onSetStatusFilter: (filter: string) => void;
   onCreateArc: (arcData: Omit<IPlotArc, "id" | "events" | "progress">) => void;
   onMoveArc: (arcId: string, direction: "up" | "down") => void;
   onPlotTimelineClick: (bookId: string) => void;
   onArcClick: (arcId: string, bookId: string) => void;
-  bookId: string;
+  getSizeColor: (size: PlotArcSize) => string;
+  getStatusColor: (status: PlotArcStatus) => string;
+  getVisibleEvents: (events: IPlotEvent[]) => IPlotEvent[];
 }
 
 export function PlotView({
@@ -74,17 +57,17 @@ export function PlotView({
   showCreateModal,
   statusFilter,
   filteredAndSortedArcs,
-  getSizeColor,
-  getStatusColor,
-  getVisibleEvents,
+  bookId,
   onSetShowCreateModal,
   onSetStatusFilter,
   onCreateArc,
   onMoveArc,
   onPlotTimelineClick,
   onArcClick,
-  bookId,
-}: PlotViewProps) {
+  getSizeColor,
+  getStatusColor,
+  getVisibleEvents,
+}: PropsPlotView) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -121,7 +104,6 @@ export function PlotView({
         </div>
       </div>
 
-      {/* Arc Cards */}
       <div className="grid gap-6">
         {filteredAndSortedArcs.map((arc, index) => (
           <Card

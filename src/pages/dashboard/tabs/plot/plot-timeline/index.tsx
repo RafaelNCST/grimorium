@@ -2,8 +2,10 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate, useParams } from "@tanstack/react-router";
 
-import { mockArcs, type IPlotArc } from "@/mocks/local/plot-arcs";
+import type { IPlotArc } from "@/types/plot-types";
 
+import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
+import { getSizeColor } from "../utils/get-size-color";
 import { PlotTimelineView } from "./view";
 
 export function PlotTimeline() {
@@ -11,32 +13,16 @@ export function PlotTimeline() {
     from: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
   });
   const navigate = useNavigate();
-  const [arcs] = useState<IPlotArc[]>(mockArcs);
+  const [arcs] = useState<IPlotArc[]>(MOCK_PLOT_ARCS);
 
-  // Sort all arcs by order for the timeline - memoized
   const sortedArcs = useMemo(
     () => [...arcs].sort((a, b) => a.order - b.order),
     [arcs]
   );
 
-  // Memoized color function
-  const getSizeColor = useCallback((size: string) => {
-    switch (size) {
-      case "pequeno":
-        return "bg-blue-500/20 text-blue-400 border-blue-400/30";
-      case "médio":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-400/30";
-      case "grande":
-        return "bg-red-500/20 text-red-400 border-red-400/30";
-      default:
-        return "bg-muted";
-    }
-  }, []);
-
-  // Navigation handlers
   const handleBack = useCallback(() => {
-    window.history.back();
-  }, []);
+    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: dashboardId! } });
+  }, [navigate, dashboardId]);
 
   const handleArcClick = useCallback(
     (arcId: string) => {

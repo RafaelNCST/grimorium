@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   ArrowLeft,
   Plus,
@@ -41,9 +39,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { IPlotArc } from "@/mocks/local/plot-arc-data";
+import type { IPlotArc, PlotArcSize, PlotArcStatus } from "@/types/plot-types";
 
-interface PlotArcDetailViewProps {
+interface PropsPlotArcDetailView {
   arc: IPlotArc;
   isEditing: boolean;
   editForm: Partial<IPlotArc>;
@@ -57,11 +55,11 @@ interface PlotArcDetailViewProps {
   onDeleteEvent: () => void;
   onDeleteArcDialogChange: (open: boolean) => void;
   onDeleteEventDialogChange: (open: boolean) => void;
-  onEditFormChange: (field: string, value: any) => void;
+  onEditFormChange: (field: string, value: string) => void;
   onToggleEventCompletion: (eventId: string) => void;
   onEventDeleteRequest: (eventId: string) => void;
-  getSizeColor: (size: string) => string;
-  getStatusColor: (status: string) => string;
+  getSizeColor: (size: PlotArcSize) => string;
+  getStatusColor: (status: PlotArcStatus) => string;
 }
 
 export function PlotArcDetailView({
@@ -83,10 +81,9 @@ export function PlotArcDetailView({
   onEventDeleteRequest,
   getSizeColor,
   getStatusColor,
-}: PlotArcDetailViewProps) {
+}: PropsPlotArcDetailView) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="bg-card border-b border-border">
         <div className="px-6 py-4">
           <div className="flex items-center gap-4 mb-4">
@@ -104,7 +101,6 @@ export function PlotArcDetailView({
       </div>
 
       <div className="px-6 py-6 space-y-6">
-        {/* Arc Details */}
         <Card className="card-magical">
           <CardHeader>
             <div className="flex justify-between items-start">
@@ -243,7 +239,6 @@ export function PlotArcDetailView({
           )}
         </Card>
 
-        {/* Events Chain */}
         <Card className="card-magical">
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -307,7 +302,6 @@ export function PlotArcDetailView({
         </Card>
       </div>
 
-      {/* Delete Arc Dialog */}
       <AlertDialog
         open={showDeleteArcDialog}
         onOpenChange={onDeleteArcDialogChange}
@@ -333,7 +327,6 @@ export function PlotArcDetailView({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Event Dialog */}
       <AlertDialog
         open={showDeleteEventDialog}
         onOpenChange={onDeleteEventDialogChange}

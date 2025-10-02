@@ -1,5 +1,3 @@
-import React from "react";
-
 import { ArrowLeft, CheckCircle2, Clock, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IPlotArc } from "@/mocks/local/plot-arcs";
+import type { IPlotArc, PlotArcSize } from "@/types/plot-types";
 
-interface PlotTimelineViewProps {
+interface PropsPlotTimelineView {
   sortedArcs: IPlotArc[];
   onBack: () => void;
   onArcClick: (arcId: string) => void;
-  getSizeColor: (size: string) => string;
+  getSizeColor: (size: PlotArcSize) => string;
 }
 
 export function PlotTimelineView({
@@ -25,10 +23,9 @@ export function PlotTimelineView({
   onBack,
   onArcClick,
   getSizeColor,
-}: PlotTimelineViewProps) {
+}: PropsPlotTimelineView) {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="bg-card border-b border-border">
         <div className="px-6 py-4">
           <div className="flex items-center gap-4 mb-4">
@@ -49,23 +46,18 @@ export function PlotTimelineView({
       </div>
 
       <div className="px-6 py-8">
-        {/* Timeline visualization - showing all arcs in order */}
         <div className="relative">
-          {/* Timeline line */}
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary-glow to-primary transform -translate-y-1/2 z-0" />
 
-          {/* Timeline content - horizontal layout */}
           <div className="flex gap-6 justify-center items-center min-h-[400px] relative z-10 overflow-x-auto pb-4">
             {sortedArcs.map((arc, index) => (
               <div key={arc.id} className="flex-shrink-0 w-80 relative">
-                {/* Position indicator */}
                 <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
                   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
                     {index + 1}
                   </div>
                 </div>
 
-                {/* Arc card */}
                 <div
                   className={
                     arc.status === "andamento" ? "transform scale-110" : ""
@@ -121,7 +113,6 @@ export function PlotTimelineView({
                   </Card>
                 </div>
 
-                {/* Status indicator below */}
                 <div className="text-center mt-2">
                   <Badge
                     className={
@@ -144,7 +135,6 @@ export function PlotTimelineView({
           </div>
         </div>
 
-        {/* Legend */}
         <div className="mt-12 bg-card rounded-lg p-6 border border-border">
           <h4 className="font-semibold mb-4">Legenda</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
