@@ -1,18 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import {
-  Users,
-  Crown,
-  Sword,
-  Shield,
-  Target,
-  User,
-  UserCheck,
-  Users2,
-  Ban,
-  HelpCircle,
-} from "lucide-react";
+import { Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { type CharacterVersion } from "@/components/character-version-manager";
@@ -23,188 +12,42 @@ import {
 } from "@/mocks/global";
 import { mockCharacterDetail } from "@/mocks/local/character-data";
 
+import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
+import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
+import { GENDERS_CONSTANT } from "./constants/genders-constant";
+import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
+import { ROLES_CONSTANT } from "./constants/roles-constant";
+import { MOCK_LINKED_NOTES } from "./mocks/mock-linked-notes";
+import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
+import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
-
-const mockCharacter = mockCharacterDetail;
-
-const roles = [
-  {
-    value: "protagonista",
-    label: "Protagonista",
-    icon: Crown,
-    color: "bg-accent text-accent-foreground",
-  },
-  {
-    value: "co-protagonista",
-    label: "Co-protagonista",
-    icon: UserCheck,
-    color: "bg-accent/80 text-accent-foreground",
-  },
-  {
-    value: "antagonista",
-    label: "Antagonista",
-    icon: Sword,
-    color: "bg-destructive text-destructive-foreground",
-  },
-  {
-    value: "vilao",
-    label: "Vilão",
-    icon: Sword,
-    color: "bg-destructive text-destructive-foreground",
-  },
-  {
-    value: "secundario",
-    label: "Secundário",
-    icon: Users,
-    color: "bg-secondary text-secondary-foreground",
-  },
-  {
-    value: "figurante",
-    label: "Figurante",
-    icon: Users,
-    color: "bg-muted text-muted-foreground",
-  },
-];
-
-const alignments = [
-  {
-    value: "bem",
-    label: "Bem",
-    icon: Shield,
-    color: "text-green-600",
-    bgColor: "bg-green-500/10 border-green-500/20",
-  },
-  {
-    value: "neutro",
-    label: "Neutro",
-    icon: Target,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-500/10 border-yellow-500/20",
-  },
-  {
-    value: "caotico",
-    label: "Caótico",
-    icon: Sword,
-    color: "text-red-600",
-    bgColor: "bg-red-500/10 border-red-500/20",
-  },
-];
-
-const genders = [
-  { value: "masculino", label: "Masculino", icon: User },
-  { value: "feminino", label: "Feminino", icon: Users2 },
-  { value: "transgenero", label: "Transgênero", icon: UserCheck },
-  { value: "assexuado", label: "Assexuado", icon: Ban },
-  { value: "outro", label: "Outro", icon: HelpCircle },
-];
-
-const familyRelations = {
-  single: [
-    { value: "father", label: "Pai" },
-    { value: "mother", label: "Mãe" },
-    { value: "spouse", label: "Cônjuge" },
-  ],
-  multiple: [
-    { value: "child", label: "Filho/Filha" },
-    { value: "sibling", label: "Irmão/Irmã" },
-    { value: "halfSibling", label: "Meio-irmão/Meio-irmã" },
-    { value: "uncleAunt", label: "Tio/Tia" },
-    { value: "cousin", label: "Primo/Prima" },
-  ],
-};
-
-const relationshipTypes = [
-  {
-    value: "odio",
-    label: "Ódio",
-    emoji: "😡",
-    color: "bg-red-500/10 text-red-600",
-  },
-  {
-    value: "amor",
-    label: "Amor",
-    emoji: "❤️",
-    color: "bg-pink-500/10 text-pink-600",
-  },
-  {
-    value: "interesse_amoroso",
-    label: "Interesse Amoroso",
-    emoji: "💕",
-    color: "bg-rose-500/10 text-rose-600",
-  },
-  {
-    value: "mentorado",
-    label: "Mentorado",
-    emoji: "🎓",
-    color: "bg-blue-500/10 text-blue-600",
-  },
-  {
-    value: "subordinacao",
-    label: "Subordinação",
-    emoji: "🫡",
-    color: "bg-gray-500/10 text-gray-600",
-  },
-  {
-    value: "rivalidade",
-    label: "Rivalidade",
-    emoji: "⚔️",
-    color: "bg-orange-500/10 text-orange-600",
-  },
-  {
-    value: "lideranca",
-    label: "Liderança",
-    emoji: "👑",
-    color: "bg-purple-500/10 text-purple-600",
-  },
-  {
-    value: "amizade",
-    label: "Amizade",
-    emoji: "😊",
-    color: "bg-green-500/10 text-green-600",
-  },
-  {
-    value: "melhores_amigos",
-    label: "Melhores Amigos",
-    emoji: "👥",
-    color: "bg-emerald-500/10 text-emerald-600",
-  },
-  {
-    value: "inimizade",
-    label: "Inimizade",
-    emoji: "😤",
-    color: "bg-red-600/10 text-red-700",
-  },
-  {
-    value: "neutro",
-    label: "Neutro",
-    emoji: "😐",
-    color: "bg-slate-500/10 text-slate-600",
-  },
-];
 
 export function CharacterDetail() {
   const { dashboardId, characterId } = useParams({
     from: "/dashboard/$dashboardId/tabs/character/$characterId/",
   });
   const navigate = useNavigate();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isEditing, setIsEditing] = useState(false);
-  const [character, setCharacter] = useState(mockCharacter);
+  const [character, setCharacter] = useState(mockCharacterDetail);
   const [editData, setEditData] = useState({
-    ...mockCharacter,
-    relationships: mockCharacter.relationships || [],
+    ...mockCharacterDetail,
+    relationships: mockCharacterDetail.relationships || [],
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuality, setNewQuality] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(mockCharacter.image);
+  const [_imageFile, _setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(
+    mockCharacterDetail.image
+  );
   const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] =
     useState("");
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
-
-  // Character versions state
   const [versions, setVersions] = useState<CharacterVersion[]>([
     {
       id: "version-1",
@@ -212,92 +55,104 @@ export function CharacterDetail() {
       description: "Estado inicial do personagem",
       createdAt: new Date(),
       isActive: true,
-      data: mockCharacter,
+      data: mockCharacterDetail,
     },
   ]);
   const [currentVersion, setCurrentVersion] = useState(versions[0]);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const currentRole = roles.find((r) => r.value === character.role);
-  const currentAlignment = alignments.find(
-    (a) => a.value === character.alignment
+  const currentRole = useMemo(
+    () => ROLES_CONSTANT.find((r) => r.value === character.role),
+    [character.role]
   );
-  const currentGender = genders.find((g) => g.value === character.gender);
+  const currentAlignment = useMemo(
+    () => ALIGNMENTS_CONSTANT.find((a) => a.value === character.alignment),
+    [character.alignment]
+  );
+  const currentGender = useMemo(
+    () => GENDERS_CONSTANT.find((g) => g.value === character.gender),
+    [character.gender]
+  );
   const RoleIcon = currentRole?.icon || Users;
 
-  // Version management functions
-  const handleVersionChange = (version: CharacterVersion) => {
-    const updatedVersions = versions.map((v) => ({
-      ...v,
-      isActive: v.id === version.id,
-    }));
-    setVersions(updatedVersions);
-    setCurrentVersion(version);
+  const handleVersionChange = useCallback(
+    (version: CharacterVersion) => {
+      const updatedVersions = versions.map((v) => ({
+        ...v,
+        isActive: v.id === version.id,
+      }));
+      setVersions(updatedVersions);
+      setCurrentVersion(version);
 
-    setCharacter(version.data);
-    setEditData({
-      ...version.data,
-      relationships: version.data.relationships || [],
-    });
-    setImagePreview(version.data.image);
-
-    toast.success(`Versão "${version.name}" ativada`);
-  };
-
-  const handleVersionSave = (name: string, description?: string) => {
-    const newVersion: CharacterVersion = {
-      id: `version-${Date.now()}`,
-      name,
-      description,
-      createdAt: new Date(),
-      isActive: false,
-      data: { ...character },
-    };
-
-    setVersions((prev) => [...prev, newVersion]);
-    toast.success(`Versão "${name}" salva com sucesso!`);
-  };
-
-  const handleVersionDelete = (versionId: string) => {
-    if (versions.length <= 1) {
-      toast.error("Não é possível excluir a última versão");
-      return;
-    }
-
-    const versionToDelete = versions.find((v) => v.id === versionId);
-    const updatedVersions = versions.filter((v) => v.id !== versionId);
-
-    if (versionToDelete?.isActive && updatedVersions.length > 0) {
-      updatedVersions[0].isActive = true;
-      setCurrentVersion(updatedVersions[0]);
-      setCharacter(updatedVersions[0].data);
+      setCharacter(version.data);
       setEditData({
-        ...updatedVersions[0].data,
-        relationships: updatedVersions[0].data.relationships || [],
+        ...version.data,
+        relationships: version.data.relationships || [],
       });
-      setImagePreview(updatedVersions[0].data.image);
-    }
+      setImagePreview(version.data.image);
 
-    setVersions(updatedVersions);
-  };
+      toast.success(`Versão "${version.name}" ativada`);
+    },
+    [versions]
+  );
 
-  const handleVersionUpdate = (
-    versionId: string,
-    name: string,
-    description?: string
-  ) => {
-    const updatedVersions = versions.map((v) =>
-      v.id === versionId ? { ...v, name, description } : v
-    );
-    setVersions(updatedVersions);
+  const handleVersionSave = useCallback(
+    (name: string, description?: string) => {
+      const newVersion: CharacterVersion = {
+        id: `version-${Date.now()}`,
+        name,
+        description,
+        createdAt: new Date(),
+        isActive: false,
+        data: { ...character },
+      };
 
-    if (currentVersion.id === versionId) {
-      setCurrentVersion({ ...currentVersion, name, description });
-    }
-  };
+      setVersions((prev) => [...prev, newVersion]);
+      toast.success(`Versão "${name}" salva com sucesso!`);
+    },
+    [character]
+  );
 
-  const handleSave = () => {
+  const handleVersionDelete = useCallback(
+    (versionId: string) => {
+      if (versions.length <= 1) {
+        toast.error("Não é possível excluir a última versão");
+        return;
+      }
+
+      const versionToDelete = versions.find((v) => v.id === versionId);
+      const updatedVersions = versions.filter((v) => v.id !== versionId);
+
+      if (versionToDelete?.isActive && updatedVersions.length > 0) {
+        updatedVersions[0].isActive = true;
+        setCurrentVersion(updatedVersions[0]);
+        setCharacter(updatedVersions[0].data);
+        setEditData({
+          ...updatedVersions[0].data,
+          relationships: updatedVersions[0].data.relationships || [],
+        });
+        setImagePreview(updatedVersions[0].data.image);
+      }
+
+      setVersions(updatedVersions);
+    },
+    [versions]
+  );
+
+  const handleVersionUpdate = useCallback(
+    (versionId: string, name: string, description?: string) => {
+      const updatedVersions = versions.map((v) =>
+        v.id === versionId ? { ...v, name, description } : v
+      );
+      setVersions(updatedVersions);
+
+      if (currentVersion.id === versionId) {
+        setCurrentVersion({ ...currentVersion, name, description });
+      }
+    },
+    [versions, currentVersion]
+  );
+
+  const handleSave = useCallback(() => {
     const updatedCharacter = { ...editData };
     setCharacter(updatedCharacter);
 
@@ -313,22 +168,27 @@ export function CharacterDetail() {
 
     setIsEditing(false);
     toast.success("Personagem atualizado com sucesso!");
-  };
+  }, [editData, versions]);
 
-  const handleDelete = () => {
-    toast.success("Personagem excluído com sucesso!");
+  const navigateToCharactersTab = useCallback(() => {
+    if (!dashboardId) return;
     navigate({
       to: "/dashboard/$dashboardId",
       params: { dashboardId },
     });
-  };
+  }, [navigate, dashboardId]);
 
-  const handleCancel = () => {
+  const handleDelete = useCallback(() => {
+    toast.success("Personagem excluído com sucesso!");
+    navigateToCharactersTab();
+  }, [navigateToCharactersTab]);
+
+  const handleCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
     setIsEditing(false);
-  };
+  }, [character]);
 
-  const handleAddQuality = () => {
+  const handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
       setEditData((prev) => ({
         ...prev,
@@ -336,121 +196,104 @@ export function CharacterDetail() {
       }));
       setNewQuality("");
     }
-  };
+  }, [newQuality, editData.qualities]);
 
-  const handleRemoveQuality = (qualityToRemove: string) => {
+  const handleRemoveQuality = useCallback((qualityToRemove: string) => {
     setEditData((prev) => ({
       ...prev,
       qualities: prev.qualities.filter((q) => q !== qualityToRemove),
     }));
-  };
+  }, []);
 
-  const handleFamilyRelationChange = (
-    relationType: string,
-    characterId: string | null
-  ) => {
-    setEditData((prev) => {
-      const newFamily = { ...prev.family };
+  const handleFamilyRelationChange = useCallback(
+    (relationType: string, characterId: string | null) => {
+      setEditData((prev) => {
+        const newFamily = { ...prev.family };
 
-      Object.keys(newFamily).forEach((key) => {
-        if (Array.isArray(newFamily[key])) {
-          newFamily[key] = newFamily[key].filter(
-            (id: string) => id !== characterId
-          );
-        } else if (newFamily[key] === characterId) {
-          newFamily[key] = null;
+        Object.keys(newFamily).forEach((key) => {
+          if (Array.isArray(newFamily[key])) {
+            newFamily[key] = newFamily[key].filter(
+              (id: string) => id !== characterId
+            );
+          } else if (newFamily[key] === characterId) {
+            newFamily[key] = null;
+          }
+        });
+
+        if (characterId && characterId !== "none") {
+          switch (relationType) {
+            case "father":
+            case "mother":
+            case "spouse":
+              newFamily[relationType] = characterId;
+              break;
+            case "child":
+              if (!newFamily.children.includes(characterId)) {
+                newFamily.children.push(characterId);
+              }
+              break;
+            case "sibling":
+              if (!newFamily.siblings.includes(characterId)) {
+                newFamily.siblings.push(characterId);
+              }
+              break;
+            case "halfSibling":
+              if (!newFamily.halfSiblings.includes(characterId)) {
+                newFamily.halfSiblings.push(characterId);
+              }
+              break;
+            case "uncleAunt":
+              if (!newFamily.unclesAunts.includes(characterId)) {
+                newFamily.unclesAunts.push(characterId);
+              }
+              break;
+            case "grandparent":
+              if (!newFamily.grandparents.includes(characterId)) {
+                newFamily.grandparents.push(characterId);
+              }
+              break;
+            case "cousin":
+              if (!newFamily.cousins.includes(characterId)) {
+                newFamily.cousins.push(characterId);
+              }
+              break;
+          }
         }
+
+        return {
+          ...prev,
+          family: newFamily,
+        };
       });
+    },
+    []
+  );
 
-      if (characterId && characterId !== "none") {
-        switch (relationType) {
-          case "father":
-          case "mother":
-          case "spouse":
-            newFamily[relationType] = characterId;
-            break;
-          case "child":
-            if (!newFamily.children.includes(characterId)) {
-              newFamily.children.push(characterId);
-            }
-            break;
-          case "sibling":
-            if (!newFamily.siblings.includes(characterId)) {
-              newFamily.siblings.push(characterId);
-            }
-            break;
-          case "halfSibling":
-            if (!newFamily.halfSiblings.includes(characterId)) {
-              newFamily.halfSiblings.push(characterId);
-            }
-            break;
-          case "uncleAunt":
-            if (!newFamily.unclesAunts.includes(characterId)) {
-              newFamily.unclesAunts.push(characterId);
-            }
-            break;
-          case "grandparent":
-            if (!newFamily.grandparents.includes(characterId)) {
-              newFamily.grandparents.push(characterId);
-            }
-            break;
-          case "cousin":
-            if (!newFamily.cousins.includes(characterId)) {
-              newFamily.cousins.push(characterId);
-            }
-            break;
-        }
+  const handleImageFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        setImageFile(file);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setImagePreview(result);
+          setEditData((prev) => ({ ...prev, image: result }));
+        };
+        reader.readAsDataURL(file);
       }
+    },
+    []
+  );
 
-      return {
-        ...prev,
-        family: newFamily,
-      };
-    });
-  };
-
-  const getFamilyRelationLabel = (
-    relationType: string,
-    characterName: string
-  ) => {
-    const relations = {
-      father: `Pai de ${characterName}`,
-      mother: `Mãe de ${characterName}`,
-      child: `Filho(a) de ${characterName}`,
-      sibling: `Irmão(ã) de ${characterName}`,
-      spouse: `Cônjuge de ${characterName}`,
-      halfSibling: `Meio-irmão(ã) de ${characterName}`,
-      uncleAunt: `Tio(a) de ${characterName}`,
-      grandparent: `Avô(ó) de ${characterName}`,
-      cousin: `Primo(a) de ${characterName}`,
-    };
-    return relations[relationType] || "";
-  };
-
-  const handleImageFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setEditData((prev) => ({ ...prev, image: result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAgeChange = (increment: boolean) => {
+  const handleAgeChange = useCallback((increment: boolean) => {
     setEditData((prev) => ({
       ...prev,
       age: Math.max(0, prev.age + (increment ? 1 : -1)),
     }));
-  };
+  }, []);
 
-  const handleAddRelationship = () => {
+  const handleAddRelationship = useCallback(() => {
     if (selectedRelationshipCharacter && selectedRelationshipType) {
       const newRelationship = {
         id: `rel-${Date.now()}`,
@@ -469,83 +312,118 @@ export function CharacterDetail() {
       setRelationshipIntensity([50]);
       toast.success("Relacionamento adicionado com sucesso!");
     }
-  };
+  }, [
+    selectedRelationshipCharacter,
+    selectedRelationshipType,
+    relationshipIntensity,
+  ]);
 
-  const handleRemoveRelationship = (relationshipId: string) => {
+  const handleRemoveRelationship = useCallback((relationshipId: string) => {
     setEditData((prev) => ({
       ...prev,
       relationships:
         prev.relationships?.filter((rel) => rel.id !== relationshipId) || [],
     }));
     toast.success("Relacionamento removido com sucesso!");
-  };
+  }, []);
 
-  const handleUpdateRelationshipIntensity = (
-    relationshipId: string,
-    intensity: number
-  ) => {
-    setEditData((prev) => ({
-      ...prev,
-      relationships:
-        prev.relationships?.map((rel) =>
-          rel.id === relationshipId ? { ...rel, intensity } : rel
-        ) || [],
-    }));
-  };
-
-  const getRelationshipTypeData = (type: string) =>
-    relationshipTypes.find((rt) => rt.value === type) || relationshipTypes[0];
-
-  // Mock linked notes - in real app would come from API/state
-  const linkedNotes = [
-    {
-      id: "note-1",
-      name: "Análise Psicológica do Aelric",
-      content:
-        "Análise detalhada da personalidade e motivações do personagem Aelric. Suas características heróicas contrastam com sua impulsividade...",
-      createdAt: new Date("2024-01-15"),
-      updatedAt: new Date("2024-01-20"),
-      linkCreatedAt: new Date("2024-01-16"),
+  const handleUpdateRelationshipIntensity = useCallback(
+    (relationshipId: string, intensity: number) => {
+      setEditData((prev) => ({
+        ...prev,
+        relationships:
+          prev.relationships?.map((rel) =>
+            rel.id === relationshipId ? { ...rel, intensity } : rel
+          ) || [],
+      }));
     },
-    {
-      id: "note-2",
-      name: "Arco Narrativo - Primeira Jornada",
-      content:
-        "Desenvolvimento do personagem durante sua primeira aventura. Como ele evolui de pastor simples para herói...",
-      createdAt: new Date("2024-01-10"),
-      updatedAt: new Date("2024-01-18"),
-      linkCreatedAt: new Date("2024-01-12"),
-    },
-  ];
+    []
+  );
 
-  // Handler functions
-  const handleBack = () => window.history.back();
-  const handleNavigationSidebarToggle = () => setIsNavigationSidebarOpen(true);
-  const handleNavigationSidebarClose = () => setIsNavigationSidebarOpen(false);
-  const handleCharacterSelect = (characterId: string) => {
-    window.location.replace(`/book/1/character/${characterId}`);
-  };
-  const handleLinkedNotesModalOpen = () => setIsLinkedNotesModalOpen(true);
-  const handleLinkedNotesModalClose = () => setIsLinkedNotesModalOpen(false);
-  const handleEdit = () => setIsEditing(true);
-  const handleDeleteModalOpen = () => setShowDeleteModal(true);
-  const handleDeleteModalClose = () => setShowDeleteModal(false);
-  const handleEditDataChange = (field: string, value: any) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
-  const handleNewQualityChange = (value: string) => setNewQuality(value);
-  const handleRelationshipCharacterChange = (characterId: string) =>
-    setSelectedRelationshipCharacter(characterId);
-  const handleRelationshipTypeChange = (type: string) =>
-    setSelectedRelationshipType(type);
-  const handleRelationshipIntensityChange = (intensity: number[]) =>
-    setRelationshipIntensity(intensity);
-  const handleNavigateToFamilyTree = () => {
+  const navigateBack = useCallback(() => {
+    window.history.back();
+  }, []);
+
+  const navigateToFamilyTree = useCallback(() => {
+    if (!dashboardId || !characterId) return;
     navigate({
       to: "/dashboard/$dashboardId/tabs/character/$characterId/family-tree",
       params: { dashboardId, characterId },
     });
-  };
+  }, [navigate, dashboardId, characterId]);
+
+  const handleNavigateToCharacter = useCallback((characterId: string) => {
+    window.location.replace(`/book/1/character/${characterId}`);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    navigateBack();
+  }, [navigateBack]);
+
+  const handleNavigationSidebarToggle = useCallback(() => {
+    setIsNavigationSidebarOpen(true);
+  }, []);
+
+  const handleNavigationSidebarClose = useCallback(() => {
+    setIsNavigationSidebarOpen(false);
+  }, []);
+
+  const handleCharacterSelect = useCallback(
+    (characterId: string) => {
+      handleNavigateToCharacter(characterId);
+    },
+    [handleNavigateToCharacter]
+  );
+
+  const handleLinkedNotesModalOpen = useCallback(() => {
+    setIsLinkedNotesModalOpen(true);
+  }, []);
+
+  const handleLinkedNotesModalClose = useCallback(() => {
+    setIsLinkedNotesModalOpen(false);
+  }, []);
+
+  const handleEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleDeleteModalOpen = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleDeleteModalClose = useCallback(() => {
+    setShowDeleteModal(false);
+  }, []);
+
+  const handleEditDataChange = useCallback((field: string, value: unknown) => {
+    setEditData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleNewQualityChange = useCallback((value: string) => {
+    setNewQuality(value);
+  }, []);
+
+  const handleRelationshipCharacterChange = useCallback(
+    (characterId: string) => {
+      setSelectedRelationshipCharacter(characterId);
+    },
+    []
+  );
+
+  const handleRelationshipTypeChange = useCallback((type: string) => {
+    setSelectedRelationshipType(type);
+  }, []);
+
+  const handleRelationshipIntensityChange = useCallback(
+    (intensity: number[]) => {
+      setRelationshipIntensity(intensity);
+    },
+    []
+  );
+
+  const handleNavigateToFamilyTree = useCallback(() => {
+    navigateToFamilyTree();
+  }, [navigateToFamilyTree]);
 
   return (
     <CharacterDetailView
@@ -563,15 +441,15 @@ export function CharacterDetail() {
       selectedRelationshipType={selectedRelationshipType}
       relationshipIntensity={relationshipIntensity}
       fileInputRef={fileInputRef}
-      linkedNotes={linkedNotes}
+      linkedNotes={MOCK_LINKED_NOTES}
       mockCharacters={mockCharacters}
       mockLocations={mockLocations}
       mockOrganizations={mockOrganizations}
-      roles={roles}
-      alignments={alignments}
-      genders={genders}
-      familyRelations={familyRelations}
-      relationshipTypes={relationshipTypes}
+      roles={ROLES_CONSTANT}
+      alignments={ALIGNMENTS_CONSTANT}
+      genders={GENDERS_CONSTANT}
+      familyRelations={FAMILY_RELATIONS_CONSTANT}
+      relationshipTypes={RELATIONSHIP_TYPES_CONSTANT}
       currentRole={currentRole}
       currentAlignment={currentAlignment}
       currentGender={currentGender}

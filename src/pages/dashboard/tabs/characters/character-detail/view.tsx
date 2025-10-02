@@ -8,23 +8,16 @@ import {
   Users,
   Calendar,
   Heart,
-  Crown,
-  Sword,
   Shield,
   Upload,
   Plus,
   Minus,
   TreePine,
-  Target,
   Menu,
-  User,
-  UserCheck,
-  Users2,
-  Ban,
-  HelpCircle,
   FileText,
   BookOpen,
   UserPlus,
+  type LucideIcon,
 } from "lucide-react";
 
 import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
@@ -50,9 +43,64 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 
+import { type IAlignment } from "./constants/alignments-constant";
+import { type IFamilyRelations } from "./constants/family-relations-constant";
+import { type IGender } from "./constants/genders-constant";
+import { type IRelationshipType } from "./constants/relationship-types-constant";
+import { type IRole } from "./constants/roles-constant";
+import { type ILinkedNote } from "./mocks/mock-linked-notes";
+
+interface ICharacter {
+  id: string;
+  name: string;
+  age: number;
+  image: string;
+  role: string;
+  alignment: string;
+  gender: string;
+  description: string;
+  appearance?: string;
+  personality?: string;
+  organization: string;
+  birthPlace?: string;
+  affiliatedPlace?: string;
+  qualities: string[];
+  chapterMentions?: number;
+  firstAppearance?: string;
+  lastAppearance?: string;
+  family: {
+    father: string | null;
+    mother: string | null;
+    children: string[];
+    siblings: string[];
+    spouse: string | null;
+    halfSiblings: string[];
+    unclesAunts: string[];
+    grandparents: string[];
+    cousins: string[];
+  };
+  relationships?: Array<{
+    id: string;
+    characterId: string;
+    type: string;
+    intensity: number;
+  }>;
+}
+
+interface ILocation {
+  id: string;
+  name: string;
+  type: string;
+}
+
+interface IOrganization {
+  id: string;
+  name: string;
+}
+
 interface CharacterDetailViewProps {
-  character: any;
-  editData: any;
+  character: ICharacter;
+  editData: ICharacter;
   isEditing: boolean;
   versions: CharacterVersion[];
   currentVersion: CharacterVersion;
@@ -65,19 +113,19 @@ interface CharacterDetailViewProps {
   selectedRelationshipType: string;
   relationshipIntensity: number[];
   fileInputRef: React.RefObject<HTMLInputElement>;
-  linkedNotes: any[];
-  mockCharacters: any[];
-  mockLocations: any[];
-  mockOrganizations: any[];
-  roles: any[];
-  alignments: any[];
-  genders: any[];
-  familyRelations: any;
-  relationshipTypes: any[];
-  currentRole: any;
-  currentAlignment: any;
-  currentGender: any;
-  RoleIcon: any;
+  linkedNotes: ILinkedNote[];
+  mockCharacters: ICharacter[];
+  mockLocations: ILocation[];
+  mockOrganizations: IOrganization[];
+  roles: IRole[];
+  alignments: IAlignment[];
+  genders: IGender[];
+  familyRelations: IFamilyRelations;
+  relationshipTypes: IRelationshipType[];
+  currentRole: IRole | undefined;
+  currentAlignment: IAlignment | undefined;
+  currentGender: IGender | undefined;
+  RoleIcon: LucideIcon;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -100,7 +148,7 @@ interface CharacterDetailViewProps {
   ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onAgeChange: (increment: boolean) => void;
-  onEditDataChange: (field: string, value: any) => void;
+  onEditDataChange: (field: string, value: unknown) => void;
   onQualityAdd: () => void;
   onQualityRemove: (quality: string) => void;
   onNewQualityChange: (value: string) => void;
@@ -118,7 +166,7 @@ interface CharacterDetailViewProps {
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
   onNavigateToFamilyTree: () => void;
-  getRelationshipTypeData: (type: string) => any;
+  getRelationshipTypeData: (type: string) => IRelationshipType;
   getFamilyRelationLabel: (
     relationType: string,
     characterName: string
@@ -184,7 +232,6 @@ export function CharacterDetailView({
   onRelationshipIntensityChange,
   onNavigateToFamilyTree,
   getRelationshipTypeData,
-  getFamilyRelationLabel,
 }: CharacterDetailViewProps) {
   return (
     <div className="flex min-h-screen">
@@ -285,6 +332,14 @@ export function CharacterDetailView({
                           <div
                             className="flex items-center justify-center w-24 h-24 aspect-square border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
                             onClick={() => fileInputRef.current?.click()}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                fileInputRef.current?.click();
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
                           >
                             {imagePreview ? (
                               <div className="relative w-full h-full">
@@ -421,6 +476,17 @@ export function CharacterDetailView({
                                       onClick={() =>
                                         onEditDataChange("role", role.value)
                                       }
+                                      onKeyDown={(e) => {
+                                        if (
+                                          e.key === "Enter" ||
+                                          e.key === " "
+                                        ) {
+                                          e.preventDefault();
+                                          onEditDataChange("role", role.value);
+                                        }
+                                      }}
+                                      role="button"
+                                      tabIndex={0}
                                     >
                                       <div className="text-center space-y-1">
                                         <RoleIcon className="w-5 h-5 mx-auto" />
@@ -454,6 +520,20 @@ export function CharacterDetailView({
                                           alignment.value
                                         )
                                       }
+                                      onKeyDown={(e) => {
+                                        if (
+                                          e.key === "Enter" ||
+                                          e.key === " "
+                                        ) {
+                                          e.preventDefault();
+                                          onEditDataChange(
+                                            "alignment",
+                                            alignment.value
+                                          );
+                                        }
+                                      }}
+                                      role="button"
+                                      tabIndex={0}
                                     >
                                       <div className="flex items-center gap-2">
                                         <AlignmentIcon className="w-4 h-4" />
@@ -1156,6 +1236,14 @@ export function CharacterDetailView({
                                   onClick={() =>
                                     onRelationshipTypeChange(type.value)
                                   }
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      onRelationshipTypeChange(type.value);
+                                    }
+                                  }}
+                                  role="button"
+                                  tabIndex={0}
                                 >
                                   <div className="text-center space-y-1">
                                     <div className="text-2xl">{type.emoji}</div>
@@ -1370,8 +1458,8 @@ export function CharacterDetailView({
 
                       {editData.qualities.length === 0 && (
                         <p className="text-sm text-muted-foreground">
-                          Nenhuma qualidade adicionada. Clique em "Adicionar"
-                          para incluir qualidades.
+                          {`Nenhuma qualidade adicionada. Clique em "Adicionar"
+                          para incluir qualidades.`}
                         </p>
                       )}
                     </div>
@@ -1387,7 +1475,6 @@ export function CharacterDetailView({
                 </CardContent>
               </Card>
 
-              {/* Organization */}
               <Card className="card-magical">
                 <CardHeader>
                   <CardTitle>Organização</CardTitle>

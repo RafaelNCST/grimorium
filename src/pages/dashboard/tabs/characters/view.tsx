@@ -1,13 +1,4 @@
-import {
-  Plus,
-  Search,
-  Users,
-  Crown,
-  Sword,
-  Heart,
-  Shield,
-  MapPin,
-} from "lucide-react";
+import { Plus, Search, Users, MapPin } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
@@ -24,20 +15,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface ICharacter {
-  id: string;
-  name: string;
-  age?: number;
-  appearance?: string;
-  role: string;
-  personality?: string;
-  description: string;
-  organization: string;
-  birthPlace?: string;
-  affiliatedPlace?: string;
-  alignment?: string;
-  image?: string;
-  qualities: string[];
+import { ICharacter } from "./mocks/mock-characters";
+import { getRoleColor } from "./utils/get-role-color";
+import { getRoleIcon } from "./utils/get-role-icon";
+import { getRoleLabel } from "./utils/get-role-label";
+
+interface IRoleStats {
+  total: number;
+  protagonista: number;
+  antagonista: number;
+  secundario: number;
+  vilao: number;
 }
 
 interface CharactersViewProps {
@@ -46,65 +34,16 @@ interface CharactersViewProps {
   filteredCharacters: ICharacter[];
   organizations: string[];
   locations: string[];
-  roleStats: {
-    total: number;
-    protagonista: number;
-    antagonista: number;
-    secundario: number;
-    vilao: number;
-  };
+  roleStats: IRoleStats;
   searchTerm: string;
   selectedOrg: string;
   selectedLocation: string;
   onSearchTermChange: (term: string) => void;
   onSelectedOrgChange: (org: string) => void;
   onSelectedLocationChange: (location: string) => void;
-  onCharacterCreated: (character: any) => void;
+  onCharacterCreated: (character: ICharacter) => void;
   onCharacterClick: (characterId: string) => void;
 }
-
-const getRoleIcon = (role: string) => {
-  switch (role.toLowerCase()) {
-    case "protagonista":
-      return <Crown className="w-4 h-4" />;
-    case "antagonista":
-    case "vilao":
-      return <Sword className="w-4 h-4" />;
-    case "secundario":
-      return <Users className="w-4 h-4" />;
-    case "figurante":
-      return <Heart className="w-4 h-4" />;
-    default:
-      return <Users className="w-4 h-4" />;
-  }
-};
-
-const getRoleColor = (role: string) => {
-  switch (role.toLowerCase()) {
-    case "protagonista":
-      return "bg-accent text-accent-foreground";
-    case "antagonista":
-    case "vilao":
-      return "bg-destructive text-destructive-foreground";
-    case "secundario":
-      return "bg-primary text-primary-foreground";
-    case "figurante":
-      return "bg-muted text-muted-foreground";
-    default:
-      return "bg-secondary text-secondary-foreground";
-  }
-};
-
-const getRoleLabel = (role: string) => {
-  const labels: { [key: string]: string } = {
-    protagonista: "Protagonista",
-    antagonista: "Antagonista",
-    vilao: "Vilão",
-    secundario: "Secundário",
-    figurante: "Figurante",
-  };
-  return labels[role.toLowerCase()] || role;
-};
 
 export function CharactersView({
   characters,
@@ -256,8 +195,8 @@ export function CharactersView({
               </div>
 
               <div className="flex flex-wrap gap-1">
-                {character.qualities.slice(0, 3).map((quality, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
+                {character.qualities.slice(0, 3).map((quality) => (
+                  <Badge key={quality} variant="outline" className="text-xs">
                     {quality}
                   </Badge>
                 ))}
@@ -285,14 +224,17 @@ export function CharactersView({
               ? "Comece criando seu primeiro personagem para dar vida à sua história"
               : "Tente ajustar seus filtros ou criar um novo personagem"
           }
-          actionLabel="Criar Personagem"
-          onAction={() => {
-            // Click the trigger button to open the modal
-            const trigger = document.querySelector(
-              '[data-testid="create-character-trigger"]'
-            ) as HTMLButtonElement;
-            trigger?.click();
-          }}
+          actionLabel={characters.length === 0 ? "Criar Personagem" : undefined}
+          onAction={
+            characters.length === 0
+              ? () => {
+                  const trigger = document.querySelector(
+                    '[data-testid="create-character-trigger"]'
+                  ) as HTMLButtonElement;
+                  trigger?.click();
+                }
+              : undefined
+          }
         />
       )}
     </div>
