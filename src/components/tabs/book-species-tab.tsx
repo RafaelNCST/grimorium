@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Plus, ChevronRight, Search, Dna } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateRaceModal } from "@/components/modals/create-race-modal";

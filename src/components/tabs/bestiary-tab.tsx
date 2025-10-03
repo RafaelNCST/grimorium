@@ -11,7 +11,7 @@ import {
   TreePine,
   Skull,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateBeastModal } from "@/components/modals/create-beast-modal";

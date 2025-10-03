@@ -10,7 +10,7 @@ import {
   Gem,
   Star,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateItemModal } from "@/components/modals/create-item-modal";

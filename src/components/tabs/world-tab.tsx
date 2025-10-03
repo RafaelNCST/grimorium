@@ -13,7 +13,7 @@ import {
   StickyNote,
   Edit2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateContinentModal } from "@/components/modals/create-continent-modal";

@@ -1,231 +1,92 @@
 import { useState, useCallback, useMemo } from "react";
-
 import { useNavigate } from "@tanstack/react-router";
 
+import { MOCK_WORLD_ENTITIES } from "./mocks/mock-world-entities";
+import { IWorldEntity, IWorld, IContinent } from "./types/world-types";
+import { filterEntities } from "./utils/filter-entities";
+import { getParentName } from "./utils/get-parent-name";
+import { getTypeColor } from "./utils/get-type-color";
 import { WorldView } from "./view";
-
-interface WorldEntity {
-  id: string;
-  name: string;
-  type: "World" | "Continent" | "Location";
-  description: string;
-  parentId?: string;
-  bookId: string;
-  // Specific to Location
-  classification?: string;
-  climate?: string;
-  terrain?: string;
-  location?: string;
-  organizations?: string[];
-  livingEntities?: string[];
-  // Specific to World/Continent
-  age?: string;
-  dominantOrganization?: string;
-  image?: string;
-}
 
 interface PropsWorldTab {
   bookId: string;
 }
 
-// Mock data structure - in real app this would be from state management
-const getWorldEntitiesForBook = (bookId: string): WorldEntity[] => [
-  {
-    id: "world1",
-    bookId,
-    name: "Aethermoor",
-    type: "World",
-    description:
-      "Mundo principal onde se desenrola a história. Um reino de magia e mistério.",
-    age: "5000 anos",
-    dominantOrganization: "Ordem dos Guardiões",
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "continent1",
-    bookId,
-    name: "Continente Central",
-    type: "Continent",
-    description:
-      "Continente principal de Aethermoor, rico em recursos mágicos.",
-    parentId: "world1",
-    age: "3000 anos",
-    dominantOrganization: "Reino de Aethermoor",
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "continent2",
-    bookId,
-    name: "Terras Sombrias",
-    type: "Continent",
-    description:
-      "Continente corrompido pelas trevas, lar do Culto das Sombras.",
-    parentId: "world1",
-    age: "2000 anos",
-    dominantOrganization: "Culto das Sombras",
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "continent3",
-    bookId,
-    name: "Ilhas Flutuantes",
-    type: "Continent",
-    description:
-      "Continente mágico que flutua nas nuvens, sem ligação com mundos terrestres.",
-    age: "1500 anos",
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "loc1",
-    bookId,
-    name: "Floresta das Lamentações",
-    type: "Location",
-    description: "Floresta sombria habitada por criaturas mágicas perigosas.",
-    parentId: "continent1",
-    classification: "Floresta Mágica",
-    climate: "Frio e Úmido",
-    location: "Norte do Continente Central",
-    terrain: "Florestal",
-    organizations: ["Culto das Sombras", "Guarda Florestal"],
-    livingEntities: [
-      "Lobos Sombrios",
-      "Espíritos da Floresta",
-      "Dríades Corrompidas",
-      "Unicórnios das Trevas",
-      "Ents Ancestrais",
-    ],
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "loc2",
-    bookId,
-    name: "Aldeia de Pedraverde",
-    type: "Location",
-    description: "Pequena aldeia de mineradores anões nas montanhas.",
-    parentId: "continent1",
-    classification: "Assentamento",
-    climate: "Montanhoso",
-    location: "Sul do Continente Central",
-    terrain: "Rochoso",
-    organizations: ["Guilda dos Artífices"],
-    livingEntities: ["Anões", "Águias Gigantes", "Cabras Montanhesas"],
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "loc3",
-    bookId,
-    name: "Torre de Cristal",
-    type: "Location",
-    description:
-      "Antiga torre dos magos, agora em ruínas. Contém segredos sobre magia antiga.",
-    classification: "Ruína Mágica",
-    climate: "Temperado",
-    terrain: "Planície",
-    organizations: [],
-    livingEntities: ["Constructos de Cristal", "Wisp de Energia"],
-    image: "/api/placeholder/300/200",
-  },
-  {
-    id: "loc4",
-    bookId,
-    name: "Cidade Flutuante de Nimbus",
-    type: "Location",
-    description:
-      "Capital das Ilhas Flutuantes, cidade mágica suspensa nas nuvens.",
-    parentId: "continent3",
-    classification: "Cidade",
-    climate: "Aéreo e Fresco",
-    location: "Centro das Ilhas Flutuantes",
-    terrain: "Aéreo",
-    organizations: ["Conselho dos Ventos", "Guarda Celestial"],
-    livingEntities: [
-      "Humanos Alados",
-      "Pégasos",
-      "Elementais do Ar",
-      "Fênix Menores",
-    ],
-    image: "/api/placeholder/300/200",
-  },
-];
-
 export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
+  const [worldEntities, setWorldEntities] = useState<IWorldEntity[]>(
+    MOCK_WORLD_ENTITIES
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
   const [showCreateContinentModal, setShowCreateContinentModal] =
     useState(false);
   const [showCreateLocationModal, setShowCreateLocationModal] = useState(false);
-  const [mockWorldEntities, setMockWorldEntities] = useState(() =>
-    getWorldEntitiesForBook(bookId)
-  );
 
   const worlds = useMemo(
-    () => mockWorldEntities.filter((e) => e.type === "World"),
-    [mockWorldEntities]
+    () => worldEntities.filter((e) => e.type === "World"),
+    [worldEntities]
   );
+
   const continents = useMemo(
-    () => mockWorldEntities.filter((e) => e.type === "Continent"),
-    [mockWorldEntities]
+    () => worldEntities.filter((e) => e.type === "Continent"),
+    [worldEntities]
   );
+
   const locations = useMemo(
-    () => mockWorldEntities.filter((e) => e.type === "Location"),
-    [mockWorldEntities]
-  );
-
-  const getTypeColor = useCallback((type: string) => {
-    switch (type) {
-      case "World":
-        return "bg-primary text-primary-foreground";
-      case "Continent":
-        return "bg-accent text-accent-foreground";
-      default:
-        return "bg-secondary text-secondary-foreground";
-    }
-  }, []);
-
-  const getParentName = useCallback(
-    (parentId?: string) => {
-      if (!parentId) return "";
-      const parent = mockWorldEntities.find((e) => e.id === parentId);
-      return parent?.name || "";
-    },
-    [mockWorldEntities]
-  );
-
-  const getFilteredEntities = useCallback(
-    (typeFilter?: string) => {
-      let entities = mockWorldEntities;
-
-      if (typeFilter && typeFilter !== "all") {
-        entities = entities.filter((e) => e.type === typeFilter);
-      }
-
-      return entities.filter((entity) => {
-        const matchesSearch =
-          entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entity.description.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesSearch;
-      });
-    },
-    [mockWorldEntities, searchTerm]
+    () => worldEntities.filter((e) => e.type === "Location"),
+    [worldEntities]
   );
 
   const filteredWorlds = useMemo(
-    () => getFilteredEntities("World"),
-    [getFilteredEntities]
-  );
-  const filteredContinents = useMemo(
-    () => getFilteredEntities("Continent"),
-    [getFilteredEntities]
-  );
-  const filteredLocations = useMemo(
-    () => getFilteredEntities("Location"),
-    [getFilteredEntities]
+    () => filterEntities(worldEntities, searchTerm, "World"),
+    [worldEntities, searchTerm]
   );
 
-  const totalWorlds = useMemo(() => worlds.length, [worlds]);
-  const totalContinents = useMemo(() => continents.length, [continents]);
-  const totalLocations = useMemo(() => locations.length, [locations]);
+  const filteredContinents = useMemo(
+    () => filterEntities(worldEntities, searchTerm, "Continent"),
+    [worldEntities, searchTerm]
+  );
+
+  const filteredLocations = useMemo(
+    () => filterEntities(worldEntities, searchTerm, "Location"),
+    [worldEntities, searchTerm]
+  );
+
+  const entityStats = useMemo(
+    () => ({
+      totalWorlds: worlds.length,
+      totalContinents: continents.length,
+      totalLocations: locations.length,
+    }),
+    [worlds.length, continents.length, locations.length]
+  );
+
+  const availableWorlds = useMemo<IWorld[]>(
+    () => worlds.map((w) => ({ id: w.id, name: w.name })),
+    [worlds]
+  );
+
+  const availableContinents = useMemo<IContinent[]>(
+    () => continents.map((c) => ({ id: c.id, name: c.name })),
+    [continents]
+  );
+
+  const handleSetSearchTerm = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleSetShowCreateWorldModal = useCallback((show: boolean) => {
+    setShowCreateWorldModal(show);
+  }, []);
+
+  const handleSetShowCreateContinentModal = useCallback((show: boolean) => {
+    setShowCreateContinentModal(show);
+  }, []);
+
+  const handleSetShowCreateLocationModal = useCallback((show: boolean) => {
+    setShowCreateLocationModal(show);
+  }, []);
 
   const handleCreateWorld = useCallback(() => {
     setShowCreateWorldModal(true);
@@ -239,20 +100,20 @@ export function WorldTab({ bookId }: PropsWorldTab) {
     setShowCreateLocationModal(true);
   }, []);
 
-  const handleWorldCreated = useCallback((newWorld: any) => {
-    setMockWorldEntities((prev) => [...prev, newWorld]);
+  const handleWorldCreated = useCallback((newWorld: IWorldEntity) => {
+    setWorldEntities((prev) => [...prev, newWorld]);
   }, []);
 
-  const handleContinentCreated = useCallback((newContinent: any) => {
-    setMockWorldEntities((prev) => [...prev, newContinent]);
+  const handleContinentCreated = useCallback((newContinent: IWorldEntity) => {
+    setWorldEntities((prev) => [...prev, newContinent]);
   }, []);
 
-  const handleLocationCreated = useCallback((newLocation: any) => {
-    setMockWorldEntities((prev) => [...prev, newLocation]);
+  const handleLocationCreated = useCallback((newLocation: IWorldEntity) => {
+    setWorldEntities((prev) => [...prev, newLocation]);
   }, []);
 
   const handleEntityClick = useCallback(
-    (entity: WorldEntity) => {
+    (entity: IWorldEntity) => {
       navigate({
         to: "/dashboard/$dashboardId/tabs/world/$worldId",
         params: { dashboardId: bookId, worldId: entity.id },
@@ -261,27 +122,35 @@ export function WorldTab({ bookId }: PropsWorldTab) {
     [navigate, bookId]
   );
 
+  const handleGetTypeColor = useCallback((type: string) => {
+    return getTypeColor(type as "World" | "Continent" | "Location");
+  }, []);
+
+  const handleGetParentName = useCallback(
+    (parentId?: string) => {
+      return getParentName(parentId, worldEntities);
+    },
+    [worldEntities]
+  );
+
   return (
     <WorldView
       bookId={bookId}
       searchTerm={searchTerm}
-      mockWorldEntities={mockWorldEntities}
+      worldEntities={worldEntities}
       showCreateWorldModal={showCreateWorldModal}
       showCreateContinentModal={showCreateContinentModal}
       showCreateLocationModal={showCreateLocationModal}
-      worlds={worlds}
-      continents={continents}
-      locations={locations}
       filteredWorlds={filteredWorlds}
       filteredContinents={filteredContinents}
       filteredLocations={filteredLocations}
-      totalWorlds={totalWorlds}
-      totalContinents={totalContinents}
-      totalLocations={totalLocations}
-      onSetSearchTerm={setSearchTerm}
-      onSetShowCreateWorldModal={setShowCreateWorldModal}
-      onSetShowCreateContinentModal={setShowCreateContinentModal}
-      onSetShowCreateLocationModal={setShowCreateLocationModal}
+      entityStats={entityStats}
+      availableWorlds={availableWorlds}
+      availableContinents={availableContinents}
+      onSetSearchTerm={handleSetSearchTerm}
+      onSetShowCreateWorldModal={handleSetShowCreateWorldModal}
+      onSetShowCreateContinentModal={handleSetShowCreateContinentModal}
+      onSetShowCreateLocationModal={handleSetShowCreateLocationModal}
       onCreateWorld={handleCreateWorld}
       onCreateContinent={handleCreateContinent}
       onCreateLocation={handleCreateLocation}
@@ -289,8 +158,8 @@ export function WorldTab({ bookId }: PropsWorldTab) {
       onContinentCreated={handleContinentCreated}
       onLocationCreated={handleLocationCreated}
       onEntityClick={handleEntityClick}
-      getTypeColor={getTypeColor}
-      getParentName={getParentName}
+      onGetTypeColor={handleGetTypeColor}
+      onGetParentName={handleGetParentName}
     />
   );
 }

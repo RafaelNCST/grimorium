@@ -14,7 +14,7 @@ import {
   ArrowDown,
   Filter,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
 import { Badge } from "@/components/ui/badge";

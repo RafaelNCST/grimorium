@@ -10,7 +10,7 @@ import {
   Shield,
   MapPin,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
