@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
-import { IRaceTypeStats } from "../types/species-types";
 import { TYPE_BADGE_COLORS_CONSTANT } from "../constants/type-colors-constant";
+import { IRaceTypeStats } from "../types/species-types";
 
 interface PropsStatsBadges {
   totalSpecies: number;
@@ -17,10 +17,16 @@ export function StatsBadges({ totalSpecies, raceTypeStats }: PropsStatsBadges) {
       >
         {totalSpecies} Total
       </Badge>
-      <Badge variant="secondary" className={TYPE_BADGE_COLORS_CONSTANT.Aquática}>
+      <Badge
+        variant="secondary"
+        className={TYPE_BADGE_COLORS_CONSTANT.Aquática}
+      >
         {raceTypeStats.Aquática} Aquática
       </Badge>
-      <Badge variant="secondary" className={TYPE_BADGE_COLORS_CONSTANT.Terrestre}>
+      <Badge
+        variant="secondary"
+        className={TYPE_BADGE_COLORS_CONSTANT.Terrestre}
+      >
         {raceTypeStats.Terrestre} Terrestre
       </Badge>
       <Badge variant="secondary" className={TYPE_BADGE_COLORS_CONSTANT.Voadora}>

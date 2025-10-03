@@ -5,7 +5,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { useToast } from "@/hooks/use-toast";
 
 import { MOCK_SPECIES } from "./mocks/mock-species";
-import { ISpecies, IRace, IRaceTypeStats, RaceType } from "./types/species-types";
+import {
+  ISpecies,
+  IRace,
+  IRaceTypeStats,
+  RaceType,
+} from "./types/species-types";
 import { SpeciesView } from "./view";
 
 interface PropsSpeciesTab {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Target,
@@ -14,7 +15,6 @@ import {
   ArrowDown,
   Filter,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
 import { Badge } from "@/components/ui/badge";

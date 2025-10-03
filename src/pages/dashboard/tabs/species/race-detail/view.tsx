@@ -4,9 +4,10 @@ import { ConfirmDeleteModal } from "@/components/modals/confirm-delete-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
+import { IRaceWithSpeciesName, RaceType } from "../types/species-types";
+
 import { RaceHeader } from "./components/race-header";
 import { RaceSection } from "./components/race-section";
-import { IRaceWithSpeciesName, RaceType } from "../types/species-types";
 
 interface IEditForm {
   name: string;

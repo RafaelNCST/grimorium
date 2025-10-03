@@ -44,7 +44,10 @@
       "Bash(pnpm exec prettier:*)",
       "Bash(echo:*)",
       "Bash(netstat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build:*)",
+      "Bash(cargo:*)"
     ],
     "deny": [],
     "ask": []

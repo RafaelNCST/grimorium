@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { IRaceWithSpeciesName, RaceType } from "../../types/species-types";
 import { TYPE_COLORS_CONSTANT } from "../../constants/type-colors-constant";
+import { IRaceWithSpeciesName, RaceType } from "../../types/species-types";
 
 interface PropsRaceHeader {
   race: IRaceWithSpeciesName;

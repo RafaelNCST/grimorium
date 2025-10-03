@@ -52,7 +52,9 @@ export function WorldDetail() {
   const linkedNotes = useMemo<ILinkedNote[]>(() => MOCK_LINKED_NOTES, []);
 
   useEffect(() => {
-    const foundEntity = MOCK_WORLD_DETAIL_ENTITIES.find((e) => e.id === worldId);
+    const foundEntity = MOCK_WORLD_DETAIL_ENTITIES.find(
+      (e) => e.id === worldId
+    );
     if (foundEntity) {
       setEntity(foundEntity);
       setEditData(foundEntity);

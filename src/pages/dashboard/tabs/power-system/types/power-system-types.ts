@@ -1,4 +1,8 @@
-export type ElementType = "section-card" | "details-card" | "visual-card" | "text-box";
+export type ElementType =
+  | "section-card"
+  | "details-card"
+  | "visual-card"
+  | "text-box";
 export type ConnectionType = "arrow" | "line";
 
 export interface IPowerElement {

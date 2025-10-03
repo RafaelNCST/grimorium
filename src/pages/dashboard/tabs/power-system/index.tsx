@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 
-import { PowerSystemView } from "./view";
 import { DEFAULT_COLORS_CONSTANT } from "./constants/colors-constant";
 import { ELEMENT_TYPES_CONSTANT } from "./constants/element-types-constant";
 import { TUTORIAL_STEPS_CONSTANT } from "./constants/tutorial-steps-constant";
@@ -11,6 +10,7 @@ import {
   ITemplate,
   ElementType,
 } from "./types/power-system-types";
+import { PowerSystemView } from "./view";
 
 export function PowerSystemTab() {
   const canvasRef = useRef<HTMLDivElement>(null);

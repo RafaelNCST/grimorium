@@ -1,4 +1,5 @@
 import { RefObject } from "react";
+
 import {
   Eye,
   Edit,
@@ -13,10 +14,10 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { HelpDialog } from "./components/help-dialog";
+import { PowerElement } from "./components/power-element";
 import { PropertiesPanel } from "./components/properties-panel";
 import { TemplateDialog } from "./components/template-dialog";
 import { TutorialDialog } from "./components/tutorial-dialog";
-import { PowerElement } from "./components/power-element";
 import {
   IPowerElement,
   IPowerMap,

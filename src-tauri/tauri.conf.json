@@ -22,7 +22,7 @@
         "center": true,
         "devtools": true,
         "maximized": false,
-        "decorations": true,
+        "decorations": false,
         "transparent": false,
         "alwaysOnTop": false,
         "skipTaskbar": false

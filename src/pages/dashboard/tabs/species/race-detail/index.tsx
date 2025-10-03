@@ -4,8 +4,9 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { MOCK_RACE } from "./mocks/mock-race";
 import { IRaceWithSpeciesName, RaceType } from "../types/species-types";
+
+import { MOCK_RACE } from "./mocks/mock-race";
 import { RaceDetailView } from "./view";
 
 export function RaceDetail() {

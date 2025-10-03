@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import { Plus, ChevronRight } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import { Plus, ChevronRight } from "lucide-react";
 
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
 import { CreateSpeciesModal } from "@/components/modals/create-species-modal";

@@ -30,8 +30,7 @@ export const MOCK_SPECIES: ISpecies[] = [
           "Descendentes dos primeiros elfos que migraram para os oceanos...",
         type: "Aquática",
         physicalCharacteristics: "Pele azulada, guelras funcionais...",
-        culture:
-          "Sociedade baseada na harmonia com as correntes oceânicas...",
+        culture: "Sociedade baseada na harmonia com as correntes oceânicas...",
         speciesId: "1",
       },
     ],

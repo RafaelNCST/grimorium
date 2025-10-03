@@ -1,8 +1,4 @@
-import {
-  DndContext,
-  closestCenter,
-  DragOverlay,
-} from "@dnd-kit/core";
+import { DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,

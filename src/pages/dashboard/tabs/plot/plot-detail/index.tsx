@@ -8,6 +8,7 @@ import type { IPlotArc } from "@/types/plot-types";
 import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
 import { getSizeColor } from "../utils/get-size-color";
 import { getStatusColor } from "../utils/get-status-color";
+
 import { PlotArcDetailView } from "./view";
 
 export function PlotArcDetail() {
@@ -31,7 +32,10 @@ export function PlotArcDetail() {
   }, [plotId]);
 
   const handleBack = useCallback(() => {
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: plotId } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: plotId },
+    });
   }, [navigate, plotId]);
 
   const handleEdit = useCallback(() => {
@@ -81,7 +85,10 @@ export function PlotArcDetail() {
 
   const handleDeleteArc = useCallback(() => {
     toast("Arco excluído com sucesso!");
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: plotId } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: plotId },
+    });
   }, [navigate, plotId]);
 
   const handleDeleteEvent = useCallback(() => {

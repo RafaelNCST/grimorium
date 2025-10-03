@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   FileText,
   FolderOpen,
@@ -11,7 +12,6 @@ import {
   AlertTriangle,
   Link,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import { RichTextEditor } from "@/components/rich-text-editor";

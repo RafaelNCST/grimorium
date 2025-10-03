@@ -125,7 +125,9 @@ export function BasicInfoCard({
                   <Input
                     id="climate"
                     value={editData.climate || ""}
-                    onChange={(e) => onEditDataChange("climate", e.target.value)}
+                    onChange={(e) =>
+                      onEditDataChange("climate", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -143,7 +145,9 @@ export function BasicInfoCard({
                   <Input
                     id="terrain"
                     value={editData.terrain || ""}
-                    onChange={(e) => onEditDataChange("terrain", e.target.value)}
+                    onChange={(e) =>
+                      onEditDataChange("terrain", e.target.value)
+                    }
                   />
                 </div>
               </>

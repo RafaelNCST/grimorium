@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -11,7 +12,6 @@ import {
   TreePine,
   Skull,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateBeastModal } from "@/components/modals/create-beast-modal";

@@ -1,8 +1,4 @@
-import {
-  Item,
-  mockRarities,
-  mockStatuses,
-} from "@/mocks/local/item-data";
+import { Item, mockRarities, mockStatuses } from "@/mocks/local/item-data";
 
 export const MOCK_ITEMS: Item[] = [
   {

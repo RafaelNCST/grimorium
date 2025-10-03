@@ -13,7 +13,8 @@ export function StatsInfo({ stats }: PropsStatsInfo) {
         {stats.totalWorlds} mundo{stats.totalWorlds !== 1 ? "s" : ""}
       </Badge>
       <Badge variant="secondary">
-        {stats.totalContinents} continente{stats.totalContinents !== 1 ? "s" : ""}
+        {stats.totalContinents} continente
+        {stats.totalContinents !== 1 ? "s" : ""}
       </Badge>
       <Badge variant="secondary">
         {stats.totalLocations} local{stats.totalLocations !== 1 ? "is" : ""}

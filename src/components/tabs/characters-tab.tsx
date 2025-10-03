@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -10,7 +11,6 @@ import {
   Shield,
   MapPin,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";

@@ -1,4 +1,9 @@
-export type RaceType = "Aquática" | "Terrestre" | "Voadora" | "Espacial" | "Espiritual";
+export type RaceType =
+  | "Aquática"
+  | "Terrestre"
+  | "Voadora"
+  | "Espacial"
+  | "Espiritual";
 
 export interface IRace {
   id: string;

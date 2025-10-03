@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Search,
@@ -10,7 +11,6 @@ import {
   Gem,
   Star,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateItemModal } from "@/components/modals/create-item-modal";

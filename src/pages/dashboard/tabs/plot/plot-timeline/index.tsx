@@ -6,6 +6,7 @@ import type { IPlotArc } from "@/types/plot-types";
 
 import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
 import { getSizeColor } from "../utils/get-size-color";
+
 import { PlotTimelineView } from "./view";
 
 export function PlotTimeline() {
@@ -21,7 +22,10 @@ export function PlotTimeline() {
   );
 
   const handleBack = useCallback(() => {
-    navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: dashboardId! } });
+    navigate({
+      to: "/dashboard/$dashboardId",
+      params: { dashboardId: dashboardId! },
+    });
   }, [navigate, dashboardId]);
 
   const handleArcClick = useCallback(

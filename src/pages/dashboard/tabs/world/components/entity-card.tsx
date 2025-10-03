@@ -1,12 +1,7 @@
 import { Globe, Mountain, MapPin, TreePine, Home, Castle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { IWorldEntity } from "../types/world-types";
 

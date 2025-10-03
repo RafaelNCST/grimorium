@@ -166,9 +166,11 @@
 
   #root {
     @apply bg-background;
-    min-height: 100vh;
+    height: 100vh;
     width: 100vw;
-    overflow: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Tauri specific optimizations */

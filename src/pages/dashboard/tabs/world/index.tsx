@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 
 import { MOCK_WORLD_ENTITIES } from "./mocks/mock-world-entities";
@@ -14,9 +15,8 @@ interface PropsWorldTab {
 
 export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
-  const [worldEntities, setWorldEntities] = useState<IWorldEntity[]>(
-    MOCK_WORLD_ENTITIES
-  );
+  const [worldEntities, setWorldEntities] =
+    useState<IWorldEntity[]>(MOCK_WORLD_ENTITIES);
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
   const [showCreateContinentModal, setShowCreateContinentModal] =
@@ -122,14 +122,13 @@ export function WorldTab({ bookId }: PropsWorldTab) {
     [navigate, bookId]
   );
 
-  const handleGetTypeColor = useCallback((type: string) => {
-    return getTypeColor(type as "World" | "Continent" | "Location");
-  }, []);
+  const handleGetTypeColor = useCallback(
+    (type: string) => getTypeColor(type as "World" | "Continent" | "Location"),
+    []
+  );
 
   const handleGetParentName = useCallback(
-    (parentId?: string) => {
-      return getParentName(parentId, worldEntities);
-    },
+    (parentId?: string) => getParentName(parentId, worldEntities),
     [worldEntities]
   );
 
