@@ -14,6 +14,7 @@ interface PropsHomeView {
   searchTerm: string;
   totalBooks: number;
   lastEditedBook: string;
+  daysSinceLastChapter: number;
   showCreateModal: boolean;
   showSettingsModal: boolean;
   onSearchTermChange: (term: string) => void;
@@ -30,6 +31,7 @@ export function HomeView({
   searchTerm,
   totalBooks,
   lastEditedBook,
+  daysSinceLastChapter,
   showCreateModal,
   showSettingsModal,
   onSearchTermChange,
@@ -43,6 +45,7 @@ export function HomeView({
   return (
     <div className="min-h-screen bg-background">
       <Header
+        daysSinceLastChapter={daysSinceLastChapter}
         onOpenCreateModal={onOpenCreateModal}
         onOpenSettingsModal={onOpenSettingsModal}
       />
@@ -54,7 +57,6 @@ export function HomeView({
         searchTerm={searchTerm}
         onSearchTermChange={onSearchTermChange}
         onBookSelect={onBookSelect}
-        onOpenCreateModal={onOpenCreateModal}
       />
 
       <CreateBookModal

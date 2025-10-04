@@ -20,6 +20,8 @@ export function HomePage() {
 
   const lastEditedBook = useMemo(() => getLastEditedBook(books), [books]);
 
+  const daysSinceLastChapter = 3;
+
   const handleOpenCreateModal = useCallback(() => {
     setShowCreateModal(true);
   }, []);
@@ -71,6 +73,7 @@ export function HomePage() {
       searchTerm={searchTerm}
       totalBooks={books.length}
       lastEditedBook={lastEditedBook}
+      daysSinceLastChapter={daysSinceLastChapter}
       showCreateModal={showCreateModal}
       showSettingsModal={showSettingsModal}
       onSearchTermChange={setSearchTerm}

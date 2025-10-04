@@ -1,17 +1,30 @@
 {
-  "welcome": "Bem-vindo ao",
-  "creative_universe": "Grimorium",
-  "organize_worlds": "Organize seus mundos criativos em um só lugar",
-  "create_new_book": "Criar Novo Livro",
-  "total_books": "Total de Livros",
-  "active_projects": "projetos ativos",
-  "storage_used": "Armazenamento Usado",
-  "storage_available": "de 10 GB disponíveis",
-  "last_edition": "Última Edição",
-  "this_month": "neste mês",
-  "library": "Biblioteca",
-  "search_books": "Buscar livros...",
-  "no_books_found": "Nenhum livro encontrado",
-  "adjust_search": "Tente ajustar sua busca ou criar um novo livro.",
-  "create_first_book": "Comece criando seu primeiro livro!"
+  "header": {
+    "title_first_part": "Bem-vindo ao",
+    "title_second_part": "Grimorium",
+    "subtext": "dias sem escrever um capítulo",
+    "button_create_book": "Criar Novo Livro"
+  },
+  "cards": {
+    "metrics": {
+      "total_books_title": "Total de livros",
+      "total_chars_title": "Total de caracteres",
+      "total_words_title": "Total de palavras"
+    },
+    "chapter": {
+      "title": "Ultimo capítulo lançado"
+    },
+    "edit": {
+      "title": "Última edição feita"
+    }
+  },
+ "filter": {
+    "placeholder": "Buscar livros",
+    "text_empty": "Tente ajustar sua busca ou criar um novo livro.",
+    "button_create_books": "Comece criando seu primeiro livro!"
+  },
+  "list_books": {
+    "title": "Biblioteca",
+    "text_empty": "Nenhum livro encontrado"
+  }
 }

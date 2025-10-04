@@ -1,4 +1,4 @@
-import { Book, HardDrive } from "lucide-react";
+import { Book, Edit, Paperclip } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { StatsCard } from "@/components/common/stats-card";
@@ -15,22 +15,23 @@ export function StatsCards({ totalBooks, lastEditedBook }: StatsCardsProps) {
     <div className="px-6 mb-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
-          title={t("total_books")}
+          title={t("cards.metrics.total_books_title")}
           value={totalBooks}
-          description={t("active_projects")}
           icon={Book}
+          subMetrics={[
+            { label: "Caracteres", value: "150.000" },
+            { label: "Palavras", value: "25.000" },
+          ]}
         />
         <StatsCard
-          title={t("storage_used")}
-          value="2.1 GB"
-          description={t("storage_available")}
-          icon={HardDrive}
+          title={t("cards.chapter.title")}
+          value="Capítulo 1: O templo de dandara"
+          icon={Paperclip}
         />
         <StatsCard
-          title={t("last_edition")}
+          title={t("cards.edit.title")}
           value={lastEditedBook}
-          description={t("this_month")}
-          icon={Book}
+          icon={Edit}
         />
       </div>
     </div>
