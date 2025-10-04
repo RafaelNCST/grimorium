@@ -20,6 +20,17 @@ export function HomePage() {
 
   const lastEditedBook = useMemo(() => getLastEditedBook(books), [books]);
 
+  // Mock data for last chapter - this would come from actual chapter data in production
+  const lastChapter = useMemo(() => {
+    if (books.length > 0) {
+      return {
+        title: "Capítulo 1: O templo de Dandara e a sombra perene que avança",
+        bookTitle: books[0].title,
+      };
+    }
+    return undefined;
+  }, [books]);
+
   const daysSinceLastChapter = 3;
 
   const handleOpenCreateModal = useCallback(() => {
@@ -73,6 +84,7 @@ export function HomePage() {
       searchTerm={searchTerm}
       totalBooks={books.length}
       lastEditedBook={lastEditedBook}
+      lastChapter={lastChapter}
       daysSinceLastChapter={daysSinceLastChapter}
       showCreateModal={showCreateModal}
       showSettingsModal={showSettingsModal}

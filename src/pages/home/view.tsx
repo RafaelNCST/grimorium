@@ -6,14 +6,18 @@ import { SettingsModal } from "@/components/modals/settings-modal";
 import { Book as BookType } from "@/stores/book-store";
 
 import { Header } from "./components/header";
+import { InfoCard } from "./components/info-card";
 import { ListBooks } from "./components/list-books";
-import { StatsCards } from "./components/stats-cards";
 
 interface PropsHomeView {
   filteredBooks: BookType[];
   searchTerm: string;
   totalBooks: number;
   lastEditedBook: string;
+  lastChapter?: {
+    title: string;
+    bookTitle: string;
+  };
   daysSinceLastChapter: number;
   showCreateModal: boolean;
   showSettingsModal: boolean;
@@ -31,6 +35,7 @@ export function HomeView({
   searchTerm,
   totalBooks,
   lastEditedBook,
+  lastChapter,
   daysSinceLastChapter,
   showCreateModal,
   showSettingsModal,
@@ -50,7 +55,11 @@ export function HomeView({
         onOpenSettingsModal={onOpenSettingsModal}
       />
 
-      <StatsCards totalBooks={totalBooks} lastEditedBook={lastEditedBook} />
+      <InfoCard
+        totalBooks={totalBooks}
+        lastEditedBook={lastEditedBook}
+        lastChapter={lastChapter}
+      />
 
       <ListBooks
         filteredBooks={filteredBooks}

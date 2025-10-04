@@ -77,7 +77,9 @@
     --shadow-lg: 0 8px 32px hsl(240 10% 3.9% / 0.3);
     --shadow-glow: 0 0 20px hsl(263 70% 50% / 0.3);
     --shadow-accent-glow: 0 0 24px hsl(45 93% 58% / 0.4);
-    --shadow-magical-glow: 0 0 30px hsl(263 70% 50% / 0.5), 0 0 60px hsl(280 70% 60% / 0.3), 0 0 90px hsl(45 93% 58% / 0.2);
+    --shadow-magical-glow:
+      0 0 30px hsl(263 70% 50% / 0.5), 0 0 60px hsl(280 70% 60% / 0.3),
+      0 0 90px hsl(45 93% 58% / 0.2);
 
     /* Border radius system */
     --radius: 0.75rem;
@@ -301,7 +303,8 @@
 
   /* Magical sparkle animation */
   @keyframes magical-sparkle {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0;
       transform: scale(0) rotate(0deg);
     }

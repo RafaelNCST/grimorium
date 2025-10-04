@@ -6,16 +6,19 @@
     "button_create_book": "Create New Book"
   },
   "cards": {
-    "metrics": {
-      "total_books_title": "Total de livros",
-      "total_chars_title": "Total de caracteres",
-      "total_words_title": "Total de palavras"
-    },
-    "chapter": {
-      "title": "Last chapter released"
-    },
-    "edit": {
-      "title": "Last edit made"
+    "info": {
+      "title": "General Information",
+      "metrics_section": "Metrics",
+      "total_books": "Total books",
+      "total_characters": "Total characters",
+      "total_words": "Total words",
+      "last_edited_section": "Last Edited",
+      "last_edited_label": "Last edited book",
+      "no_book": "No book",
+      "last_chapter_section": "Last Chapter",
+      "last_chapter_label": "Last released chapter",
+      "no_chapter": "No chapter",
+      "from_book": "From book"
     }
   },
   "filter": {
