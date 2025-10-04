@@ -30,7 +30,7 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] card-magical">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Settings className="w-5 h-5 text-primary" />

@@ -65,16 +65,17 @@ export default {
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
-        'gradient-secondary': 'var(--gradient-secondary)', 
+        'gradient-secondary': 'var(--gradient-secondary)',
         'gradient-accent': 'var(--gradient-accent)',
         'gradient-magical': 'var(--gradient-magical)',
       },
       boxShadow: {
         'sm': 'var(--shadow-sm)',
-        'md': 'var(--shadow-md)', 
+        'md': 'var(--shadow-md)',
         'lg': 'var(--shadow-lg)',
         'glow': 'var(--shadow-glow)',
         'accent-glow': 'var(--shadow-accent-glow)',
+        'magical-glow': 'var(--shadow-magical-glow)',
       },
       borderRadius: {
         lg: "var(--radius)",

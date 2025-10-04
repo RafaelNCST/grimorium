@@ -77,6 +77,7 @@
     --shadow-lg: 0 8px 32px hsl(240 10% 3.9% / 0.3);
     --shadow-glow: 0 0 20px hsl(263 70% 50% / 0.3);
     --shadow-accent-glow: 0 0 24px hsl(45 93% 58% / 0.4);
+    --shadow-magical-glow: 0 0 30px hsl(263 70% 50% / 0.5), 0 0 60px hsl(280 70% 60% / 0.3), 0 0 90px hsl(45 93% 58% / 0.2);
 
     /* Border radius system */
     --radius: 0.75rem;
@@ -279,6 +280,44 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /* Magical pulse animation for buttons */
+  @keyframes magical-pulse {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+
+  /* Magical sparkle animation */
+  @keyframes magical-sparkle {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1) rotate(180deg);
+    }
+  }
+
+  /* Magical shine sweep */
+  @keyframes magical-shine {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 200%;
     }
   }
 

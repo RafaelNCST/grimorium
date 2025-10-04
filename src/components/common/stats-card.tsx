@@ -16,22 +16,36 @@ interface PropsStatsCard {
   subMetrics?: SubMetric[];
 }
 
-export function StatsCard({ title, value, icon: Icon, trend, subMetrics }: PropsStatsCard) {
+export function StatsCard({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  subMetrics,
+}: PropsStatsCard) {
   return (
-    <div className="bg-card rounded-xl border border-border p-6 card-magical animate-fade-in-up">
+    <div className="bg-card rounded-xl border border-border p-6 ">
       <div className="flex items-center justify-between">
         <div className="flex-1 flex items-end justify-between pr-6">
           <div className="flex flex-col flex-1">
-            <span className="text-sm font-medium text-muted-foreground">{title}</span>
-            <span className="text-2xl font-bold text-foreground mt-2">{value}</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              {title}
+            </span>
+            <span className="text-2xl font-bold text-foreground mt-2">
+              {value}
+            </span>
           </div>
 
           {subMetrics && subMetrics.length > 0 && (
             <>
               {subMetrics.map((metric, index) => (
                 <div key={index} className="flex flex-col flex-1">
-                  <span className="text-sm font-medium text-muted-foreground">{metric.label}</span>
-                  <span className="text-2xl font-bold text-foreground mt-2">{metric.value}</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {metric.label}
+                  </span>
+                  <span className="text-2xl font-bold text-foreground mt-2">
+                    {metric.value}
+                  </span>
                 </div>
               ))}
             </>

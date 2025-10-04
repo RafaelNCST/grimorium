@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Minus, Square, X } from "lucide-react";
+import { Inbox, Minus, Square, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -95,6 +95,18 @@ export const TitleBar = () => {
 
       {/* Right section - Window controls */}
       <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "h-10 w-12 rounded-none hover:bg-gray-50",
+            "transition-colors duration-200"
+          )}
+          aria-label="Inbox"
+        >
+          <Inbox className="h-4 w-4" />
+        </Button>
+        <div className="h-6 w-px bg-border" />
         <Button
           variant="ghost"
           size="icon"

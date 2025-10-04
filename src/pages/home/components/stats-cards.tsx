@@ -19,8 +19,8 @@ export function StatsCards({ totalBooks, lastEditedBook }: StatsCardsProps) {
           value={totalBooks}
           icon={Book}
           subMetrics={[
-            { label: "Caracteres", value: "150.000" },
-            { label: "Palavras", value: "25.000" },
+            { label: t("cards.metrics.total_chars_title"), value: "150.000" },
+            { label: t("cards.metrics.total_words_title"), value: "25.000" },
           ]}
         />
         <StatsCard
