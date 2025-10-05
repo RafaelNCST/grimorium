@@ -1,5 +1,6 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
+import { InboxInitializer } from "@/components/inbox-initializer";
 import { ThemeInitializer } from "@/components/theme-initializer";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,6 +22,7 @@ declare module "@tanstack/react-router" {
 const App = () => (
   <TooltipProvider>
     <ThemeInitializer />
+    <InboxInitializer />
     <Toaster />
     <Sonner />
     <RouterProvider router={router} />

@@ -1,0 +1,36 @@
+{
+  "title": "Inbox",
+  "tooltip": "Inbox",
+  "tabs": {
+    "all": "All",
+    "deleted": "Deleted"
+  },
+  "empty": {
+    "all": "No messages yet",
+    "deleted": "No deleted messages"
+  },
+  "message_types": {
+    "update": "Update",
+    "team_response": "Team Response",
+    "data_research": "Data Research",
+    "news": "News"
+  },
+  "actions": {
+    "read_more": "Read more",
+    "read_less": "Read less",
+    "delete": "Delete",
+    "delete_selected": "Delete selected",
+    "clear_all": "Clear all",
+    "delete_forever": "Delete forever",
+    "select_all": "Select all",
+    "deselect_all": "Deselect all"
+  },
+  "confirm": {
+    "delete_all_title": "Clear all messages",
+    "delete_all_description": "Are you sure you want to delete all messages? This action cannot be undone.",
+    "delete_forever_title": "Delete forever",
+    "delete_forever_description": "Are you sure you want to permanently delete these messages? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  }
+}
