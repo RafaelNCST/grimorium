@@ -56,7 +56,7 @@ export function HomePage() {
         title: bookData.title,
         genre: bookData.genre,
         visualStyle: bookData.visualStyle,
-        coverImage: "/placeholder.svg",
+        coverImage: bookData.cover || "/placeholder.svg",
         chapters: 0,
         lastModified: "agora",
         storySummary: bookData.authorSummary || "",

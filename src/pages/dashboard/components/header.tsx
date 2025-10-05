@@ -72,8 +72,8 @@ export function Header({
                 />
                 <div className="flex items-center gap-3">
                   <Select
-                    value={draftBook?.genre || ""}
-                    onValueChange={(v) => onDraftBookChange({ genre: v })}
+                    value={draftBook?.genre?.[0] || ""}
+                    onValueChange={(v) => onDraftBookChange({ genre: [v] })}
                   >
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Gênero" />
@@ -124,8 +124,10 @@ export function Header({
             ) : (
               <div>
                 <h2 className="text-3xl font-bold mb-2">{book.title}</h2>
-                <div className="flex items-center gap-3 mb-3">
-                  <Badge variant="secondary">{book.genre}</Badge>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  {book.genre.map((g, index) => (
+                    <Badge key={index} variant="secondary">{g}</Badge>
+                  ))}
                   <Badge variant="outline">{book.visualStyle}</Badge>
                 </div>
                 <p className="text-muted-foreground max-w-2xl">

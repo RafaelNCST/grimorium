@@ -3,7 +3,7 @@ import { create } from "zustand";
 export interface Book {
   id: string;
   title: string;
-  genre: string;
+  genre: string[];
   visualStyle: string;
   coverImage: string;
   chapters: number;
@@ -31,7 +31,7 @@ export const useBookStore = create<BookState>((set, get) => ({
     {
       id: "1",
       title: "As Crônicas do Reino Perdido",
-      genre: "Alta Fantasia",
+      genre: ["Alta Fantasia", "Aventura"],
       visualStyle: "Realista",
       coverImage: "/assets/book-cover-1.jpg",
       chapters: 12,
@@ -69,7 +69,7 @@ export const useBookStore = create<BookState>((set, get) => ({
     return books.filter(
       (book) =>
         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.genre.toLowerCase().includes(searchTerm.toLowerCase())
+        book.genre.some((g) => g.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   },
 }));

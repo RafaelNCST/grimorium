@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 interface PropsBookCard {
   id: string;
   title: string;
-  genre: string;
+  genre: string[];
   visualStyle: string;
   coverImage?: string;
   chapters?: number;
@@ -84,11 +84,18 @@ export function BookCard({
           )}
         </div>
 
-        {/* Genre Badge */}
-        <div className="absolute top-2 left-2">
-          <Badge variant="secondary" className="text-xs">
-            {genre}
-          </Badge>
+        {/* Genre Badges */}
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)]">
+          {genre.slice(0, 2).map((g, index) => (
+            <Badge key={index} variant="secondary" className="text-xs">
+              {g}
+            </Badge>
+          ))}
+          {genre.length > 2 && (
+            <Badge variant="secondary" className="text-xs">
+              +{genre.length - 2}
+            </Badge>
+          )}
         </div>
       </div>
 

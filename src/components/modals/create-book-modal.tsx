@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
-import { Upload } from "lucide-react";
+import { Upload, Book, BookPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,31 +29,36 @@ interface PropsCreateBookModal {
 
 export interface IBookFormData {
   title: string;
-  genre: string;
+  genre: string[];
   visualStyle: string;
   cover?: string;
+  synopsis?: string;
   authorSummary?: string;
 }
 
-const genres = [
-  "Alta Fantasia",
-  "Fantasia Urbana",
-  "Épico",
-  "Romance",
-  "Mistério",
-  "Suspense",
-  "Terror",
-  "Ficção Científica",
-  "Distopia",
-  "Aventura",
-  "Drama",
-  "Comédia",
-  "Biografia",
-  "Histórico",
-  "Contemporâneo",
-];
+const GENRE_KEYS = [
+  "genre.urban",
+  "genre.fantasy",
+  "genre.futuristic",
+  "genre.cyberpunk",
+  "genre.high_fantasy",
+  "genre.romance",
+  "genre.mystery",
+  "genre.horror",
+  "genre.suspense",
+  "genre.drama",
+  "genre.sci_fi",
+  "genre.historical",
+  "genre.action",
+  "genre.adventure",
+  "genre.litrpg",
+] as const;
 
-const visualStyles = ["Cartoon", "Anime", "Realista"];
+const VISUAL_STYLE_KEYS = [
+  "style.realistic",
+  "style.cartoon",
+  "style.anime",
+] as const;
 
 export function CreateBookModal({
   open,
@@ -61,13 +66,17 @@ export function CreateBookModal({
   onConfirm,
 }: PropsCreateBookModal) {
   const { t } = useLanguageStore();
-  const [formData, setFormData] = useState<BookFormData>({
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState<IBookFormData>({
     title: "",
-    genre: "",
+    genre: [],
     visualStyle: "",
     cover: "",
+    synopsis: "",
     authorSummary: "",
   });
+  const [previewImage, setPreviewImage] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
@@ -77,7 +86,7 @@ export function CreateBookModal({
       newErrors.title = t("modal.title_required");
     }
 
-    if (!formData.genre) {
+    if (formData.genre.length === 0) {
       newErrors.genre = t("modal.genre_required");
     }
 
@@ -89,93 +98,188 @@ export function CreateBookModal({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setPreviewImage(result);
+        setFormData({ ...formData, cover: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGenreToggle = (genreKey: string) => {
+    const genreValue = t(genreKey);
+    setFormData((prev) => ({
+      ...prev,
+      genre: prev.genre.includes(genreValue)
+        ? prev.genre.filter((g) => g !== genreValue)
+        : [...prev.genre, genreValue],
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
       onConfirm(formData);
-      // Reset form
-      setFormData({
-        title: "",
-        genre: "",
-        visualStyle: "",
-        cover: "",
-        authorSummary: "",
-      });
-      setErrors({});
+      resetForm();
       onClose();
     }
   };
 
-  const handleClose = () => {
+  const resetForm = () => {
     setFormData({
       title: "",
-      genre: "",
+      genre: [],
       visualStyle: "",
       cover: "",
+      synopsis: "",
       authorSummary: "",
     });
+    setPreviewImage("");
     setErrors({});
+  };
+
+  const handleClose = () => {
+    resetForm();
     onClose();
   };
 
   const isValid =
-    formData.title.trim() && formData.genre && formData.visualStyle;
+    formData.title.trim() && formData.genre.length > 0 && formData.visualStyle;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px] card-magical">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto" showCloseButton={false}>
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <span className="text-primary">✨</span>
+            <BookPlus className="w-5 h-5 text-primary" />
             {t("modal.create_book")}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title" className="text-sm font-medium">
-              {t("modal.book_title")} *
-            </Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              placeholder="Ex: As Crônicas do Reino Perdido"
-              className={errors.title ? "border-destructive" : ""}
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive">{errors.title}</p>
-            )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Cover and Title Section */}
+          <div className="flex gap-4">
+            {/* Book Cover */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                {t("modal.book_cover")}
+              </Label>
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-32 h-48 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
+                >
+                  {previewImage ? (
+                    <div className="relative w-full h-full group">
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-xs text-center px-2">
+                          {t("modal.change_image")}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50 p-3">
+                      <Book className="w-12 h-12 text-muted-foreground mb-2" />
+                      <p className="text-xs text-muted-foreground text-center">
+                        {t("modal.upload_image")}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-1 text-center">
+                        {t("modal.upload_formats")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Title and Synopsis */}
+            <div className="flex-1 space-y-4">
+              {/* Title */}
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-sm font-medium">
+                  {t("modal.book_title")} *
+                </Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  placeholder={t("modal.title_placeholder")}
+                  className={`h-12 ${errors.title ? "border-destructive" : ""}`}
+                />
+                {errors.title && (
+                  <p className="text-sm text-destructive">{errors.title}</p>
+                )}
+              </div>
+
+              {/* Synopsis */}
+              <div className="space-y-2">
+                <Label htmlFor="synopsis" className="text-sm font-medium">
+                  {t("modal.book_synopsis")}
+                </Label>
+                <Textarea
+                  id="synopsis"
+                  value={formData.synopsis}
+                  onChange={(e) =>
+                    setFormData({ ...formData, synopsis: e.target.value })
+                  }
+                  placeholder={t("modal.synopsis_placeholder")}
+                  rows={6}
+                  maxLength={1000}
+                  className="resize-none"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{t("modal.optional")}</span>
+                  <span>{formData.synopsis?.length || 0}/1000</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Genre */}
+          {/* Genre Selection */}
           <div className="space-y-2">
-            <Label htmlFor="genre" className="text-sm font-medium">
+            <Label className="text-sm font-medium">
               {t("modal.book_genre")} *
             </Label>
-            <Select
-              value={formData.genre}
-              onValueChange={(value) =>
-                setFormData({ ...formData, genre: value })
-              }
-            >
-              <SelectTrigger
-                className={errors.genre ? "border-destructive" : ""}
-              >
-                <SelectValue placeholder="Selecione o gênero" />
-              </SelectTrigger>
-              <SelectContent side="bottom">
-                {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
-                    {genre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-2">
+              {GENRE_KEYS.map((genreKey) => {
+                const genreValue = t(genreKey);
+                const isSelected = formData.genre.includes(genreValue);
+                return (
+                  <button
+                    key={genreKey}
+                    type="button"
+                    onClick={() => handleGenreToggle(genreKey)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground shadow-md scale-105"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {genreValue}
+                  </button>
+                );
+              })}
+            </div>
             {errors.genre && (
               <p className="text-sm text-destructive">{errors.genre}</p>
             )}
@@ -195,33 +299,22 @@ export function CreateBookModal({
               <SelectTrigger
                 className={errors.visualStyle ? "border-destructive" : ""}
               >
-                <SelectValue placeholder="Selecione o estilo visual" />
+                <SelectValue placeholder={t("modal.style_placeholder")} />
               </SelectTrigger>
               <SelectContent side="bottom">
-                {visualStyles.map((style) => (
-                  <SelectItem key={style} value={style}>
-                    {style}
-                  </SelectItem>
-                ))}
+                {VISUAL_STYLE_KEYS.map((styleKey) => {
+                  const styleValue = t(styleKey);
+                  return (
+                    <SelectItem key={styleKey} value={styleValue}>
+                      {styleValue}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             {errors.visualStyle && (
               <p className="text-sm text-destructive">{errors.visualStyle}</p>
             )}
-          </div>
-
-          {/* Cover Upload */}
-          <div className="space-y-2">
-            <Label htmlFor="cover" className="text-sm font-medium">
-              {t("modal.book_cover")}
-            </Label>
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors">
-              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground mb-2">
-                Clique para fazer upload ou arraste uma imagem
-              </p>
-              <p className="text-xs text-muted-foreground">PNG, JPG até 5MB</p>
-            </div>
           </div>
 
           {/* Author Summary */}
@@ -235,13 +328,14 @@ export function CreateBookModal({
               onChange={(e) =>
                 setFormData({ ...formData, authorSummary: e.target.value })
               }
-              placeholder="Suas anotações pessoais sobre a obra..."
-              rows={3}
-              maxLength={500}
+              placeholder={t("modal.summary_placeholder")}
+              rows={4}
+              maxLength={1000}
+              className="resize-none"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Opcional</span>
-              <span>{formData.authorSummary?.length || 0}/500</span>
+              <span>{t("modal.optional")}</span>
+              <span>{formData.authorSummary?.length || 0}/1000</span>
             </div>
           </div>
 
