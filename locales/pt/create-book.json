@@ -1,0 +1,48 @@
+{
+  "modal": {
+    "create_book": "Criar Novo Livro",
+    "book_cover": "Capa do Livro",
+    "change_image": "Alterar Imagem",
+    "upload_image": "Enviar Imagem",
+    "upload_formats": "PNG, JPG, WEBP ou GIF",
+    "book_title": "Título do Livro",
+    "title_placeholder": "Digite o título do livro",
+    "title_required": "Título é obrigatório",
+    "book_synopsis": "Sinopse do Livro",
+    "synopsis_placeholder": "Uma breve descrição da história para apresentação aos leitores...",
+    "optional": "Opcional",
+    "book_genre": "Gênero do Livro",
+    "genre_required": "Pelo menos um gênero é obrigatório",
+    "book_style": "Estilo Visual",
+    "style_placeholder": "Selecione um estilo visual",
+    "style_required": "Estilo visual é obrigatório",
+    "author_summary": "Resumo do Autor",
+    "summary_placeholder": "Resumo interno para controle e organização do autor..."
+  },
+  "genre": {
+    "urban": "Urbano",
+    "fantasy": "Fantasia",
+    "futuristic": "Futurista",
+    "cyberpunk": "Cyberpunk",
+    "high_fantasy": "Alta Fantasia",
+    "romance": "Romance",
+    "mystery": "Mistério",
+    "horror": "Terror",
+    "suspense": "Suspense",
+    "drama": "Drama",
+    "sci_fi": "Ficção Científica",
+    "historical": "Histórico",
+    "action": "Ação",
+    "adventure": "Aventura",
+    "litrpg": "LitRPG"
+  },
+  "style": {
+    "realistic": "Realista",
+    "cartoon": "Cartoon",
+    "anime": "Anime"
+  },
+  "button": {
+    "cancel": "Cancelar",
+    "create": "Criar"
+  }
+}

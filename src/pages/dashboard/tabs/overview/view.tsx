@@ -14,6 +14,7 @@ import {
   Minus,
   Eye,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,9 @@ import { SortableSection } from "./components/sortable-section";
 import { PropsOverviewView, ISection } from "./types/overview-types";
 
 export function OverviewView(props: PropsOverviewView) {
+  const { t } = useTranslation("overview");
+  const { t: tCreateBook } = useTranslation("create-book");
+
   const {
     book,
     isCustomizing,
@@ -327,7 +331,7 @@ export function OverviewView(props: PropsOverviewView) {
               value={authorSummary}
               onChange={(e) => onAuthorSummaryChange(e.target.value)}
               className="min-h-[80px] text-xs"
-              placeholder="Resumo interno para controle do autor..."
+              placeholder={tCreateBook("modal.summary_placeholder")}
             />
             <div className="flex gap-2">
               <Button
@@ -350,7 +354,11 @@ export function OverviewView(props: PropsOverviewView) {
           </div>
         ) : (
           <p className="text-xs text-foreground leading-relaxed">
-            {authorSummary}
+            {authorSummary || (
+              <span className="text-muted-foreground italic">
+                {t("author_summary.empty_message")}
+              </span>
+            )}
           </p>
         )}
       </CardContent>
@@ -384,7 +392,7 @@ export function OverviewView(props: PropsOverviewView) {
               value={storySummary}
               onChange={(e) => onStorySummaryChange(e.target.value)}
               className="min-h-[80px] text-xs"
-              placeholder="Resumo da história para apresentação..."
+              placeholder={t("story_summary.placeholder")}
             />
             <div className="flex gap-2">
               <Button
@@ -407,7 +415,11 @@ export function OverviewView(props: PropsOverviewView) {
           </div>
         ) : (
           <p className="text-xs text-foreground leading-relaxed">
-            {storySummary}
+            {storySummary || (
+              <span className="text-muted-foreground italic">
+                {t("story_summary.empty_message")}
+              </span>
+            )}
           </p>
         )}
       </CardContent>

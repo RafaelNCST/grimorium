@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Upload, Book, BookPlus } from "lucide-react";
 
@@ -19,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useLanguageStore } from "@/stores/language-store";
 
 interface PropsCreateBookModal {
   open: boolean;
@@ -65,7 +65,7 @@ export function CreateBookModal({
   onClose,
   onConfirm,
 }: PropsCreateBookModal) {
-  const { t } = useLanguageStore();
+  const { t } = useTranslation("create-book");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<IBookFormData>({

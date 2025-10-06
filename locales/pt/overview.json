@@ -1,0 +1,10 @@
+{
+  "author_summary": {
+    "empty_message": "Nenhum resumo do autor adicionado ainda. Clique no ícone de edição para adicionar.",
+    "placeholder": "Internal summary for the author's control and organization, this summary is yours alone and allows you to write your ideas the way you want"
+  },
+  "story_summary": {
+    "empty_message": "Nenhum resumo da história adicionado ainda. Clique no ícone de edição para adicionar.",
+    "placeholder": "Resumo da história para apresentar aos leitores. Descreva os eventos principais, conflitos e o que torna sua história única!"
+  }
+}

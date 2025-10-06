@@ -1,0 +1,48 @@
+{
+  "modal": {
+    "create_book": "Create New Book",
+    "book_cover": "Book Cover",
+    "change_image": "Change Image",
+    "upload_image": "Upload Image",
+    "upload_formats": "PNG, JPG, WEBP or GIF",
+    "book_title": "Book Title",
+    "title_placeholder": "Enter the book title",
+    "title_required": "Title is required",
+    "book_synopsis": "Book Synopsis",
+    "synopsis_placeholder": "A brief description of the story for presentation to readers...",
+    "optional": "Optional",
+    "book_genre": "Book Genre",
+    "genre_required": "At least one genre is required",
+    "book_style": "Visual Style",
+    "style_placeholder": "Select a visual style",
+    "style_required": "Visual style is required",
+    "author_summary": "Author Summary",
+    "summary_placeholder": "Internal summary for author control and organization..."
+  },
+  "genre": {
+    "urban": "Urban",
+    "fantasy": "Fantasy",
+    "futuristic": "Futuristic",
+    "cyberpunk": "Cyberpunk",
+    "high_fantasy": "High Fantasy",
+    "romance": "Romance",
+    "mystery": "Mystery",
+    "horror": "Horror",
+    "suspense": "Suspense",
+    "drama": "Drama",
+    "sci_fi": "Sci-Fi",
+    "historical": "Historical",
+    "action": "Action",
+    "adventure": "Adventure",
+    "litrpg": "LitRPG"
+  },
+  "style": {
+    "realistic": "Realistic",
+    "cartoon": "Cartoon",
+    "anime": "Anime"
+  },
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create"
+  }
+}
