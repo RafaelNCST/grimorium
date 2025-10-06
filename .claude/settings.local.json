@@ -47,7 +47,8 @@
       "Bash(taskkill:*)",
       "Bash(pnpm typecheck:*)",
       "Bash(pnpm build:*)",
-      "Bash(cargo:*)"
+      "Bash(cargo:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

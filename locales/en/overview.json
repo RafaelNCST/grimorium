@@ -1,8 +1,11 @@
 {
+  "metrics": {
+    "title": "Metrics"
+  },
   "stats": {
     "chapters": "Chapters",
-    "average_per_week": "Average/Week",
-    "average_per_month": "Average/Month",
+    "average_per_week": "Average/Week of Chapters",
+    "average_per_month": "Average/Month of Chapters",
     "last_released_chapter": "Last Released Chapter",
     "total_words": "Total Words",
     "total_characters": "Total Characters",

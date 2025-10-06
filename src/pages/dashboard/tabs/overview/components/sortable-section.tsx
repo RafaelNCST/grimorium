@@ -34,9 +34,9 @@ export function SortableSection({
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative transition-all duration-200 w-fit ${
-        isDragging ? "opacity-50 z-50" : ""
-      } ${
+      className={`relative transition-all duration-200 ${
+        section.type === "stats" ? "w-full" : "w-fit"
+      } ${isDragging ? "opacity-50 z-50" : ""} ${
         !section.visible
           ? "opacity-50 border-2 border-dashed border-muted-foreground/30"
           : ""

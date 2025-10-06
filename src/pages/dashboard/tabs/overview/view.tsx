@@ -3,22 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  Edit2,
-  Target,
-  BookOpen,
-  TrendingUp,
-  StickyNote,
-  Plus,
-  FileText,
-  Eye,
-  Calendar,
-  CheckCircle,
-  FileEdit,
-  ClipboardList,
-  Type,
-  Hash,
-} from "lucide-react";
+import { Edit2, StickyNote, Plus, Eye } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -32,6 +17,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
+import { MetricsCard } from "./components/metrics-card";
 import { SortableNote } from "./components/sortable-note";
 import { SortableSection } from "./components/sortable-section";
 import { PropsOverviewView, ISection } from "./types/overview-types";
@@ -40,10 +26,10 @@ export function OverviewView(props: PropsOverviewView) {
   const { t } = useTranslation("overview");
 
   const {
-    book,
+    book: _book,
     isCustomizing,
-    goals,
-    isEditingGoals,
+    goals: _goals,
+    isEditingGoals: _isEditingGoals,
     storyProgress,
     authorSummary,
     isEditingAuthorSummary,
@@ -58,8 +44,8 @@ export function OverviewView(props: PropsOverviewView) {
     overviewStats,
     storyProgressPercentage,
     sensors,
-    onGoalsChange,
-    onEditingGoalsChange,
+    onGoalsChange: _onGoalsChange,
+    onEditingGoalsChange: _onEditingGoalsChange,
     onAuthorSummaryChange,
     onEditingAuthorSummaryChange,
     onStorySummaryChange,
@@ -70,7 +56,7 @@ export function OverviewView(props: PropsOverviewView) {
     onAddNote,
     onDeleteNote,
     onEditNote,
-    onSaveGoals,
+    onSaveGoals: _onSaveGoals,
     onSaveAuthorSummary,
     onSaveStorySummary,
     onToggleSectionVisibility,
@@ -81,285 +67,7 @@ export function OverviewView(props: PropsOverviewView) {
   } = props;
 
   const renderStatsSection = () => (
-    <div className="flex gap-4 overflow-x-auto pb-2">
-      {/* Total Chapters */}
-      <Card className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.chapters")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.totalChapters}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average per Week */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.1s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.average_per_week")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.averagePerWeek}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {t("stats.chapters_unit")}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average per Month */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.15s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.average_per_month")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.averagePerMonth}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {t("stats.chapters_unit")}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Last Released Chapter */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.2s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Target className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.last_released_chapter")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.lastChapterNumber > 0
-                  ? `Cap. ${overviewStats.lastChapterNumber}`
-                  : t("stats.no_chapter")}
-              </p>
-              {overviewStats.lastChapterName && (
-                <p className="text-xs text-muted-foreground">
-                  {overviewStats.lastChapterName}
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Total Words */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.25s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Type className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.total_words")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.totalWords > 0
-                  ? `${(overviewStats.totalWords / 1000).toFixed(1)}k`
-                  : "0"}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Total Characters */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.3s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Hash className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.total_characters")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.totalCharacters > 0
-                  ? `${(overviewStats.totalCharacters / 1000).toFixed(0)}k`
-                  : "0"}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Chapters in Progress */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.35s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <FileEdit className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.chapters_in_progress")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.chaptersInProgress}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Chapters Finished */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.4s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.chapters_finished")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.chaptersFinished}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Chapters Draft */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.45s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.chapters_draft")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.chaptersDraft}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Chapters Planning */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.5s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ClipboardList className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.chapters_planning")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.chaptersPlanning}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average Words per Chapter */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.55s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Type className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.average_words_per_chapter")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.averageWordsPerChapter}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average Characters per Chapter */}
-      <Card
-        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
-        style={{ animationDelay: "0.6s" }}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Hash className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("stats.average_characters_per_chapter")}
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {overviewStats.averageCharactersPerChapter}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <MetricsCard stats={overviewStats} isCustomizing={isCustomizing} />
   );
 
   const renderProgressSection = () => (
@@ -397,7 +105,9 @@ export function OverviewView(props: PropsOverviewView) {
     <Card className="card-magical m-1 h-fit animate-fade-in">
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base">{t("author_summary.title")}</CardTitle>
+          <CardTitle className="text-base">
+            {t("author_summary.title")}
+          </CardTitle>
           <CardDescription className="text-xs">
             {t("author_summary.description")}
           </CardDescription>
@@ -460,7 +170,9 @@ export function OverviewView(props: PropsOverviewView) {
     <Card className="card-magical m-1 h-fit animate-fade-in">
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base">{t("story_summary.title")}</CardTitle>
+          <CardTitle className="text-base">
+            {t("story_summary.title")}
+          </CardTitle>
           <CardDescription className="text-xs">
             {t("story_summary.description")}
           </CardDescription>
