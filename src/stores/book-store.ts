@@ -13,7 +13,8 @@ export interface Book {
   visualStyle: string;
   coverImage: string;
   chapters: number;
-  lastModified: string;
+  lastModified: number;
+  createdAt: number;
   status: BookStatus;
   currentArc?: string;
   authorSummary?: string;
@@ -42,11 +43,11 @@ export const useBookStore = create<BookState>((set, get) => ({
   updateBook: (id, updates) =>
     set((state) => ({
       books: state.books.map((book) =>
-        book.id === id ? { ...book, ...updates } : book
+        book.id === id ? { ...book, ...updates, lastModified: Date.now() } : book
       ),
       currentBook:
         state.currentBook?.id === id
-          ? { ...state.currentBook, ...updates }
+          ? { ...state.currentBook, ...updates, lastModified: Date.now() }
           : state.currentBook,
     })),
   deleteBook: (id) =>

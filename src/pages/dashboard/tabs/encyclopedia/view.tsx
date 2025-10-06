@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatRelativeTime } from "@/lib/utils";
 import type { IEncyclopediaEntry, ICategoryGroup } from "@/types/encyclopedia";
 
 interface PropsEncyclopediaView {
@@ -188,7 +189,7 @@ export function EncyclopediaView({
                   )}
 
                   <div className="text-xs text-muted-foreground">
-                    {t("modified")} {entry.lastModified}
+                    {t("modified")} {formatRelativeTime(entry.lastModified, i18n.language)}
                   </div>
                 </CardContent>
               </Card>

@@ -5,7 +5,7 @@ export interface ChapterListItem {
   number: number;
   title: string;
   wordCount: number;
-  lastModified: string;
+  lastModified: number;
   status: ChapterStatus;
 }
 
@@ -15,7 +15,7 @@ export interface Chapter {
   title: string;
   content: string;
   wordCount: number;
-  lastModified: string;
+  lastModified: number;
   status: ChapterStatus;
   notes: string;
   tags: string[];

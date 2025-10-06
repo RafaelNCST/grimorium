@@ -3,23 +3,16 @@
     "title_first_part": "Welcome to",
     "title_second_part": "Grimorium",
     "subtext": "days without writing a chapter",
-    "button_create_book": "Create New Book"
+    "button_create_book": "Create New Book",
+    "last_edited": "Last edited",
+    "last_chapter": "Last chapter",
+    "no_book": "No book",
+    "no_chapter": "No chapter"
   },
-  "cards": {
-    "info": {
-      "title": "General Information",
-      "metrics_section": "Metrics",
-      "total_books": "Total books",
-      "total_characters": "Total characters",
-      "total_words": "Total words",
-      "last_edited_section": "Last Edited",
-      "last_edited_label": "Last edited book",
-      "no_book": "No book",
-      "last_chapter_section": "Last Chapter",
-      "last_chapter_label": "Last released chapter",
-      "no_chapter": "No chapter",
-      "from_book": "From book"
-    }
+  "metrics": {
+    "total_books": "Total books",
+    "total_characters": "Total characters",
+    "total_words": "Total words"
   },
   "filter": {
     "placeholder": "Search books",

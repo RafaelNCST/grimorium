@@ -3,7 +3,7 @@ export interface NoteFile {
   name: string;
   type: string;
   size: number;
-  lastModified: Date;
+  lastModified: number;
   content: string;
   parentId: string | null;
 }

@@ -12,7 +12,7 @@ export interface IEncyclopediaEntry {
   content: string;
   relatedEntries: string[];
   tags: string[];
-  lastModified: string;
+  lastModified: number;
 }
 
 export interface ICategoryGroup {

@@ -6,17 +6,20 @@ import { SettingsModal } from "@/components/modals/settings-modal";
 import { Book as BookType } from "@/stores/book-store";
 
 import { Header } from "./components/header";
-import { InfoCard } from "./components/info-card";
 import { ListBooks } from "./components/list-books";
 
 interface PropsHomeView {
   filteredBooks: BookType[];
   searchTerm: string;
   totalBooks: number;
+  totalCharacters: number;
+  totalWords: number;
   lastEditedBook: string;
+  lastEditedDate?: Date;
   lastChapter?: {
     title: string;
     bookTitle: string;
+    date?: Date;
   };
   daysSinceLastChapter: number;
   showCreateModal: boolean;
@@ -34,7 +37,10 @@ export function HomeView({
   filteredBooks,
   searchTerm,
   totalBooks,
+  totalCharacters,
+  totalWords,
   lastEditedBook,
+  lastEditedDate,
   lastChapter,
   daysSinceLastChapter,
   showCreateModal,
@@ -51,19 +57,19 @@ export function HomeView({
     <div className="min-h-screen bg-background">
       <Header
         daysSinceLastChapter={daysSinceLastChapter}
+        lastEditedBook={lastEditedBook}
+        lastEditedDate={lastEditedDate}
+        lastChapter={lastChapter}
         onOpenCreateModal={onOpenCreateModal}
         onOpenSettingsModal={onOpenSettingsModal}
-      />
-
-      <InfoCard
-        totalBooks={totalBooks}
-        lastEditedBook={lastEditedBook}
-        lastChapter={lastChapter}
       />
 
       <ListBooks
         filteredBooks={filteredBooks}
         searchTerm={searchTerm}
+        totalBooks={totalBooks}
+        totalCharacters={totalCharacters}
+        totalWords={totalWords}
         onSearchTermChange={onSearchTermChange}
         onBookSelect={onBookSelect}
       />

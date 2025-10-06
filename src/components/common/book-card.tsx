@@ -1,9 +1,11 @@
 import { useState } from "react";
 
 import { Book, Eye, Edit2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface PropsBookCard {
   id: string;
@@ -12,7 +14,7 @@ interface PropsBookCard {
   visualStyle: string;
   coverImage?: string;
   chapters?: number;
-  lastModified?: string;
+  lastModified?: number;
   onClick?: () => void;
   onEdit?: () => void;
 }
@@ -29,6 +31,11 @@ export function BookCard({
   onEdit,
 }: PropsBookCard) {
   const [isHovered, setIsHovered] = useState(false);
+  const { i18n } = useTranslation();
+
+  const formattedLastModified = lastModified
+    ? formatRelativeTime(lastModified, i18n.language)
+    : undefined;
 
   return (
     <div
@@ -110,9 +117,9 @@ export function BookCard({
           <span>{chapters} capítulos</span>
         </div>
 
-        {lastModified && (
+        {formattedLastModified && (
           <p className="text-xs text-muted-foreground mt-2">
-            Modificado {lastModified}
+            Modificado {formattedLastModified}
           </p>
         )}
       </div>

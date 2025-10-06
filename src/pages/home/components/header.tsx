@@ -7,16 +7,46 @@ import { getColorClass } from "../utils/get-color-class";
 
 interface HeaderProps {
   daysSinceLastChapter: number;
+  lastEditedBook: string;
+  lastEditedDate?: Date;
+  lastChapter?: {
+    title: string;
+    bookTitle: string;
+    date?: Date;
+  };
   onOpenCreateModal: () => void;
   onOpenSettingsModal: () => void;
 }
 
+function formatDate(date: Date | undefined, locale: string): string {
+  if (!date) return "";
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+
+  // Format based on locale
+  if (locale === "pt" || locale === "pt-BR") {
+    return date.toLocaleDateString("pt-BR", options);
+  }
+
+  return date.toLocaleDateString("en-US", options);
+}
+
 export function Header({
   daysSinceLastChapter,
+  lastEditedBook,
+  lastEditedDate,
+  lastChapter,
   onOpenCreateModal,
   onOpenSettingsModal,
 }: HeaderProps) {
-  const { t } = useTranslation("home");
+  const { t, i18n } = useTranslation("home");
+
+  const formattedLastEditedDate = formatDate(lastEditedDate, i18n.language);
+  const formattedLastChapterDate = formatDate(lastChapter?.date, i18n.language);
 
   return (
     <div className="relative h-80 overflow-hidden rounded-xl mx-6 mt-6 mb-8">
@@ -35,7 +65,7 @@ export function Header({
               {t("header.title_second_part")}
             </span>
           </h1>
-          <div className="animate-fade-in-up">
+          <div className="animate-fade-in-up space-y-1">
             <p className="text-lg">
               <span
                 className={`font-bold ${getColorClass(daysSinceLastChapter)}`}
@@ -44,6 +74,26 @@ export function Header({
               </span>
               <span className="text-gray-200"> {t("header.subtext")}</span>
             </p>
+            <div className="flex gap-6 text-sm text-gray-300">
+              <div>
+                <span className="text-gray-400">
+                  {t("header.last_edited")}:{" "}
+                </span>
+                <span className="font-medium">
+                  {lastEditedBook || t("header.no_book")}
+                  {formattedLastEditedDate && ` - ${formattedLastEditedDate}`}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-400">
+                  {t("header.last_chapter")}:{" "}
+                </span>
+                <span className="font-medium">
+                  {lastChapter?.title || t("header.no_chapter")}
+                  {formattedLastChapterDate && ` - ${formattedLastChapterDate}`}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

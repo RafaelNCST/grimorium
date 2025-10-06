@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface EncyclopediaEntry {
   id: string;
@@ -38,7 +39,7 @@ interface EncyclopediaEntry {
   content: string;
   relatedEntries: string[];
   tags: string[];
-  lastModified: string;
+  lastModified: number;
 }
 
 const mockEntries: EncyclopediaEntry[] = [
@@ -50,7 +51,7 @@ const mockEntries: EncyclopediaEntry[] = [
       "Período sombrio da história mundial que durou aproximadamente 1000 anos. Iniciou-se com a Grande Ruptura, evento que dividiu o mundo entre luz e trevas. Durante este período, criaturas sombrias dominaram vastas regiões, forçando a humanidade a se refugiar em cidades fortificadas.",
     relatedEntries: ["Grande Ruptura", "Ordem dos Guardiões"],
     tags: ["história", "trevas", "guerra"],
-    lastModified: "há 2 dias",
+    lastModified: Date.now() - 2 * 24 * 60 * 60 * 1000, // 2 dias atrás
   },
   {
     id: "2",
@@ -60,7 +61,7 @@ const mockEntries: EncyclopediaEntry[] = [
       "Cristais mágicos raros encontrados apenas nas Montanhas Celestiais. São a principal fonte de poder mágico no mundo. Possuem uma cor azul-prateada e emitem uma luz suave. Extremamente valiosos e disputados por todas as facções.",
     relatedEntries: ["Montanhas Celestiais", "Sistema de Magia"],
     tags: ["magia", "cristais", "recursos"],
-    lastModified: "há 1 semana",
+    lastModified: Date.now() - 7 * 24 * 60 * 60 * 1000, // 1 semana atrás
   },
   {
     id: "3",
@@ -70,7 +71,7 @@ const mockEntries: EncyclopediaEntry[] = [
       "Celebração anual realizada durante a lua cheia de inverno. Marca o fim do período mais sombrio do ano e renova as esperanças de paz. Inclui danças rituais, oferendas aos ancestrais e a tradicional Cerimônia das Luzes.",
     relatedEntries: ["Cultura Élfica", "Religião da Luz"],
     tags: ["festival", "cultura", "tradição"],
-    lastModified: "há 5 dias",
+    lastModified: Date.now() - 5 * 24 * 60 * 60 * 1000, // 5 dias atrás
   },
   {
     id: "4",
@@ -80,7 +81,7 @@ const mockEntries: EncyclopediaEntry[] = [
       "Órgão político formado pelos representantes dos cinco principais reinos. Criado para coordenar a defesa contra as ameaças sombrias e mediar conflitos entre os reinos. Reúne-se na Torre Neutra uma vez por estação.",
     relatedEntries: ["Reino de Aethermoor", "Torre Neutra"],
     tags: ["política", "governo", "diplomacia"],
-    lastModified: "há 3 dias",
+    lastModified: Date.now() - 3 * 24 * 60 * 60 * 1000, // 3 dias atrás
   },
 ];
 
@@ -264,7 +265,7 @@ export function EncyclopediaTab() {
                   )}
 
                   <div className="text-xs text-muted-foreground">
-                    Modificado {entry.lastModified}
+                    Modificado {formatRelativeTime(entry.lastModified, "pt")}
                   </div>
                 </CardContent>
               </Card>
