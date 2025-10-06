@@ -1,5 +1,11 @@
 import { create } from "zustand";
 
+export type BookStatus =
+  | "Em planejamento"
+  | "Em lançamento"
+  | "Hiato"
+  | "Completo";
+
 export interface Book {
   id: string;
   title: string;
@@ -8,6 +14,7 @@ export interface Book {
   coverImage: string;
   chapters: number;
   lastModified: string;
+  status: BookStatus;
   currentArc?: string;
   authorSummary?: string;
   storySummary?: string;
@@ -27,21 +34,7 @@ interface BookState {
 }
 
 export const useBookStore = create<BookState>((set, get) => ({
-  books: [
-    {
-      id: "1",
-      title: "As Crônicas do Reino Perdido",
-      genre: ["Alta Fantasia", "Aventura"],
-      visualStyle: "Realista",
-      coverImage: "/assets/book-cover-1.jpg",
-      chapters: 12,
-      lastModified: "há 2 dias",
-      authorSummary:
-        "Para mim como autor: explorar temas de crescimento pessoal através da jornada do herói. Focar na dualidade luz/trevas como metáfora.",
-      storySummary:
-        "Em um reino onde a magia está desaparecendo, um jovem pastor descobre que carrega o poder de restaurar o equilíbrio entre luz e trevas.",
-    },
-  ],
+  books: [],
   currentBook: null,
   searchTerm: "",
   setBooks: (books) => set({ books }),
@@ -69,7 +62,9 @@ export const useBookStore = create<BookState>((set, get) => ({
     return books.filter(
       (book) =>
         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.genre.some((g) => g.toLowerCase().includes(searchTerm.toLowerCase()))
+        book.genre.some((g) =>
+          g.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
   },
 }));

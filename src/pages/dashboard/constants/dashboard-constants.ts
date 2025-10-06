@@ -18,25 +18,27 @@ interface TabConfig {
   isDefault?: boolean;
 }
 
+// Genres aligned with create book modal translations
 export const GENRES_CONSTANT = [
+  "Urbano",
+  "Fantasia",
+  "Futurístico",
+  "Cyberpunk",
   "Alta Fantasia",
-  "Fantasia Urbana",
-  "Épico",
   "Romance",
   "Mistério",
-  "Suspense",
   "Terror",
-  "Ficção Científica",
-  "Distopia",
-  "Aventura",
+  "Suspense",
   "Drama",
-  "Comédia",
-  "Biografia",
+  "Ficção Científica",
   "Histórico",
-  "Contemporâneo",
+  "Ação",
+  "Aventura",
+  "LitRPG",
 ];
 
-export const VISUAL_STYLES_CONSTANT = ["Cartoon", "Anime", "Realista"];
+// Visual styles aligned with create book modal translations
+export const VISUAL_STYLES_CONSTANT = ["Realista", "Cartoon", "Anime"];
 
 export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   {

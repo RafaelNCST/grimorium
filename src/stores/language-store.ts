@@ -41,9 +41,11 @@ const translations = {
     "modal.title_placeholder": "Ex: As Crônicas do Reino Perdido",
     "modal.genre_placeholder": "Selecione os gêneros da sua história",
     "modal.style_placeholder": "Selecione o estilo visual",
-    "modal.summary_placeholder": "Escreva um resumo rápido e casual da sua história. Não precisa ser perfeito, apenas suas ideias iniciais sobre o enredo, personagens ou o que você imagina para esta obra",
+    "modal.summary_placeholder":
+      "Escreva um resumo rápido e casual da sua história. Não precisa ser perfeito, apenas suas ideias iniciais sobre o enredo, personagens ou o que você imagina para esta obra",
     "modal.book_synopsis": "Sinopse",
-    "modal.synopsis_placeholder": "Escreva a sinopse oficial que será apresentada aos leitores. Descreva de forma atraente o enredo, os personagens principais e o que torna sua história única",
+    "modal.synopsis_placeholder":
+      "Escreva a sinopse oficial que será apresentada aos leitores. Descreva de forma atraente o enredo, os personagens principais e o que torna sua história única",
     "modal.optional": "Opcional",
     "modal.upload_image": "Clique para selecionar ou arraste uma imagem",
     "modal.upload_formats": "PNG, JPG, JPEG, WEBP ou GIF",
@@ -98,9 +100,11 @@ const translations = {
     "modal.title_placeholder": "Ex: The Chronicles of the Lost Kingdom",
     "modal.genre_placeholder": "Select your story genres",
     "modal.style_placeholder": "Select visual style",
-    "modal.summary_placeholder": "Write a quick and casual summary of your story. It doesn't have to be perfect, just your initial ideas about the plot, characters, or what you imagine for this work",
+    "modal.summary_placeholder":
+      "Write a quick and casual summary of your story. It doesn't have to be perfect, just your initial ideas about the plot, characters, or what you imagine for this work",
     "modal.book_synopsis": "Synopsis",
-    "modal.synopsis_placeholder": "Write the official synopsis that will be presented to readers. Describe in an engaging way the plot, main characters, and what makes your story unique",
+    "modal.synopsis_placeholder":
+      "Write the official synopsis that will be presented to readers. Describe in an engaging way the plot, main characters, and what makes your story unique",
     "modal.optional": "Optional",
     "modal.upload_image": "Click to select or drag an image",
     "modal.upload_formats": "PNG, JPG, JPEG, WEBP or GIF",

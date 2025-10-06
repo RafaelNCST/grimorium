@@ -53,9 +53,7 @@ export function ListBooks({
             {t("list_books.text_empty")}
           </h3>
           <p className="text-muted-foreground mb-4">
-            {searchTerm
-              ? t("filter.text_empty")
-              : t("filter.button_create_book")}
+            {searchTerm ? t("filter.text_empty") : t("filter.text_create_book")}
           </p>
         </div>
       )}

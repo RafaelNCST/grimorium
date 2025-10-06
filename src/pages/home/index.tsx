@@ -59,13 +59,18 @@ export function HomePage() {
         coverImage: bookData.cover || "/placeholder.svg",
         chapters: 0,
         lastModified: "agora",
-        storySummary: bookData.authorSummary || "",
+        status: "Em planejamento" as const,
+        storySummary: bookData.synopsis || "",
         authorSummary: bookData.authorSummary || "",
       };
       addBook(newBook);
       setShowCreateModal(false);
+      navigate({
+        to: "/dashboard/$dashboardId",
+        params: { dashboardId: newBook.id },
+      });
     },
-    [addBook]
+    [addBook, navigate]
   );
 
   const handleBookSelect = useCallback(

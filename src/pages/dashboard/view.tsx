@@ -75,7 +75,6 @@ interface PropsDashboardView {
   onSave: () => void;
   onCancel: () => void;
   onDelete: () => void;
-  onUpdateBook: (updates: Partial<BookType>) => void;
   onDeleteBook: () => void;
   onNavigateToChapters: () => void;
   onNavigateToNotes: () => void;
@@ -135,7 +134,6 @@ export function DashboardView({
                 book={book}
                 draftBook={draftBook}
                 isEditingHeader={isEditingHeader}
-                currentArc={currentArc}
                 onEditingHeaderChange={onEditingHeaderChange}
                 onDraftBookChange={onDraftBookChange}
                 onSave={onSave}

@@ -147,13 +147,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     }
   }, [book, deleteInput, deleteBook, bookId, onBack]);
 
-  const handleUpdateBook = useCallback(
-    (updates: Partial<BookType>) => {
-      updateBook(bookId, updates);
-    },
-    [updateBook, bookId]
-  );
-
   const handleDeleteBook = useCallback(() => {
     deleteBook(bookId);
     onBack();
@@ -224,7 +217,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onSave={handleSave}
       onCancel={handleCancel}
       onDelete={handleDelete}
-      onUpdateBook={handleUpdateBook}
       onDeleteBook={handleDeleteBook}
       onNavigateToChapters={handleNavigateToChapters}
       onNavigateToNotes={handleNavigateToNotes}

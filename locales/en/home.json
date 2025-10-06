@@ -24,7 +24,7 @@
   "filter": {
     "placeholder": "Search books",
     "text_empty": "Try adjusting your search or create a new book.",
-    "button_create_book": "Start by creating your first book!"
+    "text_create_book": "Start by creating your first book!"
   },
   "list_books": {
     "title": "Library",

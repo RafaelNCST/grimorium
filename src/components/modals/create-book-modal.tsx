@@ -154,7 +154,10 @@ export function CreateBookModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto" showCloseButton={false}>
+      <DialogContent
+        className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
+        showCloseButton={false}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <BookPlus className="w-5 h-5 text-primary" />
