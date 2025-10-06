@@ -1,10 +1,52 @@
 {
+  "stats": {
+    "chapters": "Chapters",
+    "average_per_week": "Average/Week",
+    "average_per_month": "Average/Month",
+    "last_released_chapter": "Last Released Chapter",
+    "total_words": "Total Words",
+    "total_characters": "Total Characters",
+    "chapters_in_progress": "Chapters in Progress",
+    "chapters_finished": "Chapters Finished",
+    "chapters_draft": "Chapters Draft",
+    "chapters_planning": "Chapters Planning",
+    "average_words_per_chapter": "Average Words/Chapter",
+    "average_characters_per_chapter": "Average Characters/Chapter",
+    "chapters_unit": "Chapters",
+    "no_chapter": "No chapters yet"
+  },
+  "story_progress": {
+    "title": "Story Progress",
+    "overall_progress": "Overall Progress",
+    "completed_arcs": "Completed Arcs",
+    "current_arc_progress": "Current Arc Progress"
+  },
   "author_summary": {
+    "title": "Author Summary",
+    "description": "For internal control",
     "empty_message": "No author summary added yet. Click the edit icon to add one.",
-    "placeholder": "Internal summary for author control and organization..."
+    "placeholder": "Internal summary for author control and organization...",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "story_summary": {
+    "title": "Story Summary",
+    "description": "For presentation",
     "empty_message": "No story summary added yet. Click the edit icon to add one.",
-    "placeholder": "Story summary to present to readers. Describe the main events, conflicts, and what makes your story unique!"
+    "placeholder": "Story summary to present to readers. Describe the main events, conflicts, and what makes your story unique!",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "notes_board": {
+    "title": "Reminders Board",
+    "description": "Drag notes to organize them",
+    "add_note_placeholder": "Add new note...",
+    "add": "Add"
+  },
+  "customize_mode": {
+    "title": "Customize Mode Active",
+    "description": "Drag sections to reorder them and use visibility buttons to show/hide sections. Content editing is disabled in this mode.",
+    "hidden_sections": "Hidden Sections",
+    "all_sections_visible": "All sections are visible"
   }
 }

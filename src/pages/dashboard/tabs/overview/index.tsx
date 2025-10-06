@@ -22,17 +22,16 @@ import { OverviewView } from "./view";
 
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [goals, setGoals] = useState<IGoals>({
-    wordsPerDay: 500,
-    chaptersPerWeek: 2,
+    wordsPerDay: 0,
+    chaptersPerWeek: 0,
   });
   const [isEditingGoals, setIsEditingGoals] = useState(false);
   const [storyProgress, setStoryProgress] = useState<IStoryProgress>({
-    estimatedArcs: 3,
-    estimatedChapters: 25,
-    completedArcs: 1,
-    currentArcProgress: 45,
+    estimatedArcs: 0,
+    estimatedChapters: 0,
+    completedArcs: 0,
+    currentArcProgress: 0,
   });
-  const [isEditingProgress, setIsEditingProgress] = useState(false);
   const [authorSummary, setAuthorSummary] = useState(book.authorSummary || "");
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
   const [storySummary, setStorySummary] = useState(book.storySummary || "");
@@ -88,13 +87,23 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     () => ({
       totalWords: 0,
       totalCharacters: 0,
-      lastChapterNumber: book.chapters,
+      totalChapters: book.chapters || 0,
+      lastChapterNumber: 0,
       lastChapterName: "",
+      averagePerWeek: 0,
+      averagePerMonth: 0,
+      chaptersInProgress: 0,
+      chaptersFinished: 0,
+      chaptersDraft: 0,
+      chaptersPlanning: 0,
+      averageWordsPerChapter: 0,
+      averageCharactersPerChapter: 0,
     }),
     [book.chapters]
   );
 
   const storyProgressPercentage = useMemo(() => {
+    if (storyProgress.estimatedArcs === 0) return 0;
     const totalProgress =
       storyProgress.completedArcs + storyProgress.currentArcProgress / 100;
     return Math.round((totalProgress / storyProgress.estimatedArcs) * 100);
@@ -226,7 +235,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       goals={goals}
       isEditingGoals={isEditingGoals}
       storyProgress={storyProgress}
-      isEditingProgress={isEditingProgress}
       authorSummary={authorSummary}
       isEditingAuthorSummary={isEditingAuthorSummary}
       storySummary={storySummary}
@@ -244,8 +252,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       sensors={sensors}
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
-      onStoryProgressChange={setStoryProgress}
-      onEditingProgressChange={setIsEditingProgress}
       onAuthorSummaryChange={setAuthorSummary}
       onEditingAuthorSummaryChange={setIsEditingAuthorSummary}
       onStorySummaryChange={setStorySummary}

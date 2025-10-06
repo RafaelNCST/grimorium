@@ -44,8 +44,17 @@ export interface ISection {
 export interface IOverviewStats {
   totalWords: number;
   totalCharacters: number;
+  totalChapters: number;
   lastChapterNumber: number;
   lastChapterName: string;
+  averagePerWeek: number;
+  averagePerMonth: number;
+  chaptersInProgress: number;
+  chaptersFinished: number;
+  chaptersDraft: number;
+  chaptersPlanning: number;
+  averageWordsPerChapter: number;
+  averageCharactersPerChapter: number;
 }
 
 export interface PropsOverviewTab {
@@ -61,7 +70,6 @@ export interface PropsOverviewView {
   goals: IGoals;
   isEditingGoals: boolean;
   storyProgress: IStoryProgress;
-  isEditingProgress: boolean;
   authorSummary: string;
   isEditingAuthorSummary: boolean;
   storySummary: string;
@@ -79,8 +87,6 @@ export interface PropsOverviewView {
   sensors: SensorDescriptor<SensorOptions>[];
   onGoalsChange: (goals: IGoals) => void;
   onEditingGoalsChange: (editing: boolean) => void;
-  onStoryProgressChange: (progress: IStoryProgress) => void;
-  onEditingProgressChange: (editing: boolean) => void;
   onAuthorSummaryChange: (summary: string) => void;
   onEditingAuthorSummaryChange: (editing: boolean) => void;
   onStorySummaryChange: (summary: string) => void;

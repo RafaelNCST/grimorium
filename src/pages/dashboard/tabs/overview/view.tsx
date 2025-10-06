@@ -11,8 +11,13 @@ import {
   StickyNote,
   Plus,
   FileText,
-  Minus,
   Eye,
+  Calendar,
+  CheckCircle,
+  FileEdit,
+  ClipboardList,
+  Type,
+  Hash,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -24,7 +29,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -34,7 +38,6 @@ import { PropsOverviewView, ISection } from "./types/overview-types";
 
 export function OverviewView(props: PropsOverviewView) {
   const { t } = useTranslation("overview");
-  const { t: tCreateBook } = useTranslation("create-book");
 
   const {
     book,
@@ -42,7 +45,6 @@ export function OverviewView(props: PropsOverviewView) {
     goals,
     isEditingGoals,
     storyProgress,
-    isEditingProgress,
     authorSummary,
     isEditingAuthorSummary,
     storySummary,
@@ -58,8 +60,6 @@ export function OverviewView(props: PropsOverviewView) {
     sensors,
     onGoalsChange,
     onEditingGoalsChange,
-    onStoryProgressChange,
-    onEditingProgressChange,
     onAuthorSummaryChange,
     onEditingAuthorSummaryChange,
     onStorySummaryChange,
@@ -82,6 +82,7 @@ export function OverviewView(props: PropsOverviewView) {
 
   const renderStatsSection = () => (
     <div className="flex gap-4 overflow-x-auto pb-2">
+      {/* Total Chapters */}
       <Card className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
@@ -90,16 +91,17 @@ export function OverviewView(props: PropsOverviewView) {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Capítulos
+                {t("stats.chapters")}
               </p>
               <p className="text-xl font-bold text-foreground">
-                {book.chapters}
+                {overviewStats.totalChapters}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Average per Week */}
       <Card
         className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
         style={{ animationDelay: "0.1s" }}
@@ -111,15 +113,45 @@ export function OverviewView(props: PropsOverviewView) {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Média/Semana
+                {t("stats.average_per_week")}
               </p>
-              <p className="text-xl font-bold text-foreground">2.1</p>
-              <p className="text-xs text-muted-foreground">Capítulos</p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.averagePerWeek}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("stats.chapters_unit")}
+              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Average per Month */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.15s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.average_per_month")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.averagePerMonth}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("stats.chapters_unit")}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Last Released Chapter */}
       <Card
         className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
         style={{ animationDelay: "0.2s" }}
@@ -131,12 +163,12 @@ export function OverviewView(props: PropsOverviewView) {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Último Capítulo
+                {t("stats.last_released_chapter")}
               </p>
               <p className="text-xl font-bold text-foreground">
                 {overviewStats.lastChapterNumber > 0
                   ? `Cap. ${overviewStats.lastChapterNumber}`
-                  : "-"}
+                  : t("stats.no_chapter")}
               </p>
               {overviewStats.lastChapterName && (
                 <p className="text-xs text-muted-foreground">
@@ -148,6 +180,31 @@ export function OverviewView(props: PropsOverviewView) {
         </CardContent>
       </Card>
 
+      {/* Total Words */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.25s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Type className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.total_words")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.totalWords > 0
+                  ? `${(overviewStats.totalWords / 1000).toFixed(1)}k`
+                  : "0"}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Total Characters */}
       <Card
         className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
         style={{ animationDelay: "0.3s" }}
@@ -155,25 +212,70 @@ export function OverviewView(props: PropsOverviewView) {
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-primary" />
+              <Hash className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Total de Palavras
+                {t("stats.total_characters")}
               </p>
               <p className="text-xl font-bold text-foreground">
-                {overviewStats.totalWords > 0
-                  ? `${(overviewStats.totalWords / 1000).toFixed(1)}k`
-                  : "-"}
+                {overviewStats.totalCharacters > 0
+                  ? `${(overviewStats.totalCharacters / 1000).toFixed(0)}k`
+                  : "0"}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Chapters in Progress */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.35s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <FileEdit className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.chapters_in_progress")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.chaptersInProgress}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Chapters Finished */}
       <Card
         className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
         style={{ animationDelay: "0.4s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.chapters_finished")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.chaptersFinished}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Chapters Draft */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.45s" }}
       >
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
@@ -182,12 +284,76 @@ export function OverviewView(props: PropsOverviewView) {
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
-                Total de Caracteres
+                {t("stats.chapters_draft")}
               </p>
               <p className="text-xl font-bold text-foreground">
-                {overviewStats.totalCharacters > 0
-                  ? `${(overviewStats.totalCharacters / 1000).toFixed(0)}k`
-                  : "-"}
+                {overviewStats.chaptersDraft}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Chapters Planning */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.5s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <ClipboardList className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.chapters_planning")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.chaptersPlanning}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Average Words per Chapter */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.55s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Type className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.average_words_per_chapter")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.averageWordsPerChapter}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Average Characters per Chapter */}
+      <Card
+        className="card-magical flex-shrink-0 m-1 h-fit animate-fade-in"
+        style={{ animationDelay: "0.6s" }}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Hash className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("stats.average_characters_per_chapter")}
+              </p>
+              <p className="text-xl font-bold text-foreground">
+                {overviewStats.averageCharactersPerChapter}
               </p>
             </div>
           </div>
@@ -198,114 +364,31 @@ export function OverviewView(props: PropsOverviewView) {
 
   const renderProgressSection = () => (
     <Card className="card-magical m-1 min-w-[280px] h-fit animate-fade-in">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <div>
-          <CardTitle className="text-base">Progressão da História</CardTitle>
-        </div>
-        {!isCustomizing && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEditingProgressChange(!isEditingProgress)}
-            className="h-6 w-6"
-          >
-            <Edit2 className="w-3 h-3" />
-          </Button>
-        )}
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">{t("story_progress.title")}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        {isEditingProgress && !isCustomizing ? (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-medium mb-1 block">
-                Estimativa de arcos
-              </label>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-7 p-0"
-                  onClick={() =>
-                    onStoryProgressChange({
-                      ...storyProgress,
-                      estimatedArcs: Math.max(
-                        1,
-                        storyProgress.estimatedArcs - 1
-                      ),
-                    })
-                  }
-                >
-                  <Minus className="w-3 h-3" />
-                </Button>
-                <Input
-                  type="number"
-                  value={storyProgress.estimatedArcs}
-                  onChange={(e) =>
-                    onStoryProgressChange({
-                      ...storyProgress,
-                      estimatedArcs: Math.max(1, parseInt(e.target.value) || 1),
-                    })
-                  }
-                  className="h-7 text-xs text-center"
-                  min="1"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 w-7 p-0"
-                  onClick={() =>
-                    onStoryProgressChange({
-                      ...storyProgress,
-                      estimatedArcs: storyProgress.estimatedArcs + 1,
-                    })
-                  }
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </div>
+        <div className="space-y-3">
+          <div>
+            <div className="flex justify-between text-xs mb-1">
+              <span>{t("story_progress.overall_progress")}</span>
+              <span>{storyProgressPercentage}%</span>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="accent"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={() => onEditingProgressChange(false)}
-              >
-                Salvar
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={() => onEditingProgressChange(false)}
-              >
-                Cancelar
-              </Button>
+            <Progress value={storyProgressPercentage} className="h-2" />
+          </div>
+          <div className="text-xs text-muted-foreground space-y-1">
+            <div className="flex justify-between">
+              <span>{t("story_progress.completed_arcs")}</span>
+              <span>
+                {storyProgress.completedArcs}/{storyProgress.estimatedArcs}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>{t("story_progress.current_arc_progress")}</span>
+              <span>{storyProgress.currentArcProgress}%</span>
             </div>
           </div>
-        ) : (
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Progresso Geral</span>
-                <span>{storyProgressPercentage}%</span>
-              </div>
-              <Progress value={storyProgressPercentage} className="h-2" />
-            </div>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <div className="flex justify-between">
-                <span>Arcos completos:</span>
-                <span>
-                  {storyProgress.completedArcs}/{storyProgress.estimatedArcs}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Progresso do arco atual:</span>
-                <span>{storyProgress.currentArcProgress}%</span>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -314,9 +397,9 @@ export function OverviewView(props: PropsOverviewView) {
     <Card className="card-magical m-1 h-fit animate-fade-in">
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base">Resumo do Autor</CardTitle>
+          <CardTitle className="text-base">{t("author_summary.title")}</CardTitle>
           <CardDescription className="text-xs">
-            Para controle interno
+            {t("author_summary.description")}
           </CardDescription>
         </div>
         {!isCustomizing && (
@@ -339,7 +422,7 @@ export function OverviewView(props: PropsOverviewView) {
               value={authorSummary}
               onChange={(e) => onAuthorSummaryChange(e.target.value)}
               className="min-h-[80px] text-xs"
-              placeholder={tCreateBook("modal.summary_placeholder")}
+              placeholder={t("author_summary.placeholder")}
             />
             <div className="flex gap-2">
               <Button
@@ -348,7 +431,7 @@ export function OverviewView(props: PropsOverviewView) {
                 className="h-6 text-xs"
                 onClick={onSaveAuthorSummary}
               >
-                Salvar
+                {t("author_summary.save")}
               </Button>
               <Button
                 variant="ghost"
@@ -356,7 +439,7 @@ export function OverviewView(props: PropsOverviewView) {
                 className="h-6 text-xs"
                 onClick={() => onEditingAuthorSummaryChange(false)}
               >
-                Cancelar
+                {t("author_summary.cancel")}
               </Button>
             </div>
           </div>
@@ -377,9 +460,9 @@ export function OverviewView(props: PropsOverviewView) {
     <Card className="card-magical m-1 h-fit animate-fade-in">
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="text-base">Resumo da História</CardTitle>
+          <CardTitle className="text-base">{t("story_summary.title")}</CardTitle>
           <CardDescription className="text-xs">
-            Para apresentação
+            {t("story_summary.description")}
           </CardDescription>
         </div>
         {!isCustomizing && (
@@ -409,7 +492,7 @@ export function OverviewView(props: PropsOverviewView) {
                 className="h-6 text-xs"
                 onClick={onSaveStorySummary}
               >
-                Salvar
+                {t("story_summary.save")}
               </Button>
               <Button
                 variant="ghost"
@@ -417,7 +500,7 @@ export function OverviewView(props: PropsOverviewView) {
                 className="h-6 text-xs"
                 onClick={() => onEditingStorySummaryChange(false)}
               >
-                Cancelar
+                {t("story_summary.cancel")}
               </Button>
             </div>
           </div>
@@ -440,9 +523,9 @@ export function OverviewView(props: PropsOverviewView) {
         <div>
           <CardTitle className="flex items-center gap-2">
             <StickyNote className="w-5 h-5" />
-            Quadro de Lembretes
+            {t("notes_board.title")}
           </CardTitle>
-          <CardDescription>Arraste as notas para organizá-las</CardDescription>
+          <CardDescription>{t("notes_board.description")}</CardDescription>
         </div>
       </CardHeader>
       <CardContent>
@@ -479,7 +562,7 @@ export function OverviewView(props: PropsOverviewView) {
 
         <div className="flex gap-2">
           <Textarea
-            placeholder="Adicionar nova nota..."
+            placeholder={t("notes_board.add_note_placeholder")}
             value={newNote}
             onChange={(e) => onNewNoteChange(e.target.value)}
             className="min-h-[60px]"
@@ -528,12 +611,10 @@ export function OverviewView(props: PropsOverviewView) {
     <div className="space-y-4">
       <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg animate-fade-in">
         <h3 className="font-semibold text-primary mb-2">
-          Modo Personalizar Ativo
+          {t("customize_mode.title")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          Arraste as seções para reordená-las e use os botões de visibilidade
-          para mostrar/esconder seções. A edição de conteúdo está desabilitada
-          neste modo.
+          {t("customize_mode.description")}
         </p>
       </div>
 
@@ -570,7 +651,7 @@ export function OverviewView(props: PropsOverviewView) {
 
       <div className="mt-6 p-4 bg-muted/20 border border-dashed border-muted-foreground/30 rounded-lg animate-fade-in">
         <h4 className="font-semibold mb-3 text-muted-foreground">
-          Seções Ocultas
+          {t("customize_mode.hidden_sections")}
         </h4>
         <div className="flex flex-wrap gap-2">
           {sections
@@ -589,7 +670,7 @@ export function OverviewView(props: PropsOverviewView) {
             ))}
           {sections.filter((s) => !s.visible).length === 0 && (
             <p className="text-sm text-muted-foreground italic">
-              Todas as seções estão visíveis
+              {t("customize_mode.all_sections_visible")}
             </p>
           )}
         </div>

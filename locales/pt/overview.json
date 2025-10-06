@@ -1,10 +1,52 @@
 {
+  "stats": {
+    "chapters": "Capítulos",
+    "average_per_week": "Média/Semana",
+    "average_per_month": "Média/Mês",
+    "last_released_chapter": "Último capítulo lançado",
+    "total_words": "Total de Palavras",
+    "total_characters": "Total de Caracteres",
+    "chapters_in_progress": "Capítulos em Andamento",
+    "chapters_finished": "Capítulos Finalizados",
+    "chapters_draft": "Capítulos em Rascunho",
+    "chapters_planning": "Capítulos em Planejamento",
+    "average_words_per_chapter": "Média de Palavras/Capítulo",
+    "average_characters_per_chapter": "Média de Caracteres/Capítulo",
+    "chapters_unit": "Capítulos",
+    "no_chapter": "Nenhum capítulo ainda"
+  },
+  "story_progress": {
+    "title": "Progressão da História",
+    "overall_progress": "Progresso Geral",
+    "completed_arcs": "Arcos Completos",
+    "current_arc_progress": "Progressão do arco atual"
+  },
   "author_summary": {
+    "title": "Resumo do Autor",
+    "description": "Para controle interno",
     "empty_message": "Nenhum resumo do autor adicionado ainda. Clique no ícone de edição para adicionar.",
-    "placeholder": "Internal summary for the author's control and organization, this summary is yours alone and allows you to write your ideas the way you want"
+    "placeholder": "Resumo interno para controle e organização do autor. Este resumo é só seu e permite escrever suas ideias do jeito que quiser",
+    "save": "Salvar",
+    "cancel": "Cancelar"
   },
   "story_summary": {
+    "title": "Resumo da História",
+    "description": "Para apresentação",
     "empty_message": "Nenhum resumo da história adicionado ainda. Clique no ícone de edição para adicionar.",
-    "placeholder": "Resumo da história para apresentar aos leitores. Descreva os eventos principais, conflitos e o que torna sua história única!"
+    "placeholder": "Resumo da história para apresentar aos leitores. Descreva os eventos principais, conflitos e o que torna sua história única!",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "notes_board": {
+    "title": "Quadro de Lembretes",
+    "description": "Arraste as notas para organizá-las",
+    "add_note_placeholder": "Adicionar nova nota...",
+    "add": "Adicionar"
+  },
+  "customize_mode": {
+    "title": "Modo Personalizar Ativo",
+    "description": "Arraste as seções para reordená-las e use os botões de visibilidade para mostrar/esconder seções. A edição de conteúdo está desabilitada neste modo.",
+    "hidden_sections": "Seções Ocultas",
+    "all_sections_visible": "Todas as seções estão visíveis"
   }
 }
