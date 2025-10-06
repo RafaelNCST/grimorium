@@ -8,7 +8,6 @@ import {
   mockBeast,
   habits,
   humanComparisons,
-  mockLinkedNotes,
 } from "@/mocks/local/beast-data";
 
 import { getComparisonColorWithBg } from "../utils/get-comparison-color-with-bg";
@@ -146,7 +145,7 @@ export function BeastDetail() {
       newMythology={newMythology}
       isAddingMythology={isAddingMythology}
       isLinkedNotesModalOpen={isLinkedNotesModalOpen}
-      linkedNotes={mockLinkedNotes}
+      linkedNotes={[]}
       fileInputRef={fileInputRef}
       getThreatLevelIcon={getThreatLevelIcon}
       getHabitIcon={getHabitIcon}

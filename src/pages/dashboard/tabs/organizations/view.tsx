@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/select";
 import { IOrganization } from "@/types/organization-types";
 
-import { MOCK_CHARACTERS } from "./mocks/mock-characters";
-import { MOCK_LOCATIONS } from "./mocks/mock-locations";
 import { getAlignmentColor } from "./utils/formatters/get-alignment-color";
 import { getInfluenceColor } from "./utils/formatters/get-influence-color";
 import { getOrganizationIcon } from "./utils/formatters/get-organization-icon";
+
+const MOCK_CHARACTERS: any[] = [];
+const MOCK_LOCATIONS: any[] = [];
 
 interface PropsOrganizationsView {
   bookId: string;

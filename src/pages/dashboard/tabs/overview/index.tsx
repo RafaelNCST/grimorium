@@ -11,7 +11,6 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
-import { MOCK_OVERVIEW_STATS } from "./mocks/mock-overview-data";
 import {
   PropsOverviewTab,
   IStickyNote,
@@ -38,23 +37,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
   const [storySummary, setStorySummary] = useState(book.storySummary || "");
   const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
-  const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([
-    {
-      id: "1",
-      content:
-        "Desenvolver melhor o relacionamento entre protagonista e mentor",
-      color: NOTE_COLORS_CONSTANT[0],
-      x: 20,
-      y: 20,
-    },
-    {
-      id: "2",
-      content: "Adicionar mais detalhes sobre o sistema de magia",
-      color: NOTE_COLORS_CONSTANT[1],
-      x: 250,
-      y: 80,
-    },
-  ]);
+  const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -103,8 +86,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
   const overviewStats = useMemo(
     () => ({
-      ...MOCK_OVERVIEW_STATS,
+      totalWords: 0,
+      totalCharacters: 0,
       lastChapterNumber: book.chapters,
+      lastChapterName: "",
     }),
     [book.chapters]
   );

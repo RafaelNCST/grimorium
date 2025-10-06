@@ -23,11 +23,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  ITimelineEvent,
-  eventTypeIcons,
-  eventTypeNames,
-} from "@/mocks/local/timeline-data";
+
+export interface ITimelineEvent {
+  id: string;
+  title: string;
+  description: string;
+  date?: string;
+  location?: string;
+  character?: string;
+  eventType:
+    | "creation"
+    | "battle"
+    | "discovery"
+    | "loss"
+    | "transformation"
+    | "other";
+}
+
+const eventTypeIcons: Record<ITimelineEvent["eventType"], string> = {
+  creation: "⚒️",
+  battle: "⚔️",
+  discovery: "🔍",
+  loss: "💔",
+  transformation: "✨",
+  other: "📍",
+};
+
+const eventTypeNames: Record<ITimelineEvent["eventType"], string> = {
+  creation: "Criação",
+  battle: "Batalha",
+  discovery: "Descoberta",
+  loss: "Perda",
+  transformation: "Transformação",
+  other: "Outro",
+};
 
 interface PropsItemTimelineView {
   itemName: string;

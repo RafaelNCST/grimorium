@@ -3,12 +3,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
-import {
-  Item,
-  mockItems,
-  mockLinkedNotes,
-  MythologyEntry,
-} from "@/mocks/local/item-data";
+import { Item, MythologyEntry } from "@/mocks/local/item-data";
 
 import { ItemDetailView } from "./view";
 
@@ -19,16 +14,14 @@ export default function ItemDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [item, setItem] = useState<Item | null>(
-    itemId ? mockItems[itemId] || null : null
-  );
+  const [item, setItem] = useState<Item | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newMythologyPeople, setNewMythologyPeople] = useState("");
   const [newMythologyVersion, setNewMythologyVersion] = useState("");
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
-  const linkedNotes = useMemo(() => mockLinkedNotes, []);
+  const linkedNotes = useMemo(() => [], []);
 
   const handleBack = useCallback(() => {
     window.history.back();

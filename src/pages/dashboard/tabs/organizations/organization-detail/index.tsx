@@ -5,12 +5,6 @@ import { toast } from "sonner";
 
 import { IOrganization, IOrganizationTitle } from "@/types/organization-types";
 
-import {
-  MOCK_LOCATIONS,
-  MOCK_WORLDS,
-  MOCK_CONTINENTS,
-} from "../mocks/mock-locations";
-import { MOCK_ORGANIZATIONS_DETAIL } from "../mocks/mock-organization-detail";
 import { getAlignmentColor } from "../utils/formatters/get-alignment-color";
 import { getInfluenceColor } from "../utils/formatters/get-influence-color";
 import { getLocationIcon } from "../utils/formatters/get-location-icon";
@@ -18,16 +12,17 @@ import { getTitleName } from "../utils/formatters/get-title-name";
 
 import { OrganizationDetailView } from "./view";
 
+const MOCK_LOCATIONS: any[] = [];
+const MOCK_WORLDS: any[] = [];
+const MOCK_CONTINENTS: any[] = [];
+
 export function OrganizationDetail() {
   const { dashboardId, orgId } = useParams({
     from: "/dashboard/$dashboardId/tabs/organization/$orgId",
   });
   const navigate = useNavigate();
 
-  const organization = useMemo(
-    () => MOCK_ORGANIZATIONS_DETAIL[orgId || ""],
-    [orgId]
-  );
+  const organization = useMemo(() => undefined, [orgId]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

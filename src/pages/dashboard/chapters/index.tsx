@@ -51,12 +51,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
+
+type ChapterStatus = "draft" | "in-progress" | "review" | "finished";
+
+interface Chapter {
+  id: string;
+  number: number;
+  title: string;
+  status: ChapterStatus;
+  wordCount: number;
+  characterCount: number;
+  lastEdited: Date;
+  summary?: string;
+  characters?: string[];
+  items?: string[];
+  locations?: string[];
+}
+
+const statusConfig: Record<
   ChapterStatus,
-  Chapter,
-  statusConfig,
-  mockChapters,
-} from "@/mocks/local/chapters-data";
+  { label: string; color: string; icon: any }
+> = {
+  draft: { label: "Rascunho", color: "bg-gray-500", icon: null },
+  "in-progress": { label: "Em andamento", color: "bg-blue-500", icon: null },
+  review: { label: "Em revisão", color: "bg-yellow-500", icon: null },
+  finished: { label: "Finalizado", color: "bg-green-500", icon: null },
+};
+
+const mockChapters: Chapter[] = [];
 
 export function ChaptersPage() {
   const { dashboardId } = useParams({

@@ -5,12 +5,6 @@ import { Globe, Mountain, TreePine, Castle, Home, MapPin } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { MOCK_CONTINENTS } from "./mocks/mock-continents";
-import { MOCK_LINKED_NOTES } from "./mocks/mock-linked-notes";
-import { MOCK_ORGANIZATIONS } from "./mocks/mock-organizations";
-import { MOCK_STICKY_NOTES } from "./mocks/mock-sticky-notes";
-import { MOCK_WORLD_DETAIL_ENTITIES } from "./mocks/mock-world-entities";
-import { MOCK_WORLDS } from "./mocks/mock-worlds";
 import {
   IWorldDetailEntity,
   IStickyNote,
@@ -21,6 +15,22 @@ import {
 } from "./types/world-detail-types";
 import { WorldDetailView } from "./view";
 
+const emptyEntity: IWorldDetailEntity = {
+  id: "",
+  name: "",
+  type: "World",
+  description: "",
+  parentId: undefined,
+  features: [],
+  history: "",
+  climate: "",
+  population: "",
+  government: "",
+  economy: "",
+  culture: "",
+  image: "",
+};
+
 export function WorldDetail() {
   const { dashboardId, worldId } = useParams({
     from: "/dashboard/$dashboardId/tabs/world/$worldId",
@@ -30,35 +40,22 @@ export function WorldDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [entity, setEntity] = useState<IWorldDetailEntity | undefined>(
-    MOCK_WORLD_DETAIL_ENTITIES.find((e) => e.id === worldId)
+    undefined
   );
-  const [editData, setEditData] = useState<IWorldDetailEntity>(
-    MOCK_WORLD_DETAIL_ENTITIES.find((e) => e.id === worldId) ||
-      MOCK_WORLD_DETAIL_ENTITIES[0]
-  );
+  const [editData, setEditData] = useState<IWorldDetailEntity>(emptyEntity);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [stickyNotes, setStickyNotes] =
-    useState<IStickyNote[]>(MOCK_STICKY_NOTES);
+  const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
-  const mockOrganizations = useMemo<IOrganization[]>(
-    () => MOCK_ORGANIZATIONS,
-    []
-  );
-  const mockWorlds = useMemo<IWorld[]>(() => MOCK_WORLDS, []);
-  const mockContinents = useMemo<IContinent[]>(() => MOCK_CONTINENTS, []);
-  const linkedNotes = useMemo<ILinkedNote[]>(() => MOCK_LINKED_NOTES, []);
+  const mockOrganizations = useMemo<IOrganization[]>(() => [], []);
+  const mockWorlds = useMemo<IWorld[]>(() => [], []);
+  const mockContinents = useMemo<IContinent[]>(() => [], []);
+  const linkedNotes = useMemo<ILinkedNote[]>(() => [], []);
 
   useEffect(() => {
-    const foundEntity = MOCK_WORLD_DETAIL_ENTITIES.find(
-      (e) => e.id === worldId
-    );
-    if (foundEntity) {
-      setEntity(foundEntity);
-      setEditData(foundEntity);
-    }
+    // Entity would be loaded from database here
   }, [worldId]);
 
   const handleBack = useCallback(() => {

@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import type { IPlotArc } from "@/types/plot-types";
 
-import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
 import { getSizeColor } from "../utils/get-size-color";
 import { getStatusColor } from "../utils/get-status-color";
 

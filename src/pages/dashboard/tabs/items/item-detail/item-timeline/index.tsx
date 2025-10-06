@@ -3,12 +3,8 @@ import { useState, useCallback, useMemo } from "react";
 import { useParams } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
-import {
-  ITimelineEvent,
-  mockTimelineEvents,
-} from "@/mocks/local/timeline-data";
 
-import { ItemTimelineView } from "./view";
+import { type ITimelineEvent, ItemTimelineView } from "./view";
 
 export default function ItemTimeline() {
   const { itemId } = useParams({
@@ -16,7 +12,7 @@ export default function ItemTimeline() {
   });
   const { toast } = useToast();
 
-  const [events, setEvents] = useState<ITimelineEvent[]>(mockTimelineEvents);
+  const [events, setEvents] = useState<ITimelineEvent[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<ITimelineEvent | null>(null);
   const [newEvent, setNewEvent] = useState<Partial<ITimelineEvent>>({

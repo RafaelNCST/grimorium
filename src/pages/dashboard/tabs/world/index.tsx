@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { MOCK_WORLD_ENTITIES } from "./mocks/mock-world-entities";
 import { IWorldEntity, IWorld, IContinent } from "./types/world-types";
 import { filterEntities } from "./utils/filter-entities";
 import { getParentName } from "./utils/get-parent-name";
@@ -15,8 +14,7 @@ interface PropsWorldTab {
 
 export function WorldTab({ bookId }: PropsWorldTab) {
   const navigate = useNavigate();
-  const [worldEntities, setWorldEntities] =
-    useState<IWorldEntity[]>(MOCK_WORLD_ENTITIES);
+  const [worldEntities, setWorldEntities] = useState<IWorldEntity[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
   const [showCreateContinentModal, setShowCreateContinentModal] =

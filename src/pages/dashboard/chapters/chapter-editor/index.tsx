@@ -3,9 +3,11 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { mockEntities } from "@/mocks/local/editor-data";
+import { type Entity } from "@/mocks/local/editor-data";
 
 import { ChapterEditorView } from "./view";
+
+const mockEntities: Entity[] = [];
 
 type ChapterStatus = "draft" | "in-progress" | "review" | "finished";
 

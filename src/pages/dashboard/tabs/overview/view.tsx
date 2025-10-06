@@ -134,11 +134,15 @@ export function OverviewView(props: PropsOverviewView) {
                 Último Capítulo
               </p>
               <p className="text-xl font-bold text-foreground">
-                Cap. {overviewStats.lastChapterNumber}
+                {overviewStats.lastChapterNumber > 0
+                  ? `Cap. ${overviewStats.lastChapterNumber}`
+                  : "-"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {overviewStats.lastChapterName}
-              </p>
+              {overviewStats.lastChapterName && (
+                <p className="text-xs text-muted-foreground">
+                  {overviewStats.lastChapterName}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -158,7 +162,9 @@ export function OverviewView(props: PropsOverviewView) {
                 Total de Palavras
               </p>
               <p className="text-xl font-bold text-foreground">
-                {(overviewStats.totalWords / 1000).toFixed(1)}k
+                {overviewStats.totalWords > 0
+                  ? `${(overviewStats.totalWords / 1000).toFixed(1)}k`
+                  : "-"}
               </p>
             </div>
           </div>
@@ -179,7 +185,9 @@ export function OverviewView(props: PropsOverviewView) {
                 Total de Caracteres
               </p>
               <p className="text-xl font-bold text-foreground">
-                {(overviewStats.totalCharacters / 1000).toFixed(0)}k
+                {overviewStats.totalCharacters > 0
+                  ? `${(overviewStats.totalCharacters / 1000).toFixed(0)}k`
+                  : "-"}
               </p>
             </div>
           </div>

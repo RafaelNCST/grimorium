@@ -2,7 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { MOCK_BEASTS } from "./mocks/mock-beasts";
+import { Beast } from "@/mocks/local/beast-data";
+
 import { filterBeasts } from "./utils/filter-beasts";
 import { getUniqueRaces } from "./utils/get-unique-races";
 import { BestiaryView } from "./view";
@@ -20,7 +21,7 @@ export function BestiaryTab({ bookId }: PropsBestiaryTab) {
   const [selectedHabit, setSelectedHabit] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const beasts = useMemo(() => MOCK_BEASTS, []);
+  const beasts = useMemo<Beast[]>(() => [], []);
 
   const filteredBeasts = useMemo(
     () =>

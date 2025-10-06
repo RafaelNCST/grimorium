@@ -3,7 +3,6 @@ import { useState, useCallback, useMemo } from "react";
 import type { ICategoryGroup } from "@/types/encyclopedia";
 
 import { ENCYCLOPEDIA_CATEGORIES_CONSTANT } from "./constants/encyclopedia-categories";
-import { MOCK_ENCYCLOPEDIA_ENTRIES } from "./mocks/mock-encyclopedia-entries";
 import { getCategoryColor } from "./utils/get-category-color";
 import { EncyclopediaView } from "./view";
 
@@ -14,32 +13,14 @@ export function EncyclopediaTab() {
 
   const categories = useMemo(() => ENCYCLOPEDIA_CATEGORIES_CONSTANT, []);
 
-  const filteredEntries = useMemo(
-    () =>
-      MOCK_ENCYCLOPEDIA_ENTRIES.filter((entry) => {
-        const matchesSearch =
-          entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.tags.some((tag) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        const matchesCategory =
-          selectedCategory === "all" || entry.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-      }),
-    [searchTerm, selectedCategory]
-  );
+  const filteredEntries = useMemo(() => [], [searchTerm, selectedCategory]);
 
   const entriesByCategory = useMemo<ICategoryGroup[]>(
     () =>
       categories.slice(1).map((category) => ({
         category,
-        entries: MOCK_ENCYCLOPEDIA_ENTRIES.filter(
-          (entry) => entry.category === category
-        ),
-        count: MOCK_ENCYCLOPEDIA_ENTRIES.filter(
-          (entry) => entry.category === category
-        ).length,
+        entries: [],
+        count: 0,
       })),
     [categories]
   );

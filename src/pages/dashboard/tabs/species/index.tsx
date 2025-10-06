@@ -4,7 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { MOCK_SPECIES } from "./mocks/mock-species";
 import {
   ISpecies,
   IRace,
@@ -21,7 +20,7 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [species, setSpecies] = useState<ISpecies[]>(MOCK_SPECIES);
+  const [species, setSpecies] = useState<ISpecies[]>([]);
   const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>("");

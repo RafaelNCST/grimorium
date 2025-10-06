@@ -2,7 +2,8 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { MOCK_BOOK_CHARACTERS, type ICharacter } from "./mocks/mock-characters";
+import { type ICharacter } from "@/types/character-types";
+
 import { CharactersView } from "./view";
 
 interface PropsCharactersTab {
@@ -11,9 +12,7 @@ interface PropsCharactersTab {
 
 export function CharactersTab({ bookId }: PropsCharactersTab) {
   const navigate = useNavigate();
-  const [characters, setCharacters] = useState(() =>
-    MOCK_BOOK_CHARACTERS(bookId)
-  );
+  const [characters, setCharacters] = useState<ICharacter[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrg, setSelectedOrg] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");

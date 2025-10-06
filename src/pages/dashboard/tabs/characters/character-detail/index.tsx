@@ -10,14 +10,12 @@ import {
   mockLocations,
   mockOrganizations,
 } from "@/mocks/global";
-import { mockCharacterDetail } from "@/mocks/local/character-data";
 
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
 import { GENDERS_CONSTANT } from "./constants/genders-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
 import { ROLES_CONSTANT } from "./constants/roles-constant";
-import { MOCK_LINKED_NOTES } from "./mocks/mock-linked-notes";
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
@@ -30,18 +28,36 @@ export function CharacterDetail() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const emptyCharacter = {
+    id: "",
+    name: "",
+    age: 0,
+    role: "",
+    image: "",
+    description: "",
+    appearance: "",
+    personality: "",
+    backstory: "",
+    motivations: "",
+    fears: "",
+    organization: "",
+    birthPlace: "",
+    currentLocation: "",
+    alignment: "",
+    qualities: [],
+    relationships: [],
+  };
+
   const [isEditing, setIsEditing] = useState(false);
-  const [character, setCharacter] = useState(mockCharacterDetail);
+  const [character, setCharacter] = useState(emptyCharacter);
   const [editData, setEditData] = useState({
-    ...mockCharacterDetail,
-    relationships: mockCharacterDetail.relationships || [],
+    ...emptyCharacter,
+    relationships: [],
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newQuality, setNewQuality] = useState("");
   const [_imageFile, _setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(
-    mockCharacterDetail.image
-  );
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] =
     useState("");
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
@@ -55,7 +71,7 @@ export function CharacterDetail() {
       description: "Estado inicial do personagem",
       createdAt: new Date(),
       isActive: true,
-      data: mockCharacterDetail,
+      data: emptyCharacter,
     },
   ]);
   const [currentVersion, setCurrentVersion] = useState(versions[0]);
@@ -441,7 +457,7 @@ export function CharacterDetail() {
       selectedRelationshipType={selectedRelationshipType}
       relationshipIntensity={relationshipIntensity}
       fileInputRef={fileInputRef}
-      linkedNotes={MOCK_LINKED_NOTES}
+      linkedNotes={[]}
       mockCharacters={mockCharacters}
       mockLocations={mockLocations}
       mockOrganizations={mockOrganizations}

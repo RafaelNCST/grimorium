@@ -28,12 +28,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Item,
-  mockRarities,
-  mockStatuses,
-  categories,
-} from "@/mocks/local/item-data";
+import { Item, mockRarities, mockStatuses } from "@/mocks/local/item-data";
+
+const categories = [
+  "Arma",
+  "Armadura",
+  "Acessório",
+  "Consumível",
+  "Ferramenta",
+  "Outro",
+];
 
 interface PropsItemDetailView {
   item: Item;

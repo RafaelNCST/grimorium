@@ -5,7 +5,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { mockRarities, mockStatuses } from "@/mocks/local/item-data";
 
 import { ITEM_CATEGORIES_CONSTANT } from "./constants/item-categories-constant";
-import { MOCK_ITEMS } from "./mocks/mock-items";
 import { filterItems } from "./utils/filter-items";
 import { ItemsView } from "./view";
 
@@ -21,7 +20,7 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
   const [selectedRarity, setSelectedRarity] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const items = useMemo(() => MOCK_ITEMS, []);
+  const items = useMemo(() => [], []);
 
   const filteredItems = useMemo(
     () =>

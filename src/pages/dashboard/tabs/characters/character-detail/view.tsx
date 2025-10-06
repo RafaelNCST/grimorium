@@ -48,7 +48,13 @@ import { type IFamilyRelations } from "./constants/family-relations-constant";
 import { type IGender } from "./constants/genders-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 import { type IRole } from "./constants/roles-constant";
-import { type ILinkedNote } from "./mocks/mock-linked-notes";
+
+interface ILinkedNote {
+  id: string;
+  title: string;
+  type: string;
+  date: string;
+}
 
 interface ICharacter {
   id: string;

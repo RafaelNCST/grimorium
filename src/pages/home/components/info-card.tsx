@@ -27,9 +27,9 @@ export function InfoCard({
   const { t } = useTranslation("home");
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // Mock data - these would come from actual data stores in production
-  const totalCharacters = "150.000";
-  const totalWords = "25.000";
+  // These values should come from actual data stores
+  const totalCharacters = 0;
+  const totalWords = 0;
 
   return (
     <div className="px-6 mb-8">

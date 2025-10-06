@@ -4,7 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 import type { IPlotArc } from "@/types/plot-types";
 
-import { MOCK_PLOT_ARCS } from "./mocks/mock-plot-arcs";
 import { getSizeColor } from "./utils/get-size-color";
 import { getStatusColor } from "./utils/get-status-color";
 import { getStatusPriority } from "./utils/get-status-priority";
@@ -17,7 +16,7 @@ interface PropsPlotTab {
 
 export function PlotTab({ bookId }: PropsPlotTab) {
   const navigate = useNavigate();
-  const [arcs, setArcs] = useState<IPlotArc[]>(MOCK_PLOT_ARCS);
+  const [arcs, setArcs] = useState<IPlotArc[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("todos");
 

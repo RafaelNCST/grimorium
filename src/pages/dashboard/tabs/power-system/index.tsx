@@ -3,7 +3,6 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { DEFAULT_COLORS_CONSTANT } from "./constants/colors-constant";
 import { ELEMENT_TYPES_CONSTANT } from "./constants/element-types-constant";
 import { TUTORIAL_STEPS_CONSTANT } from "./constants/tutorial-steps-constant";
-import { MOCK_POWER_MAPS } from "./mocks/mock-power-maps";
 import {
   IPowerElement,
   IPowerMap,
@@ -16,7 +15,12 @@ export function PowerSystemTab() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentMap, setCurrentMap] = useState<IPowerMap>(MOCK_POWER_MAPS[0]);
+  const [currentMap, setCurrentMap] = useState<IPowerMap>({
+    id: "main",
+    name: "Sistema de Poder Principal",
+    elements: [],
+    connections: [],
+  });
   const [maps, setMaps] = useState<IPowerMap[]>([]);
   const [templates, setTemplates] = useState<ITemplate[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);

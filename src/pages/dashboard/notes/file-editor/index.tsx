@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { NoteFile, mockFiles } from "@/mocks/local/files-data";
+import { NoteFile } from "@/mocks/local/files-data";
 import { AnnotationLink } from "@/types/annotations";
 
 export default function FileEditor() {
@@ -32,13 +32,9 @@ export default function FileEditor() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
   useEffect(() => {
-    // Find the file by ID
-    const foundFile = mockFiles.find((f) => f.id === fileId);
-    if (foundFile) {
-      setFile(foundFile);
-      setEditContent(foundFile.content);
-      setEditName(foundFile.name);
-    }
+    // Find the file by ID - would fetch from database in production
+    // For now, set null as there are no mock files
+    setFile(null);
   }, [fileId]);
 
   useEffect(() => {

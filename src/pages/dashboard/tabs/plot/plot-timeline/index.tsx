@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 
 import type { IPlotArc } from "@/types/plot-types";
 
-import { MOCK_PLOT_ARCS } from "../mocks/mock-plot-arcs";
 import { getSizeColor } from "../utils/get-size-color";
 
 import { PlotTimelineView } from "./view";
@@ -14,7 +13,7 @@ export function PlotTimeline() {
     from: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
   });
   const navigate = useNavigate();
-  const [arcs] = useState<IPlotArc[]>(MOCK_PLOT_ARCS);
+  const [arcs] = useState<IPlotArc[]>([]);
 
   const sortedArcs = useMemo(
     () => [...arcs].sort((a, b) => a.order - b.order),

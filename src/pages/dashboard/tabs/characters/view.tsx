@@ -14,8 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ICharacter } from "@/types/character-types";
 
-import { ICharacter } from "./mocks/mock-characters";
 import { getRoleColor } from "./utils/get-role-color";
 import { getRoleIcon } from "./utils/get-role-icon";
 import { getRoleLabel } from "./utils/get-role-label";

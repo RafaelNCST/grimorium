@@ -4,7 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { IOrganization } from "@/types/organization-types";
 
-import { MOCK_ORGANIZATIONS } from "./mocks/mock-organizations";
 import { calculateTotalByAlignment } from "./utils/calculators/calculate-total-by-alignment";
 import { filterOrganizations } from "./utils/filters/filter-organizations";
 import { OrganizationsView } from "./view";
@@ -20,7 +19,7 @@ export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
   const [selectedAlignment, setSelectedAlignment] = useState<string>("all");
   const [selectedWorld, setSelectedWorld] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [organizations, setOrganizations] = useState(MOCK_ORGANIZATIONS);
+  const [organizations, setOrganizations] = useState<IOrganization[]>([]);
 
   const alignments = useMemo(() => ["all", "Bem", "Neutro", "Caótico"], []);
   const worlds = useMemo(() => ["all", "Aethermoor"], []);

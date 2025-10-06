@@ -6,8 +6,17 @@ import { useToast } from "@/hooks/use-toast";
 
 import { IRaceWithSpeciesName, RaceType } from "../types/species-types";
 
-import { MOCK_RACE } from "./mocks/mock-race";
 import { RaceDetailView } from "./view";
+
+const emptyRace: IRaceWithSpeciesName = {
+  id: "",
+  name: "",
+  description: "",
+  history: "",
+  type: "Terrestre",
+  speciesId: "",
+  speciesName: "",
+};
 
 export function RaceDetail() {
   const { dashboardId, raceId } = useParams({
@@ -16,7 +25,7 @@ export function RaceDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [race, setRace] = useState<IRaceWithSpeciesName>(MOCK_RACE);
+  const [race, setRace] = useState<IRaceWithSpeciesName>(emptyRace);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({
