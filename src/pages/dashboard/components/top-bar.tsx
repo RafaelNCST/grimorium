@@ -122,9 +122,7 @@ export function TopBar({
           </TooltipTrigger>
           <TooltipContent>
             <p className="text-sm font-medium">
-              {isCustomizing
-                ? "Sair do modo personalizar"
-                : "Personalizar abas"}
+              {isCustomizing ? "Sair do modo personalizar" : "Personalizar"}
             </p>
           </TooltipContent>
         </Tooltip>
