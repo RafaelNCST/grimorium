@@ -57,7 +57,7 @@ export function TabsBar({
             &quot;Visão Geral&quot; não pode ser movida ou ocultada.
           </p>
         </div>
-        <div className="sticky top-0 z-30 bg-background pb-3 px-6">
+        <div className="bg-background pb-3 px-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -85,7 +85,7 @@ export function TabsBar({
   }
 
   return (
-    <div className="sticky pointer-events-none top-0 z-30 pb-3 px-6 pt-6">
+    <div className="pointer-events-none pb-3 px-6 pt-6">
       <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
         {visibleTabs.map((tab, index) => (
           <SortableTab

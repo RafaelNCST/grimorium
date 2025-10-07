@@ -1,3 +1,5 @@
+import React from "react";
+
 import { DragEndEvent, SensorDescriptor, SensorOptions } from "@dnd-kit/core";
 
 import {
@@ -11,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Book as BookType } from "@/stores/book-store";
 
@@ -83,6 +85,18 @@ interface PropsDashboardView {
   onDraftBookChange: (updates: Partial<BookType>) => void;
 }
 
+// Componentes memoizados para evitar re-renders desnecessários
+const MemoizedOverviewTab = React.memo(OverviewTab);
+const MemoizedCharactersTab = React.memo(CharactersTab);
+const MemoizedWorldTab = React.memo(WorldTab);
+const MemoizedOrganizationsTab = React.memo(OrganizationsTab);
+const MemoizedPlotTab = React.memo(PlotTab);
+const MemoizedPowerSystemTab = React.memo(PowerSystemTab);
+const MemoizedEncyclopediaTab = React.memo(EncyclopediaTab);
+const MemoizedSpeciesTab = React.memo(SpeciesTab);
+const MemoizedBestiaryTab = React.memo(BestiaryTab);
+const MemoizedItemsTab = React.memo(ItemsTab);
+
 export function DashboardView({
   book,
   draftBook,
@@ -93,7 +107,6 @@ export function DashboardView({
   isCustomizing,
   tabs,
   visibleTabs,
-  currentArc,
   sensors,
   showDeleteDialog,
   deleteInput,
@@ -115,86 +128,125 @@ export function DashboardView({
 }: PropsDashboardView) {
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background">
-        <div className="bg-card border-b border-border">
-          <div className="px-6 py-4">
-            <TopBar
-              isCustomizing={isCustomizing}
-              isHeaderHidden={isHeaderHidden}
-              onBack={onBack}
-              onShowDeleteDialog={onShowDeleteDialog}
-              onNavigateToChapters={onNavigateToChapters}
-              onNavigateToNotes={onNavigateToNotes}
-              onCustomizingToggle={onCustomizingToggle}
-              onHeaderHiddenChange={onHeaderHiddenChange}
-            />
-
-            {!isHeaderHidden && (
-              <Header
-                book={book}
-                draftBook={draftBook}
-                isEditingHeader={isEditingHeader}
-                onEditingHeaderChange={onEditingHeaderChange}
-                onDraftBookChange={onDraftBookChange}
-                onSave={onSave}
-                onCancel={onCancel}
-              />
-            )}
-          </div>
-        </div>
-
+      <div className="h-full flex flex-col bg-background overflow-hidden">
         <Tabs
           value={activeTab}
           onValueChange={onActiveTabChange}
-          className="w-full"
+          className="h-full flex flex-col overflow-hidden"
         >
-          <TabsBar
-            isCustomizing={isCustomizing}
-            isHeaderHidden={isHeaderHidden}
-            tabs={tabs}
-            visibleTabs={visibleTabs}
-            sensors={sensors}
-            activeTab={activeTab}
-            onDragEnd={onDragEnd}
-            onToggleVisibility={onToggleVisibility}
-            onActiveTabChange={onActiveTabChange}
-          />
+          {/* Seção fixa do topo - Header + TabBar */}
+          <div className="flex-shrink-0 bg-card border-b border-border">
+            <div className="px-6 py-4">
+              <TopBar
+                isCustomizing={isCustomizing}
+                isHeaderHidden={isHeaderHidden}
+                onBack={onBack}
+                onShowDeleteDialog={onShowDeleteDialog}
+                onNavigateToChapters={onNavigateToChapters}
+                onNavigateToNotes={onNavigateToNotes}
+                onCustomizingToggle={onCustomizingToggle}
+                onHeaderHiddenChange={onHeaderHiddenChange}
+              />
 
-          <div className="px-6 mt-6 pb-6">
-            <TabsContent value="overview" className="mt-0">
-              <OverviewTab
+              {!isHeaderHidden && (
+                <Header
+                  book={book}
+                  draftBook={draftBook}
+                  isEditingHeader={isEditingHeader}
+                  onEditingHeaderChange={onEditingHeaderChange}
+                  onDraftBookChange={onDraftBookChange}
+                  onSave={onSave}
+                  onCancel={onCancel}
+                />
+              )}
+            </div>
+
+            <TabsBar
+              isCustomizing={isCustomizing}
+              isHeaderHidden={isHeaderHidden}
+              tabs={tabs}
+              visibleTabs={visibleTabs}
+              sensors={sensors}
+              activeTab={activeTab}
+              onDragEnd={onDragEnd}
+              onToggleVisibility={onToggleVisibility}
+              onActiveTabChange={onActiveTabChange}
+            />
+          </div>
+
+          {/* Container com altura fixa para as tabs - cada tab tem seu próprio scroll */}
+          <div className="flex-1 relative overflow-hidden">
+            {/* Todas as tabs são mantidas no DOM com scroll individual */}
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "overview" ? "block" : "none" }}
+            >
+              <MemoizedOverviewTab
                 book={book}
                 bookId={bookId}
                 isCustomizing={isCustomizing}
               />
-            </TabsContent>
-            <TabsContent value="characters" className="mt-0">
-              <CharactersTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="world" className="mt-0">
-              <WorldTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="organizations" className="mt-0">
-              <OrganizationsTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="plot" className="mt-0">
-              <PlotTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="magic" className="mt-0">
-              <PowerSystemTab />
-            </TabsContent>
-            <TabsContent value="encyclopedia" className="mt-0">
-              <EncyclopediaTab />
-            </TabsContent>
-            <TabsContent value="species" className="mt-0">
-              <SpeciesTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="bestiary" className="mt-0">
-              <BestiaryTab bookId={bookId} />
-            </TabsContent>
-            <TabsContent value="items" className="mt-0">
-              <ItemsTab bookId={bookId} />
-            </TabsContent>
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{
+                display: activeTab === "characters" ? "block" : "none",
+              }}
+            >
+              <MemoizedCharactersTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "world" ? "block" : "none" }}
+            >
+              <MemoizedWorldTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{
+                display: activeTab === "organizations" ? "block" : "none",
+              }}
+            >
+              <MemoizedOrganizationsTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "plot" ? "block" : "none" }}
+            >
+              <MemoizedPlotTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "magic" ? "block" : "none" }}
+            >
+              <MemoizedPowerSystemTab />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{
+                display: activeTab === "encyclopedia" ? "block" : "none",
+              }}
+            >
+              <MemoizedEncyclopediaTab />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "species" ? "block" : "none" }}
+            >
+              <MemoizedSpeciesTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "bestiary" ? "block" : "none" }}
+            >
+              <MemoizedBestiaryTab bookId={bookId} />
+            </div>
+            <div
+              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              style={{ display: activeTab === "items" ? "block" : "none" }}
+            >
+              <MemoizedItemsTab bookId={bookId} />
+            </div>
           </div>
         </Tabs>
 
