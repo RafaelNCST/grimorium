@@ -1,6 +1,4 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -10,58 +8,58 @@ export function SortableSection({
   section,
   isCustomizing,
   children,
+  isFirst,
+  isLast,
   onToggleVisibility,
+  onMoveUp,
+  onMoveDown,
 }: PropsSortableSection) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   if (!section.visible && !isCustomizing) {
     return null;
   }
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative transition-all duration-200 ${
-        section.type === "stats" ? "w-full" : "w-fit"
-      } ${isDragging ? "opacity-50 z-50" : ""} ${
+      className={`relative transition-all duration-200 w-full ${
         !section.visible
-          ? "opacity-50 border-2 border-dashed border-muted-foreground/30"
+          ? "opacity-50 border-2 border-dashed border-muted-foreground/30 rounded-lg"
           : ""
       } ${
         isCustomizing
-          ? "hover:shadow-lg cursor-grab active:cursor-grabbing"
+          ? "hover:shadow-lg hover:border hover:border-primary/30 rounded-lg"
           : ""
       }`}
-      {...attributes}
-      {...(isCustomizing ? listeners : {})}
     >
       {isCustomizing && (
-        <div className="absolute -top-2 -right-2 z-10">
+        <div className="absolute -top-2 -right-2 z-10 flex gap-1">
           <Button
             variant="outline"
             size="sm"
             className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
-            onPointerDown={(e) => {
+            disabled={isFirst}
+            onClick={(e) => {
               e.stopPropagation();
-              e.preventDefault();
+              onMoveUp(section.id);
             }}
-            onMouseDown={(e) => {
+          >
+            <ArrowUp className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
+            disabled={isLast}
+            onClick={(e) => {
               e.stopPropagation();
-              e.preventDefault();
+              onMoveDown(section.id);
             }}
+          >
+            <ArrowDown className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
             onClick={(e) => {
               e.stopPropagation();
               onToggleVisibility(section.id);

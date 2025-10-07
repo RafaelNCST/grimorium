@@ -1,9 +1,9 @@
-import { DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
+import { DndContext, closestCenter } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { StickyNote, Plus, Eye } from "lucide-react";
+import { StickyNote, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ export function OverviewView(props: PropsOverviewView) {
     editingNote,
     editContent,
     sections,
-    activeId,
+    activeId: _activeId,
     overviewStats,
     storyProgressPercentage,
     sensors,
@@ -58,10 +58,10 @@ export function OverviewView(props: PropsOverviewView) {
     onSaveGoals: _onSaveGoals,
     onSaveSummaries,
     onToggleSectionVisibility,
+    onMoveSectionUp,
+    onMoveSectionDown,
     onNoteDragStart,
     onNoteDragEnd,
-    onSectionDragStart,
-    onSectionDragEnd,
   } = props;
 
   const renderStatsSection = () => (
@@ -69,7 +69,7 @@ export function OverviewView(props: PropsOverviewView) {
   );
 
   const renderProgressSection = () => (
-    <Card className="card-magical m-1 min-w-[280px] h-fit animate-fade-in">
+    <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{t("story_progress.title")}</CardTitle>
       </CardHeader>
@@ -113,7 +113,7 @@ export function OverviewView(props: PropsOverviewView) {
   );
 
   const renderNotesSection = () => (
-    <Card className="card-magical m-1 h-fit animate-fade-in">
+    <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
@@ -212,63 +212,20 @@ export function OverviewView(props: PropsOverviewView) {
         </p>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={onSectionDragStart}
-        onDragEnd={onSectionDragEnd}
-      >
-        <SortableContext
-          items={sections.map((s) => s.id)}
-          strategy={verticalListSortingStrategy}
+      {sectionsWithComponents.map((section, index) => (
+        <SortableSection
+          key={section.id}
+          section={section}
+          isCustomizing={isCustomizing || false}
+          isFirst={index === 0}
+          isLast={index === sectionsWithComponents.length - 1}
+          onToggleVisibility={onToggleSectionVisibility}
+          onMoveUp={onMoveSectionUp}
+          onMoveDown={onMoveSectionDown}
         >
-          {sectionsWithComponents.map((section) => (
-            <SortableSection
-              key={section.id}
-              section={section}
-              isCustomizing={isCustomizing || false}
-              onToggleVisibility={onToggleSectionVisibility}
-            >
-              <div className="animate-fade-in">{section.component}</div>
-            </SortableSection>
-          ))}
-        </SortableContext>
-
-        <DragOverlay>
-          {activeId ? (
-            <div className="opacity-80 animate-scale-in">
-              {sectionsWithComponents.find((s) => s.id === activeId)?.component}
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-
-      <div className="mt-6 p-4 bg-muted/20 border border-dashed border-muted-foreground/30 rounded-lg animate-fade-in">
-        <h4 className="font-semibold mb-3 text-muted-foreground">
-          {t("customize_mode.hidden_sections")}
-        </h4>
-        <div className="flex flex-wrap gap-2">
-          {sections
-            .filter((section) => !section.visible)
-            .map((section) => (
-              <Button
-                key={section.id}
-                variant="outline"
-                size="sm"
-                onClick={() => onToggleSectionVisibility(section.id)}
-                className="hover-scale"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                {section.title}
-              </Button>
-            ))}
-          {sections.filter((s) => !s.visible).length === 0 && (
-            <p className="text-sm text-muted-foreground italic">
-              {t("customize_mode.all_sections_visible")}
-            </p>
-          )}
-        </div>
-      </div>
+          <div className="animate-fade-in">{section.component}</div>
+        </SortableSection>
+      ))}
     </div>
   );
 }

@@ -73,7 +73,6 @@ export interface PropsOverviewView {
   editingNote: string | null;
   editContent: string;
   sections: ISection[];
-  activeId: string | null;
   activeNoteId: string | null;
   draggedNoteData: IStickyNote | null;
   overviewStats: IOverviewStats;
@@ -88,7 +87,6 @@ export interface PropsOverviewView {
   onEditingNoteChange: (id: string | null) => void;
   onEditContentChange: (content: string) => void;
   onSectionsChange: (sections: ISection[]) => void;
-  onActiveIdChange: (id: string | null) => void;
   onActiveNoteIdChange: (id: string | null) => void;
   onDraggedNoteDataChange: (data: IStickyNote | null) => void;
   onAddNote: () => void;
@@ -97,10 +95,10 @@ export interface PropsOverviewView {
   onSaveGoals: () => void;
   onSaveSummaries: () => void;
   onToggleSectionVisibility: (sectionId: string) => void;
+  onMoveSectionUp: (sectionId: string) => void;
+  onMoveSectionDown: (sectionId: string) => void;
   onNoteDragStart: (event: any) => void;
   onNoteDragEnd: (event: any) => void;
-  onSectionDragStart: (event: any) => void;
-  onSectionDragEnd: (event: any) => void;
 }
 
 export interface PropsSortableNote {
@@ -118,5 +116,9 @@ export interface PropsSortableSection {
   section: ISection;
   isCustomizing: boolean;
   children: React.ReactNode;
+  isFirst: boolean;
+  isLast: boolean;
   onToggleVisibility: (sectionId: string) => void;
+  onMoveUp: (sectionId: string) => void;
+  onMoveDown: (sectionId: string) => void;
 }

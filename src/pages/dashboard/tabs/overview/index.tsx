@@ -8,7 +8,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
 import {
@@ -42,7 +42,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [draggedNoteData, setDraggedNoteData] = useState<IStickyNote | null>(
     null
   );
-  const [activeId, setActiveId] = useState<string | null>(null);
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [sections, setSections] = useState<ISection[]>([
     {
@@ -122,23 +121,30 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     );
   }, []);
 
-  const handleSectionDragStart = useCallback((event: any) => {
-    setActiveId(event.active.id);
+  const handleMoveSectionUp = useCallback((sectionId: string) => {
+    setSections((sections) => {
+      const index = sections.findIndex((section) => section.id === sectionId);
+      if (index <= 0) return sections;
+
+      const newSections = [...sections];
+      const temp = newSections[index];
+      newSections[index] = newSections[index - 1];
+      newSections[index - 1] = temp;
+      return newSections;
+    });
   }, []);
 
-  const handleSectionDragEnd = useCallback((event: any) => {
-    const { active, over } = event;
+  const handleMoveSectionDown = useCallback((sectionId: string) => {
+    setSections((sections) => {
+      const index = sections.findIndex((section) => section.id === sectionId);
+      if (index < 0 || index >= sections.length - 1) return sections;
 
-    if (active.id !== over?.id) {
-      setSections((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-
-    setActiveId(null);
+      const newSections = [...sections];
+      const temp = newSections[index];
+      newSections[index] = newSections[index + 1];
+      newSections[index + 1] = temp;
+      return newSections;
+    });
   }, []);
 
   const handleSaveGoals = useCallback(() => {
@@ -231,7 +237,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       editingNote={editingNote}
       editContent={editContent}
       sections={sections}
-      activeId={activeId}
       activeNoteId={activeNoteId}
       draggedNoteData={draggedNoteData}
       overviewStats={overviewStats}
@@ -246,7 +251,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onEditingNoteChange={setEditingNote}
       onEditContentChange={setEditContent}
       onSectionsChange={setSections}
-      onActiveIdChange={setActiveId}
       onActiveNoteIdChange={setActiveNoteId}
       onDraggedNoteDataChange={setDraggedNoteData}
       onAddNote={handleAddNote}
@@ -255,10 +259,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onSaveGoals={handleSaveGoals}
       onSaveSummaries={handleSaveSummaries}
       onToggleSectionVisibility={handleToggleSectionVisibility}
+      onMoveSectionUp={handleMoveSectionUp}
+      onMoveSectionDown={handleMoveSectionDown}
       onNoteDragStart={handleNoteDragStart}
       onNoteDragEnd={handleNoteDragEnd}
-      onSectionDragStart={handleSectionDragStart}
-      onSectionDragEnd={handleSectionDragEnd}
     />
   );
 }

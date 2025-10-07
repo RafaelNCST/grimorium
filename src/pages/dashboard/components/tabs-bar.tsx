@@ -57,7 +57,7 @@ export function TabsBar({
             &quot;Visão Geral&quot; não pode ser movida ou ocultada.
           </p>
         </div>
-        <div className="bg-background pb-3 px-6">
+        <div className="pb-3 px-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
