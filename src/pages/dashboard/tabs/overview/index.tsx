@@ -33,9 +33,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     currentArcProgress: 0,
   });
   const [authorSummary, setAuthorSummary] = useState(book.authorSummary || "");
-  const [isEditingAuthorSummary, setIsEditingAuthorSummary] = useState(false);
   const [storySummary, setStorySummary] = useState(book.storySummary || "");
-  const [isEditingStorySummary, setIsEditingStorySummary] = useState(false);
+  const [isEditingSummaries, setIsEditingSummaries] = useState(false);
   const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
@@ -61,16 +60,9 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       component: null,
     },
     {
-      id: "author-summary",
-      type: "author-summary",
-      title: "Resumo do Autor",
-      visible: true,
-      component: null,
-    },
-    {
-      id: "story-summary",
-      type: "story-summary",
-      title: "Resumo da História",
+      id: "summaries",
+      type: "summaries",
+      title: "Resumos",
       visible: true,
       component: null,
     },
@@ -153,12 +145,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     setIsEditingGoals(false);
   }, []);
 
-  const handleSaveAuthorSummary = useCallback(() => {
-    setIsEditingAuthorSummary(false);
-  }, []);
-
-  const handleSaveStorySummary = useCallback(() => {
-    setIsEditingStorySummary(false);
+  const handleSaveSummaries = useCallback(() => {
+    setIsEditingSummaries(false);
   }, []);
 
   const handleAddNote = useCallback(() => {
@@ -236,9 +224,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       isEditingGoals={isEditingGoals}
       storyProgress={storyProgress}
       authorSummary={authorSummary}
-      isEditingAuthorSummary={isEditingAuthorSummary}
       storySummary={storySummary}
-      isEditingStorySummary={isEditingStorySummary}
+      isEditingSummaries={isEditingSummaries}
       stickyNotes={stickyNotes}
       newNote={newNote}
       editingNote={editingNote}
@@ -253,9 +240,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
       onAuthorSummaryChange={setAuthorSummary}
-      onEditingAuthorSummaryChange={setIsEditingAuthorSummary}
       onStorySummaryChange={setStorySummary}
-      onEditingStorySummaryChange={setIsEditingStorySummary}
+      onEditingSummariesChange={setIsEditingSummaries}
       onNewNoteChange={setNewNote}
       onEditingNoteChange={setEditingNote}
       onEditContentChange={setEditContent}
@@ -267,8 +253,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onDeleteNote={handleDeleteNote}
       onEditNote={handleEditNote}
       onSaveGoals={handleSaveGoals}
-      onSaveAuthorSummary={handleSaveAuthorSummary}
-      onSaveStorySummary={handleSaveStorySummary}
+      onSaveSummaries={handleSaveSummaries}
       onToggleSectionVisibility={handleToggleSectionVisibility}
       onNoteDragStart={handleNoteDragStart}
       onNoteDragEnd={handleNoteDragEnd}

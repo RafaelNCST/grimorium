@@ -3,7 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Edit2, StickyNote, Plus, Eye } from "lucide-react";
+import { StickyNote, Plus, Eye } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
 import { MetricsCard } from "./components/metrics-card";
+import { SummariesCard } from "./components/summaries-card";
 import { SortableNote } from "./components/sortable-note";
 import { SortableSection } from "./components/sortable-section";
 import { PropsOverviewView, ISection } from "./types/overview-types";
@@ -32,9 +33,8 @@ export function OverviewView(props: PropsOverviewView) {
     isEditingGoals: _isEditingGoals,
     storyProgress,
     authorSummary,
-    isEditingAuthorSummary,
     storySummary,
-    isEditingStorySummary,
+    isEditingSummaries,
     stickyNotes,
     newNote,
     editingNote,
@@ -47,9 +47,8 @@ export function OverviewView(props: PropsOverviewView) {
     onGoalsChange: _onGoalsChange,
     onEditingGoalsChange: _onEditingGoalsChange,
     onAuthorSummaryChange,
-    onEditingAuthorSummaryChange,
     onStorySummaryChange,
-    onEditingStorySummaryChange,
+    onEditingSummariesChange,
     onNewNoteChange,
     onEditingNoteChange,
     onEditContentChange,
@@ -57,8 +56,7 @@ export function OverviewView(props: PropsOverviewView) {
     onDeleteNote,
     onEditNote,
     onSaveGoals: _onSaveGoals,
-    onSaveAuthorSummary,
-    onSaveStorySummary,
+    onSaveSummaries,
     onToggleSectionVisibility,
     onNoteDragStart,
     onNoteDragEnd,
@@ -101,132 +99,17 @@ export function OverviewView(props: PropsOverviewView) {
     </Card>
   );
 
-  const renderAuthorSummarySection = () => (
-    <Card className="card-magical m-1 h-fit animate-fade-in">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <div>
-          <CardTitle className="text-base">
-            {t("author_summary.title")}
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {t("author_summary.description")}
-          </CardDescription>
-        </div>
-        {!isCustomizing && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() =>
-              onEditingAuthorSummaryChange(!isEditingAuthorSummary)
-            }
-            className="h-6 w-6"
-          >
-            <Edit2 className="w-3 h-3" />
-          </Button>
-        )}
-      </CardHeader>
-      <CardContent className="pt-0">
-        {isEditingAuthorSummary && !isCustomizing ? (
-          <div className="space-y-3">
-            <Textarea
-              value={authorSummary}
-              onChange={(e) => onAuthorSummaryChange(e.target.value)}
-              className="min-h-[80px] text-xs"
-              placeholder={t("author_summary.placeholder")}
-            />
-            <div className="flex gap-2">
-              <Button
-                variant="accent"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={onSaveAuthorSummary}
-              >
-                {t("author_summary.save")}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={() => onEditingAuthorSummaryChange(false)}
-              >
-                {t("author_summary.cancel")}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <p className="text-xs text-foreground leading-relaxed">
-            {authorSummary || (
-              <span className="text-muted-foreground italic">
-                {t("author_summary.empty_message")}
-              </span>
-            )}
-          </p>
-        )}
-      </CardContent>
-    </Card>
-  );
-
-  const renderStorySummarySection = () => (
-    <Card className="card-magical m-1 h-fit animate-fade-in">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-        <div>
-          <CardTitle className="text-base">
-            {t("story_summary.title")}
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {t("story_summary.description")}
-          </CardDescription>
-        </div>
-        {!isCustomizing && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEditingStorySummaryChange(!isEditingStorySummary)}
-            className="h-6 w-6"
-          >
-            <Edit2 className="w-3 h-3" />
-          </Button>
-        )}
-      </CardHeader>
-      <CardContent className="pt-0">
-        {isEditingStorySummary && !isCustomizing ? (
-          <div className="space-y-3">
-            <Textarea
-              value={storySummary}
-              onChange={(e) => onStorySummaryChange(e.target.value)}
-              className="min-h-[80px] text-xs"
-              placeholder={t("story_summary.placeholder")}
-            />
-            <div className="flex gap-2">
-              <Button
-                variant="accent"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={onSaveStorySummary}
-              >
-                {t("story_summary.save")}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-xs"
-                onClick={() => onEditingStorySummaryChange(false)}
-              >
-                {t("story_summary.cancel")}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <p className="text-xs text-foreground leading-relaxed">
-            {storySummary || (
-              <span className="text-muted-foreground italic">
-                {t("story_summary.empty_message")}
-              </span>
-            )}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+  const renderSummariesSection = () => (
+    <SummariesCard
+      authorSummary={authorSummary}
+      storySummary={storySummary}
+      isEditingSummaries={isEditingSummaries}
+      isCustomizing={isCustomizing}
+      onAuthorSummaryChange={onAuthorSummaryChange}
+      onStorySummaryChange={onStorySummaryChange}
+      onEditingSummariesChange={onEditingSummariesChange}
+      onSaveSummaries={onSaveSummaries}
+    />
   );
 
   const renderNotesSection = () => (
@@ -295,8 +178,7 @@ export function OverviewView(props: PropsOverviewView) {
   const sectionRenderers: Record<ISection["type"], () => React.ReactNode> = {
     stats: renderStatsSection,
     progress: renderProgressSection,
-    "author-summary": renderAuthorSummarySection,
-    "story-summary": renderStorySummarySection,
+    summaries: renderSummariesSection,
     "notes-board": renderNotesSection,
   };
 

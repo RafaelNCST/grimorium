@@ -2,6 +2,9 @@
   "metrics": {
     "title": "Métricas"
   },
+  "summaries": {
+    "title": "Resumos"
+  },
   "stats": {
     "chapters": "Capítulos",
     "average_per_week": "Média/Semana de Capítulos",

@@ -33,8 +33,7 @@ export interface ISection {
   type:
     | "stats"
     | "progress"
-    | "author-summary"
-    | "story-summary"
+    | "summaries"
     | "notes-board";
   title: string;
   visible: boolean;
@@ -71,9 +70,8 @@ export interface PropsOverviewView {
   isEditingGoals: boolean;
   storyProgress: IStoryProgress;
   authorSummary: string;
-  isEditingAuthorSummary: boolean;
   storySummary: string;
-  isEditingStorySummary: boolean;
+  isEditingSummaries: boolean;
   stickyNotes: IStickyNote[];
   newNote: string;
   editingNote: string | null;
@@ -88,9 +86,8 @@ export interface PropsOverviewView {
   onGoalsChange: (goals: IGoals) => void;
   onEditingGoalsChange: (editing: boolean) => void;
   onAuthorSummaryChange: (summary: string) => void;
-  onEditingAuthorSummaryChange: (editing: boolean) => void;
   onStorySummaryChange: (summary: string) => void;
-  onEditingStorySummaryChange: (editing: boolean) => void;
+  onEditingSummariesChange: (editing: boolean) => void;
   onNewNoteChange: (note: string) => void;
   onEditingNoteChange: (id: string | null) => void;
   onEditContentChange: (content: string) => void;
@@ -102,8 +99,7 @@ export interface PropsOverviewView {
   onDeleteNote: (id: string) => void;
   onEditNote: (id: string, content: string) => void;
   onSaveGoals: () => void;
-  onSaveAuthorSummary: () => void;
-  onSaveStorySummary: () => void;
+  onSaveSummaries: () => void;
   onToggleSectionVisibility: (sectionId: string) => void;
   onNoteDragStart: (event: any) => void;
   onNoteDragEnd: (event: any) => void;
