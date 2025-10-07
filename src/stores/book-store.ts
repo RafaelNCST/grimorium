@@ -43,7 +43,9 @@ export const useBookStore = create<BookState>((set, get) => ({
   updateBook: (id, updates) =>
     set((state) => ({
       books: state.books.map((book) =>
-        book.id === id ? { ...book, ...updates, lastModified: Date.now() } : book
+        book.id === id
+          ? { ...book, ...updates, lastModified: Date.now() }
+          : book
       ),
       currentBook:
         state.currentBook?.id === id

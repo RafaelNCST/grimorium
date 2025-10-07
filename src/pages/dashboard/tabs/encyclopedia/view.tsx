@@ -189,7 +189,8 @@ export function EncyclopediaView({
                   )}
 
                   <div className="text-xs text-muted-foreground">
-                    {t("modified")} {formatRelativeTime(entry.lastModified, i18n.language)}
+                    {t("modified")}{" "}
+                    {formatRelativeTime(entry.lastModified, i18n.language)}
                   </div>
                 </CardContent>
               </Card>

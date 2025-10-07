@@ -30,11 +30,7 @@ export interface IStoryProgress {
 
 export interface ISection {
   id: string;
-  type:
-    | "stats"
-    | "progress"
-    | "summaries"
-    | "notes-board";
+  type: "stats" | "progress" | "summaries" | "notes-board";
   title: string;
   visible: boolean;
   component: React.ReactNode;

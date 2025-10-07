@@ -18,9 +18,9 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
 import { MetricsCard } from "./components/metrics-card";
-import { SummariesCard } from "./components/summaries-card";
 import { SortableNote } from "./components/sortable-note";
 import { SortableSection } from "./components/sortable-section";
+import { SummariesCard } from "./components/summaries-card";
 import { PropsOverviewView, ISection } from "./types/overview-types";
 
 export function OverviewView(props: PropsOverviewView) {

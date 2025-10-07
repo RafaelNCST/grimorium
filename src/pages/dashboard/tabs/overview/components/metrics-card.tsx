@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import {
   BookOpen,
   TrendingUp,
@@ -15,8 +16,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { IOverviewStats } from "../types/overview-types";
 
@@ -67,7 +68,10 @@ function MetricItem({
   );
 }
 
-export function MetricsCard({ stats, isCustomizing = false }: MetricsCardProps) {
+export function MetricsCard({
+  stats,
+  isCustomizing = false,
+}: MetricsCardProps) {
   const { t } = useTranslation("overview");
 
   // Load visibility state from localStorage or use defaults
@@ -244,7 +248,11 @@ export function MetricsCard({ stats, isCustomizing = false }: MetricsCardProps) 
                   setRow1Visible(newValue);
                   console.log("Row1 toggled to:", newValue);
                 }}
-                title={row1Visible ? "Esconder no modo visualização" : "Mostrar no modo visualização"}
+                title={
+                  row1Visible
+                    ? "Esconder no modo visualização"
+                    : "Mostrar no modo visualização"
+                }
               >
                 {row1Visible ? (
                   <Eye className="h-4 w-4" />
@@ -279,7 +287,13 @@ export function MetricsCard({ stats, isCustomizing = false }: MetricsCardProps) 
         </div>
 
         {/* Row 2 - Averages (Green) */}
-        <div className={row1Visible && !isCustomizing ? "pt-4 border-t border-border/50" : ""}>
+        <div
+          className={
+            row1Visible && !isCustomizing
+              ? "pt-4 border-t border-border/50"
+              : ""
+          }
+        >
           {isCustomizing && (
             <div className="flex items-center justify-end mb-2">
               <Button
@@ -301,7 +315,11 @@ export function MetricsCard({ stats, isCustomizing = false }: MetricsCardProps) 
                   setRow2Visible(newValue);
                   console.log("Row2 toggled to:", newValue);
                 }}
-                title={row2Visible ? "Esconder no modo visualização" : "Mostrar no modo visualização"}
+                title={
+                  row2Visible
+                    ? "Esconder no modo visualização"
+                    : "Mostrar no modo visualização"
+                }
               >
                 {row2Visible ? (
                   <Eye className="h-4 w-4" />
@@ -364,7 +382,11 @@ export function MetricsCard({ stats, isCustomizing = false }: MetricsCardProps) 
                   setRow3Visible(newValue);
                   console.log("Row3 toggled to:", newValue);
                 }}
-                title={row3Visible ? "Esconder no modo visualização" : "Mostrar no modo visualização"}
+                title={
+                  row3Visible
+                    ? "Esconder no modo visualização"
+                    : "Mostrar no modo visualização"
+                }
               >
                 {row3Visible ? (
                   <Eye className="h-4 w-4" />
