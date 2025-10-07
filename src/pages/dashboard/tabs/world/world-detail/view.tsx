@@ -2,7 +2,6 @@ import { MapPin } from "lucide-react";
 
 import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
 import { ConfirmDeleteModal } from "@/components/modals/confirm-delete-modal";
-import { SpeciesTab } from "@/components/tabs/species-tab";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorldTimeline } from "@/components/world-timeline";
@@ -153,9 +152,6 @@ export function WorldDetailView({
               <CardHeader>
                 <CardTitle>Espécies e Raças</CardTitle>
               </CardHeader>
-              <CardContent>
-                <SpeciesTab bookId={dashboardId} worldId={worldId} />
-              </CardContent>
             </Card>
           </div>
         )}
