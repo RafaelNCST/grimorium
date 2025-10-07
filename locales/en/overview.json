@@ -54,5 +54,13 @@
     "description": "Drag sections to reorder them and use visibility buttons to show/hide sections. Content editing is disabled in this mode.",
     "hidden_sections": "Hidden Sections",
     "all_sections_visible": "All sections are visible"
+  },
+  "checklist": {
+    "title": "Task List",
+    "description": "Organize your tasks and track progress",
+    "empty_state": "No tasks added yet",
+    "add_item_placeholder": "Add new task...",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

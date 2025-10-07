@@ -28,9 +28,15 @@ export interface IStoryProgress {
   currentArcProgress: number;
 }
 
+export interface IChecklistItem {
+  id: string;
+  text: string;
+  checked: boolean;
+}
+
 export interface ISection {
   id: string;
-  type: "stats" | "progress" | "summaries" | "notes-board";
+  type: "stats" | "progress" | "summaries" | "notes-board" | "checklist";
   title: string;
   visible: boolean;
   component: React.ReactNode;
@@ -78,6 +84,7 @@ export interface PropsOverviewView {
   overviewStats: IOverviewStats;
   storyProgressPercentage: number;
   sensors: SensorDescriptor<SensorOptions>[];
+  checklistItems: IChecklistItem[];
   onGoalsChange: (goals: IGoals) => void;
   onEditingGoalsChange: (editing: boolean) => void;
   onAuthorSummaryChange: (summary: string) => void;
@@ -99,6 +106,10 @@ export interface PropsOverviewView {
   onMoveSectionDown: (sectionId: string) => void;
   onNoteDragStart: (event: any) => void;
   onNoteDragEnd: (event: any) => void;
+  onAddChecklistItem: (text: string) => void;
+  onToggleChecklistItem: (id: string) => void;
+  onEditChecklistItem: (id: string, text: string) => void;
+  onDeleteChecklistItem: (id: string) => void;
 }
 
 export interface PropsSortableNote {
@@ -121,4 +132,13 @@ export interface PropsSortableSection {
   onToggleVisibility: (sectionId: string) => void;
   onMoveUp: (sectionId: string) => void;
   onMoveDown: (sectionId: string) => void;
+}
+
+export interface PropsChecklistCard {
+  checklistItems: IChecklistItem[];
+  isCustomizing: boolean;
+  onAddItem: (text: string) => void;
+  onToggleItem: (id: string) => void;
+  onEditItem: (id: string, text: string) => void;
+  onDeleteItem: (id: string) => void;
 }

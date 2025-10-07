@@ -17,6 +17,7 @@ import {
   IGoals,
   IStoryProgress,
   ISection,
+  IChecklistItem,
 } from "./types/overview-types";
 import { OverviewView } from "./view";
 
@@ -43,6 +44,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     null
   );
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+  const [checklistItems, setChecklistItems] = useState<IChecklistItem[]>([]);
   const [sections, setSections] = useState<ISection[]>([
     {
       id: "stats",
@@ -69,6 +71,13 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       id: "notes-board",
       type: "notes-board",
       title: "Quadro de Lembretes",
+      visible: true,
+      component: null,
+    },
+    {
+      id: "checklist",
+      type: "checklist",
+      title: "Lista de Tarefas",
       visible: true,
       component: null,
     },
@@ -221,6 +230,33 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     setDraggedNoteData(null);
   }, []);
 
+  const handleAddChecklistItem = useCallback((text: string) => {
+    const newItem: IChecklistItem = {
+      id: Date.now().toString(),
+      text,
+      checked: false,
+    };
+    setChecklistItems((prev) => [...prev, newItem]);
+  }, []);
+
+  const handleToggleChecklistItem = useCallback((id: string) => {
+    setChecklistItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, checked: !item.checked } : item
+      )
+    );
+  }, []);
+
+  const handleEditChecklistItem = useCallback((id: string, text: string) => {
+    setChecklistItems((items) =>
+      items.map((item) => (item.id === id ? { ...item, text } : item))
+    );
+  }, []);
+
+  const handleDeleteChecklistItem = useCallback((id: string) => {
+    setChecklistItems((items) => items.filter((item) => item.id !== id));
+  }, []);
+
   return (
     <OverviewView
       book={book}
@@ -242,6 +278,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       overviewStats={overviewStats}
       storyProgressPercentage={storyProgressPercentage}
       sensors={sensors}
+      checklistItems={checklistItems}
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
       onAuthorSummaryChange={setAuthorSummary}
@@ -263,6 +300,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onMoveSectionDown={handleMoveSectionDown}
       onNoteDragStart={handleNoteDragStart}
       onNoteDragEnd={handleNoteDragEnd}
+      onAddChecklistItem={handleAddChecklistItem}
+      onToggleChecklistItem={handleToggleChecklistItem}
+      onEditChecklistItem={handleEditChecklistItem}
+      onDeleteChecklistItem={handleDeleteChecklistItem}
     />
   );
 }

@@ -54,5 +54,13 @@
     "description": "Arraste as seções para reordená-las e use os botões de visibilidade para mostrar/esconder seções. A edição de conteúdo está desabilitada neste modo.",
     "hidden_sections": "Seções Ocultas",
     "all_sections_visible": "Todas as seções estão visíveis"
+  },
+  "checklist": {
+    "title": "Lista de Tarefas",
+    "description": "Organize suas tarefas e acompanhe o progresso",
+    "empty_state": "Nenhuma tarefa adicionada ainda",
+    "add_item_placeholder": "Adicionar nova tarefa...",
+    "save": "Salvar",
+    "cancel": "Cancelar"
   }
 }

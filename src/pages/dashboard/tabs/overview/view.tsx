@@ -17,6 +17,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
+import { ChecklistCard } from "./components/checklist-card";
 import { MetricsCard } from "./components/metrics-card";
 import { SortableNote } from "./components/sortable-note";
 import { SortableSection } from "./components/sortable-section";
@@ -44,6 +45,7 @@ export function OverviewView(props: PropsOverviewView) {
     overviewStats,
     storyProgressPercentage,
     sensors,
+    checklistItems,
     onGoalsChange: _onGoalsChange,
     onEditingGoalsChange: _onEditingGoalsChange,
     onAuthorSummaryChange,
@@ -62,6 +64,10 @@ export function OverviewView(props: PropsOverviewView) {
     onMoveSectionDown,
     onNoteDragStart,
     onNoteDragEnd,
+    onAddChecklistItem,
+    onToggleChecklistItem,
+    onEditChecklistItem,
+    onDeleteChecklistItem,
   } = props;
 
   const renderStatsSection = () => (
@@ -175,11 +181,23 @@ export function OverviewView(props: PropsOverviewView) {
     </Card>
   );
 
+  const renderChecklistSection = () => (
+    <ChecklistCard
+      checklistItems={checklistItems}
+      isCustomizing={isCustomizing || false}
+      onAddItem={onAddChecklistItem}
+      onToggleItem={onToggleChecklistItem}
+      onEditItem={onEditChecklistItem}
+      onDeleteItem={onDeleteChecklistItem}
+    />
+  );
+
   const sectionRenderers: Record<ISection["type"], () => React.ReactNode> = {
     stats: renderStatsSection,
     progress: renderProgressSection,
     summaries: renderSummariesSection,
     "notes-board": renderNotesSection,
+    checklist: renderChecklistSection,
   };
 
   const sectionsWithComponents = sections.map((section) => ({
