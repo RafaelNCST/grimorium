@@ -17,12 +17,16 @@ interface PropsSortableTab {
   tab: TabConfig;
   isCustomizing: boolean;
   onToggleVisibility: (tabId: string) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function SortableTab({
   tab,
   isCustomizing,
   onToggleVisibility,
+  isFirst = false,
+  isLast = false,
 }: PropsSortableTab) {
   const {
     attributes,
@@ -78,7 +82,10 @@ export function SortableTab({
   if (!tab.visible) return null;
 
   return (
-    <TabsTrigger value={tab.id} className="flex items-center gap-2 py-3 flex-1">
+    <TabsTrigger
+      value={tab.id}
+      className="flex pointer-events-auto items-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+    >
       <tab.icon className="w-4 h-4" />
       <span className="hidden sm:inline">{tab.label}</span>
     </TabsTrigger>

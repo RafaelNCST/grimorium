@@ -143,62 +143,60 @@ export function DashboardView({
           </div>
         </div>
 
-        <div className="w-full">
-          <Tabs
-            value={activeTab}
-            onValueChange={onActiveTabChange}
-            className="w-full"
-          >
-            <TabsBar
-              isCustomizing={isCustomizing}
-              isHeaderHidden={isHeaderHidden}
-              tabs={tabs}
-              visibleTabs={visibleTabs}
-              sensors={sensors}
-              activeTab={activeTab}
-              onDragEnd={onDragEnd}
-              onToggleVisibility={onToggleVisibility}
-              onActiveTabChange={onActiveTabChange}
-            />
+        <Tabs
+          value={activeTab}
+          onValueChange={onActiveTabChange}
+          className="w-full"
+        >
+          <TabsBar
+            isCustomizing={isCustomizing}
+            isHeaderHidden={isHeaderHidden}
+            tabs={tabs}
+            visibleTabs={visibleTabs}
+            sensors={sensors}
+            activeTab={activeTab}
+            onDragEnd={onDragEnd}
+            onToggleVisibility={onToggleVisibility}
+            onActiveTabChange={onActiveTabChange}
+          />
 
-            <div className="px-6 mt-6 pb-6">
-              <TabsContent value="overview" className="mt-0">
-                <OverviewTab
-                  book={book}
-                  bookId={bookId}
-                  isCustomizing={isCustomizing}
-                />
-              </TabsContent>
-              <TabsContent value="characters" className="mt-0">
-                <CharactersTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="world" className="mt-0">
-                <WorldTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="organizations" className="mt-0">
-                <OrganizationsTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="plot" className="mt-0">
-                <PlotTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="magic" className="mt-0">
-                <PowerSystemTab />
-              </TabsContent>
-              <TabsContent value="encyclopedia" className="mt-0">
-                <EncyclopediaTab />
-              </TabsContent>
-              <TabsContent value="species" className="mt-0">
-                <SpeciesTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="bestiary" className="mt-0">
-                <BestiaryTab bookId={bookId} />
-              </TabsContent>
-              <TabsContent value="items" className="mt-0">
-                <ItemsTab bookId={bookId} />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
+          <div className="px-6 mt-6 pb-6">
+            <TabsContent value="overview" className="mt-0">
+              <OverviewTab
+                book={book}
+                bookId={bookId}
+                isCustomizing={isCustomizing}
+              />
+            </TabsContent>
+            <TabsContent value="characters" className="mt-0">
+              <CharactersTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="world" className="mt-0">
+              <WorldTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="organizations" className="mt-0">
+              <OrganizationsTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="plot" className="mt-0">
+              <PlotTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="magic" className="mt-0">
+              <PowerSystemTab />
+            </TabsContent>
+            <TabsContent value="encyclopedia" className="mt-0">
+              <EncyclopediaTab />
+            </TabsContent>
+            <TabsContent value="species" className="mt-0">
+              <SpeciesTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="bestiary" className="mt-0">
+              <BestiaryTab bookId={bookId} />
+            </TabsContent>
+            <TabsContent value="items" className="mt-0">
+              <ItemsTab bookId={bookId} />
+            </TabsContent>
+          </div>
+        </Tabs>
 
         <AlertDialog open={showDeleteDialog} onOpenChange={onShowDeleteDialog}>
           <AlertDialogContent>

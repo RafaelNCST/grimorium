@@ -44,20 +44,20 @@ export function TabsBar({
   onDragEnd,
   onToggleVisibility,
 }: PropsTabsBar) {
-  return (
-    <>
-      {isCustomizing ? (
-        <div className={`px-6 ${isHeaderHidden ? "pt-4" : "pt-10"}`}>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <Palette className="w-5 h-5" />
-              Personalizar Abas
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Arraste para reordenar ou clique no olho para mostrar/ocultar. A
-              aba "Visão Geral" não pode ser movida ou ocultada.
-            </p>
-          </div>
+  if (isCustomizing) {
+    return (
+      <>
+        <div className={`px-6 mb-4 ${isHeaderHidden ? "pt-4" : "pt-10"}`}>
+          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+            <Palette className="w-5 h-5" />
+            Personalizar Abas
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Arraste para reordenar ou clique no olho para mostrar/ocultar. A aba
+            &quot;Visão Geral&quot; não pode ser movida ou ocultada.
+          </p>
+        </div>
+        <div className="sticky top-0 z-30 bg-background pb-3 px-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -80,22 +80,24 @@ export function TabsBar({
             </SortableContext>
           </DndContext>
         </div>
-      ) : (
-        <div className="px-6">
-          <TabsList
-            className={`w-full h-10 flex items-center justify-start rounded-md bg-muted p-1 text-muted-foreground ${isHeaderHidden ? "mt-4" : "mt-6"}`}
-          >
-            {visibleTabs.map((tab) => (
-              <SortableTab
-                key={tab.id}
-                tab={tab}
-                isCustomizing={isCustomizing}
-                onToggleVisibility={onToggleVisibility}
-              />
-            ))}
-          </TabsList>
-        </div>
-      )}
-    </>
+      </>
+    );
+  }
+
+  return (
+    <div className="sticky pointer-events-none top-0 z-30 pb-3 px-6 pt-6">
+      <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
+        {visibleTabs.map((tab, index) => (
+          <SortableTab
+            key={tab.id}
+            tab={tab}
+            isCustomizing={isCustomizing}
+            onToggleVisibility={onToggleVisibility}
+            isFirst={index === 0}
+            isLast={index === visibleTabs.length - 1}
+          />
+        ))}
+      </TabsList>
+    </div>
   );
 }
