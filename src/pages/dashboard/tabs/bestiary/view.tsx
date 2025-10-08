@@ -71,10 +71,13 @@ export function BestiaryView({
             </p>
           </div>
           <Button
+            variant="magical"
+            size="lg"
             onClick={() => onShowCreateModalChange(true)}
-            className="btn-magical"
+            data-testid="create-character-trigger"
+            className="animate-glow"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Nova Besta
           </Button>
         </div>

@@ -54,7 +54,7 @@ export function HomeView({
   onCloseSettingsModal,
 }: PropsHomeView) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <Header
         daysSinceLastChapter={daysSinceLastChapter}
         lastEditedBook={lastEditedBook}

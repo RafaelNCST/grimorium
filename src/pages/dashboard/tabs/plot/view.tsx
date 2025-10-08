@@ -78,39 +78,49 @@ export function PlotView({
           </p>
         </div>
         <div className="flex gap-2">
-          <Select value={statusFilter} onValueChange={onSetStatusFilter}>
-            <SelectTrigger className="w-48">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os status</SelectItem>
-              <SelectItem value="andamento">Em andamento</SelectItem>
-              <SelectItem value="planejamento">Em planejamento</SelectItem>
-              <SelectItem value="finalizado">Finalizados</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={() => onPlotTimelineClick(bookId)}>
-            <GitBranch className="w-4 h-4 mr-2" />
-            Árvore Visual
-          </Button>
+          {arcs.length > 0 && (
+            <>
+              <Select value={statusFilter} onValueChange={onSetStatusFilter}>
+                <SelectTrigger className="w-48">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os status</SelectItem>
+                  <SelectItem value="andamento">Em andamento</SelectItem>
+                  <SelectItem value="planejamento">Em planejamento</SelectItem>
+                  <SelectItem value="finalizado">Finalizados</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                onClick={() => onPlotTimelineClick(bookId)}
+              >
+                <GitBranch className="w-4 h-4 mr-2" />
+                Árvore Visual
+              </Button>
+            </>
+          )}
           <Button
-            className="btn-magical"
+            variant="magical"
+            size="lg"
             onClick={() => onSetShowCreateModal(true)}
+            className="animate-glow"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Criar Arco
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-6">
-        {filteredAndSortedArcs.map((arc, index) => (
-          <Card
-            key={arc.id}
-            className="card-magical cursor-pointer"
-            onClick={() => onArcClick(arc.id, bookId)}
-          >
+      {arcs.length > 0 && (
+        <div className="grid gap-6">
+          {filteredAndSortedArcs.map((arc, index) => (
+            <Card
+              key={arc.id}
+              className="card-magical cursor-pointer"
+              onClick={() => onArcClick(arc.id, bookId)}
+            >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
@@ -207,7 +217,8 @@ export function PlotView({
             </CardContent>
           </Card>
         ))}
-      </div>
+        </div>
+      )}
 
       <CreatePlotArcModal
         open={showCreateModal}

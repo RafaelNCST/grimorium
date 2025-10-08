@@ -69,26 +69,33 @@ export function CharactersView({
           <p className="text-muted-foreground">
             Gerencie os personagens da sua história
           </p>
-          <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{roleStats.total} Total</Badge>
-            <Badge className="bg-accent/10 text-accent">
-              {roleStats.protagonista} Protagonista
-            </Badge>
-            <Badge className="bg-destructive/10 text-destructive">
-              {roleStats.antagonista} Antagonista
-            </Badge>
-            <Badge className="bg-primary/10 text-primary">
-              {roleStats.secundario} Secundário
-            </Badge>
-            <Badge className="bg-muted/50 text-muted-foreground">
-              {roleStats.vilao} Vilão
-            </Badge>
-          </div>
+          {characters.length > 0 && (
+            <div className="flex items-center gap-4 mt-2">
+              <Badge variant="outline">{roleStats.total} Total</Badge>
+              <Badge className="bg-accent/10 text-accent">
+                {roleStats.protagonista} Protagonista
+              </Badge>
+              <Badge className="bg-destructive/10 text-destructive">
+                {roleStats.antagonista} Antagonista
+              </Badge>
+              <Badge className="bg-primary/10 text-primary">
+                {roleStats.secundario} Secundário
+              </Badge>
+              <Badge className="bg-muted/50 text-muted-foreground">
+                {roleStats.vilao} Vilão
+              </Badge>
+            </div>
+          )}
         </div>
         <CreateCharacterModal
           trigger={
-            <Button variant="magical" data-testid="create-character-trigger">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button
+              variant="magical"
+              size="lg"
+              data-testid="create-character-trigger"
+              className="animate-glow"
+            >
+              <Plus className="w-5 h-5 mr-2" />
               Novo Personagem
             </Button>
           }
@@ -97,48 +104,50 @@ export function CharactersView({
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar personagens..."
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            className="pl-10"
-          />
+      {characters.length > 0 && (
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar personagens..."
+              value={searchTerm}
+              onChange={(e) => onSearchTermChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Select value={selectedOrg} onValueChange={onSelectedOrgChange}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Organização" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todas organizações</SelectItem>
+              {organizations.slice(1).map((org) => (
+                <SelectItem key={org} value={org}>
+                  {org}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedLocation}
+            onValueChange={onSelectedLocationChange}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Local" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todos locais</SelectItem>
+              {locations.slice(1).map((location) => (
+                <SelectItem key={location} value={location}>
+                  {location}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-
-        <Select value={selectedOrg} onValueChange={onSelectedOrgChange}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Organização" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todas organizações</SelectItem>
-            {organizations.slice(1).map((org) => (
-              <SelectItem key={org} value={org}>
-                {org}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={selectedLocation}
-          onValueChange={onSelectedLocationChange}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Local" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todos locais</SelectItem>
-            {locations.slice(1).map((location) => (
-              <SelectItem key={location} value={location}>
-                {location}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      )}
 
       {/* Characters Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -223,17 +232,6 @@ export function CharactersView({
             characters.length === 0
               ? "Comece criando seu primeiro personagem para dar vida à sua história"
               : "Tente ajustar seus filtros ou criar um novo personagem"
-          }
-          actionLabel={characters.length === 0 ? "Criar Personagem" : undefined}
-          onAction={
-            characters.length === 0
-              ? () => {
-                  const trigger = document.querySelector(
-                    '[data-testid="create-character-trigger"]'
-                  ) as HTMLButtonElement;
-                  trigger?.click();
-                }
-              : undefined
           }
         />
       )}

@@ -74,67 +74,76 @@ export function OrganizationsView({
           <p className="text-muted-foreground">
             Gerencie as organizações e facções do seu mundo
           </p>
-          <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{organizations.length} Total</Badge>
-            <Badge className="bg-success/10 text-success">
-              {totalByAlignment.bem} Bem
-            </Badge>
-            <Badge className="bg-secondary/10 text-secondary-foreground">
-              {totalByAlignment.neutro} Neutro
-            </Badge>
-            <Badge className="bg-destructive/10 text-destructive">
-              {totalByAlignment.caotico} Caótico
-            </Badge>
-          </div>
+          {organizations.length > 0 && (
+            <div className="flex items-center gap-4 mt-2">
+              <Badge variant="outline">{organizations.length} Total</Badge>
+              <Badge className="bg-success/10 text-success">
+                {totalByAlignment.bem} Bem
+              </Badge>
+              <Badge className="bg-secondary/10 text-secondary-foreground">
+                {totalByAlignment.neutro} Neutro
+              </Badge>
+              <Badge className="bg-destructive/10 text-destructive">
+                {totalByAlignment.caotico} Caótico
+              </Badge>
+            </div>
+          )}
         </div>
-        <Button variant="magical" onClick={onCreateOrganization}>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button
+          variant="magical"
+          size="lg"
+          onClick={onCreateOrganization}
+          className="animate-glow"
+        >
+          <Plus className="w-5 h-5 mr-2" />
           Nova Organização
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar organizações..."
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            className="pl-10"
-          />
+      {organizations.length > 0 && (
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar organizações..."
+              value={searchTerm}
+              onChange={(e) => onSearchTermChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Select
+            value={selectedAlignment}
+            onValueChange={onSelectedAlignmentChange}
+          >
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Alinhamento" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todos</SelectItem>
+              {alignments.slice(1).map((alignment) => (
+                <SelectItem key={alignment} value={alignment}>
+                  {alignment}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedWorld} onValueChange={onSelectedWorldChange}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Mundo" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todos</SelectItem>
+              {worlds.slice(1).map((world) => (
+                <SelectItem key={world} value={world}>
+                  {world}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-
-        <Select
-          value={selectedAlignment}
-          onValueChange={onSelectedAlignmentChange}
-        >
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Alinhamento" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todos</SelectItem>
-            {alignments.slice(1).map((alignment) => (
-              <SelectItem key={alignment} value={alignment}>
-                {alignment}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedWorld} onValueChange={onSelectedWorldChange}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Mundo" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todos</SelectItem>
-            {worlds.slice(1).map((world) => (
-              <SelectItem key={world} value={world}>
-                {world}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      )}
 
       <div className="space-y-6">
         {filteredOrganizations.map((organization) => (
@@ -220,22 +229,12 @@ export function OrganizationsView({
         ))}
       </div>
 
-      {filteredOrganizations.length === 0 && (
-        <div className="text-center py-12">
-          <Building className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">
-            Nenhuma organização encontrada
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            {searchTerm || selectedAlignment !== "all"
-              ? "Tente ajustar seus filtros"
-              : "Comece criando a primeira organização do seu mundo"}
-          </p>
-          <Button variant="magical" onClick={onCreateOrganization}>
-            <Plus className="w-4 h-4 mr-2" />
-            Criar Organização
-          </Button>
-        </div>
+      {filteredOrganizations.length === 0 && organizations.length > 0 && (
+        <EmptyState
+          icon={Building}
+          title="Nenhuma organização encontrada"
+          description="Tente ajustar seus filtros para encontrar organizações."
+        />
       )}
 
       {organizations.length === 0 && (
@@ -243,8 +242,6 @@ export function OrganizationsView({
           icon={Building}
           title="Nenhuma organização criada"
           description="Comece criando a primeira organização do seu mundo para gerenciar facções e grupos."
-          actionLabel="Criar Organização"
-          onAction={onCreateOrganization}
         />
       )}
 

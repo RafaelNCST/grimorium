@@ -83,13 +83,18 @@ export function WorldView({
               Gerencie mundos, continentes e locais
             </p>
           </div>
-          <Button variant="magical" onClick={onCreateWorld}>
-            <Plus className="w-4 h-4 mr-2" />
+          <Button
+            variant="magical"
+            size="lg"
+            onClick={onCreateWorld}
+            className="animate-glow"
+          >
+            <Plus className="w-5 h-5 mr-2" />
             Criar Mundo
           </Button>
         </div>
 
-        <EmptyState onCreateWorld={onCreateWorld} />
+        <EmptyState />
       </div>
     );
   }

@@ -53,21 +53,28 @@ export function SpeciesView({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Espécies</h2>
-          <div className="mt-1">
-            <StatsBadges
-              totalSpecies={species.length}
-              raceTypeStats={raceTypeStats}
-            />
-          </div>
+          {species.length > 0 && (
+            <div className="mt-1">
+              <StatsBadges
+                totalSpecies={species.length}
+                raceTypeStats={raceTypeStats}
+              />
+            </div>
+          )}
         </div>
-        <Button onClick={() => onSetIsCreateSpeciesOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button
+          variant="magical"
+          size="lg"
+          onClick={() => onSetIsCreateSpeciesOpen(true)}
+          className="animate-glow"
+        >
+          <Plus className="w-5 h-5 mr-2" />
           Nova Espécie
         </Button>
       </div>
 
       {species.length === 0 ? (
-        <EmptyState onCreateSpecies={() => onSetIsCreateSpeciesOpen(true)} />
+        <EmptyState />
       ) : (
         <Accordion type="multiple" className="space-y-4">
           {species.map((speciesItem) => (

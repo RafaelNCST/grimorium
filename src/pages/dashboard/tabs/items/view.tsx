@@ -63,10 +63,12 @@ export function ItemsView({
             </p>
           </div>
           <Button
+            variant="magical"
+            size="lg"
             onClick={() => onShowCreateModalChange(true)}
-            className="btn-magical"
+            className="animate-glow"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Novo Item
           </Button>
         </div>
@@ -75,8 +77,6 @@ export function ItemsView({
           icon={Package}
           title="Nenhum item cadastrado"
           description="Comece criando seu primeiro item para equipar seus personagens e enriquecer sua história."
-          actionLabel="Criar Primeiro Item"
-          onAction={() => onShowCreateModalChange(true)}
         />
 
         <CreateItemModal
@@ -98,74 +98,80 @@ export function ItemsView({
           <p className="text-muted-foreground">
             Gerencie armas, artefatos e itens importantes da sua história
           </p>
-          <div className="flex items-center gap-4 mt-2">
-            <Badge variant="outline">{items.length} Total</Badge>
-            <Badge className="bg-gray-100 text-gray-700">
-              {items.filter((i) => i.rarity.name === "Comum").length} Comum
-            </Badge>
-            <Badge className="bg-blue-100 text-blue-700">
-              {items.filter((i) => i.rarity.name === "Raro").length} Raro
-            </Badge>
-            <Badge className="bg-yellow-100 text-yellow-700">
-              {items.filter((i) => i.rarity.name === "Lendário").length}{" "}
-              Lendário
-            </Badge>
-          </div>
+          {items.length > 0 && (
+            <div className="flex items-center gap-4 mt-2">
+              <Badge variant="outline">{items.length} Total</Badge>
+              <Badge className="bg-gray-100 text-gray-700">
+                {items.filter((i) => i.rarity.name === "Comum").length} Comum
+              </Badge>
+              <Badge className="bg-blue-100 text-blue-700">
+                {items.filter((i) => i.rarity.name === "Raro").length} Raro
+              </Badge>
+              <Badge className="bg-yellow-100 text-yellow-700">
+                {items.filter((i) => i.rarity.name === "Lendário").length}{" "}
+                Lendário
+              </Badge>
+            </div>
+          )}
         </div>
         <Button
+          variant="magical"
+          size="lg"
           onClick={() => onShowCreateModalChange(true)}
-          className="btn-magical"
+          className="animate-glow"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-5 h-5 mr-2" />
           Novo Item
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar itens..."
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            className="pl-10"
-          />
+      {items.length > 0 && (
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar itens..."
+              value={searchTerm}
+              onChange={(e) => onSearchTermChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Select
+            value={selectedCategory}
+            onValueChange={onSelectedCategoryChange}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todas as categorias</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedRarity} onValueChange={onSelectedRarityChange}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Raridade" />
+            </SelectTrigger>
+            <SelectContent side="bottom">
+              <SelectItem value="all">Todas as raridades</SelectItem>
+              {mockRarities.map((rarity) => (
+                <SelectItem key={rarity.id} value={rarity.id}>
+                  <div className="flex items-center gap-2">
+                    <span>{rarity.icon}</span>
+                    <span>{rarity.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-
-        <Select
-          value={selectedCategory}
-          onValueChange={onSelectedCategoryChange}
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todas as categorias</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedRarity} onValueChange={onSelectedRarityChange}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Raridade" />
-          </SelectTrigger>
-          <SelectContent side="bottom">
-            <SelectItem value="all">Todas as raridades</SelectItem>
-            {mockRarities.map((rarity) => (
-              <SelectItem key={rarity.id} value={rarity.id}>
-                <div className="flex items-center gap-2">
-                  <span>{rarity.icon}</span>
-                  <span>{rarity.name}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      )}
 
       {filteredItems.length === 0 && items.length > 0 && (
         <EmptyState

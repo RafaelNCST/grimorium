@@ -45,7 +45,10 @@ export const TitleBar = () => {
   const routerState = useRouterState();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
-  const [controlsPosition, setControlsPosition] = useState({ top: 0, right: 0 });
+  const [controlsPosition, setControlsPosition] = useState({
+    top: 0,
+    right: 0,
+  });
   const { t } = useTranslation("inbox");
   const messages = useInboxStore((state) => state.messages);
   const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
@@ -89,7 +92,7 @@ export const TitleBar = () => {
   // Update window controls position when component mounts or window resizes
   useEffect(() => {
     const updateControlsPosition = () => {
-      const titleBar = document.querySelector('[data-title-bar]');
+      const titleBar = document.querySelector("[data-title-bar]");
       if (titleBar) {
         const rect = titleBar.getBoundingClientRect();
         setControlsPosition({ top: rect.top, right: 0 });
@@ -97,10 +100,10 @@ export const TitleBar = () => {
     };
 
     updateControlsPosition();
-    window.addEventListener('resize', updateControlsPosition);
+    window.addEventListener("resize", updateControlsPosition);
 
     return () => {
-      window.removeEventListener('resize', updateControlsPosition);
+      window.removeEventListener("resize", updateControlsPosition);
     };
   }, []);
 
@@ -145,7 +148,9 @@ export const TitleBar = () => {
           "h-10 w-12 rounded-none hover:bg-gray-50",
           "transition-colors duration-200"
         )}
-        aria-label={isMaximized ? "Restore window control" : "Maximize window control"}
+        aria-label={
+          isMaximized ? "Restore window control" : "Maximize window control"
+        }
       >
         <Square className="h-4 w-4" />
       </Button>
@@ -187,7 +192,9 @@ export const TitleBar = () => {
           data-tauri-drag-region
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >
-          <span className="text-sm font-medium text-foreground">{pageTitle}</span>
+          <span className="text-sm font-medium text-foreground">
+            {pageTitle}
+          </span>
         </div>
 
         {/* Right section - Inbox and placeholder for window controls */}
@@ -201,9 +208,9 @@ export const TitleBar = () => {
                       variant="ghost"
                       size="icon"
                       className={cn(
-                        "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-primary relative",
+                        "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
                         "transition-colors duration-200",
-                        isInboxOpen && "bg-gray-50 text-primary"
+                        isInboxOpen && "bg-gray-50 text-secondary"
                       )}
                       aria-label="Inbox"
                     >
@@ -232,7 +239,10 @@ export const TitleBar = () => {
             </Popover>
           </TooltipProvider>
           {/* Placeholder to maintain spacing - invisible but takes up space */}
-          <div className="h-10 w-[145px] opacity-0 pointer-events-none" aria-hidden="true" />
+          <div
+            className="h-10 w-[145px] opacity-0 pointer-events-none"
+            aria-hidden="true"
+          />
         </div>
       </div>
 
@@ -243,7 +253,7 @@ export const TitleBar = () => {
           style={{
             top: `${controlsPosition.top}px`,
             right: `${controlsPosition.right}px`,
-            height: '40px',
+            height: "40px",
           }}
         >
           <WindowControls />

@@ -81,8 +81,13 @@ export function EncyclopediaView({
           <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-muted-foreground">{t("description")}</p>
         </div>
-        <Button variant="magical" onClick={onCreateEntry}>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button
+          variant="magical"
+          size="lg"
+          className="animate-glow"
+          onClick={onCreateEntry}
+        >
+          <Plus className="w-5 h-5 mr-2" />
           {t("new_entry")}
         </Button>
       </div>
@@ -253,10 +258,6 @@ export function EncyclopediaView({
               ? t("empty_state.adjust_search")
               : t("empty_state.create_first")}
           </p>
-          <Button variant="magical" onClick={onCreateEntry}>
-            <Plus className="w-4 h-4 mr-2" />
-            {t("empty_state.create_entry")}
-          </Button>
         </div>
       )}
     </div>
