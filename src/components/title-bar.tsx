@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -44,6 +45,7 @@ export const TitleBar = () => {
   const routerState = useRouterState();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [controlsPosition, setControlsPosition] = useState({ top: 0, right: 0 });
   const { t } = useTranslation("inbox");
   const messages = useInboxStore((state) => state.messages);
   const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
@@ -84,121 +86,170 @@ export const TitleBar = () => {
     }
   }, [isInboxOpen, markAllAsRead]);
 
-  const handleMinimize = () => {
+  // Update window controls position when component mounts or window resizes
+  useEffect(() => {
+    const updateControlsPosition = () => {
+      const titleBar = document.querySelector('[data-title-bar]');
+      if (titleBar) {
+        const rect = titleBar.getBoundingClientRect();
+        setControlsPosition({ top: rect.top, right: 0 });
+      }
+    };
+
+    updateControlsPosition();
+    window.addEventListener('resize', updateControlsPosition);
+
+    return () => {
+      window.removeEventListener('resize', updateControlsPosition);
+    };
+  }, []);
+
+  const handleMinimize = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     getCurrentWindow().minimize();
   };
 
-  const handleMaximize = () => {
+  const handleMaximize = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     getCurrentWindow().toggleMaximize();
   };
 
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent) => {
+    event.stopPropagation();
     getCurrentWindow().close();
   };
 
-  return (
-    <div
-      data-tauri-drag-region
-      className={cn(
-        "flex h-10 w-full items-center justify-between",
-        "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-        "select-none"
-      )}
-    >
-      {/* Left section - App logo/name */}
-      <div data-tauri-drag-region className="flex items-center px-4">
-        <span className="text-sm font-semibold text-foreground/80">
-          Grimorium
-        </span>
-      </div>
+  // Window control buttons component
+  const WindowControls = () => (
+    <div className="flex items-center">
+      <div className="h-6 w-px bg-border" />
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleMinimize}
+        className={cn(
+          "h-10 w-12 rounded-none hover:bg-gray-50",
+          "transition-colors duration-200"
+        )}
+        aria-label="Minimize window control"
+      >
+        <Minus className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleMaximize}
+        className={cn(
+          "h-10 w-12 rounded-none hover:bg-gray-50",
+          "transition-colors duration-200"
+        )}
+        aria-label={isMaximized ? "Restore window control" : "Maximize window control"}
+      >
+        <Square className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleClose}
+        className={cn(
+          "h-10 w-12 rounded-none hover:bg-destructive hover:text-destructive-foreground",
+          "transition-colors duration-200"
+        )}
+        aria-label="Close window control"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
-      {/* Center section - Page title */}
+  return (
+    <>
       <div
         data-tauri-drag-region
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        data-title-bar
+        className={cn(
+          "flex h-10 w-full items-center justify-between",
+          "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "select-none"
+        )}
       >
-        <span className="text-sm font-medium text-foreground">{pageTitle}</span>
+        {/* Left section - App logo/name */}
+        <div data-tauri-drag-region className="flex items-center px-4">
+          <span className="text-sm font-semibold text-foreground/80">
+            Grimorium
+          </span>
+        </div>
+
+        {/* Center section - Page title */}
+        <div
+          data-tauri-drag-region
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        >
+          <span className="text-sm font-medium text-foreground">{pageTitle}</span>
+        </div>
+
+        {/* Right section - Inbox and placeholder for window controls */}
+        <div className="flex items-center">
+          <TooltipProvider>
+            <Popover open={isInboxOpen} onOpenChange={setIsInboxOpen}>
+              <Tooltip open={isInboxOpen ? false : undefined}>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-primary relative",
+                        "transition-colors duration-200",
+                        isInboxOpen && "bg-gray-50 text-primary"
+                      )}
+                      aria-label="Inbox"
+                    >
+                      <Inbox
+                        className={cn("h-4 w-4 transition-colors duration-200")}
+                      />
+                      {unreadCount > 0 && !isInboxOpen && (
+                        <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{t("tooltip")}</p>
+                </TooltipContent>
+              </Tooltip>
+              <PopoverContent
+                className="p-0 border shadow-lg w-[560px] max-w-[90vw]"
+                align="end"
+                side="bottom"
+                sideOffset={4}
+                alignOffset={0}
+              >
+                <InboxModal />
+              </PopoverContent>
+            </Popover>
+          </TooltipProvider>
+          {/* Placeholder to maintain spacing - invisible but takes up space */}
+          <div className="h-10 w-[145px] opacity-0 pointer-events-none" aria-hidden="true" />
+        </div>
       </div>
 
-      {/* Right section - Window controls */}
-      <div className="flex items-center">
-        <TooltipProvider>
-          <Popover open={isInboxOpen} onOpenChange={setIsInboxOpen}>
-            <Tooltip open={isInboxOpen ? false : undefined}>
-              <TooltipTrigger asChild>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-primary relative",
-                      "transition-colors duration-200",
-                      isInboxOpen && "bg-gray-50 text-primary"
-                    )}
-                    aria-label="Inbox"
-                  >
-                    <Inbox
-                      className={cn("h-4 w-4 transition-colors duration-200")}
-                    />
-                    {unreadCount > 0 && !isInboxOpen && (
-                      <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
-                    )}
-                  </Button>
-                </PopoverTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{t("tooltip")}</p>
-              </TooltipContent>
-            </Tooltip>
-            <PopoverContent
-              className="p-0 border shadow-lg w-[560px] max-w-[90vw]"
-              align="end"
-              side="bottom"
-              sideOffset={4}
-              alignOffset={0}
-            >
-              <InboxModal />
-            </PopoverContent>
-          </Popover>
-        </TooltipProvider>
-        <div className="h-6 w-px bg-border" />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleMinimize}
-          className={cn(
-            "h-10 w-12 rounded-none hover:bg-gray-50",
-            "transition-colors duration-200"
-          )}
-          aria-label="Minimize window"
+      {/* Window controls rendered in a portal with highest z-index */}
+      {createPortal(
+        <div
+          className="fixed z-[100] flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border pointer-events-auto"
+          style={{
+            top: `${controlsPosition.top}px`,
+            right: `${controlsPosition.right}px`,
+            height: '40px',
+          }}
         >
-          <Minus className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleMaximize}
-          className={cn(
-            "h-10 w-12 rounded-none hover:bg-gray-50",
-            "transition-colors duration-200"
-          )}
-          aria-label={isMaximized ? "Restore window" : "Maximize window"}
-        >
-          <Square className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleClose}
-          className={cn(
-            "h-10 w-12 rounded-none hover:bg-destructive hover:text-destructive-foreground",
-            "transition-colors duration-200"
-          )}
-          aria-label="Close window"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
+          <WindowControls />
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
