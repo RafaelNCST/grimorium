@@ -47,7 +47,17 @@
     "title": "Quadro de Lembretes",
     "description": "Arraste as notas para organizá-las",
     "add_note_placeholder": "Adicionar nova nota...",
-    "add": "Adicionar"
+    "add": "Adicionar",
+    "default_note": "Olá, eu sou seu primeiro lembrete",
+    "empty_state": "Nenhum lembrete adicionado ainda",
+    "select_color": "Selecione a cor do lembrete",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "bring_to_front": "Trazer para frente",
+    "send_to_back": "Enviar para trás",
+    "change_color": "Alterar cor",
+    "edit_note": "Editar nota",
+    "delete_note": "Excluir nota"
   },
   "customize_mode": {
     "title": "Modo Personalizar Ativo",

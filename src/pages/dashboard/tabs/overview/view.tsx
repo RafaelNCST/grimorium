@@ -1,9 +1,5 @@
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { StickyNote, Plus } from "lucide-react";
+import { StickyNote as StickyNoteIcon, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -18,11 +14,14 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 
 import { ChecklistCard } from "./components/checklist-card";
+import { ColorPicker } from "./components/color-picker";
 import { MetricsCard } from "./components/metrics-card";
-import { SortableNote } from "./components/sortable-note";
+import { StickyNote } from "./components/sticky-note";
 import { SortableSection } from "./components/sortable-section";
 import { SummariesCard } from "./components/summaries-card";
 import { PropsOverviewView, ISection } from "./types/overview-types";
+
+const MAX_NOTE_CHARACTER_LIMIT = 200;
 
 export function OverviewView(props: PropsOverviewView) {
   const { t } = useTranslation("overview");
@@ -41,11 +40,14 @@ export function OverviewView(props: PropsOverviewView) {
     editingNote,
     editContent,
     sections,
-    activeId: _activeId,
+    activeNoteId,
+    draggedNoteData,
     overviewStats,
     storyProgressPercentage,
     sensors,
     checklistItems,
+    selectedColor,
+    dragModifiers,
     onGoalsChange: _onGoalsChange,
     onEditingGoalsChange: _onEditingGoalsChange,
     onAuthorSummaryChange,
@@ -54,15 +56,20 @@ export function OverviewView(props: PropsOverviewView) {
     onNewNoteChange,
     onEditingNoteChange,
     onEditContentChange,
+    onSelectedColorChange,
     onAddNote,
     onDeleteNote,
     onEditNote,
+    onColorChange,
+    onBringToFront,
+    onSendToBack,
     onSaveGoals: _onSaveGoals,
     onSaveSummaries,
     onToggleSectionVisibility,
     onMoveSectionUp,
     onMoveSectionDown,
     onNoteDragStart,
+    onNoteDragMove,
     onNoteDragEnd,
     onAddChecklistItem,
     onToggleChecklistItem,
@@ -123,7 +130,7 @@ export function OverviewView(props: PropsOverviewView) {
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <StickyNote className="w-5 h-5" />
+            <StickyNoteIcon className="w-5 h-5" />
             {t("notes_board.title")}
           </CardTitle>
           <CardDescription>{t("notes_board.description")}</CardDescription>
@@ -133,19 +140,25 @@ export function OverviewView(props: PropsOverviewView) {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          modifiers={dragModifiers}
           onDragStart={onNoteDragStart}
+          onDragMove={onNoteDragMove}
           onDragEnd={onNoteDragEnd}
         >
-          <SortableContext
-            items={stickyNotes.map((note) => `note-${note.id}`)}
-            strategy={verticalListSortingStrategy}
+          <div
+            id="notes-drop-area"
+            className="relative min-h-[400px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4 overflow-hidden select-none"
+            style={{ touchAction: "none" }}
           >
-            <div
-              id="notes-drop-area"
-              className="relative min-h-[300px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4"
-            >
-              {stickyNotes.map((note) => (
-                <SortableNote
+            {stickyNotes.length === 0 ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-muted-foreground text-sm">
+                  {t("notes_board.empty_state")}
+                </p>
+              </div>
+            ) : (
+              stickyNotes.map((note) => (
+                <StickyNote
                   key={note.id}
                   note={note}
                   editingNote={editingNote}
@@ -155,27 +168,53 @@ export function OverviewView(props: PropsOverviewView) {
                   onEditContentChange={onEditContentChange}
                   onEditNote={onEditNote}
                   onDeleteNote={onDeleteNote}
+                  onColorChange={onColorChange}
+                  onBringToFront={onBringToFront}
+                  onSendToBack={onSendToBack}
                 />
-              ))}
-            </div>
-          </SortableContext>
+              ))
+            )}
+          </div>
         </DndContext>
 
-        <div className="flex gap-2">
-          <Textarea
-            placeholder={t("notes_board.add_note_placeholder")}
-            value={newNote}
-            onChange={(e) => onNewNoteChange(e.target.value)}
-            className="min-h-[60px]"
-            disabled={isCustomizing}
-          />
-          <Button
-            variant="outline"
-            onClick={onAddNote}
-            disabled={isCustomizing}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+        <div className="space-y-3">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              {t("notes_board.select_color")}
+            </label>
+            <ColorPicker
+              selectedColor={selectedColor}
+              onColorSelect={onSelectedColorChange}
+              disabled={isCustomizing}
+            />
+          </div>
+          <div className="space-y-1">
+            <div className="flex gap-2">
+              <Textarea
+                placeholder={t("notes_board.add_note_placeholder")}
+                value={newNote}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= MAX_NOTE_CHARACTER_LIMIT) {
+                    onNewNoteChange(value);
+                  }
+                }}
+                className="min-h-[60px]"
+                disabled={isCustomizing}
+                maxLength={MAX_NOTE_CHARACTER_LIMIT}
+              />
+              <Button
+                variant="outline"
+                onClick={onAddNote}
+                disabled={isCustomizing || !newNote.trim()}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {newNote.length}/{MAX_NOTE_CHARACTER_LIMIT}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

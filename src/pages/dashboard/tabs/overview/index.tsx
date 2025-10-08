@@ -1,14 +1,16 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   DragStartEvent,
   DragEndEvent,
+  DragMoveEvent,
   PointerSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
+  Modifier,
 } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
 import {
@@ -21,7 +23,36 @@ import {
 } from "./types/overview-types";
 import { OverviewView } from "./view";
 
+// Custom modifier to restrict dragging within the notes board container
+const restrictToNotesBoard: Modifier = ({ transform, draggingNodeRect, containerNodeRect }) => {
+  if (!draggingNodeRect || !containerNodeRect) {
+    return transform;
+  }
+
+  const padding = 0;
+
+  // Calculate the maximum allowed positions
+  const maxX = containerNodeRect.width - draggingNodeRect.width - padding;
+  const maxY = containerNodeRect.height - draggingNodeRect.height - padding;
+
+  // Calculate the current position (initial position + transform delta)
+  const currentX = draggingNodeRect.left - containerNodeRect.left + transform.x;
+  const currentY = draggingNodeRect.top - containerNodeRect.top + transform.y;
+
+  // Constrain the position within boundaries
+  const constrainedX = Math.max(padding, Math.min(maxX, currentX));
+  const constrainedY = Math.max(padding, Math.min(maxY, currentY));
+
+  // Return adjusted transform that respects boundaries
+  return {
+    ...transform,
+    x: constrainedX - (draggingNodeRect.left - containerNodeRect.left),
+    y: constrainedY - (draggingNodeRect.top - containerNodeRect.top),
+  };
+};
+
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
+  const { t } = useTranslation("overview");
   const [goals, setGoals] = useState<IGoals>({
     wordsPerDay: 0,
     chaptersPerWeek: 0,
@@ -45,6 +76,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   );
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [checklistItems, setChecklistItems] = useState<IChecklistItem[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string>(
+    NOTE_COLORS_CONSTANT[0]
+  );
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [sections, setSections] = useState<ISection[]>([
     {
       id: "stats",
@@ -114,11 +149,28 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   ]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor)
   );
+
+  useEffect(() => {
+    if (!hasInitialized && stickyNotes.length === 0) {
+      const defaultNote: IStickyNote = {
+        id: "default-note",
+        content: t("notes_board.default_note"),
+        color: NOTE_COLORS_CONSTANT[0],
+        x: 10,
+        y: 10,
+        zIndex: 10,
+      };
+      setStickyNotes([defaultNote]);
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, stickyNotes.length, t]);
 
   const handleToggleSectionVisibility = useCallback((sectionId: string) => {
     setSections((sections) =>
@@ -166,20 +218,21 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
   const handleAddNote = useCallback(() => {
     if (newNote.trim()) {
+      // Find highest z-index among existing notes
+      const maxZIndex = stickyNotes.reduce((max, note) => Math.max(max, note.zIndex), 0);
+
       const newStickyNote: IStickyNote = {
         id: Date.now().toString(),
         content: newNote,
-        color:
-          NOTE_COLORS_CONSTANT[
-            Math.floor(Math.random() * NOTE_COLORS_CONSTANT.length)
-          ],
-        x: Math.random() * 300,
-        y: Math.random() * 200,
+        color: selectedColor,
+        x: 10,
+        y: 10,
+        zIndex: maxZIndex + 1,
       };
       setStickyNotes((prev) => [...prev, newStickyNote]);
       setNewNote("");
     }
-  }, [newNote]);
+  }, [newNote, selectedColor, stickyNotes]);
 
   const handleDeleteNote = useCallback((id: string) => {
     setStickyNotes((notes) => notes.filter((note) => note.id !== id));
@@ -191,6 +244,36 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         note.id === id ? { ...note, content: newContent } : note
       )
     );
+  }, []);
+
+  const handleColorChange = useCallback((id: string, color: string) => {
+    setStickyNotes((notes) =>
+      notes.map((note) => (note.id === id ? { ...note, color } : note))
+    );
+  }, []);
+
+  const handleBringToFront = useCallback((id: string) => {
+    setStickyNotes((notes) => {
+      // Find highest z-index among all notes
+      const maxZIndex = notes.reduce((max, note) => Math.max(max, note.zIndex), 0);
+
+      // Set the selected note's z-index to be higher than all others
+      return notes.map((note) =>
+        note.id === id ? { ...note, zIndex: maxZIndex + 1 } : note
+      );
+    });
+  }, []);
+
+  const handleSendToBack = useCallback((id: string) => {
+    setStickyNotes((notes) => {
+      // Find lowest z-index among all notes
+      const minZIndex = notes.reduce((min, note) => Math.min(min, note.zIndex), Infinity);
+
+      // Set the selected note's z-index to be lower than all others
+      return notes.map((note) =>
+        note.id === id ? { ...note, zIndex: minZIndex - 1 } : note
+      );
+    });
   }, []);
 
   const handleNoteDragStart = useCallback((event: DragStartEvent) => {
@@ -208,22 +291,49 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     }
   }, []);
 
+  const handleNoteDragMove = useCallback((_event: DragMoveEvent) => {
+    // No need to update position during drag - transform handles visual movement
+  }, []);
+
   const handleNoteDragEnd = useCallback((event: DragEndEvent) => {
     const { active, delta } = event;
 
     if (active && active.id.toString().startsWith("note-")) {
       const noteId = active.id.toString().replace("note-", "");
 
-      setStickyNotes((notes) =>
-        notes.map((note) => {
-          if (note.id === noteId) {
-            const newX = Math.max(0, note.x + delta.x);
-            const newY = Math.max(0, note.y + delta.y);
-            return { ...note, x: newX, y: newY };
-          }
-          return note;
-        })
-      );
+      setStickyNotes((notes) => {
+        const note = notes.find((n) => n.id === noteId);
+        if (!note) return notes;
+
+        const boardElement = document.getElementById("notes-drop-area");
+        const noteElement = document.querySelector(
+          `[data-note-id="${noteId}"]`
+        ) as HTMLElement;
+
+        if (!boardElement || !noteElement) {
+          return notes;
+        }
+
+        // Get actual dimensions
+        const noteWidth = noteElement.offsetWidth;
+        const noteHeight = noteElement.offsetHeight;
+        const containerWidth = boardElement.clientWidth;
+        const containerHeight = boardElement.clientHeight;
+
+        // Calculate boundaries (with padding to keep note inside dotted border)
+        const padding = 0;
+        const maxX = containerWidth - noteWidth - padding;
+        const maxY = containerHeight - noteHeight - padding;
+
+        // Calculate final position: initial position + delta
+        // Constrain to boundaries
+        const newX = Math.max(padding, Math.min(maxX, note.x + delta.x));
+        const newY = Math.max(padding, Math.min(maxY, note.y + delta.y));
+
+        return notes.map((n) =>
+          n.id === noteId ? { ...n, x: newX, y: newY } : n
+        );
+      });
     }
 
     setActiveNoteId(null);
@@ -279,6 +389,8 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       storyProgressPercentage={storyProgressPercentage}
       sensors={sensors}
       checklistItems={checklistItems}
+      selectedColor={selectedColor}
+      dragModifiers={[restrictToNotesBoard]}
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
       onAuthorSummaryChange={setAuthorSummary}
@@ -290,15 +402,20 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onSectionsChange={setSections}
       onActiveNoteIdChange={setActiveNoteId}
       onDraggedNoteDataChange={setDraggedNoteData}
+      onSelectedColorChange={setSelectedColor}
       onAddNote={handleAddNote}
       onDeleteNote={handleDeleteNote}
       onEditNote={handleEditNote}
+      onColorChange={handleColorChange}
+      onBringToFront={handleBringToFront}
+      onSendToBack={handleSendToBack}
       onSaveGoals={handleSaveGoals}
       onSaveSummaries={handleSaveSummaries}
       onToggleSectionVisibility={handleToggleSectionVisibility}
       onMoveSectionUp={handleMoveSectionUp}
       onMoveSectionDown={handleMoveSectionDown}
       onNoteDragStart={handleNoteDragStart}
+      onNoteDragMove={handleNoteDragMove}
       onNoteDragEnd={handleNoteDragEnd}
       onAddChecklistItem={handleAddChecklistItem}
       onToggleChecklistItem={handleToggleChecklistItem}

@@ -50,7 +50,8 @@
       "Bash(cargo:*)",
       "Bash(git restore:*)",
       "Bash(tasklist:*)",
-      "Bash(pnpm lint:*)"
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": [],
     "ask": []

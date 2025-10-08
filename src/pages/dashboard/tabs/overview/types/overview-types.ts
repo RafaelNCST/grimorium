@@ -1,4 +1,4 @@
-import { SensorDescriptor, SensorOptions } from "@dnd-kit/core";
+import { SensorDescriptor, SensorOptions, Modifier } from "@dnd-kit/core";
 
 export interface IBook {
   title: string;
@@ -14,6 +14,7 @@ export interface IStickyNote {
   color: string;
   x: number;
   y: number;
+  zIndex: number;
 }
 
 export interface IGoals {
@@ -85,6 +86,8 @@ export interface PropsOverviewView {
   storyProgressPercentage: number;
   sensors: SensorDescriptor<SensorOptions>[];
   checklistItems: IChecklistItem[];
+  selectedColor: string;
+  dragModifiers: Modifier[];
   onGoalsChange: (goals: IGoals) => void;
   onEditingGoalsChange: (editing: boolean) => void;
   onAuthorSummaryChange: (summary: string) => void;
@@ -96,15 +99,20 @@ export interface PropsOverviewView {
   onSectionsChange: (sections: ISection[]) => void;
   onActiveNoteIdChange: (id: string | null) => void;
   onDraggedNoteDataChange: (data: IStickyNote | null) => void;
+  onSelectedColorChange: (color: string) => void;
   onAddNote: () => void;
   onDeleteNote: (id: string) => void;
   onEditNote: (id: string, content: string) => void;
+  onColorChange: (id: string, color: string) => void;
+  onBringToFront: (id: string) => void;
+  onSendToBack: (id: string) => void;
   onSaveGoals: () => void;
   onSaveSummaries: () => void;
   onToggleSectionVisibility: (sectionId: string) => void;
   onMoveSectionUp: (sectionId: string) => void;
   onMoveSectionDown: (sectionId: string) => void;
   onNoteDragStart: (event: any) => void;
+  onNoteDragMove: (event: any) => void;
   onNoteDragEnd: (event: any) => void;
   onAddChecklistItem: (text: string) => void;
   onToggleChecklistItem: (id: string) => void;
@@ -121,6 +129,9 @@ export interface PropsSortableNote {
   onEditContentChange: (content: string) => void;
   onEditNote: (id: string, content: string) => void;
   onDeleteNote: (id: string) => void;
+  onColorChange: (id: string, color: string) => void;
+  onBringToFront: (id: string) => void;
+  onSendToBack: (id: string) => void;
 }
 
 export interface PropsSortableSection {

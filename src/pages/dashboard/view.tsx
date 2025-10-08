@@ -1,6 +1,12 @@
 import React from "react";
 
-import { DragEndEvent, SensorDescriptor, SensorOptions } from "@dnd-kit/core";
+import {
+  DragEndEvent,
+  DragStartEvent,
+  DragMoveEvent,
+  SensorDescriptor,
+  SensorOptions
+} from "@dnd-kit/core";
 
 import {
   AlertDialog,
@@ -64,6 +70,8 @@ interface PropsDashboardView {
   sensors: SensorDescriptor<SensorOptions>[];
   showDeleteDialog: boolean;
   deleteInput: string;
+  previewTabs?: TabConfig[];
+  draggedTabId?: string | null;
   onBack: () => void;
   onActiveTabChange: (tab: string) => void;
   onEditingHeaderChange: (editing: boolean) => void;
@@ -72,6 +80,8 @@ interface PropsDashboardView {
   onCustomizingToggle: () => void;
   onTabsUpdate: (tabs: TabConfig[]) => void;
   onToggleTabVisibility: (tabId: string) => void;
+  onDragStart: (event: DragStartEvent) => void;
+  onDragMove: (event: DragMoveEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onToggleVisibility: (tabId: string) => void;
   onSave: () => void;
@@ -110,11 +120,15 @@ export function DashboardView({
   sensors,
   showDeleteDialog,
   deleteInput,
+  previewTabs,
+  draggedTabId,
   onBack,
   onActiveTabChange,
   onEditingHeaderChange,
   onHeaderHiddenChange,
   onCustomizingToggle,
+  onDragStart,
+  onDragMove,
   onDragEnd,
   onToggleVisibility,
   onSave,
@@ -168,6 +182,10 @@ export function DashboardView({
               visibleTabs={visibleTabs}
               sensors={sensors}
               activeTab={activeTab}
+              previewTabs={previewTabs}
+              draggedTabId={draggedTabId}
+              onDragStart={onDragStart}
+              onDragMove={onDragMove}
               onDragEnd={onDragEnd}
               onToggleVisibility={onToggleVisibility}
               onActiveTabChange={onActiveTabChange}

@@ -1,5 +1,4 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useDraggable } from "@dnd-kit/core";
 import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ interface TabConfig {
   icon: React.ComponentType<{ className?: string }>;
   visible: boolean;
   isDefault?: boolean;
+  x?: number;
 }
 
 interface PropsSortableTab {
@@ -19,6 +19,7 @@ interface PropsSortableTab {
   onToggleVisibility: (tabId: string) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  isDragging?: boolean;
 }
 
 export function SortableTab({
@@ -27,36 +28,48 @@ export function SortableTab({
   onToggleVisibility,
   isFirst = false,
   isLast = false,
+  isDragging: isDraggingProp = false,
 }: PropsSortableTab) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: tab.id, disabled: !isCustomizing || tab.isDefault });
+  const { attributes, listeners, setNodeRef, isDragging, transform } =
+    useDraggable({
+      id: tab.id,
+      disabled: !isCustomizing || tab.isDefault,
+      data: tab,
+    });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
+  const style = isCustomizing
+    ? {
+        transform: isDragging && transform
+          ? `translate3d(${transform.x}px, 0, 0)`
+          : undefined,
+        opacity: isDragging ? 0.7 : 1,
+        transition: isDragging ? "none" : "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+        zIndex: isDragging ? 50 : "auto",
+      }
+    : undefined;
 
   if (isCustomizing) {
     return (
       <div
         ref={setNodeRef}
         style={style}
+        data-tab-id={tab.id}
         className={`relative flex items-center gap-2 px-4 py-2 bg-muted border border-border rounded-md flex-1 min-w-0 ${
           tab.isDefault ? "opacity-75" : ""
-        } ${!tab.visible ? "opacity-50" : ""}`}
+        } ${!tab.visible ? "opacity-50" : ""} ${
+          isDragging ? "cursor-grabbing shadow-lg" : ""
+        }`}
       >
         {!tab.isDefault && (
           <div
             {...attributes}
             {...listeners}
             className="absolute inset-0 cursor-grab active:cursor-grabbing"
+            style={{
+              touchAction: "none",
+              userSelect: "none",
+              WebkitUserDrag: "none",
+            }}
           />
         )}
         <tab.icon className="w-4 h-4" />

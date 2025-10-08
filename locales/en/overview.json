@@ -47,7 +47,17 @@
     "title": "Reminders Board",
     "description": "Drag notes to organize them",
     "add_note_placeholder": "Add new note...",
-    "add": "Add"
+    "add": "Add",
+    "default_note": "Hello, I am your first reminder",
+    "empty_state": "No reminders added yet",
+    "select_color": "Select reminder color",
+    "save": "Save",
+    "cancel": "Cancel",
+    "bring_to_front": "Bring to front",
+    "send_to_back": "Send to back",
+    "change_color": "Change color",
+    "edit_note": "Edit note",
+    "delete_note": "Delete note"
   },
   "customize_mode": {
     "title": "Customize Mode Active",

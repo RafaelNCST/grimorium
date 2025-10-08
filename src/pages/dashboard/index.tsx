@@ -2,12 +2,13 @@ import { useEffect, useCallback, useMemo, useState } from "react";
 
 import {
   DragEndEvent,
+  DragStartEvent,
+  DragMoveEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useBookStore, Book as BookType } from "@/stores/book-store";
@@ -53,6 +54,8 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const [tabs, setTabs] = useState<TabConfig[]>(
     storeTabs.length > 0 ? storeTabs : DEFAULT_TABS_CONSTANT
   );
+  const [draggedTabId, setDraggedTabId] = useState<string | null>(null);
+  const [previewTabs, setPreviewTabs] = useState<TabConfig[]>([]);
 
   const book = useMemo(
     () => books.find((b) => b.id === bookId),
@@ -61,10 +64,12 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const currentArc = useMemo(() => getCurrentArc(), [getCurrentArc]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor)
   );
 
   const visibleTabs = useMemo(() => tabs.filter((tab) => tab.visible), [tabs]);
@@ -97,21 +102,203 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     }
   }, [activeTab, isCustomizing, setIsCustomizing]);
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+    if (active) {
+      setDraggedTabId(active.id.toString());
+    }
+  }, []);
 
-      if (over && active.id !== over.id) {
+  const handleDragMove = useCallback(
+    (event: DragMoveEvent) => {
+      const { active, delta } = event;
+
+      if (!active || !draggedTabId) {
+        return;
+      }
+
+      // Get all tab elements to calculate positions
+      const tabsContainer = document.getElementById("tabs-container");
+      if (!tabsContainer) {
+        return;
+      }
+
+      const tabElements = Array.from(
+        tabsContainer.querySelectorAll("[data-tab-id]")
+      ) as HTMLElement[];
+
+      // Find the dragged tab's new position based on its center point
+      const draggedElement = tabElements.find(
+        (el) => el.getAttribute("data-tab-id") === draggedTabId
+      );
+
+      if (!draggedElement) {
+        return;
+      }
+
+      const draggedRect = draggedElement.getBoundingClientRect();
+      const draggedCenterX = draggedRect.left + draggedRect.width / 2 + delta.x;
+
+      // Find which tab position the dragged tab should occupy
+      let newIndex = tabs.findIndex((tab) => tab.id === draggedTabId);
+
+      for (let i = 0; i < tabElements.length; i++) {
+        const element = tabElements[i];
+        const tabId = element.getAttribute("data-tab-id");
+
+        // Skip the overview tab (isDefault)
+        const tab = tabs.find((t) => t.id === tabId);
+        if (tab?.isDefault) continue;
+
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+
+        // If dragged tab center is past this tab's center, potential new position
+        if (draggedCenterX > centerX && tabId !== draggedTabId) {
+          const tabIndex = tabs.findIndex((t) => t.id === tabId);
+          if (tabIndex > newIndex) {
+            newIndex = tabIndex;
+          }
+        } else if (draggedCenterX < centerX && tabId !== draggedTabId) {
+          const tabIndex = tabs.findIndex((t) => t.id === tabId);
+          if (tabIndex < newIndex) {
+            newIndex = tabIndex;
+          }
+        }
+      }
+
+      // Create preview order
+      const oldIndex = tabs.findIndex((tab) => tab.id === draggedTabId);
+      if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
         const newTabs = [...tabs];
-        const oldIndex = newTabs.findIndex((item) => item.id === active.id);
-        const newIndex = newTabs.findIndex((item) => item.id === over.id);
+        const [movedTab] = newTabs.splice(oldIndex, 1);
 
-        const updatedTabs = arrayMove(newTabs, oldIndex, newIndex);
-        setTabs(updatedTabs);
-        updateTabs(updatedTabs);
+        // Ensure overview tab stays at index 0
+        const overviewIndex = newTabs.findIndex((tab) => tab.isDefault);
+        if (overviewIndex !== 0 && overviewIndex !== -1) {
+          const [overviewTab] = newTabs.splice(overviewIndex, 1);
+          newTabs.unshift(overviewTab);
+        }
+
+        // Insert the moved tab at the correct position
+        let finalIndex = newIndex;
+        if (newIndex > oldIndex) {
+          finalIndex = newIndex;
+        }
+
+        // Make sure we don't insert before the overview tab
+        if (finalIndex === 0) {
+          finalIndex = 1;
+        }
+
+        newTabs.splice(finalIndex, 0, movedTab);
+
+        setPreviewTabs(newTabs);
+      } else {
+        setPreviewTabs([]);
       }
     },
-    [tabs, updateTabs]
+    [tabs, draggedTabId]
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, delta } = event;
+
+      if (!active || !draggedTabId) {
+        setDraggedTabId(null);
+        setPreviewTabs([]);
+        return;
+      }
+
+      // Get all tab elements to calculate positions
+      const tabsContainer = document.getElementById("tabs-container");
+      if (!tabsContainer) {
+        setDraggedTabId(null);
+        setPreviewTabs([]);
+        return;
+      }
+
+      const tabElements = Array.from(
+        tabsContainer.querySelectorAll("[data-tab-id]")
+      ) as HTMLElement[];
+
+      // Find the dragged tab's new position based on its center point
+      const draggedElement = tabElements.find(
+        (el) => el.getAttribute("data-tab-id") === draggedTabId
+      );
+
+      if (!draggedElement) {
+        setDraggedTabId(null);
+        setPreviewTabs([]);
+        return;
+      }
+
+      const draggedRect = draggedElement.getBoundingClientRect();
+      const draggedCenterX = draggedRect.left + draggedRect.width / 2 + delta.x;
+
+      // Find which tab position the dragged tab should occupy
+      let newIndex = tabs.findIndex((tab) => tab.id === draggedTabId);
+
+      for (let i = 0; i < tabElements.length; i++) {
+        const element = tabElements[i];
+        const tabId = element.getAttribute("data-tab-id");
+
+        // Skip the overview tab (isDefault)
+        const tab = tabs.find((t) => t.id === tabId);
+        if (tab?.isDefault) continue;
+
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+
+        // If dragged tab center is past this tab's center, potential new position
+        if (draggedCenterX > centerX && tabId !== draggedTabId) {
+          const tabIndex = tabs.findIndex((t) => t.id === tabId);
+          if (tabIndex > newIndex) {
+            newIndex = tabIndex;
+          }
+        } else if (draggedCenterX < centerX && tabId !== draggedTabId) {
+          const tabIndex = tabs.findIndex((t) => t.id === tabId);
+          if (tabIndex < newIndex) {
+            newIndex = tabIndex;
+          }
+        }
+      }
+
+      // Reorder tabs
+      const oldIndex = tabs.findIndex((tab) => tab.id === draggedTabId);
+      if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
+        const newTabs = [...tabs];
+        const [movedTab] = newTabs.splice(oldIndex, 1);
+
+        // Ensure overview tab stays at index 0
+        const overviewIndex = newTabs.findIndex((tab) => tab.isDefault);
+        if (overviewIndex !== 0 && overviewIndex !== -1) {
+          const [overviewTab] = newTabs.splice(overviewIndex, 1);
+          newTabs.unshift(overviewTab);
+        }
+
+        // Insert the moved tab at the correct position
+        let finalIndex = newIndex;
+        if (newIndex > oldIndex) {
+          finalIndex = newIndex;
+        }
+
+        // Make sure we don't insert before the overview tab
+        if (finalIndex === 0) {
+          finalIndex = 1;
+        }
+
+        newTabs.splice(finalIndex, 0, movedTab);
+
+        setTabs(newTabs);
+        updateTabs(newTabs);
+      }
+
+      setDraggedTabId(null);
+      setPreviewTabs([]);
+    },
+    [tabs, updateTabs, draggedTabId]
   );
 
   const handleToggleVisibility = useCallback(
@@ -204,6 +391,8 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       sensors={sensors}
       showDeleteDialog={showDeleteDialog}
       deleteInput={deleteInput}
+      previewTabs={previewTabs}
+      draggedTabId={draggedTabId}
       onBack={onBack}
       onActiveTabChange={setActiveTab}
       onEditingHeaderChange={setIsEditingHeader}
@@ -212,6 +401,8 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onCustomizingToggle={handleCustomizingToggle}
       onTabsUpdate={updateTabs}
       onToggleTabVisibility={toggleTabVisibility}
+      onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
       onToggleVisibility={handleToggleVisibility}
       onSave={handleSave}

@@ -1,11 +1,4 @@
-# Refatoração da tab beastiry
-**Objetivo**: Refatorar a página `src/pages/dashboard/tabs/bestiary` para seguir os detalhes propostos nesse arquivo e no arquivo `tech-stack`
-- Refatore `src/pages/dashboard/bestiary/index e view`
-- Refatore `src/pages/dashboard/bestiary/beast-detail/index e view`
-
-**Pontos extras**: Você pode também sugerir mudanças em outros componentes que afetam a página home como os modais ou tabs se necessário o objetivo é refatorar tudo
+# Refatoração do quadro de lembretes do overview
+**Objetivo**: Refaça o atual quadro de lembretes com um quadro de post-its com dnd-kit, com layout livre (freeform). Cada post-it pode ser arrastado e solto em qualquer posição, inclusive sobrepondo outros. Não use o fantasma padrão do HTML5 drag; o próprio post-it deve ser arrastado suavemente. O post it só pode ser arrastado dentro da area pontilhada e cada post it pode se soprepor e ser organizado da forma que o usuário preferir. Ao criar um post it, ele sempre é criado no canto superior inicial do quadro. A cor de cada post it é escolhida pelo usuário, faça com que ele possa escolher a cor do post it antes de criar, e faça com que ele possa editar a cor sempre que quiser de cada post it, são pelo menos 6 cores no minimo. Por padrão, sempre haverá um post it criado dizendo "Olá, eu sou seu primeiro lembrete" isso seguindo as linguagens que temos (pt e en). Mas caso o usuário apague esse post it, uma mensagem irá aparecer no meio da seção, avisando que não há post its adicionados.
 
 **Verificação final**: Antes de terminar a implementação, certifique-se de verificar se tudo que foi feito combina com o que foi pedido nesse arquivo e em `tech-stack`
-
-# O que não fazer
-- Não mexer em nada fora do `bestiary` page

@@ -1,14 +1,11 @@
 import {
   DndContext,
-  closestCenter,
   DragEndEvent,
+  DragStartEvent,
+  DragMoveEvent,
   SensorDescriptor,
   SensorOptions,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import { Palette } from "lucide-react";
 
 import { TabsList } from "@/components/ui/tabs";
@@ -30,6 +27,10 @@ interface PropsTabsBar {
   visibleTabs: TabConfig[];
   sensors: SensorDescriptor<SensorOptions>[];
   activeTab: string;
+  previewTabs?: TabConfig[];
+  draggedTabId?: string | null;
+  onDragStart: (event: DragStartEvent) => void;
+  onDragMove: (event: DragMoveEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onToggleVisibility: (tabId: string) => void;
   onActiveTabChange: (tab: string) => void;
@@ -41,9 +42,14 @@ export function TabsBar({
   tabs,
   visibleTabs,
   sensors,
+  previewTabs,
+  draggedTabId,
+  onDragStart,
+  onDragMove,
   onDragEnd,
   onToggleVisibility,
 }: PropsTabsBar) {
+  const displayTabs = previewTabs && previewTabs.length > 0 ? previewTabs : tabs;
   if (isCustomizing) {
     return (
       <>
@@ -60,24 +66,24 @@ export function TabsBar({
         <div className="pb-3 px-6">
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCenter}
+            onDragStart={onDragStart}
+            onDragMove={onDragMove}
             onDragEnd={onDragEnd}
           >
-            <SortableContext
-              items={tabs.map((tab) => tab.id)}
-              strategy={horizontalListSortingStrategy}
+            <div
+              id="tabs-container"
+              className="flex gap-2 p-1 bg-muted/50 rounded-md border overflow-x-auto"
             >
-              <div className="flex gap-2 p-1 bg-muted/50 rounded-md border overflow-x-auto">
-                {tabs.map((tab) => (
-                  <SortableTab
-                    key={tab.id}
-                    tab={tab}
-                    isCustomizing={isCustomizing}
-                    onToggleVisibility={onToggleVisibility}
-                  />
-                ))}
-              </div>
-            </SortableContext>
+              {displayTabs.map((tab) => (
+                <SortableTab
+                  key={tab.id}
+                  tab={tab}
+                  isCustomizing={isCustomizing}
+                  onToggleVisibility={onToggleVisibility}
+                  isDragging={draggedTabId === tab.id}
+                />
+              ))}
+            </div>
           </DndContext>
         </div>
       </>
