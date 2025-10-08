@@ -156,7 +156,6 @@ export function CreateBookModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
-        showCloseButton={false}
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
@@ -355,7 +354,9 @@ export function CreateBookModal({
             <Button
               type="submit"
               disabled={!isValid}
-              className="flex-1 btn-magical"
+              variant="magical"
+              size="lg"
+              className="flex-1 animate-glow"
             >
               {t("button.create")}
             </Button>
