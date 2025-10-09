@@ -23,6 +23,7 @@ const DialogOverlay = React.forwardRef<
       "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
+    data-modal-overlay="true"
     {...props}
   />
 ));
@@ -36,7 +37,7 @@ interface DialogContentProps
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, showCloseButton = true, ...props }, ref) => (
+>(({ className, children, showCloseButton = true, onInteractOutside, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -46,11 +47,18 @@ const DialogContent = React.forwardRef<
         className
       )}
       onInteractOutside={(e) => {
-        // Prevent dialog from closing when clicking window control buttons
+        // Prevent dialog from closing when clicking window control buttons or title bar
         const target = e.target as HTMLElement;
-        if (target.closest('[aria-label*="window"]')) {
+        if (
+          target.closest('[aria-label*="window"]') ||
+          target.closest('[data-title-bar]') ||
+          target.closest('[data-tauri-drag-region]')
+        ) {
           e.preventDefault();
+          return;
         }
+        // Call the custom handler if provided
+        onInteractOutside?.(e);
       }}
       {...props}
     >

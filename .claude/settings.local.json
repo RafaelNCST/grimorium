@@ -51,7 +51,8 @@
       "Bash(git restore:*)",
       "Bash(tasklist:*)",
       "Bash(pnpm lint:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "WebFetch(domain:docs.rs)"
     ],
     "deny": [],
     "ask": []

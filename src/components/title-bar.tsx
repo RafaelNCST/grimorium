@@ -45,6 +45,7 @@ export const TitleBar = () => {
   const routerState = useRouterState();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [controlsPosition, setControlsPosition] = useState({
     top: 0,
     right: 0,
@@ -88,6 +89,33 @@ export const TitleBar = () => {
       markAllAsRead();
     }
   }, [isInboxOpen, markAllAsRead]);
+
+  // Detect if a Dialog modal is open
+  useEffect(() => {
+    const checkModalState = () => {
+      // Check if there's a Dialog overlay in the DOM with data-state="open"
+      const overlay = document.querySelector('[data-modal-overlay="true"][data-state="open"]');
+      setIsModalOpen(!!overlay);
+    };
+
+    // Create a MutationObserver to watch for modal changes
+    const observer = new MutationObserver(checkModalState);
+
+    // Observe changes to the body and its children
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-state'],
+    });
+
+    // Initial check
+    checkModalState();
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Update window controls position when component mounts or window resizes
   useEffect(() => {
@@ -134,7 +162,7 @@ export const TitleBar = () => {
         onClick={handleMinimize}
         className={cn(
           "h-10 w-12 rounded-none hover:bg-gray-50",
-          "transition-colors duration-200"
+          "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label="Minimize window control"
       >
@@ -146,7 +174,7 @@ export const TitleBar = () => {
         onClick={handleMaximize}
         className={cn(
           "h-10 w-12 rounded-none hover:bg-gray-50",
-          "transition-colors duration-200"
+          "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label={
           isMaximized ? "Restore window control" : "Maximize window control"
@@ -160,7 +188,7 @@ export const TitleBar = () => {
         onClick={handleClose}
         className={cn(
           "h-10 w-12 rounded-none hover:bg-destructive hover:text-destructive-foreground",
-          "transition-colors duration-200"
+          "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label="Close window control"
       >
@@ -177,8 +205,9 @@ export const TitleBar = () => {
         className={cn(
           "flex h-10 w-full items-center justify-between",
           "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-          "select-none"
+          "select-none z-[60] relative pointer-events-auto"
         )}
+        style={{ pointerEvents: 'auto' }}
       >
         {/* Left section - App logo/name */}
         <div data-tauri-drag-region className="flex items-center px-4">
@@ -198,7 +227,7 @@ export const TitleBar = () => {
         </div>
 
         {/* Right section - Inbox and placeholder for window controls */}
-        <div className="flex items-center">
+        <div data-tauri-drag-region className="flex items-center">
           <TooltipProvider>
             <Popover open={isInboxOpen} onOpenChange={setIsInboxOpen}>
               <Tooltip open={isInboxOpen ? false : undefined}>
@@ -207,10 +236,12 @@ export const TitleBar = () => {
                     <Button
                       variant="ghost"
                       size="icon"
+                      disabled={isModalOpen}
                       className={cn(
                         "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
                         "transition-colors duration-200",
-                        isInboxOpen && "bg-gray-50 text-secondary"
+                        isInboxOpen && "bg-gray-50 text-secondary",
+                        isModalOpen && "opacity-50 cursor-not-allowed"
                       )}
                       aria-label="Inbox"
                     >
@@ -233,6 +264,13 @@ export const TitleBar = () => {
                 side="bottom"
                 sideOffset={4}
                 alignOffset={0}
+                onInteractOutside={(e) => {
+                  // Prevent closing when clicking on title bar
+                  const target = e.target as HTMLElement;
+                  if (target.closest('[data-title-bar]')) {
+                    e.preventDefault();
+                  }
+                }}
               >
                 <InboxModal />
               </PopoverContent>
@@ -249,7 +287,7 @@ export const TitleBar = () => {
       {/* Window controls rendered in a portal with highest z-index */}
       {createPortal(
         <div
-          className="fixed z-[100] flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border pointer-events-auto"
+          className="fixed z-[100] flex items-center bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border pointer-events-none"
           style={{
             top: `${controlsPosition.top}px`,
             right: `${controlsPosition.right}px`,
