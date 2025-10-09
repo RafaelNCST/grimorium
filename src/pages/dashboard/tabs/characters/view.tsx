@@ -1,11 +1,16 @@
-import { Plus, Search, Users, MapPin } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import { Calendar, Plus, Search, Users } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
+import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
+import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,10 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ICharacter } from "@/types/character-types";
+import { ICharacter, ICharacterFormData } from "@/types/character-types";
 
-import { getRoleColor } from "./utils/get-role-color";
-import { getRoleIcon } from "./utils/get-role-icon";
 import { getRoleLabel } from "./utils/get-role-label";
 
 interface IRoleStats {
@@ -60,48 +63,67 @@ export function CharactersView({
   onCharacterCreated,
   onCharacterClick,
 }: CharactersViewProps) {
+  const { t } = useTranslation(["characters", "create-character"]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCreateCharacter = (formData: ICharacterFormData) => {
+    const newCharacter: ICharacter = {
+      id: Date.now().toString(),
+      ...formData,
+      qualities: [],
+      createdAt: new Date().toISOString(),
+    };
+
+    onCharacterCreated(newCharacter);
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header with compact role stats */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Personagens</h2>
+          <h2 className="text-2xl font-bold">{t("characters:page.title")}</h2>
           <p className="text-muted-foreground">
-            Gerencie os personagens da sua história
+            {t("characters:page.description")}
           </p>
           {characters.length > 0 && (
             <div className="flex items-center gap-4 mt-2">
-              <Badge variant="outline">{roleStats.total} Total</Badge>
+              <Badge variant="outline">
+                {roleStats.total} {t("characters:page.total_badge")}
+              </Badge>
               <Badge className="bg-accent/10 text-accent">
-                {roleStats.protagonista} Protagonista
+                {roleStats.protagonista} {t("characters:page.protagonist_badge")}
               </Badge>
               <Badge className="bg-destructive/10 text-destructive">
-                {roleStats.antagonista} Antagonista
+                {roleStats.antagonista} {t("characters:page.antagonist_badge")}
               </Badge>
               <Badge className="bg-primary/10 text-primary">
-                {roleStats.secundario} Secundário
+                {roleStats.secundario} {t("characters:page.secondary_badge")}
               </Badge>
               <Badge className="bg-muted/50 text-muted-foreground">
-                {roleStats.vilao} Vilão
+                {roleStats.vilao} {t("characters:page.villain_badge")}
               </Badge>
             </div>
           )}
         </div>
-        <CreateCharacterModal
-          trigger={
-            <Button
-              variant="magical"
-              size="lg"
-              data-testid="create-character-trigger"
-              className="animate-glow"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Novo Personagem
-            </Button>
-          }
-          onCharacterCreated={onCharacterCreated}
-        />
+        <Button
+          variant="magical"
+          size="lg"
+          data-testid="create-character-trigger"
+          className="animate-glow"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          {t("characters:page.new_character")}
+        </Button>
       </div>
+
+      <CreateCharacterModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleCreateCharacter}
+      />
 
       {/* Filters */}
       {characters.length > 0 && (
@@ -109,7 +131,7 @@ export function CharactersView({
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar personagens..."
+              placeholder={t("characters:page.search_placeholder")}
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
               className="pl-10"
@@ -118,10 +140,10 @@ export function CharactersView({
 
           <Select value={selectedOrg} onValueChange={onSelectedOrgChange}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Organização" />
+              <SelectValue placeholder={t("characters:page.organization_filter")} />
             </SelectTrigger>
             <SelectContent side="bottom">
-              <SelectItem value="all">Todas organizações</SelectItem>
+              <SelectItem value="all">{t("characters:page.all_organizations")}</SelectItem>
               {organizations.slice(1).map((org) => (
                 <SelectItem key={org} value={org}>
                   {org}
@@ -135,10 +157,10 @@ export function CharactersView({
             onValueChange={onSelectedLocationChange}
           >
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Local" />
+              <SelectValue placeholder={t("characters:page.location_filter")} />
             </SelectTrigger>
             <SelectContent side="bottom">
-              <SelectItem value="all">Todos locais</SelectItem>
+              <SelectItem value="all">{t("characters:page.all_locations")}</SelectItem>
               {locations.slice(1).map((location) => (
                 <SelectItem key={location} value={location}>
                   {location}
@@ -149,75 +171,89 @@ export function CharactersView({
         </div>
       )}
 
-      {/* Characters Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCharacters.map((character) => (
-          <Card
-            key={character.id}
-            className="card-magical animate-stagger cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => onCharacterClick(character.id)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <Avatar className="w-16 h-16 aspect-square">
-                  <AvatarImage src={character.image} className="object-cover" />
-                  <AvatarFallback className="text-lg">
-                    {character.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{character.name}</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge
-                      className={getRoleColor(character.role)}
-                      variant="secondary"
-                    >
-                      {getRoleIcon(character.role)}
-                      <span className="ml-1">
-                        {getRoleLabel(character.role)}
-                      </span>
-                    </Badge>
+      {/* Characters List */}
+      <div className="flex flex-wrap gap-4">
+        {filteredCharacters.map((character) => {
+          // Find role data
+          const roleData = CHARACTER_ROLES_CONSTANT.find(
+            (r) => r.value === character.role
+          );
+          const RoleIcon = roleData?.icon;
+
+          // Find gender data
+          const genderData = GENDERS_CONSTANT.find(
+            (g) => g.value === character.gender
+          );
+          const GenderIcon = genderData?.icon;
+
+          return (
+            <Card
+              key={character.id}
+              className="card-magical animate-stagger cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all w-[500px]"
+              onClick={() => onCharacterClick(character.id)}
+            >
+              <CardContent className="p-5 space-y-4">
+                {/* Top Section: Image + Name/Age/Gender/Role */}
+                <div className="flex gap-4">
+                  {/* Character Image - Circular */}
+                  <Avatar className="w-20 h-20 flex-shrink-0">
+                    <AvatarImage src={character.image} className="object-cover" />
+                    <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                      {character.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {/* Name, Age, Gender, and Role */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <CardTitle className="text-base font-bold line-clamp-2">
+                      {character.name}
+                    </CardTitle>
+
+                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                      {character.age && (
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-sm font-medium text-muted-foreground">
+                            {character.age} {t("characters:card.years")}
+                          </span>
+                        </div>
+                      )}
+                      {character.gender && GenderIcon && (
+                        <div className="flex items-center gap-1.5">
+                          <GenderIcon className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-sm font-medium text-muted-foreground capitalize">
+                            {t(`create-character:gender.${character.gender}`)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Role Badge */}
+                    <div className="flex">
+                      <Badge
+                        className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
+                      >
+                        {RoleIcon && <RoleIcon className="w-3.5 h-3.5 mr-1.5" />}
+                        <span className="text-xs font-medium">
+                          {t(`create-character:role.${character.role}`)}
+                        </span>
+                      </Badge>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardHeader>
 
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {character.description}
-              </p>
-
-              <div className="space-y-2 mb-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Users className="w-3 h-3" />
-                  <span>{character.organization}</span>
-                </div>
-                {character.birthPlace && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
-                    <span>{character.birthPlace}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-1">
-                {character.qualities.slice(0, 3).map((quality) => (
-                  <Badge key={quality} variant="outline" className="text-xs">
-                    {quality}
-                  </Badge>
-                ))}
-                {character.qualities.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{character.qualities.length - 3}
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                  {character.description}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredCharacters.length === 0 && (
@@ -225,13 +261,13 @@ export function CharactersView({
           icon={Users}
           title={
             characters.length === 0
-              ? "Nenhum personagem criado"
-              : "Nenhum personagem encontrado"
+              ? t("characters:empty_state.no_characters")
+              : t("characters:empty_state.no_results")
           }
           description={
             characters.length === 0
-              ? "Comece criando seu primeiro personagem para dar vida à sua história"
-              : "Tente ajustar seus filtros ou criar um novo personagem"
+              ? t("characters:empty_state.no_characters_description")
+              : t("characters:empty_state.no_results_description")
           }
         />
       )}

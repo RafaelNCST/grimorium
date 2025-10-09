@@ -1,0 +1,26 @@
+{
+  "page": {
+    "title": "Personagens",
+    "description": "Gerencie os personagens da sua história",
+    "new_character": "Novo Personagem",
+    "search_placeholder": "Buscar personagens...",
+    "all_organizations": "Todas organizações",
+    "all_locations": "Todos locais",
+    "organization_filter": "Organização",
+    "location_filter": "Local",
+    "total_badge": "Total",
+    "protagonist_badge": "Protagonista",
+    "antagonist_badge": "Antagonista",
+    "secondary_badge": "Secundário",
+    "villain_badge": "Vilão"
+  },
+  "card": {
+    "years": "anos"
+  },
+  "empty_state": {
+    "no_characters": "Nenhum personagem criado",
+    "no_characters_description": "Comece criando seu primeiro personagem para dar vida à sua história",
+    "no_results": "Nenhum personagem encontrado",
+    "no_results_description": "Tente ajustar seus filtros ou criar um novo personagem"
+  }
+}
