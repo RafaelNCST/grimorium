@@ -163,38 +163,38 @@ export const TitleBar = () => {
         size="icon"
         onClick={handleMinimize}
         className={cn(
-          "h-10 w-12 rounded-none hover:bg-gray-50",
+          "h-8 w-12 rounded-none hover:bg-gray-50",
           "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label="Minimize window control"
       >
-        <Minus className="h-4 w-4" />
+        <Minus className="h-2 w-2" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={handleMaximize}
         className={cn(
-          "h-10 w-12 rounded-none hover:bg-gray-50",
+          "h-8 w-12 rounded-none hover:bg-gray-50",
           "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label={
           isMaximized ? "Restore window control" : "Maximize window control"
         }
       >
-        <Square className="h-4 w-4" />
+        <Square className="h-2 w-2" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={handleClose}
         className={cn(
-          "h-10 w-12 rounded-none hover:bg-destructive hover:text-destructive-foreground",
+          "h-8 w-12 rounded-none hover:bg-destructive hover:text-destructive-foreground",
           "transition-colors duration-200 pointer-events-auto"
         )}
         aria-label="Close window control"
       >
-        <X className="h-4 w-4" />
+        <X className="h-2 w-2" />
       </Button>
     </div>
   );
@@ -205,7 +205,7 @@ export const TitleBar = () => {
         data-tauri-drag-region
         data-title-bar
         className={cn(
-          "flex h-10 w-full items-center justify-between",
+          "flex h-8 w-full items-center justify-between",
           "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "select-none z-[60] relative pointer-events-auto"
         )}
@@ -240,7 +240,7 @@ export const TitleBar = () => {
                       size="icon"
                       disabled={isModalOpen}
                       className={cn(
-                        "h-10 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
+                        "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
                         "transition-colors duration-200",
                         isInboxOpen && "bg-gray-50 text-secondary",
                         isModalOpen && "opacity-50 cursor-not-allowed"
@@ -293,7 +293,7 @@ export const TitleBar = () => {
           style={{
             top: `${controlsPosition.top}px`,
             right: `${controlsPosition.right}px`,
-            height: "40px",
+            height: "2rem",
           }}
         >
           <WindowControls />
