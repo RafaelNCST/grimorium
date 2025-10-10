@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { ListChecks, Plus, Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -97,7 +98,9 @@ export function ChecklistCard({
                     <Input
                       value={editingText}
                       onChange={(e) => setEditingText(e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(item.id))}
+                      onKeyDown={(e) =>
+                        handleKeyDown(e, () => handleSaveEdit(item.id))
+                      }
                       className="flex-1"
                       autoFocus
                     />

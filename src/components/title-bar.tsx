@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Inbox, Minus, Square, X } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { InboxModal } from "@/components/modals/inbox-modal";
@@ -94,7 +94,9 @@ export const TitleBar = () => {
   useEffect(() => {
     const checkModalState = () => {
       // Check if there's a Dialog overlay in the DOM with data-state="open"
-      const overlay = document.querySelector('[data-modal-overlay="true"][data-state="open"]');
+      const overlay = document.querySelector(
+        '[data-modal-overlay="true"][data-state="open"]'
+      );
       setIsModalOpen(!!overlay);
     };
 
@@ -106,7 +108,7 @@ export const TitleBar = () => {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['data-state'],
+      attributeFilter: ["data-state"],
     });
 
     // Initial check
@@ -207,7 +209,7 @@ export const TitleBar = () => {
           "border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "select-none z-[60] relative pointer-events-auto"
         )}
-        style={{ pointerEvents: 'auto' }}
+        style={{ pointerEvents: "auto" }}
       >
         {/* Left section - App logo/name */}
         <div data-tauri-drag-region className="flex items-center px-4">
@@ -267,7 +269,7 @@ export const TitleBar = () => {
                 onInteractOutside={(e) => {
                   // Prevent closing when clicking on title bar
                   const target = e.target as HTMLElement;
-                  if (target.closest('[data-title-bar]')) {
+                  if (target.closest("[data-title-bar]")) {
                     e.preventDefault();
                   }
                 }}

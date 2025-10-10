@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   DragStartEvent,
@@ -11,6 +10,7 @@ import {
   useSensors,
   Modifier,
 } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
 import {
@@ -24,7 +24,11 @@ import {
 import { OverviewView } from "./view";
 
 // Custom modifier to restrict dragging within the notes board container
-const restrictToNotesBoard: Modifier = ({ transform, draggingNodeRect, containerNodeRect }) => {
+const restrictToNotesBoard: Modifier = ({
+  transform,
+  draggingNodeRect,
+  containerNodeRect,
+}) => {
   if (!draggingNodeRect || !containerNodeRect) {
     return transform;
   }
@@ -219,7 +223,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const handleAddNote = useCallback(() => {
     if (newNote.trim()) {
       // Find highest z-index among existing notes
-      const maxZIndex = stickyNotes.reduce((max, note) => Math.max(max, note.zIndex), 0);
+      const maxZIndex = stickyNotes.reduce(
+        (max, note) => Math.max(max, note.zIndex),
+        0
+      );
 
       const newStickyNote: IStickyNote = {
         id: Date.now().toString(),
@@ -255,7 +262,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const handleBringToFront = useCallback((id: string) => {
     setStickyNotes((notes) => {
       // Find highest z-index among all notes
-      const maxZIndex = notes.reduce((max, note) => Math.max(max, note.zIndex), 0);
+      const maxZIndex = notes.reduce(
+        (max, note) => Math.max(max, note.zIndex),
+        0
+      );
 
       // Set the selected note's z-index to be higher than all others
       return notes.map((note) =>
@@ -267,7 +277,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const handleSendToBack = useCallback((id: string) => {
     setStickyNotes((notes) => {
       // Find lowest z-index among all notes
-      const minZIndex = notes.reduce((min, note) => Math.min(min, note.zIndex), Infinity);
+      const minZIndex = notes.reduce(
+        (min, note) => Math.min(min, note.zIndex),
+        Infinity
+      );
 
       // Set the selected note's z-index to be lower than all others
       return notes.map((note) =>

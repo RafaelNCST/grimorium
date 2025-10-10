@@ -16,8 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChecklistCard } from "./components/checklist-card";
 import { ColorPicker } from "./components/color-picker";
 import { MetricsCard } from "./components/metrics-card";
-import { StickyNote } from "./components/sticky-note";
 import { SortableSection } from "./components/sortable-section";
+import { StickyNote } from "./components/sticky-note";
 import { SummariesCard } from "./components/summaries-card";
 import { PropsOverviewView, ISection } from "./types/overview-types";
 
@@ -194,7 +194,7 @@ export function OverviewView(props: PropsOverviewView) {
                 placeholder={t("notes_board.add_note_placeholder")}
                 value={newNote}
                 onChange={(e) => {
-                  const value = e.target.value;
+                  const { value } = e.target;
                   if (value.length <= MAX_NOTE_CHARACTER_LIMIT) {
                     onNewNoteChange(value);
                   }

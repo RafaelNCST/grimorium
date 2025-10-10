@@ -1,4 +1,12 @@
-import { Bone, Wind, Dumbbell, Shield, Beef, Skull, type LucideIcon } from "lucide-react";
+import {
+  Bone,
+  Wind,
+  Dumbbell,
+  Shield,
+  Beef,
+  Skull,
+  type LucideIcon,
+} from "lucide-react";
 
 export interface IPhysicalType {
   value: string;

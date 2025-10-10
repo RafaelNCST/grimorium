@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import { Calendar, Plus, Search, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { EmptyState } from "@/components/empty-state";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
@@ -93,7 +93,8 @@ export function CharactersView({
                 {roleStats.total} {t("characters:page.total_badge")}
               </Badge>
               <Badge className="bg-accent/10 text-accent">
-                {roleStats.protagonista} {t("characters:page.protagonist_badge")}
+                {roleStats.protagonista}{" "}
+                {t("characters:page.protagonist_badge")}
               </Badge>
               <Badge className="bg-destructive/10 text-destructive">
                 {roleStats.antagonista} {t("characters:page.antagonist_badge")}
@@ -140,10 +141,14 @@ export function CharactersView({
 
           <Select value={selectedOrg} onValueChange={onSelectedOrgChange}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder={t("characters:page.organization_filter")} />
+              <SelectValue
+                placeholder={t("characters:page.organization_filter")}
+              />
             </SelectTrigger>
             <SelectContent side="bottom">
-              <SelectItem value="all">{t("characters:page.all_organizations")}</SelectItem>
+              <SelectItem value="all">
+                {t("characters:page.all_organizations")}
+              </SelectItem>
               {organizations.slice(1).map((org) => (
                 <SelectItem key={org} value={org}>
                   {org}
@@ -160,7 +165,9 @@ export function CharactersView({
               <SelectValue placeholder={t("characters:page.location_filter")} />
             </SelectTrigger>
             <SelectContent side="bottom">
-              <SelectItem value="all">{t("characters:page.all_locations")}</SelectItem>
+              <SelectItem value="all">
+                {t("characters:page.all_locations")}
+              </SelectItem>
               {locations.slice(1).map((location) => (
                 <SelectItem key={location} value={location}>
                   {location}
@@ -197,7 +204,10 @@ export function CharactersView({
                 <div className="flex gap-4">
                   {/* Character Image - Circular */}
                   <Avatar className="w-20 h-20 flex-shrink-0">
-                    <AvatarImage src={character.image} className="object-cover" />
+                    <AvatarImage
+                      src={character.image}
+                      className="object-cover"
+                    />
                     <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
                       {character.name
                         .split(" ")
@@ -237,7 +247,9 @@ export function CharactersView({
                       <Badge
                         className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
                       >
-                        {RoleIcon && <RoleIcon className="w-3.5 h-3.5 mr-1.5" />}
+                        {RoleIcon && (
+                          <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
+                        )}
                         <span className="text-xs font-medium">
                           {t(`create-character:role.${character.role}`)}
                         </span>

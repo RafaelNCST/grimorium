@@ -39,11 +39,14 @@ export function SortableTab({
 
   const style = isCustomizing
     ? {
-        transform: isDragging && transform
-          ? `translate3d(${transform.x}px, 0, 0)`
-          : undefined,
+        transform:
+          isDragging && transform
+            ? `translate3d(${transform.x}px, 0, 0)`
+            : undefined,
         opacity: isDragging ? 0.7 : 1,
-        transition: isDragging ? "none" : "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: isDragging
+          ? "none"
+          : "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
         zIndex: isDragging ? 50 : "auto",
       }
     : undefined;

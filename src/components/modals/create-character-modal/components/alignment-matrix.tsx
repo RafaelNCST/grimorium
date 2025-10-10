@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+
 import { CHARACTER_ALIGNMENTS_CONSTANT } from "../constants/character-alignments";
 
 interface PropsAlignmentMatrix {
@@ -7,15 +8,24 @@ interface PropsAlignmentMatrix {
 }
 
 const ALIGNMENT_GRADIENTS: Record<string, string> = {
-  "lawful-good": "bg-gradient-to-br from-green-500/20 to-blue-500/20 border-green-500/40",
-  "neutral-good": "bg-gradient-to-br from-green-500/20 to-gray-500/20 border-green-500/40",
-  "chaotic-good": "bg-gradient-to-br from-green-500/20 to-red-500/20 border-green-500/40",
-  "lawful-neutral": "bg-gradient-to-br from-blue-500/20 to-gray-500/20 border-gray-500/40",
-  "true-neutral": "bg-gradient-to-br from-gray-500/20 to-gray-500/20 border-gray-500/40",
-  "chaotic-neutral": "bg-gradient-to-br from-red-500/20 to-gray-500/20 border-gray-500/40",
-  "lawful-evil": "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-purple-500/40",
-  "neutral-evil": "bg-gradient-to-br from-gray-500/20 to-purple-500/20 border-purple-500/40",
-  "chaotic-evil": "bg-gradient-to-br from-red-500/20 to-purple-500/20 border-red-500/40",
+  "lawful-good":
+    "bg-gradient-to-br from-green-500/20 to-blue-500/20 border-green-500/40",
+  "neutral-good":
+    "bg-gradient-to-br from-green-500/20 to-gray-500/20 border-green-500/40",
+  "chaotic-good":
+    "bg-gradient-to-br from-green-500/20 to-red-500/20 border-green-500/40",
+  "lawful-neutral":
+    "bg-gradient-to-br from-blue-500/20 to-gray-500/20 border-gray-500/40",
+  "true-neutral":
+    "bg-gradient-to-br from-gray-500/20 to-gray-500/20 border-gray-500/40",
+  "chaotic-neutral":
+    "bg-gradient-to-br from-red-500/20 to-gray-500/20 border-gray-500/40",
+  "lawful-evil":
+    "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-purple-500/40",
+  "neutral-evil":
+    "bg-gradient-to-br from-gray-500/20 to-purple-500/20 border-purple-500/40",
+  "chaotic-evil":
+    "bg-gradient-to-br from-red-500/20 to-purple-500/20 border-red-500/40",
 };
 
 export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
@@ -64,7 +74,9 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
             >
               {t(alignment.translationKey)}
             </span>
-            <p className={`text-xs text-center line-clamp-2 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}>
+            <p
+              className={`text-xs text-center line-clamp-2 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}
+            >
               {t(alignment.descriptionKey)}
             </p>
           </button>

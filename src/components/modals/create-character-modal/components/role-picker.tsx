@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+
 import { CHARACTER_ROLES_CONSTANT } from "../constants/character-roles";
 
 interface PropsRolePicker {

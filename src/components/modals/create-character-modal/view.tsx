@@ -1,7 +1,6 @@
 import { Info, UserPlus } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { type UseFormReturn } from "react-hook-form";
-import { type CharacterFormSchema } from "./hooks/use-character-validation";
+import { useTranslation } from "react-i18next";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -20,18 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
-import { CharacterImageUpload } from "./components/character-image-upload";
-import { RolePicker } from "./components/role-picker";
-import { ArchetypeSelector } from "./components/archetype-selector";
-import { AlignmentMatrix } from "./components/alignment-matrix";
-import { ColorPickerInput } from "./components/color-picker-input";
 import { AdvancedSection } from "./components/advanced-section";
-
+import { AlignmentMatrix } from "./components/alignment-matrix";
+import { ArchetypeSelector } from "./components/archetype-selector";
+import { CharacterImageUpload } from "./components/character-image-upload";
+import { ColorPickerInput } from "./components/color-picker-input";
+import { RolePicker } from "./components/role-picker";
 import { GENDERS_CONSTANT } from "./constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "./constants/physical-types";
+import { type CharacterFormSchema } from "./hooks/use-character-validation";
 
 interface PropsCreateCharacterModalView {
   open: boolean;
@@ -346,24 +345,21 @@ export function CreateCharacterModalView({
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{watchedValues.distinguishingFeatures?.length || 0}/200</span>
+                  <span>
+                    {watchedValues.distinguishingFeatures?.length || 0}/200
+                  </span>
                 </div>
               </div>
 
               {/* Species and Race */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="speciesAndRace"
-                  className="text-sm font-medium"
-                >
+                <Label htmlFor="speciesAndRace" className="text-sm font-medium">
                   {t("modal.species_and_race")}
                 </Label>
                 {hasSpecies ? (
                   <Select
                     value={watchedValues.speciesAndRace}
-                    onValueChange={(value) =>
-                      setValue("speciesAndRace", value)
-                    }
+                    onValueChange={(value) => setValue("speciesAndRace", value)}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -441,10 +437,7 @@ export function CreateCharacterModalView({
 
               {/* Dreams and Goals */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="dreamsAndGoals"
-                  className="text-sm font-medium"
-                >
+                <Label htmlFor="dreamsAndGoals" className="text-sm font-medium">
                   {t("modal.dreams_and_goals")}
                 </Label>
                 <Textarea
@@ -483,10 +476,7 @@ export function CreateCharacterModalView({
 
               {/* Favorite Food */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="favoriteFood"
-                  className="text-sm font-medium"
-                >
+                <Label htmlFor="favoriteFood" className="text-sm font-medium">
                   {t("modal.favorite_food")}
                 </Label>
                 <Input
@@ -498,10 +488,7 @@ export function CreateCharacterModalView({
 
               {/* Favorite Music */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="favoriteMusic"
-                  className="text-sm font-medium"
-                >
+                <Label htmlFor="favoriteMusic" className="text-sm font-medium">
                   {t("modal.favorite_music")}
                 </Label>
                 <Input

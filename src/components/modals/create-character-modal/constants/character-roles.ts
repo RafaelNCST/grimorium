@@ -21,14 +21,16 @@ export const CHARACTER_ROLES_CONSTANT: ICharacterRole[] = [
     icon: Crown,
     translationKey: "role.protagonist",
     colorClass: "text-yellow-600 dark:text-yellow-400",
-    bgColorClass: "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20",
+    bgColorClass:
+      "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20",
   },
   {
     value: "antagonist",
     icon: Swords,
     translationKey: "role.antagonist",
     colorClass: "text-orange-600 dark:text-orange-400",
-    bgColorClass: "bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20",
+    bgColorClass:
+      "bg-orange-500/10 border-orange-500/30 hover:bg-orange-500/20",
   },
   {
     value: "villain",

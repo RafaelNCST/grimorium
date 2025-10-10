@@ -49,7 +49,8 @@ export function TabsBar({
   onDragEnd,
   onToggleVisibility,
 }: PropsTabsBar) {
-  const displayTabs = previewTabs && previewTabs.length > 0 ? previewTabs : tabs;
+  const displayTabs =
+    previewTabs && previewTabs.length > 0 ? previewTabs : tabs;
   if (isCustomizing) {
     return (
       <>

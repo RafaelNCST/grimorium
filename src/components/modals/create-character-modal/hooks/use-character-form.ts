@@ -1,6 +1,10 @@
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { characterFormSchema, type CharacterFormSchema } from "./use-character-validation";
+import { useForm } from "react-hook-form";
+
+import {
+  characterFormSchema,
+  type CharacterFormSchema,
+} from "./use-character-validation";
 
 const DEFAULT_FORM_VALUES: CharacterFormSchema = {
   name: "",

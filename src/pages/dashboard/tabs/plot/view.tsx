@@ -121,102 +121,102 @@ export function PlotView({
               className="card-magical cursor-pointer"
               onClick={() => onArcClick(arc.id, bookId)}
             >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    {arc.name}
-                    <Badge className={getStatusColor(arc.status)}>
-                      {arc.status === "andamento" && (
-                        <Star className="w-3 h-3 mr-1" />
-                      )}
-                      {arc.status}
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription className="mt-2">
-                    {arc.description}
-                  </CardDescription>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Badge className={getSizeColor(arc.size)}>{arc.size}</Badge>
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveArc(arc.id, "up");
-                      }}
-                      disabled={index === 0}
-                      className="h-6 w-6 p-0"
-                    >
-                      <ArrowUp className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onMoveArc(arc.id, "down");
-                      }}
-                      disabled={index === filteredAndSortedArcs.length - 1}
-                      className="h-6 w-6 p-0"
-                    >
-                      <ArrowDown className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Progresso</span>
-                    <span className="text-sm text-muted-foreground">
-                      {arc.progress.toFixed(0)}%
-                    </span>
-                  </div>
-                  <Progress value={arc.progress} className="h-2" />
-                </div>
-
-                {arc.events.length > 0 && (
+              <CardHeader>
+                <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      Próximos Eventos
-                    </h4>
-                    <div className="space-y-2">
-                      {getVisibleEvents(arc.events).map((event) => (
-                        <div
-                          key={event.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          {event.completed ? (
-                            <CheckCircle2 className="w-4 h-4 text-success" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-muted-foreground" />
-                          )}
-                          <span
-                            className={
-                              event.completed
-                                ? "line-through text-muted-foreground"
-                                : ""
-                            }
-                          >
-                            {event.name}
-                          </span>
-                        </div>
-                      ))}
+                    <CardTitle className="flex items-center gap-2">
+                      {arc.name}
+                      <Badge className={getStatusColor(arc.status)}>
+                        {arc.status === "andamento" && (
+                          <Star className="w-3 h-3 mr-1" />
+                        )}
+                        {arc.status}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                      {arc.description}
+                    </CardDescription>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Badge className={getSizeColor(arc.size)}>{arc.size}</Badge>
+                    <div className="flex flex-col gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onMoveArc(arc.id, "up");
+                        }}
+                        disabled={index === 0}
+                        className="h-6 w-6 p-0"
+                      >
+                        <ArrowUp className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onMoveArc(arc.id, "down");
+                        }}
+                        disabled={index === filteredAndSortedArcs.length - 1}
+                        className="h-6 w-6 p-0"
+                      >
+                        <ArrowDown className="w-3 h-3" />
+                      </Button>
                     </div>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </div>
+              </CardHeader>
+
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Progresso</span>
+                      <span className="text-sm text-muted-foreground">
+                        {arc.progress.toFixed(0)}%
+                      </span>
+                    </div>
+                    <Progress value={arc.progress} className="h-2" />
+                  </div>
+
+                  {arc.events.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Próximos Eventos
+                      </h4>
+                      <div className="space-y-2">
+                        {getVisibleEvents(arc.events).map((event) => (
+                          <div
+                            key={event.id}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            {event.completed ? (
+                              <CheckCircle2 className="w-4 h-4 text-success" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-muted-foreground" />
+                            )}
+                            <span
+                              className={
+                                event.completed
+                                  ? "line-through text-muted-foreground"
+                                  : ""
+                              }
+                            >
+                              {event.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 

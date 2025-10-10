@@ -1,5 +1,7 @@
 import { useCallback, useMemo } from "react";
+
 import { type ICharacterFormData } from "@/types/character-types";
+
 import { useCharacterForm } from "./hooks/use-character-form";
 import { CreateCharacterModalView } from "./view";
 
@@ -25,18 +27,23 @@ export function CreateCharacterModal({
 
   const hasSpecies = useMemo(() => species.length > 0, [species]);
   const hasLocations = useMemo(() => locations.length > 0, [locations]);
-  const hasOrganizations = useMemo(() => organizations.length > 0, [organizations]);
+  const hasOrganizations = useMemo(
+    () => organizations.length > 0,
+    [organizations]
+  );
 
-  const watchedFields = form.watch(["name", "role", "age", "gender", "description"]);
+  const watchedFields = form.watch([
+    "name",
+    "role",
+    "age",
+    "gender",
+    "description",
+  ]);
 
   const isValid = useMemo(() => {
     const [name, role, age, gender, description] = watchedFields;
     return Boolean(
-      name?.trim() &&
-      role &&
-      age?.trim() &&
-      gender &&
-      description?.trim()
+      name?.trim() && role && age?.trim() && gender && description?.trim()
     );
   }, [watchedFields]);
 

@@ -33,10 +33,7 @@ export function CharacterImageUpload({
         className="hidden"
         id="character-image-upload"
       />
-      <label
-        htmlFor="character-image-upload"
-        className="cursor-pointer group"
-      >
+      <label htmlFor="character-image-upload" className="cursor-pointer group">
         <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
           {image ? (
             <div className="relative w-full h-full group">

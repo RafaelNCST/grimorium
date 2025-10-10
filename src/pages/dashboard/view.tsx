@@ -5,7 +5,7 @@ import {
   DragStartEvent,
   DragMoveEvent,
   SensorDescriptor,
-  SensorOptions
+  SensorOptions,
 } from "@dnd-kit/core";
 
 import {

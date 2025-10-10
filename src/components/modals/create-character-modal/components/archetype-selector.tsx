@@ -1,7 +1,8 @@
 import { useState } from "react";
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { CHARACTER_ARCHETYPES_CONSTANT } from "../constants/character-archetypes";
+
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -9,6 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+import { CHARACTER_ARCHETYPES_CONSTANT } from "../constants/character-archetypes";
 
 interface PropsArchetypeSelector {
   value: string;
@@ -55,9 +58,7 @@ export function ArchetypeSelector({ value, onChange }: PropsArchetypeSelector) {
               <button
                 key={archetype.value}
                 type="button"
-                onClick={() =>
-                  onChange(isSelected ? "" : archetype.value)
-                }
+                onClick={() => onChange(isSelected ? "" : archetype.value)}
                 className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all h-32 ${
                   isSelected
                     ? "border-primary bg-primary/10 shadow-md"

@@ -1,12 +1,14 @@
 import { useState, type ReactNode } from "react";
+
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
 
 interface PropsAdvancedSection {
   children: ReactNode;
@@ -32,9 +34,7 @@ export function AdvancedSection({ children }: PropsAdvancedSection) {
           )}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-6">
-        {children}
-      </CollapsibleContent>
+      <CollapsibleContent className="space-y-6">{children}</CollapsibleContent>
     </Collapsible>
   );
 }

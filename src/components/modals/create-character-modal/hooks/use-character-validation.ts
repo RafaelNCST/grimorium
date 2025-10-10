@@ -2,11 +2,17 @@ import { z } from "zod";
 
 export const characterFormSchema = z.object({
   // Required fields
-  name: z.string().min(1, "validation.name_required").max(100, "validation.name_max_length"),
+  name: z
+    .string()
+    .min(1, "validation.name_required")
+    .max(100, "validation.name_max_length"),
   role: z.string().min(1, "validation.role_required"),
   age: z.string().min(1, "validation.age_required"),
   gender: z.string().min(1, "validation.gender_required"),
-  description: z.string().min(1, "validation.description_required").max(500, "validation.description_max_length"),
+  description: z
+    .string()
+    .min(1, "validation.description_required")
+    .max(500, "validation.description_max_length"),
   image: z.string().optional(),
 
   // Appearance (Advanced - all optional)
@@ -23,10 +29,19 @@ export const characterFormSchema = z.object({
 
   // Behavior and Tastes (Advanced - all optional)
   archetype: z.string().optional(),
-  personality: z.string().max(500, "validation.personality_max_length").optional(),
+  personality: z
+    .string()
+    .max(500, "validation.personality_max_length")
+    .optional(),
   hobbies: z.string().max(250, "validation.hobbies_max_length").optional(),
-  dreamsAndGoals: z.string().max(250, "validation.dreams_max_length").optional(),
-  fearsAndTraumas: z.string().max(250, "validation.fears_max_length").optional(),
+  dreamsAndGoals: z
+    .string()
+    .max(250, "validation.dreams_max_length")
+    .optional(),
+  fearsAndTraumas: z
+    .string()
+    .max(250, "validation.fears_max_length")
+    .optional(),
   favoriteFood: z.string().optional(),
   favoriteMusic: z.string().optional(),
 
