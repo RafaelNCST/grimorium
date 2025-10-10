@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Calendar, Plus, Search, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -65,6 +65,23 @@ export function CharactersView({
 }: CharactersViewProps) {
   const { t } = useTranslation(["characters", "create-character"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const hasMountedRef = useRef(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  // Only animate on initial mount
+  useEffect(() => {
+    if (!hasMountedRef.current && filteredCharacters.length > 0) {
+      hasMountedRef.current = true;
+      setShouldAnimate(true);
+
+      // Remove animation class after animation completes
+      const timer = setTimeout(() => {
+        setShouldAnimate(false);
+      }, 1000); // Animation duration + stagger delay for last item
+
+      return () => clearTimeout(timer);
+    }
+  }, [filteredCharacters.length]);
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
     const newCharacter: ICharacter = {
@@ -196,7 +213,7 @@ export function CharactersView({
           return (
             <Card
               key={character.id}
-              className="card-magical animate-stagger cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all w-[500px]"
+              className={`card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${shouldAnimate ? "animate-stagger" : ""}`}
               onClick={() => onCharacterClick(character.id)}
             >
               <CardContent className="p-5 space-y-4">
