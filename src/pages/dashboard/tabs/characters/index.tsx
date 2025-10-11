@@ -14,31 +14,7 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
   const navigate = useNavigate();
   const [characters, setCharacters] = useState<ICharacter[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedOrg, setSelectedOrg] = useState("all");
-  const [selectedLocation, setSelectedLocation] = useState("all");
-
-  const organizations = useMemo(
-    () => [
-      "all",
-      ...Array.from(
-        new Set(characters.map((c) => c.organization).filter(Boolean))
-      ),
-    ],
-    [characters]
-  );
-
-  const locations = useMemo(
-    () => [
-      "all",
-      ...Array.from(
-        new Set([
-          ...characters.map((c) => c.birthPlace).filter(Boolean),
-          ...characters.map((c) => c.affiliatedPlace).filter(Boolean),
-        ])
-      ),
-    ],
-    [characters]
-  );
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   const filteredCharacters = useMemo(
     () =>
@@ -48,24 +24,20 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
           character.description
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
-        const matchesOrg =
-          selectedOrg === "all" || character.organization === selectedOrg;
-        const matchesLocation =
-          selectedLocation === "all" ||
-          character.birthPlace === selectedLocation ||
-          character.affiliatedPlace === selectedLocation;
-        return matchesSearch && matchesOrg && matchesLocation;
+        const matchesRole = selectedRole === null || character.role === selectedRole;
+        return matchesSearch && matchesRole;
       }),
-    [characters, searchTerm, selectedOrg, selectedLocation]
+    [characters, searchTerm, selectedRole]
   );
 
   const roleStats = useMemo(
     () => ({
       total: characters.length,
-      protagonista: characters.filter((c) => c.role === "protagonista").length,
-      antagonista: characters.filter((c) => c.role === "antagonista").length,
-      secundario: characters.filter((c) => c.role === "secundario").length,
-      vilao: characters.filter((c) => c.role === "vilao").length,
+      protagonist: characters.filter((c) => c.role === "protagonist").length,
+      antagonist: characters.filter((c) => c.role === "antagonist").length,
+      secondary: characters.filter((c) => c.role === "secondary").length,
+      villain: characters.filter((c) => c.role === "villain").length,
+      extra: characters.filter((c) => c.role === "extra").length,
     }),
     [characters]
   );
@@ -91,20 +63,20 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
     [navigateToCharacterDetail]
   );
 
+  const handleRoleFilter = useCallback((role: string | null) => {
+    setSelectedRole(role);
+  }, []);
+
   return (
     <CharactersView
       bookId={bookId}
       characters={characters}
       filteredCharacters={filteredCharacters}
-      organizations={organizations}
-      locations={locations}
       roleStats={roleStats}
       searchTerm={searchTerm}
-      selectedOrg={selectedOrg}
-      selectedLocation={selectedLocation}
+      selectedRole={selectedRole}
       onSearchTermChange={setSearchTerm}
-      onSelectedOrgChange={setSelectedOrg}
-      onSelectedLocationChange={setSelectedLocation}
+      onRoleFilterChange={handleRoleFilter}
       onCharacterCreated={handleCharacterCreated}
       onCharacterClick={handleCharacterClick}
     />

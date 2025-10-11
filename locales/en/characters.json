@@ -4,15 +4,12 @@
     "description": "Manage your story's characters",
     "new_character": "New Character",
     "search_placeholder": "Search characters...",
-    "all_organizations": "All organizations",
-    "all_locations": "All locations",
-    "organization_filter": "Organization",
-    "location_filter": "Location",
     "total_badge": "Total",
     "protagonist_badge": "Protagonist",
     "antagonist_badge": "Antagonist",
     "secondary_badge": "Secondary",
-    "villain_badge": "Villain"
+    "villain_badge": "Villain",
+    "extra_badge": "Extra"
   },
   "card": {
     "years": "years old"
@@ -21,6 +18,8 @@
     "no_characters": "No characters created",
     "no_characters_description": "Start creating your first character to bring your story to life",
     "no_results": "No characters found",
-    "no_results_description": "Try adjusting your filters or create a new character"
+    "no_results_description": "Try adjusting your search or create a new character",
+    "no_role_characters": "No {{role}} characters",
+    "no_role_characters_description": "You haven't created characters with this role yet"
   }
 }
