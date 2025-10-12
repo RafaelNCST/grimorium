@@ -43,13 +43,13 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { type IFieldVisibility } from "@/types/character-types";
 
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IFamilyRelations } from "./constants/family-relations-constant";
 import { type IGender } from "./constants/genders-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 import { type IRole } from "./constants/roles-constant";
-import { type IFieldVisibility } from "@/types/character-types";
 
 // TODO: Refatorar anotações no futuro
 // interface ILinkedNote {

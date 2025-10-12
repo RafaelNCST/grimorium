@@ -54,7 +54,10 @@
     "no_relationships_hint": "Use edit mode to add relationships",
     "no_family": "No family relations defined",
     "no_family_hint": "Use edit mode to add family members",
-    "need_more_characters": "More characters needed to create relationships",
+    "need_more_characters_relationships": "More characters needed",
+    "need_more_characters_relationships_hint": "Create at least 2 characters to establish friendships, rivalries, and other social connections",
+    "need_more_characters_family": "More characters needed",
+    "need_more_characters_family_hint": "Create at least 2 characters to define family relationships like parents, siblings, and relatives",
     "no_characters_to_add": "No characters available to add",
     "create_more_hint": "Create more characters to establish relationships"
   },
@@ -75,8 +78,8 @@
       "description": "Create alternative versions to explore different character states"
     },
     "hint": {
-      "title": "Tip:",
-      "description": "Versions are useful for characters that evolve throughout the story"
+      "title": "💡 Tip:",
+      "description": "Create versions to explore different character states: pre-transformation, injured version, alternate version, etc. Each version maintains independent data!"
     },
     "create_dialog": {
       "title": "Create New Version",
@@ -99,7 +102,17 @@
     "select_character": "Select a character",
     "relationship_type": "Relationship Type",
     "intensity": "Intensity",
-    "current_relationships": "Current Relationships"
+    "current_relationships": "Current Relationships",
+    "intensity_labels": {
+      "weak": "Weak",
+      "moderate": "Moderate",
+      "strong": "Strong"
+    },
+    "cancel": "Cancel",
+    "add": "Add",
+    "save": "Save",
+    "edit_title": "Edit Relationship",
+    "editing_with": "Editing relationship with"
   },
   "relationship_types": {
     "friend": "Friend",
@@ -162,6 +175,7 @@
         "message": "This action will permanently delete the character '{{characterName}}' and all its versions.",
         "input_label": "Type the full character name to confirm:",
         "input_placeholder": "Type the character name",
+        "name_mismatch": "The entered name does not match the character name",
         "cancel": "Cancel",
         "continue": "Continue"
       },
@@ -187,5 +201,8 @@
   "actions": {
     "open": "Open",
     "close": "Close"
+  },
+  "upload": {
+    "click": "Click"
   }
 }

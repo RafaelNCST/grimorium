@@ -1,7 +1,11 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import {
+  getCharactersByBookId,
+  createCharacter,
+} from "@/lib/db/characters.service";
 import { type ICharacter } from "@/types/character-types";
 
 import { CharactersView } from "./view";
@@ -15,6 +19,23 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
   const [characters, setCharacters] = useState<ICharacter[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [_isLoading, setIsLoading] = useState(true);
+
+  // Load characters from database on mount
+  useEffect(() => {
+    const loadCharacters = async () => {
+      try {
+        const charactersFromDB = await getCharactersByBookId(bookId);
+        setCharacters(charactersFromDB);
+      } catch (error) {
+        console.error("Error loading characters:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCharacters();
+  }, [bookId]);
 
   const filteredCharacters = useMemo(
     () =>
@@ -24,7 +45,8 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
           character.description
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
-        const matchesRole = selectedRole === null || character.role === selectedRole;
+        const matchesRole =
+          selectedRole === null || character.role === selectedRole;
         return matchesSearch && matchesRole;
       }),
     [characters, searchTerm, selectedRole]
@@ -42,9 +64,19 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
     [characters]
   );
 
-  const handleCharacterCreated = useCallback((newCharacter: ICharacter) => {
-    setCharacters((prev) => [...prev, newCharacter]);
-  }, []);
+  const handleCharacterCreated = useCallback(
+    async (newCharacter: ICharacter) => {
+      try {
+        // Save to database
+        await createCharacter(bookId, newCharacter);
+        // Update local state
+        setCharacters((prev) => [...prev, newCharacter]);
+      } catch (error) {
+        console.error("Error creating character:", error);
+      }
+    },
+    [bookId]
+  );
 
   const navigateToCharacterDetail = useCallback(
     (characterId: string) => {

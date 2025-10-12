@@ -11,9 +11,6 @@
     "villain_badge": "Vilão",
     "extra_badge": "Figurante"
   },
-  "card": {
-    "years": "anos"
-  },
   "empty_state": {
     "no_characters": "Nenhum personagem criado",
     "no_characters_description": "Comece criando seu primeiro personagem para dar vida à sua história",

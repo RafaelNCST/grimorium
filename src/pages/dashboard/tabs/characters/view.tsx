@@ -108,10 +108,13 @@ export function CharactersView({
                     ? "!bg-yellow-500 !text-black !border-yellow-500"
                     : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500 hover:text-black dark:hover:text-black hover:border-yellow-500"
                 }`}
-                onClick={() => onRoleFilterChange(selectedRole === "protagonist" ? null : "protagonist")}
+                onClick={() =>
+                  onRoleFilterChange(
+                    selectedRole === "protagonist" ? null : "protagonist"
+                  )
+                }
               >
-                {roleStats.protagonist}{" "}
-                {t("characters:page.protagonist_badge")}
+                {roleStats.protagonist} {t("characters:page.protagonist_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
@@ -119,7 +122,11 @@ export function CharactersView({
                     ? "!bg-orange-500 !text-black !border-orange-500"
                     : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:bg-orange-500 hover:text-black dark:hover:text-black hover:border-orange-500"
                 }`}
-                onClick={() => onRoleFilterChange(selectedRole === "antagonist" ? null : "antagonist")}
+                onClick={() =>
+                  onRoleFilterChange(
+                    selectedRole === "antagonist" ? null : "antagonist"
+                  )
+                }
               >
                 {roleStats.antagonist} {t("characters:page.antagonist_badge")}
               </Badge>
@@ -129,7 +136,11 @@ export function CharactersView({
                     ? "!bg-red-500 !text-black !border-red-500"
                     : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-black dark:hover:text-black hover:border-red-500"
                 }`}
-                onClick={() => onRoleFilterChange(selectedRole === "villain" ? null : "villain")}
+                onClick={() =>
+                  onRoleFilterChange(
+                    selectedRole === "villain" ? null : "villain"
+                  )
+                }
               >
                 {roleStats.villain} {t("characters:page.villain_badge")}
               </Badge>
@@ -139,7 +150,11 @@ export function CharactersView({
                     ? "!bg-blue-500 !text-black !border-blue-500"
                     : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-black dark:hover:text-black hover:border-blue-500"
                 }`}
-                onClick={() => onRoleFilterChange(selectedRole === "secondary" ? null : "secondary")}
+                onClick={() =>
+                  onRoleFilterChange(
+                    selectedRole === "secondary" ? null : "secondary"
+                  )
+                }
               >
                 {roleStats.secondary} {t("characters:page.secondary_badge")}
               </Badge>
@@ -149,7 +164,9 @@ export function CharactersView({
                     ? "!bg-gray-500 !text-black !border-gray-500"
                     : "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:bg-gray-500 hover:text-black dark:hover:text-black hover:border-gray-500"
                 }`}
-                onClick={() => onRoleFilterChange(selectedRole === "extra" ? null : "extra")}
+                onClick={() =>
+                  onRoleFilterChange(selectedRole === "extra" ? null : "extra")
+                }
               >
                 {roleStats.extra} {t("characters:page.extra_badge")}
               </Badge>
@@ -237,7 +254,7 @@ export function CharactersView({
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 text-primary" />
                           <span className="text-sm font-medium text-muted-foreground">
-                            {character.age} {t("characters:card.years")}
+                            {character.age}
                           </span>
                         </div>
                       )}
@@ -291,7 +308,9 @@ export function CharactersView({
               ? t("characters:empty_state.no_characters")
               : selectedRole !== null
                 ? t("characters:empty_state.no_role_characters", {
-                    role: t(`create-character:role.${selectedRole}`).toLowerCase(),
+                    role: t(
+                      `create-character:role.${selectedRole}`
+                    ).toLowerCase(),
                   })
                 : t("characters:empty_state.no_results")
           }

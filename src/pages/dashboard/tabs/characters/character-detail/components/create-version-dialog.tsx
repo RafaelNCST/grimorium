@@ -16,7 +16,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { type ICharacter, type ICharacterFormData } from "@/types/character-types";
+import {
+  type ICharacter,
+  type ICharacterFormData,
+} from "@/types/character-types";
 
 interface CreateVersionDialogProps {
   open: boolean;
@@ -48,11 +51,10 @@ export function CreateVersionDialog({
   const descriptionCharsRemaining =
     MAX_DESCRIPTION_LENGTH - versionDescription.length;
 
-  const canProceedToStep2 = useMemo(() => {
-    return (
-      versionName.trim().length > 0 && versionDescription.trim().length > 0
-    );
-  }, [versionName, versionDescription]);
+  const canProceedToStep2 = useMemo(
+    () => versionName.trim().length > 0 && versionDescription.trim().length > 0,
+    [versionName, versionDescription]
+  );
 
   const handleClose = useCallback(() => {
     setStep(1);
@@ -141,7 +143,8 @@ export function CreateVersionDialog({
                       : "text-muted-foreground"
                   }`}
                 >
-                  {nameCharsRemaining} {t("versions.create_dialog.chars_remaining")}
+                  {nameCharsRemaining}{" "}
+                  {t("versions.create_dialog.chars_remaining")}
                 </span>
               </div>
             </div>
@@ -162,7 +165,9 @@ export function CreateVersionDialog({
                     setVersionDescription(e.target.value);
                   }
                 }}
-                placeholder={t("versions.create_dialog.description_placeholder")}
+                placeholder={t(
+                  "versions.create_dialog.description_placeholder"
+                )}
                 maxLength={MAX_DESCRIPTION_LENGTH}
                 rows={4}
                 className={`resize-none ${

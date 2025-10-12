@@ -30,13 +30,21 @@ export function CharacterNavigationSidebar({
 }: PropsCharacterNavigationSidebar) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredCharacters = characters.filter((char) =>
+  // Separate current character from others
+  const currentCharacter = characters.find(
+    (char) => char.id === currentCharacterId
+  );
+  const otherCharacters = characters.filter(
+    (char) => char.id !== currentCharacterId
+  );
+
+  const filteredOtherCharacters = otherCharacters.filter((char) =>
     char.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div
-      className={`fixed left-0 top-0 bottom-0 w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out z-40 ${
+      className={`fixed left-0 top-[32px] bottom-0 w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out z-40 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -46,7 +54,7 @@ export function CharacterNavigationSidebar({
           <Users className="w-5 h-5 text-muted-foreground" />
           <h2 className="font-semibold">Personagens</h2>
           <span className="text-xs text-muted-foreground">
-            ({filteredCharacters.length})
+            ({characters.length})
           </span>
         </div>
         <Button
@@ -72,27 +80,49 @@ export function CharacterNavigationSidebar({
         </div>
       </div>
 
+      {/* Current Character */}
+      {currentCharacter && (
+        <div className="p-2 border-b border-border bg-card">
+          <div className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30 cursor-default">
+            <Avatar className="w-10 h-10 flex-shrink-0">
+              <AvatarImage src={currentCharacter.image} />
+              <AvatarFallback className="text-sm">
+                {currentCharacter.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm truncate">
+                {currentCharacter.name}
+              </p>
+              <p className="text-xs text-primary font-medium">
+                Visualizando atualmente
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Character List */}
-      <ScrollArea className="flex-1 h-[calc(100vh-140px)]">
+      <ScrollArea className="flex-1 h-[calc(100vh-32px-220px)]">
         <div className="p-2">
-          {filteredCharacters.length === 0 ? (
+          {filteredOtherCharacters.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>Nenhum personagem encontrado</p>
             </div>
           ) : (
             <div className="space-y-1">
-              {filteredCharacters.map((character) => (
+              {filteredOtherCharacters.map((character) => (
                 <button
                   key={character.id}
                   onClick={() => {
                     onCharacterSelect(character.id);
+                    onClose();
                   }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-muted/50 ${
-                    currentCharacterId === character.id
-                      ? "bg-muted border border-primary/20"
-                      : ""
-                  }`}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-muted/50"
                 >
                   <Avatar className="w-10 h-10 flex-shrink-0">
                     <AvatarImage src={character.image} />
@@ -107,11 +137,6 @@ export function CharacterNavigationSidebar({
                     <p className="font-medium text-sm truncate">
                       {character.name}
                     </p>
-                    {currentCharacterId === character.id && (
-                      <p className="text-xs text-primary">
-                        Visualizando atualmente
-                      </p>
-                    )}
                   </div>
                 </button>
               ))}

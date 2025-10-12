@@ -1,22 +1,33 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Users } from "lucide-react";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
-import { type ICharacterVersion, type ICharacterFormData, type ICharacter, type IFieldVisibility } from "@/types/character-types";
+import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
+import { GENDERS_CONSTANT as GENDERS_CONSTANT_MODAL } from "@/components/modals/create-character-modal/constants/genders";
 import {
-  mockCharacters,
-  mockLocations,
-  mockOrganizations,
-} from "@/mocks/global";
+  getCharacterById,
+  getCharactersByBookId,
+  updateCharacter,
+  deleteCharacter,
+  getCharacterRelationships,
+  saveCharacterRelationships,
+  getCharacterFamily,
+  saveCharacterFamily,
+} from "@/lib/db/characters.service";
+import { mockLocations, mockOrganizations } from "@/mocks/global";
+import {
+  type ICharacterVersion,
+  type ICharacterFormData,
+  type ICharacter,
+  type IFieldVisibility,
+} from "@/types/character-types";
 
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
-import { GENDERS_CONSTANT } from "./constants/genders-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
-import { ROLES_CONSTANT } from "./constants/roles-constant";
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailViewRefactored } from "./view-refactored";
@@ -83,12 +94,69 @@ export function CharacterDetail() {
       characterData: emptyCharacter as ICharacter,
     },
   ]);
-  const [currentVersion, setCurrentVersion] = useState<ICharacterVersion | null>(versions[0]);
+  const [currentVersion, setCurrentVersion] =
+    useState<ICharacterVersion | null>(versions[0]);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [_isLoading, setIsLoading] = useState(true);
+  const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
+
+  // Load character from database
+  useEffect(() => {
+    const loadCharacter = async () => {
+      try {
+        const characterFromDB = await getCharacterById(characterId);
+        if (characterFromDB) {
+          setCharacter(characterFromDB);
+          setEditData(characterFromDB);
+          setImagePreview(characterFromDB.image || "");
+          setFieldVisibility(characterFromDB.fieldVisibility || {});
+
+          // Load relationships
+          const relationships = await getCharacterRelationships(characterId);
+          setCharacter((prev) => ({ ...prev, relationships }));
+          setEditData((prev) => ({ ...prev, relationships }));
+
+          // Load family
+          const family = await getCharacterFamily(characterId);
+          setCharacter((prev) => ({ ...prev, family }));
+          setEditData((prev) => ({ ...prev, family }));
+
+          // Update main version with loaded data
+          setVersions((prev) =>
+            prev.map((v) =>
+              v.isMain
+                ? {
+                    ...v,
+                    characterData: {
+                      ...characterFromDB,
+                      relationships,
+                      family,
+                    },
+                  }
+                : v
+            )
+          );
+
+          // Load all characters from the same book
+          if (dashboardId) {
+            const allCharsFromBook = await getCharactersByBookId(dashboardId);
+            setAllCharacters(allCharsFromBook);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading character:", error);
+        toast.error("Erro ao carregar personagem");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCharacter();
+  }, [characterId, dashboardId]);
 
   const currentRole = useMemo(
-    () => ROLES_CONSTANT.find((r) => r.value === character.role),
+    () => CHARACTER_ROLES_CONSTANT.find((r) => r.value === character.role),
     [character.role]
   );
   const currentAlignment = useMemo(
@@ -96,7 +164,7 @@ export function CharacterDetail() {
     [character.alignment]
   );
   const currentGender = useMemo(
-    () => GENDERS_CONSTANT.find((g) => g.value === character.gender),
+    () => GENDERS_CONSTANT_MODAL.find((g) => g.value === character.gender),
     [character.gender]
   );
   const RoleIcon = currentRole?.icon || Users;
@@ -189,7 +257,7 @@ export function CharacterDetail() {
     [versions, currentVersion]
   );
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     const updatedCharacter = { ...editData, fieldVisibility };
     setCharacter(updatedCharacter);
 
@@ -201,14 +269,37 @@ export function CharacterDetail() {
     );
     setVersions(updatedVersions);
 
-    const activeVersion = updatedVersions.find((v) => v.id === currentVersion?.id);
+    const activeVersion = updatedVersions.find(
+      (v) => v.id === currentVersion?.id
+    );
     if (activeVersion) {
       setCurrentVersion(activeVersion);
     }
 
-    setIsEditing(false);
-    toast.success("Personagem atualizado com sucesso!");
-  }, [editData, fieldVisibility, versions, currentVersion]);
+    try {
+      // Save to database
+      await updateCharacter(characterId, updatedCharacter);
+
+      // Save relationships
+      if (updatedCharacter.relationships) {
+        await saveCharacterRelationships(
+          characterId,
+          updatedCharacter.relationships
+        );
+      }
+
+      // Save family
+      if (updatedCharacter.family) {
+        await saveCharacterFamily(characterId, updatedCharacter.family);
+      }
+
+      setIsEditing(false);
+      toast.success("Personagem atualizado com sucesso!");
+    } catch (error) {
+      console.error("Error saving character:", error);
+      toast.error("Erro ao salvar personagem");
+    }
+  }, [editData, fieldVisibility, versions, currentVersion, characterId]);
 
   const navigateToCharactersTab = useCallback(() => {
     if (!dashboardId) return;
@@ -218,14 +309,17 @@ export function CharacterDetail() {
     });
   }, [navigate, dashboardId]);
 
-  const handleConfirmDelete = useCallback(() => {
+  const handleConfirmDelete = useCallback(async () => {
+    console.log("handleConfirmDelete called", { currentVersion, characterId });
     if (currentVersion && !currentVersion.isMain) {
       // Delete version (non-main)
       const versionToDelete = versions.find((v) => v.id === currentVersion.id);
 
       if (!versionToDelete) return;
 
-      const updatedVersions = versions.filter((v) => v.id !== currentVersion.id);
+      const updatedVersions = versions.filter(
+        (v) => v.id !== currentVersion.id
+      );
 
       // Switch to main version after deleting
       const mainVersion = updatedVersions.find((v) => v.isMain);
@@ -244,10 +338,20 @@ export function CharacterDetail() {
       toast.success(t("delete.version.success"));
     } else {
       // Delete entire character (main version)
-      toast.success(t("delete.character.step2.success"));
-      navigateToCharactersTab();
+      console.log("Attempting to delete character");
+      try {
+        console.log("Calling deleteCharacter with ID:", characterId);
+        await deleteCharacter(characterId);
+        console.log("Delete successful, showing toast");
+        toast.success(t("delete.character.step2.success"));
+        console.log("Navigating to characters tab");
+        navigateToCharactersTab();
+      } catch (error) {
+        console.error("Error deleting character:", error);
+        toast.error("Erro ao excluir personagem");
+      }
     }
-  }, [currentVersion, versions, navigateToCharactersTab]);
+  }, [currentVersion, versions, navigateToCharactersTab, characterId, t]);
 
   const handleCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
@@ -423,11 +527,11 @@ export function CharacterDetail() {
   }, []);
 
   const handleBack = useCallback(() => {
-    navigateBack();
-  }, [navigateBack]);
+    navigateToCharactersTab();
+  }, [navigateToCharactersTab]);
 
   const handleNavigationSidebarToggle = useCallback(() => {
-    setIsNavigationSidebarOpen(true);
+    setIsNavigationSidebarOpen((prev) => !prev);
   }, []);
 
   const handleNavigationSidebarClose = useCallback(() => {
@@ -518,12 +622,12 @@ export function CharacterDetail() {
       selectedRelationshipType={selectedRelationshipType}
       relationshipIntensity={relationshipIntensity}
       fileInputRef={fileInputRef}
-      mockCharacters={mockCharacters}
+      mockCharacters={allCharacters}
       mockLocations={mockLocations}
       mockOrganizations={mockOrganizations}
-      roles={ROLES_CONSTANT}
+      roles={CHARACTER_ROLES_CONSTANT}
       alignments={ALIGNMENTS_CONSTANT}
-      genders={GENDERS_CONSTANT}
+      genders={GENDERS_CONSTANT_MODAL}
       relationshipTypes={RELATIONSHIP_TYPES_CONSTANT}
       currentRole={currentRole}
       currentAlignment={currentAlignment}

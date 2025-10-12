@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
 import enCreateBook from "../../locales/en/create-book.json";
 import enCreateCharacter from "../../locales/en/create-character.json";
@@ -8,6 +9,7 @@ import enEncyclopedia from "../../locales/en/encyclopedia.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enOverview from "../../locales/en/overview.json";
+import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateCharacter from "../../locales/pt/create-character.json";
@@ -22,6 +24,7 @@ const resources = {
     encyclopedia: enEncyclopedia,
     inbox: enInbox,
     characters: enCharacters,
+    "character-detail": enCharacterDetail,
     "create-book": enCreateBook,
     "create-character": enCreateCharacter,
     overview: enOverview,
@@ -31,6 +34,7 @@ const resources = {
     encyclopedia: ptEncyclopedia,
     inbox: ptInbox,
     characters: ptCharacters,
+    "character-detail": ptCharacterDetail,
     "create-book": ptCreateBook,
     "create-character": ptCreateCharacter,
     overview: ptOverview,

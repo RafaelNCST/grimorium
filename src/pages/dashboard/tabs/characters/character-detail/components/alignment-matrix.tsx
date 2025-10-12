@@ -1,5 +1,8 @@
 import React from "react";
+
+import { Target } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
 import { cn } from "@/lib/utils";
 
 export interface AlignmentValue {
@@ -32,16 +35,34 @@ export function AlignmentMatrix({
     const ethical = parts[0] as AlignmentValue["ethical"];
     const moral = parts[1] as AlignmentValue["moral"];
 
-    if (
-      ETHICAL_AXIS.includes(ethical) &&
-      MORAL_AXIS.includes(moral)
-    ) {
+    if (ETHICAL_AXIS.includes(ethical) && MORAL_AXIS.includes(moral)) {
       return { moral, ethical };
     }
     return null;
   };
 
   const currentAlignment = parseAlignment(value);
+
+  // If not editable and no alignment selected, show empty state
+  if (!isEditable && !currentAlignment) {
+    return (
+      <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+            <Target className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-foreground">
+              Nenhum alinhamento escolhido
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Use o modo de edição para selecionar um alinhamento
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isSelected = (moral: string, ethical: string) => {
     if (!currentAlignment) return false;
@@ -138,13 +159,12 @@ export function AlignmentMatrix({
                     getCellColor(moral, ethical),
                     selected ? "border-2" : "border-transparent",
                     isEditable && "cursor-pointer hover:scale-105",
+                    !isEditable && !selected && "opacity-30",
                     !isEditable && "cursor-default"
                   )}
                   title={t(`alignment.${alignmentKey}`)}
                 >
-                  {selected && (
-                    <span className="text-lg leading-none">✓</span>
-                  )}
+                  {selected && <span className="text-lg leading-none">✓</span>}
                 </button>
               );
             })}
@@ -155,9 +175,7 @@ export function AlignmentMatrix({
       {/* Current selection display */}
       {currentAlignment && (
         <div className="text-center">
-          <p className="text-sm font-medium">
-            {t(`alignment.${value}`)}
-          </p>
+          <p className="text-sm font-medium">{t(`alignment.${value}`)}</p>
           <p className="text-xs text-muted-foreground mt-1">
             {t(`alignment.${value}_desc`)}
           </p>

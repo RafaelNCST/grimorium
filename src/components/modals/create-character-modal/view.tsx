@@ -114,11 +114,16 @@ export function CreateCharacterModalView({
                     maxLength={100}
                     className={errors.name ? "border-destructive" : ""}
                   />
-                  {errors.name && (
-                    <p className="text-sm text-destructive">
-                      {t(errors.name.message || "")}
-                    </p>
-                  )}
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    {errors.name && (
+                      <p className="text-destructive">
+                        {t(errors.name.message || "")}
+                      </p>
+                    )}
+                    <span className="ml-auto">
+                      {watchedValues.name?.length || 0}/100
+                    </span>
+                  </div>
                 </div>
 
                 {/* Age and Gender */}
@@ -132,13 +137,19 @@ export function CreateCharacterModalView({
                       id="age"
                       {...register("age")}
                       placeholder={t("modal.age_placeholder")}
+                      maxLength={50}
                       className={errors.age ? "border-destructive" : ""}
                     />
-                    {errors.age && (
-                      <p className="text-sm text-destructive">
-                        {t(errors.age.message || "")}
-                      </p>
-                    )}
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      {errors.age && (
+                        <p className="text-destructive">
+                          {t(errors.age.message || "")}
+                        </p>
+                      )}
+                      <span className="ml-auto">
+                        {watchedValues.age?.length || 0}/50
+                      </span>
+                    </div>
                   </div>
 
                   {/* Gender */}

@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import {
-  Heart,
-  Users,
-  X,
-  TreePine,
-} from "lucide-react";
+
+import { Heart, Users, X, TreePine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -66,7 +62,9 @@ function FamilyMemberCard({
       </Avatar>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{character.name}</p>
-        <p className="text-xs text-muted-foreground">{t(`character-detail:family.${relation}`)}</p>
+        <p className="text-xs text-muted-foreground">
+          {t(`character-detail:family.${relation}`)}
+        </p>
       </div>
       {isEditMode && onRemove && (
         <Button
@@ -93,15 +91,13 @@ export function FamilySection({
   const [isTreeDialogOpen, setIsTreeDialogOpen] = useState(false);
 
   // Filter available characters (exclude self and already selected)
-  const getAvailableCharacters = (excludeIds: string[] = []) => {
-    return allCharacters.filter(
+  const getAvailableCharacters = (excludeIds: string[] = []) =>
+    allCharacters.filter(
       (char) => char.id !== currentCharacterId && !excludeIds.includes(char.id)
     );
-  };
 
-  const getCharacterById = (id: string): ICharacter | undefined => {
-    return allCharacters.find((char) => char.id === id);
-  };
+  const getCharacterById = (id: string): ICharacter | undefined =>
+    allCharacters.find((char) => char.id === id);
 
   // Handle single-value family relations (father, mother, spouse)
   const handleSingleRelationChange = (
@@ -122,7 +118,10 @@ export function FamilySection({
     if (characterId === "none") return;
 
     const currentRelations = family[relationType];
-    if (Array.isArray(currentRelations) && !currentRelations.includes(characterId)) {
+    if (
+      Array.isArray(currentRelations) &&
+      !currentRelations.includes(characterId)
+    ) {
       onFamilyChange({
         ...family,
         [relationType]: [...currentRelations, characterId],
@@ -163,12 +162,12 @@ export function FamilySection({
   if (allCharacters.length <= 1 && isEditMode) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">
-        <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <TreePine className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p className="font-medium">
-          {t("character-detail:empty_states.need_more_characters")}
+          {t("character-detail:empty_states.need_more_characters_family")}
         </p>
         <p className="text-xs mt-1">
-          {t("character-detail:empty_states.create_more_hint")}
+          {t("character-detail:empty_states.need_more_characters_family_hint")}
         </p>
       </div>
     );
@@ -225,7 +224,9 @@ export function FamilySection({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("character-detail:family.select_father")} />
+                    <SelectValue
+                      placeholder={t("character-detail:family.select_father")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
@@ -255,7 +256,9 @@ export function FamilySection({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("character-detail:family.select_mother")} />
+                    <SelectValue
+                      placeholder={t("character-detail:family.select_mother")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
@@ -285,7 +288,9 @@ export function FamilySection({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("character-detail:family.select_spouse")} />
+                    <SelectValue
+                      placeholder={t("character-detail:family.select_spouse")}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
@@ -319,7 +324,9 @@ export function FamilySection({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_child")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_child")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -370,7 +377,9 @@ export function FamilySection({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_sibling")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_sibling")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -423,7 +432,9 @@ export function FamilySection({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_half_sibling")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_half_sibling")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -483,7 +494,9 @@ export function FamilySection({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_grandparent")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_grandparent")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -535,7 +548,9 @@ export function FamilySection({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_uncle_aunt")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_uncle_aunt")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -582,10 +597,14 @@ export function FamilySection({
             </Label>
             <Select
               value="none"
-              onValueChange={(value) => handleMultiRelationAdd("cousins", value)}
+              onValueChange={(value) =>
+                handleMultiRelationAdd("cousins", value)
+              }
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("character-detail:family.add_cousin")} />
+                <SelectValue
+                  placeholder={t("character-detail:family.add_cousin")}
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
@@ -639,30 +658,27 @@ export function FamilySection({
                 {t("character-detail:family.direct_family")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.father &&
-                  getCharacterById(family.father) && (
-                    <FamilyMemberCard
-                      character={getCharacterById(family.father)!}
-                      relation="father"
-                      isEditMode={false}
-                    />
-                  )}
-                {family.mother &&
-                  getCharacterById(family.mother) && (
-                    <FamilyMemberCard
-                      character={getCharacterById(family.mother)!}
-                      relation="mother"
-                      isEditMode={false}
-                    />
-                  )}
-                {family.spouse &&
-                  getCharacterById(family.spouse) && (
-                    <FamilyMemberCard
-                      character={getCharacterById(family.spouse)!}
-                      relation="spouse"
-                      isEditMode={false}
-                    />
-                  )}
+                {family.father && getCharacterById(family.father) && (
+                  <FamilyMemberCard
+                    character={getCharacterById(family.father)!}
+                    relation="father"
+                    isEditMode={false}
+                  />
+                )}
+                {family.mother && getCharacterById(family.mother) && (
+                  <FamilyMemberCard
+                    character={getCharacterById(family.mother)!}
+                    relation="mother"
+                    isEditMode={false}
+                  />
+                )}
+                {family.spouse && getCharacterById(family.spouse) && (
+                  <FamilyMemberCard
+                    character={getCharacterById(family.spouse)!}
+                    relation="spouse"
+                    isEditMode={false}
+                  />
+                )}
               </div>
             </div>
           )}

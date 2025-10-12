@@ -1,8 +1,13 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
 import { IBookFormData } from "@/components/modals/create-book-modal";
+import {
+  getAllBooks,
+  createBook as createBookDB,
+  updateLastOpened,
+} from "@/lib/db/books.service";
 import { useBookStore } from "@/stores/book-store";
 
 import { getLastEditedBook } from "./utils/get-last-edited-book";
@@ -10,11 +15,34 @@ import { HomeView } from "./view";
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { getFilteredBooks, searchTerm, setSearchTerm, addBook, books } =
-    useBookStore();
+  const {
+    getFilteredBooks,
+    searchTerm,
+    setSearchTerm,
+    addBook,
+    books,
+    setBooks,
+  } = useBookStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [_isLoading, setIsLoading] = useState(true);
+
+  // Load books from database on mount
+  useEffect(() => {
+    const loadBooks = async () => {
+      try {
+        const booksFromDB = await getAllBooks();
+        setBooks(booksFromDB);
+      } catch (error) {
+        console.error("Error loading books:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBooks();
+  }, [setBooks]);
 
   const filteredBooks = useMemo(() => getFilteredBooks(), [getFilteredBooks]);
 
@@ -57,7 +85,9 @@ export function HomePage() {
   }, []);
 
   const handleCreateBook = useCallback(
-    (bookData: IBookFormData) => {
+    async (bookData: IBookFormData) => {
+      console.log("Starting book creation with data:", bookData);
+
       const now = Date.now();
       const newBook = {
         id: now.toString(),
@@ -72,22 +102,54 @@ export function HomePage() {
         storySummary: bookData.synopsis || "",
         authorSummary: bookData.authorSummary || "",
       };
-      addBook(newBook);
-      setShowCreateModal(false);
-      navigate({
-        to: "/dashboard/$dashboardId",
-        params: { dashboardId: newBook.id },
-      });
+
+      console.log("New book object:", newBook);
+
+      try {
+        console.log("Attempting to save to database...");
+        // Save to database
+        await createBookDB(newBook);
+        console.log("Book saved to database successfully!");
+
+        // Update store
+        addBook(newBook);
+        console.log("Book added to store!");
+
+        setShowCreateModal(false);
+
+        console.log("Navigating to dashboard...");
+        navigate({
+          to: "/dashboard/$dashboardId",
+          params: { dashboardId: newBook.id },
+        });
+      } catch (error) {
+        console.error("Error creating book:", error);
+        console.error("Error details:", JSON.stringify(error, null, 2));
+        alert(
+          `Erro ao criar livro: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     },
     [addBook, navigate]
   );
 
   const handleBookSelect = useCallback(
-    (bookId: string) => {
-      navigate({
-        to: "/dashboard/$dashboardId",
-        params: { dashboardId: bookId },
-      });
+    async (bookId: string) => {
+      try {
+        // Update last opened timestamp
+        await updateLastOpened(bookId);
+        navigate({
+          to: "/dashboard/$dashboardId",
+          params: { dashboardId: bookId },
+        });
+      } catch (error) {
+        console.error("Error updating last opened:", error);
+        // Still navigate even if update fails
+        navigate({
+          to: "/dashboard/$dashboardId",
+          params: { dashboardId: bookId },
+        });
+      }
     },
     [navigate]
   );

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -68,7 +69,11 @@ function TreeNode({ character, relation, isCurrentCharacter }: TreeNodeProps) {
   );
 }
 
-function ConnectionLine({ direction = "vertical" }: { direction?: "vertical" | "horizontal" }) {
+function ConnectionLine({
+  direction = "vertical",
+}: {
+  direction?: "vertical" | "horizontal";
+}) {
   if (direction === "horizontal") {
     return <div className="w-8 h-0.5 bg-border" />;
   }
@@ -109,13 +114,11 @@ export function FamilyTreeDialog({
 }: FamilyTreeDialogProps) {
   const { t } = useTranslation("character-detail");
 
-  const getCharacterById = (id: string): ICharacter | undefined => {
-    return allCharacters.find((char) => char.id === id);
-  };
+  const getCharacterById = (id: string): ICharacter | undefined =>
+    allCharacters.find((char) => char.id === id);
 
-  const getCurrentCharacter = (): ICharacter | undefined => {
-    return getCharacterById(currentCharacterId);
-  };
+  const getCurrentCharacter = (): ICharacter | undefined =>
+    getCharacterById(currentCharacterId);
 
   // Organize family members by generation
   const grandparents = family.grandparents
@@ -222,7 +225,13 @@ export function FamilyTreeDialog({
                       <div className="space-y-4">
                         <TreeLevel
                           characters={parents}
-                          relation={parents.length > 1 ? "parents" : parents[0].id === family.father ? "father" : "mother"}
+                          relation={
+                            parents.length > 1
+                              ? "parents"
+                              : parents[0].id === family.father
+                                ? "father"
+                                : "mother"
+                          }
                           currentCharacterId={currentCharacterId}
                         />
                       </div>

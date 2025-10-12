@@ -1,3 +1,4 @@
+import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import {
   CreateBookModal,
   IBookFormData,
@@ -54,25 +55,29 @@ export function HomeView({
   onCloseSettingsModal,
 }: PropsHomeView) {
   return (
-    <div className="bg-background">
-      <Header
-        daysSinceLastChapter={daysSinceLastChapter}
-        lastEditedBook={lastEditedBook}
-        lastEditedDate={lastEditedDate}
-        lastChapter={lastChapter}
-        onOpenCreateModal={onOpenCreateModal}
-        onOpenSettingsModal={onOpenSettingsModal}
-      />
+    <div className="bg-background min-h-full flex flex-col">
+      <div className="flex-shrink-0">
+        <Header
+          daysSinceLastChapter={daysSinceLastChapter}
+          lastEditedBook={lastEditedBook}
+          lastEditedDate={lastEditedDate}
+          lastChapter={lastChapter}
+          onOpenCreateModal={onOpenCreateModal}
+          onOpenSettingsModal={onOpenSettingsModal}
+        />
+      </div>
 
-      <ListBooks
-        filteredBooks={filteredBooks}
-        searchTerm={searchTerm}
-        totalBooks={totalBooks}
-        totalCharacters={totalCharacters}
-        totalWords={totalWords}
-        onSearchTermChange={onSearchTermChange}
-        onBookSelect={onBookSelect}
-      />
+      <div className="flex-1 min-h-0 flex flex-col">
+        <ListBooks
+          filteredBooks={filteredBooks}
+          searchTerm={searchTerm}
+          totalBooks={totalBooks}
+          totalCharacters={totalCharacters}
+          totalWords={totalWords}
+          onSearchTermChange={onSearchTermChange}
+          onBookSelect={onBookSelect}
+        />
+      </div>
 
       <CreateBookModal
         open={showCreateModal}
@@ -81,6 +86,9 @@ export function HomeView({
       />
 
       <SettingsModal open={showSettingsModal} onClose={onCloseSettingsModal} />
+
+      {/* Dev Tools - Only visible in development */}
+      <ResetDatabaseButton />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type ICharacterVersion } from "@/types/character-types";
@@ -55,6 +56,11 @@ export function DeleteConfirmationDialog({
   const isNameValid = nameInput.trim() === characterName;
 
   const handleConfirm = () => {
+    console.log("handleConfirm called", {
+      isVersionDeletion,
+      step,
+      isNameValid,
+    });
     if (isVersionDeletion) {
       // Simple version deletion
       onConfirmDelete();
@@ -62,10 +68,16 @@ export function DeleteConfirmationDialog({
     } else {
       // Character deletion - check step
       if (step === 1) {
+        if (!isNameValid) {
+          console.log("Name validation failed", { nameInput, characterName });
+          return;
+        }
         // Move to step 2
+        console.log("Moving to step 2");
         setStep(2);
       } else {
         // Final confirmation - delete character
+        console.log("Deleting character");
         onConfirmDelete();
         onClose();
       }
@@ -86,9 +98,7 @@ export function DeleteConfirmationDialog({
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
-              <AlertDialogTitle>
-                {t("delete.version.title")}
-              </AlertDialogTitle>
+              <AlertDialogTitle>{t("delete.version.title")}</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-left pt-4">
               {t("delete.version.message", { versionName: versionName || "" })}
@@ -124,11 +134,12 @@ export function DeleteConfirmationDialog({
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-4 space-y-4">
-                <p>
-                  {t("delete.character.step1.message", { characterName })}
-                </p>
+                <p>{t("delete.character.step1.message", { characterName })}</p>
                 <div className="space-y-2">
-                  <Label htmlFor="character-name-input" className="text-foreground font-medium">
+                  <Label
+                    htmlFor="character-name-input"
+                    className="text-foreground font-medium"
+                  >
                     {t("delete.character.step1.input_label")}
                   </Label>
                   <Input
@@ -137,17 +148,23 @@ export function DeleteConfirmationDialog({
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
                     placeholder={t("delete.character.step1.input_placeholder")}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                     className={`${
                       nameInput.length > 0 && !isNameValid
                         ? "border-destructive focus-visible:ring-destructive"
                         : ""
                     }`}
                   />
-                  {nameInput.length > 0 && !isNameValid && (
-                    <p className="text-xs text-destructive">
-                      O nome digitado não corresponde ao nome do personagem
-                    </p>
-                  )}
+                  <div className="h-4">
+                    {nameInput.length > 0 && !isNameValid && (
+                      <p className="text-xs text-destructive">
+                        {t("delete.character.step1.name_mismatch")}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -155,17 +172,15 @@ export function DeleteConfirmationDialog({
               <AlertDialogCancel onClick={handleCancel}>
                 {t("delete.character.step1.cancel")}
               </AlertDialogCancel>
-              <AlertDialogAction
+              <Button
                 onClick={handleConfirm}
                 disabled={!isNameValid}
                 className={`${
-                  !isNameValid
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
+                  !isNameValid ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {t("delete.character.step1.continue")}
-              </AlertDialogAction>
+              </Button>
             </AlertDialogFooter>
           </>
         ) : (

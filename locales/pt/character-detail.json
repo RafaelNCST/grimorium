@@ -54,7 +54,10 @@
     "no_relationships_hint": "Use o modo de edição para adicionar relacionamentos",
     "no_family": "Nenhuma relação familiar definida",
     "no_family_hint": "Use o modo de edição para adicionar familiares",
-    "need_more_characters": "É necessário mais personagens para criar relacionamentos",
+    "need_more_characters_relationships": "Mais personagens necessários",
+    "need_more_characters_relationships_hint": "Crie pelo menos 2 personagens para estabelecer amizades, rivalidades e outras conexões sociais",
+    "need_more_characters_family": "Mais personagens necessários",
+    "need_more_characters_family_hint": "Crie pelo menos 2 personagens para definir relações familiares como pais, irmãos e parentes",
     "no_characters_to_add": "Nenhum personagem disponível para adicionar",
     "create_more_hint": "Crie mais personagens para estabelecer relacionamentos"
   },
@@ -75,8 +78,8 @@
       "description": "Crie versões alternativas para explorar diferentes estados do personagem"
     },
     "hint": {
-      "title": "Dica:",
-      "description": "Versões são úteis para personagens que evoluem ao longo da história"
+      "title": "💡 Dica:",
+      "description": "Crie versões para explorar diferentes estados do personagem: pré-transformação, versão ferida, versão alternativa, etc. Cada versão mantém dados independentes!"
     },
     "create_dialog": {
       "title": "Criar Nova Versão",
@@ -99,7 +102,17 @@
     "select_character": "Selecione um personagem",
     "relationship_type": "Tipo de Relacionamento",
     "intensity": "Intensidade",
-    "current_relationships": "Relacionamentos Atuais"
+    "current_relationships": "Relacionamentos Atuais",
+    "intensity_labels": {
+      "weak": "Fraco",
+      "moderate": "Moderado",
+      "strong": "Forte"
+    },
+    "cancel": "Cancelar",
+    "add": "Adicionar",
+    "save": "Salvar",
+    "edit_title": "Editar Relacionamento",
+    "editing_with": "Editando relacionamento com"
   },
   "relationship_types": {
     "friend": "Amigo",
@@ -162,6 +175,7 @@
         "message": "Esta ação excluirá o personagem '{{characterName}}' e todas as suas versões permanentemente.",
         "input_label": "Digite o nome completo do personagem para confirmar:",
         "input_placeholder": "Digite o nome do personagem",
+        "name_mismatch": "O nome digitado não corresponde ao nome do personagem",
         "cancel": "Cancelar",
         "continue": "Continuar"
       },
@@ -187,5 +201,8 @@
   "actions": {
     "open": "Abrir",
     "close": "Fechar"
+  },
+  "upload": {
+    "click": "Clique"
   }
 }

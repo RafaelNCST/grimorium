@@ -1,7 +1,16 @@
 export interface ICharacterRelationship {
   id: string;
   characterId: string;
-  type: 'friend' | 'rival' | 'mentor' | 'student' | 'enemy' | 'love_interest' | 'ally' | 'acquaintance' | 'leader';
+  type:
+    | "friend"
+    | "rival"
+    | "mentor"
+    | "student"
+    | "enemy"
+    | "love_interest"
+    | "ally"
+    | "acquaintance"
+    | "leader";
   intensity: number; // 1-10
 }
 

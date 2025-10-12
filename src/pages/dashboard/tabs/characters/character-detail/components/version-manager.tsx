@@ -6,7 +6,11 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { type ICharacter, type ICharacterVersion, type ICharacterFormData } from "@/types/character-types";
+import {
+  type ICharacter,
+  type ICharacterVersion,
+  type ICharacterFormData,
+} from "@/types/character-types";
 
 import { CreateVersionDialog } from "./create-version-dialog";
 import { VersionCard } from "./version-card";

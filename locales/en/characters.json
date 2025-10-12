@@ -11,9 +11,6 @@
     "villain_badge": "Villain",
     "extra_badge": "Extra"
   },
-  "card": {
-    "years": "years old"
-  },
   "empty_state": {
     "no_characters": "No characters created",
     "no_characters_description": "Start creating your first character to bring your story to life",

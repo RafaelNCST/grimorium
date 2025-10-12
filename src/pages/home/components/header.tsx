@@ -49,7 +49,7 @@ export function Header({
   const formattedLastChapterDate = formatDate(lastChapter?.date, i18n.language);
 
   return (
-    <div className="relative h-80 overflow-hidden rounded-xl mx-6 mt-6 mb-8">
+    <div className="relative h-80 overflow-hidden rounded-xl mx-6 my-6">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(/assets/hero-workspace.jpg)` }}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   Heart,
   Swords,
@@ -21,8 +22,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +30,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Slider } from "@/components/ui/slider";
 
 interface ICharacterRelationship {
   id: string;
@@ -146,13 +147,11 @@ export function RelationshipsSection({
 
   const getRelationshipTypeConfig = (
     type: string
-  ): RelationshipTypeConfig | undefined => {
-    return RELATIONSHIP_TYPES.find((t) => t.value === type);
-  };
+  ): RelationshipTypeConfig | undefined =>
+    RELATIONSHIP_TYPES.find((t) => t.value === type);
 
-  const getCharacterById = (characterId: string): ICharacter | undefined => {
-    return allCharacters.find((char) => char.id === characterId);
-  };
+  const getCharacterById = (characterId: string): ICharacter | undefined =>
+    allCharacters.find((char) => char.id === characterId);
 
   const handleAddRelationship = () => {
     if (!selectedCharacterId || !selectedType) return;
@@ -221,12 +220,16 @@ export function RelationshipsSection({
   if (allCharacters.length <= 1 && isEditMode) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">
-        <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p className="font-medium">
-          {t("character-detail:empty_states.need_more_characters")}
+          {t(
+            "character-detail:empty_states.need_more_characters_relationships"
+          )}
         </p>
         <p className="text-xs mt-1">
-          {t("character-detail:empty_states.create_more_hint")}
+          {t(
+            "character-detail:empty_states.need_more_characters_relationships_hint"
+          )}
         </p>
       </div>
     );
@@ -262,17 +265,19 @@ export function RelationshipsSection({
       )}
 
       {/* Empty state in edit mode when no characters available */}
-      {isEditMode && availableCharacters.length === 0 && relationships.length === 0 && (
-        <div className="text-center text-muted-foreground text-sm py-8">
-          <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p className="font-medium">
-            {t("character-detail:empty_states.no_characters_to_add")}
-          </p>
-          <p className="text-xs mt-1">
-            {t("character-detail:empty_states.create_more_hint")}
-          </p>
-        </div>
-      )}
+      {isEditMode &&
+        availableCharacters.length === 0 &&
+        relationships.length === 0 && (
+          <div className="text-center text-muted-foreground text-sm py-8">
+            <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">
+              {t("character-detail:empty_states.no_characters_to_add")}
+            </p>
+            <p className="text-xs mt-1">
+              {t("character-detail:empty_states.create_more_hint")}
+            </p>
+          </div>
+        )}
 
       {/* Relationships List */}
       {relationships.length > 0 && (
@@ -354,7 +359,9 @@ export function RelationshipsSection({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteRelationship(relationship.id)}
+                        onClick={() =>
+                          handleDeleteRelationship(relationship.id)
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -477,9 +484,21 @@ export function RelationshipsSection({
                     className="w-full"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Fraco</span>
-                    <span>Moderado</span>
-                    <span>Forte</span>
+                    <span>
+                      {t(
+                        "character-detail:relationships.intensity_labels.weak"
+                      )}
+                    </span>
+                    <span>
+                      {t(
+                        "character-detail:relationships.intensity_labels.moderate"
+                      )}
+                    </span>
+                    <span>
+                      {t(
+                        "character-detail:relationships.intensity_labels.strong"
+                      )}
+                    </span>
                   </div>
                 </div>
               )}
@@ -489,14 +508,14 @@ export function RelationshipsSection({
           <DialogFooter>
             <Button variant="outline" onClick={closeAddDialog}>
               <X className="w-4 h-4 mr-2" />
-              Cancelar
+              {t("character-detail:relationships.cancel")}
             </Button>
             <Button
               onClick={handleAddRelationship}
               disabled={!selectedCharacterId || !selectedType}
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              Adicionar
+              {t("character-detail:relationships.add")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -506,10 +525,12 @@ export function RelationshipsSection({
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle>Editar Relacionamento</DialogTitle>
+            <DialogTitle>
+              {t("character-detail:relationships.edit_title")}
+            </DialogTitle>
             <DialogDescription>
               {editingRelationship &&
-                `Editando relacionamento com ${
+                `${t("character-detail:relationships.editing_with")} ${
                   getCharacterById(editingRelationship.characterId)?.name
                 }`}
             </DialogDescription>
@@ -552,7 +573,8 @@ export function RelationshipsSection({
               {/* Intensity Slider */}
               <div className="space-y-3">
                 <Label className="text-sm font-semibold">
-                  {t("character-detail:relationships.intensity")}: {intensity[0]}
+                  {t("character-detail:relationships.intensity")}:{" "}
+                  {intensity[0]}
                   /10
                 </Label>
                 <Slider
@@ -564,9 +586,19 @@ export function RelationshipsSection({
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Fraco</span>
-                  <span>Moderado</span>
-                  <span>Forte</span>
+                  <span>
+                    {t("character-detail:relationships.intensity_labels.weak")}
+                  </span>
+                  <span>
+                    {t(
+                      "character-detail:relationships.intensity_labels.moderate"
+                    )}
+                  </span>
+                  <span>
+                    {t(
+                      "character-detail:relationships.intensity_labels.strong"
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
@@ -575,11 +607,11 @@ export function RelationshipsSection({
           <DialogFooter>
             <Button variant="outline" onClick={closeEditDialog}>
               <X className="w-4 h-4 mr-2" />
-              Cancelar
+              {t("character-detail:relationships.cancel")}
             </Button>
             <Button onClick={handleEditRelationship} disabled={!selectedType}>
               <Edit2 className="w-4 h-4 mr-2" />
-              Salvar
+              {t("character-detail:relationships.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
