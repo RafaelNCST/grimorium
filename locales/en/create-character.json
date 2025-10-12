@@ -117,6 +117,16 @@
     "ruler_desc": "Authoritative, responsible, creates order"
   },
   "alignment": {
+    "ethical": {
+      "lawful": "Lawful",
+      "neutral": "Neutral",
+      "chaotic": "Chaotic"
+    },
+    "moral": {
+      "good": "Good",
+      "neutral": "Neutral",
+      "evil": "Evil"
+    },
     "lawful_good": "Lawful Good",
     "lawful_good_desc": "Acts with compassion and honor, follows rules",
     "neutral_good": "Neutral Good",

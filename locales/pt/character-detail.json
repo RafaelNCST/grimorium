@@ -1,0 +1,191 @@
+{
+  "header": {
+    "back": "Voltar",
+    "character_details": "Detalhes do personagem",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "quick_navigation": "Navegação Rápida"
+  },
+  "sections": {
+    "basic_info": "Informações Básicas",
+    "advanced_info": "Informações Avançadas",
+    "appearance": "Aparência Física",
+    "behavior": "Comportamento e Gostos",
+    "alignment": "Alinhamento",
+    "locations_orgs": "Localizações e Organizações",
+    "relationships": "Relacionamentos",
+    "family": "Relações Familiares",
+    "versions": "Versões"
+  },
+  "fields": {
+    "image": "Imagem",
+    "name": "Nome",
+    "age": "Idade",
+    "gender": "Gênero",
+    "role": "Papel",
+    "description": "Descrição Simples",
+    "height": "Altura",
+    "weight": "Peso",
+    "skin_tone": "Tom de Pele",
+    "physical_type": "Tipo Físico",
+    "hair": "Cabelo",
+    "eyes": "Olhos",
+    "face": "Rosto",
+    "distinguishing_features": "Características Distintivas",
+    "species_and_race": "Espécie e Raça",
+    "archetype": "Arquétipo",
+    "personality": "Personalidade",
+    "hobbies": "Hobbies",
+    "dreams_and_goals": "Sonhos e Objetivos",
+    "fears_and_traumas": "Medos e Traumas",
+    "favorite_food": "Comida Favorita",
+    "favorite_music": "Música Favorita",
+    "alignment": "Alinhamento",
+    "birth_place": "Local de Nascimento",
+    "affiliated_place": "Local Afiliado",
+    "organization": "Organização"
+  },
+  "empty_states": {
+    "no_data": "Nada foi adicionado ainda",
+    "no_data_hint": "Edite para adicionar informações",
+    "no_relationships": "Nenhum relacionamento definido",
+    "no_relationships_hint": "Use o modo de edição para adicionar relacionamentos",
+    "no_family": "Nenhuma relação familiar definida",
+    "no_family_hint": "Use o modo de edição para adicionar familiares",
+    "need_more_characters": "É necessário mais personagens para criar relacionamentos",
+    "no_characters_to_add": "Nenhum personagem disponível para adicionar",
+    "create_more_hint": "Crie mais personagens para estabelecer relacionamentos"
+  },
+  "versions": {
+    "title": "Versões",
+    "main": "Principal",
+    "main_badge": "Principal",
+    "selected": "Versão selecionada",
+    "add_version": "Nova Versão",
+    "create_new": "Nova Versão",
+    "edit_version": "Editar Versão",
+    "delete_version": "Excluir Versão",
+    "version_name": "Nome da Versão",
+    "version_description": "Descrição da Versão",
+    "created_at": "Criada em",
+    "empty_state": {
+      "title": "Apenas a versão principal existe",
+      "description": "Crie versões alternativas para explorar diferentes estados do personagem"
+    },
+    "hint": {
+      "title": "Dica:",
+      "description": "Versões são úteis para personagens que evoluem ao longo da história"
+    },
+    "create_dialog": {
+      "title": "Criar Nova Versão",
+      "info_message": "Primeiro, defina o nome e descrição da versão. Depois você poderá personalizar os dados do personagem.",
+      "name_label": "Nome da Versão",
+      "name_placeholder": "Ex: Versão Original, Transformado, Ferido...",
+      "name_required": "Nome é obrigatório",
+      "description_label": "Descrição",
+      "description_placeholder": "Descreva as diferenças desta versão...",
+      "description_required": "Descrição é obrigatória",
+      "chars_remaining": "caracteres restantes",
+      "cancel": "Cancelar",
+      "continue": "Continuar",
+      "step1_validation_error": "Preencha todos os campos obrigatórios",
+      "success": "Versão criada com sucesso!"
+    }
+  },
+  "relationships": {
+    "add_relationship": "Adicionar Relacionamento",
+    "select_character": "Selecione um personagem",
+    "relationship_type": "Tipo de Relacionamento",
+    "intensity": "Intensidade",
+    "current_relationships": "Relacionamentos Atuais"
+  },
+  "relationship_types": {
+    "friend": "Amigo",
+    "rival": "Rival",
+    "mentor": "Mentor",
+    "student": "Estudante",
+    "enemy": "Inimigo",
+    "love_interest": "Interesse Amoroso",
+    "ally": "Aliado",
+    "acquaintance": "Conhecido",
+    "leader": "Líder"
+  },
+  "family": {
+    "view_tree": "Ver Árvore Genealógica",
+    "family_tree": "Árvore Genealógica",
+    "family_tree_description": "Visualização hierárquica da família do personagem",
+    "direct_family": "Família Direta",
+    "father": "Pai",
+    "mother": "Mãe",
+    "spouse": "Cônjuge",
+    "parents": "Pais",
+    "children": "Filhos",
+    "child": "Filho(a)",
+    "siblings": "Irmãos",
+    "sibling": "Irmão(ã)",
+    "full_siblings": "Irmãos",
+    "half_siblings": "Meio-irmãos",
+    "half_sibling": "Meio-irmão(ã)",
+    "extended_family": "Família Extendida",
+    "grandparents": "Avós",
+    "grandparent": "Avô/Avó",
+    "uncles_aunts": "Tios",
+    "uncle_aunt": "Tio(a)",
+    "cousins": "Primos",
+    "cousin": "Primo(a)",
+    "current": "Você",
+    "select": "Selecione",
+    "none": "Nenhum",
+    "select_father": "Selecione o pai",
+    "select_mother": "Selecione a mãe",
+    "select_spouse": "Selecione o cônjuge",
+    "add_child": "Adicionar filho(a)",
+    "add_sibling": "Adicionar irmão(ã)",
+    "add_half_sibling": "Adicionar meio-irmão(ã)",
+    "add_grandparent": "Adicionar avô/avó",
+    "add_uncle_aunt": "Adicionar tio(a)",
+    "add_cousin": "Adicionar primo(a)"
+  },
+  "delete": {
+    "version": {
+      "title": "Excluir Versão",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versão",
+      "success": "Versão excluída com sucesso"
+    },
+    "character": {
+      "title": "Excluir Personagem",
+      "step1": {
+        "message": "Esta ação excluirá o personagem '{{characterName}}' e todas as suas versões permanentemente.",
+        "input_label": "Digite o nome completo do personagem para confirmar:",
+        "input_placeholder": "Digite o nome do personagem",
+        "cancel": "Cancelar",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Confirmação Final",
+        "message": "Você está prestes a excluir permanentemente o personagem '{{characterName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita.",
+        "message_single": "Você está prestes a excluir permanentemente o personagem '{{characterName}}' e sua versão. Esta ação não pode ser desfeita.",
+        "cancel": "Não, cancelar",
+        "confirm": "Sim, excluir permanentemente",
+        "success": "Personagem excluído com sucesso"
+      }
+    }
+  },
+  "navigation": {
+    "search_placeholder": "Buscar personagem...",
+    "current_character": "Personagem atual"
+  },
+  "visibility": {
+    "show_field": "Mostrar campo",
+    "hide_field": "Ocultar campo",
+    "hidden": "Campo oculto no modo visualização"
+  },
+  "actions": {
+    "open": "Abrir",
+    "close": "Fechar"
+  }
+}

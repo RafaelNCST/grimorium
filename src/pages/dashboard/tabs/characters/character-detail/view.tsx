@@ -20,7 +20,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
+// TODO: Refatorar anotações no futuro
+// import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import {
   CharacterVersionManager,
@@ -48,13 +49,15 @@ import { type IFamilyRelations } from "./constants/family-relations-constant";
 import { type IGender } from "./constants/genders-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 import { type IRole } from "./constants/roles-constant";
+import { type IFieldVisibility } from "@/types/character-types";
 
-interface ILinkedNote {
-  id: string;
-  title: string;
-  type: string;
-  date: string;
-}
+// TODO: Refatorar anotações no futuro
+// interface ILinkedNote {
+//   id: string;
+//   title: string;
+//   type: string;
+//   date: string;
+// }
 
 interface ICharacter {
   id: string;
@@ -112,14 +115,16 @@ interface CharacterDetailViewProps {
   currentVersion: CharacterVersion;
   showDeleteModal: boolean;
   isNavigationSidebarOpen: boolean;
-  isLinkedNotesModalOpen: boolean;
+  // TODO: Refatorar anotações no futuro
+  // isLinkedNotesModalOpen: boolean;
   newQuality: string;
   imagePreview: string;
   selectedRelationshipCharacter: string;
   selectedRelationshipType: string;
   relationshipIntensity: number[];
   fileInputRef: React.RefObject<HTMLInputElement>;
-  linkedNotes: ILinkedNote[];
+  // TODO: Refatorar anotações no futuro
+  // linkedNotes: ILinkedNote[];
   mockCharacters: ICharacter[];
   mockLocations: ILocation[];
   mockOrganizations: IOrganization[];
@@ -132,12 +137,15 @@ interface CharacterDetailViewProps {
   currentAlignment: IAlignment | undefined;
   currentGender: IGender | undefined;
   RoleIcon: LucideIcon;
+  fieldVisibility: IFieldVisibility;
+  advancedSectionOpen: boolean;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
   onCharacterSelect: (characterId: string) => void;
-  onLinkedNotesModalOpen: () => void;
-  onLinkedNotesModalClose: () => void;
+  // TODO: Refatorar anotações no futuro
+  // onLinkedNotesModalOpen: () => void;
+  // onLinkedNotesModalClose: () => void;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
@@ -172,6 +180,8 @@ interface CharacterDetailViewProps {
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
   onNavigateToFamilyTree: () => void;
+  onFieldVisibilityToggle: (field: string) => void;
+  onAdvancedSectionToggle: () => void;
   getRelationshipTypeData: (type: string) => IRelationshipType;
   getFamilyRelationLabel: (
     relationType: string,
@@ -187,14 +197,15 @@ export function CharacterDetailView({
   currentVersion,
   showDeleteModal,
   isNavigationSidebarOpen,
-  isLinkedNotesModalOpen,
+  // TODO: Refatorar anotações no futuro
+  // isLinkedNotesModalOpen,
   newQuality,
   imagePreview,
   selectedRelationshipCharacter,
   selectedRelationshipType,
   relationshipIntensity,
   fileInputRef,
-  linkedNotes,
+  // linkedNotes,
   mockCharacters,
   mockLocations,
   mockOrganizations,
@@ -207,12 +218,15 @@ export function CharacterDetailView({
   currentAlignment,
   currentGender,
   RoleIcon,
+  fieldVisibility,
+  advancedSectionOpen,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
   onCharacterSelect,
-  onLinkedNotesModalOpen,
-  onLinkedNotesModalClose,
+  // TODO: Refatorar anotações no futuro
+  // onLinkedNotesModalOpen,
+  // onLinkedNotesModalClose,
   onEdit,
   onSave,
   onCancel,
@@ -237,6 +251,8 @@ export function CharacterDetailView({
   onRelationshipTypeChange,
   onRelationshipIntensityChange,
   onNavigateToFamilyTree,
+  onFieldVisibilityToggle,
+  onAdvancedSectionToggle,
   getRelationshipTypeData,
 }: CharacterDetailViewProps) {
   return (
@@ -291,10 +307,11 @@ export function CharacterDetailView({
                 </>
               ) : (
                 <>
-                  <Button variant="outline" onClick={onLinkedNotesModalOpen}>
+                  {/* TODO: Refatorar anotações no futuro */}
+                  {/* <Button variant="outline" onClick={onLinkedNotesModalOpen}>
                     <FileText className="w-4 h-4 mr-2" />
                     Anotações ({linkedNotes.length})
-                  </Button>
+                  </Button> */}
                   <Button variant="outline" onClick={onEdit}>
                     <Edit2 className="w-4 h-4 mr-2" />
                     Editar
@@ -1531,14 +1548,15 @@ export function CharacterDetailView({
             itemType="personagem"
           />
 
-          <LinkedNotesModal
+          {/* TODO: Refatorar anotações no futuro */}
+          {/* <LinkedNotesModal
             isOpen={isLinkedNotesModalOpen}
             onClose={onLinkedNotesModalClose}
             entityId={character.id}
             entityName={character.name}
             entityType="character"
             linkedNotes={linkedNotes}
-          />
+          /> */}
         </div>
       </div>
     </div>

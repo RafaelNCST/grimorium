@@ -117,6 +117,16 @@
     "ruler_desc": "Autoritário, responsável, cria ordem"
   },
   "alignment": {
+    "ethical": {
+      "lawful": "Leal",
+      "neutral": "Neutro",
+      "chaotic": "Caótico"
+    },
+    "moral": {
+      "good": "Bom",
+      "neutral": "Neutro",
+      "evil": "Maligno"
+    },
     "lawful_good": "Leal e Bom",
     "lawful_good_desc": "Age com compaixão e honra, segue regras",
     "neutral_good": "Neutro e Bom",

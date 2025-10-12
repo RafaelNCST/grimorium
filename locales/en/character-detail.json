@@ -1,0 +1,191 @@
+{
+  "header": {
+    "back": "Back",
+    "character_details": "Character details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "quick_navigation": "Quick Navigation"
+  },
+  "sections": {
+    "basic_info": "Basic Information",
+    "advanced_info": "Advanced Information",
+    "appearance": "Physical Appearance",
+    "behavior": "Behavior and Tastes",
+    "alignment": "Alignment",
+    "locations_orgs": "Locations and Organizations",
+    "relationships": "Relationships",
+    "family": "Family Relations",
+    "versions": "Versions"
+  },
+  "fields": {
+    "image": "Image",
+    "name": "Name",
+    "age": "Age",
+    "gender": "Gender",
+    "role": "Role",
+    "description": "Simple Description",
+    "height": "Height",
+    "weight": "Weight",
+    "skin_tone": "Skin Tone",
+    "physical_type": "Physical Type",
+    "hair": "Hair",
+    "eyes": "Eyes",
+    "face": "Face",
+    "distinguishing_features": "Distinguishing Features",
+    "species_and_race": "Species and Race",
+    "archetype": "Archetype",
+    "personality": "Personality",
+    "hobbies": "Hobbies",
+    "dreams_and_goals": "Dreams and Goals",
+    "fears_and_traumas": "Fears and Traumas",
+    "favorite_food": "Favorite Food",
+    "favorite_music": "Favorite Music",
+    "alignment": "Alignment",
+    "birth_place": "Birth Place",
+    "affiliated_place": "Affiliated Place",
+    "organization": "Organization"
+  },
+  "empty_states": {
+    "no_data": "Nothing added yet",
+    "no_data_hint": "Edit to add information",
+    "no_relationships": "No relationships defined",
+    "no_relationships_hint": "Use edit mode to add relationships",
+    "no_family": "No family relations defined",
+    "no_family_hint": "Use edit mode to add family members",
+    "need_more_characters": "More characters needed to create relationships",
+    "no_characters_to_add": "No characters available to add",
+    "create_more_hint": "Create more characters to establish relationships"
+  },
+  "versions": {
+    "title": "Versions",
+    "main": "Main",
+    "main_badge": "Main",
+    "selected": "Selected version",
+    "add_version": "New Version",
+    "create_new": "New Version",
+    "edit_version": "Edit Version",
+    "delete_version": "Delete Version",
+    "version_name": "Version Name",
+    "version_description": "Version Description",
+    "created_at": "Created at",
+    "empty_state": {
+      "title": "Only the main version exists",
+      "description": "Create alternative versions to explore different character states"
+    },
+    "hint": {
+      "title": "Tip:",
+      "description": "Versions are useful for characters that evolve throughout the story"
+    },
+    "create_dialog": {
+      "title": "Create New Version",
+      "info_message": "First, define the version name and description. Then you can customize the character data.",
+      "name_label": "Version Name",
+      "name_placeholder": "E.g.: Original Version, Transformed, Injured...",
+      "name_required": "Name is required",
+      "description_label": "Description",
+      "description_placeholder": "Describe the differences of this version...",
+      "description_required": "Description is required",
+      "chars_remaining": "characters remaining",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "step1_validation_error": "Fill all required fields",
+      "success": "Version created successfully!"
+    }
+  },
+  "relationships": {
+    "add_relationship": "Add Relationship",
+    "select_character": "Select a character",
+    "relationship_type": "Relationship Type",
+    "intensity": "Intensity",
+    "current_relationships": "Current Relationships"
+  },
+  "relationship_types": {
+    "friend": "Friend",
+    "rival": "Rival",
+    "mentor": "Mentor",
+    "student": "Student",
+    "enemy": "Enemy",
+    "love_interest": "Love Interest",
+    "ally": "Ally",
+    "acquaintance": "Acquaintance",
+    "leader": "Leader"
+  },
+  "family": {
+    "view_tree": "View Family Tree",
+    "family_tree": "Family Tree",
+    "family_tree_description": "Hierarchical view of character's family",
+    "direct_family": "Direct Family",
+    "father": "Father",
+    "mother": "Mother",
+    "spouse": "Spouse",
+    "parents": "Parents",
+    "children": "Children",
+    "child": "Child",
+    "siblings": "Siblings",
+    "sibling": "Sibling",
+    "full_siblings": "Siblings",
+    "half_siblings": "Half-siblings",
+    "half_sibling": "Half-sibling",
+    "extended_family": "Extended Family",
+    "grandparents": "Grandparents",
+    "grandparent": "Grandparent",
+    "uncles_aunts": "Uncles/Aunts",
+    "uncle_aunt": "Uncle/Aunt",
+    "cousins": "Cousins",
+    "cousin": "Cousin",
+    "current": "You",
+    "select": "Select",
+    "none": "None",
+    "select_father": "Select father",
+    "select_mother": "Select mother",
+    "select_spouse": "Select spouse",
+    "add_child": "Add child",
+    "add_sibling": "Add sibling",
+    "add_half_sibling": "Add half-sibling",
+    "add_grandparent": "Add grandparent",
+    "add_uncle_aunt": "Add uncle/aunt",
+    "add_cousin": "Add cousin"
+  },
+  "delete": {
+    "version": {
+      "title": "Delete Version",
+      "message": "Are you sure you want to delete the version '{{versionName}}'? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Version",
+      "success": "Version deleted successfully"
+    },
+    "character": {
+      "title": "Delete Character",
+      "step1": {
+        "message": "This action will permanently delete the character '{{characterName}}' and all its versions.",
+        "input_label": "Type the full character name to confirm:",
+        "input_placeholder": "Type the character name",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Final Confirmation",
+        "message": "You are about to permanently delete the character '{{characterName}}' and all its {{totalVersions}} versions. This action cannot be undone.",
+        "message_single": "You are about to permanently delete the character '{{characterName}}' and its version. This action cannot be undone.",
+        "cancel": "No, cancel",
+        "confirm": "Yes, permanently delete",
+        "success": "Character deleted successfully"
+      }
+    }
+  },
+  "navigation": {
+    "search_placeholder": "Search character...",
+    "current_character": "Current character"
+  },
+  "visibility": {
+    "show_field": "Show field",
+    "hide_field": "Hide field",
+    "hidden": "Field hidden in view mode"
+  },
+  "actions": {
+    "open": "Open",
+    "close": "Close"
+  }
+}

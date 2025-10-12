@@ -36,7 +36,7 @@ export function CharacterNavigationSidebar({
 
   return (
     <div
-      className={`w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out ${
+      className={`fixed left-0 top-0 bottom-0 w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out z-40 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >

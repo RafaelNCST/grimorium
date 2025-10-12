@@ -3,8 +3,9 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Users } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
-import { type CharacterVersion } from "@/components/character-version-manager";
+import { type ICharacterVersion, type ICharacterFormData, type ICharacter, type IFieldVisibility } from "@/types/character-types";
 import {
   mockCharacters,
   mockLocations,
@@ -18,39 +19,46 @@ import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-cons
 import { ROLES_CONSTANT } from "./constants/roles-constant";
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
-import { CharacterDetailView } from "./view";
+import { CharacterDetailViewRefactored } from "./view-refactored";
 
 export function CharacterDetail() {
   const { dashboardId, characterId } = useParams({
     from: "/dashboard/$dashboardId/tabs/character/$characterId/",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation("character-detail");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const emptyCharacter = {
+  const emptyCharacter: ICharacter = {
     id: "",
     name: "",
-    age: 0,
+    age: "0",
     role: "",
     image: "",
+    gender: "",
     description: "",
-    appearance: "",
-    personality: "",
-    backstory: "",
-    motivations: "",
-    fears: "",
-    organization: "",
-    birthPlace: "",
-    currentLocation: "",
     alignment: "",
     qualities: [],
     relationships: [],
+    family: {
+      father: null,
+      mother: null,
+      spouse: null,
+      children: [],
+      siblings: [],
+      halfSiblings: [],
+      grandparents: [],
+      unclesAunts: [],
+      cousins: [],
+    },
+    fieldVisibility: {},
+    createdAt: new Date().toISOString(),
   };
 
   const [isEditing, setIsEditing] = useState(false);
-  const [character, setCharacter] = useState(emptyCharacter);
-  const [editData, setEditData] = useState({
+  const [character, setCharacter] = useState<ICharacter>(emptyCharacter);
+  const [editData, setEditData] = useState<ICharacter>({
     ...emptyCharacter,
     relationships: [],
   });
@@ -63,18 +71,21 @@ export function CharacterDetail() {
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
-  const [versions, setVersions] = useState<CharacterVersion[]>([
+  // TODO: Refatorar anotações no futuro
+  // const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
+  const [versions, setVersions] = useState<ICharacterVersion[]>([
     {
-      id: "version-1",
-      name: "Versão Original",
-      description: "Estado inicial do personagem",
-      createdAt: new Date(),
-      isActive: true,
-      data: emptyCharacter,
+      id: "main-version",
+      name: "Versão Principal",
+      description: "Versão principal do personagem",
+      createdAt: new Date().toISOString(),
+      isMain: true,
+      characterData: emptyCharacter as ICharacter,
     },
   ]);
-  const [currentVersion, setCurrentVersion] = useState(versions[0]);
+  const [currentVersion, setCurrentVersion] = useState<ICharacterVersion | null>(versions[0]);
+  const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
 
   const currentRole = useMemo(
     () => ROLES_CONSTANT.find((r) => r.value === character.role),
@@ -91,67 +102,77 @@ export function CharacterDetail() {
   const RoleIcon = currentRole?.icon || Users;
 
   const handleVersionChange = useCallback(
-    (version: CharacterVersion) => {
-      const updatedVersions = versions.map((v) => ({
-        ...v,
-        isActive: v.id === version.id,
-      }));
-      setVersions(updatedVersions);
-      setCurrentVersion(version);
+    (versionId: string | null) => {
+      if (!versionId) return;
 
-      setCharacter(version.data);
+      const version = versions.find((v) => v.id === versionId);
+      if (!version) return;
+
+      setCurrentVersion(version);
+      setCharacter(version.characterData as any);
       setEditData({
-        ...version.data,
-        relationships: version.data.relationships || [],
+        ...(version.characterData as any),
+        relationships: version.characterData.relationships || [],
       });
-      setImagePreview(version.data.image);
+      setImagePreview(version.characterData.image || "");
+      setFieldVisibility(version.characterData.fieldVisibility || {});
 
       toast.success(`Versão "${version.name}" ativada`);
     },
     [versions]
   );
 
-  const handleVersionSave = useCallback(
-    (name: string, description?: string) => {
-      const newVersion: CharacterVersion = {
+  const handleVersionCreate = useCallback(
+    (versionData: {
+      name: string;
+      description: string;
+      characterData: ICharacterFormData;
+    }) => {
+      const newVersion: ICharacterVersion = {
         id: `version-${Date.now()}`,
-        name,
-        description,
-        createdAt: new Date(),
-        isActive: false,
-        data: { ...character },
+        name: versionData.name,
+        description: versionData.description,
+        createdAt: new Date().toISOString(),
+        isMain: false,
+        characterData: versionData.characterData as unknown as ICharacter,
       };
 
       setVersions((prev) => [...prev, newVersion]);
-      toast.success(`Versão "${name}" salva com sucesso!`);
+      toast.success(`Versão "${versionData.name}" criada com sucesso!`);
     },
-    [character]
+    []
   );
 
   const handleVersionDelete = useCallback(
     (versionId: string) => {
-      if (versions.length <= 1) {
-        toast.error("Não é possível excluir a última versão");
+      const versionToDelete = versions.find((v) => v.id === versionId);
+
+      // Não permitir deletar versão principal
+      if (versionToDelete?.isMain) {
+        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
-      const versionToDelete = versions.find((v) => v.id === versionId);
       const updatedVersions = versions.filter((v) => v.id !== versionId);
 
-      if (versionToDelete?.isActive && updatedVersions.length > 0) {
-        updatedVersions[0].isActive = true;
-        setCurrentVersion(updatedVersions[0]);
-        setCharacter(updatedVersions[0].data);
-        setEditData({
-          ...updatedVersions[0].data,
-          relationships: updatedVersions[0].data.relationships || [],
-        });
-        setImagePreview(updatedVersions[0].data.image);
+      // Se a versão deletada for a atual, voltar para a principal
+      if (currentVersion?.id === versionId) {
+        const mainVersion = updatedVersions.find((v) => v.isMain);
+        if (mainVersion) {
+          setCurrentVersion(mainVersion);
+          setCharacter(mainVersion.characterData as any);
+          setEditData({
+            ...(mainVersion.characterData as any),
+            relationships: mainVersion.characterData.relationships || [],
+          });
+          setImagePreview(mainVersion.characterData.image || "");
+        }
       }
 
       setVersions(updatedVersions);
+      toast.success("Versão excluída com sucesso!");
     },
-    [versions]
+    [versions, currentVersion]
   );
 
   const handleVersionUpdate = useCallback(
@@ -169,22 +190,25 @@ export function CharacterDetail() {
   );
 
   const handleSave = useCallback(() => {
-    const updatedCharacter = { ...editData };
+    const updatedCharacter = { ...editData, fieldVisibility };
     setCharacter(updatedCharacter);
 
+    // Atualizar dados na versão atual
     const updatedVersions = versions.map((v) =>
-      v.isActive ? { ...v, data: updatedCharacter } : v
+      v.id === currentVersion?.id
+        ? { ...v, characterData: updatedCharacter as ICharacter }
+        : v
     );
     setVersions(updatedVersions);
 
-    const activeVersion = updatedVersions.find((v) => v.isActive);
+    const activeVersion = updatedVersions.find((v) => v.id === currentVersion?.id);
     if (activeVersion) {
       setCurrentVersion(activeVersion);
     }
 
     setIsEditing(false);
     toast.success("Personagem atualizado com sucesso!");
-  }, [editData, versions]);
+  }, [editData, fieldVisibility, versions, currentVersion]);
 
   const navigateToCharactersTab = useCallback(() => {
     if (!dashboardId) return;
@@ -194,10 +218,36 @@ export function CharacterDetail() {
     });
   }, [navigate, dashboardId]);
 
-  const handleDelete = useCallback(() => {
-    toast.success("Personagem excluído com sucesso!");
-    navigateToCharactersTab();
-  }, [navigateToCharactersTab]);
+  const handleConfirmDelete = useCallback(() => {
+    if (currentVersion && !currentVersion.isMain) {
+      // Delete version (non-main)
+      const versionToDelete = versions.find((v) => v.id === currentVersion.id);
+
+      if (!versionToDelete) return;
+
+      const updatedVersions = versions.filter((v) => v.id !== currentVersion.id);
+
+      // Switch to main version after deleting
+      const mainVersion = updatedVersions.find((v) => v.isMain);
+      if (mainVersion) {
+        setCurrentVersion(mainVersion);
+        setCharacter(mainVersion.characterData as any);
+        setEditData({
+          ...(mainVersion.characterData as any),
+          relationships: mainVersion.characterData.relationships || [],
+        });
+        setImagePreview(mainVersion.characterData.image || "");
+        setFieldVisibility(mainVersion.characterData.fieldVisibility || {});
+      }
+
+      setVersions(updatedVersions);
+      toast.success(t("delete.version.success"));
+    } else {
+      // Delete entire character (main version)
+      toast.success(t("delete.character.step2.success"));
+      navigateToCharactersTab();
+    }
+  }, [currentVersion, versions, navigateToCharactersTab]);
 
   const handleCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
@@ -391,13 +441,14 @@ export function CharacterDetail() {
     [handleNavigateToCharacter]
   );
 
-  const handleLinkedNotesModalOpen = useCallback(() => {
-    setIsLinkedNotesModalOpen(true);
-  }, []);
+  // TODO: Refatorar anotações no futuro
+  // const handleLinkedNotesModalOpen = useCallback(() => {
+  //   setIsLinkedNotesModalOpen(true);
+  // }, []);
 
-  const handleLinkedNotesModalClose = useCallback(() => {
-    setIsLinkedNotesModalOpen(false);
-  }, []);
+  // const handleLinkedNotesModalClose = useCallback(() => {
+  //   setIsLinkedNotesModalOpen(false);
+  // }, []);
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
@@ -441,8 +492,19 @@ export function CharacterDetail() {
     navigateToFamilyTree();
   }, [navigateToFamilyTree]);
 
+  const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
+    setFieldVisibility((prev) => ({
+      ...prev,
+      [fieldName]: prev[fieldName] === false ? true : false,
+    }));
+  }, []);
+
+  const handleAdvancedSectionToggle = useCallback(() => {
+    setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
   return (
-    <CharacterDetailView
+    <CharacterDetailViewRefactored
       character={character}
       editData={editData}
       isEditing={isEditing}
@@ -450,58 +512,51 @@ export function CharacterDetail() {
       currentVersion={currentVersion}
       showDeleteModal={showDeleteModal}
       isNavigationSidebarOpen={isNavigationSidebarOpen}
-      isLinkedNotesModalOpen={isLinkedNotesModalOpen}
       newQuality={newQuality}
       imagePreview={imagePreview}
       selectedRelationshipCharacter={selectedRelationshipCharacter}
       selectedRelationshipType={selectedRelationshipType}
       relationshipIntensity={relationshipIntensity}
       fileInputRef={fileInputRef}
-      linkedNotes={[]}
       mockCharacters={mockCharacters}
       mockLocations={mockLocations}
       mockOrganizations={mockOrganizations}
       roles={ROLES_CONSTANT}
       alignments={ALIGNMENTS_CONSTANT}
       genders={GENDERS_CONSTANT}
-      familyRelations={FAMILY_RELATIONS_CONSTANT}
       relationshipTypes={RELATIONSHIP_TYPES_CONSTANT}
       currentRole={currentRole}
       currentAlignment={currentAlignment}
       currentGender={currentGender}
       RoleIcon={RoleIcon}
+      fieldVisibility={fieldVisibility}
+      advancedSectionOpen={advancedSectionOpen}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}
       onCharacterSelect={handleCharacterSelect}
-      onLinkedNotesModalOpen={handleLinkedNotesModalOpen}
-      onLinkedNotesModalClose={handleLinkedNotesModalClose}
       onEdit={handleEdit}
       onSave={handleSave}
       onCancel={handleCancel}
-      onDelete={handleDelete}
       onDeleteModalOpen={handleDeleteModalOpen}
       onDeleteModalClose={handleDeleteModalClose}
+      onConfirmDelete={handleConfirmDelete}
       onVersionChange={handleVersionChange}
-      onVersionSave={handleVersionSave}
+      onVersionCreate={handleVersionCreate}
       onVersionDelete={handleVersionDelete}
       onVersionUpdate={handleVersionUpdate}
       onImageFileChange={handleImageFileChange}
       onAgeChange={handleAgeChange}
       onEditDataChange={handleEditDataChange}
-      onQualityAdd={handleAddQuality}
-      onQualityRemove={handleRemoveQuality}
-      onNewQualityChange={handleNewQualityChange}
-      onFamilyRelationChange={handleFamilyRelationChange}
       onRelationshipAdd={handleAddRelationship}
       onRelationshipRemove={handleRemoveRelationship}
       onRelationshipIntensityUpdate={handleUpdateRelationshipIntensity}
       onRelationshipCharacterChange={handleRelationshipCharacterChange}
       onRelationshipTypeChange={handleRelationshipTypeChange}
       onRelationshipIntensityChange={handleRelationshipIntensityChange}
-      onNavigateToFamilyTree={handleNavigateToFamilyTree}
+      onFieldVisibilityToggle={handleFieldVisibilityToggle}
+      onAdvancedSectionToggle={handleAdvancedSectionToggle}
       getRelationshipTypeData={getRelationshipTypeData}
-      getFamilyRelationLabel={getFamilyRelationLabel}
     />
   );
 }
