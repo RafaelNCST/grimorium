@@ -213,7 +213,7 @@ export const TitleBar = () => {
       >
         {/* Left section - App logo/name */}
         <div data-tauri-drag-region className="flex items-center px-4">
-          <span className="text-sm font-semibold text-foreground/80">
+          <span className="text-sm font-semibold text-foreground/80 pointer-events-none">
             Grimorium
           </span>
         </div>
@@ -223,7 +223,7 @@ export const TitleBar = () => {
           data-tauri-drag-region
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >
-          <span className="text-sm font-medium text-foreground">
+          <span className="text-sm font-medium text-foreground pointer-events-none">
             {pageTitle}
           </span>
         </div>
