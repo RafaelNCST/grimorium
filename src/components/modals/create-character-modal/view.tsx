@@ -235,43 +235,107 @@ export function CreateCharacterModalView({
                 {t("modal.appearance_section")}
               </h4>
 
-              {/* Height */}
-              <div className="space-y-2">
-                <Label htmlFor="height" className="text-sm font-medium">
-                  {t("modal.height")}
-                </Label>
-                <Input
-                  id="height"
-                  {...register("height")}
-                  placeholder={t("modal.height_placeholder")}
-                />
-              </div>
-
-              {/* Weight */}
-              <div className="space-y-2">
-                <Label htmlFor="weight" className="text-sm font-medium">
-                  {t("modal.weight")}
-                </Label>
-                <Input
-                  id="weight"
-                  {...register("weight")}
-                  placeholder={t("modal.weight_placeholder")}
-                />
-              </div>
-
+              {/* Height and Weight - 2 columns */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Skin Tone */}
+                {/* Height */}
                 <div className="space-y-2">
-                  <Label htmlFor="skinTone" className="text-sm font-medium">
-                    {t("modal.skin_tone")}
+                  <Label htmlFor="height" className="text-sm font-medium">
+                    {t("modal.height")}
                   </Label>
                   <Input
-                    id="skinTone"
-                    {...register("skinTone")}
-                    placeholder={t("modal.skin_tone_placeholder")}
+                    id="height"
+                    {...register("height")}
+                    placeholder={t("modal.height_placeholder")}
+                    maxLength={50}
                   />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{watchedValues.height?.length || 0}/50</span>
+                  </div>
                 </div>
 
+                {/* Weight */}
+                <div className="space-y-2">
+                  <Label htmlFor="weight" className="text-sm font-medium">
+                    {t("modal.weight")}
+                  </Label>
+                  <Input
+                    id="weight"
+                    {...register("weight")}
+                    placeholder={t("modal.weight_placeholder")}
+                    maxLength={50}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{watchedValues.weight?.length || 0}/50</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skin Tone - Full width */}
+              <div className="space-y-2">
+                <Label htmlFor="skinTone" className="text-sm font-medium">
+                  {t("modal.skin_tone")}
+                </Label>
+                <Input
+                  id="skinTone"
+                  {...register("skinTone")}
+                  placeholder={t("modal.skin_tone_placeholder")}
+                  maxLength={100}
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.skinTone?.length || 0}/100</span>
+                </div>
+              </div>
+
+              {/* Hair - Full width */}
+              <div className="space-y-2">
+                <Label htmlFor="hair" className="text-sm font-medium">
+                  {t("modal.hair")}
+                </Label>
+                <Input
+                  id="hair"
+                  {...register("hair")}
+                  placeholder={t("modal.hair_placeholder")}
+                  maxLength={100}
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.hair?.length || 0}/100</span>
+                </div>
+              </div>
+
+              {/* Eyes - Full width */}
+              <div className="space-y-2">
+                <Label htmlFor="eyes" className="text-sm font-medium">
+                  {t("modal.eyes")}
+                </Label>
+                <Input
+                  id="eyes"
+                  {...register("eyes")}
+                  placeholder={t("modal.eyes_placeholder")}
+                  maxLength={200}
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.eyes?.length || 0}/200</span>
+                </div>
+              </div>
+
+              {/* Face - Full width */}
+              <div className="space-y-2">
+                <Label htmlFor="face" className="text-sm font-medium">
+                  {t("modal.face")}
+                </Label>
+                <Input
+                  id="face"
+                  {...register("face")}
+                  placeholder={t("modal.face_placeholder")}
+                  maxLength={200}
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.face?.length || 0}/200</span>
+                </div>
+              </div>
+
+              {/* Physical Type and Species/Race - 2 columns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Physical Type */}
                 <div className="space-y-2">
                   <Label htmlFor="physicalType" className="text-sm font-medium">
@@ -301,45 +365,42 @@ export function CreateCharacterModalView({
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Species and Race */}
+                <div className="space-y-2">
+                  <Label htmlFor="speciesAndRace" className="text-sm font-medium">
+                    {t("modal.species_and_race")}
+                  </Label>
+                  {hasSpecies ? (
+                    <Select
+                      value={watchedValues.speciesAndRace}
+                      onValueChange={(value) => setValue("speciesAndRace", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t("modal.species_placeholder")}
+                        />
+                      </SelectTrigger>
+                      <SelectContent side="bottom">
+                        {species.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Alert className="bg-muted/50">
+                      <Info className="h-4 w-4" />
+                      <AlertDescription className="text-xs">
+                        {t("modal.no_species_warning")}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
               </div>
 
-              {/* Hair */}
-              <div className="space-y-2">
-                <Label htmlFor="hair" className="text-sm font-medium">
-                  {t("modal.hair")}
-                </Label>
-                <Input
-                  id="hair"
-                  {...register("hair")}
-                  placeholder={t("modal.hair_placeholder")}
-                />
-              </div>
-
-              {/* Eyes */}
-              <div className="space-y-2">
-                <Label htmlFor="eyes" className="text-sm font-medium">
-                  {t("modal.eyes")}
-                </Label>
-                <Input
-                  id="eyes"
-                  {...register("eyes")}
-                  placeholder={t("modal.eyes_placeholder")}
-                />
-              </div>
-
-              {/* Face */}
-              <div className="space-y-2">
-                <Label htmlFor="face" className="text-sm font-medium">
-                  {t("modal.face")}
-                </Label>
-                <Input
-                  id="face"
-                  {...register("face")}
-                  placeholder={t("modal.face_placeholder")}
-                />
-              </div>
-
-              {/* Distinguishing Features */}
+              {/* Distinguishing Features - Full width */}
               <div className="space-y-2">
                 <Label
                   htmlFor="distinguishingFeatures"
@@ -352,47 +413,14 @@ export function CreateCharacterModalView({
                   {...register("distinguishingFeatures")}
                   placeholder={t("modal.distinguishing_features_placeholder")}
                   rows={3}
-                  maxLength={200}
+                  maxLength={400}
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
                   <span>
-                    {watchedValues.distinguishingFeatures?.length || 0}/200
+                    {watchedValues.distinguishingFeatures?.length || 0}/400
                   </span>
                 </div>
-              </div>
-
-              {/* Species and Race */}
-              <div className="space-y-2">
-                <Label htmlFor="speciesAndRace" className="text-sm font-medium">
-                  {t("modal.species_and_race")}
-                </Label>
-                {hasSpecies ? (
-                  <Select
-                    value={watchedValues.speciesAndRace}
-                    onValueChange={(value) => setValue("speciesAndRace", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={t("modal.species_placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      {species.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Alert className="bg-muted/50">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription className="text-xs">
-                      {t("modal.no_species_warning")}
-                    </AlertDescription>
-                  </Alert>
-                )}
               </div>
             </div>
 
@@ -438,11 +466,11 @@ export function CreateCharacterModalView({
                   {...register("hobbies")}
                   placeholder={t("modal.hobbies_placeholder")}
                   rows={3}
-                  maxLength={250}
+                  maxLength={500}
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{watchedValues.hobbies?.length || 0}/250</span>
+                  <span>{watchedValues.hobbies?.length || 0}/500</span>
                 </div>
               </div>
 
@@ -456,11 +484,11 @@ export function CreateCharacterModalView({
                   {...register("dreamsAndGoals")}
                   placeholder={t("modal.dreams_placeholder")}
                   rows={3}
-                  maxLength={250}
+                  maxLength={500}
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{watchedValues.dreamsAndGoals?.length || 0}/250</span>
+                  <span>{watchedValues.dreamsAndGoals?.length || 0}/500</span>
                 </div>
               </div>
 
@@ -477,11 +505,11 @@ export function CreateCharacterModalView({
                   {...register("fearsAndTraumas")}
                   placeholder={t("modal.fears_placeholder")}
                   rows={3}
-                  maxLength={250}
+                  maxLength={500}
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{watchedValues.fearsAndTraumas?.length || 0}/250</span>
+                  <span>{watchedValues.fearsAndTraumas?.length || 0}/500</span>
                 </div>
               </div>
 
@@ -494,7 +522,11 @@ export function CreateCharacterModalView({
                   id="favoriteFood"
                   {...register("favoriteFood")}
                   placeholder={t("modal.favorite_food_placeholder")}
+                  maxLength={100}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.favoriteFood?.length || 0}/100</span>
+                </div>
               </div>
 
               {/* Favorite Music */}
@@ -507,7 +539,11 @@ export function CreateCharacterModalView({
                   {...register("favoriteMusic")}
                   placeholder={t("modal.favorite_music_placeholder")}
                   type="url"
+                  maxLength={100}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{watchedValues.favoriteMusic?.length || 0}/100</span>
+                </div>
               </div>
             </div>
 

@@ -1,14 +1,7 @@
-import React from "react";
-
 import { Target } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils";
-
-export interface AlignmentValue {
-  moral: "good" | "neutral" | "evil";
-  ethical: "lawful" | "neutral" | "chaotic";
-}
+import { CHARACTER_ALIGNMENTS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-alignments";
 
 interface AlignmentMatrixProps {
   value?: string;
@@ -16,8 +9,26 @@ interface AlignmentMatrixProps {
   isEditable?: boolean;
 }
 
-const MORAL_AXIS = ["good", "neutral", "evil"] as const;
-const ETHICAL_AXIS = ["lawful", "neutral", "chaotic"] as const;
+const ALIGNMENT_GRADIENTS: Record<string, string> = {
+  "lawful-good":
+    "bg-gradient-to-br from-green-500/20 to-blue-500/20 border-green-500/40",
+  "neutral-good":
+    "bg-gradient-to-br from-green-500/20 to-gray-500/20 border-green-500/40",
+  "chaotic-good":
+    "bg-gradient-to-br from-green-500/20 to-red-500/20 border-green-500/40",
+  "lawful-neutral":
+    "bg-gradient-to-br from-blue-500/20 to-gray-500/20 border-gray-500/40",
+  "true-neutral":
+    "bg-gradient-to-br from-gray-500/20 to-gray-500/20 border-gray-500/40",
+  "chaotic-neutral":
+    "bg-gradient-to-br from-red-500/20 to-gray-500/20 border-gray-500/40",
+  "lawful-evil":
+    "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-purple-500/40",
+  "neutral-evil":
+    "bg-gradient-to-br from-gray-500/20 to-purple-500/20 border-purple-500/40",
+  "chaotic-evil":
+    "bg-gradient-to-br from-red-500/20 to-purple-500/20 border-red-500/40",
+};
 
 export function AlignmentMatrix({
   value = "",
@@ -26,161 +37,110 @@ export function AlignmentMatrix({
 }: AlignmentMatrixProps) {
   const { t } = useTranslation("create-character");
 
-  // Parse the alignment value (format: "lawful_good", "chaotic_evil", etc)
-  const parseAlignment = (alignmentStr: string): AlignmentValue | null => {
-    if (!alignmentStr) return null;
-    const parts = alignmentStr.split("_");
-    if (parts.length !== 2) return null;
+  const alignmentOrder = [
+    "lawful-good",
+    "neutral-good",
+    "chaotic-good",
+    "lawful-neutral",
+    "true-neutral",
+    "chaotic-neutral",
+    "lawful-evil",
+    "neutral-evil",
+    "chaotic-evil",
+  ];
 
-    const ethical = parts[0] as AlignmentValue["ethical"];
-    const moral = parts[1] as AlignmentValue["moral"];
-
-    if (ETHICAL_AXIS.includes(ethical) && MORAL_AXIS.includes(moral)) {
-      return { moral, ethical };
-    }
-    return null;
-  };
-
-  const currentAlignment = parseAlignment(value);
-
-  // If not editable and no alignment selected, show empty state
-  if (!isEditable && !currentAlignment) {
-    return (
-      <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-            <Target className="w-6 h-6 text-muted-foreground" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-foreground">
-              Nenhum alinhamento escolhido
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Use o modo de edição para selecionar um alinhamento
-            </p>
+  // If not editable, show only selected alignment or empty state
+  if (!isEditable) {
+    if (!value) {
+      return (
+        <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+              <Target className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">
+                Nenhum alinhamento escolhido
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Use o modo de edição para selecionar um alinhamento
+              </p>
+            </div>
           </div>
         </div>
+      );
+    }
+
+    // Show only selected alignment in view mode
+    const selectedAlignment = CHARACTER_ALIGNMENTS_CONSTANT.find(
+      (a) => a.value === value
+    );
+
+    if (!selectedAlignment) return null;
+
+    const Icon = selectedAlignment.icon;
+    const gradientClass = ALIGNMENT_GRADIENTS[selectedAlignment.value] || "";
+
+    return (
+      <div
+        className={`flex flex-col items-center justify-center gap-4 p-6 rounded-lg border-2 ${gradientClass} shadow-md`}
+      >
+        <Icon className="w-12 h-12" />
+        <span className="text-lg font-semibold text-center">
+          {t(selectedAlignment.translationKey)}
+        </span>
+        <p className="text-sm text-center text-muted-foreground max-w-md">
+          {t(selectedAlignment.descriptionKey)}
+        </p>
       </div>
     );
   }
 
-  const isSelected = (moral: string, ethical: string) => {
-    if (!currentAlignment) return false;
-    return (
-      currentAlignment.moral === moral && currentAlignment.ethical === ethical
-    );
-  };
-
-  const handleCellClick = (moral: string, ethical: string) => {
-    if (!isEditable || !onChange) return;
-    const newValue = `${ethical}_${moral}`;
-    onChange(newValue);
-  };
-
-  const getCellColor = (moral: string, ethical: string) => {
-    const selected = isSelected(moral, ethical);
-
-    // Base colors by alignment
-    let baseColor = "";
-    let selectedColor = "";
-
-    if (moral === "good") {
-      if (ethical === "lawful") {
-        baseColor = "bg-blue-500/10 hover:bg-blue-500/20";
-        selectedColor = "bg-blue-500/30 border-blue-500";
-      } else if (ethical === "neutral") {
-        baseColor = "bg-green-500/10 hover:bg-green-500/20";
-        selectedColor = "bg-green-500/30 border-green-500";
-      } else {
-        baseColor = "bg-cyan-500/10 hover:bg-cyan-500/20";
-        selectedColor = "bg-cyan-500/30 border-cyan-500";
-      }
-    } else if (moral === "neutral") {
-      if (ethical === "lawful") {
-        baseColor = "bg-slate-500/10 hover:bg-slate-500/20";
-        selectedColor = "bg-slate-500/30 border-slate-500";
-      } else if (ethical === "neutral") {
-        baseColor = "bg-gray-500/10 hover:bg-gray-500/20";
-        selectedColor = "bg-gray-500/30 border-gray-500";
-      } else {
-        baseColor = "bg-zinc-500/10 hover:bg-zinc-500/20";
-        selectedColor = "bg-zinc-500/30 border-zinc-500";
-      }
-    } else {
-      // evil
-      if (ethical === "lawful") {
-        baseColor = "bg-purple-500/10 hover:bg-purple-500/20";
-        selectedColor = "bg-purple-500/30 border-purple-500";
-      } else if (ethical === "neutral") {
-        baseColor = "bg-red-500/10 hover:bg-red-500/20";
-        selectedColor = "bg-red-500/30 border-red-500";
-      } else {
-        baseColor = "bg-orange-500/10 hover:bg-orange-500/20";
-        selectedColor = "bg-orange-500/30 border-orange-500";
-      }
-    }
-
-    return selected ? selectedColor : baseColor;
-  };
-
+  // Edit mode - show all alignments
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-2">
-        {/* Header row */}
-        <div className="text-xs font-medium text-muted-foreground" />
-        {ETHICAL_AXIS.map((ethical) => (
-          <div
-            key={ethical}
-            className="text-xs font-medium text-center text-muted-foreground"
+    <div className="grid grid-cols-3 gap-3">
+      {alignmentOrder.map((alignmentValue) => {
+        const alignment = CHARACTER_ALIGNMENTS_CONSTANT.find(
+          (a) => a.value === alignmentValue
+        );
+        if (!alignment) return null;
+
+        const Icon = alignment.icon;
+        const isSelected = value === alignment.value;
+        const gradientClass = ALIGNMENT_GRADIENTS[alignment.value] || "";
+
+        return (
+          <button
+            key={alignment.value}
+            type="button"
+            onClick={() => {
+              if (isEditable && onChange) {
+                onChange(isSelected ? "" : alignment.value);
+              }
+            }}
+            disabled={!isEditable}
+            className={`flex flex-col items-center justify-center gap-3 p-5 rounded-lg border-2 transition-all min-h-[140px] ${
+              isSelected
+                ? `${gradientClass} scale-105 shadow-lg`
+                : "bg-muted/30 border-muted hover:bg-muted/50 hover:border-muted-foreground/30"
+            } ${isEditable ? "cursor-pointer" : "cursor-default"}`}
           >
-            {t(`alignment.ethical.${ethical}`)}
-          </div>
-        ))}
-
-        {/* Data rows */}
-        {MORAL_AXIS.map((moral) => (
-          <React.Fragment key={moral}>
-            <div className="text-xs font-medium text-right text-muted-foreground flex items-center justify-end">
-              {t(`alignment.moral.${moral}`)}
-            </div>
-            {ETHICAL_AXIS.map((ethical) => {
-              const alignmentKey = `${ethical}-${moral}`;
-              const selected = isSelected(moral, ethical);
-
-              return (
-                <button
-                  key={alignmentKey}
-                  type="button"
-                  onClick={() => handleCellClick(moral, ethical)}
-                  disabled={!isEditable}
-                  className={cn(
-                    "aspect-square rounded-lg border-2 transition-all",
-                    "flex items-center justify-center text-xs font-medium",
-                    getCellColor(moral, ethical),
-                    selected ? "border-2" : "border-transparent",
-                    isEditable && "cursor-pointer hover:scale-105",
-                    !isEditable && !selected && "opacity-30",
-                    !isEditable && "cursor-default"
-                  )}
-                  title={t(`alignment.${alignmentKey}`)}
-                >
-                  {selected && <span className="text-lg leading-none">✓</span>}
-                </button>
-              );
-            })}
-          </React.Fragment>
-        ))}
-      </div>
-
-      {/* Current selection display */}
-      {currentAlignment && (
-        <div className="text-center">
-          <p className="text-sm font-medium">{t(`alignment.${value}`)}</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t(`alignment.${value}_desc`)}
-          </p>
-        </div>
-      )}
+            <Icon
+              className={`w-7 h-7 ${isSelected ? "" : "text-muted-foreground"}`}
+            />
+            <span
+              className={`text-xs font-medium text-center leading-tight ${isSelected ? "" : "text-muted-foreground"}`}
+            >
+              {t(alignment.translationKey)}
+            </span>
+            <p
+              className={`text-xs text-center line-clamp-2 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}
+            >
+              {t(alignment.descriptionKey)}
+            </p>
+          </button>
+        );
+      })}
     </div>
   );
 }

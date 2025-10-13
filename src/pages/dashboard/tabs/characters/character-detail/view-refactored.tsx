@@ -12,6 +12,7 @@ import {
   Shield,
   Sparkles,
   Target,
+  Info,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,7 @@ import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-charac
 import { type ICharacterRole } from "@/components/modals/create-character-modal/constants/character-roles";
 import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -203,7 +205,15 @@ const FieldWrapper = ({
   const isVisible = fieldVisibility[fieldName] !== false;
 
   return (
-    <div className={`space-y-2 ${!isVisible && !isEditing ? "hidden" : ""}`}>
+    <div
+      className={`space-y-2 transition-all duration-200 ${
+        !isVisible && !isEditing
+          ? "hidden"
+          : !isVisible && isEditing
+            ? "opacity-50 bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30"
+            : ""
+      }`}
+    >
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium">
           {label} {!isOptional && "*"}
@@ -346,7 +356,7 @@ export function CharacterDetailViewRefactored({
                     <Button variant="outline" onClick={onCancel}>
                       {t("character-detail:header.cancel")}
                     </Button>
-                    <Button variant="magical" onClick={onSave}>
+                    <Button variant="magical" className="animate-glow" onClick={onSave}>
                       {t("character-detail:header.save")}
                     </Button>
                   </>
@@ -706,6 +716,7 @@ export function CharacterDetailViewRefactored({
                           {t("character-detail:sections.appearance")}
                         </h4>
 
+                        {/* Height and Weight - 2 columns */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FieldWrapper
                             fieldName="height"
@@ -716,15 +727,21 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.height || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("height", e.target.value)
-                                }
-                                placeholder={t(
-                                  "create-character:modal.height_placeholder"
-                                )}
-                              />
+                              <>
+                                <Input
+                                  value={editData.height || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange("height", e.target.value)
+                                  }
+                                  placeholder={t(
+                                    "create-character:modal.height_placeholder"
+                                  )}
+                                  maxLength={50}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.height?.length || 0}/50</span>
+                                </div>
+                              </>
                             ) : character.height ? (
                               <p className="text-sm">{character.height}</p>
                             ) : (
@@ -741,31 +758,40 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.weight || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("weight", e.target.value)
-                                }
-                                placeholder={t(
-                                  "create-character:modal.weight_placeholder"
-                                )}
-                              />
+                              <>
+                                <Input
+                                  value={editData.weight || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange("weight", e.target.value)
+                                  }
+                                  placeholder={t(
+                                    "create-character:modal.weight_placeholder"
+                                  )}
+                                  maxLength={50}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.weight?.length || 0}/50</span>
+                                </div>
+                              </>
                             ) : character.weight ? (
                               <p className="text-sm">{character.weight}</p>
                             ) : (
                               <EmptyFieldState t={t} />
                             )}
                           </FieldWrapper>
+                        </div>
 
-                          <FieldWrapper
-                            fieldName="skinTone"
-                            label={t("character-detail:fields.skin_tone")}
-                            fieldVisibility={fieldVisibility}
-                            isEditing={isEditing}
-                            onFieldVisibilityToggle={onFieldVisibilityToggle}
-                            t={t}
-                          >
-                            {isEditing ? (
+                        {/* Skin Tone - Full width */}
+                        <FieldWrapper
+                          fieldName="skinTone"
+                          label={t("character-detail:fields.skin_tone")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
                               <Input
                                 value={editData.skinTone || ""}
                                 onChange={(e) =>
@@ -774,14 +800,111 @@ export function CharacterDetailViewRefactored({
                                 placeholder={t(
                                   "character-detail:fields.skin_tone"
                                 )}
+                                maxLength={100}
                               />
-                            ) : character.skinTone ? (
-                              <p className="text-sm">{character.skinTone}</p>
-                            ) : (
-                              <EmptyFieldState t={t} />
-                            )}
-                          </FieldWrapper>
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.skinTone?.length || 0}/100</span>
+                              </div>
+                            </>
+                          ) : character.skinTone ? (
+                            <p className="text-sm">{character.skinTone}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
 
+                        {/* Hair - Full width */}
+                        <FieldWrapper
+                          fieldName="hair"
+                          label={t("character-detail:fields.hair")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.hair || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("hair", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.hair")}
+                                maxLength={100}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.hair?.length || 0}/100</span>
+                              </div>
+                            </>
+                          ) : character.hair ? (
+                            <p className="text-sm">{character.hair}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Eyes - Full width */}
+                        <FieldWrapper
+                          fieldName="eyes"
+                          label={t("character-detail:fields.eyes")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.eyes || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("eyes", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.eyes")}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.eyes?.length || 0}/200</span>
+                              </div>
+                            </>
+                          ) : character.eyes ? (
+                            <p className="text-sm">{character.eyes}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Face - Full width */}
+                        <FieldWrapper
+                          fieldName="face"
+                          label={t("character-detail:fields.face")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.face || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("face", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.face")}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.face?.length || 0}/200</span>
+                              </div>
+                            </>
+                          ) : character.face ? (
+                            <p className="text-sm">{character.face}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Physical Type and Species/Race - 2 columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FieldWrapper
                             fieldName="physicalType"
                             label={t("character-detail:fields.physical_type")}
@@ -844,75 +967,6 @@ export function CharacterDetailViewRefactored({
                           </FieldWrapper>
 
                           <FieldWrapper
-                            fieldName="hair"
-                            label={t("character-detail:fields.hair")}
-                            fieldVisibility={fieldVisibility}
-                            isEditing={isEditing}
-                            onFieldVisibilityToggle={onFieldVisibilityToggle}
-                            t={t}
-                          >
-                            {isEditing ? (
-                              <Input
-                                value={editData.hair || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("hair", e.target.value)
-                                }
-                                placeholder={t("character-detail:fields.hair")}
-                              />
-                            ) : character.hair ? (
-                              <p className="text-sm">{character.hair}</p>
-                            ) : (
-                              <EmptyFieldState t={t} />
-                            )}
-                          </FieldWrapper>
-
-                          <FieldWrapper
-                            fieldName="eyes"
-                            label={t("character-detail:fields.eyes")}
-                            fieldVisibility={fieldVisibility}
-                            isEditing={isEditing}
-                            onFieldVisibilityToggle={onFieldVisibilityToggle}
-                            t={t}
-                          >
-                            {isEditing ? (
-                              <Input
-                                value={editData.eyes || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("eyes", e.target.value)
-                                }
-                                placeholder={t("character-detail:fields.eyes")}
-                              />
-                            ) : character.eyes ? (
-                              <p className="text-sm">{character.eyes}</p>
-                            ) : (
-                              <EmptyFieldState t={t} />
-                            )}
-                          </FieldWrapper>
-
-                          <FieldWrapper
-                            fieldName="face"
-                            label={t("character-detail:fields.face")}
-                            fieldVisibility={fieldVisibility}
-                            isEditing={isEditing}
-                            onFieldVisibilityToggle={onFieldVisibilityToggle}
-                            t={t}
-                          >
-                            {isEditing ? (
-                              <Input
-                                value={editData.face || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("face", e.target.value)
-                                }
-                                placeholder={t("character-detail:fields.face")}
-                              />
-                            ) : character.face ? (
-                              <p className="text-sm">{character.face}</p>
-                            ) : (
-                              <EmptyFieldState t={t} />
-                            )}
-                          </FieldWrapper>
-
-                          <FieldWrapper
                             fieldName="speciesAndRace"
                             label={t(
                               "character-detail:fields.species_and_race"
@@ -923,18 +977,12 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.speciesAndRace || ""}
-                                onChange={(e) =>
-                                  onEditDataChange(
-                                    "speciesAndRace",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.species_and_race"
-                                )}
-                              />
+                              <Alert className="bg-muted/50">
+                                <Info className="h-4 w-4" />
+                                <AlertDescription className="text-xs">
+                                  Nenhuma espécie/raça cadastrada. Crie espécies e raças na aba Espécies para selecioná-las aqui.
+                                </AlertDescription>
+                              </Alert>
                             ) : character.speciesAndRace ? (
                               <p className="text-sm">
                                 {character.speciesAndRace}
@@ -956,20 +1004,26 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <Textarea
-                              value={editData.distinguishingFeatures || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "distinguishingFeatures",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "character-detail:fields.distinguishing_features"
-                              )}
-                              rows={3}
-                              className="resize-none"
-                            />
+                            <>
+                              <Textarea
+                                value={editData.distinguishingFeatures || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "distinguishingFeatures",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.distinguishing_features"
+                                )}
+                                rows={3}
+                                maxLength={400}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.distinguishingFeatures?.length || 0}/400</span>
+                              </div>
+                            </>
                           ) : character.distinguishingFeatures ? (
                             <p className="text-sm whitespace-pre-wrap">
                               {character.distinguishingFeatures}
@@ -997,38 +1051,44 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                               {CHARACTER_ARCHETYPES_CONSTANT.map(
                                 (archetype) => {
                                   const ArchetypeIcon = archetype.icon;
                                   const isSelected =
                                     editData.archetype === archetype.value;
                                   return (
-                                    <div
+                                    <button
                                       key={archetype.value}
-                                      className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                                        isSelected
-                                          ? "border-primary bg-primary/10"
-                                          : "border-muted hover:border-primary/50"
-                                      }`}
+                                      type="button"
                                       onClick={() =>
                                         onEditDataChange(
                                           "archetype",
-                                          archetype.value
+                                          isSelected ? "" : archetype.value
                                         )
                                       }
-                                      role="button"
-                                      tabIndex={0}
+                                      className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all h-32 ${
+                                        isSelected
+                                          ? "border-primary bg-primary/10 shadow-md"
+                                          : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
+                                      }`}
                                     >
-                                      <div className="text-center space-y-2">
-                                        <ArchetypeIcon className="w-6 h-6 mx-auto" />
-                                        <div className="text-xs font-medium">
-                                          {t(
-                                            `create-character:${archetype.translationKey}`
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
+                                      <ArchetypeIcon
+                                        className={`w-6 h-6 ${isSelected ? "text-primary" : "text-muted-foreground"}`}
+                                      />
+                                      <span
+                                        className={`text-xs font-medium text-center ${isSelected ? "text-primary" : "text-muted-foreground"}`}
+                                      >
+                                        {t(
+                                          `create-character:${archetype.translationKey}`
+                                        )}
+                                      </span>
+                                      <p className="text-xs text-muted-foreground text-center line-clamp-2">
+                                        {t(
+                                          `create-character:${archetype.descriptionKey}`
+                                        )}
+                                      </p>
+                                    </button>
                                   );
                                 }
                               )}
@@ -1061,14 +1121,19 @@ export function CharacterDetailViewRefactored({
                               }
                               const ArchetypeIcon = archetype.icon;
                               return (
-                                <div className="border-2 border-primary bg-primary/10 p-4 rounded-lg">
-                                  <div className="text-center space-y-2">
-                                    <ArchetypeIcon className="w-8 h-8 mx-auto" />
-                                    <div className="text-sm font-medium">
+                                <div className="border-2 border-primary bg-primary/10 p-6 rounded-lg shadow-md">
+                                  <div className="flex flex-col items-center gap-4 text-center">
+                                    <ArchetypeIcon className="w-12 h-12 text-primary" />
+                                    <span className="text-lg font-semibold">
                                       {t(
                                         `create-character:${archetype.translationKey}`
                                       )}
-                                    </div>
+                                    </span>
+                                    <p className="text-sm text-muted-foreground max-w-md">
+                                      {t(
+                                        `create-character:${archetype.descriptionKey}`
+                                      )}
+                                    </p>
                                   </div>
                                 </div>
                               );
@@ -1103,18 +1168,24 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.favoriteFood || ""}
-                                onChange={(e) =>
-                                  onEditDataChange(
-                                    "favoriteFood",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.favorite_food"
-                                )}
-                              />
+                              <>
+                                <Input
+                                  value={editData.favoriteFood || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "favoriteFood",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "character-detail:fields.favorite_food"
+                                  )}
+                                  maxLength={100}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.favoriteFood?.length || 0}/100</span>
+                                </div>
+                              </>
                             ) : character.favoriteFood ? (
                               <p className="text-sm">
                                 {character.favoriteFood}
@@ -1133,18 +1204,24 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.favoriteMusic || ""}
-                                onChange={(e) =>
-                                  onEditDataChange(
-                                    "favoriteMusic",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.favorite_music"
-                                )}
-                              />
+                              <>
+                                <Input
+                                  value={editData.favoriteMusic || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "favoriteMusic",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "character-detail:fields.favorite_music"
+                                  )}
+                                  maxLength={100}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.favoriteMusic?.length || 0}/100</span>
+                                </div>
+                              </>
                             ) : character.favoriteMusic ? (
                               <p className="text-sm">
                                 {character.favoriteMusic}
@@ -1164,17 +1241,23 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <Textarea
-                              value={editData.personality || ""}
-                              onChange={(e) =>
-                                onEditDataChange("personality", e.target.value)
-                              }
-                              placeholder={t(
-                                "character-detail:fields.personality"
-                              )}
-                              rows={3}
-                              className="resize-none"
-                            />
+                            <>
+                              <Textarea
+                                value={editData.personality || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("personality", e.target.value)
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.personality"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.personality?.length || 0}/500</span>
+                              </div>
+                            </>
                           ) : character.personality ? (
                             <p className="text-sm whitespace-pre-wrap">
                               {character.personality}
@@ -1193,15 +1276,21 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <Textarea
-                              value={editData.hobbies || ""}
-                              onChange={(e) =>
-                                onEditDataChange("hobbies", e.target.value)
-                              }
-                              placeholder={t("character-detail:fields.hobbies")}
-                              rows={3}
-                              className="resize-none"
-                            />
+                            <>
+                              <Textarea
+                                value={editData.hobbies || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("hobbies", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.hobbies")}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.hobbies?.length || 0}/500</span>
+                              </div>
+                            </>
                           ) : character.hobbies ? (
                             <p className="text-sm whitespace-pre-wrap">
                               {character.hobbies}
@@ -1220,20 +1309,26 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <Textarea
-                              value={editData.dreamsAndGoals || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "dreamsAndGoals",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "character-detail:fields.dreams_and_goals"
-                              )}
-                              rows={3}
-                              className="resize-none"
-                            />
+                            <>
+                              <Textarea
+                                value={editData.dreamsAndGoals || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "dreamsAndGoals",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.dreams_and_goals"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.dreamsAndGoals?.length || 0}/500</span>
+                              </div>
+                            </>
                           ) : character.dreamsAndGoals ? (
                             <p className="text-sm whitespace-pre-wrap">
                               {character.dreamsAndGoals}
@@ -1252,20 +1347,26 @@ export function CharacterDetailViewRefactored({
                           t={t}
                         >
                           {isEditing ? (
-                            <Textarea
-                              value={editData.fearsAndTraumas || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "fearsAndTraumas",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "character-detail:fields.fears_and_traumas"
-                              )}
-                              rows={3}
-                              className="resize-none"
-                            />
+                            <>
+                              <Textarea
+                                value={editData.fearsAndTraumas || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "fearsAndTraumas",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.fears_and_traumas"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.fearsAndTraumas?.length || 0}/500</span>
+                              </div>
+                            </>
                           ) : character.fearsAndTraumas ? (
                             <p className="text-sm whitespace-pre-wrap">
                               {character.fearsAndTraumas}
@@ -1313,15 +1414,39 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.birthPlace || ""}
-                                onChange={(e) =>
-                                  onEditDataChange("birthPlace", e.target.value)
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.birth_place"
-                                )}
-                              />
+                              mockLocations && mockLocations.length > 0 ? (
+                                <Select
+                                  value={editData.birthPlace || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("birthPlace", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.birth_place"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockLocations.map((location) => (
+                                      <SelectItem
+                                        key={location.id}
+                                        value={location.id}
+                                      >
+                                        {location.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhum local cadastrado. Crie locais na aba Mundo para selecioná-los aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
                             ) : character.birthPlace ? (
                               <p className="text-sm">{character.birthPlace}</p>
                             ) : (
@@ -1340,18 +1465,39 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.affiliatedPlace || ""}
-                                onChange={(e) =>
-                                  onEditDataChange(
-                                    "affiliatedPlace",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.affiliated_place"
-                                )}
-                              />
+                              mockLocations && mockLocations.length > 0 ? (
+                                <Select
+                                  value={editData.affiliatedPlace || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("affiliatedPlace", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.affiliated_place"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockLocations.map((location) => (
+                                      <SelectItem
+                                        key={location.id}
+                                        value={location.id}
+                                      >
+                                        {location.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhum local cadastrado. Crie locais na aba Mundo para selecioná-los aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
                             ) : character.affiliatedPlace ? (
                               <p className="text-sm">
                                 {character.affiliatedPlace}
@@ -1370,18 +1516,36 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              <Input
-                                value={editData.organization || ""}
-                                onChange={(e) =>
-                                  onEditDataChange(
-                                    "organization",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder={t(
-                                  "character-detail:fields.organization"
-                                )}
-                              />
+                              mockOrganizations && mockOrganizations.length > 0 ? (
+                                <Select
+                                  value={editData.organization || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("organization", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.organization"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockOrganizations.map((org) => (
+                                      <SelectItem key={org.id} value={org.id}>
+                                        {org.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhuma organização cadastrada. Crie organizações para selecioná-las aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
                             ) : character.organization ? (
                               <p className="text-sm">
                                 {character.organization}
