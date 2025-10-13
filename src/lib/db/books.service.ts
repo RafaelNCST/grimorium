@@ -46,11 +46,36 @@ function dbBookToBook(dbBook: DBBook): Book {
 }
 
 export async function getAllBooks(): Promise<Book[]> {
-  const db = await getDB();
-  const result = await db.select<DBBook[]>(
-    "SELECT * FROM books ORDER BY last_opened_at DESC NULLS LAST, updated_at DESC"
-  );
-  return result.map(dbBookToBook);
+  console.log("[books.service] getAllBooks called");
+
+  try {
+    const db = await getDB();
+    console.log("[books.service] Database connection obtained");
+
+    const result = await db.select<DBBook[]>(
+      "SELECT * FROM books ORDER BY last_opened_at DESC NULLS LAST, updated_at DESC"
+    );
+
+    console.log("[books.service] Query executed successfully:", {
+      rowCount: result.length,
+      books: result,
+    });
+
+    const books = result.map(dbBookToBook);
+    console.log("[books.service] Books converted to store format:", {
+      count: books.length,
+      books,
+    });
+
+    return books;
+  } catch (error) {
+    console.error("[books.service] Error in getAllBooks:", error);
+    console.error("[books.service] Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw error;
+  }
 }
 
 export async function getBookById(id: string): Promise<Book | null> {

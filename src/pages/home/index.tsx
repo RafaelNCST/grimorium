@@ -32,19 +32,44 @@ export function HomePage() {
   useEffect(() => {
     const loadBooks = async () => {
       try {
+        console.log("[HomePage] Starting to load books from database...");
+        console.log("[HomePage] Current books in store before load:", books.length);
+
         const booksFromDB = await getAllBooks();
+
+        console.log("[HomePage] Books loaded from database:", {
+          count: booksFromDB.length,
+          books: booksFromDB,
+        });
+
+        // Check for data inconsistency
+        if (books.length > 0 && booksFromDB.length === 0) {
+          console.warn(
+            "[HomePage] Data inconsistency detected! Books exist in store but not in database.",
+            {
+              storeBooks: books,
+            }
+          );
+        }
+
         setBooks(booksFromDB);
+        console.log("[HomePage] Books set in store successfully");
       } catch (error) {
-        console.error("Error loading books:", error);
+        console.error("[HomePage] Error loading books:", error);
+        console.error("[HomePage] Error details:", {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
       } finally {
         setIsLoading(false);
+        console.log("[HomePage] Loading completed");
       }
     };
 
     loadBooks();
   }, [setBooks]);
 
-  const filteredBooks = useMemo(() => getFilteredBooks(), [getFilteredBooks]);
+  const filteredBooks = useMemo(() => getFilteredBooks(), [getFilteredBooks, books, searchTerm]);
 
   const lastEditedBook = useMemo(() => getLastEditedBook(books), [books]);
 

@@ -27,10 +27,25 @@ export function ListBooks({
 }: ListBooksProps) {
   const { t } = useTranslation("home");
 
+  // Debug logging
+  console.log("[ListBooks] Rendering with:", {
+    filteredBooksCount: filteredBooks.length,
+    filteredBooks,
+    searchTerm,
+    totalBooks,
+    totalCharacters,
+    totalWords,
+  });
+
   const shouldShowMetrics =
     totalBooks > 0 || totalCharacters > 0 || totalWords > 0;
 
   const isEmpty = filteredBooks.length === 0;
+
+  console.log("[ListBooks] Display state:", {
+    isEmpty,
+    shouldShowMetrics,
+  });
 
   if (isEmpty) {
     return (

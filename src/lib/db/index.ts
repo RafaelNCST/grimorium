@@ -16,7 +16,10 @@ export async function getDB(): Promise<Database> {
 }
 
 async function runMigrations(database: Database): Promise<void> {
-  const schema = `
+  try {
+    console.log("[db] Starting schema migrations...");
+
+    const schema = `
     -- LIVROS (PROJETOS)
     CREATE TABLE IF NOT EXISTS books (
       id TEXT PRIMARY KEY,
@@ -126,7 +129,18 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
   `;
 
-  await database.execute(schema);
+    await database.execute(schema);
+    console.log("[db] Schema migrations executed successfully");
+
+    // Verify books table exists and log count
+    const result = await database.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM books"
+    );
+    console.log("[db] Books table verified. Current row count:", result[0]?.count || 0);
+  } catch (error) {
+    console.error("[db] Error during migrations:", error);
+    throw error;
+  }
 }
 
 export async function closeDB(): Promise<void> {
