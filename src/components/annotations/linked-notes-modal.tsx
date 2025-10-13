@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { useNavigate } from "@tanstack/react-router";
 import {
   FileText,
@@ -23,7 +21,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { IAnnotationLink, ILinkedEntity } from "@/types/annotations";
 
 interface PropsLinkedNotesModal {
   isOpen: boolean;
@@ -50,7 +47,6 @@ interface PropsLinkedNotesModal {
 export function LinkedNotesModal({
   isOpen,
   onClose,
-  entityId,
   entityName,
   entityType,
   linkedNotes,

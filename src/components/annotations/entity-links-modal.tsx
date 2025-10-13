@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import {
   Link,
@@ -272,7 +272,7 @@ export function EntityLinksModal({
                     <div className="text-center py-8">
                       <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">
-                        Nenhuma entidade encontrada com "{searchTerm}"
+                        {`Nenhuma entidade encontrada com "${searchTerm}"`}
                       </p>
                     </div>
                   )}

@@ -11,7 +11,6 @@ import {
   Calendar,
   Shield,
   Sparkles,
-  Target,
   Info,
   type LucideIcon,
 } from "lucide-react";
@@ -42,7 +41,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import {
   type ICharacterVersion,
@@ -191,7 +189,7 @@ const FieldWrapper = ({
   fieldVisibility,
   isEditing,
   onFieldVisibilityToggle,
-  t,
+  t: _t,
 }: {
   fieldName: string;
   label: string;
@@ -200,7 +198,7 @@ const FieldWrapper = ({
   fieldVisibility: IFieldVisibility;
   isEditing: boolean;
   onFieldVisibilityToggle: (field: string) => void;
-  t: (key: string) => string;
+  t: (_key: string) => string;
 }) => {
   const isVisible = fieldVisibility[fieldName] !== false;
 
@@ -266,17 +264,17 @@ export function CharacterDetailViewRefactored({
   showDeleteModal,
   isNavigationSidebarOpen,
   imagePreview,
-  selectedRelationshipCharacter,
-  selectedRelationshipType,
-  relationshipIntensity,
+  selectedRelationshipCharacter: _selectedRelationshipCharacter,
+  selectedRelationshipType: _selectedRelationshipType,
+  relationshipIntensity: _relationshipIntensity,
   fileInputRef,
   mockCharacters,
   mockLocations,
   mockOrganizations,
   roles,
-  alignments,
+  alignments: _alignments,
   genders,
-  relationshipTypes,
+  relationshipTypes: _relationshipTypes,
   currentRole,
   currentAlignment,
   currentGender,
@@ -296,21 +294,22 @@ export function CharacterDetailViewRefactored({
   onVersionChange,
   onVersionCreate,
   onVersionDelete,
-  onVersionUpdate,
+  onVersionUpdate: _onVersionUpdate,
   onImageFileChange,
-  onAgeChange,
+  onAgeChange: _onAgeChange,
   onEditDataChange,
-  onRelationshipAdd,
-  onRelationshipRemove,
-  onRelationshipIntensityUpdate,
-  onRelationshipCharacterChange,
-  onRelationshipTypeChange,
-  onRelationshipIntensityChange,
+  onRelationshipAdd: _onRelationshipAdd,
+  onRelationshipRemove: _onRelationshipRemove,
+  onRelationshipIntensityUpdate: _onRelationshipIntensityUpdate,
+  onRelationshipCharacterChange: _onRelationshipCharacterChange,
+  onRelationshipTypeChange: _onRelationshipTypeChange,
+  onRelationshipIntensityChange: _onRelationshipIntensityChange,
   onFieldVisibilityToggle,
   onAdvancedSectionToggle,
-  getRelationshipTypeData,
+  getRelationshipTypeData: _getRelationshipTypeData,
 }: CharacterDetailViewRefactoredProps) {
-  const { t } = useTranslation(["character-detail", "create-character"]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { t } = useTranslation(["character-detail", "create-character"] as any);
 
   return (
     <div className="relative min-h-screen">
@@ -356,7 +355,11 @@ export function CharacterDetailViewRefactored({
                     <Button variant="outline" onClick={onCancel}>
                       {t("character-detail:header.cancel")}
                     </Button>
-                    <Button variant="magical" className="animate-glow" onClick={onSave}>
+                    <Button
+                      variant="magical"
+                      className="animate-glow"
+                      onClick={onSave}
+                    >
                       {t("character-detail:header.save")}
                     </Button>
                   </>
@@ -641,7 +644,7 @@ export function CharacterDetailViewRefactored({
                             <h2 className="text-3xl font-bold">
                               {character.name}
                             </h2>
-                            <Badge className={currentRole?.color}>
+                            <Badge className={currentRole?.bgColorClass}>
                               <RoleIcon className="w-4 h-4 mr-1" />
                               {t(`create-character:role.${character.role}`)}
                             </Badge>
@@ -803,7 +806,9 @@ export function CharacterDetailViewRefactored({
                                 maxLength={100}
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.skinTone?.length || 0}/100</span>
+                                <span>
+                                  {editData.skinTone?.length || 0}/100
+                                </span>
                               </div>
                             </>
                           ) : character.skinTone ? (
@@ -980,7 +985,9 @@ export function CharacterDetailViewRefactored({
                               <Alert className="bg-muted/50">
                                 <Info className="h-4 w-4" />
                                 <AlertDescription className="text-xs">
-                                  Nenhuma espécie/raça cadastrada. Crie espécies e raças na aba Espécies para selecioná-las aqui.
+                                  Nenhuma espécie/raça cadastrada. Crie espécies
+                                  e raças na aba Espécies para selecioná-las
+                                  aqui.
                                 </AlertDescription>
                               </Alert>
                             ) : character.speciesAndRace ? (
@@ -1021,7 +1028,10 @@ export function CharacterDetailViewRefactored({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.distinguishingFeatures?.length || 0}/400</span>
+                                <span>
+                                  {editData.distinguishingFeatures?.length || 0}
+                                  /400
+                                </span>
                               </div>
                             </>
                           ) : character.distinguishingFeatures ? (
@@ -1183,7 +1193,9 @@ export function CharacterDetailViewRefactored({
                                   maxLength={100}
                                 />
                                 <div className="flex justify-end text-xs text-muted-foreground">
-                                  <span>{editData.favoriteFood?.length || 0}/100</span>
+                                  <span>
+                                    {editData.favoriteFood?.length || 0}/100
+                                  </span>
                                 </div>
                               </>
                             ) : character.favoriteFood ? (
@@ -1219,7 +1231,9 @@ export function CharacterDetailViewRefactored({
                                   maxLength={100}
                                 />
                                 <div className="flex justify-end text-xs text-muted-foreground">
-                                  <span>{editData.favoriteMusic?.length || 0}/100</span>
+                                  <span>
+                                    {editData.favoriteMusic?.length || 0}/100
+                                  </span>
                                 </div>
                               </>
                             ) : character.favoriteMusic ? (
@@ -1245,7 +1259,10 @@ export function CharacterDetailViewRefactored({
                               <Textarea
                                 value={editData.personality || ""}
                                 onChange={(e) =>
-                                  onEditDataChange("personality", e.target.value)
+                                  onEditDataChange(
+                                    "personality",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder={t(
                                   "character-detail:fields.personality"
@@ -1255,7 +1272,9 @@ export function CharacterDetailViewRefactored({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.personality?.length || 0}/500</span>
+                                <span>
+                                  {editData.personality?.length || 0}/500
+                                </span>
                               </div>
                             </>
                           ) : character.personality ? (
@@ -1282,7 +1301,9 @@ export function CharacterDetailViewRefactored({
                                 onChange={(e) =>
                                   onEditDataChange("hobbies", e.target.value)
                                 }
-                                placeholder={t("character-detail:fields.hobbies")}
+                                placeholder={t(
+                                  "character-detail:fields.hobbies"
+                                )}
                                 rows={3}
                                 maxLength={500}
                                 className="resize-none"
@@ -1326,7 +1347,9 @@ export function CharacterDetailViewRefactored({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.dreamsAndGoals?.length || 0}/500</span>
+                                <span>
+                                  {editData.dreamsAndGoals?.length || 0}/500
+                                </span>
                               </div>
                             </>
                           ) : character.dreamsAndGoals ? (
@@ -1364,7 +1387,9 @@ export function CharacterDetailViewRefactored({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.fearsAndTraumas?.length || 0}/500</span>
+                                <span>
+                                  {editData.fearsAndTraumas?.length || 0}/500
+                                </span>
                               </div>
                             </>
                           ) : character.fearsAndTraumas ? (
@@ -1443,7 +1468,8 @@ export function CharacterDetailViewRefactored({
                                 <Alert className="bg-muted/50">
                                   <Info className="h-4 w-4" />
                                   <AlertDescription className="text-xs">
-                                    Nenhum local cadastrado. Crie locais na aba Mundo para selecioná-los aqui.
+                                    Nenhum local cadastrado. Crie locais na aba
+                                    Mundo para selecioná-los aqui.
                                   </AlertDescription>
                                 </Alert>
                               )
@@ -1494,7 +1520,8 @@ export function CharacterDetailViewRefactored({
                                 <Alert className="bg-muted/50">
                                   <Info className="h-4 w-4" />
                                   <AlertDescription className="text-xs">
-                                    Nenhum local cadastrado. Crie locais na aba Mundo para selecioná-los aqui.
+                                    Nenhum local cadastrado. Crie locais na aba
+                                    Mundo para selecioná-los aqui.
                                   </AlertDescription>
                                 </Alert>
                               )
@@ -1516,7 +1543,8 @@ export function CharacterDetailViewRefactored({
                             t={t}
                           >
                             {isEditing ? (
-                              mockOrganizations && mockOrganizations.length > 0 ? (
+                              mockOrganizations &&
+                              mockOrganizations.length > 0 ? (
                                 <Select
                                   value={editData.organization || ""}
                                   onValueChange={(value) =>
@@ -1542,7 +1570,8 @@ export function CharacterDetailViewRefactored({
                                 <Alert className="bg-muted/50">
                                   <Info className="h-4 w-4" />
                                   <AlertDescription className="text-xs">
-                                    Nenhuma organização cadastrada. Crie organizações para selecioná-las aqui.
+                                    Nenhuma organização cadastrada. Crie
+                                    organizações para selecioná-las aqui.
                                   </AlertDescription>
                                 </Alert>
                               )
@@ -1633,7 +1662,7 @@ export function CharacterDetailViewRefactored({
                       onVersionCreate={onVersionCreate}
                       onVersionDelete={onVersionDelete}
                       isEditMode={isEditing}
-                      mainCharacterData={character}
+                      mainCharacterData={character as any}
                     />
                   </CardContent>
                 </Card>

@@ -20,7 +20,6 @@ interface PropsBookCard {
 }
 
 export function BookCard({
-  id,
   title,
   genre,
   visualStyle,
@@ -43,6 +42,14 @@ export function BookCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
     >
       {/* Book Cover */}
       <div className="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-muted to-muted/50">

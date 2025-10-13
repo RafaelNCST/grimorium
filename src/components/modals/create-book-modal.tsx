@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-import { Upload, Book, BookPlus } from "lucide-react";
+import { Book, BookPlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -111,8 +111,8 @@ export function CreateBookModal({
     }
   };
 
-  const handleGenreToggle = (genreKey: string) => {
-    const genreValue = t(genreKey);
+  const handleGenreToggle = (genreKey: (typeof GENRE_KEYS)[number]) => {
+    const genreValue = t(genreKey) as string;
     setFormData((prev) => ({
       ...prev,
       genre: prev.genre.includes(genreValue)
@@ -179,7 +179,16 @@ export function CreateBookModal({
                   className="hidden"
                 />
                 <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label={t("modal.upload_image")}
                   onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
                   className="w-32 h-48 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
                 >
                   {previewImage ? (
@@ -262,7 +271,7 @@ export function CreateBookModal({
             </Label>
             <div className="flex flex-wrap gap-2">
               {GENRE_KEYS.map((genreKey) => {
-                const genreValue = t(genreKey);
+                const genreValue = t(genreKey) as string;
                 const isSelected = formData.genre.includes(genreValue);
                 return (
                   <button
@@ -303,7 +312,7 @@ export function CreateBookModal({
               </SelectTrigger>
               <SelectContent side="bottom">
                 {VISUAL_STYLE_KEYS.map((styleKey) => {
-                  const styleValue = t(styleKey);
+                  const styleValue = t(styleKey) as string;
                   return (
                     <SelectItem key={styleKey} value={styleValue}>
                       {styleValue}

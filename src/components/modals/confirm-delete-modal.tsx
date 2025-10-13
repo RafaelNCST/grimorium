@@ -32,7 +32,6 @@ export function ConfirmDeleteModal({
   title,
   description,
   itemName,
-  itemType = "item",
 }: PropsConfirmDeleteModal) {
   const { t } = useLanguageStore();
   const [confirmText, setConfirmText] = useState("");
@@ -74,7 +73,7 @@ export function ConfirmDeleteModal({
         {itemName && (
           <div className="space-y-3">
             <Label htmlFor="confirm-name" className="text-sm font-medium">
-              Digite "{itemName}" para confirmar:
+              {`Digite "${itemName}" para confirmar:`}
             </Label>
             <Input
               id="confirm-name"

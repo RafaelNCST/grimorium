@@ -14,8 +14,6 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ICharacter, ICharacterFormData } from "@/types/character-types";
 
-import { getRoleLabel } from "./utils/get-role-label";
-
 interface IRoleStats {
   total: number;
   protagonist: number;
@@ -49,7 +47,8 @@ export function CharactersView({
   onCharacterCreated,
   onCharacterClick,
 }: CharactersViewProps) {
-  const { t } = useTranslation(["characters", "create-character"]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { t } = useTranslation(["characters", "create-character"] as any);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasMountedRef = useRef(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
@@ -308,8 +307,8 @@ export function CharactersView({
               ? t("characters:empty_state.no_characters")
               : selectedRole !== null
                 ? t("characters:empty_state.no_role_characters", {
-                    role: t(
-                      `create-character:role.${selectedRole}`
+                    role: (
+                      t(`create-character:role.${selectedRole}`) as string
                     ).toLowerCase(),
                   })
                 : t("characters:empty_state.no_results")

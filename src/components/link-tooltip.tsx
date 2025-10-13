@@ -56,7 +56,7 @@ export function LinkTooltip({
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              Texto linkado: "{text}"
+              {`Texto linkado: "${text}"`}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               Clique para navegar para {entityType}

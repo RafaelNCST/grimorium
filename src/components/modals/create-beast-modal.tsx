@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -57,7 +56,6 @@ const threatLevels = [
 export function CreateBeastModal({
   open,
   onOpenChange,
-  bookId,
 }: PropsCreateBeastModal) {
   const [formData, setFormData] = useState({
     name: "",
@@ -96,9 +94,6 @@ export function CreateBeastModal({
       toast.error("Nível de ameaça é obrigatório");
       return;
     }
-
-    // Here you would typically save to your data store
-    console.log("Creating beast:", formData);
 
     toast.success(`Besta "${formData.name}" criada com sucesso!`);
 

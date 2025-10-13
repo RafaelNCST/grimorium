@@ -33,7 +33,10 @@ export function HomePage() {
     const loadBooks = async () => {
       try {
         console.log("[HomePage] Starting to load books from database...");
-        console.log("[HomePage] Current books in store before load:", books.length);
+        console.log(
+          "[HomePage] Current books in store before load:",
+          books.length
+        );
 
         const booksFromDB = await getAllBooks();
 
@@ -69,7 +72,10 @@ export function HomePage() {
     loadBooks();
   }, [setBooks]);
 
-  const filteredBooks = useMemo(() => getFilteredBooks(), [getFilteredBooks, books, searchTerm]);
+  const filteredBooks = useMemo(
+    () => getFilteredBooks(),
+    [getFilteredBooks, books, searchTerm]
+  );
 
   const lastEditedBook = useMemo(() => getLastEditedBook(books), [books]);
 

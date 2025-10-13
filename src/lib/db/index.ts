@@ -136,7 +136,10 @@ async function runMigrations(database: Database): Promise<void> {
     const result = await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"
     );
-    console.log("[db] Books table verified. Current row count:", result[0]?.count || 0);
+    console.log(
+      "[db] Books table verified. Current row count:",
+      result[0]?.count || 0
+    );
   } catch (error) {
     console.error("[db] Error during migrations:", error);
     throw error;

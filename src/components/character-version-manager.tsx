@@ -25,7 +25,7 @@ export interface ICharacterVersion {
   description?: string;
   createdAt: Date;
   isActive: boolean;
-  data: any; // Character data for this version
+  data: unknown; // Character data for this version
 }
 
 interface PropsCharacterVersionManager {
@@ -43,7 +43,6 @@ interface PropsCharacterVersionManager {
 
 export function CharacterVersionManager({
   versions,
-  currentVersion,
   onVersionChange,
   onVersionSave,
   onVersionDelete,
@@ -203,9 +202,19 @@ export function CharacterVersionManager({
                         ? "border-primary bg-primary/10"
                         : "border-muted hover:border-primary/50"
                     }`}
+                    role="button"
+                    tabIndex={0}
                     onClick={() =>
                       !version.isActive && onVersionChange(version)
                     }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (!version.isActive) {
+                          onVersionChange(version);
+                        }
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">

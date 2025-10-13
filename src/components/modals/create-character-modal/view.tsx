@@ -368,13 +368,18 @@ export function CreateCharacterModalView({
 
                 {/* Species and Race */}
                 <div className="space-y-2">
-                  <Label htmlFor="speciesAndRace" className="text-sm font-medium">
+                  <Label
+                    htmlFor="speciesAndRace"
+                    className="text-sm font-medium"
+                  >
                     {t("modal.species_and_race")}
                   </Label>
                   {hasSpecies ? (
                     <Select
                       value={watchedValues.speciesAndRace}
-                      onValueChange={(value) => setValue("speciesAndRace", value)}
+                      onValueChange={(value) =>
+                        setValue("speciesAndRace", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue
