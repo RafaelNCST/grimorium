@@ -55,7 +55,7 @@ export function HomeView({
   onCloseSettingsModal,
 }: PropsHomeView) {
   return (
-    <div className="bg-background min-h-full flex flex-col">
+    <div className="bg-background flex-1 h-full flex flex-col">
       <div className="flex-shrink-0">
         <Header
           daysSinceLastChapter={daysSinceLastChapter}
@@ -67,17 +67,15 @@ export function HomeView({
         />
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col">
-        <ListBooks
-          filteredBooks={filteredBooks}
-          searchTerm={searchTerm}
-          totalBooks={totalBooks}
-          totalCharacters={totalCharacters}
-          totalWords={totalWords}
-          onSearchTermChange={onSearchTermChange}
-          onBookSelect={onBookSelect}
-        />
-      </div>
+      <ListBooks
+        filteredBooks={filteredBooks}
+        searchTerm={searchTerm}
+        totalBooks={totalBooks}
+        totalCharacters={totalCharacters}
+        totalWords={totalWords}
+        onSearchTermChange={onSearchTermChange}
+        onBookSelect={onBookSelect}
+      />
 
       <CreateBookModal
         open={showCreateModal}

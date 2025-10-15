@@ -81,7 +81,7 @@ export function CharactersView({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 h-full flex flex-col space-y-6">
       {/* Header with compact role stats */}
       <div className="flex items-center justify-between">
         <div>

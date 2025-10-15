@@ -54,7 +54,7 @@ export function ItemsView({
 }: PropsItemsView) {
   if (items.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="flex-1 h-full flex flex-col space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">Itens</h2>
@@ -91,7 +91,7 @@ export function ItemsView({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 h-full flex flex-col space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Itens</h2>
