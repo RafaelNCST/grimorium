@@ -1,0 +1,38 @@
+{
+  "page": {
+    "title": "Itens",
+    "description": "Gerencie armas, artefatos e itens importantes da sua história",
+    "new_item": "Novo Item",
+    "search_placeholder": "Buscar itens...",
+    "total_badge": "Total",
+    "category_badge": {
+      "weapon": "Arma",
+      "armor": "Armadura",
+      "accessory": "Acessório",
+      "relic": "Relíquia",
+      "consumable": "Consumível",
+      "resource": "Recurso",
+      "artifact": "Artefato",
+      "other": "Outro"
+    },
+    "status_badge": {
+      "complete": "Completa",
+      "incomplete": "Incompleta",
+      "destroyed": "Destruída",
+      "sealed": "Selada",
+      "weakened": "Enfraquecida",
+      "strengthened": "Fortalecida",
+      "apex": "Ápice"
+    }
+  },
+  "empty_state": {
+    "no_items": "Nenhum item cadastrado",
+    "no_items_description": "Comece criando seu primeiro item para equipar seus personagens e enriquecer sua história.",
+    "no_results": "Nenhum item encontrado",
+    "no_results_description": "Tente ajustar os filtros ou o termo de busca.",
+    "no_category_items": "Nenhum item de {{category}}",
+    "no_category_items_description": "Você ainda não criou itens nesta categoria",
+    "no_status_items": "Nenhum item {{status}}",
+    "no_status_items_description": "Você ainda não criou itens com este status"
+  }
+}

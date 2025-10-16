@@ -1,31 +1,40 @@
-import { Item } from "@/mocks/local/item-data";
+import { IItem } from "../components/item-card";
 
 interface FilterItemsParams {
-  items: Item[];
+  items: IItem[];
   searchTerm: string;
-  selectedCategory: string;
-  selectedRarity: string;
+  selectedCategory: string | null;
+  selectedStatus: string | null;
 }
 
 export function filterItems({
   items,
   searchTerm,
   selectedCategory,
-  selectedRarity,
-}: FilterItemsParams): Item[] {
+  selectedStatus,
+}: FilterItemsParams): IItem[] {
   return items.filter((item) => {
+    // Search filter
     const matchesSearch =
+      searchTerm === "" ||
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.alternativeNames.some((name) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      item.basicDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.alternativeNames &&
+        item.alternativeNames.some((name) =>
+          name.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
 
+    // Category filter - if category is "other", match all custom categories (items with category="other")
     const matchesCategory =
-      selectedCategory === "all" || item.category === selectedCategory;
+      selectedCategory === null ||
+      (selectedCategory === "other"
+        ? item.category === "other"
+        : item.category === selectedCategory);
 
-    const matchesRarity =
-      selectedRarity === "all" || item.rarity.id === selectedRarity;
+    // Status filter
+    const matchesStatus =
+      selectedStatus === null || item.status === selectedStatus;
 
-    return matchesSearch && matchesCategory && matchesRarity;
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 }

@@ -10,6 +10,37 @@ interface PropsStatusPicker {
   error?: string;
 }
 
+// Helper function to get the CSS color from Tailwind class
+const getColorFromTailwindClass = (className: string): string => {
+  // Extract the base color from classes like "text-green-600 dark:text-green-400"
+  // In light mode, we use the first color (e.g., green-600)
+  // In dark mode, the dark: variant will apply automatically via the Tailwind class
+
+  // For light mode
+  if (className.includes("text-green-600")) return "rgb(22 163 74)";
+  if (className.includes("text-slate-700")) return "rgb(51 65 85)";
+  if (className.includes("text-red-600")) return "rgb(220 38 38)";
+  if (className.includes("text-purple-600")) return "rgb(147 51 234)";
+  if (className.includes("text-orange-600")) return "rgb(234 88 12)";
+  if (className.includes("text-blue-600")) return "rgb(37 99 235)";
+  if (className.includes("text-yellow-600")) return "rgb(202 138 4)";
+
+  return "currentColor";
+};
+
+// Helper to get dark mode color
+const getDarkColorFromTailwindClass = (className: string): string => {
+  if (className.includes("dark:text-green-400")) return "rgb(74 222 128)";
+  if (className.includes("dark:text-slate-300")) return "rgb(203 213 225)";
+  if (className.includes("dark:text-red-400")) return "rgb(248 113 113)";
+  if (className.includes("dark:text-purple-400")) return "rgb(192 132 252)";
+  if (className.includes("dark:text-orange-400")) return "rgb(251 146 60)";
+  if (className.includes("dark:text-blue-400")) return "rgb(96 165 250)";
+  if (className.includes("dark:text-yellow-400")) return "rgb(250 204 21)";
+
+  return "currentColor";
+};
+
 export function StatusPicker({ value, onChange, error }: PropsStatusPicker) {
   const { t } = useTranslation("create-item");
 
@@ -20,23 +51,8 @@ export function StatusPicker({ value, onChange, error }: PropsStatusPicker) {
         {ITEM_STATUSES_CONSTANT.map((status) => {
           const Icon = status.icon;
           const isSelected = value === status.value;
-
-          // Map colors
-          const hoverColor = status.activeColor.includes("green")
-            ? "rgb(22 163 74)"
-            : status.activeColor.includes("slate")
-              ? "rgb(51 65 85)"
-              : status.activeColor.includes("red")
-                ? "rgb(220 38 38)"
-                : status.activeColor.includes("purple")
-                  ? "rgb(147 51 234)"
-                  : status.activeColor.includes("orange")
-                    ? "rgb(234 88 12)"
-                    : status.activeColor.includes("blue")
-                      ? "rgb(37 99 235)"
-                      : status.activeColor.includes("yellow")
-                        ? "rgb(202 138 4)"
-                        : "currentColor";
+          const lightColor = getColorFromTailwindClass(status.activeColor);
+          const darkColor = getDarkColorFromTailwindClass(status.activeColor);
 
           return (
             <button
@@ -64,7 +80,17 @@ export function StatusPicker({ value, onChange, error }: PropsStatusPicker) {
                 <style>{`
                   .status-picker-item[data-status="${status.value}"]:hover svg,
                   .status-picker-item[data-status="${status.value}"]:hover span {
-                    color: ${hoverColor} !important;
+                    color: ${lightColor} !important;
+                  }
+                  @media (prefers-color-scheme: dark) {
+                    .status-picker-item[data-status="${status.value}"]:hover svg,
+                    .status-picker-item[data-status="${status.value}"]:hover span {
+                      color: ${darkColor} !important;
+                    }
+                  }
+                  .dark .status-picker-item[data-status="${status.value}"]:hover svg,
+                  .dark .status-picker-item[data-status="${status.value}"]:hover span {
+                    color: ${darkColor} !important;
                   }
                 `}</style>
               )}

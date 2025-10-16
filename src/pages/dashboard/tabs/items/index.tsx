@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { mockRarities, mockStatuses } from "@/mocks/local/item-data";
+import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 
-import { ITEM_CATEGORIES_CONSTANT } from "./constants/item-categories-constant";
+import { IItem } from "./components/item-card";
 import { filterItems } from "./utils/filter-items";
 import { ItemsView } from "./view";
 
@@ -15,12 +15,11 @@ interface PropsItemsTab {
 export function ItemsTab({ bookId }: PropsItemsTab) {
   const navigate = useNavigate();
 
+  const [items, setItems] = useState<IItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedRarity, setSelectedRarity] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-
-  const items = useMemo(() => [], []);
 
   const filteredItems = useMemo(
     () =>
@@ -28,9 +27,9 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
         items,
         searchTerm,
         selectedCategory,
-        selectedRarity,
+        selectedStatus,
       }),
-    [items, searchTerm, selectedCategory, selectedRarity]
+    [items, searchTerm, selectedCategory, selectedStatus]
   );
 
   const handleNavigateToItem = useCallback(
@@ -47,19 +46,38 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     setSearchTerm(term);
   }, []);
 
-  const handleSelectedCategoryChange = useCallback((category: string) => {
+  const handleCategoryFilterChange = useCallback((category: string | null) => {
     setSelectedCategory(category);
   }, []);
 
-  const handleSelectedRarityChange = useCallback((rarity: string) => {
-    setSelectedRarity(rarity);
+  const handleStatusFilterChange = useCallback((status: string | null) => {
+    setSelectedStatus(status);
   }, []);
 
   const handleShowCreateModalChange = useCallback((show: boolean) => {
     setShowCreateModal(show);
   }, []);
 
-  const handleCreateItem = useCallback((itemData: any) => {
+  const handleCreateItem = useCallback((itemData: ItemFormSchema) => {
+    const newItem: IItem = {
+      id: Date.now().toString(),
+      name: itemData.name,
+      status: itemData.status,
+      category: itemData.category,
+      customCategory: itemData.customCategory,
+      basicDescription: itemData.basicDescription,
+      image: itemData.image,
+      appearance: itemData.appearance,
+      origin: itemData.origin,
+      alternativeNames: itemData.alternativeNames,
+      storyRarity: itemData.storyRarity,
+      narrativePurpose: itemData.narrativePurpose,
+      usageRequirements: itemData.usageRequirements,
+      usageConsequences: itemData.usageConsequences,
+      createdAt: new Date().toISOString(),
+    };
+
+    setItems((prev) => [...prev, newItem]);
     setShowCreateModal(false);
   }, []);
 
@@ -67,16 +85,13 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     <ItemsView
       items={items}
       filteredItems={filteredItems}
-      categories={ITEM_CATEGORIES_CONSTANT}
-      mockRarities={mockRarities}
-      mockStatuses={mockStatuses}
       searchTerm={searchTerm}
       selectedCategory={selectedCategory}
-      selectedRarity={selectedRarity}
+      selectedStatus={selectedStatus}
       showCreateModal={showCreateModal}
       onSearchTermChange={handleSearchTermChange}
-      onSelectedCategoryChange={handleSelectedCategoryChange}
-      onSelectedRarityChange={handleSelectedRarityChange}
+      onCategoryFilterChange={handleCategoryFilterChange}
+      onStatusFilterChange={handleStatusFilterChange}
       onShowCreateModalChange={handleShowCreateModalChange}
       onNavigateToItem={handleNavigateToItem}
       onCreateItem={handleCreateItem}

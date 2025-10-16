@@ -1,0 +1,38 @@
+{
+  "page": {
+    "title": "Items",
+    "description": "Manage weapons, artifacts, and important items in your story",
+    "new_item": "New Item",
+    "search_placeholder": "Search items...",
+    "total_badge": "Total",
+    "category_badge": {
+      "weapon": "Weapon",
+      "armor": "Armor",
+      "accessory": "Accessory",
+      "relic": "Relic",
+      "consumable": "Consumable",
+      "resource": "Resource",
+      "artifact": "Artifact",
+      "other": "Other"
+    },
+    "status_badge": {
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "destroyed": "Destroyed",
+      "sealed": "Sealed",
+      "weakened": "Weakened",
+      "strengthened": "Strengthened",
+      "apex": "Apex"
+    }
+  },
+  "empty_state": {
+    "no_items": "No items created",
+    "no_items_description": "Start creating your first item to equip your characters and enrich your story.",
+    "no_results": "No items found",
+    "no_results_description": "Try adjusting the filters or search term.",
+    "no_category_items": "No {{category}} items",
+    "no_category_items_description": "You haven't created items in this category yet",
+    "no_status_items": "No {{status}} items",
+    "no_status_items_description": "You haven't created items with this status yet"
+  }
+}
