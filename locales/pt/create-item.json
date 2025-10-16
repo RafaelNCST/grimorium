@@ -1,0 +1,82 @@
+{
+  "modal": {
+    "create_item": "Criar Novo Item",
+    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história.",
+    "basic_fields": "Campos Básicos",
+    "change_image": "Alterar Imagem",
+    "upload_image": "Enviar Imagem",
+
+    "item_name": "Nome do Item",
+    "name_placeholder": "Excalibur, Anel do Destino, Poção de Cura",
+    "item_status": "Status do Item",
+    "category": "Categoria",
+    "category_placeholder": "Selecione uma categoria",
+    "custom_category_placeholder": "Digite a categoria personalizada...",
+    "back_to_categories": "Voltar às categorias",
+    "basic_description": "Descrição Básica",
+    "basic_description_placeholder": "Uma espada lendária forjada nas chamas de um dragão ancestral, capaz de cortar qualquer material.",
+
+    "appearance": "Aparência",
+    "appearance_placeholder": "Lâmina prateada com runas douradas que brilham quando próxima ao perigo, cabo envolto em couro negro de dragão.",
+    "origin": "Origem",
+    "origin_placeholder": "Forjada há mil anos pelo ferreiro lendário Thorgrim nas Montanhas Eternas.",
+    "alternative_names": "Nomes Alternativos",
+    "alternative_names_placeholder": "A Lâmina do Rei, Cortadora de Sombras",
+    "story_rarity": "Raridade na História",
+    "rarity_explanation": "A raridade determina quão único é o item no mundo da sua história. Isso não serve para definir mecânicas de jogo, mas sim a raridade disso na sua narrativa.",
+    "narrative_purpose": "Propósito Narrativo",
+    "narrative_purpose_placeholder": "Símbolo de poder que será disputado pelos reinos, chave para romper a maldição ancestral.",
+    "usage_requirements": "Requisitos de Uso",
+    "usage_requirements_placeholder": "Apenas pode ser empunhada por alguém de sangue real, requer grande força física.",
+    "usage_consequences": "Consequências ou Custo de Uso",
+    "usage_consequences_placeholder": "Drena a energia vital do usuário, atrai criaturas das sombras quando desembainhada."
+  },
+  "status": {
+    "complete": "Completa",
+    "incomplete": "Incompleta",
+    "destroyed": "Destruída",
+    "sealed": "Selada",
+    "weakened": "Enfraquecida",
+    "strengthened": "Fortalecida",
+    "apex": "Ápice"
+  },
+  "category": {
+    "weapon": "Arma",
+    "armor": "Armadura",
+    "accessory": "Acessório",
+    "relic": "Relíquia",
+    "consumable": "Consumível",
+    "resource": "Recurso",
+    "artifact": "Artefato",
+    "other": "Outro"
+  },
+  "rarity": {
+    "common": "Comum",
+    "common_desc": "Existem várias na sua história",
+    "uncommon": "Incomum",
+    "uncommon_desc": "Poucas existem, mas não é única",
+    "rare": "Raro",
+    "rare_desc": "Muito difícil de encontrar",
+    "legendary": "Lendário",
+    "legendary_desc": "Pouquíssimas existem, altamente cobiçada",
+    "unique": "Único",
+    "unique_desc": "Só existe uma em toda a sua história!"
+  },
+  "validation": {
+    "name_required": "Nome é obrigatório",
+    "name_max_length": "Nome deve ter no máximo 150 caracteres",
+    "status_required": "Status é obrigatório",
+    "category_required": "Categoria é obrigatória",
+    "basic_description_required": "Descrição básica é obrigatória",
+    "basic_description_max_length": "Descrição básica deve ter no máximo 500 caracteres",
+    "appearance_max_length": "Aparência deve ter no máximo 500 caracteres",
+    "origin_max_length": "Origem deve ter no máximo 500 caracteres",
+    "narrative_purpose_max_length": "Propósito narrativo deve ter no máximo 500 caracteres",
+    "usage_requirements_max_length": "Requisitos de uso devem ter no máximo 250 caracteres",
+    "usage_consequences_max_length": "Consequências de uso devem ter no máximo 250 caracteres"
+  },
+  "button": {
+    "cancel": "Cancelar",
+    "create": "Criar Item"
+  }
+}

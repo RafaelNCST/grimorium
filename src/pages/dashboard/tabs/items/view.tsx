@@ -3,7 +3,7 @@ import React from "react";
 import { Plus, Search, Package } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
-import { CreateItemModal } from "@/components/modals/create-item-modal";
+import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -80,11 +80,9 @@ export function ItemsView({
         />
 
         <CreateItemModal
-          isOpen={showCreateModal}
+          open={showCreateModal}
           onClose={() => onShowCreateModalChange(false)}
-          onSubmit={onCreateItem}
-          rarities={mockRarities}
-          statuses={mockStatuses}
+          onConfirm={onCreateItem}
         />
       </div>
     );
@@ -238,11 +236,9 @@ export function ItemsView({
       </div>
 
       <CreateItemModal
-        isOpen={showCreateModal}
+        open={showCreateModal}
         onClose={() => onShowCreateModalChange(false)}
-        onSubmit={onCreateItem}
-        rarities={mockRarities}
-        statuses={mockStatuses}
+        onConfirm={onCreateItem}
       />
     </div>
   );

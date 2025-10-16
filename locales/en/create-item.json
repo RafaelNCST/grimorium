@@ -1,0 +1,82 @@
+{
+  "modal": {
+    "create_item": "Create New Item",
+    "info_message": "Everything can be edited later. Start with basic information and add details as you develop your story.",
+    "basic_fields": "Basic Fields",
+    "change_image": "Change Image",
+    "upload_image": "Upload Image",
+
+    "item_name": "Item Name",
+    "name_placeholder": "Excalibur, Ring of Destiny, Healing Potion",
+    "item_status": "Item Status",
+    "category": "Category",
+    "category_placeholder": "Select a category",
+    "custom_category_placeholder": "Enter custom category...",
+    "back_to_categories": "Back to categories",
+    "basic_description": "Basic Description",
+    "basic_description_placeholder": "A legendary sword forged in the flames of an ancient dragon, capable of cutting any material.",
+
+    "appearance": "Appearance",
+    "appearance_placeholder": "Silver blade with golden runes that glow when near danger, hilt wrapped in black dragon leather.",
+    "origin": "Origin",
+    "origin_placeholder": "Forged a thousand years ago by the legendary blacksmith Thorgrim in the Eternal Mountains.",
+    "alternative_names": "Alternative Names",
+    "alternative_names_placeholder": "The King's Blade, Shadow Cutter",
+    "story_rarity": "Story Rarity",
+    "rarity_explanation": "Rarity determines how unique the item is in your story world. This does not serve to define game mechanics, but rather the rarity of it in its narrative.",
+    "narrative_purpose": "Narrative Purpose",
+    "narrative_purpose_placeholder": "Symbol of power that will be disputed among kingdoms, key to breaking the ancestral curse.",
+    "usage_requirements": "Usage Requirements",
+    "usage_requirements_placeholder": "Can only be wielded by someone of royal blood, requires great physical strength.",
+    "usage_consequences": "Consequences or Cost of Use",
+    "usage_consequences_placeholder": "Drains the user's life energy, attracts shadow creatures when unsheathed."
+  },
+  "status": {
+    "complete": "Complete",
+    "incomplete": "Incomplete",
+    "destroyed": "Destroyed",
+    "sealed": "Sealed",
+    "weakened": "Weakened",
+    "strengthened": "Strengthened",
+    "apex": "Apex"
+  },
+  "category": {
+    "weapon": "Weapon",
+    "armor": "Armor",
+    "accessory": "Accessory",
+    "relic": "Relic",
+    "consumable": "Consumable",
+    "resource": "Resource",
+    "artifact": "Artifact",
+    "other": "Other"
+  },
+  "rarity": {
+    "common": "Common",
+    "common_desc": "Several exist in your story",
+    "uncommon": "Uncommon",
+    "uncommon_desc": "Few exist, but not unique",
+    "rare": "Rare",
+    "rare_desc": "Very difficult to find",
+    "legendary": "Legendary",
+    "legendary_desc": "Very few exist, highly coveted",
+    "unique": "Unique",
+    "unique_desc": "Only one exists in your entire story!"
+  },
+  "validation": {
+    "name_required": "Name is required",
+    "name_max_length": "Name must be at most 150 characters",
+    "status_required": "Status is required",
+    "category_required": "Category is required",
+    "basic_description_required": "Basic description is required",
+    "basic_description_max_length": "Basic description must be at most 500 characters",
+    "appearance_max_length": "Appearance must be at most 500 characters",
+    "origin_max_length": "Origin must be at most 500 characters",
+    "narrative_purpose_max_length": "Narrative purpose must be at most 500 characters",
+    "usage_requirements_max_length": "Usage requirements must be at most 250 characters",
+    "usage_consequences_max_length": "Usage consequences must be at most 250 characters"
+  },
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create Item"
+  }
+}
