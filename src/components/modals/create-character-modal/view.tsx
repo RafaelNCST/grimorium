@@ -26,7 +26,6 @@ import { AdvancedSection } from "./components/advanced-section";
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { ArchetypeSelector } from "./components/archetype-selector";
 import { CharacterImageUpload } from "./components/character-image-upload";
-import { ColorPickerInput } from "./components/color-picker-input";
 import { RolePicker } from "./components/role-picker";
 import { GENDERS_CONSTANT } from "./constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "./constants/physical-types";

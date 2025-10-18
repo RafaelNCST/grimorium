@@ -49,10 +49,13 @@ export function SpeciesView({
   onOpenCreateRaceModal,
 }: PropsSpeciesView) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className={species.length === 0 ? "flex-1 h-full flex flex-col space-y-6" : "space-y-6"}>
+      <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Espécies</h2>
+          <p className="text-muted-foreground">
+            Gerencie as espécies e raças que habitam o seu mundo
+          </p>
           {species.length > 0 && (
             <div className="mt-1">
               <StatsBadges

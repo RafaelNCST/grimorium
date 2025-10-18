@@ -22,7 +22,6 @@ import { Route as DashboardDashboardIdTabsRaceRaceIdRouteImport } from './routes
 import { Route as DashboardDashboardIdTabsPlotPlotTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/plot-timeline'
 import { Route as DashboardDashboardIdTabsPlotPlotIdRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/$plotId'
 import { Route as DashboardDashboardIdTabsOrganizationOrgIdRouteImport } from './routes/dashboard/$dashboardId/tabs/organization/$orgId'
-import { Route as DashboardDashboardIdTabsBeastBeastIdRouteImport } from './routes/dashboard/$dashboardId/tabs/beast/$beastId'
 import { Route as DashboardDashboardIdTabsItemItemIdIndexRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/index'
 import { Route as DashboardDashboardIdTabsCharacterCharacterIdIndexRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/index'
 import { Route as DashboardDashboardIdTabsItemItemIdTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/timeline'
@@ -104,12 +103,6 @@ const DashboardDashboardIdTabsOrganizationOrgIdRoute =
     path: '/dashboard/$dashboardId/tabs/organization/$orgId',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardDashboardIdTabsBeastBeastIdRoute =
-  DashboardDashboardIdTabsBeastBeastIdRouteImport.update({
-    id: '/dashboard/$dashboardId/tabs/beast/$beastId',
-    path: '/dashboard/$dashboardId/tabs/beast/$beastId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const DashboardDashboardIdTabsItemItemIdIndexRoute =
   DashboardDashboardIdTabsItemItemIdIndexRouteImport.update({
     id: '/dashboard/$dashboardId/tabs/item/$itemId/',
@@ -144,7 +137,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
-  '/dashboard/$dashboardId/tabs/beast/$beastId': typeof DashboardDashboardIdTabsBeastBeastIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -164,7 +156,6 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
-  '/dashboard/$dashboardId/tabs/beast/$beastId': typeof DashboardDashboardIdTabsBeastBeastIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -185,7 +176,6 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters/': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes/': typeof DashboardDashboardIdNotesIndexRoute
-  '/dashboard/$dashboardId/tabs/beast/$beastId': typeof DashboardDashboardIdTabsBeastBeastIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -207,7 +197,6 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
     | '/dashboard/$dashboardId/notes'
-    | '/dashboard/$dashboardId/tabs/beast/$beastId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -227,7 +216,6 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
     | '/dashboard/$dashboardId/notes'
-    | '/dashboard/$dashboardId/tabs/beast/$beastId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -247,7 +235,6 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters/'
     | '/dashboard/$dashboardId/notes/'
-    | '/dashboard/$dashboardId/tabs/beast/$beastId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -268,7 +255,6 @@ export interface RootRouteChildren {
   DashboardDashboardIdNotesFileNotesIdRoute: typeof DashboardDashboardIdNotesFileNotesIdRoute
   DashboardDashboardIdChaptersIndexRoute: typeof DashboardDashboardIdChaptersIndexRoute
   DashboardDashboardIdNotesIndexRoute: typeof DashboardDashboardIdNotesIndexRoute
-  DashboardDashboardIdTabsBeastBeastIdRoute: typeof DashboardDashboardIdTabsBeastBeastIdRoute
   DashboardDashboardIdTabsOrganizationOrgIdRoute: typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   DashboardDashboardIdTabsPlotPlotIdRoute: typeof DashboardDashboardIdTabsPlotPlotIdRoute
   DashboardDashboardIdTabsPlotPlotTimelineRoute: typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -373,13 +359,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIdTabsOrganizationOrgIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/$dashboardId/tabs/beast/$beastId': {
-      id: '/dashboard/$dashboardId/tabs/beast/$beastId'
-      path: '/dashboard/$dashboardId/tabs/beast/$beastId'
-      fullPath: '/dashboard/$dashboardId/tabs/beast/$beastId'
-      preLoaderRoute: typeof DashboardDashboardIdTabsBeastBeastIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/$dashboardId/tabs/item/$itemId/': {
       id: '/dashboard/$dashboardId/tabs/item/$itemId/'
       path: '/dashboard/$dashboardId/tabs/item/$itemId'
@@ -424,8 +403,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardDashboardIdChaptersIndexRoute:
     DashboardDashboardIdChaptersIndexRoute,
   DashboardDashboardIdNotesIndexRoute: DashboardDashboardIdNotesIndexRoute,
-  DashboardDashboardIdTabsBeastBeastIdRoute:
-    DashboardDashboardIdTabsBeastBeastIdRoute,
   DashboardDashboardIdTabsOrganizationOrgIdRoute:
     DashboardDashboardIdTabsOrganizationOrgIdRoute,
   DashboardDashboardIdTabsPlotPlotIdRoute:

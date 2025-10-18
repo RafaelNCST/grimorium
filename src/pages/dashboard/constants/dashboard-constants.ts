@@ -6,7 +6,6 @@ import {
   Target,
   Sparkles,
   Dna,
-  Skull,
   Package,
 } from "lucide-react";
 
@@ -54,7 +53,5 @@ export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   { id: "plot", label: "Enredo", icon: Target, visible: true },
   { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
   { id: "species", label: "Espécies", icon: Dna, visible: true },
-  { id: "bestiary", label: "Bestiário", icon: Skull, visible: true },
   { id: "items", label: "Itens", icon: Package, visible: true },
-  { id: "encyclopedia", label: "Enciclopédia", icon: BookOpen, visible: true },
 ];

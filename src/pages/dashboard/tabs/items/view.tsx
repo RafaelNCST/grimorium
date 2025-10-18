@@ -80,7 +80,7 @@ const ItemsViewComponent = function ItemsView({
   if (totalItems === 0) {
     return (
       <div className="flex-1 h-full flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold">{t("items:page.title")}</h2>
             <p className="text-muted-foreground">
@@ -174,7 +174,7 @@ const ItemsViewComponent = function ItemsView({
   return (
     <div className="flex-1 h-full flex flex-col space-y-6">
       {/* Header with category and status counters */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold">{t("items:page.title")}</h2>
           <p className="text-muted-foreground">{t("items:page.description")}</p>

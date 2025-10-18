@@ -6,7 +6,6 @@ import enCharacters from "../../locales/en/characters.json";
 import enCreateBook from "../../locales/en/create-book.json";
 import enCreateCharacter from "../../locales/en/create-character.json";
 import enCreateItem from "../../locales/en/create-item.json";
-import enEncyclopedia from "../../locales/en/encyclopedia.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
@@ -17,7 +16,6 @@ import ptCharacters from "../../locales/pt/characters.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateCharacter from "../../locales/pt/create-character.json";
 import ptCreateItem from "../../locales/pt/create-item.json";
-import ptEncyclopedia from "../../locales/pt/encyclopedia.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
@@ -27,7 +25,6 @@ import ptOverview from "../../locales/pt/overview.json";
 const resources = {
   en: {
     home: enHome,
-    encyclopedia: enEncyclopedia,
     inbox: enInbox,
     characters: enCharacters,
     "character-detail": enCharacterDetail,
@@ -40,7 +37,6 @@ const resources = {
   },
   pt: {
     home: ptHome,
-    encyclopedia: ptEncyclopedia,
     inbox: ptInbox,
     characters: ptCharacters,
     "character-detail": ptCharacterDetail,

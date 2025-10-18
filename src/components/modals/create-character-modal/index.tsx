@@ -23,7 +23,7 @@ export function CreateCharacterModal({
   organizations = [],
 }: PropsCreateCharacterModal) {
   const form = useCharacterForm();
-  const { handleSubmit, formState, reset } = form;
+  const { handleSubmit, reset } = form;
 
   const hasSpecies = useMemo(() => species.length > 0, [species]);
   const hasLocations = useMemo(() => locations.length > 0, [locations]);

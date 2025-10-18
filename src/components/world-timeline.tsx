@@ -156,11 +156,7 @@ const mockTimeline: TimelineEra[] = [
   },
 ];
 
-export function WorldTimeline({
-  worldId,
-  worldType,
-  isEditing,
-}: PropsWorldTimeline) {
+export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
   const [timeline, setTimeline] = useState<TimelineEra[]>(mockTimeline);
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(
     null
@@ -423,7 +419,7 @@ export function WorldTimeline({
           </div>
 
           <Accordion type="multiple" className="space-y-6">
-            {timeline.map((era, eraIndex) => (
+            {timeline.map((era) => (
               <AccordionItem
                 key={era.id}
                 value={era.id}
@@ -503,7 +499,7 @@ export function WorldTimeline({
                       <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
                         {era.events.length > 0 ? (
                           <>
-                            {era.events.map((event, eventIndex) => (
+                            {era.events.map((event) => (
                               <div key={event.id} className="relative">
                                 {/* Event Marker */}
                                 <div className="absolute -left-8 top-3">

@@ -26,9 +26,7 @@ import { Book as BookType } from "@/stores/book-store";
 import { Header } from "./components/header";
 import { TabsBar } from "./components/tabs-bar";
 import { TopBar } from "./components/top-bar";
-import { BestiaryTab } from "./tabs/bestiary";
 import { CharactersTab } from "./tabs/characters";
-import { EncyclopediaTab } from "./tabs/encyclopedia";
 import { ItemsTab } from "./tabs/items";
 import { OrganizationsTab } from "./tabs/organizations";
 import { OverviewTab } from "./tabs/overview";
@@ -102,9 +100,7 @@ const MemoizedWorldTab = React.memo(WorldTab);
 const MemoizedOrganizationsTab = React.memo(OrganizationsTab);
 const MemoizedPlotTab = React.memo(PlotTab);
 const MemoizedPowerSystemTab = React.memo(PowerSystemTab);
-const MemoizedEncyclopediaTab = React.memo(EncyclopediaTab);
 const MemoizedSpeciesTab = React.memo(SpeciesTab);
-const MemoizedBestiaryTab = React.memo(BestiaryTab);
 const MemoizedItemsTab = React.memo(ItemsTab);
 
 export function DashboardView({
@@ -241,23 +237,9 @@ export function DashboardView({
             </div>
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"
-              style={{
-                display: activeTab === "encyclopedia" ? "block" : "none",
-              }}
-            >
-              <MemoizedEncyclopediaTab />
-            </div>
-            <div
-              className="absolute inset-0 overflow-y-auto px-6 py-6"
               style={{ display: activeTab === "species" ? "block" : "none" }}
             >
               <MemoizedSpeciesTab bookId={bookId} />
-            </div>
-            <div
-              className="absolute inset-0 overflow-y-auto px-6 py-6"
-              style={{ display: activeTab === "bestiary" ? "block" : "none" }}
-            >
-              <MemoizedBestiaryTab bookId={bookId} />
             </div>
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"

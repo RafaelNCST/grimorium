@@ -29,7 +29,6 @@ const getPageTitle = (pathname: string): string => {
     if (pathname.includes("/chapters")) return "Chapters";
     if (pathname.includes("/notes")) return "Notes";
     if (pathname.includes("/character/")) return "Character";
-    if (pathname.includes("/beast/")) return "Beast";
     if (pathname.includes("/item/")) return "Item";
     if (pathname.includes("/organization/")) return "Organization";
     if (pathname.includes("/plot/")) return "Plot";

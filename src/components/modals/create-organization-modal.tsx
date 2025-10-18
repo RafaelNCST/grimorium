@@ -145,9 +145,6 @@ export function CreateOrganizationModal({
   const getCharacterName = (id: string) =>
     availableCharacters.find((c) => c.id === id)?.name || "";
 
-  const getLocationName = (id: string) =>
-    availableLocations.find((l) => l.id === id)?.name || "";
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
