@@ -136,23 +136,23 @@ const ItemsViewComponent = function ItemsView({
     // Map active colors to badge colors
     const colorMap: Record<string, string> = {
       "text-green-600 dark:text-green-400": isActive
-        ? "!bg-green-500 !text-white !border-green-500"
-        : "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:!bg-green-500 hover:!text-white hover:!border-green-500",
+        ? "!bg-green-500 !text-black !border-green-500"
+        : "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400 hover:!bg-green-500 hover:!text-black hover:!border-green-500",
       "text-slate-700 dark:text-slate-300": isActive
-        ? "!bg-slate-500 !text-white !border-slate-500"
-        : "bg-slate-500/10 border-slate-500/30 text-slate-700 dark:text-slate-300 hover:!bg-slate-500 hover:!text-white hover:!border-slate-500",
+        ? "!bg-slate-500 !text-black !border-slate-500"
+        : "bg-slate-500/10 border-slate-500/30 text-slate-700 dark:text-slate-300 hover:!bg-slate-500 hover:!text-black hover:!border-slate-500",
       "text-red-600 dark:text-red-400": isActive
-        ? "!bg-red-500 !text-white !border-red-500"
-        : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-white hover:!border-red-500",
+        ? "!bg-red-500 !text-black !border-red-500"
+        : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500",
       "text-purple-600 dark:text-purple-400": isActive
-        ? "!bg-purple-500 !text-white !border-purple-500"
-        : "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 hover:!bg-purple-500 hover:!text-white hover:!border-purple-500",
+        ? "!bg-purple-500 !text-black !border-purple-500"
+        : "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 hover:!bg-purple-500 hover:!text-black hover:!border-purple-500",
       "text-orange-600 dark:text-orange-400": isActive
-        ? "!bg-orange-500 !text-white !border-orange-500"
-        : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-white hover:!border-orange-500",
+        ? "!bg-orange-500 !text-black !border-orange-500"
+        : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500",
       "text-blue-600 dark:text-blue-400": isActive
-        ? "!bg-blue-500 !text-white !border-blue-500"
-        : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-white hover:!border-blue-500",
+        ? "!bg-blue-500 !text-black !border-blue-500"
+        : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
       "text-yellow-600 dark:text-yellow-400": isActive
         ? "!bg-yellow-500 !text-black !border-yellow-500"
         : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-500",

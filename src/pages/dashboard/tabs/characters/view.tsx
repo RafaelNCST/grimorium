@@ -100,7 +100,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === null
                     ? "!bg-primary !text-white !border-primary"
-                    : "bg-background text-foreground border-border hover:bg-primary hover:text-white hover:border-primary"
+                    : "bg-background text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
                 }`}
                 onClick={() => onRoleFilterChange(null)}
               >
@@ -110,7 +110,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === "protagonist"
                     ? "!bg-yellow-500 !text-black !border-yellow-500"
-                    : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500 hover:text-black dark:hover:text-black hover:border-yellow-500"
+                    : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400"
                 }`}
                 onClick={() =>
                   onRoleFilterChange(
@@ -124,7 +124,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === "antagonist"
                     ? "!bg-orange-500 !text-black !border-orange-500"
-                    : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:bg-orange-500 hover:text-black dark:hover:text-black hover:border-orange-500"
+                    : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500"
                 }`}
                 onClick={() =>
                   onRoleFilterChange(
@@ -138,7 +138,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === "villain"
                     ? "!bg-red-500 !text-black !border-red-500"
-                    : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-black dark:hover:text-black hover:border-red-500"
+                    : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500"
                 }`}
                 onClick={() =>
                   onRoleFilterChange(
@@ -152,7 +152,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === "secondary"
                     ? "!bg-blue-500 !text-black !border-blue-500"
-                    : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500 hover:text-black dark:hover:text-black hover:border-blue-500"
+                    : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500"
                 }`}
                 onClick={() =>
                   onRoleFilterChange(
@@ -166,7 +166,7 @@ const CharactersViewComponent = function CharactersView({
                 className={`cursor-pointer border transition-colors ${
                   selectedRole === "extra"
                     ? "!bg-gray-500 !text-black !border-gray-500"
-                    : "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:bg-gray-500 hover:text-black dark:hover:text-black hover:border-gray-500"
+                    : "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500"
                 }`}
                 onClick={() =>
                   onRoleFilterChange(selectedRole === "extra" ? null : "extra")
