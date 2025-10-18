@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 
 import { Calendar, Filter, Plus, Search, SearchX, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -52,29 +52,6 @@ const CharactersViewComponent = function CharactersView({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["characters", "create-character"] as any);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [animationState, setAnimationState] = useState<'none' | 'running' | 'done'>('none');
-
-  const hasAnimated = useCharactersStore((state) => state.hasAnimated(bookId));
-  const setHasAnimated = useCharactersStore((state) => state.setHasAnimated);
-
-  // Only animate on initial mount (controlled by store + animation state)
-  useEffect(() => {
-    // Se já animou anteriormente, pular direto para 'done'
-    if (hasAnimated) {
-      setAnimationState('done');
-    }
-    // Se ainda não animou e tem personagens, iniciar animação
-    else if (filteredCharacters.length > 0) {
-      setHasAnimated(bookId);
-      setAnimationState('running');
-
-      const timer = setTimeout(() => {
-        setAnimationState('done');
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [hasAnimated, filteredCharacters.length, bookId, setHasAnimated]);
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
     const newCharacter: ICharacter = {
@@ -229,10 +206,7 @@ const CharactersViewComponent = function CharactersView({
           return (
             <Card
               key={character.id}
-              className={`card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${
-                animationState === 'running' ? "animate-stagger" :
-                animationState === 'done' ? "animate-stagger-done" : ""
-              }`}
+              className="card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
               onClick={() => onCharacterClick(character.id)}
             >
               <CardContent className="p-5 space-y-4">
