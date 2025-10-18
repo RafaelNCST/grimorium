@@ -24,6 +24,17 @@ function bookToDBBook(book: Book): DBBook {
     created_at: book.createdAt,
     updated_at: book.lastModified,
     last_opened_at: book.lastModified,
+
+    // Overview fields - will be set through updateBook
+    words_per_day: undefined,
+    chapters_per_week: undefined,
+    estimated_arcs: undefined,
+    estimated_chapters: undefined,
+    completed_arcs: undefined,
+    current_arc_progress: undefined,
+    sticky_notes: undefined,
+    checklist_items: undefined,
+    sections_config: undefined,
   };
 }
 
@@ -101,9 +112,12 @@ export async function createBook(book: Book): Promise<void> {
       `INSERT INTO books (
         id, title, subtitle, description, cover_image_path, genre, visual_style,
         status, word_count_goal, current_word_count, author_summary, story_summary,
-        current_arc, chapters, created_at, updated_at, last_opened_at
+        current_arc, chapters, created_at, updated_at, last_opened_at,
+        words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
+        completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
+        $18, $19, $20, $21, $22, $23, $24, $25, $26
       )`,
       [
         dbBook.id,
@@ -123,6 +137,15 @@ export async function createBook(book: Book): Promise<void> {
         dbBook.created_at,
         dbBook.updated_at,
         dbBook.last_opened_at,
+        dbBook.words_per_day,
+        dbBook.chapters_per_week,
+        dbBook.estimated_arcs,
+        dbBook.estimated_chapters,
+        dbBook.completed_arcs,
+        dbBook.current_arc_progress,
+        dbBook.sticky_notes,
+        dbBook.checklist_items,
+        dbBook.sections_config,
       ]
     );
 
@@ -209,4 +232,174 @@ export async function updateLastOpened(id: string): Promise<void> {
     "UPDATE books SET last_opened_at = $1, updated_at = $2 WHERE id = $3",
     [now, now, id]
   );
+}
+
+// Overview-specific update functions
+export interface OverviewData {
+  goals?: {
+    wordsPerDay: number;
+    chaptersPerWeek: number;
+  };
+  storyProgress?: {
+    estimatedArcs: number;
+    estimatedChapters: number;
+    completedArcs: number;
+    currentArcProgress: number;
+  };
+  stickyNotes?: Array<{
+    id: string;
+    content: string;
+    color: string;
+    x: number;
+    y: number;
+    zIndex: number;
+  }>;
+  checklistItems?: Array<{
+    id: string;
+    text: string;
+    checked: boolean;
+  }>;
+  sectionsConfig?: Array<{
+    id: string;
+    type: string;
+    title: string;
+    visible: boolean;
+  }>;
+}
+
+export async function updateOverviewData(
+  bookId: string,
+  overviewData: OverviewData
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  // Goals
+  if (overviewData.goals) {
+    fields.push(`words_per_day = $${paramIndex++}`);
+    values.push(overviewData.goals.wordsPerDay);
+    fields.push(`chapters_per_week = $${paramIndex++}`);
+    values.push(overviewData.goals.chaptersPerWeek);
+  }
+
+  // Story Progress
+  if (overviewData.storyProgress) {
+    fields.push(`estimated_arcs = $${paramIndex++}`);
+    values.push(overviewData.storyProgress.estimatedArcs);
+    fields.push(`estimated_chapters = $${paramIndex++}`);
+    values.push(overviewData.storyProgress.estimatedChapters);
+    fields.push(`completed_arcs = $${paramIndex++}`);
+    values.push(overviewData.storyProgress.completedArcs);
+    fields.push(`current_arc_progress = $${paramIndex++}`);
+    values.push(overviewData.storyProgress.currentArcProgress);
+  }
+
+  // Sticky Notes
+  if (overviewData.stickyNotes) {
+    fields.push(`sticky_notes = $${paramIndex++}`);
+    values.push(JSON.stringify(overviewData.stickyNotes));
+  }
+
+  // Checklist Items
+  if (overviewData.checklistItems) {
+    fields.push(`checklist_items = $${paramIndex++}`);
+    values.push(JSON.stringify(overviewData.checklistItems));
+  }
+
+  // Sections Config
+  if (overviewData.sectionsConfig) {
+    fields.push(`sections_config = $${paramIndex++}`);
+    values.push(JSON.stringify(overviewData.sectionsConfig));
+  }
+
+  // Always update updated_at
+  fields.push(`updated_at = $${paramIndex++}`);
+  values.push(now);
+
+  // Add bookId to values
+  values.push(bookId);
+
+  if (fields.length > 1) {
+    // More than just updated_at
+    await db.execute(
+      `UPDATE books SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
+      values
+    );
+  }
+}
+
+export async function getOverviewData(bookId: string): Promise<OverviewData> {
+  const db = await getDB();
+  const result = await db.select<DBBook[]>(
+    `SELECT words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
+     completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
+     FROM books WHERE id = $1`,
+    [bookId]
+  );
+
+  if (result.length === 0) {
+    return {};
+  }
+
+  const row = result[0];
+  const overviewData: OverviewData = {};
+
+  // Parse goals
+  if (row.words_per_day !== undefined || row.chapters_per_week !== undefined) {
+    overviewData.goals = {
+      wordsPerDay: row.words_per_day || 0,
+      chaptersPerWeek: row.chapters_per_week || 0,
+    };
+  }
+
+  // Parse story progress
+  if (
+    row.estimated_arcs !== undefined ||
+    row.estimated_chapters !== undefined ||
+    row.completed_arcs !== undefined ||
+    row.current_arc_progress !== undefined
+  ) {
+    overviewData.storyProgress = {
+      estimatedArcs: row.estimated_arcs || 0,
+      estimatedChapters: row.estimated_chapters || 0,
+      completedArcs: row.completed_arcs || 0,
+      currentArcProgress: row.current_arc_progress || 0,
+    };
+  }
+
+  // Parse sticky notes
+  if (row.sticky_notes) {
+    try {
+      overviewData.stickyNotes = JSON.parse(row.sticky_notes);
+    } catch (e) {
+      console.error("Error parsing sticky notes:", e);
+      overviewData.stickyNotes = [];
+    }
+  }
+
+  // Parse checklist items
+  if (row.checklist_items) {
+    try {
+      overviewData.checklistItems = JSON.parse(row.checklist_items);
+    } catch (e) {
+      console.error("Error parsing checklist items:", e);
+      overviewData.checklistItems = [];
+    }
+  }
+
+  // Parse sections config
+  if (row.sections_config) {
+    try {
+      overviewData.sectionsConfig = JSON.parse(row.sections_config);
+    } catch (e) {
+      console.error("Error parsing sections config:", e);
+      overviewData.sectionsConfig = [];
+    }
+  }
+
+  return overviewData;
 }

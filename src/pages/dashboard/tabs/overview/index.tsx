@@ -22,6 +22,7 @@ import {
   IChecklistItem,
 } from "./types/overview-types";
 import { OverviewView } from "./view";
+import { useOverviewPersistence } from "./hooks/useOverviewPersistence";
 
 // Custom modifier to restrict dragging within the notes board container
 const restrictToNotesBoard: Modifier = ({
@@ -161,8 +162,39 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     useSensor(KeyboardSensor)
   );
 
+  // Persistence hook
+  const { loadOverviewData } = useOverviewPersistence(
+    {
+      bookId,
+      goals,
+      storyProgress,
+      stickyNotes,
+      checklistItems,
+      sections,
+      authorSummary,
+      storySummary,
+    },
+    {
+      setGoals,
+      setStoryProgress,
+      setStickyNotes,
+      setChecklistItems,
+      setSections,
+    }
+  );
+
+  // Load data on mount
   useEffect(() => {
-    if (!hasInitialized && stickyNotes.length === 0) {
+    if (!hasInitialized) {
+      loadOverviewData().then(() => {
+        setHasInitialized(true);
+      });
+    }
+  }, [hasInitialized, loadOverviewData]);
+
+  // Set default note if no notes exist after loading
+  useEffect(() => {
+    if (hasInitialized && stickyNotes.length === 0) {
       const defaultNote: IStickyNote = {
         id: "default-note",
         content: t("notes_board.default_note"),
@@ -172,7 +204,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         zIndex: 10,
       };
       setStickyNotes([defaultNote]);
-      setHasInitialized(true);
     }
   }, [hasInitialized, stickyNotes.length, t]);
 

@@ -38,7 +38,26 @@ async function runMigrations(database: Database): Promise<void> {
       chapters INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      last_opened_at INTEGER
+      last_opened_at INTEGER,
+
+      -- Overview Goals
+      words_per_day INTEGER DEFAULT 0,
+      chapters_per_week INTEGER DEFAULT 0,
+
+      -- Overview Story Progress
+      estimated_arcs INTEGER DEFAULT 0,
+      estimated_chapters INTEGER DEFAULT 0,
+      completed_arcs INTEGER DEFAULT 0,
+      current_arc_progress INTEGER DEFAULT 0,
+
+      -- Overview Sticky Notes (JSON)
+      sticky_notes TEXT,
+
+      -- Overview Checklist (JSON)
+      checklist_items TEXT,
+
+      -- Overview Sections Configuration (JSON)
+      sections_config TEXT
     );
 
     -- PERSONAGENS

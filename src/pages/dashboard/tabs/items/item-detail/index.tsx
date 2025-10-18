@@ -7,6 +7,10 @@ import { toast } from "sonner";
 import {
   getItemById,
   getItemsByBookId,
+  getItemVersions,
+  createItemVersion,
+  deleteItemVersion,
+  updateItemVersion,
   type IItem,
   type IItemVersion,
 } from "@/lib/db/items.service";
@@ -81,23 +85,49 @@ export default function ItemDetail() {
           setEditData(itemFromDB);
           setImagePreview(itemFromDB.image || "");
 
-          setVersions((prev) =>
-            prev.map((v) =>
+          // Carregar versões do banco de dados
+          const versionsFromDB = await getItemVersions(itemId);
+
+          // Se não houver versões, criar a versão principal
+          if (versionsFromDB.length === 0) {
+            const mainVersion: IItemVersion = {
+              id: "main-version",
+              name: "Versão Principal",
+              description: "Versão principal do item",
+              createdAt: new Date().toISOString(),
+              isMain: true,
+              itemData: itemFromDB,
+            };
+
+            await createItemVersion(itemId, mainVersion);
+            setVersions([mainVersion]);
+            setCurrentVersion(mainVersion);
+          } else {
+            // Atualizar versão principal com dados carregados
+            const updatedVersions = versionsFromDB.map((v) =>
               v.isMain
                 ? {
                     ...v,
                     itemData: itemFromDB,
                   }
                 : v
-            )
-          );
+            );
+            setVersions(updatedVersions);
+
+            // Definir versão principal como atual
+            const mainVersion = updatedVersions.find((v) => v.isMain);
+            if (mainVersion) {
+              setCurrentVersion(mainVersion);
+            }
+          }
 
           if (dashboardId) {
             const allItemsFromBook = await getItemsByBookId(dashboardId);
             setAllItems(allItemsFromBook);
           }
         }
-      } catch (_error) {
+      } catch (error) {
+        console.error("Error loading item:", error);
         toast.error("Erro ao carregar item");
       } finally {
         setIsLoading(false);
@@ -138,45 +168,88 @@ export default function ItemDetail() {
   );
 
   const handleVersionCreate = useCallback(
-    (versionData: { name: string; description: string; itemData: IItem }) => {
-      const newVersion: IItemVersion = {
-        id: `version-${Date.now()}`,
-        name: versionData.name,
-        description: versionData.description,
-        createdAt: new Date().toISOString(),
-        isMain: false,
-        itemData: versionData.itemData,
-      };
+    async (versionData: { name: string; description: string; itemData: IItem }) => {
+      try {
+        const newVersion: IItemVersion = {
+          id: `version-${Date.now()}`,
+          name: versionData.name,
+          description: versionData.description,
+          createdAt: new Date().toISOString(),
+          isMain: false,
+          itemData: versionData.itemData,
+        };
 
-      setVersions((prev) => [...prev, newVersion]);
-      toast.success(`Versão "${versionData.name}" criada com sucesso!`);
+        // Salvar no banco de dados
+        await createItemVersion(itemId, newVersion);
+
+        // Atualizar o estado apenas se o save for bem-sucedido
+        setVersions((prev) => [...prev, newVersion]);
+        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
+      } catch (error) {
+        console.error("Error creating item version:", error);
+        toast.error("Erro ao criar versão");
+      }
     },
-    []
+    [itemId]
   );
 
   const handleVersionDelete = useCallback(
-    (versionId: string) => {
+    async (versionId: string) => {
       const versionToDelete = versions.find((v) => v.id === versionId);
 
+      // Não permitir deletar versão principal
       if (versionToDelete?.isMain) {
         toast.error("Não é possível excluir a versão principal");
         return;
       }
 
-      const updatedVersions = versions.filter((v) => v.id !== versionId);
+      try {
+        // Deletar do banco de dados
+        await deleteItemVersion(versionId);
 
-      if (currentVersion?.id === versionId) {
-        const mainVersion = updatedVersions.find((v) => v.isMain);
-        if (mainVersion) {
-          setCurrentVersion(mainVersion);
-          setItem(mainVersion.itemData);
-          setEditData(mainVersion.itemData);
-          setImagePreview(mainVersion.itemData.image || "");
+        // Atualizar o estado apenas se o delete for bem-sucedido
+        const updatedVersions = versions.filter((v) => v.id !== versionId);
+
+        // Se a versão deletada for a atual, voltar para a principal
+        if (currentVersion?.id === versionId) {
+          const mainVersion = updatedVersions.find((v) => v.isMain);
+          if (mainVersion) {
+            setCurrentVersion(mainVersion);
+            setItem(mainVersion.itemData);
+            setEditData(mainVersion.itemData);
+            setImagePreview(mainVersion.itemData.image || "");
+          }
         }
-      }
 
-      setVersions(updatedVersions);
-      toast.success("Versão excluída com sucesso!");
+        setVersions(updatedVersions);
+        toast.success("Versão excluída com sucesso!");
+      } catch (error) {
+        console.error("Error deleting item version:", error);
+        toast.error("Erro ao excluir versão");
+      }
+    },
+    [versions, currentVersion]
+  );
+
+  const handleVersionUpdate = useCallback(
+    async (versionId: string, name: string, description?: string) => {
+      try {
+        // Atualizar no banco de dados
+        await updateItemVersion(versionId, name, description);
+
+        // Atualizar o estado apenas se o update for bem-sucedido
+        const updatedVersions = versions.map((v) =>
+          v.id === versionId ? { ...v, name, description } : v
+        );
+        setVersions(updatedVersions);
+
+        if (currentVersion?.id === versionId) {
+          setCurrentVersion({ ...currentVersion, name, description });
+        }
+      } catch (error) {
+        console.error("Error updating item version:", error);
+        toast.error("Erro ao atualizar versão");
+      }
     },
     [versions, currentVersion]
   );
@@ -348,6 +421,7 @@ export default function ItemDetail() {
       onVersionChange={handleVersionChange}
       onVersionCreate={handleVersionCreate}
       onVersionDelete={handleVersionDelete}
+      onVersionUpdate={handleVersionUpdate}
       onImageFileChange={handleImageFileChange}
       onEditDataChange={handleEditDataChange}
     />

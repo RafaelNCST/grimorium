@@ -21,6 +21,7 @@ interface VersionManagerProps {
     itemData: IItem;
   }) => void;
   onVersionDelete: (versionId: string) => void;
+  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
   isEditMode: boolean;
   mainItemData: IItem;
 }
@@ -30,6 +31,8 @@ export function VersionManager({
   currentVersion,
   onVersionChange,
   onVersionCreate,
+  onVersionDelete,
+  onVersionUpdate,
   isEditMode: _isEditMode,
   mainItemData,
 }: VersionManagerProps) {
@@ -80,6 +83,8 @@ export function VersionManager({
               version={mainVersion}
               isSelected={currentVersion?.id === mainVersion.id}
               onClick={() => handleVersionClick(mainVersion)}
+              onDelete={onVersionDelete}
+              onUpdate={onVersionUpdate}
             />
           )}
 
@@ -92,6 +97,8 @@ export function VersionManager({
                   version={version}
                   isSelected={currentVersion?.id === version.id}
                   onClick={() => handleVersionClick(version)}
+                  onDelete={onVersionDelete}
+                  onUpdate={onVersionUpdate}
                 />
               ))}
             </div>

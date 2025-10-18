@@ -2,9 +2,10 @@ import {
   ICharacter,
   ICharacterRelationship,
   ICharacterFamily,
+  ICharacterVersion,
 } from "@/types/character-types";
 
-import { DBCharacter, DBRelationship, DBFamilyRelation } from "./types";
+import { DBCharacter, DBRelationship, DBFamilyRelation, DBCharacterVersion } from "./types";
 
 import { getDB } from "./index";
 
@@ -387,4 +388,61 @@ export async function saveCharacterFamily(
       [relId, characterId, rel.id, rel.type, now]
     );
   }
+}
+
+// Character Versions
+export async function getCharacterVersions(characterId: string): Promise<ICharacterVersion[]> {
+  const db = await getDB();
+  const result = await db.select<DBCharacterVersion[]>(
+    "SELECT * FROM character_versions WHERE character_id = $1 ORDER BY created_at DESC",
+    [characterId]
+  );
+
+  return result.map((v) => ({
+    id: v.id,
+    name: v.name,
+    description: v.description || "",
+    createdAt: new Date(v.created_at).toISOString(),
+    isMain: v.is_main === 1,
+    characterData: v.character_data ? JSON.parse(v.character_data) : ({} as ICharacter),
+  }));
+}
+
+export async function createCharacterVersion(
+  characterId: string,
+  version: ICharacterVersion
+): Promise<void> {
+  const db = await getDB();
+
+  await db.execute(
+    `INSERT INTO character_versions (
+      id, character_id, name, description, is_main, character_data, created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      version.id,
+      characterId,
+      version.name,
+      version.description,
+      version.isMain ? 1 : 0,
+      JSON.stringify(version.characterData),
+      Date.now(),
+    ]
+  );
+}
+
+export async function deleteCharacterVersion(versionId: string): Promise<void> {
+  const db = await getDB();
+  await db.execute("DELETE FROM character_versions WHERE id = $1", [versionId]);
+}
+
+export async function updateCharacterVersion(
+  versionId: string,
+  name: string,
+  description?: string
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE character_versions SET name = $1, description = $2 WHERE id = $3",
+    [name, description, versionId]
+  );
 }

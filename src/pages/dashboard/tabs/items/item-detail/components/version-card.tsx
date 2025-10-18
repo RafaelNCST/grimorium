@@ -10,12 +10,16 @@ interface VersionCardProps {
   version: IItemVersion;
   isSelected: boolean;
   onClick: () => void;
+  onDelete?: (versionId: string) => void;
+  onUpdate?: (versionId: string, name: string, description?: string) => void;
 }
 
 export function VersionCard({
   version,
   isSelected,
   onClick,
+  onDelete: _onDelete,
+  onUpdate: _onUpdate,
 }: VersionCardProps) {
   const { t } = useTranslation("item-detail");
 

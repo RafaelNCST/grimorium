@@ -18,6 +18,21 @@ export interface DBBook {
   created_at: number;
   updated_at: number;
   last_opened_at?: number;
+
+  // Overview Goals
+  words_per_day?: number;
+  chapters_per_week?: number;
+
+  // Overview Story Progress
+  estimated_arcs?: number;
+  estimated_chapters?: number;
+  completed_arcs?: number;
+  current_arc_progress?: number;
+
+  // Overview Data (JSON strings)
+  sticky_notes?: string; // JSON array of IStickyNote
+  checklist_items?: string; // JSON array of IChecklistItem
+  sections_config?: string; // JSON array of section visibility/order
 }
 
 export interface DBCharacter {

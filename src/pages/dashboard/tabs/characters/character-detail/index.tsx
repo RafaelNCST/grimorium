@@ -14,6 +14,10 @@ import {
   saveCharacterRelationships,
   getCharacterFamily,
   saveCharacterFamily,
+  getCharacterVersions,
+  createCharacterVersion,
+  deleteCharacterVersion,
+  updateCharacterVersion,
 } from "@/lib/db/characters.service";
 import { mockLocations, mockOrganizations } from "@/mocks/global";
 import { useCharactersStore } from "@/stores/characters-store";
@@ -129,9 +133,30 @@ export function CharacterDetail() {
           setCharacter((prev) => ({ ...prev, family }));
           setEditData((prev) => ({ ...prev, family }));
 
-          // Update main version with loaded data
-          setVersions((prev) =>
-            prev.map((v) =>
+          // Load versions from database
+          const versionsFromDB = await getCharacterVersions(characterId);
+
+          // Se não houver versões, criar a versão principal
+          if (versionsFromDB.length === 0) {
+            const mainVersion: ICharacterVersion = {
+              id: "main-version",
+              name: "Versão Principal",
+              description: "Versão principal do personagem",
+              createdAt: new Date().toISOString(),
+              isMain: true,
+              characterData: {
+                ...characterFromDB,
+                relationships,
+                family,
+              },
+            };
+
+            await createCharacterVersion(characterId, mainVersion);
+            setVersions([mainVersion]);
+            setCurrentVersion(mainVersion);
+          } else {
+            // Atualizar versão principal com dados carregados
+            const updatedVersions = versionsFromDB.map((v) =>
               v.isMain
                 ? {
                     ...v,
@@ -142,8 +167,15 @@ export function CharacterDetail() {
                     },
                   }
                 : v
-            )
-          );
+            );
+            setVersions(updatedVersions);
+
+            // Definir versão principal como atual
+            const mainVersion = updatedVersions.find((v) => v.isMain);
+            if (mainVersion) {
+              setCurrentVersion(mainVersion);
+            }
+          }
 
           // Load all characters from the same book
           if (dashboardId) {
@@ -198,28 +230,37 @@ export function CharacterDetail() {
   );
 
   const handleVersionCreate = useCallback(
-    (versionData: {
+    async (versionData: {
       name: string;
       description: string;
       characterData: ICharacterFormData;
     }) => {
-      const newVersion: ICharacterVersion = {
-        id: `version-${Date.now()}`,
-        name: versionData.name,
-        description: versionData.description,
-        createdAt: new Date().toISOString(),
-        isMain: false,
-        characterData: versionData.characterData as unknown as ICharacter,
-      };
+      try {
+        const newVersion: ICharacterVersion = {
+          id: `version-${Date.now()}`,
+          name: versionData.name,
+          description: versionData.description,
+          createdAt: new Date().toISOString(),
+          isMain: false,
+          characterData: versionData.characterData as unknown as ICharacter,
+        };
 
-      setVersions((prev) => [...prev, newVersion]);
-      toast.success(`Versão "${versionData.name}" criada com sucesso!`);
+        // Salvar no banco de dados
+        await createCharacterVersion(characterId, newVersion);
+
+        // Atualizar o estado apenas se o save for bem-sucedido
+        setVersions((prev) => [...prev, newVersion]);
+        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
+      } catch (error) {
+        console.error("Error creating character version:", error);
+        toast.error("Erro ao criar versão");
+      }
     },
-    []
+    [characterId]
   );
 
   const handleVersionDelete = useCallback(
-    (versionId: string) => {
+    async (versionId: string) => {
       const versionToDelete = versions.find((v) => v.id === versionId);
 
       // Não permitir deletar versão principal
@@ -228,37 +269,55 @@ export function CharacterDetail() {
         return;
       }
 
-      const updatedVersions = versions.filter((v) => v.id !== versionId);
+      try {
+        // Deletar do banco de dados
+        await deleteCharacterVersion(versionId);
 
-      // Se a versão deletada for a atual, voltar para a principal
-      if (currentVersion?.id === versionId) {
-        const mainVersion = updatedVersions.find((v) => v.isMain);
-        if (mainVersion) {
-          setCurrentVersion(mainVersion);
-          setCharacter(mainVersion.characterData as any);
-          setEditData({
-            ...(mainVersion.characterData as any),
-            relationships: mainVersion.characterData.relationships || [],
-          });
-          setImagePreview(mainVersion.characterData.image || "");
+        // Atualizar o estado apenas se o delete for bem-sucedido
+        const updatedVersions = versions.filter((v) => v.id !== versionId);
+
+        // Se a versão deletada for a atual, voltar para a principal
+        if (currentVersion?.id === versionId) {
+          const mainVersion = updatedVersions.find((v) => v.isMain);
+          if (mainVersion) {
+            setCurrentVersion(mainVersion);
+            setCharacter(mainVersion.characterData as any);
+            setEditData({
+              ...(mainVersion.characterData as any),
+              relationships: mainVersion.characterData.relationships || [],
+            });
+            setImagePreview(mainVersion.characterData.image || "");
+          }
         }
-      }
 
-      setVersions(updatedVersions);
-      toast.success("Versão excluída com sucesso!");
+        setVersions(updatedVersions);
+        toast.success("Versão excluída com sucesso!");
+      } catch (error) {
+        console.error("Error deleting character version:", error);
+        toast.error("Erro ao excluir versão");
+      }
     },
     [versions, currentVersion]
   );
 
   const handleVersionUpdate = useCallback(
-    (versionId: string, name: string, description?: string) => {
-      const updatedVersions = versions.map((v) =>
-        v.id === versionId ? { ...v, name, description } : v
-      );
-      setVersions(updatedVersions);
+    async (versionId: string, name: string, description?: string) => {
+      try {
+        // Atualizar no banco de dados
+        await updateCharacterVersion(versionId, name, description);
 
-      if (currentVersion.id === versionId) {
-        setCurrentVersion({ ...currentVersion, name, description });
+        // Atualizar o estado apenas se o update for bem-sucedido
+        const updatedVersions = versions.map((v) =>
+          v.id === versionId ? { ...v, name, description } : v
+        );
+        setVersions(updatedVersions);
+
+        if (currentVersion.id === versionId) {
+          setCurrentVersion({ ...currentVersion, name, description });
+        }
+      } catch (error) {
+        console.error("Error updating character version:", error);
+        toast.error("Erro ao atualizar versão");
       }
     },
     [versions, currentVersion]

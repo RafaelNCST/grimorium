@@ -61,6 +61,7 @@ interface ItemDetailViewRefactoredProps {
     itemData: IItem;
   }) => void;
   onVersionDelete: (versionId: string) => void;
+  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
 }
@@ -95,6 +96,7 @@ export function ItemDetailViewRefactored({
   onVersionChange,
   onVersionCreate,
   onVersionDelete,
+  onVersionUpdate,
   onImageFileChange,
   onEditDataChange,
 }: ItemDetailViewRefactoredProps) {
@@ -643,6 +645,7 @@ export function ItemDetailViewRefactored({
                       onVersionChange={onVersionChange}
                       onVersionCreate={onVersionCreate}
                       onVersionDelete={onVersionDelete}
+                      onVersionUpdate={onVersionUpdate}
                       isEditMode={isEditing}
                       mainItemData={item}
                     />
