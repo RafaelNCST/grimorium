@@ -1,9 +1,11 @@
 import { useEffect, useCallback, useRef } from "react";
+
 import {
   updateOverviewData,
   getOverviewData,
   updateBook,
 } from "@/lib/db/books.service";
+
 import {
   IGoals,
   IStoryProgress,
@@ -51,7 +53,13 @@ export function useOverviewPersistence(
     storySummary,
   } = props;
 
-  const { setGoals, setStoryProgress, setStickyNotes, setChecklistItems, setSections } = setters;
+  const {
+    setGoals,
+    setStoryProgress,
+    setStickyNotes,
+    setChecklistItems,
+    setSections,
+  } = setters;
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isLoadingRef = useRef(false);
@@ -62,7 +70,10 @@ export function useOverviewPersistence(
     isLoadingRef.current = true;
 
     try {
-      console.log("[useOverviewPersistence] Loading overview data for book:", bookId);
+      console.log(
+        "[useOverviewPersistence] Loading overview data for book:",
+        bookId
+      );
       const data = await getOverviewData(bookId);
 
       if (data.goals) {
@@ -97,16 +108,29 @@ export function useOverviewPersistence(
 
       console.log("[useOverviewPersistence] Data loaded successfully");
     } catch (error) {
-      console.error("[useOverviewPersistence] Error loading overview data:", error);
+      console.error(
+        "[useOverviewPersistence] Error loading overview data:",
+        error
+      );
     } finally {
       isLoadingRef.current = false;
     }
-  }, [bookId, setGoals, setStoryProgress, setStickyNotes, setChecklistItems, setSections]);
+  }, [
+    bookId,
+    setGoals,
+    setStoryProgress,
+    setStickyNotes,
+    setChecklistItems,
+    setSections,
+  ]);
 
   // Save data to database
   const saveOverviewData = useCallback(async () => {
     try {
-      console.log("[useOverviewPersistence] Saving overview data for book:", bookId);
+      console.log(
+        "[useOverviewPersistence] Saving overview data for book:",
+        bookId
+      );
 
       // Save overview-specific data
       await updateOverviewData(bookId, {
@@ -130,9 +154,21 @@ export function useOverviewPersistence(
 
       console.log("[useOverviewPersistence] Data saved successfully");
     } catch (error) {
-      console.error("[useOverviewPersistence] Error saving overview data:", error);
+      console.error(
+        "[useOverviewPersistence] Error saving overview data:",
+        error
+      );
     }
-  }, [bookId, goals, storyProgress, stickyNotes, checklistItems, sections, authorSummary, storySummary]);
+  }, [
+    bookId,
+    goals,
+    storyProgress,
+    stickyNotes,
+    checklistItems,
+    sections,
+    authorSummary,
+    storySummary,
+  ]);
 
   // Debounced save effect
   useEffect(() => {
@@ -152,7 +188,16 @@ export function useOverviewPersistence(
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [goals, storyProgress, stickyNotes, checklistItems, sections, authorSummary, storySummary, saveOverviewData]);
+  }, [
+    goals,
+    storyProgress,
+    stickyNotes,
+    checklistItems,
+    sections,
+    authorSummary,
+    storySummary,
+    saveOverviewData,
+  ]);
 
   return {
     loadOverviewData,

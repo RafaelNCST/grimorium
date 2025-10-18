@@ -5,7 +5,12 @@ import {
   ICharacterVersion,
 } from "@/types/character-types";
 
-import { DBCharacter, DBRelationship, DBFamilyRelation, DBCharacterVersion } from "./types";
+import {
+  DBCharacter,
+  DBRelationship,
+  DBFamilyRelation,
+  DBCharacterVersion,
+} from "./types";
 
 import { getDB } from "./index";
 
@@ -391,7 +396,9 @@ export async function saveCharacterFamily(
 }
 
 // Character Versions
-export async function getCharacterVersions(characterId: string): Promise<ICharacterVersion[]> {
+export async function getCharacterVersions(
+  characterId: string
+): Promise<ICharacterVersion[]> {
   const db = await getDB();
   const result = await db.select<DBCharacterVersion[]>(
     "SELECT * FROM character_versions WHERE character_id = $1 ORDER BY created_at DESC",
@@ -404,7 +411,9 @@ export async function getCharacterVersions(characterId: string): Promise<ICharac
     description: v.description || "",
     createdAt: new Date(v.created_at).toISOString(),
     isMain: v.is_main === 1,
-    characterData: v.character_data ? JSON.parse(v.character_data) : ({} as ICharacter),
+    characterData: v.character_data
+      ? JSON.parse(v.character_data)
+      : ({} as ICharacter),
   }));
 }
 

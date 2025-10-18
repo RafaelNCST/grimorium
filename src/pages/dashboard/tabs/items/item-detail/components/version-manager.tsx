@@ -21,7 +21,11 @@ interface VersionManagerProps {
     itemData: IItem;
   }) => void;
   onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
+  onVersionUpdate: (
+    versionId: string,
+    name: string,
+    description?: string
+  ) => void;
   isEditMode: boolean;
   mainItemData: IItem;
 }

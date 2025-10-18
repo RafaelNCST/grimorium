@@ -168,7 +168,11 @@ export default function ItemDetail() {
   );
 
   const handleVersionCreate = useCallback(
-    async (versionData: { name: string; description: string; itemData: IItem }) => {
+    async (versionData: {
+      name: string;
+      description: string;
+      itemData: IItem;
+    }) => {
       try {
         const newVersion: IItemVersion = {
           id: `version-${Date.now()}`,

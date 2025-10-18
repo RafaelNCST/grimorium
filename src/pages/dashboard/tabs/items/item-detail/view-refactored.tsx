@@ -61,7 +61,11 @@ interface ItemDetailViewRefactoredProps {
     itemData: IItem;
   }) => void;
   onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
+  onVersionUpdate: (
+    versionId: string,
+    name: string,
+    description?: string
+  ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
 }

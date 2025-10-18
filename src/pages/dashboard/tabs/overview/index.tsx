@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
+import { useOverviewPersistence } from "./hooks/useOverviewPersistence";
 import {
   PropsOverviewTab,
   IStickyNote,
@@ -22,7 +23,6 @@ import {
   IChecklistItem,
 } from "./types/overview-types";
 import { OverviewView } from "./view";
-import { useOverviewPersistence } from "./hooks/useOverviewPersistence";
 
 // Custom modifier to restrict dragging within the notes board container
 const restrictToNotesBoard: Modifier = ({
