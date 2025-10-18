@@ -338,6 +338,14 @@
   /* Stagger animation for lists */
   .animate-stagger {
     animation: fadeInUp 0.5s ease-out forwards;
+    animation-play-state: running;
+  }
+
+  /* Prevent animation from re-running */
+  .animate-stagger-done {
+    animation: none !important;
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .animate-stagger:nth-child(1) {

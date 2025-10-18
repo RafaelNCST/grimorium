@@ -52,20 +52,23 @@ const CharactersViewComponent = function CharactersView({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["characters", "create-character"] as any);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [animationState, setAnimationState] = useState<'none' | 'running' | 'done'>('none');
 
   const hasAnimated = useCharactersStore((state) => state.hasAnimated(bookId));
   const setHasAnimated = useCharactersStore((state) => state.setHasAnimated);
 
-  // Only animate on initial mount (controlled by store)
+  // Only animate on initial mount (controlled by store + animation state)
   useEffect(() => {
     if (!hasAnimated && filteredCharacters.length > 0) {
-      setShouldAnimate(true);
+      // Set hasAnimated in store to prevent animation when navigating to detail and back
       setHasAnimated(bookId);
 
-      // Remove animation class after animation completes
+      // Start animation
+      setAnimationState('running');
+
+      // After animation completes, set to 'done' to prevent re-runs on tab switching
       const timer = setTimeout(() => {
-        setShouldAnimate(false);
+        setAnimationState('done');
       }, 1000); // Animation duration + stagger delay for last item
 
       return () => clearTimeout(timer);
@@ -226,7 +229,10 @@ const CharactersViewComponent = function CharactersView({
           return (
             <Card
               key={character.id}
-              className={`card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${shouldAnimate ? "animate-stagger" : ""}`}
+              className={`card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${
+                animationState === 'running' ? "animate-stagger" :
+                animationState === 'done' ? "animate-stagger-done" : ""
+              }`}
               onClick={() => onCharacterClick(character.id)}
             >
               <CardContent className="p-5 space-y-4">
