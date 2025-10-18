@@ -59,22 +59,22 @@ const CharactersViewComponent = function CharactersView({
 
   // Only animate on initial mount (controlled by store + animation state)
   useEffect(() => {
-    if (!hasAnimated && filteredCharacters.length > 0) {
-      // Set hasAnimated in store to prevent animation when navigating to detail and back
+    // Se já animou anteriormente, pular direto para 'done'
+    if (hasAnimated) {
+      setAnimationState('done');
+    }
+    // Se ainda não animou e tem personagens, iniciar animação
+    else if (filteredCharacters.length > 0) {
       setHasAnimated(bookId);
-
-      // Start animation
       setAnimationState('running');
 
-      // After animation completes, set to 'done' to prevent re-runs on tab switching
       const timer = setTimeout(() => {
         setAnimationState('done');
-      }, 1000); // Animation duration + stagger delay for last item
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasAnimated, filteredCharacters.length]); // Removido bookId e setHasAnimated das dependências
+  }, [hasAnimated, filteredCharacters.length, bookId, setHasAnimated]);
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
     const newCharacter: ICharacter = {
