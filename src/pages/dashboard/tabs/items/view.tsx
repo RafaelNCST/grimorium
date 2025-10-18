@@ -1,13 +1,13 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { Plus, Search, Package, Filter, SearchX } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EmptyState } from "@/components/empty-state";
-import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
 import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
+import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ interface PropsItemsView {
   onCreateItem: (itemData: ItemFormSchema) => void;
 }
 
-export function ItemsView({
+const ItemsViewComponent = function ItemsView({
   items,
   filteredItems,
   searchTerm,
@@ -126,7 +126,9 @@ export function ItemsView({
 
   // Get status badge class based on status colors from constants
   const getStatusBadgeClass = (statusValue: string) => {
-    const statusData = ITEM_STATUSES_CONSTANT.find((s) => s.value === statusValue);
+    const statusData = ITEM_STATUSES_CONSTANT.find(
+      (s) => s.value === statusValue
+    );
     const isActive = selectedStatus === statusValue;
 
     if (!statusData) return "";
@@ -272,11 +274,15 @@ export function ItemsView({
               ? t("items:empty_state.no_results")
               : selectedCategory !== null
                 ? t("items:empty_state.no_category_items", {
-                    category: t(`create-item:category.${selectedCategory}`).toLowerCase(),
+                    category: t(
+                      `create-item:category.${selectedCategory}`
+                    ).toLowerCase(),
                   })
                 : selectedStatus !== null
                   ? t("items:empty_state.no_status_items", {
-                      status: t(`create-item:status.${selectedStatus}`).toLowerCase(),
+                      status: t(
+                        `create-item:status.${selectedStatus}`
+                      ).toLowerCase(),
                     })
                   : t("items:empty_state.no_items")
           }
@@ -296,11 +302,7 @@ export function ItemsView({
       {filteredItems.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
           {filteredItems.map((item) => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              onClick={onNavigateToItem}
-            />
+            <ItemCard key={item.id} item={item} onClick={onNavigateToItem} />
           ))}
         </div>
       )}
@@ -312,4 +314,6 @@ export function ItemsView({
       />
     </div>
   );
-}
+};
+
+export const ItemsView = memo(ItemsViewComponent);

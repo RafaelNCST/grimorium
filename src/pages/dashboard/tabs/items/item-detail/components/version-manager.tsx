@@ -6,27 +6,23 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  type ICharacter,
-  type ICharacterVersion,
-  type ICharacterFormData,
-} from "@/types/character-types";
+import { IItem, IItemVersion } from "@/lib/db/items.service";
 
 import { CreateVersionDialog } from "./create-version-dialog";
 import { VersionCard } from "./version-card";
 
 interface VersionManagerProps {
-  versions: ICharacterVersion[];
-  currentVersion: ICharacterVersion | null;
+  versions: IItemVersion[];
+  currentVersion: IItemVersion | null;
   onVersionChange: (versionId: string | null) => void;
   onVersionCreate: (versionData: {
     name: string;
     description: string;
-    characterData: ICharacterFormData;
+    itemData: IItem;
   }) => void;
   onVersionDelete: (versionId: string) => void;
   isEditMode: boolean;
-  mainCharacterData: ICharacter;
+  mainItemData: IItem;
 }
 
 export function VersionManager({
@@ -34,16 +30,16 @@ export function VersionManager({
   currentVersion,
   onVersionChange,
   onVersionCreate,
-  isEditMode,
-  mainCharacterData,
+  isEditMode: _isEditMode,
+  mainItemData,
 }: VersionManagerProps) {
-  const { t } = useTranslation("character-detail");
+  const { t } = useTranslation("item-detail");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const mainVersion = versions.find((v) => v.isMain);
   const alternativeVersions = versions.filter((v) => !v.isMain);
 
-  const handleVersionClick = (version: ICharacterVersion) => {
+  const handleVersionClick = (version: IItemVersion) => {
     if (currentVersion?.id !== version.id) {
       onVersionChange(version.id);
     }
@@ -52,7 +48,7 @@ export function VersionManager({
   const handleCreateVersion = (versionData: {
     name: string;
     description: string;
-    characterData: ICharacterFormData;
+    itemData: IItem;
   }) => {
     onVersionCreate(versionData);
     setIsCreateDialogOpen(false);
@@ -126,12 +122,11 @@ export function VersionManager({
         </div>
       </div>
 
-      {/* Create Version Dialog */}
       <CreateVersionDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onConfirm={handleCreateVersion}
-        baseCharacter={mainCharacterData}
+        baseItem={mainItemData}
       />
     </div>
   );

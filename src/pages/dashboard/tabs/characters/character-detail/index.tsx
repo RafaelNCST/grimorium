@@ -10,14 +10,13 @@ import { GENDERS_CONSTANT as GENDERS_CONSTANT_MODAL } from "@/components/modals/
 import {
   getCharacterById,
   getCharactersByBookId,
-  updateCharacter,
-  deleteCharacter,
   getCharacterRelationships,
   saveCharacterRelationships,
   getCharacterFamily,
   saveCharacterFamily,
 } from "@/lib/db/characters.service";
 import { mockLocations, mockOrganizations } from "@/mocks/global";
+import { useCharactersStore } from "@/stores/characters-store";
 import {
   type ICharacterVersion,
   type ICharacterFormData,
@@ -40,6 +39,14 @@ export function CharacterDetail() {
   const { t } = useTranslation("character-detail");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Usar o store para atualizar personagens
+  const updateCharacterInStore = useCharactersStore(
+    (state) => state.updateCharacterInCache
+  );
+  const deleteCharacterFromStore = useCharactersStore(
+    (state) => state.deleteCharacterFromCache
+  );
 
   const emptyCharacter: ICharacter = {
     id: "",
@@ -277,9 +284,6 @@ export function CharacterDetail() {
     }
 
     try {
-      // Save to database
-      await updateCharacter(characterId, updatedCharacter);
-
       // Save relationships
       if (updatedCharacter.relationships) {
         await saveCharacterRelationships(
@@ -293,13 +297,23 @@ export function CharacterDetail() {
         await saveCharacterFamily(characterId, updatedCharacter.family);
       }
 
+      // Atualizar no store (que também salva no DB)
+      await updateCharacterInStore(characterId, updatedCharacter);
+
       setIsEditing(false);
       toast.success("Personagem atualizado com sucesso!");
     } catch (error) {
       console.error("Error saving character:", error);
       toast.error("Erro ao salvar personagem");
     }
-  }, [editData, fieldVisibility, versions, currentVersion, characterId]);
+  }, [
+    editData,
+    fieldVisibility,
+    versions,
+    currentVersion,
+    characterId,
+    updateCharacterInStore,
+  ]);
 
   const navigateToCharactersTab = useCallback(() => {
     if (!dashboardId) return;
@@ -341,7 +355,9 @@ export function CharacterDetail() {
       console.log("Attempting to delete character");
       try {
         console.log("Calling deleteCharacter with ID:", characterId);
-        await deleteCharacter(characterId);
+        if (!dashboardId) return;
+        // Deletar do store (que também deleta do DB)
+        await deleteCharacterFromStore(dashboardId, characterId);
         console.log("Delete successful, showing toast");
         toast.success(t("delete.character.step2.success"));
         console.log("Navigating to characters tab");
@@ -351,7 +367,15 @@ export function CharacterDetail() {
         toast.error("Erro ao excluir personagem");
       }
     }
-  }, [currentVersion, versions, navigateToCharactersTab, characterId, t]);
+  }, [
+    currentVersion,
+    versions,
+    navigateToCharactersTab,
+    characterId,
+    dashboardId,
+    deleteCharacterFromStore,
+    t,
+  ]);
 
   const handleCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
@@ -556,6 +580,7 @@ export function CharacterDetail() {
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
+    setIsNavigationSidebarOpen(false);
   }, []);
 
   const handleDeleteModalOpen = useCallback(() => {

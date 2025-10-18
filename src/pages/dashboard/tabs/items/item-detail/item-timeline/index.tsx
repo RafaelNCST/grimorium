@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { type ITimelineEvent, ItemTimelineView } from "./view";
 
 export default function ItemTimeline() {
-  const { itemId } = useParams({
+  const { itemId: _itemId } = useParams({
     from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline",
   });
   const { toast } = useToast();

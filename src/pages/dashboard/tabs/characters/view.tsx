@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { Calendar, Filter, Plus, Search, SearchX, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useCharactersStore } from "@/stores/characters-store";
 import { ICharacter, ICharacterFormData } from "@/types/character-types";
 
 interface IRoleStats {
@@ -36,7 +37,8 @@ interface CharactersViewProps {
   onCharacterClick: (characterId: string) => void;
 }
 
-export function CharactersView({
+const CharactersViewComponent = function CharactersView({
+  bookId,
   characters,
   filteredCharacters,
   roleStats,
@@ -50,14 +52,16 @@ export function CharactersView({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["characters", "create-character"] as any);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const hasMountedRef = useRef(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
 
-  // Only animate on initial mount
+  const hasAnimated = useCharactersStore((state) => state.hasAnimated(bookId));
+  const setHasAnimated = useCharactersStore((state) => state.setHasAnimated);
+
+  // Only animate on initial mount (controlled by store)
   useEffect(() => {
-    if (!hasMountedRef.current && filteredCharacters.length > 0) {
-      hasMountedRef.current = true;
+    if (!hasAnimated && filteredCharacters.length > 0) {
       setShouldAnimate(true);
+      setHasAnimated(bookId);
 
       // Remove animation class after animation completes
       const timer = setTimeout(() => {
@@ -66,7 +70,8 @@ export function CharactersView({
 
       return () => clearTimeout(timer);
     }
-  }, [filteredCharacters.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAnimated, filteredCharacters.length]); // Removido bookId e setHasAnimated das dependências
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
     const newCharacter: ICharacter = {
@@ -324,4 +329,6 @@ export function CharactersView({
       )}
     </div>
   );
-}
+};
+
+export const CharactersView = memo(CharactersViewComponent);

@@ -4,7 +4,8 @@ import { ArrowRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { CreateCharacterModal } from "@/components/modals/create-character-modal";
+import { CreateItemModal } from "@/components/modals/create-item-modal";
+import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  type ICharacter,
-  type ICharacterFormData,
-} from "@/types/character-types";
+import { IItem } from "@/lib/db/items.service";
 
 interface CreateVersionDialogProps {
   open: boolean;
@@ -27,22 +25,22 @@ interface CreateVersionDialogProps {
   onConfirm: (data: {
     name: string;
     description: string;
-    characterData: ICharacterFormData;
+    itemData: IItem;
   }) => void;
-  baseCharacter: ICharacter;
+  baseItem: IItem;
 }
 
 export function CreateVersionDialog({
   open,
   onClose,
   onConfirm,
-  baseCharacter,
+  baseItem: _baseItem,
 }: CreateVersionDialogProps) {
-  const { t } = useTranslation("character-detail");
+  const { t } = useTranslation("item-detail");
   const [step, setStep] = useState<1 | 2>(1);
   const [versionName, setVersionName] = useState("");
   const [versionDescription, setVersionDescription] = useState("");
-  const [isCharacterModalOpen, setIsCharacterModalOpen] = useState(false);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
 
   const MAX_NAME_LENGTH = 150;
   const MAX_DESCRIPTION_LENGTH = 150;
@@ -60,7 +58,7 @@ export function CreateVersionDialog({
     setStep(1);
     setVersionName("");
     setVersionDescription("");
-    setIsCharacterModalOpen(false);
+    setIsItemModalOpen(false);
     onClose();
   }, [onClose]);
 
@@ -70,20 +68,20 @@ export function CreateVersionDialog({
       return;
     }
     setStep(2);
-    setIsCharacterModalOpen(true);
+    setIsItemModalOpen(true);
   }, [canProceedToStep2, t]);
 
-  const handleCharacterModalClose = useCallback(() => {
-    setIsCharacterModalOpen(false);
+  const handleItemModalClose = useCallback(() => {
+    setIsItemModalOpen(false);
     setStep(1);
   }, []);
 
-  const handleCharacterCreate = useCallback(
-    (characterData: ICharacterFormData) => {
+  const handleItemCreate = useCallback(
+    (itemData: ItemFormSchema) => {
       onConfirm({
         name: versionName.trim(),
         description: versionDescription.trim(),
-        characterData: characterData as unknown as ICharacterFormData,
+        itemData: itemData as unknown as IItem,
       });
       handleClose();
       toast.success(t("versions.create_dialog.success"));
@@ -109,7 +107,6 @@ export function CreateVersionDialog({
           </Alert>
 
           <div className="space-y-4 pt-2">
-            {/* Version Name */}
             <div className="space-y-2">
               <Label htmlFor="version-name" className="text-sm font-medium">
                 {t("versions.create_dialog.name_label")} *
@@ -149,7 +146,6 @@ export function CreateVersionDialog({
               </div>
             </div>
 
-            {/* Version Description */}
             <div className="space-y-2">
               <Label
                 htmlFor="version-description"
@@ -198,7 +194,6 @@ export function CreateVersionDialog({
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
@@ -223,15 +218,11 @@ export function CreateVersionDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Step 2: Character Creation Modal */}
       {step === 2 && (
-        <CreateCharacterModal
-          open={isCharacterModalOpen}
-          onClose={handleCharacterModalClose}
-          onConfirm={handleCharacterCreate}
-          species={[]}
-          locations={[]}
-          organizations={[]}
+        <CreateItemModal
+          open={isItemModalOpen}
+          onClose={handleItemModalClose}
+          onConfirm={handleItemCreate}
         />
       )}
     </>

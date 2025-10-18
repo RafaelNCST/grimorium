@@ -9,6 +9,7 @@ import enCreateItem from "../../locales/en/create-item.json";
 import enEncyclopedia from "../../locales/en/encyclopedia.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
+import enItemDetail from "../../locales/en/item-detail.json";
 import enItems from "../../locales/en/items.json";
 import enOverview from "../../locales/en/overview.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
@@ -19,6 +20,7 @@ import ptCreateItem from "../../locales/pt/create-item.json";
 import ptEncyclopedia from "../../locales/pt/encyclopedia.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
+import ptItemDetail from "../../locales/pt/item-detail.json";
 import ptItems from "../../locales/pt/items.json";
 import ptOverview from "../../locales/pt/overview.json";
 
@@ -32,6 +34,7 @@ const resources = {
     "create-book": enCreateBook,
     "create-character": enCreateCharacter,
     "create-item": enCreateItem,
+    "item-detail": enItemDetail,
     items: enItems,
     overview: enOverview,
   },
@@ -44,6 +47,7 @@ const resources = {
     "create-book": ptCreateBook,
     "create-character": ptCreateCharacter,
     "create-item": ptCreateItem,
+    "item-detail": ptItemDetail,
     items: ptItems,
     overview: ptOverview,
   },

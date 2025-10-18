@@ -119,6 +119,45 @@ async function runMigrations(database: Database): Promise<void> {
       UNIQUE(character_id, related_character_id, relation_type)
     );
 
+    -- ITENS
+    CREATE TABLE IF NOT EXISTS items (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      status TEXT,
+      category TEXT,
+      custom_category TEXT,
+      basic_description TEXT,
+      image TEXT,
+
+      -- Advanced fields
+      appearance TEXT,
+      origin TEXT,
+      alternative_names TEXT,
+      story_rarity TEXT,
+      narrative_purpose TEXT,
+      usage_requirements TEXT,
+      usage_consequences TEXT,
+
+      -- Metadata
+      field_visibility TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+
+      UNIQUE(book_id, name)
+    );
+
+    -- VERSÕES DE ITENS
+    CREATE TABLE IF NOT EXISTS item_versions (
+      id TEXT PRIMARY KEY,
+      item_id TEXT NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      is_main INTEGER DEFAULT 0,
+      item_data TEXT,
+      created_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -127,6 +166,8 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_family_character ON family_relations(character_id);
     CREATE INDEX IF NOT EXISTS idx_family_related ON family_relations(related_character_id);
     CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_items_book_id ON items(book_id);
+    CREATE INDEX IF NOT EXISTS idx_item_versions_item_id ON item_versions(item_id);
   `;
 
     await database.execute(schema);

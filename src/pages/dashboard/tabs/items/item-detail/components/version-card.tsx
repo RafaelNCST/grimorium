@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { type ICharacterVersion } from "@/types/character-types";
+import { IItemVersion } from "@/lib/db/items.service";
 
 interface VersionCardProps {
-  version: ICharacterVersion;
+  version: IItemVersion;
   isSelected: boolean;
   onClick: () => void;
 }
@@ -17,7 +17,7 @@ export function VersionCard({
   isSelected,
   onClick,
 }: VersionCardProps) {
-  const { t } = useTranslation("character-detail");
+  const { t } = useTranslation("item-detail");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,11 +51,11 @@ export function VersionCard({
           </div>
         )}
 
-        {/* Character Image */}
+        {/* Item Image and Info */}
         <div className="flex items-center gap-3">
           <Avatar className="w-12 h-12 border-2 border-border">
             <AvatarImage
-              src={version.characterData.image}
+              src={version.image}
               alt={version.name}
               className="object-cover"
             />

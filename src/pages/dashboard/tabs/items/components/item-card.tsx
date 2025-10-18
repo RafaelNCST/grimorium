@@ -31,7 +31,9 @@ interface PropsItemCard {
 export function ItemCard({ item, onClick }: PropsItemCard) {
   const { t } = useTranslation(["items", "create-item"]);
 
-  const statusData = ITEM_STATUSES_CONSTANT.find((s) => s.value === item.status);
+  const statusData = ITEM_STATUSES_CONSTANT.find(
+    (s) => s.value === item.status
+  );
   const StatusIcon = statusData?.icon;
 
   const categoryData = ITEM_CATEGORIES_CONSTANT.find(

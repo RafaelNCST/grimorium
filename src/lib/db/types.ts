@@ -90,6 +90,39 @@ export interface DBFamilyRelation {
   created_at: number;
 }
 
+export interface DBItem {
+  id: string;
+  book_id: string;
+  name: string;
+  status?: string;
+  category?: string;
+  custom_category?: string;
+  basic_description?: string;
+  image?: string;
+
+  appearance?: string;
+  origin?: string;
+  alternative_names?: string;
+  story_rarity?: string;
+  narrative_purpose?: string;
+  usage_requirements?: string;
+  usage_consequences?: string;
+
+  field_visibility?: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBItemVersion {
+  id: string;
+  item_id: string;
+  name: string;
+  description?: string;
+  is_main: number;
+  item_data?: string;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

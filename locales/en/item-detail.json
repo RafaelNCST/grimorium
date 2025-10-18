@@ -1,0 +1,109 @@
+{
+  "header": {
+    "back": "Back",
+    "item_details": "Item details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "quick_navigation": "Quick Navigation"
+  },
+  "sections": {
+    "basic_info": "Basic Information",
+    "additional_info": "Additional Information",
+    "advanced_info": "Advanced Information",
+    "versions": "Versions"
+  },
+  "actions": {
+    "open": "Open",
+    "close": "Close"
+  },
+  "fields": {
+    "image": "Image",
+    "name": "Name",
+    "category": "Category",
+    "status": "Status",
+    "rarity": "Rarity",
+    "basic_description": "Basic Description",
+    "appearance": "Appearance",
+    "origin": "Origin",
+    "narrative_purpose": "Narrative Purpose",
+    "usage_requirements": "Usage Requirements",
+    "usage_consequences": "Usage Consequences"
+  },
+  "empty_states": {
+    "no_data": "Nothing added yet",
+    "no_data_hint": "Edit to add information"
+  },
+  "versions": {
+    "title": "Versions",
+    "main": "Main",
+    "main_badge": "Main",
+    "selected": "Selected version",
+    "add_version": "New Version",
+    "create_new": "New Version",
+    "edit_version": "Edit Version",
+    "delete_version": "Delete Version",
+    "version_name": "Version Name",
+    "version_description": "Version Description",
+    "created_at": "Created at",
+    "empty_state": {
+      "title": "Only the main version exists",
+      "description": "Create alternative versions to explore different item states"
+    },
+    "hint": {
+      "title": "💡 Tip:",
+      "description": "Create versions to explore different item states: broken version, enhanced version, alternate version, etc. Each version maintains independent data!"
+    },
+    "create_dialog": {
+      "title": "Create New Version",
+      "info_message": "First, define the version name and description. Then you can customize the item data.",
+      "name_label": "Version Name",
+      "name_placeholder": "E.g.: Original Version, Enhanced, Broken...",
+      "name_required": "Name is required",
+      "description_label": "Description",
+      "description_placeholder": "Describe the differences of this version...",
+      "description_required": "Description is required",
+      "chars_remaining": "characters remaining",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "step1_validation_error": "Fill all required fields",
+      "success": "Version created successfully!"
+    }
+  },
+  "delete": {
+    "version": {
+      "title": "Delete Version",
+      "message": "Are you sure you want to delete the version '{{versionName}}'? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Version",
+      "success": "Version deleted successfully"
+    },
+    "item": {
+      "title": "Delete Item",
+      "step1": {
+        "message": "This action will permanently delete the item '{{itemName}}' and all its versions.",
+        "input_label": "Type the full item name to confirm:",
+        "input_placeholder": "Type the item name",
+        "name_mismatch": "The entered name does not match the item name",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Final Confirmation",
+        "message": "You are about to permanently delete the item '{{itemName}}' and all its {{totalVersions}} versions. This action cannot be undone.",
+        "message_single": "You are about to permanently delete the item '{{itemName}}' and its version. This action cannot be undone.",
+        "cancel": "No, cancel",
+        "confirm": "Yes, permanently delete",
+        "success": "Item deleted successfully"
+      }
+    }
+  },
+  "navigation": {
+    "search_placeholder": "Search item...",
+    "current_item": "Current item"
+  },
+  "upload": {
+    "click": "Click to upload"
+  }
+}

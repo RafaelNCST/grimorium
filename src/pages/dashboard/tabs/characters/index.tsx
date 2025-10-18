@@ -2,10 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import {
-  getCharactersByBookId,
-  createCharacter,
-} from "@/lib/db/characters.service";
+import { useCharactersStore } from "@/stores/characters-store";
 import { type ICharacter } from "@/types/character-types";
 
 import { CharactersView } from "./view";
@@ -14,28 +11,30 @@ interface PropsCharactersTab {
   bookId: string;
 }
 
+const EMPTY_ARRAY: ICharacter[] = [];
+
 export function CharactersTab({ bookId }: PropsCharactersTab) {
   const navigate = useNavigate();
-  const [characters, setCharacters] = useState<ICharacter[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-  const [_isLoading, setIsLoading] = useState(true);
 
-  // Load characters from database on mount
+  // Usar o store para gerenciar characters - seletores otimizados
+  const characters = useCharactersStore(
+    (state) => state.cache[bookId]?.characters ?? EMPTY_ARRAY
+  );
+  const isLoading = useCharactersStore(
+    (state) => state.cache[bookId]?.isLoading ?? false
+  );
+
+  // Separar funções do store (não precisam de shallow comparison)
+  const fetchCharacters = useCharactersStore((state) => state.fetchCharacters);
+  const addCharacter = useCharactersStore((state) => state.addCharacter);
+
+  // Load characters from cache or database on mount
   useEffect(() => {
-    const loadCharacters = async () => {
-      try {
-        const charactersFromDB = await getCharactersByBookId(bookId);
-        setCharacters(charactersFromDB);
-      } catch (error) {
-        console.error("Error loading characters:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCharacters();
-  }, [bookId]);
+    fetchCharacters(bookId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId]); // Apenas bookId como dependência
 
   const filteredCharacters = useMemo(
     () =>
@@ -67,15 +66,13 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
   const handleCharacterCreated = useCallback(
     async (newCharacter: ICharacter) => {
       try {
-        // Save to database
-        await createCharacter(bookId, newCharacter);
-        // Update local state
-        setCharacters((prev) => [...prev, newCharacter]);
+        // Adicionar ao store (que também salva no DB)
+        await addCharacter(bookId, newCharacter);
       } catch (error) {
         console.error("Error creating character:", error);
       }
     },
-    [bookId]
+    [bookId, addCharacter]
   );
 
   const navigateToCharacterDetail = useCallback(

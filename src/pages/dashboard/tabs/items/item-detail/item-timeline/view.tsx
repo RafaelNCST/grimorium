@@ -120,7 +120,7 @@ export function ItemTimelineView({
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-border" />
 
           <div className="space-y-8">
-            {events.map((event, index) => (
+            {events.map((event, _index) => (
               <div key={event.id} className="relative flex items-start gap-6">
                 <div className="relative z-10 flex items-center justify-center w-16 h-16 bg-background border-4 border-primary rounded-full">
                   <span className="text-2xl">

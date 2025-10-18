@@ -1,0 +1,109 @@
+{
+  "header": {
+    "back": "Voltar",
+    "item_details": "Detalhes do item",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "quick_navigation": "Navegação Rápida"
+  },
+  "sections": {
+    "basic_info": "Informações Básicas",
+    "additional_info": "Informações Adicionais",
+    "advanced_info": "Informações Avançadas",
+    "versions": "Versões"
+  },
+  "actions": {
+    "open": "Abrir",
+    "close": "Fechar"
+  },
+  "fields": {
+    "image": "Imagem",
+    "name": "Nome",
+    "category": "Categoria",
+    "status": "Status",
+    "rarity": "Raridade",
+    "basic_description": "Descrição Básica",
+    "appearance": "Aparência",
+    "origin": "Origem",
+    "narrative_purpose": "Propósito Narrativo",
+    "usage_requirements": "Requisitos de Uso",
+    "usage_consequences": "Consequências de Uso"
+  },
+  "empty_states": {
+    "no_data": "Nada foi adicionado ainda",
+    "no_data_hint": "Edite para adicionar informações"
+  },
+  "versions": {
+    "title": "Versões",
+    "main": "Principal",
+    "main_badge": "Principal",
+    "selected": "Versão selecionada",
+    "add_version": "Nova Versão",
+    "create_new": "Nova Versão",
+    "edit_version": "Editar Versão",
+    "delete_version": "Excluir Versão",
+    "version_name": "Nome da Versão",
+    "version_description": "Descrição da Versão",
+    "created_at": "Criada em",
+    "empty_state": {
+      "title": "Apenas a versão principal existe",
+      "description": "Crie versões alternativas para explorar diferentes estados do item"
+    },
+    "hint": {
+      "title": "💡 Dica:",
+      "description": "Crie versões para explorar diferentes estados do item: versão quebrada, versão melhorada, versão alternativa, etc. Cada versão mantém dados independentes!"
+    },
+    "create_dialog": {
+      "title": "Criar Nova Versão",
+      "info_message": "Primeiro, defina o nome e descrição da versão. Depois você poderá personalizar os dados do item.",
+      "name_label": "Nome da Versão",
+      "name_placeholder": "Ex: Versão Original, Melhorada, Quebrada...",
+      "name_required": "Nome é obrigatório",
+      "description_label": "Descrição",
+      "description_placeholder": "Descreva as diferenças desta versão...",
+      "description_required": "Descrição é obrigatória",
+      "chars_remaining": "caracteres restantes",
+      "cancel": "Cancelar",
+      "continue": "Continuar",
+      "step1_validation_error": "Preencha todos os campos obrigatórios",
+      "success": "Versão criada com sucesso!"
+    }
+  },
+  "delete": {
+    "version": {
+      "title": "Excluir Versão",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versão",
+      "success": "Versão excluída com sucesso"
+    },
+    "item": {
+      "title": "Excluir Item",
+      "step1": {
+        "message": "Esta ação excluirá o item '{{itemName}}' e todas as suas versões permanentemente.",
+        "input_label": "Digite o nome completo do item para confirmar:",
+        "input_placeholder": "Digite o nome do item",
+        "name_mismatch": "O nome digitado não corresponde ao nome do item",
+        "cancel": "Cancelar",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Confirmação Final",
+        "message": "Você está prestes a excluir permanentemente o item '{{itemName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita.",
+        "message_single": "Você está prestes a excluir permanentemente o item '{{itemName}}' e sua versão. Esta ação não pode ser desfeita.",
+        "cancel": "Não, cancelar",
+        "confirm": "Sim, excluir permanentemente",
+        "success": "Item excluído com sucesso"
+      }
+    }
+  },
+  "navigation": {
+    "search_placeholder": "Buscar item...",
+    "current_item": "Item atual"
+  },
+  "upload": {
+    "click": "Clique para fazer upload"
+  }
+}
