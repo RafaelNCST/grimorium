@@ -315,7 +315,7 @@ export function Header({
               <div className="mb-3">
                 <p
                   ref={synopsisRef}
-                  className={`text-muted-foreground leading-relaxed ${
+                  className={`text-muted-foreground leading-relaxed select-text ${
                     !showFullSynopsis && isSynopsisLong(book.storySummary)
                       ? "line-clamp-3"
                       : ""

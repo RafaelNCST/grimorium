@@ -153,13 +153,14 @@ export function ItemDetailView({
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Categoria:</span>
-                  <Badge variant="outline">{item.category}</Badge>
+                  <Badge variant="outline" className="select-text">{item.category}</Badge>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Raridade:</span>
                   <Badge
                     variant="secondary"
+                    className="select-text"
                     style={{
                       backgroundColor: `${item.rarity.color}20`,
                       color: item.rarity.color,
@@ -173,7 +174,7 @@ export function ItemDetailView({
 
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Status:</span>
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="select-text">
                     <span className="mr-1 text-lg">{item.status.icon}</span>
                     {item.status.name}
                   </Badge>
@@ -308,15 +309,15 @@ export function ItemDetailView({
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-2xl">{item.name}</h3>
+                      <h3 className="font-semibold text-2xl select-text">{item.name}</h3>
                       {item.alternativeNames.length > 0 && (
-                        <p className="text-muted-foreground mt-1">
+                        <p className="text-muted-foreground mt-1 select-text">
                           Também conhecido como:{" "}
                           {item.alternativeNames.join(", ")}
                         </p>
                       )}
                     </div>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground select-text">
                       {item.basicDescription}
                     </p>
                   </div>
@@ -340,7 +341,7 @@ export function ItemDetailView({
                       rows={4}
                     />
                   ) : (
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground select-text">
                       {item.appearanceDescription}
                     </p>
                   )}
@@ -359,7 +360,7 @@ export function ItemDetailView({
                       rows={4}
                     />
                   ) : (
-                    <p className="text-muted-foreground">{item.origin}</p>
+                    <p className="text-muted-foreground select-text">{item.origin}</p>
                   )}
                 </CardContent>
               </Card>
@@ -379,7 +380,7 @@ export function ItemDetailView({
                       rows={6}
                     />
                   ) : (
-                    <p className="whitespace-pre-wrap text-muted-foreground">
+                    <p className="whitespace-pre-wrap text-muted-foreground select-text">
                       {item.powers}
                     </p>
                   )}
@@ -400,7 +401,7 @@ export function ItemDetailView({
                       rows={6}
                     />
                   ) : (
-                    <p className="whitespace-pre-wrap text-muted-foreground">
+                    <p className="whitespace-pre-wrap text-muted-foreground select-text">
                       {item.weaknesses}
                     </p>
                   )}
@@ -420,7 +421,7 @@ export function ItemDetailView({
                 {item.mythology.map((entry) => (
                   <div key={entry.id} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="outline">{entry.people}</Badge>
+                      <Badge variant="outline" className="select-text">{entry.people}</Badge>
                       {isEditing && (
                         <Button
                           variant="ghost"
@@ -431,7 +432,7 @@ export function ItemDetailView({
                         </Button>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground select-text">
                       {entry.version}
                     </p>
                   </div>

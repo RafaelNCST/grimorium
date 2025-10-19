@@ -57,7 +57,7 @@ function SummaryItem({
           placeholder={placeholder}
         />
       ) : (
-        <p className="text-xs text-foreground leading-relaxed">
+        <p className="text-xs text-foreground leading-relaxed select-text">
           {summary || (
             <span className="text-muted-foreground italic">{emptyMessage}</span>
           )}

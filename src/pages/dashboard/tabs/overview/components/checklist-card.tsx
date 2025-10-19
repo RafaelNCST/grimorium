@@ -122,7 +122,7 @@ export function ChecklistCard({
                 ) : (
                   <>
                     <span
-                      className={`flex-1 text-sm ${
+                      className={`flex-1 text-sm select-text ${
                         item.checked ? "line-through text-muted-foreground" : ""
                       }`}
                     >

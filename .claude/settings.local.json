@@ -53,7 +53,8 @@
       "Bash(pnpm lint:*)",
       "Bash(pnpm dev:*)",
       "WebFetch(domain:docs.rs)",
-      "Bash(pnpm lint:fix:*)"
+      "Bash(pnpm lint:fix:*)",
+      "Bash(pnpm tauri dev)"
     ],
     "deny": [],
     "ask": []

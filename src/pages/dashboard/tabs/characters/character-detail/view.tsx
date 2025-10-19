@@ -608,10 +608,10 @@ export function CharacterDetailView({
 
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-3">
-                            <h2 className="text-3xl font-bold">
+                            <h2 className="text-3xl font-bold select-text">
                               {character.name}
                             </h2>
-                            <Badge className={currentRole?.color}>
+                            <Badge className={`${currentRole?.color} select-text`}>
                               <RoleIcon className="w-4 h-4 mr-1" />
                               {currentRole?.label}
                             </Badge>
@@ -620,7 +620,7 @@ export function CharacterDetailView({
                           <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
-                              <span>{character.age} anos</span>
+                              <span className="select-text">{character.age} anos</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {(() => {
@@ -629,14 +629,14 @@ export function CharacterDetailView({
                                   <GenderIcon className="w-4 h-4" />
                                 ) : null;
                               })()}
-                              <span>{currentGender?.label}</span>
+                              <span className="select-text">{currentGender?.label}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge
                                 variant="secondary"
                                 className={`${currentAlignment?.bgColor} ${
                                   currentAlignment?.color
-                                }`}
+                                } select-text`}
                               >
                                 <Shield className="w-3 h-3 mr-1" />
                                 {currentAlignment?.label}
@@ -644,7 +644,7 @@ export function CharacterDetailView({
                             </div>
                           </div>
 
-                          <p className="text-foreground text-base">
+                          <p className="text-foreground text-base select-text">
                             {character.description}
                           </p>
                         </div>
@@ -675,7 +675,7 @@ export function CharacterDetailView({
                         />
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground select-text">
                         {character.appearance}
                       </p>
                     )}
@@ -704,7 +704,7 @@ export function CharacterDetailView({
                         />
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground select-text">
                         {character.personality}
                       </p>
                     )}
@@ -746,7 +746,7 @@ export function CharacterDetailView({
                   ) : (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4" />
-                      <span>{character.birthPlace || "Não definido"}</span>
+                      <span className="select-text">{character.birthPlace || "Não definido"}</span>
                     </div>
                   )}
                 </CardContent>
@@ -825,7 +825,7 @@ export function CharacterDetailView({
                               <span className="text-muted-foreground">
                                 Pai:
                               </span>
-                              <span>
+                              <span className="select-text">
                                 {
                                   mockCharacters.find(
                                     (c) => c.id === character.family.father
@@ -840,7 +840,7 @@ export function CharacterDetailView({
                               <span className="text-muted-foreground">
                                 Mãe:
                               </span>
-                              <span>
+                              <span className="select-text">
                                 {
                                   mockCharacters.find(
                                     (c) => c.id === character.family.mother
@@ -855,7 +855,7 @@ export function CharacterDetailView({
                               <span className="text-muted-foreground">
                                 Cônjuge:
                               </span>
-                              <span>
+                              <span className="select-text">
                                 {
                                   mockCharacters.find(
                                     (c) => c.id === character.family.spouse
@@ -881,7 +881,7 @@ export function CharacterDetailView({
                               <Badge
                                 key={childId}
                                 variant="secondary"
-                                className="text-xs"
+                                className="text-xs select-text"
                               >
                                 {child.name}
                               </Badge>
@@ -912,7 +912,7 @@ export function CharacterDetailView({
                                       <Badge
                                         key={siblingId}
                                         variant="secondary"
-                                        className="text-xs"
+                                        className="text-xs select-text"
                                       >
                                         {sibling.name}
                                       </Badge>
@@ -937,7 +937,7 @@ export function CharacterDetailView({
                                       <Badge
                                         key={halfSiblingId}
                                         variant="outline"
-                                        className="text-xs"
+                                        className="text-xs select-text"
                                       >
                                         {halfSibling.name}
                                       </Badge>
@@ -975,7 +975,7 @@ export function CharacterDetailView({
                                       <Badge
                                         key={grandparentId}
                                         variant="secondary"
-                                        className="text-xs"
+                                        className="text-xs select-text"
                                       >
                                         {grandparent.name}
                                       </Badge>
@@ -1000,7 +1000,7 @@ export function CharacterDetailView({
                                       <Badge
                                         key={uncleAuntId}
                                         variant="secondary"
-                                        className="text-xs"
+                                        className="text-xs select-text"
                                       >
                                         {uncleAunt.name}
                                       </Badge>
@@ -1025,7 +1025,7 @@ export function CharacterDetailView({
                                       <Badge
                                         key={cousinId}
                                         variant="secondary"
-                                        className="text-xs"
+                                        className="text-xs select-text"
                                       >
                                         {cousin.name}
                                       </Badge>
@@ -1404,7 +1404,7 @@ export function CharacterDetailView({
                                     </span>
                                     <Badge
                                       variant="outline"
-                                      className={typeData.color}
+                                      className={`${typeData.color} select-text`}
                                     >
                                       {typeData.label}
                                     </Badge>
@@ -1489,7 +1489,7 @@ export function CharacterDetailView({
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {character.qualities.map((quality) => (
-                        <Badge key={quality} variant="secondary">
+                        <Badge key={quality} variant="secondary" className="select-text">
                           {quality}
                         </Badge>
                       ))}
@@ -1528,7 +1528,7 @@ export function CharacterDetailView({
                   ) : (
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">
+                      <span className="text-sm select-text">
                         {character.organization || "Nenhuma organização"}
                       </span>
                     </div>
