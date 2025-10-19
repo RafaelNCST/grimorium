@@ -294,7 +294,7 @@ export function ItemDetailView({
                     </div>
 
                     <div>
-                      <Label htmlFor="basicDescription">Descrição Básica</Label>
+                      <Label htmlFor="basicDescription">Resumo</Label>
                       <Textarea
                         id="basicDescription"
                         value={item.basicDescription}

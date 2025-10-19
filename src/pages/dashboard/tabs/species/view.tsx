@@ -60,7 +60,7 @@ export function SpeciesView({
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Espécies</h2>
           <p className="text-muted-foreground">
-            Gerencie as espécies e raças que habitam o seu mundo
+            Gerencie as espécies, bestas e raças que habitam o seu mundo
           </p>
           {species.length > 0 && (
             <div className="mt-1">

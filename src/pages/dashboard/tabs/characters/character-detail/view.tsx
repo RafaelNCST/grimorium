@@ -574,7 +574,7 @@ export function CharacterDetailView({
                           {/* Description */}
                           <div className="space-y-2">
                             <Label htmlFor="description">
-                              Descrição Básica *
+                              Resumo *
                             </Label>
                             <Textarea
                               id="description"
