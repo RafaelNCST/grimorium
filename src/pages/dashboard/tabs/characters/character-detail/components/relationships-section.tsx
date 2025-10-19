@@ -14,6 +14,7 @@ import {
   Edit2,
   Trash2,
   X,
+  ChevronLeft,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -137,6 +138,7 @@ export function RelationshipsSection({
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
   const [intensity, setIntensity] = useState<number[]>([5]);
+  const [modalStep, setModalStep] = useState<1 | 2>(1);
 
   // Filter out current character and already related characters
   const availableCharacters = allCharacters.filter(
@@ -207,6 +209,18 @@ export function RelationshipsSection({
     setSelectedCharacterId("");
     setSelectedType("");
     setIntensity([5]);
+    setModalStep(1);
+  };
+
+  const handleCharacterSelect = (characterId: string) => {
+    setSelectedCharacterId(characterId);
+    setModalStep(2);
+  };
+
+  const handleBackToStep1 = () => {
+    setSelectedType("");
+    setIntensity([5]);
+    setModalStep(1);
   };
 
   const closeEditDialog = () => {
@@ -379,144 +393,193 @@ export function RelationshipsSection({
         <DialogContent className="max-w-2xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>
-              {t("character-detail:relationships.add_relationship")}
+              {modalStep === 1
+                ? t("character-detail:relationships.add_relationship")
+                : t("character-detail:relationships.select_relationship_type")}
             </DialogTitle>
             <DialogDescription>
-              {t("character-detail:relationships.select_character")}
+              {modalStep === 1
+                ? t("character-detail:relationships.select_character")
+                : t("character-detail:relationships.configure_relationship")}
             </DialogDescription>
           </DialogHeader>
 
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-6">
-              {/* Character Selection Grid */}
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold">
-                  {t("character-detail:relationships.select_character")}
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {availableCharacters.map((character) => (
-                    <Card
-                      key={character.id}
-                      className={`p-3 cursor-pointer transition-all hover:shadow-md ${
-                        selectedCharacterId === character.id
-                          ? "ring-2 ring-primary bg-primary/5"
-                          : "hover:bg-muted/30"
-                      }`}
-                      onClick={() => setSelectedCharacterId(character.id)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10">
+              {/* STEP 1: Character Selection */}
+              {modalStep === 1 && (
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold">
+                    {t("character-detail:relationships.available_characters")}
+                  </Label>
+                  <div className="grid grid-cols-1 gap-3 p-1">
+                    {availableCharacters.map((character) => (
+                      <Card
+                        key={character.id}
+                        className="p-4 cursor-pointer transition-all hover:shadow-md hover:bg-muted/30 hover:border-primary/50"
+                        onClick={() => handleCharacterSelect(character.id)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={character.image}
+                              className="object-cover"
+                            />
+                            <AvatarFallback>
+                              {character.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-base truncate">
+                              {character.name}
+                            </p>
+                            {character.role && (
+                              <p className="text-sm text-muted-foreground truncate">
+                                {character.role}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: Relationship Type & Intensity */}
+              {modalStep === 2 && selectedCharacterId && (
+                <div className="space-y-6">
+                  {/* Selected Character Card (Read-only) */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold">
+                      {t("character-detail:relationships.selected_character")}
+                    </Label>
+                    <Card className="p-4 bg-primary/5 border-primary/20">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="w-12 h-12">
                           <AvatarImage
-                            src={character.image}
+                            src={getCharacterById(selectedCharacterId)?.image}
                             className="object-cover"
                           />
                           <AvatarFallback>
-                            {character.name
-                              .split(" ")
+                            {getCharacterById(selectedCharacterId)
+                              ?.name.split(" ")
                               .map((n) => n[0])
                               .join("")
                               .slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">
-                            {character.name}
+                          <p className="font-semibold text-base truncate">
+                            {getCharacterById(selectedCharacterId)?.name}
                           </p>
-                          {character.role && (
-                            <p className="text-xs text-muted-foreground truncate">
-                              {character.role}
+                          {getCharacterById(selectedCharacterId)?.role && (
+                            <p className="text-sm text-muted-foreground truncate">
+                              {getCharacterById(selectedCharacterId)?.role}
                             </p>
                           )}
                         </div>
                       </div>
                     </Card>
-                  ))}
-                </div>
-              </div>
-
-              {/* Relationship Type Selection */}
-              {selectedCharacterId && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold">
-                    {t("character-detail:relationships.relationship_type")}
-                  </Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {RELATIONSHIP_TYPES.map((type) => {
-                      const Icon = type.icon;
-                      return (
-                        <Card
-                          key={type.value}
-                          className={`p-3 cursor-pointer transition-all hover:shadow-md ${
-                            selectedType === type.value
-                              ? `ring-2 ring-primary ${type.color}`
-                              : "hover:bg-muted/30"
-                          }`}
-                          onClick={() => setSelectedType(type.value)}
-                        >
-                          <div className="flex flex-col items-center gap-2 text-center">
-                            <Icon className="w-6 h-6" />
-                            <span className="text-xs font-medium">
-                              {t(
-                                `character-detail:relationship_types.${type.translationKey}`
-                              )}
-                            </span>
-                          </div>
-                        </Card>
-                      );
-                    })}
                   </div>
-                </div>
-              )}
 
-              {/* Intensity Slider */}
-              {selectedCharacterId && selectedType && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold">
-                    {t("character-detail:relationships.intensity")}:{" "}
-                    {intensity[0]}/10
-                  </Label>
-                  <Slider
-                    value={intensity}
-                    onValueChange={setIntensity}
-                    max={10}
-                    min={1}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>
-                      {t(
-                        "character-detail:relationships.intensity_labels.weak"
-                      )}
-                    </span>
-                    <span>
-                      {t(
-                        "character-detail:relationships.intensity_labels.moderate"
-                      )}
-                    </span>
-                    <span>
-                      {t(
-                        "character-detail:relationships.intensity_labels.strong"
-                      )}
-                    </span>
+                  {/* Relationship Type Selection */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold">
+                      {t("character-detail:relationships.relationship_type")}
+                    </Label>
+                    <div className="grid grid-cols-3 gap-2 p-1">
+                      {RELATIONSHIP_TYPES.map((type) => {
+                        const Icon = type.icon;
+                        return (
+                          <Card
+                            key={type.value}
+                            className={`p-3 cursor-pointer transition-all hover:shadow-md ${
+                              selectedType === type.value
+                                ? `border-primary ${type.color}`
+                                : "hover:bg-muted/30"
+                            }`}
+                            onClick={() => setSelectedType(type.value)}
+                          >
+                            <div className="flex flex-col items-center gap-2 text-center">
+                              <Icon className="w-6 h-6" />
+                              <span className="text-xs font-medium">
+                                {t(
+                                  `character-detail:relationship_types.${type.translationKey}`
+                                )}
+                              </span>
+                            </div>
+                          </Card>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Intensity Slider */}
+                  {selectedType && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold">
+                        {t("character-detail:relationships.intensity")}:{" "}
+                        {intensity[0]}/10
+                      </Label>
+                      <Slider
+                        value={intensity}
+                        onValueChange={setIntensity}
+                        max={10}
+                        min={1}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>
+                          {t(
+                            "character-detail:relationships.intensity_labels.weak"
+                          )}
+                        </span>
+                        <span>
+                          {t(
+                            "character-detail:relationships.intensity_labels.moderate"
+                          )}
+                        </span>
+                        <span>
+                          {t(
+                            "character-detail:relationships.intensity_labels.strong"
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </ScrollArea>
 
           <DialogFooter>
-            <Button variant="outline" onClick={closeAddDialog}>
-              <X className="w-4 h-4 mr-2" />
-              {t("character-detail:relationships.cancel")}
-            </Button>
-            <Button
-              onClick={handleAddRelationship}
-              disabled={!selectedCharacterId || !selectedType}
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              {t("character-detail:relationships.add")}
-            </Button>
+            {modalStep === 1 ? (
+              <Button variant="outline" onClick={closeAddDialog}>
+                <X className="w-4 h-4 mr-2" />
+                {t("character-detail:relationships.cancel")}
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleBackToStep1}>
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  {t("character-detail:relationships.back")}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={handleAddRelationship}
+                  disabled={!selectedType}
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  {t("character-detail:relationships.add")}
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -543,7 +606,7 @@ export function RelationshipsSection({
                 <Label className="text-sm font-semibold">
                   {t("character-detail:relationships.relationship_type")}
                 </Label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-2 p-1">
                   {RELATIONSHIP_TYPES.map((type) => {
                     const Icon = type.icon;
                     return (
@@ -551,7 +614,7 @@ export function RelationshipsSection({
                         key={type.value}
                         className={`p-3 cursor-pointer transition-all hover:shadow-md ${
                           selectedType === type.value
-                            ? `ring-2 ring-primary ${type.color}`
+                            ? `border-primary ${type.color}`
                             : "hover:bg-muted/30"
                         }`}
                         onClick={() => setSelectedType(type.value)}
@@ -609,7 +672,7 @@ export function RelationshipsSection({
               <X className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.cancel")}
             </Button>
-            <Button onClick={handleEditRelationship} disabled={!selectedType}>
+            <Button variant="default" onClick={handleEditRelationship} disabled={!selectedType}>
               <Edit2 className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.save")}
             </Button>

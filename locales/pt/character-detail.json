@@ -100,6 +100,10 @@
   "relationships": {
     "add_relationship": "Adicionar Relacionamento",
     "select_character": "Selecione um personagem",
+    "select_relationship_type": "Escolher Tipo de Relacionamento",
+    "configure_relationship": "Configure o tipo e intensidade do relacionamento",
+    "available_characters": "Personagens Disponíveis",
+    "selected_character": "Personagem Selecionado",
     "relationship_type": "Tipo de Relacionamento",
     "intensity": "Intensidade",
     "current_relationships": "Relacionamentos Atuais",
@@ -111,6 +115,7 @@
     "cancel": "Cancelar",
     "add": "Adicionar",
     "save": "Salvar",
+    "back": "Voltar",
     "edit_title": "Editar Relacionamento",
     "editing_with": "Editando relacionamento com"
   },
