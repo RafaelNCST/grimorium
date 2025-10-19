@@ -189,7 +189,7 @@ const CharactersViewComponent = function CharactersView({
       )}
 
       {/* Characters List */}
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] max-[2500px]:grid-cols-5 gap-4">
         {filteredCharacters.map((character) => {
           // Find role data
           const roleData = CHARACTER_ROLES_CONSTANT.find(
@@ -206,7 +206,7 @@ const CharactersViewComponent = function CharactersView({
           return (
             <Card
               key={character.id}
-              className="card-magical cursor-pointer w-[500px] transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
+              className="card-magical cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
               onClick={() => onCharacterClick(character.id)}
             >
               <CardContent className="p-5 space-y-4">
