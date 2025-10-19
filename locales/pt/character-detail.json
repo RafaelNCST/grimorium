@@ -117,7 +117,9 @@
     "save": "Salvar",
     "back": "Voltar",
     "edit_title": "Editar Relacionamento",
-    "editing_with": "Editando relacionamento com"
+    "editing_with": "Editando relacionamento com",
+    "no_characters_available": "Nenhum personagem disponível",
+    "no_characters_available_hint": "Você já relacionou todos os personagens disponíveis ou não há outros personagens criados"
   },
   "relationship_types": {
     "friend": "Amigo",

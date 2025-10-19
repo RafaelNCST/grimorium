@@ -139,7 +139,7 @@ export function CharacterDetail() {
           // Se não houver versões, criar a versão principal
           if (versionsFromDB.length === 0) {
             const mainVersion: ICharacterVersion = {
-              id: "main-version",
+              id: `main-version-${characterId}`,
               name: "Versão Principal",
               description: "Versão principal do personagem",
               createdAt: new Date().toISOString(),

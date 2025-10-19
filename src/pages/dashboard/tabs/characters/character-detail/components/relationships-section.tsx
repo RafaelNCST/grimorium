@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { toast } from "@/hooks/use-toast";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -167,15 +169,12 @@ export function RelationshipsSection({
 
     onRelationshipsChange([...relationships, newRelationship]);
 
-    // Reset form
-    setSelectedCharacterId("");
-    setSelectedType("");
-    setIntensity([5]);
-    setIsAddDialogOpen(false);
+    // Reset form and close dialog
+    closeAddDialog();
   };
 
   const handleEditRelationship = () => {
-    if (!editingRelationship) return;
+    if (!editingRelationship || !selectedType) return;
 
     const updatedRelationships = relationships.map((rel) =>
       rel.id === editingRelationship.id
@@ -184,10 +183,9 @@ export function RelationshipsSection({
     );
 
     onRelationshipsChange(updatedRelationships);
-    setIsEditDialogOpen(false);
-    setEditingRelationship(null);
-    setSelectedType("");
-    setIntensity([5]);
+
+    // Reset and close dialog
+    closeEditDialog();
   };
 
   const handleDeleteRelationship = (relationshipId: string) => {
@@ -210,6 +208,19 @@ export function RelationshipsSection({
     setSelectedType("");
     setIntensity([5]);
     setModalStep(1);
+  };
+
+  const handleOpenAddDialog = () => {
+    if (availableCharacters.length === 0) {
+      toast({
+        title: t("character-detail:relationships.no_characters_available"),
+        description: t(
+          "character-detail:relationships.no_characters_available_hint"
+        ),
+      });
+      return;
+    }
+    setIsAddDialogOpen(true);
   };
 
   const handleCharacterSelect = (characterId: string) => {
@@ -266,10 +277,10 @@ export function RelationshipsSection({
 
   return (
     <div className="space-y-4">
-      {/* Add Relationship Button - Only in Edit Mode */}
-      {isEditMode && availableCharacters.length > 0 && (
+      {/* Add Relationship Button - Always visible in Edit Mode */}
+      {isEditMode && (
         <Button
-          onClick={() => setIsAddDialogOpen(true)}
+          onClick={handleOpenAddDialog}
           className="w-full"
           variant="outline"
         >
@@ -277,21 +288,6 @@ export function RelationshipsSection({
           {t("character-detail:relationships.add_relationship")}
         </Button>
       )}
-
-      {/* Empty state in edit mode when no characters available */}
-      {isEditMode &&
-        availableCharacters.length === 0 &&
-        relationships.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="font-medium">
-              {t("character-detail:empty_states.no_characters_to_add")}
-            </p>
-            <p className="text-xs mt-1">
-              {t("character-detail:empty_states.create_more_hint")}
-            </p>
-          </div>
-        )}
 
       {/* Relationships List */}
       {relationships.length > 0 && (
@@ -373,9 +369,7 @@ export function RelationshipsSection({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() =>
-                          handleDeleteRelationship(relationship.id)
-                        }
+                        onClick={() => handleDeleteRelationship(relationship.id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -571,11 +565,13 @@ export function RelationshipsSection({
                   {t("character-detail:relationships.back")}
                 </Button>
                 <Button
-                  variant="default"
+                  variant="magical"
                   onClick={handleAddRelationship}
                   disabled={!selectedType}
+                  className="animate-glow"
+                  size="lg"
                 >
-                  <UserPlus className="w-4 h-4 mr-2" />
+                  <UserPlus className="w-5 h-5 mr-2" />
                   {t("character-detail:relationships.add")}
                 </Button>
               </>
@@ -679,6 +675,7 @@ export function RelationshipsSection({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

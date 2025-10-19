@@ -266,8 +266,8 @@ export async function getCharacterRelationships(
   );
 
   return result.map((rel) => ({
-    id: rel.related_character_id,
-    characterId: rel.character_id,
+    id: rel.id,
+    characterId: rel.related_character_id,
     type: rel.type as ICharacterRelationship["type"],
     intensity: rel.intensity,
   }));
@@ -286,11 +286,11 @@ export async function saveCharacterRelationships(
 
   // Insert new relationships
   for (const rel of relationships) {
-    const relId = `${characterId}-${rel.id}-${rel.type}-${Date.now()}`;
+    const relId = `${characterId}-${rel.characterId}-${rel.type}-${Date.now()}`;
     await db.execute(
       `INSERT INTO relationships (id, character_id, related_character_id, type, intensity, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [relId, characterId, rel.id, rel.type, rel.intensity, Date.now()]
+      [relId, characterId, rel.characterId, rel.type, rel.intensity, Date.now()]
     );
   }
 }

@@ -54,7 +54,12 @@
       "Bash(pnpm dev:*)",
       "WebFetch(domain:docs.rs)",
       "Bash(pnpm lint:fix:*)",
-      "Bash(pnpm tauri dev)"
+      "Bash(pnpm tauri dev)",
+      "Bash(git checkout src/pages/dashboard/tabs/characters/character-detail/index.tsx)",
+      "Bash(git apply fix_character_versions.patch)",
+      "Bash(git apply fix_relationships.patch)",
+      "Bash(perl -i -pe 's/id: rel\\.related_character_id,/id: rel.id,/' src/lib/db/characters.service.ts)",
+      "Bash(perl -i -pe 's/characterId: rel\\.character_id,/characterId: rel.related_character_id,/' src/lib/db/characters.service.ts)"
     ],
     "deny": [],
     "ask": []

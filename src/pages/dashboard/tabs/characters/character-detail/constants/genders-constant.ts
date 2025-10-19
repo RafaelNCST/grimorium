@@ -1,22 +1,42 @@
 import {
   User,
-  UserCheck,
-  Users2,
-  Ban,
+  UserRound,
+  Users,
+  Sparkles,
   HelpCircle,
   type LucideIcon,
 } from "lucide-react";
 
 export interface IGender {
   value: string;
-  label: string;
+  translationKey: string;
   icon: LucideIcon;
 }
 
 export const GENDERS_CONSTANT: IGender[] = [
-  { value: "masculino", label: "Masculino", icon: User },
-  { value: "feminino", label: "Feminino", icon: Users2 },
-  { value: "transgenero", label: "Transgênero", icon: UserCheck },
-  { value: "assexuado", label: "Assexuado", icon: Ban },
-  { value: "outro", label: "Outro", icon: HelpCircle },
+  {
+    value: "male",
+    translationKey: "gender.male",
+    icon: User,
+  },
+  {
+    value: "female",
+    translationKey: "gender.female",
+    icon: UserRound,
+  },
+  {
+    value: "non_binary",
+    translationKey: "gender.non_binary",
+    icon: Users,
+  },
+  {
+    value: "other",
+    translationKey: "gender.other",
+    icon: Sparkles,
+  },
+  {
+    value: "prefer_not_say",
+    translationKey: "gender.prefer_not_say",
+    icon: HelpCircle,
+  },
 ];

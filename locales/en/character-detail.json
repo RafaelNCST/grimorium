@@ -117,7 +117,9 @@
     "save": "Save",
     "back": "Back",
     "edit_title": "Edit Relationship",
-    "editing_with": "Editing relationship with"
+    "editing_with": "Editing relationship with",
+    "no_characters_available": "No characters available",
+    "no_characters_available_hint": "You have already related all available characters or there are no other characters created"
   },
   "relationship_types": {
     "friend": "Friend",

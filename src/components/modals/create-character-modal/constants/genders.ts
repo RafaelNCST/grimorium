@@ -20,7 +20,7 @@ export const GENDERS_CONSTANT: IGender[] = [
     icon: UserRound,
   },
   {
-    value: "non-binary",
+    value: "non_binary",
     translationKey: "gender.non_binary",
     icon: Users,
   },
@@ -30,7 +30,7 @@ export const GENDERS_CONSTANT: IGender[] = [
     icon: Sparkles,
   },
   {
-    value: "prefer-not-say",
+    value: "prefer_not_say",
     translationKey: "gender.prefer_not_say",
     icon: HelpCircle,
   },
