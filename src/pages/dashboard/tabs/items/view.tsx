@@ -18,12 +18,13 @@ interface PropsItemsView {
   items: IItem[];
   filteredItems: IItem[];
   searchTerm: string;
-  selectedCategory: string | null;
-  selectedStatus: string | null;
+  selectedCategories: string[];
+  selectedStatuses: string[];
   showCreateModal: boolean;
   onSearchTermChange: (term: string) => void;
-  onCategoryFilterChange: (category: string | null) => void;
-  onStatusFilterChange: (status: string | null) => void;
+  onCategoryFilterChange: (category: string) => void;
+  onStatusFilterChange: (status: string) => void;
+  onClearFilters: () => void;
   onShowCreateModalChange: (show: boolean) => void;
   onNavigateToItem: (itemId: string) => void;
   onCreateItem: (itemData: ItemFormSchema) => void;
@@ -33,12 +34,13 @@ const ItemsViewComponent = function ItemsView({
   items,
   filteredItems,
   searchTerm,
-  selectedCategory,
-  selectedStatus,
+  selectedCategories,
+  selectedStatuses,
   showCreateModal,
   onSearchTermChange,
   onCategoryFilterChange,
   onStatusFilterChange,
+  onClearFilters,
   onShowCreateModalChange,
   onNavigateToItem,
   onCreateItem,
@@ -115,7 +117,7 @@ const ItemsViewComponent = function ItemsView({
 
   // Get category badge style - using a neutral purple color for all categories
   const getCategoryBadgeClass = (categoryValue: string) => {
-    const isActive = selectedCategory === categoryValue;
+    const isActive = selectedCategories.includes(categoryValue);
 
     if (isActive) {
       return "!bg-purple-500 !text-white !border-purple-500";
@@ -129,7 +131,7 @@ const ItemsViewComponent = function ItemsView({
     const statusData = ITEM_STATUSES_CONSTANT.find(
       (s) => s.value === statusValue
     );
-    const isActive = selectedStatus === statusValue;
+    const isActive = selectedStatuses.includes(statusValue);
 
     if (!statusData) return "";
 
@@ -162,13 +164,11 @@ const ItemsViewComponent = function ItemsView({
   };
 
   const handleCategoryClick = (categoryValue: string) => {
-    onCategoryFilterChange(
-      selectedCategory === categoryValue ? null : categoryValue
-    );
+    onCategoryFilterChange(categoryValue);
   };
 
   const handleStatusClick = (statusValue: string) => {
-    onStatusFilterChange(selectedStatus === statusValue ? null : statusValue);
+    onStatusFilterChange(statusValue);
   };
 
   return (
@@ -183,14 +183,11 @@ const ItemsViewComponent = function ItemsView({
           <div className="flex items-center gap-4 mt-2">
             <Badge
               className={`cursor-pointer border transition-colors ${
-                selectedCategory === null && selectedStatus === null
+                selectedCategories.length === 0 && selectedStatuses.length === 0
                   ? "!bg-primary !text-white !border-primary"
                   : "bg-background text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
               }`}
-              onClick={() => {
-                onCategoryFilterChange(null);
-                onStatusFilterChange(null);
-              }}
+              onClick={onClearFilters}
             >
               {totalItems} {t("items:page.total_badge")}
             </Badge>
@@ -265,33 +262,35 @@ const ItemsViewComponent = function ItemsView({
           icon={
             searchTerm !== ""
               ? SearchX
-              : selectedCategory !== null || selectedStatus !== null
+              : selectedCategories.length > 0 || selectedStatuses.length > 0
                 ? Filter
                 : Package
           }
           title={
             searchTerm !== ""
               ? t("items:empty_state.no_results")
-              : selectedCategory !== null
+              : selectedCategories.length > 0
                 ? t("items:empty_state.no_category_items", {
-                    category: t(
-                      `create-item:category.${selectedCategory}`
-                    ).toLowerCase(),
+                    category: selectedCategories
+                      .map((cat) => t(`create-item:category.${cat}`))
+                      .join(", ")
+                      .toLowerCase(),
                   })
-                : selectedStatus !== null
+                : selectedStatuses.length > 0
                   ? t("items:empty_state.no_status_items", {
-                      status: t(
-                        `create-item:status.${selectedStatus}`
-                      ).toLowerCase(),
+                      status: selectedStatuses
+                        .map((status) => t(`create-item:status.${status}`))
+                        .join(", ")
+                        .toLowerCase(),
                     })
                   : t("items:empty_state.no_items")
           }
           description={
             searchTerm !== ""
               ? t("items:empty_state.no_results_description")
-              : selectedCategory !== null
+              : selectedCategories.length > 0
                 ? t("items:empty_state.no_category_items_description")
-                : selectedStatus !== null
+                : selectedStatuses.length > 0
                   ? t("items:empty_state.no_status_items_description")
                   : t("items:empty_state.no_items_description")
           }
@@ -300,7 +299,7 @@ const ItemsViewComponent = function ItemsView({
 
       {/* Items Grid */}
       {filteredItems.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] max-[2500px]:grid-cols-5 gap-4 pb-6">
           {filteredItems.map((item) => (
             <ItemCard key={item.id} item={item} onClick={onNavigateToItem} />
           ))}

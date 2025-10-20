@@ -16,7 +16,7 @@ const EMPTY_ARRAY: ICharacter[] = [];
 export function CharactersTab({ bookId }: PropsCharactersTab) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
   // Usar o store para gerenciar characters - seletores otimizados
   const characters = useCharactersStore(
@@ -45,10 +45,10 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
         const matchesRole =
-          selectedRole === null || character.role === selectedRole;
+          selectedRoles.length === 0 || selectedRoles.includes(character.role);
         return matchesSearch && matchesRole;
       }),
-    [characters, searchTerm, selectedRole]
+    [characters, searchTerm, selectedRoles]
   );
 
   const roleStats = useMemo(
@@ -92,8 +92,17 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
     [navigateToCharacterDetail]
   );
 
-  const handleRoleFilter = useCallback((role: string | null) => {
-    setSelectedRole(role);
+  const handleRoleFilter = useCallback((role: string) => {
+    setSelectedRoles((prev) => {
+      if (prev.includes(role)) {
+        return prev.filter((r) => r !== role);
+      }
+      return [...prev, role];
+    });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedRoles([]);
   }, []);
 
   return (
@@ -103,9 +112,10 @@ export function CharactersTab({ bookId }: PropsCharactersTab) {
       filteredCharacters={filteredCharacters}
       roleStats={roleStats}
       searchTerm={searchTerm}
-      selectedRole={selectedRole}
+      selectedRoles={selectedRoles}
       onSearchTermChange={setSearchTerm}
       onRoleFilterChange={handleRoleFilter}
+      onClearFilters={handleClearFilters}
       onCharacterCreated={handleCharacterCreated}
       onCharacterClick={handleCharacterClick}
     />

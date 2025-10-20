@@ -30,9 +30,10 @@ interface CharactersViewProps {
   filteredCharacters: ICharacter[];
   roleStats: IRoleStats;
   searchTerm: string;
-  selectedRole: string | null;
+  selectedRoles: string[];
   onSearchTermChange: (term: string) => void;
-  onRoleFilterChange: (role: string | null) => void;
+  onRoleFilterChange: (role: string) => void;
+  onClearFilters: () => void;
   onCharacterCreated: (character: ICharacter) => void;
   onCharacterClick: (characterId: string) => void;
 }
@@ -43,9 +44,10 @@ const CharactersViewComponent = function CharactersView({
   filteredCharacters,
   roleStats,
   searchTerm,
-  selectedRole,
+  selectedRoles,
   onSearchTermChange,
   onRoleFilterChange,
+  onClearFilters,
   onCharacterCreated,
   onCharacterClick,
 }: CharactersViewProps) {
@@ -55,7 +57,7 @@ const CharactersViewComponent = function CharactersView({
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
     const newCharacter: ICharacter = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       ...formData,
       qualities: [],
       createdAt: new Date().toISOString(),
@@ -78,79 +80,61 @@ const CharactersViewComponent = function CharactersView({
             <div className="flex items-center gap-4 mt-2">
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === null
+                  selectedRoles.length === 0
                     ? "!bg-primary !text-white !border-primary"
                     : "bg-background text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
                 }`}
-                onClick={() => onRoleFilterChange(null)}
+                onClick={onClearFilters}
               >
                 {roleStats.total} {t("characters:page.total_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === "protagonist"
+                  selectedRoles.includes("protagonist")
                     ? "!bg-yellow-500 !text-black !border-yellow-500"
                     : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400"
                 }`}
-                onClick={() =>
-                  onRoleFilterChange(
-                    selectedRole === "protagonist" ? null : "protagonist"
-                  )
-                }
+                onClick={() => onRoleFilterChange("protagonist")}
               >
                 {roleStats.protagonist} {t("characters:page.protagonist_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === "antagonist"
+                  selectedRoles.includes("antagonist")
                     ? "!bg-orange-500 !text-black !border-orange-500"
                     : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500"
                 }`}
-                onClick={() =>
-                  onRoleFilterChange(
-                    selectedRole === "antagonist" ? null : "antagonist"
-                  )
-                }
+                onClick={() => onRoleFilterChange("antagonist")}
               >
                 {roleStats.antagonist} {t("characters:page.antagonist_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === "villain"
+                  selectedRoles.includes("villain")
                     ? "!bg-red-500 !text-black !border-red-500"
                     : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500"
                 }`}
-                onClick={() =>
-                  onRoleFilterChange(
-                    selectedRole === "villain" ? null : "villain"
-                  )
-                }
+                onClick={() => onRoleFilterChange("villain")}
               >
                 {roleStats.villain} {t("characters:page.villain_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === "secondary"
+                  selectedRoles.includes("secondary")
                     ? "!bg-blue-500 !text-black !border-blue-500"
                     : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500"
                 }`}
-                onClick={() =>
-                  onRoleFilterChange(
-                    selectedRole === "secondary" ? null : "secondary"
-                  )
-                }
+                onClick={() => onRoleFilterChange("secondary")}
               >
                 {roleStats.secondary} {t("characters:page.secondary_badge")}
               </Badge>
               <Badge
                 className={`cursor-pointer border transition-colors ${
-                  selectedRole === "extra"
+                  selectedRoles.includes("extra")
                     ? "!bg-gray-500 !text-black !border-gray-500"
                     : "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500"
                 }`}
-                onClick={() =>
-                  onRoleFilterChange(selectedRole === "extra" ? null : "extra")
-                }
+                onClick={() => onRoleFilterChange("extra")}
               >
                 {roleStats.extra} {t("characters:page.extra_badge")}
               </Badge>
@@ -283,25 +267,26 @@ const CharactersViewComponent = function CharactersView({
           icon={
             characters.length === 0
               ? Users
-              : selectedRole !== null
+              : selectedRoles.length > 0
                 ? Filter
                 : SearchX
           }
           title={
             characters.length === 0
               ? t("characters:empty_state.no_characters")
-              : selectedRole !== null
+              : selectedRoles.length > 0
                 ? t("characters:empty_state.no_role_characters", {
-                    role: (
-                      t(`create-character:role.${selectedRole}`) as string
-                    ).toLowerCase(),
+                    role: selectedRoles
+                      .map((role) => t(`create-character:role.${role}`) as string)
+                      .join(", ")
+                      .toLowerCase(),
                   })
                 : t("characters:empty_state.no_results")
           }
           description={
             characters.length === 0
               ? t("characters:empty_state.no_characters_description")
-              : selectedRole !== null
+              : selectedRoles.length > 0
                 ? t("characters:empty_state.no_role_characters_description")
                 : t("characters:empty_state.no_results_description")
           }

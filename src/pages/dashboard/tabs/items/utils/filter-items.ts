@@ -3,15 +3,15 @@ import { IItem } from "../components/item-card";
 interface FilterItemsParams {
   items: IItem[];
   searchTerm: string;
-  selectedCategory: string | null;
-  selectedStatus: string | null;
+  selectedCategories: string[];
+  selectedStatuses: string[];
 }
 
 export function filterItems({
   items,
   searchTerm,
-  selectedCategory,
-  selectedStatus,
+  selectedCategories,
+  selectedStatuses,
 }: FilterItemsParams): IItem[] {
   return items.filter((item) => {
     // Search filter
@@ -24,17 +24,26 @@ export function filterItems({
           name.toLowerCase().includes(searchTerm.toLowerCase())
         ));
 
-    // Category filter - if category is "other", match all custom categories (items with category="other")
-    const matchesCategory =
-      selectedCategory === null ||
-      (selectedCategory === "other"
-        ? item.category === "other"
-        : item.category === selectedCategory);
+    // Multi-selection filter logic
+    const hasCategoryFilter = selectedCategories.length > 0;
+    const hasStatusFilter = selectedStatuses.length > 0;
 
-    // Status filter
-    const matchesStatus =
-      selectedStatus === null || item.status === selectedStatus;
+    let matchesFilters = true;
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    if (hasCategoryFilter && hasStatusFilter) {
+      // Both filters active: item must match at least one category AND at least one status
+      const matchesCategory = selectedCategories.includes(item.category);
+      const matchesStatus = selectedStatuses.includes(item.status);
+      matchesFilters = matchesCategory && matchesStatus;
+    } else if (hasCategoryFilter) {
+      // Only category filter active: item must match at least one category (OR)
+      matchesFilters = selectedCategories.includes(item.category);
+    } else if (hasStatusFilter) {
+      // Only status filter active: item must match at least one status (OR)
+      matchesFilters = selectedStatuses.includes(item.status);
+    }
+    // If no filters are active, matchesFilters remains true
+
+    return matchesSearch && matchesFilters;
   });
 }

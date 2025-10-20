@@ -161,9 +161,7 @@ async function runMigrations(database: Database): Promise<void> {
       -- Metadata
       field_visibility TEXT,
       created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-
-      UNIQUE(book_id, name)
+      updated_at INTEGER NOT NULL
     );
 
     -- VERSÕES DE ITENS

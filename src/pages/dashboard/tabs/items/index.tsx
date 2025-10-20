@@ -20,8 +20,8 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Usar o store para gerenciar items - seletores otimizados
@@ -47,10 +47,10 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
       filterItems({
         items,
         searchTerm,
-        selectedCategory,
-        selectedStatus,
+        selectedCategories,
+        selectedStatuses,
       }),
-    [items, searchTerm, selectedCategory, selectedStatus]
+    [items, searchTerm, selectedCategories, selectedStatuses]
   );
 
   const handleNavigateToItem = useCallback(
@@ -67,12 +67,27 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     setSearchTerm(term);
   }, []);
 
-  const handleCategoryFilterChange = useCallback((category: string | null) => {
-    setSelectedCategory(category);
+  const handleCategoryFilterChange = useCallback((category: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(category)) {
+        return prev.filter((c) => c !== category);
+      }
+      return [...prev, category];
+    });
   }, []);
 
-  const handleStatusFilterChange = useCallback((status: string | null) => {
-    setSelectedStatus(status);
+  const handleStatusFilterChange = useCallback((status: string) => {
+    setSelectedStatuses((prev) => {
+      if (prev.includes(status)) {
+        return prev.filter((s) => s !== status);
+      }
+      return [...prev, status];
+    });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategories([]);
+    setSelectedStatuses([]);
   }, []);
 
   const handleShowCreateModalChange = useCallback((show: boolean) => {
@@ -82,7 +97,7 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
   const handleCreateItem = useCallback(
     async (itemData: ItemFormSchema) => {
       const newItem: IItem = {
-        id: Date.now().toString(),
+        id: crypto.randomUUID(),
         name: itemData.name,
         status: itemData.status,
         category: itemData.category,
@@ -117,12 +132,13 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
       items={items}
       filteredItems={filteredItems}
       searchTerm={searchTerm}
-      selectedCategory={selectedCategory}
-      selectedStatus={selectedStatus}
+      selectedCategories={selectedCategories}
+      selectedStatuses={selectedStatuses}
       showCreateModal={showCreateModal}
       onSearchTermChange={handleSearchTermChange}
       onCategoryFilterChange={handleCategoryFilterChange}
       onStatusFilterChange={handleStatusFilterChange}
+      onClearFilters={handleClearFilters}
       onShowCreateModalChange={handleShowCreateModalChange}
       onNavigateToItem={handleNavigateToItem}
       onCreateItem={handleCreateItem}
