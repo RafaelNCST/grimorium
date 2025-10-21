@@ -138,6 +138,66 @@ export interface DBItemVersion {
   created_at: number;
 }
 
+export interface DBRace {
+  id: string;
+  book_id: string;
+
+  // Basic required fields
+  name: string;
+  domain: string; // JSON array string
+  summary: string;
+
+  // Optional basic fields
+  image?: string;
+  scientific_name?: string;
+
+  // Culture and Myths
+  alternative_names?: string; // JSON array string
+  race_views?: string; // JSON array string
+  cultural_notes?: string;
+
+  // Appearance and Characteristics
+  general_appearance?: string;
+  life_expectancy?: string;
+  average_height?: string;
+  average_weight?: string;
+  special_physical_characteristics?: string;
+
+  // Behaviors
+  habits?: string;
+  reproductive_cycle?: string;
+  diet?: string;
+  elemental_diet?: string;
+  communication?: string; // JSON array string
+  moral_tendency?: string;
+  social_organization?: string;
+  habitat?: string; // JSON array string
+
+  // Power
+  physical_capacity?: string;
+  special_characteristics?: string;
+  weaknesses?: string;
+
+  // Narrative
+  story_motivation?: string;
+  inspirations?: string;
+
+  // Metadata
+  field_visibility?: string; // JSON object string
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBRaceVersion {
+  id: string;
+  race_id: string;
+  name: string;
+  description?: string;
+  is_main: number; // 0 or 1 (SQLite boolean)
+  race_data?: string; // JSON string
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

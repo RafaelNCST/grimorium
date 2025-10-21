@@ -1,18 +1,62 @@
-export type RaceType =
-  | "Aquática"
+export type DomainType =
+  | "Aquático"
   | "Terrestre"
-  | "Voadora"
-  | "Espacial"
-  | "Espiritual";
+  | "Aéreo"
+  | "Subterrâneo"
+  | "Elevado"
+  | "Dimensional"
+  | "Espiritual"
+  | "Cósmico";
 
 export interface IRace {
   id: string;
+
+  // Basic required fields
   name: string;
-  description: string;
-  history: string;
-  type: RaceType;
-  physicalCharacteristics?: string;
-  culture?: string;
+  domain: DomainType[];
+  summary: string;
+
+  // Optional basic fields
+  image?: string;
+  scientificName?: string;
+
+  // Culture and Myths (all optional)
+  alternativeNames?: string[];
+  raceViews?: Array<{
+    id: string;
+    raceId: string;
+    raceName: string;
+    description: string;
+  }>;
+  culturalNotes?: string;
+
+  // Appearance and Characteristics (all optional)
+  generalAppearance?: string;
+  lifeExpectancy?: string;
+  averageHeight?: string;
+  averageWeight?: string;
+  specialPhysicalCharacteristics?: string;
+
+  // Behaviors (all optional)
+  habits?: string;
+  reproductiveCycle?: string;
+  diet?: string;
+  elementalDiet?: string;
+  communication?: string[];
+  moralTendency?: string;
+  socialOrganization?: string;
+  habitat?: string[];
+
+  // Power (all optional)
+  physicalCapacity?: string;
+  specialCharacteristics?: string;
+  weaknesses?: string;
+
+  // Narrative (all optional)
+  storyMotivation?: string;
+  inspirations?: string;
+
+  // Legacy field for backwards compatibility
   speciesId: string;
 }
 
@@ -28,10 +72,16 @@ export interface IRaceWithSpeciesName extends IRace {
   speciesName: string;
 }
 
-export interface IRaceTypeStats {
-  Aquática: number;
+export interface IDomainStats {
+  Aquático: number;
   Terrestre: number;
-  Voadora: number;
-  Espacial: number;
+  Aéreo: number;
+  Subterrâneo: number;
+  Elevado: number;
+  Dimensional: number;
   Espiritual: number;
+  Cósmico: number;
 }
+
+// Legacy type alias for backwards compatibility
+export type IRaceTypeStats = IDomainStats;

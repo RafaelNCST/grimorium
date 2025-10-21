@@ -1,0 +1,135 @@
+{
+  "modal": {
+    "create_race": "Criar Nova Raça",
+    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história.",
+    "advanced_items": "Campos Avançados",
+
+    "change_image": "Alterar Imagem",
+    "upload_image": "Enviar Imagem",
+
+    "race_name": "Nome da Raça",
+    "name_placeholder": "Dragão de Fogo",
+    "scientific_name": "Nome Científico",
+    "scientific_name_placeholder": "Draco ignis magnificus",
+
+    "domain": "Domínios (Selecione um ou mais)",
+    "summary": "Resumo",
+    "summary_placeholder": "Criaturas majestosas com escamas vermelhas e habilidade de manipular chamas. Vivem em montanhas vulcânicas e são conhecidas por sua sabedoria ancestral.",
+
+    "alternative_names": "Nomes Alternativos",
+    "alternative_names_placeholder": "Senhores das Chamas, Guardiões Escarlates",
+
+    "race_views": "Visões de Raça",
+    "race_views_description": "Aqui você pode registrar como outras raças, povos e civilizações enxergam essa raça. Isso adiciona profundidade ao worldbuilding, mostrando diferentes perspectivas culturais e preconceitos.",
+    "no_races_for_views": "Você precisa criar outras raças primeiro para poder adicionar visões. Crie esta raça e depois adicione visões ao editá-la.",
+    "add_view": "Adicionar Visão",
+    "edit_view": "Editar Visão",
+    "select_race": "Selecionar Raça",
+    "select_race_placeholder": "Escolha uma raça...",
+    "view_description": "Descrição da Visão",
+    "view_description_placeholder": "Como os Elfos veem os Dragões de Fogo: criaturas perigosas mas nobres, guardiãs de segredos antigos.",
+
+    "cultural_notes": "Notas Culturais (Ritos, Tabus, Curiosidades)",
+    "cultural_notes_placeholder": "Descreva ritos, tabus e curiosidades sobre essa raça. Por exemplo: rituais sagrados, práticas proibidas, fatos interessantes sobre sua cultura e costumes.",
+
+    "rites": "Ritos",
+    "add_rite": "Adicionar Rito",
+    "rite_placeholder": "Ritual de passagem onde jovens dragões devem mergulhar em lava para provar sua resistência.",
+
+    "taboos": "Tabus",
+    "add_taboo": "Adicionar Tabu",
+    "taboo_placeholder": "É proibido usar fogo contra membros da mesma linhagem sob pena de exílio eterno.",
+
+    "curiosities": "Curiosidades",
+    "add_curiosity": "Adicionar Curiosidade",
+    "curiosity_placeholder": "As escamas dos dragões mudam de cor conforme o humor, ficando mais brilhantes quando estão felizes.",
+
+    "text": "Texto",
+
+    "general_appearance": "Aparência Geral",
+    "general_appearance_placeholder": "Corpo reptiliano massivo coberto por escamas carmesim que brilham como brasas vivas. Asas imensas que geram calor intenso ao bater.",
+
+    "life_expectancy": "Expectativa de Vida",
+    "life_expectancy_placeholder": "500-1000 anos",
+
+    "average_height": "Altura Média",
+    "average_height_placeholder": "15-20 metros de comprimento",
+
+    "average_weight": "Peso Médio",
+    "average_weight_placeholder": "5-8 toneladas",
+
+    "special_physical_characteristics": "Características Físicas Especiais",
+    "special_physical_characteristics_placeholder": "Chifres que armazenam energia mágica, garras reforçadas com cristais vulcânicos, olhos que enxergam no espectro infravermelho.",
+
+    "habits": "Hábitos",
+    "reproductive_cycle": "Ciclo Reprodutivo",
+    "diet": "Dieta",
+
+    "elemental_diet_type": "Tipo de Elemento",
+    "elemental_diet_placeholder": "Fogo, magma, energia térmica",
+
+    "communication": "Comunicação",
+    "moral_tendency": "Tendência Moral",
+
+    "social_organization": "Organização Social",
+    "social_organization_placeholder": "Vivem em clãs hierárquicos liderados pelo dragão mais velho e sábio. Cada clã controla um território vulcânico específico.",
+
+    "habitat": "Habitat",
+    "habitat_placeholder": "Crateras vulcânicas, montanhas de fogo",
+
+    "other_cycle_description": "Descreva o ciclo reprodutivo",
+    "other_cycle_placeholder": "Descreva como os membros dessa raça se reproduzem...",
+
+    "other_communication_description": "Descreva a forma de comunicação",
+    "other_communication_placeholder": "Descreva como os membros dessa raça se comunicam...",
+
+    "physical_capacity": "Capacidade de Combate",
+    "physical_capacity_description": "Este campo serve para indicar o quão perigoso é um membro médio dessa raça (sem nada, isso inclui itens, roupas e etc) comparado a um humano comum na sua história.",
+
+    "special_characteristics": "Características Especiais",
+    "special_characteristics_placeholder": "Controle absoluto sobre fogo e calor, capacidade de voar em grandes altitudes, resistência natural a todos os tipos de dano térmico.",
+
+    "weaknesses": "Fraquezas",
+    "weaknesses_placeholder": "Vulneráveis a magia de gelo, não conseguem regular temperatura em ambientes aquáticos, arrogância pode ser explorada.",
+
+    "story_motivation": "Motivação Narrativa",
+    "story_motivation_placeholder": "Representam o poder ancestral que deve ser respeitado. Servem como guardiões de conhecimento proibido e desafios épicos para heróis.",
+
+    "inspirations": "Inspirações",
+    "inspirations_placeholder": "Dragões clássicos da mitologia europeia mesclados com elementos de dragões asiáticos, inspirados em Smaug e dragões de D&D."
+  },
+  "sections": {
+    "basic_fields": "Campos Básicos",
+    "culture_myths": "Cultura e Mitos",
+    "appearance": "Aparência e Características",
+    "behaviors": "Comportamentos",
+    "power": "Poder",
+    "narrative": "Narrativa"
+  },
+  "validation": {
+    "name_required": "Nome é obrigatório",
+    "name_max_length": "Nome deve ter no máximo 150 caracteres",
+    "scientific_name_max_length": "Nome científico deve ter no máximo 150 caracteres",
+    "domain_required": "Selecione pelo menos um domínio",
+    "summary_required": "Resumo é obrigatório",
+    "summary_max_length": "Resumo deve ter no máximo 500 caracteres",
+    "general_appearance_max_length": "Aparência geral deve ter no máximo 500 caracteres",
+    "life_expectancy_max_length": "Expectativa de vida deve ter no máximo 100 caracteres",
+    "average_height_max_length": "Altura média deve ter no máximo 100 caracteres",
+    "average_weight_max_length": "Peso médio deve ter no máximo 100 caracteres",
+    "special_physical_characteristics_max_length": "Características físicas especiais devem ter no máximo 500 caracteres",
+    "elemental_diet_required": "Tipo de elemento é obrigatório quando a dieta é elemental",
+    "elemental_diet_max_length": "Tipo de elemento deve ter no máximo 50 caracteres",
+    "social_organization_max_length": "Organização social deve ter no máximo 500 caracteres",
+    "behavioral_tendency_max_length": "Tendência comportamental deve ter no máximo 500 caracteres",
+    "special_characteristics_max_length": "Características especiais devem ter no máximo 500 caracteres",
+    "weaknesses_max_length": "Fraquezas devem ter no máximo 500 caracteres",
+    "story_motivation_max_length": "Motivação narrativa deve ter no máximo 500 caracteres",
+    "inspirations_max_length": "Inspirações devem ter no máximo 500 caracteres"
+  },
+  "button": {
+    "cancel": "Cancelar",
+    "create": "Criar Raça",
+    "save": "Salvar"
+  }
+}

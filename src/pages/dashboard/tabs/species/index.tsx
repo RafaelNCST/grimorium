@@ -1,14 +1,16 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
+import { createRace, getRacesByBookId } from "@/lib/db/races.service";
+
+import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
 
 import {
-  ISpecies,
   IRace,
   IRaceTypeStats,
-  RaceType,
+  DomainType,
 } from "./types/species-types";
 import { SpeciesView } from "./view";
 
@@ -16,118 +18,175 @@ interface PropsSpeciesTab {
   bookId: string;
 }
 
+// Map English domain values to Portuguese DomainType
+const DOMAIN_MAP: Record<string, DomainType> = {
+  'aquatic': 'Aquático',
+  'terrestrial': 'Terrestre',
+  'aerial': 'Aéreo',
+  'underground': 'Subterrâneo',
+  'elevated': 'Elevado',
+  'dimensional': 'Dimensional',
+  'spiritual': 'Espiritual',
+  'cosmic': 'Cósmico',
+};
+
 export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [species, setSpecies] = useState<ISpecies[]>([]);
-  const [isCreateSpeciesOpen, setIsCreateSpeciesOpen] = useState(false);
+  const [races, setRaces] = useState<IRace[]>([]);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
+  // Load races from database
+  useEffect(() => {
+    const loadRaces = async () => {
+      try {
+        const loadedRaces = await getRacesByBookId(bookId);
+        setRaces(loadedRaces);
+      } catch (error) {
+        console.error("Error loading races:", error);
+        toast({
+          title: "Erro ao carregar raças",
+          description: "Não foi possível carregar as raças do banco de dados.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadRaces();
+  }, [bookId, toast]);
+
+  // Prepare all races for availableRaces prop (race views)
+  const availableRaces = useMemo(() => {
+    return races.map((race) => ({
+      id: race.id,
+      name: race.name,
+    }));
+  }, [races]);
+
+  // Filter races based on search term and selected domains
+  const filteredRaces = useMemo(() => {
+    let filtered = races;
+
+    // Filter by search term (name only)
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((race) =>
+        race.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by selected domains
+    if (selectedDomains.length > 0) {
+      filtered = filtered.filter((race) =>
+        selectedDomains.some((domain) => race.domain.includes(domain as DomainType))
+      );
+    }
+
+    return filtered;
+  }, [races, searchTerm, selectedDomains]);
+
+  // Calculate domain stats from races
   const raceTypeStats = useMemo<IRaceTypeStats>(
     () => ({
-      Aquática: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Aquática").length,
-        0
-      ),
-      Terrestre: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Terrestre").length,
-        0
-      ),
-      Voadora: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Voadora").length,
-        0
-      ),
-      Espacial: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Espacial").length,
-        0
-      ),
-      Espiritual: species.reduce(
-        (sum, s) => sum + s.races.filter((r) => r.type === "Espiritual").length,
-        0
-      ),
+      Aquático: races.filter((r) => r.domain.includes("Aquático")).length,
+      Terrestre: races.filter((r) => r.domain.includes("Terrestre")).length,
+      Aéreo: races.filter((r) => r.domain.includes("Aéreo")).length,
+      Subterrâneo: races.filter((r) => r.domain.includes("Subterrâneo")).length,
+      Elevado: races.filter((r) => r.domain.includes("Elevado")).length,
+      Dimensional: races.filter((r) => r.domain.includes("Dimensional")).length,
+      Espiritual: races.filter((r) => r.domain.includes("Espiritual")).length,
+      Cósmico: races.filter((r) => r.domain.includes("Cósmico")).length,
     }),
-    [species]
-  );
-
-  const handleCreateSpecies = useCallback(
-    (data: {
-      knownName: string;
-      scientificName?: string;
-      description: string;
-    }) => {
-      const newSpecies: ISpecies = {
-        id: Date.now().toString(),
-        ...data,
-        races: [],
-      };
-      setSpecies([...species, newSpecies]);
-      toast({
-        title: "Espécie criada",
-        description: `${data.knownName} foi criada com sucesso.`,
-      });
-    },
-    [species, toast]
+    [races]
   );
 
   const handleCreateRace = useCallback(
-    (data: {
-      name: string;
-      description: string;
-      history: string;
-      type: RaceType;
-      physicalCharacteristics?: string;
-      culture?: string;
-    }) => {
-      const newRace: IRace = {
-        id: Date.now().toString(),
-        ...data,
-        speciesId: selectedSpeciesId,
-      };
+    async (data: RaceFormSchema) => {
+      try {
+        // Convert domain values from English to Portuguese
+        const convertedDomains = data.domain.map(d => DOMAIN_MAP[d] || d) as DomainType[];
 
-      setSpecies(
-        species.map((s) =>
-          s.id === selectedSpeciesId
-            ? { ...s, races: [...s.races, newRace] }
-            : s
-        )
-      );
+        const newRace: IRace = {
+          id: crypto.randomUUID(),
+          name: data.name,
+          domain: convertedDomains,
+          summary: data.summary,
+          image: data.image,
+          scientificName: data.scientificName,
+          alternativeNames: data.alternativeNames,
+          raceViews: data.raceViews,
+          culturalNotes: data.culturalNotes,
+          generalAppearance: data.generalAppearance,
+          lifeExpectancy: data.lifeExpectancy,
+          averageHeight: data.averageHeight,
+          averageWeight: data.averageWeight,
+          specialPhysicalCharacteristics: data.specialPhysicalCharacteristics,
+          habits: data.habits,
+          reproductiveCycle: data.reproductiveCycle,
+          diet: data.diet,
+          elementalDiet: data.elementalDiet,
+          communication: data.communication,
+          moralTendency: data.moralTendency,
+          socialOrganization: data.socialOrganization,
+          habitat: data.habitat,
+          physicalCapacity: data.physicalCapacity,
+          specialCharacteristics: data.specialCharacteristics,
+          weaknesses: data.weaknesses,
+          storyMotivation: data.storyMotivation,
+          inspirations: data.inspirations,
+          speciesId: "", // Legacy field, not used anymore
+        };
 
-      toast({
-        title: "Raça criada",
-        description: `${data.name} foi criada com sucesso.`,
-      });
+        // Save to database
+        await createRace(bookId, newRace);
+
+        // Update local state
+        setRaces([newRace, ...races]);
+
+        toast({
+          title: "Raça criada",
+          description: `${data.name} foi criada com sucesso.`,
+        });
+
+        setIsCreateRaceOpen(false);
+      } catch (error) {
+        console.error("Error creating race:", error);
+        toast({
+          title: "Erro ao criar raça",
+          description: "Não foi possível criar a raça. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     },
-    [species, selectedSpeciesId, toast]
-  );
-
-  const handleSpeciesClick = useCallback(
-    (speciesId: string) => {
-      const worldId = "world1";
-      const speciesUrl = `/book/${bookId}/world/${worldId}/species/${speciesId}`;
-      window.location.href = speciesUrl;
-    },
-    [bookId]
+    [bookId, races, toast]
   );
 
   const handleRaceClick = useCallback(
     (raceId: string) => {
-      navigate({
-        to: "/dashboard/$dashboardId/tabs/race/$raceId",
-        params: { dashboardId: bookId, raceId },
-      });
+      // For now, just log - navigation will be implemented in future steps
+      console.log("Race clicked:", raceId);
     },
-    [navigate, bookId]
+    []
   );
 
-  const handleOpenCreateRaceModal = useCallback((speciesId: string) => {
-    setSelectedSpeciesId(speciesId);
-    setIsCreateRaceOpen(true);
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
   }, []);
 
-  const handleSetIsCreateSpeciesOpen = useCallback((open: boolean) => {
-    setIsCreateSpeciesOpen(open);
+  const handleDomainFilterChange = useCallback((domain: string) => {
+    setSelectedDomains((prev) => {
+      if (prev.includes(domain)) {
+        return prev.filter((d) => d !== domain);
+      }
+      return [...prev, domain];
+    });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedDomains([]);
+    setSearchTerm("");
   }, []);
 
   const handleSetIsCreateRaceOpen = useCallback((open: boolean) => {
@@ -136,17 +195,19 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
 
   return (
     <SpeciesView
-      species={species}
-      isCreateSpeciesOpen={isCreateSpeciesOpen}
+      races={races}
+      filteredRaces={filteredRaces}
       isCreateRaceOpen={isCreateRaceOpen}
       raceTypeStats={raceTypeStats}
-      onSetIsCreateSpeciesOpen={handleSetIsCreateSpeciesOpen}
+      availableRaces={availableRaces}
+      searchTerm={searchTerm}
+      selectedDomains={selectedDomains}
       onSetIsCreateRaceOpen={handleSetIsCreateRaceOpen}
-      onCreateSpecies={handleCreateSpecies}
       onCreateRace={handleCreateRace}
-      onSpeciesClick={handleSpeciesClick}
       onRaceClick={handleRaceClick}
-      onOpenCreateRaceModal={handleOpenCreateRaceModal}
+      onSearchTermChange={handleSearchTermChange}
+      onDomainFilterChange={handleDomainFilterChange}
+      onClearFilters={handleClearFilters}
     />
   );
 }

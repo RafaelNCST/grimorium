@@ -1,0 +1,135 @@
+{
+  "modal": {
+    "create_race": "Create New Race",
+    "info_message": "Everything can be edited later. Start with the basic information and add details as you develop your story.",
+    "advanced_items": "Advanced Fields",
+
+    "change_image": "Change Image",
+    "upload_image": "Upload Image",
+
+    "race_name": "Race Name",
+    "name_placeholder": "Fire Dragon",
+    "scientific_name": "Scientific Name",
+    "scientific_name_placeholder": "Draco ignis magnificus",
+
+    "domain": "Domains (Select one or more)",
+    "summary": "Summary",
+    "summary_placeholder": "Majestic creatures with red scales and ability to manipulate flames. They live in volcanic mountains and are known for their ancestral wisdom.",
+
+    "alternative_names": "Alternative Names",
+    "alternative_names_placeholder": "Lords of Flames, Scarlet Guardians",
+
+    "race_views": "Race Views",
+    "race_views_description": "Here you can record how other races, peoples, and civilizations view this race. This adds depth to worldbuilding by showing different cultural perspectives and prejudices.",
+    "no_races_for_views": "You need to create other races first to add views. Create this race and then add views by editing it.",
+    "add_view": "Add View",
+    "edit_view": "Edit View",
+    "select_race": "Select Race",
+    "select_race_placeholder": "Choose a race...",
+    "view_description": "View Description",
+    "view_description_placeholder": "How Elves see Fire Dragons: dangerous but noble creatures, guardians of ancient secrets.",
+
+    "cultural_notes": "Cultural Notes (Rites, Taboos, Curiosities)",
+    "cultural_notes_placeholder": "Describe rites, taboos, and curiosities about this race. For example: sacred rituals, forbidden practices, interesting facts about their culture and customs.",
+
+    "rites": "Rites",
+    "add_rite": "Add Rite",
+    "rite_placeholder": "Coming of age ritual where young dragons must dive into lava to prove their resistance.",
+
+    "taboos": "Taboos",
+    "add_taboo": "Add Taboo",
+    "taboo_placeholder": "It is forbidden to use fire against members of the same lineage under penalty of eternal exile.",
+
+    "curiosities": "Curiosities",
+    "add_curiosity": "Add Curiosity",
+    "curiosity_placeholder": "Dragon scales change color according to mood, becoming brighter when they are happy.",
+
+    "text": "Text",
+
+    "general_appearance": "General Appearance",
+    "general_appearance_placeholder": "Massive reptilian body covered in crimson scales that glow like living embers. Immense wings that generate intense heat when flapping.",
+
+    "life_expectancy": "Life Expectancy",
+    "life_expectancy_placeholder": "500-1000 years",
+
+    "average_height": "Average Height",
+    "average_height_placeholder": "15-20 meters in length",
+
+    "average_weight": "Average Weight",
+    "average_weight_placeholder": "5-8 tons",
+
+    "special_physical_characteristics": "Special Physical Characteristics",
+    "special_physical_characteristics_placeholder": "Horns that store magical energy, claws reinforced with volcanic crystals, eyes that see in the infrared spectrum.",
+
+    "habits": "Habits",
+    "reproductive_cycle": "Reproductive Cycle",
+    "diet": "Diet",
+
+    "elemental_diet_type": "Element Type",
+    "elemental_diet_placeholder": "Fire, magma, thermal energy",
+
+    "communication": "Communication",
+    "moral_tendency": "Moral Tendency",
+
+    "social_organization": "Social Organization",
+    "social_organization_placeholder": "Live in hierarchical clans led by the oldest and wisest dragon. Each clan controls a specific volcanic territory.",
+
+    "habitat": "Habitat",
+    "habitat_placeholder": "Volcanic craters, fire mountains",
+
+    "other_cycle_description": "Describe the reproductive cycle",
+    "other_cycle_placeholder": "Describe how members of this race reproduce...",
+
+    "other_communication_description": "Describe the form of communication",
+    "other_communication_placeholder": "Describe how members of this race communicate...",
+
+    "physical_capacity": "Combat Capacity",
+    "physical_capacity_description": "This field is to indicate how dangerous an average member of this race is (without anything, including items, clothing, etc.) compared to an average human in your story.",
+
+    "special_characteristics": "Special Characteristics",
+    "special_characteristics_placeholder": "Absolute control over fire and heat, ability to fly at high altitudes, natural resistance to all types of thermal damage.",
+
+    "weaknesses": "Weaknesses",
+    "weaknesses_placeholder": "Vulnerable to ice magic, cannot regulate temperature in aquatic environments, arrogance can be exploited.",
+
+    "story_motivation": "Story Motivation",
+    "story_motivation_placeholder": "Represent ancestral power that must be respected. Serve as guardians of forbidden knowledge and epic challenges for heroes.",
+
+    "inspirations": "Inspirations",
+    "inspirations_placeholder": "Classic dragons from European mythology blended with elements of Asian dragons, inspired by Smaug and D&D dragons."
+  },
+  "sections": {
+    "basic_fields": "Basic Fields",
+    "culture_myths": "Culture and Myths",
+    "appearance": "Appearance and Characteristics",
+    "behaviors": "Behaviors",
+    "power": "Power",
+    "narrative": "Narrative"
+  },
+  "validation": {
+    "name_required": "Name is required",
+    "name_max_length": "Name must be at most 150 characters",
+    "scientific_name_max_length": "Scientific name must be at most 150 characters",
+    "domain_required": "Select at least one domain",
+    "summary_required": "Summary is required",
+    "summary_max_length": "Summary must be at most 500 characters",
+    "general_appearance_max_length": "General appearance must be at most 500 characters",
+    "life_expectancy_max_length": "Life expectancy must be at most 100 characters",
+    "average_height_max_length": "Average height must be at most 100 characters",
+    "average_weight_max_length": "Average weight must be at most 100 characters",
+    "special_physical_characteristics_max_length": "Special physical characteristics must be at most 500 characters",
+    "elemental_diet_required": "Element type is required when diet is elemental",
+    "elemental_diet_max_length": "Element type must be at most 50 characters",
+    "social_organization_max_length": "Social organization must be at most 500 characters",
+    "behavioral_tendency_max_length": "Behavioral tendency must be at most 500 characters",
+    "special_characteristics_max_length": "Special characteristics must be at most 500 characters",
+    "weaknesses_max_length": "Weaknesses must be at most 500 characters",
+    "story_motivation_max_length": "Story motivation must be at most 500 characters",
+    "inspirations_max_length": "Inspirations must be at most 500 characters"
+  },
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create Race",
+    "save": "Save"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Raças",
+  "description": "Gerencie as raças, bestas e espécies que habitam o seu mundo",
+  "new_race_button": "Nova Raça",
+  "empty_state": {
+    "title": "Nenhuma raça criada",
+    "description": "Comece criando sua primeira raça para popular seu mundo"
+  },
+  "search_placeholder": "Buscar raças...",
+  "not_found": "Nenhuma raça encontrada",
+  "filters": {
+    "all": "Todas",
+    "domain": "Domínio"
+  },
+  "domains": {
+    "Aquático": "Aquático",
+    "Terrestre": "Terrestre",
+    "Aéreo": "Aéreo",
+    "Subterrâneo": "Subterrâneo",
+    "Elevado": "Elevado",
+    "Dimensional": "Dimensional",
+    "Espiritual": "Espiritual",
+    "Cósmico": "Cósmico"
+  }
+}

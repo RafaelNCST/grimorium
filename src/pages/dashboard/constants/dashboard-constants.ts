@@ -52,6 +52,6 @@ export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   { id: "organizations", label: "Organizações", icon: Building, visible: true },
   { id: "plot", label: "Enredo", icon: Target, visible: true },
   { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
-  { id: "species", label: "Espécies", icon: Dna, visible: true },
+  { id: "species", label: "Raças", icon: Dna, visible: true },
   { id: "items", label: "Itens", icon: Package, visible: true },
 ];

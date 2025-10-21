@@ -175,6 +175,68 @@ async function runMigrations(database: Database): Promise<void> {
       created_at INTEGER NOT NULL
     );
 
+    -- RAÇAS
+    CREATE TABLE IF NOT EXISTS races (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+
+      -- Basic required fields
+      name TEXT NOT NULL,
+      domain TEXT NOT NULL,
+      summary TEXT NOT NULL,
+
+      -- Optional basic fields
+      image TEXT,
+      scientific_name TEXT,
+
+      -- Culture and Myths
+      alternative_names TEXT,
+      race_views TEXT,
+      cultural_notes TEXT,
+
+      -- Appearance and Characteristics
+      general_appearance TEXT,
+      life_expectancy TEXT,
+      average_height TEXT,
+      average_weight TEXT,
+      special_physical_characteristics TEXT,
+
+      -- Behaviors
+      habits TEXT,
+      reproductive_cycle TEXT,
+      diet TEXT,
+      elemental_diet TEXT,
+      communication TEXT,
+      moral_tendency TEXT,
+      social_organization TEXT,
+      habitat TEXT,
+
+      -- Power
+      physical_capacity TEXT,
+      special_characteristics TEXT,
+      weaknesses TEXT,
+
+      -- Narrative
+      story_motivation TEXT,
+      inspirations TEXT,
+
+      -- Metadata
+      field_visibility TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- VERSÕES DE RAÇAS
+    CREATE TABLE IF NOT EXISTS race_versions (
+      id TEXT PRIMARY KEY,
+      race_id TEXT NOT NULL REFERENCES races(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      is_main INTEGER DEFAULT 0,
+      race_data TEXT,
+      created_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -185,6 +247,8 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
     CREATE INDEX IF NOT EXISTS idx_items_book_id ON items(book_id);
     CREATE INDEX IF NOT EXISTS idx_item_versions_item_id ON item_versions(item_id);
+    CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id);
+    CREATE INDEX IF NOT EXISTS idx_race_versions_race_id ON race_versions(race_id);
   `;
 
     await database.execute(schema);

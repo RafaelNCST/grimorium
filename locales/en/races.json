@@ -1,0 +1,25 @@
+{
+  "title": "Races",
+  "description": "Manage the races, beasts and species that inhabit your world",
+  "new_race_button": "New Race",
+  "empty_state": {
+    "title": "No races created",
+    "description": "Start by creating your first race to populate your world"
+  },
+  "search_placeholder": "Search races...",
+  "not_found": "No races found",
+  "filters": {
+    "all": "All",
+    "domain": "Domain"
+  },
+  "domains": {
+    "Aquático": "Aquatic",
+    "Terrestre": "Terrestrial",
+    "Aéreo": "Aerial",
+    "Subterrâneo": "Underground",
+    "Elevado": "Elevated",
+    "Dimensional": "Dimensional",
+    "Espiritual": "Spiritual",
+    "Cósmico": "Cosmic"
+  }
+}

@@ -1,113 +1,200 @@
-import { Plus } from "lucide-react";
+import { Filter, Plus, Search, SearchX, Users } from "lucide-react";
 
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
-import { CreateSpeciesModal } from "@/components/modals/create-species-modal";
-import { Accordion } from "@/components/ui/accordion";
+import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
+import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
+import { EmptyState } from "@/components/empty-state";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import { EmptyState } from "./components/empty-state";
-import { SpeciesCard } from "./components/species-card";
-import { StatsBadges } from "./components/stats-badges";
-import { ISpecies, IRaceTypeStats, RaceType } from "./types/species-types";
+import { RaceCard } from "./components/race-card";
+import { IRace, IRaceTypeStats } from "./types/species-types";
 
 interface PropsSpeciesView {
-  species: ISpecies[];
-  isCreateSpeciesOpen: boolean;
+  races: IRace[];
+  filteredRaces: IRace[];
   isCreateRaceOpen: boolean;
   raceTypeStats: IRaceTypeStats;
-  onSetIsCreateSpeciesOpen: (open: boolean) => void;
+  availableRaces: Array<{ id: string; name: string }>;
+  searchTerm: string;
+  selectedDomains: string[];
   onSetIsCreateRaceOpen: (open: boolean) => void;
-  onCreateSpecies: (data: {
-    knownName: string;
-    scientificName?: string;
-    description: string;
-  }) => void;
-  onCreateRace: (data: {
-    name: string;
-    description: string;
-    history: string;
-    type: RaceType;
-    physicalCharacteristics?: string;
-    culture?: string;
-  }) => void;
-  onSpeciesClick: (speciesId: string) => void;
+  onCreateRace: (data: RaceFormSchema) => void;
   onRaceClick: (raceId: string) => void;
-  onOpenCreateRaceModal: (speciesId: string) => void;
+  onSearchTermChange: (term: string) => void;
+  onDomainFilterChange: (domain: string) => void;
+  onClearFilters: () => void;
 }
 
 export function SpeciesView({
-  species,
-  isCreateSpeciesOpen,
+  races,
+  filteredRaces,
   isCreateRaceOpen,
   raceTypeStats,
-  onSetIsCreateSpeciesOpen,
+  availableRaces,
+  searchTerm,
+  selectedDomains,
   onSetIsCreateRaceOpen,
-  onCreateSpecies,
   onCreateRace,
-  onSpeciesClick,
   onRaceClick,
-  onOpenCreateRaceModal,
+  onSearchTermChange,
+  onDomainFilterChange,
+  onClearFilters,
 }: PropsSpeciesView) {
+  const totalRaces = races.length;
+
   return (
-    <div
-      className={
-        species.length === 0
-          ? "flex-1 h-full flex flex-col space-y-6"
-          : "space-y-6"
-      }
-    >
+    <div className="flex-1 h-full flex flex-col space-y-6">
+      {/* Header with role stats */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Espécies</h2>
+          <h2 className="text-2xl font-bold">Raças</h2>
           <p className="text-muted-foreground">
-            Gerencie as espécies, bestas e raças que habitam o seu mundo
+            Gerencie as raças, bestas e espécies que habitam o seu mundo
           </p>
-          {species.length > 0 && (
-            <div className="mt-1">
-              <StatsBadges
-                totalSpecies={species.length}
-                raceTypeStats={raceTypeStats}
-              />
+          {totalRaces > 0 && (
+            <div className="flex items-center gap-4 mt-2">
+              <Badge
+                className={`cursor-pointer border transition-colors ${
+                  selectedDomains.length === 0
+                    ? "!bg-primary !text-white !border-primary"
+                    : "bg-background text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
+                }`}
+                onClick={onClearFilters}
+              >
+                {totalRaces} Total
+              </Badge>
+              {DOMAIN_CONSTANT.map((domain) => {
+                const count = raceTypeStats[domain.value as keyof IRaceTypeStats];
+                const isSelected = selectedDomains.includes(domain.value);
+                const DomainIcon = domain.icon;
+
+                // Map domain to strong colors (like characters/items filters)
+                const colorMap: Record<string, { active: string; base: string; hover: string }> = {
+                  'Aquático': {
+                    active: '!bg-blue-500 !text-white !border-blue-500',
+                    base: 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400',
+                    hover: 'hover:!bg-blue-500 hover:!text-white hover:!border-blue-500'
+                  },
+                  'Terrestre': {
+                    active: '!bg-green-600 !text-white !border-green-600',
+                    base: 'bg-green-600/10 border-green-600/30 text-green-700 dark:text-green-400',
+                    hover: 'hover:!bg-green-600 hover:!text-white hover:!border-green-600'
+                  },
+                  'Aéreo': {
+                    active: '!bg-cyan-500 !text-white !border-cyan-500',
+                    base: 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400',
+                    hover: 'hover:!bg-cyan-500 hover:!text-white hover:!border-cyan-500'
+                  },
+                  'Subterrâneo': {
+                    active: '!bg-orange-600 !text-white !border-orange-600',
+                    base: 'bg-orange-600/10 border-orange-600/30 text-orange-700 dark:text-orange-400',
+                    hover: 'hover:!bg-orange-600 hover:!text-white hover:!border-orange-600'
+                  },
+                  'Elevado': {
+                    active: '!bg-sky-500 !text-white !border-sky-500',
+                    base: 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400',
+                    hover: 'hover:!bg-sky-500 hover:!text-white hover:!border-sky-500'
+                  },
+                  'Dimensional': {
+                    active: '!bg-purple-500 !text-white !border-purple-500',
+                    base: 'bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400',
+                    hover: 'hover:!bg-purple-500 hover:!text-white hover:!border-purple-500'
+                  },
+                  'Espiritual': {
+                    active: '!bg-violet-500 !text-white !border-violet-500',
+                    base: 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400',
+                    hover: 'hover:!bg-violet-500 hover:!text-white hover:!border-violet-500'
+                  },
+                  'Cósmico': {
+                    active: '!bg-indigo-500 !text-white !border-indigo-500',
+                    base: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400',
+                    hover: 'hover:!bg-indigo-500 hover:!text-white hover:!border-indigo-500'
+                  }
+                };
+
+                const colors = colorMap[domain.value] || colorMap['Aquático'];
+
+                return (
+                  <Badge
+                    key={domain.value}
+                    className={`cursor-pointer border transition-colors ${
+                      isSelected
+                        ? colors.active
+                        : `${colors.base} ${colors.hover}`
+                    }`}
+                    onClick={() => onDomainFilterChange(domain.value)}
+                  >
+                    <DomainIcon className="w-3.5 h-3.5 mr-1.5" />
+                    {count} {domain.label}
+                  </Badge>
+                );
+              })}
             </div>
           )}
         </div>
         <Button
           variant="magical"
           size="lg"
-          onClick={() => onSetIsCreateSpeciesOpen(true)}
+          onClick={() => onSetIsCreateRaceOpen(true)}
           className="animate-glow"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Nova Espécie
+          Nova Raça
         </Button>
       </div>
 
-      {species.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <Accordion type="multiple" className="space-y-4">
-          {species.map((speciesItem) => (
-            <SpeciesCard
-              key={speciesItem.id}
-              species={speciesItem}
-              onSpeciesClick={onSpeciesClick}
-              onRaceClick={onRaceClick}
-              onOpenCreateRaceModal={onOpenCreateRaceModal}
-            />
-          ))}
-        </Accordion>
+      {/* Search bar */}
+      {totalRaces > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Buscar raça por nome..."
+            value={searchTerm}
+            onChange={(e) => onSearchTermChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       )}
 
-      <CreateSpeciesModal
-        isOpen={isCreateSpeciesOpen}
-        onClose={() => onSetIsCreateSpeciesOpen(false)}
-        onSubmit={onCreateSpecies}
-      />
+      {/* Race grid or empty state */}
+      {totalRaces === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="Nenhuma raça criada"
+          description="Crie sua primeira raça clicando no botão 'Nova Raça'"
+        />
+      ) : filteredRaces.length === 0 ? (
+        <div className="flex-1 flex">
+          <EmptyState
+            icon={selectedDomains.length > 0 ? Filter : SearchX}
+            title={
+              selectedDomains.length > 0
+                ? "Nenhuma raça encontrada com esses filtros"
+                : "Nenhuma raça encontrada"
+            }
+            description={
+              selectedDomains.length > 0
+                ? "Tente remover alguns filtros para ver mais resultados"
+                : "Tente buscar por outro nome"
+            }
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+          {filteredRaces.map((race) => (
+            <RaceCard key={race.id} race={race} onClick={onRaceClick} />
+          ))}
+        </div>
+      )}
 
       <CreateRaceModal
-        isOpen={isCreateRaceOpen}
+        open={isCreateRaceOpen}
         onClose={() => onSetIsCreateRaceOpen(false)}
-        onSubmit={onCreateRace}
+        onConfirm={onCreateRace}
+        availableRaces={availableRaces}
       />
     </div>
   );
