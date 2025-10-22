@@ -4,34 +4,33 @@ import {
   ArrowLeft,
   Edit2,
   Trash2,
-  MapPin,
-  Users,
-  Calendar,
-  Heart,
-  Shield,
-  Upload,
-  Plus,
-  Minus,
-  TreePine,
   Menu,
-  FileText,
-  BookOpen,
-  UserPlus,
+  Eye,
+  EyeOff,
+  Upload,
+  Calendar,
+  Shield,
+  Sparkles,
+  Info,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-// TODO: Refatorar anotações no futuro
-// import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
-import {
-  CharacterVersionManager,
-  type CharacterVersion,
-} from "@/components/character-version-manager";
-import { ConfirmDeleteModal } from "@/components/modals/confirm-delete-modal";
+import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-archetypes";
+import { type ICharacterRole } from "@/components/modals/create-character-modal/constants/character-roles";
+import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
+import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -41,42 +40,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { type IFieldVisibility } from "@/types/character-types";
+import {
+  type ICharacterVersion,
+  type ICharacterFormData,
+} from "@/types/character-types";
 
+import { AlignmentMatrix } from "./components/alignment-matrix";
+import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
+import { FamilySection } from "./components/family-section";
+import { RelationshipsSection } from "./components/relationships-section";
+import { VersionManager } from "./components/version-manager";
 import { type IAlignment } from "./constants/alignments-constant";
-import { type IFamilyRelations } from "./constants/family-relations-constant";
-import { type IGender } from "./constants/genders-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
-import { type IRole } from "./constants/roles-constant";
-
-// TODO: Refatorar anotações no futuro
-// interface ILinkedNote {
-//   id: string;
-//   title: string;
-//   type: string;
-//   date: string;
-// }
 
 interface ICharacter {
   id: string;
   name: string;
-  age: number;
+  age: string;
   image: string;
   role: string;
   alignment: string;
   gender: string;
   description: string;
-  appearance?: string;
+
+  // Appearance
+  height?: string;
+  weight?: string;
+  skinTone?: string;
+  physicalType?: string;
+  hair?: string;
+  eyes?: string;
+  face?: string;
+  distinguishingFeatures?: string;
+  speciesAndRace?: string;
+
+  // Behavior
+  archetype?: string;
   personality?: string;
-  organization: string;
+  hobbies?: string;
+  dreamsAndGoals?: string;
+  fearsAndTraumas?: string;
+  favoriteFood?: string;
+  favoriteMusic?: string;
+
+  // Locations
   birthPlace?: string;
   affiliatedPlace?: string;
-  qualities: string[];
-  chapterMentions?: number;
-  firstAppearance?: string;
-  lastAppearance?: string;
+  organization?: string;
+
+  // Relations
   family: {
     father: string | null;
     mother: string | null;
@@ -96,46 +110,34 @@ interface ICharacter {
   }>;
 }
 
-interface ILocation {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface IOrganization {
-  id: string;
-  name: string;
+interface IFieldVisibility {
+  [key: string]: boolean;
 }
 
 interface CharacterDetailViewProps {
   character: ICharacter;
   editData: ICharacter;
   isEditing: boolean;
-  versions: CharacterVersion[];
-  currentVersion: CharacterVersion;
+  versions: ICharacterVersion[];
+  currentVersion: ICharacterVersion | null;
   showDeleteModal: boolean;
   isNavigationSidebarOpen: boolean;
-  // TODO: Refatorar anotações no futuro
-  // isLinkedNotesModalOpen: boolean;
   newQuality: string;
   imagePreview: string;
   selectedRelationshipCharacter: string;
   selectedRelationshipType: string;
   relationshipIntensity: number[];
   fileInputRef: React.RefObject<HTMLInputElement>;
-  // TODO: Refatorar anotações no futuro
-  // linkedNotes: ILinkedNote[];
   mockCharacters: ICharacter[];
-  mockLocations: ILocation[];
-  mockOrganizations: IOrganization[];
-  roles: IRole[];
+  mockLocations: Array<{ id: string; name: string }>;
+  mockOrganizations: Array<{ id: string; name: string }>;
+  roles: ICharacterRole[];
   alignments: IAlignment[];
-  genders: IGender[];
-  familyRelations: IFamilyRelations;
+  genders: IGenderModal[];
   relationshipTypes: IRelationshipType[];
-  currentRole: IRole | undefined;
+  currentRole: ICharacterRole | undefined;
   currentAlignment: IAlignment | undefined;
-  currentGender: IGender | undefined;
+  currentGender: IGenderModal | undefined;
   RoleIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
@@ -143,17 +145,18 @@ interface CharacterDetailViewProps {
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
   onCharacterSelect: (characterId: string) => void;
-  // TODO: Refatorar anotações no futuro
-  // onLinkedNotesModalOpen: () => void;
-  // onLinkedNotesModalClose: () => void;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
-  onDelete: () => void;
   onDeleteModalOpen: () => void;
   onDeleteModalClose: () => void;
-  onVersionChange: (version: CharacterVersion) => void;
-  onVersionSave: (name: string, description?: string) => void;
+  onConfirmDelete: () => void;
+  onVersionChange: (versionId: string | null) => void;
+  onVersionCreate: (versionData: {
+    name: string;
+    description: string;
+    characterData: ICharacterFormData;
+  }) => void;
   onVersionDelete: (versionId: string) => void;
   onVersionUpdate: (
     versionId: string,
@@ -163,13 +166,6 @@ interface CharacterDetailViewProps {
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onAgeChange: (increment: boolean) => void;
   onEditDataChange: (field: string, value: unknown) => void;
-  onQualityAdd: () => void;
-  onQualityRemove: (quality: string) => void;
-  onNewQualityChange: (value: string) => void;
-  onFamilyRelationChange: (
-    relationType: string,
-    characterId: string | null
-  ) => void;
   onRelationshipAdd: () => void;
   onRelationshipRemove: (relationshipId: string) => void;
   onRelationshipIntensityUpdate: (
@@ -179,15 +175,85 @@ interface CharacterDetailViewProps {
   onRelationshipCharacterChange: (characterId: string) => void;
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
-  onNavigateToFamilyTree: () => void;
   onFieldVisibilityToggle: (field: string) => void;
   onAdvancedSectionToggle: () => void;
   getRelationshipTypeData: (type: string) => IRelationshipType;
-  getFamilyRelationLabel: (
-    relationType: string,
-    characterName: string
-  ) => string;
 }
+
+// Helper component for field wrapper with visibility toggle
+const FieldWrapper = ({
+  fieldName,
+  label,
+  children,
+  isOptional = true,
+  fieldVisibility,
+  isEditing,
+  onFieldVisibilityToggle,
+  t: _t,
+}: {
+  fieldName: string;
+  label: string;
+  children: React.ReactNode;
+  isOptional?: boolean;
+  fieldVisibility: IFieldVisibility;
+  isEditing: boolean;
+  onFieldVisibilityToggle: (field: string) => void;
+  t: (_key: string) => string;
+}) => {
+  const isVisible = fieldVisibility[fieldName] !== false;
+
+  return (
+    <div
+      className={`space-y-2 transition-all duration-200 ${
+        !isVisible && !isEditing
+          ? "hidden"
+          : !isVisible && isEditing
+            ? "opacity-50 bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30"
+            : ""
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">
+          {label} {!isOptional && "*"}
+        </Label>
+        {isEditing && isOptional && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onFieldVisibilityToggle(fieldName)}
+            className="h-6 w-6 p-0"
+          >
+            {isVisible ? (
+              <Eye className="w-3 h-3" />
+            ) : (
+              <EyeOff className="w-3 h-3" />
+            )}
+          </Button>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+};
+
+// Helper component for empty state
+const EmptyFieldState = ({
+  hint,
+  t,
+}: {
+  hint?: string;
+  t: (key: string) => string;
+}) => (
+  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
+    <p>{t("character-detail:empty_states.no_data")}</p>
+    {hint && (
+      <p className="text-xs mt-1">
+        {hint || t("character-detail:empty_states.no_data_hint")}
+      </p>
+    )}
+  </div>
+);
 
 export function CharacterDetailView({
   character,
@@ -197,23 +263,18 @@ export function CharacterDetailView({
   currentVersion,
   showDeleteModal,
   isNavigationSidebarOpen,
-  // TODO: Refatorar anotações no futuro
-  // isLinkedNotesModalOpen,
-  newQuality,
   imagePreview,
-  selectedRelationshipCharacter,
-  selectedRelationshipType,
-  relationshipIntensity,
+  selectedRelationshipCharacter: _selectedRelationshipCharacter,
+  selectedRelationshipType: _selectedRelationshipType,
+  relationshipIntensity: _relationshipIntensity,
   fileInputRef,
-  // linkedNotes,
   mockCharacters,
   mockLocations,
   mockOrganizations,
   roles,
-  alignments,
+  alignments: _alignments,
   genders,
-  familyRelations,
-  relationshipTypes,
+  relationshipTypes: _relationshipTypes,
   currentRole,
   currentAlignment,
   currentGender,
@@ -224,143 +285,124 @@ export function CharacterDetailView({
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
   onCharacterSelect,
-  // TODO: Refatorar anotações no futuro
-  // onLinkedNotesModalOpen,
-  // onLinkedNotesModalClose,
   onEdit,
   onSave,
   onCancel,
-  onDelete,
   onDeleteModalOpen,
   onDeleteModalClose,
+  onConfirmDelete,
   onVersionChange,
-  onVersionSave,
+  onVersionCreate,
   onVersionDelete,
-  onVersionUpdate,
+  onVersionUpdate: _onVersionUpdate,
   onImageFileChange,
-  onAgeChange,
+  onAgeChange: _onAgeChange,
   onEditDataChange,
-  onQualityAdd,
-  onQualityRemove,
-  onNewQualityChange,
-  onFamilyRelationChange,
-  onRelationshipAdd,
-  onRelationshipRemove,
-  onRelationshipIntensityUpdate,
-  onRelationshipCharacterChange,
-  onRelationshipTypeChange,
-  onRelationshipIntensityChange,
-  onNavigateToFamilyTree,
+  onRelationshipAdd: _onRelationshipAdd,
+  onRelationshipRemove: _onRelationshipRemove,
+  onRelationshipIntensityUpdate: _onRelationshipIntensityUpdate,
+  onRelationshipCharacterChange: _onRelationshipCharacterChange,
+  onRelationshipTypeChange: _onRelationshipTypeChange,
+  onRelationshipIntensityChange: _onRelationshipIntensityChange,
   onFieldVisibilityToggle,
   onAdvancedSectionToggle,
-  getRelationshipTypeData,
+  getRelationshipTypeData: _getRelationshipTypeData,
 }: CharacterDetailViewProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { t } = useTranslation(["character-detail", "create-character"] as any);
+
   return (
-    <div className="flex min-h-screen">
+    <div className="relative min-h-screen">
       <CharacterNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={onNavigationSidebarClose}
         characters={mockCharacters.map((char) => ({
           id: char.id,
           name: char.name,
-          image:
-            char.id === "1"
-              ? character.image
-              : `https://images.unsplash.com/photo-150700321${char.id}?w=300&h=300&fit=crop&crop=face`,
+          image: char.image,
         }))}
         currentCharacterId={character.id}
         onCharacterSelect={onCharacterSelect}
       />
 
-      <div className="flex-1 overflow-hidden">
-        <div className="container mx-auto py-8 px-4 max-w-4xl">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={onBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onNavigationSidebarToggle}
-                className="hover:bg-muted"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold">{character.name}</h1>
-                <p className="text-muted-foreground">Detalhes do personagem</p>
+      <div className="w-full overflow-hidden">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          {/* Fixed Header */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 mb-6 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {!isEditing && (
+                  <>
+                    <Button variant="ghost" onClick={onBack}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      {t("character-detail:header.back")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onNavigationSidebarToggle}
+                      className="hover:bg-muted"
+                    >
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                {isEditing ? (
+                  <>
+                    <Button variant="outline" onClick={onCancel}>
+                      {t("character-detail:header.cancel")}
+                    </Button>
+                    <Button
+                      variant="magical"
+                      className="animate-glow"
+                      onClick={onSave}
+                    >
+                      {t("character-detail:header.save")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" size="icon" onClick={onEdit}>
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={onDeleteModalOpen}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
-
-            <div className="flex gap-2">
-              {isEditing ? (
-                <>
-                  <Button variant="outline" onClick={onCancel}>
-                    Cancelar
-                  </Button>
-                  <Button variant="magical" onClick={onSave}>
-                    Salvar
-                  </Button>
-                </>
-              ) : (
-                <>
-                  {/* TODO: Refatorar anotações no futuro */}
-                  {/* <Button variant="outline" onClick={onLinkedNotesModalOpen}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Anotações ({linkedNotes.length})
-                  </Button> */}
-                  <Button variant="outline" onClick={onEdit}>
-                    <Edit2 className="w-4 h-4 mr-2" />
-                    Editar
-                  </Button>
-                  <Button variant="destructive" onClick={onDeleteModalOpen}>
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Excluir
-                  </Button>
-                </>
-              )}
-            </div>
           </div>
 
-          {/* Character Version Manager */}
-          <div className="mb-6">
-            <CharacterVersionManager
-              versions={versions}
-              currentVersion={currentVersion}
-              onVersionChange={onVersionChange}
-              onVersionSave={onVersionSave}
-              onVersionDelete={onVersionDelete}
-              onVersionUpdate={onVersionUpdate}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Info */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Basic Info Card */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Main Content - 3 columns */}
+            <div
+              className={`${isEditing ? "lg:col-span-4" : "lg:col-span-3"} space-y-6`}
+            >
+              {/* Basic Information Card */}
               <Card className="card-magical">
                 <CardHeader>
-                  <CardTitle>Informações Básicas</CardTitle>
+                  <CardTitle>
+                    {t("character-detail:sections.basic_info")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isEditing ? (
                     <div className="space-y-6">
-                      {/* Image and Name Section */}
-                      <div className="flex items-start gap-6">
+                      <div className="flex gap-6">
+                        {/* Image Upload */}
                         <div className="space-y-2">
-                          <Label htmlFor="image">Imagem</Label>
+                          <Label>{t("character-detail:fields.image")}</Label>
                           <div
-                            className="flex items-center justify-center w-24 h-24 aspect-square border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                            className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-border rounded-full cursor-pointer hover:border-primary/50 transition-colors overflow-hidden"
                             onClick={() => fileInputRef.current?.click()}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                fileInputRef.current?.click();
-                              }
-                            }}
                             role="button"
                             tabIndex={0}
                           >
@@ -369,9 +411,9 @@ export function CharacterDetailView({
                                 <img
                                   src={imagePreview}
                                   alt="Preview"
-                                  className="w-full h-full aspect-square object-cover rounded-lg"
+                                  className="w-full h-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-lg">
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                                   <Upload className="w-4 h-4 text-white" />
                                 </div>
                               </div>
@@ -379,7 +421,7 @@ export function CharacterDetailView({
                               <div className="text-center">
                                 <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-1" />
                                 <p className="text-xs text-muted-foreground">
-                                  Clique para selecionar
+                                  {t("character-detail:upload.click")}
                                 </p>
                               </div>
                             )}
@@ -393,65 +435,69 @@ export function CharacterDetailView({
                           />
                         </div>
 
+                        {/* Name, Age, Gender, Role */}
                         <div className="flex-1 space-y-4">
-                          {/* Name */}
-                          <div className="space-y-2">
-                            <Label htmlFor="name">Nome *</Label>
+                          <FieldWrapper
+                            fieldName="name"
+                            label={t("character-detail:fields.name")}
+                            isOptional={false}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
                             <Input
-                              id="name"
                               value={editData.name}
                               onChange={(e) =>
                                 onEditDataChange("name", e.target.value)
                               }
-                              placeholder="Nome do personagem"
+                              placeholder={t(
+                                "create-character:modal.name_placeholder"
+                              )}
+                              maxLength={100}
                               required
                             />
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Age */}
-                            <div className="space-y-2">
-                              <Label htmlFor="age">Idade *</Label>
-                              <div className="flex items-center max-w-32">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-9 w-9 p-0"
-                                  onClick={() => onAgeChange(false)}
-                                >
-                                  <Minus className="w-3 h-3" />
-                                </Button>
-                                <Input
-                                  id="age"
-                                  type="number"
-                                  value={editData.age}
-                                  onChange={(e) =>
-                                    onEditDataChange(
-                                      "age",
-                                      parseInt(e.target.value) || 0
-                                    )
-                                  }
-                                  className="mx-1 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                  min="0"
-                                  max="999"
-                                  required
-                                />
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-9 w-9 p-0"
-                                  onClick={() => onAgeChange(true)}
-                                >
-                                  <Plus className="w-3 h-3" />
-                                </Button>
-                              </div>
+                            <div className="flex justify-end text-xs text-muted-foreground">
+                              <span>{editData.name?.length || 0}/100</span>
                             </div>
+                          </FieldWrapper>
 
-                            {/* Gender */}
-                            <div className="space-y-2">
-                              <Label htmlFor="gender">Gênero *</Label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FieldWrapper
+                              fieldName="age"
+                              label={t("character-detail:fields.age")}
+                              isOptional={false}
+                              fieldVisibility={fieldVisibility}
+                              isEditing={isEditing}
+                              onFieldVisibilityToggle={onFieldVisibilityToggle}
+                              t={t}
+                            >
+                              <Input
+                                type="text"
+                                value={editData.age}
+                                onChange={(e) =>
+                                  onEditDataChange("age", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-character:modal.age_placeholder"
+                                )}
+                                maxLength={50}
+                                required
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.age?.length || 0}/50</span>
+                              </div>
+                            </FieldWrapper>
+
+                            <FieldWrapper
+                              fieldName="gender"
+                              label={t("character-detail:fields.gender")}
+                              isOptional={false}
+                              fieldVisibility={fieldVisibility}
+                              isEditing={isEditing}
+                              onFieldVisibilityToggle={onFieldVisibilityToggle}
+                              t={t}
+                            >
                               <Select
                                 value={editData.gender || ""}
                                 onValueChange={(value) =>
@@ -459,7 +505,27 @@ export function CharacterDetailView({
                                 }
                               >
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Selecione o gênero" />
+                                  <SelectValue
+                                    placeholder={t(
+                                      "create-character:modal.gender_placeholder"
+                                    )}
+                                  >
+                                    {editData.gender && currentGender && (
+                                      <div className="flex items-center gap-2">
+                                        {(() => {
+                                          const GenderIcon = currentGender.icon;
+                                          return (
+                                            <GenderIcon className="w-4 h-4" />
+                                          );
+                                        })()}
+                                        <span>
+                                          {t(
+                                            `create-character:${currentGender.translationKey}`
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   {genders.map((gender) => {
@@ -471,129 +537,95 @@ export function CharacterDetailView({
                                       >
                                         <div className="flex items-center gap-2">
                                           <GenderIcon className="w-4 h-4" />
-                                          <span>{gender.label}</span>
+                                          <span>
+                                            {t(
+                                              `create-character:${gender.translationKey}`
+                                            )}
+                                          </span>
                                         </div>
                                       </SelectItem>
                                     );
                                   })}
                                 </SelectContent>
                               </Select>
-                            </div>
+                            </FieldWrapper>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Role */}
-                            <div className="space-y-2">
-                              <Label htmlFor="role">Papel *</Label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {roles.map((role) => {
-                                  const RoleIcon = role.icon;
-                                  return (
-                                    <div
-                                      key={role.value}
-                                      className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                                        editData.role === role.value
-                                          ? "border-primary bg-primary/10"
-                                          : "border-muted hover:border-primary/50"
-                                      }`}
-                                      onClick={() =>
-                                        onEditDataChange("role", role.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (
-                                          e.key === "Enter" ||
-                                          e.key === " "
-                                        ) {
-                                          e.preventDefault();
-                                          onEditDataChange("role", role.value);
-                                        }
-                                      }}
-                                      role="button"
-                                      tabIndex={0}
+                          <FieldWrapper
+                            fieldName="role"
+                            label={t("character-detail:fields.role")}
+                            isOptional={false}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                              {roles.map((role) => {
+                                const RoleIcon = role.icon;
+                                const isSelected = editData.role === role.value;
+                                return (
+                                  <button
+                                    key={role.value}
+                                    type="button"
+                                    onClick={() =>
+                                      onEditDataChange("role", role.value)
+                                    }
+                                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                                      isSelected
+                                        ? `${role.bgColorClass} scale-105 shadow-lg`
+                                        : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
+                                    }`}
+                                  >
+                                    <RoleIcon
+                                      className={`w-8 h-8 ${isSelected ? role.colorClass : "text-muted-foreground"}`}
+                                    />
+                                    <span
+                                      className={`text-xs font-medium ${isSelected ? role.colorClass : "text-muted-foreground"}`}
                                     >
-                                      <div className="text-center space-y-1">
-                                        <RoleIcon className="w-5 h-5 mx-auto" />
-                                        <div className="text-xs font-medium">
-                                          {role.label}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                                      {t(
+                                        `create-character:${role.translationKey}`
+                                      )}
+                                    </span>
+                                  </button>
+                                );
+                              })}
                             </div>
-
-                            {/* Alignment */}
-                            <div className="space-y-2">
-                              <Label htmlFor="alignment">Alinhamento *</Label>
-                              <div className="space-y-2">
-                                {alignments.map((alignment) => {
-                                  const AlignmentIcon = alignment.icon;
-                                  return (
-                                    <div
-                                      key={alignment.value}
-                                      className={`cursor-pointer p-2 rounded-lg border-2 transition-all hover:scale-105 ${
-                                        editData.alignment === alignment.value
-                                          ? "border-primary bg-primary/10"
-                                          : "border-muted hover:border-primary/50"
-                                      }`}
-                                      onClick={() =>
-                                        onEditDataChange(
-                                          "alignment",
-                                          alignment.value
-                                        )
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (
-                                          e.key === "Enter" ||
-                                          e.key === " "
-                                        ) {
-                                          e.preventDefault();
-                                          onEditDataChange(
-                                            "alignment",
-                                            alignment.value
-                                          );
-                                        }
-                                      }}
-                                      role="button"
-                                      tabIndex={0}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        <AlignmentIcon className="w-4 h-4" />
-                                        <span className="text-sm font-medium">
-                                          {alignment.label}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Description */}
-                          <div className="space-y-2">
-                            <Label htmlFor="description">
-                              Resumo *
-                            </Label>
-                            <Textarea
-                              id="description"
-                              value={editData.description}
-                              onChange={(e) =>
-                                onEditDataChange("description", e.target.value)
-                              }
-                              placeholder="Descrição do personagem"
-                              className="min-h-[80px]"
-                              required
-                            />
-                          </div>
+                          </FieldWrapper>
                         </div>
                       </div>
+
+                      <FieldWrapper
+                        fieldName="description"
+                        label={t("character-detail:fields.description")}
+                        isOptional={false}
+                        fieldVisibility={fieldVisibility}
+                        isEditing={isEditing}
+                        onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        t={t}
+                      >
+                        <Textarea
+                          value={editData.description}
+                          onChange={(e) =>
+                            onEditDataChange("description", e.target.value)
+                          }
+                          placeholder={t(
+                            "create-character:modal.description_placeholder"
+                          )}
+                          rows={4}
+                          maxLength={500}
+                          className="resize-none"
+                          required
+                        />
+                        <div className="flex justify-end text-xs text-muted-foreground">
+                          <span>{editData.description?.length || 0}/500</span>
+                        </div>
+                      </FieldWrapper>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       <div className="flex items-start gap-6">
-                        <Avatar className="w-24 h-24 aspect-square">
+                        <Avatar className="w-24 h-24">
                           <AvatarImage
                             src={character.image}
                             className="object-cover"
@@ -602,49 +634,54 @@ export function CharacterDetailView({
                             {character.name
                               .split(" ")
                               .map((n) => n[0])
-                              .join("")}
+                              .join("")
+                              .slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-3">
-                            <h2 className="text-3xl font-bold select-text">
+                            <h2 className="text-3xl font-bold">
                               {character.name}
                             </h2>
-                            <Badge className={`${currentRole?.color} select-text`}>
+                            <Badge className={currentRole?.bgColorClass}>
                               <RoleIcon className="w-4 h-4 mr-1" />
-                              {currentRole?.label}
+                              {t(`create-character:role.${character.role}`)}
                             </Badge>
                           </div>
 
                           <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
-                              <span className="select-text">{character.age} anos</span>
+                              <span>{character.age}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {(() => {
-                                const GenderIcon = currentGender?.icon;
-                                return GenderIcon ? (
-                                  <GenderIcon className="w-4 h-4" />
-                                ) : null;
-                              })()}
-                              <span className="select-text">{currentGender?.label}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
+                            {currentGender && (
+                              <div className="flex items-center gap-2">
+                                {(() => {
+                                  const GenderIcon = currentGender.icon;
+                                  return <GenderIcon className="w-4 h-4" />;
+                                })()}
+                                <span>
+                                  {t(
+                                    `create-character:gender.${character.gender}`
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                            {currentAlignment && (
                               <Badge
                                 variant="secondary"
-                                className={`${currentAlignment?.bgColor} ${
-                                  currentAlignment?.color
-                                } select-text`}
+                                className={`${currentAlignment.bgColor} ${currentAlignment.color}`}
                               >
                                 <Shield className="w-3 h-3 mr-1" />
-                                {currentAlignment?.label}
+                                {t(
+                                  `create-character:alignment.${character.alignment}`
+                                )}
                               </Badge>
-                            </div>
+                            )}
                           </div>
 
-                          <p className="text-foreground text-base select-text">
+                          <p className="text-foreground text-base">
                             {character.description}
                           </p>
                         </div>
@@ -654,911 +691,997 @@ export function CharacterDetailView({
                 </CardContent>
               </Card>
 
-              {/* Physical Appearance Card */}
-              {character.appearance && (
+              {/* Advanced Section - Collapsible */}
+              <Collapsible
+                open={advancedSectionOpen}
+                onOpenChange={onAdvancedSectionToggle}
+              >
                 <Card className="card-magical">
                   <CardHeader>
-                    <CardTitle>Aparência Física</CardTitle>
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center justify-between cursor-pointer">
+                        <CardTitle>
+                          {t("character-detail:sections.advanced_info")}
+                        </CardTitle>
+                        <Button variant="ghost" size="sm">
+                          {advancedSectionOpen
+                            ? t("character-detail:actions.close")
+                            : t("character-detail:actions.open")}
+                        </Button>
+                      </div>
+                    </CollapsibleTrigger>
                   </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <div className="space-y-2">
-                        <Label htmlFor="appearance">Aparência Física</Label>
-                        <Textarea
-                          id="appearance"
-                          value={editData.appearance}
-                          onChange={(e) =>
-                            onEditDataChange("appearance", e.target.value)
-                          }
-                          placeholder="Descrição da aparência física"
-                          className="min-h-[100px]"
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground select-text">
-                        {character.appearance}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Personality Card */}
-              {character.personality && (
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CardTitle>Personalidade</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <div className="space-y-2">
-                        <Label htmlFor="personality">Personalidade</Label>
-                        <Textarea
-                          id="personality"
-                          value={editData.personality}
-                          onChange={(e) =>
-                            onEditDataChange("personality", e.target.value)
-                          }
-                          placeholder="Descrição da personalidade"
-                          className="min-h-[100px]"
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground select-text">
-                        {character.personality}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Birth Place Card */}
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Local de Nascimento</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Label htmlFor="birthPlace">Local de Nascimento</Label>
-                      <Select
-                        value={editData.birthPlace || "none"}
-                        onValueChange={(value) =>
-                          onEditDataChange(
-                            "birthPlace",
-                            value === "none" ? "" : value
-                          )
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o local de nascimento" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Nenhum</SelectItem>
-                          {mockLocations.map((location) => (
-                            <SelectItem key={location.id} value={location.name}>
-                              {location.name} ({location.type})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4" />
-                      <span className="select-text">{character.birthPlace || "Não definido"}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Chapter Mentions Card */}
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Aparições na História</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="text-center p-4 bg-muted/20 rounded-lg">
-                      <div className="text-2xl font-bold text-primary">
-                        {character.chapterMentions || 0}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Capítulos mencionado
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 border rounded-lg">
-                        <BookOpen className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
-                        <div className="text-sm font-medium">
-                          Primeira aparição
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {character.firstAppearance || "N/A"}
-                        </div>
-                      </div>
-
-                      <div className="text-center p-3 border rounded-lg">
-                        <BookOpen className="w-4 h-4 mx-auto mb-2 text-muted-foreground" />
-                        <div className="text-sm font-medium">
-                          Última aparição
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {character.lastAppearance || "N/A"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Family Relations Card - Only show family tree button in view mode */}
-              {!isEditing && (
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>Relações Familiares</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onNavigateToFamilyTree}
-                      >
-                        <TreePine className="w-4 h-4 mr-2" />
-                        Ver Árvore
-                      </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Direct Family */}
-                    {(character.family.father ||
-                      character.family.mother ||
-                      character.family.spouse) && (
-                      <div>
-                        <h4 className="font-semibold text-sm mb-2">
-                          Família Direta
-                        </h4>
-                        <div className="space-y-2">
-                          {character.family.father && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <Heart className="w-3 h-3 text-blue-500" />
-                              <span className="text-muted-foreground">
-                                Pai:
-                              </span>
-                              <span className="select-text">
-                                {
-                                  mockCharacters.find(
-                                    (c) => c.id === character.family.father
-                                  )?.name
-                                }
-                              </span>
-                            </div>
-                          )}
-                          {character.family.mother && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <Heart className="w-3 h-3 text-pink-500" />
-                              <span className="text-muted-foreground">
-                                Mãe:
-                              </span>
-                              <span className="select-text">
-                                {
-                                  mockCharacters.find(
-                                    (c) => c.id === character.family.mother
-                                  )?.name
-                                }
-                              </span>
-                            </div>
-                          )}
-                          {character.family.spouse && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <Heart className="w-3 h-3 text-red-500" />
-                              <span className="text-muted-foreground">
-                                Cônjuge:
-                              </span>
-                              <span className="select-text">
-                                {
-                                  mockCharacters.find(
-                                    (c) => c.id === character.family.spouse
-                                  )?.name
-                                }
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Children */}
-                    {character.family.children.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-sm mb-2">Filhos</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {character.family.children.map((childId: string) => {
-                            const child = mockCharacters.find(
-                              (c) => c.id === childId
-                            );
-                            return child ? (
-                              <Badge
-                                key={childId}
-                                variant="secondary"
-                                className="text-xs select-text"
-                              >
-                                {child.name}
-                              </Badge>
-                            ) : null;
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Siblings */}
-                    {(character.family.siblings.length > 0 ||
-                      character.family.halfSiblings.length > 0) && (
-                      <div>
-                        <h4 className="font-semibold text-sm mb-2">Irmãos</h4>
-                        <div className="space-y-2">
-                          {character.family.siblings.length > 0 && (
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Irmãos:
-                              </span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {character.family.siblings.map(
-                                  (siblingId: string) => {
-                                    const sibling = mockCharacters.find(
-                                      (c) => c.id === siblingId
-                                    );
-                                    return sibling ? (
-                                      <Badge
-                                        key={siblingId}
-                                        variant="secondary"
-                                        className="text-xs select-text"
-                                      >
-                                        {sibling.name}
-                                      </Badge>
-                                    ) : null;
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {character.family.halfSiblings.length > 0 && (
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Meio-irmãos:
-                              </span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {character.family.halfSiblings.map(
-                                  (halfSiblingId: string) => {
-                                    const halfSibling = mockCharacters.find(
-                                      (c) => c.id === halfSiblingId
-                                    );
-                                    return halfSibling ? (
-                                      <Badge
-                                        key={halfSiblingId}
-                                        variant="outline"
-                                        className="text-xs select-text"
-                                      >
-                                        {halfSibling.name}
-                                      </Badge>
-                                    ) : null;
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Extended Family */}
-                    {(character.family.grandparents.length > 0 ||
-                      character.family.unclesAunts.length > 0 ||
-                      character.family.cousins.length > 0) && (
-                      <div>
-                        <h4 className="font-semibold text-sm mb-2">
-                          Família Extendida
-                        </h4>
-                        <div className="space-y-2">
-                          {character.family.grandparents.length > 0 && (
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Avós:
-                              </span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {character.family.grandparents.map(
-                                  (grandparentId: string) => {
-                                    const grandparent = mockCharacters.find(
-                                      (c) => c.id === grandparentId
-                                    );
-                                    return grandparent ? (
-                                      <Badge
-                                        key={grandparentId}
-                                        variant="secondary"
-                                        className="text-xs select-text"
-                                      >
-                                        {grandparent.name}
-                                      </Badge>
-                                    ) : null;
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {character.family.unclesAunts.length > 0 && (
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Tios:
-                              </span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {character.family.unclesAunts.map(
-                                  (uncleAuntId: string) => {
-                                    const uncleAunt = mockCharacters.find(
-                                      (c) => c.id === uncleAuntId
-                                    );
-                                    return uncleAunt ? (
-                                      <Badge
-                                        key={uncleAuntId}
-                                        variant="secondary"
-                                        className="text-xs select-text"
-                                      >
-                                        {uncleAunt.name}
-                                      </Badge>
-                                    ) : null;
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {character.family.cousins.length > 0 && (
-                            <div>
-                              <span className="text-xs text-muted-foreground">
-                                Primos:
-                              </span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {character.family.cousins.map(
-                                  (cousinId: string) => {
-                                    const cousin = mockCharacters.find(
-                                      (c) => c.id === cousinId
-                                    );
-                                    return cousin ? (
-                                      <Badge
-                                        key={cousinId}
-                                        variant="secondary"
-                                        className="text-xs select-text"
-                                      >
-                                        {cousin.name}
-                                      </Badge>
-                                    ) : null;
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {!character.family.father &&
-                      !character.family.mother &&
-                      !character.family.spouse &&
-                      character.family.children.length === 0 &&
-                      character.family.siblings.length === 0 &&
-                      character.family.halfSiblings.length === 0 &&
-                      character.family.grandparents.length === 0 &&
-                      character.family.unclesAunts.length === 0 &&
-                      character.family.cousins.length === 0 && (
-                        <div className="text-center text-muted-foreground text-sm py-4">
-                          <Heart className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p>Nenhuma relação familiar definida</p>
-                          <p className="text-xs">
-                            Use o modo de edição para adicionar familiares
-                          </p>
-                        </div>
-                      )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Family Relations Edit Card - Only show in edit mode */}
-              {isEditing && (
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CardTitle>Editar Relações Familiares</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {/* Single-value relations */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {familyRelations.single.map((relation) => (
-                          <div key={relation.value} className="space-y-2">
-                            <Label className="text-sm">{relation.label}</Label>
-                            <Select
-                              value={
-                                relation.value === "father"
-                                  ? editData.family.father || "none"
-                                  : relation.value === "mother"
-                                    ? editData.family.mother || "none"
-                                    : relation.value === "spouse"
-                                      ? editData.family.spouse || "none"
-                                      : "none"
-                              }
-                              onValueChange={(value) =>
-                                onFamilyRelationChange(
-                                  relation.value,
-                                  value === "none" ? null : value
-                                )
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue
-                                  placeholder={`Selecione ${relation.label.toLowerCase()}`}
-                                />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Nenhum</SelectItem>
-                                {mockCharacters
-                                  .filter((char) => char.id !== editData.id)
-                                  .map((char) => (
-                                    <SelectItem key={char.id} value={char.id}>
-                                      {char.name}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Multi-select relations */}
+                  <CollapsibleContent>
+                    <CardContent className="space-y-6">
+                      {/* Appearance Section */}
                       <div className="space-y-4">
-                        {familyRelations.multiple.map((relation) => {
-                          const currentRelations =
-                            editData.family[
-                              relation.value === "child"
-                                ? "children"
-                                : relation.value === "sibling"
-                                  ? "siblings"
-                                  : relation.value === "halfSibling"
-                                    ? "halfSiblings"
-                                    : relation.value === "uncleAunt"
-                                      ? "unclesAunts"
-                                      : "cousins"
-                            ];
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("character-detail:sections.appearance")}
+                        </h4>
 
-                          return (
-                            <div key={relation.value} className="space-y-2">
-                              <Label className="text-sm">
-                                {relation.label}s
-                              </Label>
+                        {/* Height and Weight - 2 columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FieldWrapper
+                            fieldName="height"
+                            label={t("character-detail:fields.height")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              <>
+                                <Input
+                                  value={editData.height || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange("height", e.target.value)
+                                  }
+                                  placeholder={t(
+                                    "create-character:modal.height_placeholder"
+                                  )}
+                                  maxLength={50}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.height?.length || 0}/50</span>
+                                </div>
+                              </>
+                            ) : character.height ? (
+                              <p className="text-sm">{character.height}</p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+
+                          <FieldWrapper
+                            fieldName="weight"
+                            label={t("character-detail:fields.weight")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              <>
+                                <Input
+                                  value={editData.weight || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange("weight", e.target.value)
+                                  }
+                                  placeholder={t(
+                                    "create-character:modal.weight_placeholder"
+                                  )}
+                                  maxLength={50}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>{editData.weight?.length || 0}/50</span>
+                                </div>
+                              </>
+                            ) : character.weight ? (
+                              <p className="text-sm">{character.weight}</p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+                        </div>
+
+                        {/* Skin Tone - Full width */}
+                        <FieldWrapper
+                          fieldName="skinTone"
+                          label={t("character-detail:fields.skin_tone")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.skinTone || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("skinTone", e.target.value)
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.skin_tone"
+                                )}
+                                maxLength={100}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.skinTone?.length || 0}/100
+                                </span>
+                              </div>
+                            </>
+                          ) : character.skinTone ? (
+                            <p className="text-sm">{character.skinTone}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Hair - Full width */}
+                        <FieldWrapper
+                          fieldName="hair"
+                          label={t("character-detail:fields.hair")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.hair || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("hair", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.hair")}
+                                maxLength={100}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.hair?.length || 0}/100</span>
+                              </div>
+                            </>
+                          ) : character.hair ? (
+                            <p className="text-sm">{character.hair}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Eyes - Full width */}
+                        <FieldWrapper
+                          fieldName="eyes"
+                          label={t("character-detail:fields.eyes")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.eyes || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("eyes", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.eyes")}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.eyes?.length || 0}/200</span>
+                              </div>
+                            </>
+                          ) : character.eyes ? (
+                            <p className="text-sm">{character.eyes}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Face - Full width */}
+                        <FieldWrapper
+                          fieldName="face"
+                          label={t("character-detail:fields.face")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.face || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("face", e.target.value)
+                                }
+                                placeholder={t("character-detail:fields.face")}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.face?.length || 0}/200</span>
+                              </div>
+                            </>
+                          ) : character.face ? (
+                            <p className="text-sm">{character.face}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Physical Type and Species/Race - 2 columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FieldWrapper
+                            fieldName="physicalType"
+                            label={t("character-detail:fields.physical_type")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
                               <Select
+                                value={editData.physicalType || ""}
                                 onValueChange={(value) =>
-                                  onFamilyRelationChange(
-                                    relation.value,
-                                    value === "none" ? null : value
-                                  )
+                                  onEditDataChange("physicalType", value)
                                 }
                               >
                                 <SelectTrigger>
                                   <SelectValue
-                                    placeholder={`Adicionar ${relation.label.toLowerCase()}`}
+                                    placeholder={t(
+                                      "character-detail:fields.physical_type"
+                                    )}
                                   />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="none">
-                                    Selecione
-                                  </SelectItem>
-                                  {mockCharacters
-                                    .filter(
-                                      (char) =>
-                                        char.id !== editData.id &&
-                                        !currentRelations.includes(char.id)
-                                    )
-                                    .map((char) => (
-                                      <SelectItem key={char.id} value={char.id}>
-                                        {char.name}
+                                  {PHYSICAL_TYPES_CONSTANT.map((type) => {
+                                    const TypeIcon = type.icon;
+                                    return (
+                                      <SelectItem
+                                        key={type.value}
+                                        value={type.value}
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          <TypeIcon className="w-4 h-4" />
+                                          <span>
+                                            {t(
+                                              `create-character:${type.translationKey}`
+                                            )}
+                                          </span>
+                                        </div>
                                       </SelectItem>
-                                    ))}
+                                    );
+                                  })}
                                 </SelectContent>
                               </Select>
+                            ) : character.physicalType ? (
+                              <p className="text-sm">
+                                {(() => {
+                                  const type = PHYSICAL_TYPES_CONSTANT.find(
+                                    (t) => t.value === character.physicalType
+                                  );
+                                  return type
+                                    ? t(
+                                        `create-character:${type.translationKey}`
+                                      )
+                                    : character.physicalType;
+                                })()}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
 
-                              {/* Display current relations */}
-                              {currentRelations.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                  {currentRelations.map(
-                                    (relationId: string) => {
-                                      const relatedChar = mockCharacters.find(
-                                        (c) => c.id === relationId
-                                      );
-                                      return relatedChar ? (
-                                        <Badge
-                                          key={relationId}
-                                          variant="secondary"
-                                          className="flex items-center gap-1"
-                                        >
-                                          {relatedChar.name}
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              onFamilyRelationChange(
-                                                relation.value,
-                                                relationId
-                                              )
-                                            }
-                                            className="ml-1 hover:text-destructive"
-                                          >
-                                            ×
-                                          </button>
-                                        </Badge>
-                                      ) : null;
-                                    }
-                                  )}
-                                </div>
+                          <FieldWrapper
+                            fieldName="speciesAndRace"
+                            label={t(
+                              "character-detail:fields.species_and_race"
+                            )}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              <Alert className="bg-muted/50">
+                                <Info className="h-4 w-4" />
+                                <AlertDescription className="text-xs">
+                                  Nenhuma espécie/raça cadastrada. Crie espécies
+                                  e raças na aba Espécies para selecioná-las
+                                  aqui.
+                                </AlertDescription>
+                              </Alert>
+                            ) : character.speciesAndRace ? (
+                              <p className="text-sm">
+                                {character.speciesAndRace}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+                        </div>
+
+                        <FieldWrapper
+                          fieldName="distinguishingFeatures"
+                          label={t(
+                            "character-detail:fields.distinguishing_features"
+                          )}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.distinguishingFeatures || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "distinguishingFeatures",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.distinguishing_features"
+                                )}
+                                rows={3}
+                                maxLength={400}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.distinguishingFeatures?.length || 0}
+                                  /400
+                                </span>
+                              </div>
+                            </>
+                          ) : character.distinguishingFeatures ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {character.distinguishingFeatures}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
+
+                      <Separator />
+
+                      {/* Behavior Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("character-detail:sections.behavior")}
+                        </h4>
+
+                        <FieldWrapper
+                          fieldName="archetype"
+                          label={t("character-detail:fields.archetype")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                              {CHARACTER_ARCHETYPES_CONSTANT.map(
+                                (archetype) => {
+                                  const ArchetypeIcon = archetype.icon;
+                                  const isSelected =
+                                    editData.archetype === archetype.value;
+                                  return (
+                                    <button
+                                      key={archetype.value}
+                                      type="button"
+                                      onClick={() =>
+                                        onEditDataChange(
+                                          "archetype",
+                                          isSelected ? "" : archetype.value
+                                        )
+                                      }
+                                      className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 transition-all h-32 ${
+                                        isSelected
+                                          ? "border-primary bg-primary/10 shadow-md"
+                                          : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
+                                      }`}
+                                    >
+                                      <ArchetypeIcon
+                                        className={`w-6 h-6 ${isSelected ? "text-primary" : "text-muted-foreground"}`}
+                                      />
+                                      <span
+                                        className={`text-xs font-medium text-center ${isSelected ? "text-primary" : "text-muted-foreground"}`}
+                                      >
+                                        {t(
+                                          `create-character:${archetype.translationKey}`
+                                        )}
+                                      </span>
+                                      <p className="text-xs text-muted-foreground text-center line-clamp-2">
+                                        {t(
+                                          `create-character:${archetype.descriptionKey}`
+                                        )}
+                                      </p>
+                                    </button>
+                                  );
+                                }
                               )}
                             </div>
-                          );
-                        })}
+                          ) : character.archetype ? (
+                            (() => {
+                              const archetype =
+                                CHARACTER_ARCHETYPES_CONSTANT.find(
+                                  (a) => a.value === character.archetype
+                                );
+                              if (!archetype) {
+                                return (
+                                  <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
+                                    <div className="flex flex-col items-center gap-3">
+                                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                                        <Sparkles className="w-6 h-6 text-muted-foreground" />
+                                      </div>
+                                      <div className="space-y-1">
+                                        <p className="text-sm font-medium text-foreground">
+                                          Nenhum arquétipo escolhido
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Use o modo de edição para selecionar
+                                          um arquétipo
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              const ArchetypeIcon = archetype.icon;
+                              return (
+                                <div className="border-2 border-primary bg-primary/10 p-6 rounded-lg shadow-md">
+                                  <div className="flex flex-col items-center gap-4 text-center">
+                                    <ArchetypeIcon className="w-12 h-12 text-primary" />
+                                    <span className="text-lg font-semibold">
+                                      {t(
+                                        `create-character:${archetype.translationKey}`
+                                      )}
+                                    </span>
+                                    <p className="text-sm text-muted-foreground max-w-md">
+                                      {t(
+                                        `create-character:${archetype.descriptionKey}`
+                                      )}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
+                              <div className="flex flex-col items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                                  <Sparkles className="w-6 h-6 text-muted-foreground" />
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-sm font-medium text-foreground">
+                                    Nenhum arquétipo escolhido
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Use o modo de edição para selecionar um
+                                    arquétipo
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </FieldWrapper>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <FieldWrapper
+                            fieldName="favoriteFood"
+                            label={t("character-detail:fields.favorite_food")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              <>
+                                <Input
+                                  value={editData.favoriteFood || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "favoriteFood",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "character-detail:fields.favorite_food"
+                                  )}
+                                  maxLength={100}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>
+                                    {editData.favoriteFood?.length || 0}/100
+                                  </span>
+                                </div>
+                              </>
+                            ) : character.favoriteFood ? (
+                              <p className="text-sm">
+                                {character.favoriteFood}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+
+                          <FieldWrapper
+                            fieldName="favoriteMusic"
+                            label={t("character-detail:fields.favorite_music")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              <>
+                                <Input
+                                  value={editData.favoriteMusic || ""}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "favoriteMusic",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "character-detail:fields.favorite_music"
+                                  )}
+                                  maxLength={100}
+                                />
+                                <div className="flex justify-end text-xs text-muted-foreground">
+                                  <span>
+                                    {editData.favoriteMusic?.length || 0}/100
+                                  </span>
+                                </div>
+                              </>
+                            ) : character.favoriteMusic ? (
+                              <p className="text-sm">
+                                {character.favoriteMusic}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+                        </div>
+
+                        <FieldWrapper
+                          fieldName="personality"
+                          label={t("character-detail:fields.personality")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.personality || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "personality",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.personality"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.personality?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : character.personality ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {character.personality}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        <FieldWrapper
+                          fieldName="hobbies"
+                          label={t("character-detail:fields.hobbies")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.hobbies || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("hobbies", e.target.value)
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.hobbies"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.hobbies?.length || 0}/500</span>
+                              </div>
+                            </>
+                          ) : character.hobbies ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {character.hobbies}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        <FieldWrapper
+                          fieldName="dreamsAndGoals"
+                          label={t("character-detail:fields.dreams_and_goals")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.dreamsAndGoals || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "dreamsAndGoals",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.dreams_and_goals"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.dreamsAndGoals?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : character.dreamsAndGoals ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {character.dreamsAndGoals}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        <FieldWrapper
+                          fieldName="fearsAndTraumas"
+                          label={t("character-detail:fields.fears_and_traumas")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.fearsAndTraumas || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "fearsAndTraumas",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "character-detail:fields.fears_and_traumas"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.fearsAndTraumas?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : character.fearsAndTraumas ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {character.fearsAndTraumas}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
                       </div>
-                    </div>
-                  </CardContent>
+
+                      <Separator />
+
+                      {/* Alignment Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("character-detail:sections.alignment")}
+                        </h4>
+
+                        <AlignmentMatrix
+                          value={
+                            isEditing ? editData.alignment : character.alignment
+                          }
+                          onChange={(value) =>
+                            onEditDataChange("alignment", value)
+                          }
+                          isEditable={isEditing}
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* Locations and Organizations */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("character-detail:sections.locations_orgs")}
+                        </h4>
+
+                        <div className="grid grid-cols-1 gap-4">
+                          <FieldWrapper
+                            fieldName="birthPlace"
+                            label={t("character-detail:fields.birth_place")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              mockLocations && mockLocations.length > 0 ? (
+                                <Select
+                                  value={editData.birthPlace || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("birthPlace", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.birth_place"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockLocations.map((location) => (
+                                      <SelectItem
+                                        key={location.id}
+                                        value={location.id}
+                                      >
+                                        {location.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhum local cadastrado. Crie locais na aba
+                                    Mundo para selecioná-los aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
+                            ) : character.birthPlace ? (
+                              <p className="text-sm">{character.birthPlace}</p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+
+                          <FieldWrapper
+                            fieldName="affiliatedPlace"
+                            label={t(
+                              "character-detail:fields.affiliated_place"
+                            )}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              mockLocations && mockLocations.length > 0 ? (
+                                <Select
+                                  value={editData.affiliatedPlace || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("affiliatedPlace", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.affiliated_place"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockLocations.map((location) => (
+                                      <SelectItem
+                                        key={location.id}
+                                        value={location.id}
+                                      >
+                                        {location.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhum local cadastrado. Crie locais na aba
+                                    Mundo para selecioná-los aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
+                            ) : character.affiliatedPlace ? (
+                              <p className="text-sm">
+                                {character.affiliatedPlace}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+
+                          <FieldWrapper
+                            fieldName="organization"
+                            label={t("character-detail:fields.organization")}
+                            fieldVisibility={fieldVisibility}
+                            isEditing={isEditing}
+                            onFieldVisibilityToggle={onFieldVisibilityToggle}
+                            t={t}
+                          >
+                            {isEditing ? (
+                              mockOrganizations &&
+                              mockOrganizations.length > 0 ? (
+                                <Select
+                                  value={editData.organization || ""}
+                                  onValueChange={(value) =>
+                                    onEditDataChange("organization", value)
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue
+                                      placeholder={t(
+                                        "character-detail:fields.organization"
+                                      )}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {mockOrganizations.map((org) => (
+                                      <SelectItem key={org.id} value={org.id}>
+                                        {org.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Alert className="bg-muted/50">
+                                  <Info className="h-4 w-4" />
+                                  <AlertDescription className="text-xs">
+                                    Nenhuma organização cadastrada. Crie
+                                    organizações para selecioná-las aqui.
+                                  </AlertDescription>
+                                </Alert>
+                              )
+                            ) : character.organization ? (
+                              <p className="text-sm">
+                                {character.organization}
+                              </p>
+                            ) : (
+                              <EmptyFieldState t={t} />
+                            )}
+                          </FieldWrapper>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
                 </Card>
-              )}
+              </Collapsible>
 
               {/* Relationships Card */}
               <Card className="card-magical">
                 <CardHeader>
-                  <CardTitle>Relacionamentos</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {isEditing ? (
-                    <div className="space-y-4">
-                      {/* Add Relationship Form */}
-                      <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
-                        <h4 className="font-semibold text-sm">
-                          Adicionar Relacionamento
-                        </h4>
-                        <div className="grid grid-cols-1 gap-3">
-                          <div className="space-y-2">
-                            <Label>Personagem</Label>
-                            <Select
-                              value={selectedRelationshipCharacter}
-                              onValueChange={onRelationshipCharacterChange}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione um personagem" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {mockCharacters
-                                  .filter((char) => char.id !== character.id)
-                                  .filter(
-                                    (char) =>
-                                      !editData.relationships?.some(
-                                        (rel) => rel.characterId === char.id
-                                      )
-                                  )
-                                  .map((char) => (
-                                    <SelectItem key={char.id} value={char.id}>
-                                      {char.name}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>Tipo de Relacionamento</Label>
-                            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg bg-background">
-                              {relationshipTypes.map((type) => (
-                                <div
-                                  key={type.value}
-                                  className={`cursor-pointer p-3 rounded-lg border-2 transition-all hover:scale-105 ${
-                                    selectedRelationshipType === type.value
-                                      ? "border-primary bg-primary/10"
-                                      : "border-muted hover:border-primary/50"
-                                  }`}
-                                  onClick={() =>
-                                    onRelationshipTypeChange(type.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                      e.preventDefault();
-                                      onRelationshipTypeChange(type.value);
-                                    }
-                                  }}
-                                  role="button"
-                                  tabIndex={0}
-                                >
-                                  <div className="text-center space-y-1">
-                                    <div className="text-2xl">{type.emoji}</div>
-                                    <div className="text-xs font-medium">
-                                      {type.label}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label>
-                              Intensidade: {relationshipIntensity[0]}%
-                            </Label>
-                            <Slider
-                              value={relationshipIntensity}
-                              onValueChange={onRelationshipIntensityChange}
-                              max={100}
-                              min={1}
-                              step={1}
-                              className="w-full"
-                            />
-                          </div>
-
-                          <Button
-                            onClick={onRelationshipAdd}
-                            disabled={
-                              !selectedRelationshipCharacter ||
-                              !selectedRelationshipType
-                            }
-                            size="sm"
-                          >
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Adicionar
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Current Relationships List */}
-                      {editData.relationships &&
-                        editData.relationships.length > 0 && (
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-sm">
-                              Relacionamentos Atuais
-                            </h4>
-                            {editData.relationships.map((relationship) => {
-                              const relatedChar = mockCharacters.find(
-                                (c) => c.id === relationship.characterId
-                              );
-                              const typeData = getRelationshipTypeData(
-                                relationship.type
-                              );
-
-                              return relatedChar ? (
-                                <div
-                                  key={relationship.id}
-                                  className="p-3 border rounded-lg space-y-2"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-lg">
-                                        {typeData.emoji}
-                                      </span>
-                                      <span className="font-medium text-sm">
-                                        {relatedChar.name}
-                                      </span>
-                                      <Badge
-                                        variant="outline"
-                                        className={typeData.color}
-                                      >
-                                        {typeData.label}
-                                      </Badge>
-                                    </div>
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() =>
-                                        onRelationshipRemove(relationship.id)
-                                      }
-                                    >
-                                      <Minus className="w-3 h-3" />
-                                    </Button>
-                                  </div>
-                                  <div className="space-y-1">
-                                    <Label className="text-xs">
-                                      Intensidade: {relationship.intensity}%
-                                    </Label>
-                                    <Slider
-                                      value={[relationship.intensity]}
-                                      onValueChange={(value) =>
-                                        onRelationshipIntensityUpdate(
-                                          relationship.id,
-                                          value[0]
-                                        )
-                                      }
-                                      max={100}
-                                      min={1}
-                                      step={1}
-                                      className="w-full"
-                                    />
-                                  </div>
-                                </div>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {character.relationships &&
-                      character.relationships.length > 0 ? (
-                        character.relationships.map((relationship) => {
-                          const relatedChar = mockCharacters.find(
-                            (c) => c.id === relationship.characterId
-                          );
-                          const typeData = getRelationshipTypeData(
-                            relationship.type
-                          );
-
-                          return relatedChar ? (
-                            <div
-                              key={relationship.id}
-                              className="flex items-center justify-between p-3 border rounded-lg"
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className="text-lg">
-                                  {typeData.emoji}
-                                </span>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm">
-                                      {relatedChar.name}
-                                    </span>
-                                    <Badge
-                                      variant="outline"
-                                      className={`${typeData.color} select-text`}
-                                    >
-                                      {typeData.label}
-                                    </Badge>
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    Intensidade: {relationship.intensity}%
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-primary transition-all"
-                                  style={{
-                                    width: `${relationship.intensity}%`,
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          ) : null;
-                        })
-                      ) : (
-                        <div className="text-center text-muted-foreground text-sm py-4">
-                          <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p>Nenhum relacionamento definido</p>
-                          <p className="text-xs">
-                            Use o modo de edição para adicionar relacionamentos
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Qualities */}
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Qualidades</CardTitle>
+                  <CardTitle>
+                    {t("character-detail:sections.relationships")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {isEditing ? (
-                    <div className="space-y-4">
-                      {/* Add Quality Input */}
-                      <div className="flex gap-2">
-                        <Input
-                          value={newQuality}
-                          onChange={(e) => onNewQualityChange(e.target.value)}
-                          placeholder="Adicionar nova qualidade"
-                          onKeyPress={(e) =>
-                            e.key === "Enter" && onQualityAdd()
-                          }
-                        />
-                        <Button size="sm" onClick={onQualityAdd}>
-                          Adicionar
-                        </Button>
-                      </div>
-
-                      {/* Quality List */}
-                      <div className="flex flex-wrap gap-2">
-                        {editData.qualities.map((quality) => (
-                          <Badge
-                            key={quality}
-                            variant="secondary"
-                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                            onClick={() => onQualityRemove(quality)}
-                          >
-                            {quality} ×
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {editData.qualities.length === 0 && (
-                        <p className="text-sm text-muted-foreground">
-                          {`Nenhuma qualidade adicionada. Clique em "Adicionar"
-                          para incluir qualidades.`}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {character.qualities.map((quality) => (
-                        <Badge key={quality} variant="secondary" className="select-text">
-                          {quality}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
+                  <RelationshipsSection
+                    relationships={
+                      isEditing
+                        ? editData.relationships || []
+                        : character.relationships || []
+                    }
+                    allCharacters={mockCharacters}
+                    currentCharacterId={character.id}
+                    isEditMode={isEditing}
+                    onRelationshipsChange={(relationships) =>
+                      onEditDataChange("relationships", relationships)
+                    }
+                  />
                 </CardContent>
               </Card>
 
+              {/* Family Card */}
               <Card className="card-magical">
                 <CardHeader>
-                  <CardTitle>Organização</CardTitle>
+                  <CardTitle>{t("character-detail:sections.family")}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {isEditing ? (
-                    <Select
-                      value={editData.organization}
-                      onValueChange={(value) =>
-                        onEditDataChange(
-                          "organization",
-                          value === "none" ? "" : value
-                        )
+                  <FamilySection
+                    family={
+                      (isEditing ? editData.family : character.family) || {
+                        father: null,
+                        mother: null,
+                        spouse: null,
+                        children: [],
+                        siblings: [],
+                        halfSiblings: [],
+                        grandparents: [],
+                        unclesAunts: [],
+                        cousins: [],
                       }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma organização" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhuma</SelectItem>
-                        {mockOrganizations.map((org) => (
-                          <SelectItem key={org.id} value={org.name}>
-                            {org.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm select-text">
-                        {character.organization || "Nenhuma organização"}
-                      </span>
-                    </div>
-                  )}
+                    }
+                    allCharacters={mockCharacters}
+                    currentCharacterId={character.id}
+                    isEditMode={isEditing}
+                    onFamilyChange={(family) =>
+                      onEditDataChange("family", family)
+                    }
+                  />
                 </CardContent>
               </Card>
             </div>
+
+            {/* Sidebar - Versions - 1 column */}
+            {!isEditing && (
+              <div className="lg:col-span-1 space-y-6">
+                <Card className="card-magical sticky top-24">
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      {t("character-detail:sections.versions")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[600px]">
+                    <VersionManager
+                      versions={versions}
+                      currentVersion={currentVersion}
+                      onVersionChange={onVersionChange}
+                      onVersionCreate={onVersionCreate}
+                      onVersionDelete={onVersionDelete}
+                      isEditMode={isEditing}
+                      mainCharacterData={character as any}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
-
-          <ConfirmDeleteModal
-            open={showDeleteModal}
-            onClose={onDeleteModalClose}
-            onConfirm={onDelete}
-            title="Excluir Personagem"
-            description={`O personagem "${character.name}" será permanentemente removido.`}
-            itemName={character.name}
-            itemType="personagem"
-          />
-
-          {/* TODO: Refatorar anotações no futuro */}
-          {/* <LinkedNotesModal
-            isOpen={isLinkedNotesModalOpen}
-            onClose={onLinkedNotesModalClose}
-            entityId={character.id}
-            entityName={character.name}
-            entityType="character"
-            linkedNotes={linkedNotes}
-          /> */}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteModal}
+        onClose={onDeleteModalClose}
+        characterName={character.name}
+        currentVersion={currentVersion}
+        versionName={currentVersion?.name}
+        totalVersions={versions.length}
+        onConfirmDelete={onConfirmDelete}
+      />
     </div>
   );
 }

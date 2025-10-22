@@ -19,7 +19,7 @@ import { useItemsStore } from "@/stores/items-store";
 import { ITEM_CATEGORIES_CONSTANT } from "./constants/item-categories-constant";
 import { ITEM_STATUSES_CONSTANT } from "./constants/item-statuses-constant";
 import { STORY_RARITIES_CONSTANT } from "./constants/story-rarities-constant";
-import { ItemDetailViewRefactored } from "./view-refactored";
+import { ItemDetailView } from "./view";
 
 export default function ItemDetail() {
   const { itemId, dashboardId } = useParams({
@@ -395,7 +395,7 @@ export default function ItemDetail() {
   }, []);
 
   return (
-    <ItemDetailViewRefactored
+    <ItemDetailView
       item={item}
       editData={editData}
       isEditing={isEditing}

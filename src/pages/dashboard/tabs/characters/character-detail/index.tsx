@@ -33,7 +33,7 @@ import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
-import { CharacterDetailViewRefactored } from "./view-refactored";
+import { CharacterDetailView } from "./view";
 
 export function CharacterDetail() {
   const { dashboardId, characterId } = useParams({
@@ -692,7 +692,7 @@ export function CharacterDetail() {
   }, []);
 
   return (
-    <CharacterDetailViewRefactored
+    <CharacterDetailView
       character={character}
       editData={editData}
       isEditing={isEditing}
