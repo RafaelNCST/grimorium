@@ -59,7 +59,10 @@
       "Bash(git apply fix_character_versions.patch)",
       "Bash(git apply fix_relationships.patch)",
       "Bash(perl -i -pe 's/id: rel\\.related_character_id,/id: rel.id,/' src/lib/db/characters.service.ts)",
-      "Bash(perl -i -pe 's/characterId: rel\\.character_id,/characterId: rel.related_character_id,/' src/lib/db/characters.service.ts)"
+      "Bash(perl -i -pe 's/characterId: rel\\.character_id,/characterId: rel.related_character_id,/' src/lib/db/characters.service.ts)",
+      "Bash(move srcpagesdashboardtabsspecies srcpagesdashboardtabsraces)",
+      "Bash(for file in src/pages/dashboard/tabs/races/constants/type-colors-constant.ts src/pages/dashboard/tabs/races/components/add-races-to-group-modal.tsx src/pages/dashboard/tabs/races/components/race-card.tsx src/pages/dashboard/tabs/races/components/race-group-accordion.tsx src/pages/dashboard/tabs/races/components/species-card.tsx src/pages/dashboard/tabs/races/components/stats-badges.tsx src/pages/dashboard/tabs/races/race-detail/index.tsx src/pages/dashboard/tabs/races/race-detail/view.tsx src/lib/db/race-groups.service.ts src/lib/db/races.service.ts)",
+      "Bash(do sed -i 's/species-types/race-types/g' \"$file\")"
     ],
     "deny": [],
     "ask": []

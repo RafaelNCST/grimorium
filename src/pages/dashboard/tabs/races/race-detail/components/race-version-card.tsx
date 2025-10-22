@@ -4,20 +4,20 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { type ICharacterVersion } from "@/types/character-types";
+import { type IRaceVersion } from "../types/race-detail-types";
 
-interface VersionCardProps {
-  version: ICharacterVersion;
+interface RaceVersionCardProps {
+  version: IRaceVersion;
   isSelected: boolean;
   onClick: () => void;
 }
 
-export function VersionCard({
+export function RaceVersionCard({
   version,
   isSelected,
   onClick,
-}: VersionCardProps) {
-  const { t } = useTranslation("character-detail");
+}: RaceVersionCardProps) {
+  const { t } = useTranslation("race-detail");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,12 +51,12 @@ export function VersionCard({
           </div>
         )}
 
-        {/* Character Image */}
+        {/* Race Image */}
         <div className="flex items-center gap-3">
           <Avatar className="w-12 h-12 border-2 border-border">
-            {version.characterData?.image && (
+            {version.raceData?.image && (
               <AvatarImage
-                src={version.characterData.image}
+                src={version.raceData.image}
                 alt={version.name}
                 className="object-cover"
               />

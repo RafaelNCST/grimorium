@@ -1,52 +1,136 @@
+import { useState } from "react";
 import { Filter, Plus, Search, SearchX, Users } from "lucide-react";
 
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
+import { CreateRaceGroupModal } from "@/components/modals/create-race-group-modal";
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
+import type { RaceGroupFormSchema } from "@/components/modals/create-race-group-modal/use-race-group-validation";
 import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { RaceCard } from "./components/race-card";
-import { IRace, IRaceTypeStats } from "./types/species-types";
+import { RaceGroupAccordion } from "./components/race-group-accordion";
+import { AddRacesToGroupModal } from "./components/add-races-to-group-modal";
+import { IRace, IRaceGroup, IRaceTypeStats } from "./types/species-types";
 
 interface PropsSpeciesView {
   races: IRace[];
-  filteredRaces: IRace[];
+  raceGroups: IRaceGroup[];
+  ungroupedRaces: IRace[];
   isCreateRaceOpen: boolean;
+  isCreateGroupOpen: boolean;
+  isAddRacesModalOpen: boolean;
+  groupInitialValues?: RaceGroupFormSchema;
+  editingGroupId?: string | null;
   raceTypeStats: IRaceTypeStats;
   availableRaces: Array<{ id: string; name: string }>;
+  racesAvailableForGroup: IRace[];
+  selectedGroupForAddRaces: string | null;
   searchTerm: string;
   selectedDomains: string[];
+  groupInRemoveMode: string | null;
   onSetIsCreateRaceOpen: (open: boolean) => void;
+  onSetIsCreateGroupOpen: (open: boolean) => void;
   onCreateRace: (data: RaceFormSchema) => void;
+  onCreateGroup: (data: RaceGroupFormSchema) => void;
+  onAddRacesToGroup: (groupId: string) => void;
+  onConfirmAddRaces: (raceIds: string[]) => void;
+  onCreateRaceInGroup: (groupId: string) => void;
+  onEditGroup: (groupId: string) => void;
+  onDeleteGroup: (groupId: string) => void;
+  onToggleRemoveMode: (groupId: string) => void;
+  onRemoveRaceFromGroup: (raceId: string) => void;
+  onDropRaceInGroup: (raceId: string, sourceGroupId: string | null, targetGroupId: string | null) => void;
   onRaceClick: (raceId: string) => void;
   onSearchTermChange: (term: string) => void;
   onDomainFilterChange: (domain: string) => void;
   onClearFilters: () => void;
+  onCloseAddRacesModal: () => void;
 }
 
 export function SpeciesView({
   races,
-  filteredRaces,
+  raceGroups,
+  ungroupedRaces,
   isCreateRaceOpen,
+  isCreateGroupOpen,
+  isAddRacesModalOpen,
+  groupInitialValues,
+  editingGroupId,
   raceTypeStats,
   availableRaces,
+  racesAvailableForGroup,
+  selectedGroupForAddRaces,
   searchTerm,
   selectedDomains,
+  groupInRemoveMode,
   onSetIsCreateRaceOpen,
+  onSetIsCreateGroupOpen,
   onCreateRace,
+  onCreateGroup,
+  onAddRacesToGroup,
+  onConfirmAddRaces,
+  onCreateRaceInGroup,
+  onEditGroup,
+  onDeleteGroup,
+  onToggleRemoveMode,
+  onRemoveRaceFromGroup,
+  onDropRaceInGroup,
   onRaceClick,
   onSearchTermChange,
   onDomainFilterChange,
   onClearFilters,
+  onCloseAddRacesModal,
 }: PropsSpeciesView) {
   const totalRaces = races.length;
+  const hasGroups = raceGroups.length > 0;
+  const hasUngroupedRaces = ungroupedRaces.length > 0;
+  const hasContent = hasGroups || hasUngroupedRaces;
+
+  const selectedGroup = raceGroups.find((g) => g.id === selectedGroupForAddRaces);
+
+  const [isUngroupedDragOver, setIsUngroupedDragOver] = useState(false);
+
+  const handleUngroupedDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleUngroupedDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsUngroupedDragOver(true);
+  };
+
+  const handleUngroupedDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.currentTarget === e.target) {
+      setIsUngroupedDragOver(false);
+    }
+  };
+
+  const handleUngroupedDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsUngroupedDragOver(false);
+
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      const { raceId, groupId: sourceGroupId } = data;
+
+      // Only handle if dropping from a group (to ungroup)
+      if (sourceGroupId && onDropRaceInGroup) {
+        onDropRaceInGroup(raceId, sourceGroupId, null);
+      }
+    } catch (error) {
+      console.error("Error parsing drag data:", error);
+    }
+  };
 
   return (
     <div className="flex-1 h-full flex flex-col space-y-6">
-      {/* Header with role stats */}
+      {/* Header with stats and action buttons */}
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold">Raças</h2>
@@ -70,7 +154,6 @@ export function SpeciesView({
                 const isSelected = selectedDomains.includes(domain.value);
                 const DomainIcon = domain.icon;
 
-                // Map domain to strong colors (like characters/items filters)
                 const colorMap: Record<string, { active: string; base: string; hover: string }> = {
                   'Aquático': {
                     active: '!bg-blue-500 !text-white !border-blue-500',
@@ -134,15 +217,26 @@ export function SpeciesView({
             </div>
           )}
         </div>
-        <Button
-          variant="magical"
-          size="lg"
-          onClick={() => onSetIsCreateRaceOpen(true)}
-          className="animate-glow"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Nova Raça
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="magical"
+            size="lg"
+            onClick={() => onSetIsCreateGroupOpen(true)}
+            className="animate-glow"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Criar Grupo
+          </Button>
+          <Button
+            variant="magical"
+            size="lg"
+            onClick={() => onSetIsCreateRaceOpen(true)}
+            className="animate-glow"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Nova Raça
+          </Button>
+        </div>
       </div>
 
       {/* Search bar */}
@@ -159,14 +253,14 @@ export function SpeciesView({
         </div>
       )}
 
-      {/* Race grid or empty state */}
-      {totalRaces === 0 ? (
+      {/* Content */}
+      {totalRaces === 0 && raceGroups.length === 0 ? (
         <EmptyState
           icon={Users}
           title="Nenhuma raça criada"
           description="Crie sua primeira raça clicando no botão 'Nova Raça'"
         />
-      ) : filteredRaces.length === 0 ? (
+      ) : !hasContent ? (
         <div className="flex-1 flex">
           <EmptyState
             icon={selectedDomains.length > 0 ? Filter : SearchX}
@@ -183,18 +277,66 @@ export function SpeciesView({
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
-          {filteredRaces.map((race) => (
-            <RaceCard key={race.id} race={race} onClick={onRaceClick} />
+        <div className="space-y-6 pb-6">
+          {/* Race Groups */}
+          {raceGroups.map((group) => (
+            <RaceGroupAccordion
+              key={group.id}
+              group={group}
+              onAddRacesToGroup={onAddRacesToGroup}
+              onCreateRaceInGroup={onCreateRaceInGroup}
+              onEditGroup={onEditGroup}
+              onDeleteGroup={onDeleteGroup}
+              onToggleRemoveMode={onToggleRemoveMode}
+              onRaceClick={onRaceClick}
+              onRemoveRaceFromGroup={onRemoveRaceFromGroup}
+              isRemoveMode={groupInRemoveMode === group.id}
+            />
           ))}
+
+          {/* Ungrouped Races */}
+          {hasUngroupedRaces && (
+            <div
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 rounded-lg transition-all ${
+                isUngroupedDragOver
+                  ? "bg-muted/50 border-2 border-dashed border-primary p-4"
+                  : ""
+              }`}
+              onDragOver={handleUngroupedDragOver}
+              onDragEnter={handleUngroupedDragEnter}
+              onDragLeave={handleUngroupedDragLeave}
+              onDrop={handleUngroupedDrop}
+            >
+              {ungroupedRaces.map((race) => (
+                <RaceCard key={race.id} race={race} onClick={onRaceClick} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
+      {/* Modals */}
       <CreateRaceModal
         open={isCreateRaceOpen}
         onClose={() => onSetIsCreateRaceOpen(false)}
         onConfirm={onCreateRace}
         availableRaces={availableRaces}
+      />
+
+      <CreateRaceGroupModal
+        open={isCreateGroupOpen}
+        onClose={() => onSetIsCreateGroupOpen(false)}
+        onConfirm={onCreateGroup}
+        initialValues={groupInitialValues}
+        groupId={editingGroupId || undefined}
+      />
+
+      <AddRacesToGroupModal
+        open={isAddRacesModalOpen}
+        groupName={selectedGroup?.name || ""}
+        availableRaces={racesAvailableForGroup}
+        onClose={onCloseAddRacesModal}
+        onConfirm={onConfirmAddRaces}
       />
     </div>
   );

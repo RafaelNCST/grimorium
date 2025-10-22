@@ -1,0 +1,198 @@
+{
+  "title": "Race Details",
+  "buttons": {
+    "back": "Back",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "show_advanced": "Show advanced fields",
+    "hide_advanced": "Hide advanced fields",
+    "upload_image": "Click to add an image",
+    "change_image": "Click to change image",
+    "add_note": "Add Note"
+  },
+  "sections": {
+    "basic_info": "Basic Information",
+    "advanced_info": "Advanced Fields",
+    "summary": "Summary",
+    "culture": "Culture and Myths",
+    "appearance": "Appearance and Characteristics",
+    "behaviors": "Behaviors",
+    "power": "Power",
+    "narrative": "Narrative",
+    "relationships": "Race Relationships",
+    "versions": "Versions"
+  },
+  "fields": {
+    "image": "Image",
+    "name": "Name",
+    "scientific_name": "Scientific Name",
+    "domain": "Domain",
+    "summary": "Summary",
+    "alternative_names": "Alternative Names",
+    "race_views": "Views Between Races",
+    "cultural_notes": "Rites, Taboos and Curiosities",
+    "general_appearance": "General Appearance",
+    "life_expectancy": "Life Expectancy",
+    "average_height": "Average Height",
+    "average_weight": "Average Weight",
+    "special_physical_characteristics": "Special Physical Characteristics",
+    "habits": "Habits",
+    "reproductive_cycle": "Reproductive Cycle",
+    "diet": "Diet",
+    "elemental_diet": "Elemental Diet",
+    "communication": "Communication",
+    "other_communication": "Other form of communication",
+    "moral_tendency": "Moral Tendency",
+    "social_organization": "Social Organization",
+    "habitat": "Habitat",
+    "physical_capacity": "Physical Capacity",
+    "special_characteristics": "Special Characteristics",
+    "weaknesses": "Weaknesses",
+    "story_motivation": "Story Motivation",
+    "inspirations": "Inspirations"
+  },
+  "placeholders": {
+    "name": "Fire Dragon",
+    "scientific_name": "Draco ignis supremus",
+    "summary": "Majestic creatures that dominate flames and inhabit active volcanoes",
+    "alternative_name": "Ex: Flaming Serpents",
+    "cultural_note": "Describe a rite, taboo or cultural curiosity of this race",
+    "general_appearance": "Red and golden scales that shine like living embers",
+    "life_expectancy": "500-800 years",
+    "average_height": "12-15 meters tall",
+    "average_weight": "8-12 tons",
+    "special_physical_characteristics": "Membranous wings capable of generating thermal currents, obsidian claws",
+    "habits": "Nocturnal during winter, diurnal in summer; hibernate during low volcanic activity",
+    "reproductive_cycle": "Oviparous, lay eggs in magma chambers every 50 years",
+    "diet": "Carnivorous, prefer large prey charred by their own fire",
+    "elemental_diet": "Absorb thermal energy from lava and geothermal sources",
+    "moral_tendency": "Neutral trending chaotic; value freedom above all",
+    "social_organization": "Live solitary in volcanic territories, rarely forming alliances",
+    "habitat": "Ex: Active volcanoes, Volcanic calderas",
+    "physical_capacity": "Superhuman strength equivalent to 20 men; resistance to extreme temperatures",
+    "special_characteristics": "Fire breath capable of melting metals; accelerated regeneration in hot environments",
+    "weaknesses": "Vulnerable to low temperatures; lose strength in aquatic environments",
+    "story_motivation": "Ancient guardians of the secrets of primordial fire",
+    "inspirations": "Norse mythology (Fafnir), Asian dragons, mythological salamanders"
+  },
+  "relationship_types": {
+    "predation": "Predation",
+    "prey": "Prey",
+    "parasitism": "Parasitism",
+    "commensalism": "Commensalism",
+    "mutualism": "Mutualism",
+    "competition": "Competition",
+    "neutralism": "Neutralism",
+    "predation_desc": "This race hunts the other",
+    "prey_desc": "This race is hunted by the other",
+    "parasitism_desc": "This race parasitizes the other",
+    "commensalism_desc": "This race benefits without affecting the other",
+    "mutualism_desc": "Both races benefit mutually",
+    "competition_desc": "Both races compete for resources",
+    "neutralism_desc": "Coexist without significant interaction"
+  },
+  "empty_states": {
+    "no_data": "No information provided.",
+    "no_data_hint": "Click 'Edit' to add information.",
+    "no_image": "No image",
+    "no_relationships": "No race relationships registered.",
+    "no_relationships_hint": "Click 'Edit' to add relationships.",
+    "no_cultural_notes": "No rites, taboos or curiosities registered.",
+    "no_race_views": "No race views registered.",
+    "no_alternative_names": "No alternative names registered.",
+    "no_habitat": "No habitat registered.",
+    "no_communication": "No communication forms registered.",
+    "need_more_races_relationships": "Create more races to add relationships",
+    "need_more_races_relationships_hint": "You need at least 2 races in the same book to create relationships",
+    "no_races_available": "No races available",
+    "no_races_available_hint": "Create more races to add relationships"
+  },
+  "relationships": {
+    "add_relationship": "Add Relationship",
+    "select_relationship_type": "Select Relationship Type",
+    "select_race": "Select a race to relate",
+    "configure_relationship": "Configure the ecological relationship type",
+    "available_races": "Available Races",
+    "selected_race": "Selected Race",
+    "relationship_type": "Relationship Type",
+    "cancel": "Cancel",
+    "back": "Back",
+    "add": "Add",
+    "save": "Save",
+    "edit_title": "Edit Relationship",
+    "editing_with": "Editing relationship with"
+  },
+  "delete": {
+    "title": "Delete Race",
+    "description": "Are you sure you want to delete this race? This action cannot be undone.",
+    "type_name": "Type the race name to confirm:",
+    "success": "Race deleted successfully!"
+  },
+  "sidebar": {
+    "title": "Navigate Between Races",
+    "search_placeholder": "Search races...",
+    "view_all": "All",
+    "view_by_groups": "By Groups",
+    "no_races_found": "No races found",
+    "no_groups_found": "No groups found",
+    "ungrouped": "Ungrouped"
+  },
+  "modals": {
+    "add_cultural_note": "Add Rite/Taboo/Curiosity"
+  },
+  "versions": {
+    "add_version": "Add Version",
+    "main_badge": "Main",
+    "empty_state": {
+      "title": "No alternative versions",
+      "description": "Create versions to represent transformations, subspecies, ethnic groups, or biological variations of this race"
+    },
+    "hint": {
+      "title": "Alternative Versions",
+      "description": "Experiment with different versions of your race without losing the original"
+    },
+    "create_dialog": {
+      "title": "Create New Version",
+      "info_message": "Create alternative versions to experiment with changes without affecting the main version",
+      "name_label": "Version Name",
+      "name_placeholder": "Ex: Shadow Dragons",
+      "name_required": "Name is required",
+      "description_label": "Description",
+      "description_placeholder": "Describe what makes this version different...",
+      "description_required": "Description is required",
+      "chars_remaining": "characters remaining",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "step1_validation_error": "Fill in all required fields",
+      "success": "Version created successfully!"
+    }
+  },
+  "delete": {
+    "version": {
+      "title": "Delete Version",
+      "message": "Are you sure you want to delete version '{{versionName}}'? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "race": {
+      "title": "Delete Race",
+      "step1": {
+        "message": "You are about to permanently delete race '{{raceName}}'. This action cannot be undone.",
+        "input_label": "Type the race name to confirm:",
+        "input_placeholder": "Type the exact race name",
+        "name_mismatch": "Name doesn't match",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Final Confirmation",
+        "message": "You are about to delete '{{raceName}}' and all its {{totalVersions}} versions. This action is IRREVERSIBLE.",
+        "message_single": "You are about to delete '{{raceName}}'. This action is IRREVERSIBLE.",
+        "cancel": "Cancel",
+        "confirm": "Delete Permanently"
+      }
+    }
+  }
+}

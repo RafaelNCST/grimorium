@@ -1,31 +1,48 @@
 import { useTranslation } from "react-i18next";
+import { useDraggable } from "@dnd-kit/core";
 
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { IRace } from "../types/species-types";
+import { IRace } from "../types/race-types";
 
 interface PropsRaceCard {
   race: IRace;
   onClick?: (raceId: string) => void;
+  isDragDisabled?: boolean;
 }
 
-export function RaceCard({ race, onClick }: PropsRaceCard) {
+export function RaceCard({ race, onClick, isDragDisabled = false }: PropsRaceCard) {
   const { t } = useTranslation("create-race");
+
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `race-${race.id}`,
+    disabled: isDragDisabled,
+    data: {
+      type: 'race',
+      race,
+    },
+  });
 
   return (
     <Card
-      className="cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
-      onClick={() => onClick?.(race.id)}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      data-race-id={race.id}
+      className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${
+        isDragging ? "opacity-0" : ""
+      }`}
+      onClick={() => !isDragging && onClick?.(race.id)}
     >
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
-        {race.image ? (
+        {race?.image ? (
           <div className="relative w-full h-52">
             <img
               src={race.image}
-              alt={race.name}
+              alt={race?.name || "Race"}
               className="w-full h-full object-cover rounded-t-lg"
             />
           </div>

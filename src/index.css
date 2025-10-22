@@ -458,7 +458,6 @@ button *,
   -moz-user-select: none !important;
   -ms-user-select: none !important;
   user-select: none !important;
-  cursor: default !important;
 }
 
 /* Preserve custom cursors for draggable elements */
@@ -479,5 +478,17 @@ button *,
 }
 
 .cursor-pointer {
+  cursor: pointer !important;
+}
+
+.cursor-pointer * {
+  cursor: pointer !important;
+}
+
+/* Ensure buttons and tabs always show pointer cursor */
+button:not(:disabled),
+[role="button"]:not(:disabled),
+button:not(:disabled) *,
+[role="button"]:not(:disabled) * {
   cursor: pointer !important;
 }

@@ -1,4 +1,4 @@
-import { RaceType } from "../types/species-types";
+import { RaceType } from "../types/race-types";
 
 export const TYPE_COLORS_CONSTANT: Record<RaceType, string> = {
   Aquática: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",

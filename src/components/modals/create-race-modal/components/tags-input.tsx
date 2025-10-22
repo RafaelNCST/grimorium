@@ -30,9 +30,9 @@ export function TagsInput({
     if (
       trimmedValue &&
       trimmedValue.length <= maxLength &&
-      !tags.includes(trimmedValue)
+      !(tags || []).includes(trimmedValue)
     ) {
-      onChange([...tags, trimmedValue]);
+      onChange([...(tags || []), trimmedValue]);
       setInputValue("");
     }
   };
@@ -80,9 +80,9 @@ export function TagsInput({
         </Button>
       </div>
 
-      {tags.length > 0 && (
+      {(tags || []).length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
+          {(tags || []).map((tag, index) => (
             <Badge
               key={`${tag}-${index}`}
               variant="secondary"

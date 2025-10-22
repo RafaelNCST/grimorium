@@ -32,7 +32,7 @@ import { OrganizationsTab } from "./tabs/organizations";
 import { OverviewTab } from "./tabs/overview";
 import { PlotTab } from "./tabs/plot";
 import { PowerSystemTab } from "./tabs/power-system";
-import { SpeciesTab } from "./tabs/species";
+import { SpeciesTab } from "./tabs/races";
 import { WorldTab } from "./tabs/world";
 
 interface TabConfig {

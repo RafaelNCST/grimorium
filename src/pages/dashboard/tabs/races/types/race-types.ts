@@ -8,8 +8,17 @@ export type DomainType =
   | "Espiritual"
   | "Cósmico";
 
+export interface IRaceGroup {
+  id: string;
+  name: string;
+  description: string;
+  orderIndex: number;
+  races: IRace[];
+}
+
 export interface IRace {
   id: string;
+  groupId?: string;
 
   // Basic required fields
   name: string;
@@ -55,6 +64,9 @@ export interface IRace {
   // Narrative (all optional)
   storyMotivation?: string;
   inspirations?: string;
+
+  // Metadata
+  fieldVisibility?: { [key: string]: boolean };
 
   // Legacy field for backwards compatibility
   speciesId: string;

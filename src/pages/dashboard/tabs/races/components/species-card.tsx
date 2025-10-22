@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { ISpecies } from "../types/species-types";
+import { ISpecies } from "../types/race-types";
 
 import { RaceCard } from "./race-card";
 

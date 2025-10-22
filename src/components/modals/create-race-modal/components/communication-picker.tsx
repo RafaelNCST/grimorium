@@ -76,13 +76,13 @@ export function CommunicationPicker({
   otherCommunicationError
 }: PropsCommunicationPicker) {
   const { t } = useTranslation("create-race");
-  const isOther = values.includes("other");
+  const isOther = values?.includes("other") ?? false;
 
   const toggleCommunication = (value: string) => {
-    if (values.includes(value)) {
-      onChange(values.filter((v) => v !== value));
+    if (values?.includes(value)) {
+      onChange((values || []).filter((v) => v !== value));
     } else {
-      onChange([...values, value]);
+      onChange([...(values || []), value]);
     }
   };
 
@@ -95,7 +95,7 @@ export function CommunicationPicker({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {RACE_COMMUNICATIONS.map((comm) => {
           const Icon = comm.icon;
-          const isSelected = values.includes(comm.value);
+          const isSelected = values?.includes(comm.value) ?? false;
           const lightTextColor = getColorFromTailwindClass(comm.color);
           const darkTextColor = getDarkColorFromTailwindClass(comm.color);
           const lightBgColor = getBgColorFromTailwindClass(comm.bgColor);
@@ -190,9 +190,9 @@ export function CommunicationPicker({
         </div>
       )}
 
-      {values.length > 0 && (
+      {(values || []).length > 0 && (
         <div className="flex flex-wrap gap-2 pt-2">
-          {values.map((value) => {
+          {(values || []).map((value) => {
             const comm = RACE_COMMUNICATIONS.find((c) => c.value === value);
             if (!comm) return null;
             const Icon = comm.icon;

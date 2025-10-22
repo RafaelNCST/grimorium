@@ -33,12 +33,14 @@ interface PropsRaceViewsManager {
   views: RaceView[];
   onChange: (views: RaceView[]) => void;
   availableRaces: Array<{ id: string; name: string }>;
+  hideLabel?: boolean;
 }
 
 export function RaceViewsManager({
   views,
   onChange,
   availableRaces,
+  hideLabel = false,
 }: PropsRaceViewsManager) {
   const { t } = useTranslation("create-race");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,7 +96,7 @@ export function RaceViewsManager({
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">{t("modal.race_views")}</label>
+      {!hideLabel && <label className="text-sm font-medium">{t("modal.race_views")}</label>}
 
       <Alert className="bg-muted/30 border-muted">
         <Info className="h-4 w-4 text-muted-foreground" />

@@ -6,57 +6,47 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  type ICharacter,
-  type ICharacterVersion,
-  type ICharacterFormData,
-} from "@/types/character-types";
 
-import { CreateVersionDialog } from "./create-version-dialog";
-import { VersionCard } from "./version-card";
+import { CreateRaceVersionDialog } from "./create-race-version-dialog";
+import { RaceVersionCard } from "./race-version-card";
 
-interface VersionManagerProps {
-  versions: ICharacterVersion[];
-  currentVersion: ICharacterVersion | null;
+import type { IRace } from "../../types/race-types";
+import type { IRaceVersion } from "../types/race-detail-types";
+
+interface RaceVersionManagerProps {
+  versions: IRaceVersion[];
+  currentVersion: IRaceVersion | null;
   onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (versionData: {
-    name: string;
-    description: string;
-    characterData: ICharacterFormData;
-  }) => void;
+  onVersionCreate: (data: { name: string; description: string; raceData: IRace }) => void;
   onVersionDelete: (versionId: string) => void;
   isEditMode: boolean;
-  mainCharacterData: ICharacter;
+  mainRaceData: IRace;
   translationNamespace?: string;
 }
 
-export function VersionManager({
+export function RaceVersionManager({
   versions,
   currentVersion,
   onVersionChange,
   onVersionCreate,
   isEditMode,
-  mainCharacterData,
-  translationNamespace = "character-detail",
-}: VersionManagerProps) {
+  mainRaceData,
+  translationNamespace = "race-detail",
+}: RaceVersionManagerProps) {
   const { t } = useTranslation(translationNamespace);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const mainVersion = versions.find((v) => v.isMain);
   const alternativeVersions = versions.filter((v) => !v.isMain);
 
-  const handleVersionClick = (version: ICharacterVersion) => {
+  const handleVersionClick = (version: IRaceVersion) => {
     if (currentVersion?.id !== version.id) {
       onVersionChange(version.id);
     }
   };
 
-  const handleCreateVersion = (versionData: {
-    name: string;
-    description: string;
-    characterData: ICharacterFormData;
-  }) => {
-    onVersionCreate(versionData);
+  const handleCreateVersion = (data: { name: string; description: string; raceData: IRace }) => {
+    onVersionCreate(data);
     setIsCreateDialogOpen(false);
   };
 
@@ -82,7 +72,7 @@ export function VersionManager({
         <div className="space-y-3">
           {/* Main Version */}
           {mainVersion && (
-            <VersionCard
+            <RaceVersionCard
               version={mainVersion}
               isSelected={currentVersion?.id === mainVersion.id}
               onClick={() => handleVersionClick(mainVersion)}
@@ -93,7 +83,7 @@ export function VersionManager({
           {alternativeVersions.length > 0 && (
             <div className="space-y-3">
               {alternativeVersions.map((version) => (
-                <VersionCard
+                <RaceVersionCard
                   key={version.id}
                   version={version}
                   isSelected={currentVersion?.id === version.id}
@@ -129,11 +119,11 @@ export function VersionManager({
       </div>
 
       {/* Create Version Dialog */}
-      <CreateVersionDialog
+      <CreateRaceVersionDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onConfirm={handleCreateVersion}
-        baseCharacter={mainCharacterData}
+        baseRace={mainRaceData}
       />
     </div>
   );

@@ -1,6 +1,7 @@
-import { IRace } from "@/pages/dashboard/tabs/species/types/species-types";
+import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import { IRaceVersion, IRaceRelationship } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 
-import { DBRace, DBRaceVersion } from "./types";
+import { DBRace, DBRaceVersion, DBRaceRelationship } from "./types";
 
 import { getDB } from "./index";
 
@@ -9,6 +10,7 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
   return {
     id: race.id,
     book_id: bookId,
+    group_id: race.groupId,
     name: race.name,
     domain: JSON.stringify(race.domain),
     summary: race.summary,
@@ -39,7 +41,9 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     weaknesses: race.weaknesses,
     story_motivation: race.storyMotivation,
     inspirations: race.inspirations,
-    field_visibility: undefined, // Will be added in future
+    field_visibility: race.fieldVisibility
+      ? JSON.stringify(race.fieldVisibility)
+      : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -49,6 +53,7 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
 function dbRaceToRace(dbRace: DBRace): IRace {
   return {
     id: dbRace.id,
+    groupId: dbRace.group_id,
     name: dbRace.name,
     domain: JSON.parse(dbRace.domain),
     summary: dbRace.summary,
@@ -79,6 +84,9 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     weaknesses: dbRace.weaknesses,
     storyMotivation: dbRace.story_motivation,
     inspirations: dbRace.inspirations,
+    fieldVisibility: dbRace.field_visibility
+      ? JSON.parse(dbRace.field_visibility)
+      : undefined,
     speciesId: "", // Legacy field, kept for backwards compatibility
   };
 }
@@ -107,7 +115,7 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
 
   await db.execute(
     `INSERT INTO races (
-      id, book_id, name, domain, summary, image, scientific_name,
+      id, book_id, group_id, name, domain, summary, image, scientific_name,
       alternative_names, race_views, cultural_notes,
       general_appearance, life_expectancy, average_height, average_weight,
       special_physical_characteristics,
@@ -117,13 +125,14 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
       story_motivation, inspirations,
       field_visibility, created_at, updated_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-      $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-      $29, $30, $31
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
+      $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29,
+      $30, $31, $32
     )`,
     [
       dbRace.id,
       dbRace.book_id,
+      dbRace.group_id,
       dbRace.name,
       dbRace.domain,
       dbRace.summary,
@@ -189,17 +198,18 @@ export async function updateRace(
 
   await db.execute(
     `UPDATE races SET
-      name = $1, domain = $2, summary = $3, image = $4, scientific_name = $5,
-      alternative_names = $6, race_views = $7, cultural_notes = $8,
-      general_appearance = $9, life_expectancy = $10, average_height = $11,
-      average_weight = $12, special_physical_characteristics = $13,
-      habits = $14, reproductive_cycle = $15, diet = $16, elemental_diet = $17,
-      communication = $18, moral_tendency = $19, social_organization = $20,
-      habitat = $21, physical_capacity = $22, special_characteristics = $23,
-      weaknesses = $24, story_motivation = $25, inspirations = $26,
-      field_visibility = $27, updated_at = $28
-    WHERE id = $29`,
+      group_id = $1, name = $2, domain = $3, summary = $4, image = $5, scientific_name = $6,
+      alternative_names = $7, race_views = $8, cultural_notes = $9,
+      general_appearance = $10, life_expectancy = $11, average_height = $12,
+      average_weight = $13, special_physical_characteristics = $14,
+      habits = $15, reproductive_cycle = $16, diet = $17, elemental_diet = $18,
+      communication = $19, moral_tendency = $20, social_organization = $21,
+      habitat = $22, physical_capacity = $23, special_characteristics = $24,
+      weaknesses = $25, story_motivation = $26, inspirations = $27,
+      field_visibility = $28, updated_at = $29
+    WHERE id = $30`,
     [
+      dbRace.group_id,
       dbRace.name,
       dbRace.domain,
       dbRace.summary,
@@ -236,4 +246,142 @@ export async function updateRace(
 export async function deleteRace(id: string): Promise<void> {
   const db = await getDB();
   await db.execute("DELETE FROM races WHERE id = $1", [id]);
+}
+
+// Get races by group ID
+export async function getRacesByGroupId(groupId: string): Promise<IRace[]> {
+  const db = await getDB();
+  const result = await db.select<DBRace[]>(
+    "SELECT * FROM races WHERE group_id = $1 ORDER BY created_at DESC",
+    [groupId]
+  );
+  return result.map(dbRaceToRace);
+}
+
+// Move race to a group
+export async function moveRaceToGroup(
+  raceId: string,
+  groupId: string | null
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  await db.execute(
+    "UPDATE races SET group_id = $1, updated_at = $2 WHERE id = $3",
+    [groupId, now, raceId]
+  );
+}
+
+// Move multiple races to a group
+export async function moveRacesToGroup(
+  raceIds: string[],
+  groupId: string | null
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  for (const raceId of raceIds) {
+    await db.execute(
+      "UPDATE races SET group_id = $1, updated_at = $2 WHERE id = $3",
+      [groupId, now, raceId]
+    );
+  }
+}
+
+// Race Versions
+export async function getRaceVersions(
+  raceId: string
+): Promise<IRaceVersion[]> {
+  const db = await getDB();
+  const result = await db.select<DBRaceVersion[]>(
+    "SELECT * FROM race_versions WHERE race_id = $1 ORDER BY created_at DESC",
+    [raceId]
+  );
+
+  return result.map((v) => ({
+    id: v.id,
+    name: v.name,
+    description: v.description || "",
+    createdAt: new Date(v.created_at).toISOString(),
+    isMain: v.is_main === 1,
+    raceData: v.race_data ? JSON.parse(v.race_data) : ({} as IRace),
+  }));
+}
+
+export async function createRaceVersion(
+  raceId: string,
+  version: IRaceVersion
+): Promise<void> {
+  const db = await getDB();
+
+  await db.execute(
+    `INSERT INTO race_versions (
+      id, race_id, name, description, is_main, race_data, created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      version.id,
+      raceId,
+      version.name,
+      version.description,
+      version.isMain ? 1 : 0,
+      JSON.stringify(version.raceData),
+      Date.now(),
+    ]
+  );
+}
+
+export async function deleteRaceVersion(versionId: string): Promise<void> {
+  const db = await getDB();
+  await db.execute("DELETE FROM race_versions WHERE id = $1", [versionId]);
+}
+
+export async function updateRaceVersion(
+  versionId: string,
+  name: string,
+  description?: string
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE race_versions SET name = $1, description = $2 WHERE id = $3",
+    [name, description, versionId]
+  );
+}
+
+// Race Relationships
+export async function getRaceRelationships(
+  raceId: string
+): Promise<IRaceRelationship[]> {
+  const db = await getDB();
+  const result = await db.select<DBRaceRelationship[]>(
+    "SELECT * FROM race_relationships WHERE race_id = $1",
+    [raceId]
+  );
+
+  return result.map((rel) => ({
+    id: rel.id,
+    raceId: rel.related_race_id,
+    type: rel.type,
+  }));
+}
+
+export async function saveRaceRelationships(
+  raceId: string,
+  relationships: IRaceRelationship[]
+): Promise<void> {
+  const db = await getDB();
+
+  // Delete existing relationships
+  await db.execute("DELETE FROM race_relationships WHERE race_id = $1", [
+    raceId,
+  ]);
+
+  // Insert new relationships
+  for (const rel of relationships) {
+    const relId = `${raceId}-${rel.raceId}-${rel.type}-${Date.now()}`;
+    await db.execute(
+      `INSERT INTO race_relationships (id, race_id, related_race_id, type, created_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [relId, raceId, rel.raceId, rel.type, Date.now()]
+    );
+  }
 }

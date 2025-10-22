@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 
 import { TYPE_BADGE_COLORS_CONSTANT } from "../constants/type-colors-constant";
-import { IRaceTypeStats } from "../types/species-types";
+import { IRaceTypeStats } from "../types/race-types";
 
 interface PropsStatsBadges {
   totalSpecies: number;

@@ -138,9 +138,20 @@ export interface DBItemVersion {
   created_at: number;
 }
 
+export interface DBRaceGroup {
+  id: string;
+  book_id: string;
+  name: string;
+  description: string;
+  order_index: number;
+  created_at: number;
+  updated_at: number;
+}
+
 export interface DBRace {
   id: string;
   book_id: string;
+  group_id?: string;
 
   // Basic required fields
   name: string;
@@ -195,6 +206,14 @@ export interface DBRaceVersion {
   description?: string;
   is_main: number; // 0 or 1 (SQLite boolean)
   race_data?: string; // JSON string
+  created_at: number;
+}
+
+export interface DBRaceRelationship {
+  id: string;
+  race_id: string;
+  related_race_id: string;
+  type: string;
   created_at: number;
 }
 

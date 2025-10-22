@@ -1,0 +1,198 @@
+{
+  "title": "Detalhes da Raça",
+  "buttons": {
+    "back": "Voltar",
+    "edit": "Editar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "show_advanced": "Mostrar campos avançados",
+    "hide_advanced": "Esconder campos avançados",
+    "upload_image": "Clique para adicionar uma imagem",
+    "change_image": "Clique para alterar a imagem",
+    "add_note": "Adicionar Nota"
+  },
+  "sections": {
+    "basic_info": "Informações Básicas",
+    "advanced_info": "Campos Avançados",
+    "summary": "Resumo",
+    "culture": "Cultura e Mitos",
+    "appearance": "Aparência e Características",
+    "behaviors": "Comportamentos",
+    "power": "Poder",
+    "narrative": "Narrativa",
+    "relationships": "Relacionamentos entre Raças",
+    "versions": "Versões"
+  },
+  "fields": {
+    "image": "Imagem",
+    "name": "Nome",
+    "scientific_name": "Nome Científico",
+    "domain": "Domínio",
+    "summary": "Resumo",
+    "alternative_names": "Nomes Alternativos",
+    "race_views": "Visões entre Raças",
+    "cultural_notes": "Ritos, Tabus e Curiosidades",
+    "general_appearance": "Aparência Geral",
+    "life_expectancy": "Expectativa de Vida",
+    "average_height": "Altura Média",
+    "average_weight": "Peso Médio",
+    "special_physical_characteristics": "Características Físicas Especiais",
+    "habits": "Hábitos",
+    "reproductive_cycle": "Ciclo Reprodutivo",
+    "diet": "Dieta",
+    "elemental_diet": "Dieta Elemental",
+    "communication": "Comunicação",
+    "other_communication": "Outra forma de comunicação",
+    "moral_tendency": "Tendência Moral",
+    "social_organization": "Organização Social",
+    "habitat": "Habitat",
+    "physical_capacity": "Capacidade Física",
+    "special_characteristics": "Características Especiais",
+    "weaknesses": "Fraquezas",
+    "story_motivation": "Motivação na História",
+    "inspirations": "Inspirações"
+  },
+  "placeholders": {
+    "name": "Dragão de Fogo",
+    "scientific_name": "Draco ignis supremus",
+    "summary": "Criaturas majestosas que dominam as chamas e habitam vulcões ativos",
+    "alternative_name": "Ex: Serpentes Flamejantes",
+    "cultural_note": "Descreva um rito, tabu ou curiosidade cultural desta raça",
+    "general_appearance": "Escamas vermelhas e douradas que brilham como brasas vivas",
+    "life_expectancy": "500-800 anos",
+    "average_height": "12-15 metros de altura",
+    "average_weight": "8-12 toneladas",
+    "special_physical_characteristics": "Asas membranosas capazes de gerar correntes térmicas, garras de obsidiana",
+    "habits": "Noturnos durante o inverno, diurnos no verão; hibernam em períodos de baixa atividade vulcânica",
+    "reproductive_cycle": "Ovíparos, depositam ovos em câmaras de magma a cada 50 anos",
+    "diet": "Carnívoros, preferem presas de grande porte calcinadas pelo próprio fogo",
+    "elemental_diet": "Absorvem energia térmica de lavas e fontes geotérmicas",
+    "moral_tendency": "Neutro tendendo ao caótico; valorizam a liberdade acima de tudo",
+    "social_organization": "Vivem solitários em territórios vulcânicos, raramente formando alianças",
+    "habitat": "Ex: Vulcões ativos, Caldeiras vulcânicas",
+    "physical_capacity": "Força sobre-humana equivalente a 20 homens; resistência a temperaturas extremas",
+    "special_characteristics": "Sopro de fogo capaz de derreter metais; regeneração acelerada em ambientes quentes",
+    "weaknesses": "Vulneráveis a baixas temperaturas; perdem força em ambientes aquáticos",
+    "story_motivation": "Guardiões ancestrais dos segredos do fogo primordial",
+    "inspirations": "Mitologia nórdica (Fafnir), dragões asiáticos, salamandras mitológicas"
+  },
+  "relationship_types": {
+    "predation": "Predação",
+    "prey": "Presa",
+    "parasitism": "Parasitismo",
+    "commensalism": "Comensalismo",
+    "mutualism": "Mutualismo",
+    "competition": "Competição",
+    "neutralism": "Neutralismo",
+    "predation_desc": "Esta raça caça a outra",
+    "prey_desc": "Esta raça é caçada pela outra",
+    "parasitism_desc": "Esta raça parasita a outra",
+    "commensalism_desc": "Esta raça se beneficia sem afetar a outra",
+    "mutualism_desc": "Ambas as raças se beneficiam mutuamente",
+    "competition_desc": "Ambas as raças competem por recursos",
+    "neutralism_desc": "Coexistem sem interação significativa"
+  },
+  "empty_states": {
+    "no_data": "Nenhuma informação fornecida.",
+    "no_data_hint": "Clique em 'Editar' para adicionar informações.",
+    "no_image": "Sem imagem",
+    "no_relationships": "Nenhum relacionamento entre raças cadastrado.",
+    "no_relationships_hint": "Clique em 'Editar' para adicionar relacionamentos.",
+    "no_cultural_notes": "Nenhum rito, tabu ou curiosidade cadastrado.",
+    "no_race_views": "Nenhuma visão entre raças cadastrada.",
+    "no_alternative_names": "Nenhum nome alternativo cadastrado.",
+    "no_habitat": "Nenhum habitat cadastrado.",
+    "no_communication": "Nenhuma forma de comunicação cadastrada.",
+    "need_more_races_relationships": "Crie mais raças para adicionar relacionamentos",
+    "need_more_races_relationships_hint": "Você precisa de pelo menos 2 raças no mesmo livro para criar relacionamentos",
+    "no_races_available": "Não há raças disponíveis",
+    "no_races_available_hint": "Crie mais raças para adicionar relacionamentos"
+  },
+  "relationships": {
+    "add_relationship": "Adicionar Relacionamento",
+    "select_relationship_type": "Selecionar Tipo de Relacionamento",
+    "select_race": "Selecione uma raça para relacionar",
+    "configure_relationship": "Configure o tipo de relacionamento ecológico",
+    "available_races": "Raças Disponíveis",
+    "selected_race": "Raça Selecionada",
+    "relationship_type": "Tipo de Relacionamento",
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "add": "Adicionar",
+    "save": "Salvar",
+    "edit_title": "Editar Relacionamento",
+    "editing_with": "Editando relacionamento com"
+  },
+  "delete": {
+    "title": "Excluir Raça",
+    "description": "Tem certeza que deseja excluir esta raça? Esta ação não pode ser desfeita.",
+    "type_name": "Digite o nome da raça para confirmar:",
+    "success": "Raça excluída com sucesso!"
+  },
+  "sidebar": {
+    "title": "Navegar entre Raças",
+    "search_placeholder": "Buscar raças...",
+    "view_all": "Todas",
+    "view_by_groups": "Por Grupos",
+    "no_races_found": "Nenhuma raça encontrada",
+    "no_groups_found": "Nenhum grupo encontrado",
+    "ungrouped": "Sem Grupo"
+  },
+  "modals": {
+    "add_cultural_note": "Adicionar Rito/Tabu/Curiosidade"
+  },
+  "versions": {
+    "add_version": "Adicionar Versão",
+    "main_badge": "Principal",
+    "empty_state": {
+      "title": "Nenhuma versão alternativa",
+      "description": "Crie versões para representar transformações, subespécies, grupos étnicos ou variações biológicas desta raça"
+    },
+    "hint": {
+      "title": "Versões Alternativas",
+      "description": "Experimente diferentes versões da sua raça sem perder a original"
+    },
+    "create_dialog": {
+      "title": "Criar Nova Versão",
+      "info_message": "Crie versões alternativas para experimentar mudanças sem afetar a versão principal",
+      "name_label": "Nome da Versão",
+      "name_placeholder": "Ex: Dragões das Sombras",
+      "name_required": "Nome é obrigatório",
+      "description_label": "Descrição",
+      "description_placeholder": "Descreva o que diferencia esta versão...",
+      "description_required": "Descrição é obrigatória",
+      "chars_remaining": "caracteres restantes",
+      "cancel": "Cancelar",
+      "continue": "Continuar",
+      "step1_validation_error": "Preencha todos os campos obrigatórios",
+      "success": "Versão criada com sucesso!"
+    }
+  },
+  "delete": {
+    "version": {
+      "title": "Excluir Versão",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir"
+    },
+    "race": {
+      "title": "Excluir Raça",
+      "step1": {
+        "message": "Você está prestes a excluir permanentemente a raça '{{raceName}}'. Esta ação não pode ser desfeita.",
+        "input_label": "Digite o nome da raça para confirmar:",
+        "input_placeholder": "Digite o nome exato da raça",
+        "name_mismatch": "O nome não corresponde",
+        "cancel": "Cancelar",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Confirmação Final",
+        "message": "Você está prestes a excluir '{{raceName}}' e todas as suas {{totalVersions}} versões. Esta ação é IRREVERSÍVEL.",
+        "message_single": "Você está prestes a excluir '{{raceName}}'. Esta ação é IRREVERSÍVEL.",
+        "cancel": "Cancelar",
+        "confirm": "Excluir Permanentemente"
+      }
+    }
+  }
+}
