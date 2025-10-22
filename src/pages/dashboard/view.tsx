@@ -27,8 +27,8 @@ import { Header } from "./components/header";
 import { TabsBar } from "./components/tabs-bar";
 import { TopBar } from "./components/top-bar";
 import { CharactersTab } from "./tabs/characters";
+import { FactionsTab } from "./tabs/factions";
 import { ItemsTab } from "./tabs/items";
-import { OrganizationsTab } from "./tabs/organizations";
 import { OverviewTab } from "./tabs/overview";
 import { PlotTab } from "./tabs/plot";
 import { PowerSystemTab } from "./tabs/power-system";
@@ -97,7 +97,7 @@ interface PropsDashboardView {
 const MemoizedOverviewTab = React.memo(OverviewTab);
 const MemoizedCharactersTab = React.memo(CharactersTab);
 const MemoizedWorldTab = React.memo(WorldTab);
-const MemoizedOrganizationsTab = React.memo(OrganizationsTab);
+const MemoizedFactionsTab = React.memo(FactionsTab);
 const MemoizedPlotTab = React.memo(PlotTab);
 const MemoizedPowerSystemTab = React.memo(PowerSystemTab);
 const MemoizedSpeciesTab = React.memo(SpeciesTab);
@@ -218,10 +218,10 @@ export function DashboardView({
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"
               style={{
-                display: activeTab === "organizations" ? "block" : "none",
+                display: activeTab === "factions" ? "block" : "none",
               }}
             >
-              <MemoizedOrganizationsTab bookId={bookId} />
+              <MemoizedFactionsTab bookId={bookId} />
             </div>
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"

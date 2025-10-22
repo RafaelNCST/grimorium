@@ -23,10 +23,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-interface PropsCreateOrganizationModal {
+interface PropsCreateFactionModal {
   open: boolean;
   onClose: () => void;
-  onOrganizationCreated?: (organization: any) => void;
+  onFactionCreated?: (faction: any) => void;
   bookId: string;
   availableCharacters: Array<{ id: string; name: string }>;
   availableLocations: Array<{ id: string; name: string; type: string }>;
@@ -46,14 +46,14 @@ const types = [
 ];
 const influences = ["Inexistente", "Baixa", "Média", "Alta", "Dominante"];
 
-export function CreateOrganizationModal({
+export function CreateFactionModal({
   open,
   onClose,
-  onOrganizationCreated,
+  onFactionCreated,
   bookId,
   availableCharacters = [],
   availableLocations = [],
-}: PropsCreateOrganizationModal) {
+}: PropsCreateFactionModal) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -100,7 +100,7 @@ export function CreateOrganizationModal({
       return;
     }
 
-    const newOrganization = {
+    const newFaction = {
       id: Date.now().toString(),
       bookId,
       ...formData,
@@ -121,8 +121,8 @@ export function CreateOrganizationModal({
       createdAt: new Date().toISOString(),
     };
 
-    onOrganizationCreated?.(newOrganization);
-    toast.success("Organização criada com sucesso!");
+    onFactionCreated?.(newFaction);
+    toast.success("Facção criada com sucesso!");
 
     // Reset form
     setFormData({
@@ -149,7 +149,7 @@ export function CreateOrganizationModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Criar Nova Organização</DialogTitle>
+          <DialogTitle>Criar Nova Facção</DialogTitle>
           <DialogDescription>
             Preencha as informações da organização. Apenas o nome é obrigatório.
           </DialogDescription>
@@ -391,7 +391,7 @@ export function CreateOrganizationModal({
               Cancelar
             </Button>
             <Button type="submit" variant="magical">
-              Criar Organização
+              Criar Facção
             </Button>
           </div>
         </form>

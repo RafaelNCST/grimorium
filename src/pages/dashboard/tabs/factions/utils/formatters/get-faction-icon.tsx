@@ -1,8 +1,8 @@
 import { Shield, Swords, Crown, Building } from "lucide-react";
 
-import { OrganizationType } from "@/types/organization-types";
+import { FactionType } from "@/types/faction-types";
 
-export function getOrganizationIcon(type: OrganizationType) {
+export function getFactionIcon(type: FactionType) {
   switch (type) {
     case "Militar":
       return <Shield className="w-4 h-4" />;

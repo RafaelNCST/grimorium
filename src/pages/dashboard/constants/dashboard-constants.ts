@@ -49,7 +49,7 @@ export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   },
   { id: "characters", label: "Personagens", icon: Users, visible: true },
   { id: "world", label: "Mundo", icon: MapPin, visible: true },
-  { id: "organizations", label: "Organizações", icon: Building, visible: true },
+  { id: "factions", label: "Facções", icon: Building, visible: true },
   { id: "plot", label: "Enredo", icon: Target, visible: true },
   { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
   { id: "species", label: "Raças", icon: Dna, visible: true },

@@ -28,7 +28,7 @@ interface PropsWorldDetailView {
   stickyNotes: IStickyNote[];
   isLinkedNotesModalOpen: boolean;
   linkedNotes: ILinkedNote[];
-  mockOrganizations: IOrganization[];
+  mockFactions: IOrganization[];
   mockWorlds: IWorld[];
   mockContinents: IContinent[];
   dashboardId: string;
@@ -67,7 +67,7 @@ export function WorldDetailView({
   stickyNotes,
   isLinkedNotesModalOpen,
   linkedNotes,
-  mockOrganizations,
+  mockFactions,
   onBack,
   onEdit,
   onSave,
@@ -110,7 +110,7 @@ export function WorldDetailView({
               editData={editData}
               imagePreview={imagePreview}
               fileInputRef={fileInputRef}
-              mockOrganizations={mockOrganizations}
+              mockFactions={mockFactions}
               onImageChange={onImageChange}
               onEditDataChange={onEditDataChange}
             />

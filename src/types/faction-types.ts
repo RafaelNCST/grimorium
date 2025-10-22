@@ -1,4 +1,4 @@
-export type OrganizationType =
+export type FactionType =
   | "Militar"
   | "Comercial"
   | "Mágica"
@@ -7,41 +7,41 @@ export type OrganizationType =
   | "Governamental"
   | "Outros";
 
-export type OrganizationAlignment = "Bem" | "Neutro" | "Caótico";
+export type FactionAlignment = "Bem" | "Neutro" | "Caótico";
 
-export type OrganizationInfluence =
+export type FactionInfluence =
   | "Inexistente"
   | "Baixa"
   | "Média"
   | "Alta"
   | "Dominante";
 
-export interface IOrganizationTitle {
+export interface IFactionTitle {
   id: string;
   name: string;
   description: string;
   level: number;
 }
 
-export interface IOrganizationMember {
+export interface IFactionMember {
   characterId: string;
   characterName: string;
   titleId: string;
   joinDate: string;
 }
 
-export interface IOrganization {
+export interface IFaction {
   id: string;
   name: string;
   photo?: string;
-  alignment: OrganizationAlignment;
+  alignment: FactionAlignment;
   description: string;
-  type: OrganizationType;
-  influence: OrganizationInfluence;
+  type: FactionType;
+  influence: FactionInfluence;
   leaders: string[];
   objectives: string[];
-  members: IOrganizationMember[];
-  titles: IOrganizationTitle[];
+  members: IFactionMember[];
+  titles: IFactionTitle[];
   dominatedLocations: string[];
   dominatedContinents: string[];
   dominatedWorlds: string[];

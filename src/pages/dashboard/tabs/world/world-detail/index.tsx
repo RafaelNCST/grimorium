@@ -49,7 +49,7 @@ export function WorldDetail() {
   const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
 
-  const mockOrganizations = useMemo<IOrganization[]>(() => [], []);
+  const mockFactions = useMemo<IOrganization[]>(() => [], []);
   const mockWorlds = useMemo<IWorld[]>(() => [], []);
   const mockContinents = useMemo<IContinent[]>(() => [], []);
   const linkedNotes = useMemo<ILinkedNote[]>(() => [], []);
@@ -211,7 +211,7 @@ export function WorldDetail() {
       stickyNotes={stickyNotes}
       isLinkedNotesModalOpen={isLinkedNotesModalOpen}
       linkedNotes={linkedNotes}
-      mockOrganizations={mockOrganizations}
+      mockFactions={mockFactions}
       mockWorlds={mockWorlds}
       mockContinents={mockContinents}
       dashboardId={dashboardId}

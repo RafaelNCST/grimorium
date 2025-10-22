@@ -3,26 +3,26 @@ import { useState, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { IOrganization, IOrganizationTitle } from "@/types/organization-types";
+import { IFaction, IFactionTitle } from "@/types/faction-types";
 
 import { getAlignmentColor } from "../utils/formatters/get-alignment-color";
 import { getInfluenceColor } from "../utils/formatters/get-influence-color";
 import { getLocationIcon } from "../utils/formatters/get-location-icon";
 import { getTitleName } from "../utils/formatters/get-title-name";
 
-import { OrganizationDetailView } from "./view";
+import { FactionDetailView } from "./view";
 
 const MOCK_LOCATIONS: any[] = [];
 const MOCK_WORLDS: any[] = [];
 const MOCK_CONTINENTS: any[] = [];
 
-export function OrganizationDetail() {
-  const { dashboardId, orgId } = useParams({
-    from: "/dashboard/$dashboardId/tabs/organization/$orgId",
+export function FactionDetail() {
+  const { dashboardId, factionId } = useParams({
+    from: "/dashboard/$dashboardId/tabs/faction/$factionId",
   });
   const navigate = useNavigate();
 
-  const organization = useMemo(() => undefined, [orgId]);
+  const faction = useMemo(() => undefined, [factionId]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -41,17 +41,17 @@ export function OrganizationDetail() {
   });
 
   const [editData, setEditData] = useState({
-    name: organization?.name || "",
-    description: organization?.description || "",
-    type: organization?.type || "",
-    alignment: organization?.alignment || "",
-    influence: organization?.influence || "",
-    baseLocation: organization?.baseLocation || "",
-    world: organization?.world || "",
-    continent: organization?.continent || "",
-    objectives: organization?.objectives || [],
-    dominatedLocations: organization?.dominatedLocations || [],
-    titles: organization?.titles || [],
+    name: faction?.name || "",
+    description: faction?.description || "",
+    type: faction?.type || "",
+    alignment: faction?.alignment || "",
+    influence: faction?.influence || "",
+    baseLocation: faction?.baseLocation || "",
+    world: faction?.world || "",
+    continent: faction?.continent || "",
+    objectives: faction?.objectives || [],
+    dominatedLocations: faction?.dominatedLocations || [],
+    titles: faction?.titles || [],
   });
 
   const handleBack = useCallback(() => {
@@ -107,7 +107,7 @@ export function OrganizationDetail() {
   }, []);
 
   const handleEditDataChange = useCallback(
-    (field: string, value: string | string[] | IOrganizationTitle[]) => {
+    (field: string, value: string | string[] | IFactionTitle[]) => {
       setEditData((prev) => ({ ...prev, [field]: value }));
     },
     []
@@ -207,22 +207,22 @@ export function OrganizationDetail() {
 
   const getAlignmentColorCallback = useCallback(
     (alignment: string) =>
-      getAlignmentColor(alignment as IOrganization["alignment"]),
+      getAlignmentColor(alignment as IFaction["alignment"]),
     []
   );
 
   const getInfluenceColorCallback = useCallback(
     (influence: string) =>
-      getInfluenceColor(influence as IOrganization["influence"]),
+      getInfluenceColor(influence as IFaction["influence"]),
     []
   );
 
   const getTitleNameCallback = useCallback(
     (titleId: string) => {
-      if (!organization) return "Membro";
-      return getTitleName(titleId, organization);
+      if (!faction) return "Membro";
+      return getTitleName(titleId, faction);
     },
-    [organization]
+    [faction]
   );
 
   const getLocationIconCallback = useCallback(
@@ -231,8 +231,8 @@ export function OrganizationDetail() {
   );
 
   return (
-    <OrganizationDetailView
-      organization={organization}
+    <FactionDetailView
+      faction={faction}
       editData={editData}
       isEditing={isEditing}
       showDeleteDialog={showDeleteDialog}

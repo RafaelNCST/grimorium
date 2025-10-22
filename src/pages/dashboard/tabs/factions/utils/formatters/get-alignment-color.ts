@@ -1,6 +1,6 @@
-import { OrganizationAlignment } from "@/types/organization-types";
+import { FactionAlignment } from "@/types/faction-types";
 
-export function getAlignmentColor(alignment: OrganizationAlignment): string {
+export function getAlignmentColor(alignment: FactionAlignment): string {
   switch (alignment) {
     case "Bem":
       return "bg-success text-success-foreground";

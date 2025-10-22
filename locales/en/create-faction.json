@@ -1,0 +1,34 @@
+{
+  "title": "New Faction",
+  "description": "Create a new faction, kingdom or group for your world",
+  "form": {
+    "name": "Name",
+    "name_placeholder": "Faction name",
+    "description": "Description",
+    "description_placeholder": "Describe the faction",
+    "type": "Type",
+    "type_military": "Military",
+    "type_commercial": "Commercial",
+    "type_magical": "Magical",
+    "type_religious": "Religious",
+    "type_cult": "Cult",
+    "type_governmental": "Governmental",
+    "type_other": "Other",
+    "alignment": "Alignment",
+    "alignment_good": "Good",
+    "alignment_neutral": "Neutral",
+    "alignment_chaotic": "Chaotic",
+    "influence": "Influence",
+    "influence_none": "None",
+    "influence_low": "Low",
+    "influence_medium": "Medium",
+    "influence_high": "High",
+    "influence_dominant": "Dominant",
+    "world": "World",
+    "base_location": "Base Location"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "create": "Create Faction"
+  }
+}

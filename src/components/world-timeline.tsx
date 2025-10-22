@@ -84,7 +84,7 @@ const mockCharacters = [
   { id: "4", name: "Kael Forjacerta" },
 ];
 
-const mockOrganizations = [
+const mockFactions = [
   { id: "1", name: "Ordem dos Guardiões" },
   { id: "2", name: "Culto das Sombras" },
   { id: "3", name: "Reino de Aethermoor" },
@@ -356,7 +356,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
     "Personagem não encontrado";
 
   const getOrganizationName = (id: string) =>
-    mockOrganizations.find((o) => o.id === id)?.name ||
+    mockFactions.find((o) => o.id === id)?.name ||
     "Organização não encontrada";
 
   if (timeline.length === 0) {
@@ -862,7 +862,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       <SelectValue placeholder="Selecionar organizações" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockOrganizations.map((org) => (
+                      {mockFactions.map((org) => (
                         <SelectItem key={org.id} value={org.id}>
                           {org.name}
                         </SelectItem>
@@ -1251,7 +1251,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   <SelectValue placeholder="Selecionar organizações" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockOrganizations.map((org) => (
+                  {mockFactions.map((org) => (
                     <SelectItem key={org.id} value={org.id}>
                       {org.name}
                     </SelectItem>

@@ -1,6 +1,6 @@
-import { OrganizationInfluence } from "@/types/organization-types";
+import { FactionInfluence } from "@/types/faction-types";
 
-export function getInfluenceColor(influence: OrganizationInfluence): string {
+export function getInfluenceColor(influence: FactionInfluence): string {
   switch (influence) {
     case "Dominante":
       return "bg-destructive text-destructive-foreground";

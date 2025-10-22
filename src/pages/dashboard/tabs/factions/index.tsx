@@ -2,60 +2,60 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { IOrganization } from "@/types/organization-types";
+import { IFaction } from "@/types/faction-types";
 
 import { calculateTotalByAlignment } from "./utils/calculators/calculate-total-by-alignment";
-import { filterOrganizations } from "./utils/filters/filter-organizations";
-import { OrganizationsView } from "./view";
+import { filterFactions } from "./utils/filters/filter-factions";
+import { FactionsView } from "./view";
 
-interface PropsOrganizationsTab {
+interface PropsFactionsTab {
   bookId: string;
 }
 
-export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
+export function FactionsTab({ bookId }: PropsFactionsTab) {
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAlignment, setSelectedAlignment] = useState<string>("all");
   const [selectedWorld, setSelectedWorld] = useState<string>("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [organizations, setOrganizations] = useState<IOrganization[]>([]);
+  const [factions, setFactions] = useState<IFaction[]>([]);
 
   const alignments = useMemo(() => ["all", "Bem", "Neutro", "Caótico"], []);
   const worlds = useMemo(() => ["all", "Aethermoor"], []);
 
-  const filteredOrganizations = useMemo(
+  const filteredFactions = useMemo(
     () =>
-      filterOrganizations({
-        organizations,
+      filterFactions({
+        factions,
         searchTerm,
         selectedAlignment,
         selectedWorld,
       }),
-    [organizations, searchTerm, selectedAlignment, selectedWorld]
+    [factions, searchTerm, selectedAlignment, selectedWorld]
   );
 
   const totalByAlignment = useMemo(
-    () => calculateTotalByAlignment(organizations),
-    [organizations]
+    () => calculateTotalByAlignment(factions),
+    [factions]
   );
 
-  const handleCreateOrganization = useCallback(() => {
+  const handleCreateFaction = useCallback(() => {
     setShowCreateModal(true);
   }, []);
 
-  const handleOrganizationCreated = useCallback(
-    (newOrganization: IOrganization) => {
-      setOrganizations((prev) => [...prev, newOrganization]);
+  const handleFactionCreated = useCallback(
+    (newFaction: IFaction) => {
+      setFactions((prev) => [...prev, newFaction]);
     },
     []
   );
 
-  const handleOrganizationClick = useCallback(
-    (orgId: string) => {
+  const handleFactionClick = useCallback(
+    (factionId: string) => {
       navigate({
-        to: "/dashboard/$dashboardId/tabs/organization/$orgId",
-        params: { dashboardId: bookId, orgId },
+        to: "/dashboard/$dashboardId/tabs/faction/$factionId",
+        params: { dashboardId: bookId, factionId },
       });
     },
     [navigate, bookId]
@@ -78,10 +78,10 @@ export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
   }, []);
 
   return (
-    <OrganizationsView
+    <FactionsView
       bookId={bookId}
-      organizations={organizations}
-      filteredOrganizations={filteredOrganizations}
+      factions={factions}
+      filteredFactions={filteredFactions}
       totalByAlignment={totalByAlignment}
       searchTerm={searchTerm}
       selectedAlignment={selectedAlignment}
@@ -93,9 +93,9 @@ export function OrganizationsTab({ bookId }: PropsOrganizationsTab) {
       onSelectedAlignmentChange={handleSelectedAlignmentChange}
       onSelectedWorldChange={handleSelectedWorldChange}
       onShowCreateModalChange={handleShowCreateModalChange}
-      onCreateOrganization={handleCreateOrganization}
-      onOrganizationCreated={handleOrganizationCreated}
-      onOrganizationClick={handleOrganizationClick}
+      onCreateFaction={handleCreateFaction}
+      onFactionCreated={handleFactionCreated}
+      onFactionClick={handleFactionClick}
     />
   );
 }

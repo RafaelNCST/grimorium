@@ -19,7 +19,7 @@ import {
   deleteCharacterVersion,
   updateCharacterVersion,
 } from "@/lib/db/characters.service";
-import { mockLocations, mockOrganizations } from "@/mocks/global";
+import { mockLocations, mockFactions } from "@/mocks/global";
 import { useCharactersStore } from "@/stores/characters-store";
 import {
   type ICharacterVersion,
@@ -708,7 +708,7 @@ export function CharacterDetail() {
       fileInputRef={fileInputRef}
       mockCharacters={allCharacters}
       mockLocations={mockLocations}
-      mockOrganizations={mockOrganizations}
+      mockFactions={mockFactions}
       roles={CHARACTER_ROLES_CONSTANT}
       alignments={ALIGNMENTS_CONSTANT}
       genders={GENDERS_CONSTANT_MODAL}

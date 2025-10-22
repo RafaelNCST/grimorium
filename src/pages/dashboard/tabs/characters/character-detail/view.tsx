@@ -130,7 +130,7 @@ interface CharacterDetailViewProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   mockCharacters: ICharacter[];
   mockLocations: Array<{ id: string; name: string }>;
-  mockOrganizations: Array<{ id: string; name: string }>;
+  mockFactions: Array<{ id: string; name: string }>;
   roles: ICharacterRole[];
   alignments: IAlignment[];
   genders: IGenderModal[];
@@ -270,7 +270,7 @@ export function CharacterDetailView({
   fileInputRef,
   mockCharacters,
   mockLocations,
-  mockOrganizations,
+  mockFactions,
   roles,
   alignments: _alignments,
   genders,
@@ -1543,8 +1543,8 @@ export function CharacterDetailView({
                             t={t}
                           >
                             {isEditing ? (
-                              mockOrganizations &&
-                              mockOrganizations.length > 0 ? (
+                              mockFactions &&
+                              mockFactions.length > 0 ? (
                                 <Select
                                   value={editData.organization || ""}
                                   onValueChange={(value) =>
@@ -1559,7 +1559,7 @@ export function CharacterDetailView({
                                     />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {mockOrganizations.map((org) => (
+                                    {mockFactions.map((org) => (
                                       <SelectItem key={org.id} value={org.id}>
                                         {org.name}
                                       </SelectItem>

@@ -21,7 +21,7 @@ interface PropsBasicInfoCard {
   editData: IWorldDetailEntity;
   imagePreview: string;
   fileInputRef: React.RefObject<HTMLInputElement>;
-  mockOrganizations: IOrganization[];
+  mockFactions: IOrganization[];
   onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: any) => void;
 }
@@ -32,7 +32,7 @@ export function BasicInfoCard({
   editData,
   imagePreview,
   fileInputRef,
-  mockOrganizations,
+  mockFactions,
   onImageChange,
   onEditDataChange,
 }: PropsBasicInfoCard) {
@@ -182,7 +182,7 @@ export function BasicInfoCard({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Nenhuma</SelectItem>
-                      {mockOrganizations.map((org) => (
+                      {mockFactions.map((org) => (
                         <SelectItem key={org.id} value={org.name}>
                           {org.name}
                         </SelectItem>

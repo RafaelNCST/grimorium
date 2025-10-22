@@ -37,15 +37,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  IOrganization,
-  IOrganizationTitle,
+  IFaction,
+  IFactionTitle,
   ILocation,
   IWorld,
   IContinent,
-} from "@/types/organization-types";
+} from "@/types/faction-types";
 
-interface PropsOrganizationDetailView {
-  organization: IOrganization | undefined;
+interface PropsFactionDetailView {
+  faction: IFaction | undefined;
   editData: {
     name: string;
     description: string;
@@ -57,7 +57,7 @@ interface PropsOrganizationDetailView {
     continent: string;
     objectives: string[];
     dominatedLocations: string[];
-    titles: IOrganizationTitle[];
+    titles: IFactionTitle[];
   };
   isEditing: boolean;
   showDeleteDialog: boolean;
@@ -89,7 +89,7 @@ interface PropsOrganizationDetailView {
   onAddMemberDialogClose: () => void;
   onEditDataChange: (
     field: string,
-    value: string | string[] | IOrganizationTitle[]
+    value: string | string[] | IFactionTitle[]
   ) => void;
   onNewTitleChange: (field: string, value: string | number) => void;
   onNewMemberChange: (field: string, value: string) => void;
@@ -106,8 +106,8 @@ interface PropsOrganizationDetailView {
   getLocationIcon: (type: string) => React.ReactNode;
 }
 
-export function OrganizationDetailView({
-  organization,
+export function FactionDetailView({
+  faction,
   editData,
   isEditing,
   showDeleteDialog,
@@ -143,8 +143,8 @@ export function OrganizationDetailView({
   getInfluenceColor,
   getTitleName,
   getLocationIcon,
-}: PropsOrganizationDetailView) {
-  if (!organization) {
+}: PropsFactionDetailView) {
+  if (!faction) {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center">
@@ -168,14 +168,14 @@ export function OrganizationDetailView({
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{organization.name}</h1>
+            <h1 className="text-3xl font-bold">{faction.name}</h1>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant="outline">{organization.type}</Badge>
-              <Badge className={getAlignmentColor(organization.alignment)}>
-                {organization.alignment}
+              <Badge variant="outline">{faction.type}</Badge>
+              <Badge className={getAlignmentColor(faction.alignment)}>
+                {faction.alignment}
               </Badge>
-              <Badge className={getInfluenceColor(organization.influence)}>
-                {organization.influence}
+              <Badge className={getInfluenceColor(faction.influence)}>
+                {faction.influence}
               </Badge>
             </div>
           </div>
@@ -227,7 +227,7 @@ export function OrganizationDetailView({
                 />
               ) : (
                 <p className="text-muted-foreground leading-relaxed">
-                  {organization.description}
+                  {faction.description}
                 </p>
               )}
             </CardContent>
@@ -287,7 +287,7 @@ export function OrganizationDetailView({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {organization.objectives.map((objective, index) => (
+                  {faction.objectives.map((objective, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <span className="text-primary mt-2">•</span>
                       <span>{objective}</span>
@@ -303,7 +303,7 @@ export function OrganizationDetailView({
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
-                  Membros ({organization.members.length})
+                  Membros ({faction.members.length})
                 </CardTitle>
                 {isEditing && (
                   <div className="flex gap-2">
@@ -332,7 +332,7 @@ export function OrganizationDetailView({
                 <div>
                   <h4 className="font-medium mb-3">Hierarquia de Títulos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {(isEditing ? editData.titles : organization.titles)
+                    {(isEditing ? editData.titles : faction.titles)
                       .sort((a, b) => a.level - b.level)
                       .map((title) => (
                         <div
@@ -427,12 +427,12 @@ export function OrganizationDetailView({
                 <div>
                   <h4 className="font-medium mb-3">Lista de Membros</h4>
                   <div className="space-y-3">
-                    {organization.members
+                    {faction.members
                       .sort((a, b) => {
-                        const titleA = organization.titles.find(
+                        const titleA = faction.titles.find(
                           (t) => t.id === a.titleId
                         );
-                        const titleB = organization.titles.find(
+                        const titleB = faction.titles.find(
                           (t) => t.id === b.titleId
                         );
                         return (titleA?.level || 999) - (titleB?.level || 999);
@@ -462,7 +462,7 @@ export function OrganizationDetailView({
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            {organization.leaders.includes(
+                            {faction.leaders.includes(
                               member.characterName
                             ) && (
                               <Badge variant="secondary" className="text-xs">
@@ -519,7 +519,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.type}
+                    {faction.type}
                   </p>
                 )}
               </div>
@@ -544,7 +544,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.alignment}
+                    {faction.alignment}
                   </p>
                 )}
               </div>
@@ -571,7 +571,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.influence}
+                    {faction.influence}
                   </p>
                 )}
               </div>
@@ -595,7 +595,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.world || "Não especificado"}
+                    {faction.world || "Não especificado"}
                   </p>
                 )}
               </div>
@@ -627,7 +627,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.continent || "Não especificado"}
+                    {faction.continent || "Não especificado"}
                   </p>
                 )}
               </div>
@@ -662,7 +662,7 @@ export function OrganizationDetailView({
                   </Select>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {organization.baseLocation || "Não especificado"}
+                    {faction.baseLocation || "Não especificado"}
                   </p>
                 )}
               </div>
@@ -671,7 +671,7 @@ export function OrganizationDetailView({
 
           {(isEditing
             ? editData.dominatedLocations.length > 0
-            : organization.dominatedLocations.length > 0) && (
+            : faction.dominatedLocations.length > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -782,7 +782,7 @@ export function OrganizationDetailView({
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {organization.dominatedLocations.map((location, index) => {
+                    {faction.dominatedLocations.map((location, index) => {
                       const icon =
                         location.includes("Continente") ||
                         location.includes("Terras") ? (
@@ -817,7 +817,7 @@ export function OrganizationDetailView({
           <DialogHeader>
             <DialogTitle>Excluir Organização</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir &quot;{organization.name}&quot;?
+              Tem certeza que deseja excluir &quot;{faction.name}&quot;?
               Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
@@ -870,7 +870,7 @@ export function OrganizationDetailView({
                   <SelectValue placeholder="Selecione um título" />
                 </SelectTrigger>
                 <SelectContent side="bottom">
-                  {organization.titles.map((title) => (
+                  {faction.titles.map((title) => (
                     <SelectItem key={title.id} value={title.id}>
                       {title.name} (Nível {title.level})
                     </SelectItem>
