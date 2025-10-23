@@ -315,6 +315,17 @@ async function runMigrations(database: Database): Promise<void> {
       created_at INTEGER NOT NULL
     );
 
+    -- VERSÕES DE FACÇÕES
+    CREATE TABLE IF NOT EXISTS faction_versions (
+      id TEXT PRIMARY KEY,
+      faction_id TEXT NOT NULL REFERENCES factions(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      is_main INTEGER DEFAULT 0,
+      faction_data TEXT,
+      created_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -333,6 +344,7 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_race_relationships_race ON race_relationships(race_id);
     CREATE INDEX IF NOT EXISTS idx_race_relationships_related ON race_relationships(related_race_id);
     CREATE INDEX IF NOT EXISTS idx_factions_book_id ON factions(book_id);
+    CREATE INDEX IF NOT EXISTS idx_faction_versions_faction_id ON faction_versions(faction_id);
   `;
 
     await database.execute(schema);

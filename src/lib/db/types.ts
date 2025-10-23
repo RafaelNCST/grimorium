@@ -272,6 +272,16 @@ export interface DBFaction {
   created_at: number;
 }
 
+export interface DBFactionVersion {
+  id: string;
+  faction_id: string;
+  name: string;
+  description?: string;
+  is_main: number; // 0 or 1 (SQLite boolean)
+  faction_data?: string; // JSON string
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

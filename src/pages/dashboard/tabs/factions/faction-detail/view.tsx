@@ -4,28 +4,39 @@ import {
   ArrowLeft,
   Edit2,
   Trash2,
-  Plus,
+  Menu,
+  Eye,
+  EyeOff,
+  Upload,
+  Shield,
+  Info,
+  Building2,
   Users,
-  Crown,
-  MapPin,
-  Target,
-  Building,
-  X,
-  Globe,
-  Mountain,
+  Heart,
+  Clock,
+  Zap,
+  BookOpen,
+  type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { FactionNavigationSidebar } from "@/components/faction-navigation-sidebar";
+import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
+import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
+import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
+import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
+import { StatusPicker } from "@/components/modals/create-faction-modal/components/status-picker";
+import { FactionTypePicker } from "@/components/modals/create-faction-modal/components/faction-type-picker";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -35,924 +46,1315 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  IFaction,
-  IFactionTitle,
-  ILocation,
-  IWorld,
-  IContinent,
+  type IFactionVersion,
+  type IFactionFormData,
+  type IFaction,
+  type FactionStatus,
+  type FactionType,
+  type FactionInfluence,
+  type FactionReputation,
+  type ITimelineEvent,
 } from "@/types/faction-types";
 
-interface PropsFactionDetailView {
-  faction: IFaction | undefined;
-  editData: {
-    name: string;
-    description: string;
-    type: string;
-    alignment: string;
-    influence: string;
-    baseLocation: string;
-    world: string;
-    continent: string;
-    objectives: string[];
-    dominatedLocations: string[];
-    titles: IFactionTitle[];
-  };
+import { AlignmentMatrix } from "./components/alignment-matrix";
+import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
+import { VersionManager } from "./components/version-manager";
+
+interface IFieldVisibility {
+  [key: string]: boolean;
+}
+
+interface FactionDetailViewProps {
+  faction: IFaction;
+  editData: IFaction;
   isEditing: boolean;
-  showDeleteDialog: boolean;
-  showAddTitleDialog: boolean;
-  showAddMemberDialog: boolean;
-  newTitle: {
-    name: string;
-    description: string;
-    level: number;
-  };
-  newMember: {
-    characterId: string;
-    titleId: string;
-    joinDate: string;
-  };
-  availableLocations: ILocation[];
-  availableWorlds: IWorld[];
-  availableContinents: IContinent[];
+  versions: IFactionVersion[];
+  currentVersion: IFactionVersion | null;
+  showDeleteModal: boolean;
+  isNavigationSidebarOpen: boolean;
+  imagePreview: string;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  mockCharacters: Array<{ id: string; name: string }>;
+  mockRaces: Array<{ id: string; name: string }>;
+  mockFactions: Array<{ id: string; name: string; image?: string }>;
+  statuses: typeof FACTION_STATUS_CONSTANT;
+  types: typeof FACTION_TYPES_CONSTANT;
+  influences: typeof FACTION_INFLUENCE_CONSTANT;
+  reputations: typeof FACTION_REPUTATION_CONSTANT;
+  currentStatus: typeof FACTION_STATUS_CONSTANT[0] | undefined;
+  currentType: typeof FACTION_TYPES_CONSTANT[0] | undefined;
+  currentInfluence: typeof FACTION_INFLUENCE_CONSTANT[0] | undefined;
+  currentReputation: typeof FACTION_REPUTATION_CONSTANT[0] | undefined;
+  StatusIcon: LucideIcon;
+  TypeIcon: LucideIcon;
+  fieldVisibility: IFieldVisibility;
+  advancedSectionOpen: boolean;
   onBack: () => void;
+  onNavigationSidebarToggle: () => void;
+  onNavigationSidebarClose: () => void;
+  onFactionSelect: (factionId: string) => void;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
-  onDelete: () => void;
-  onDeleteDialogOpen: () => void;
-  onDeleteDialogClose: () => void;
-  onAddTitleDialogOpen: () => void;
-  onAddTitleDialogClose: () => void;
-  onAddMemberDialogOpen: () => void;
-  onAddMemberDialogClose: () => void;
-  onEditDataChange: (
-    field: string,
-    value: string | string[] | IFactionTitle[]
+  onDeleteModalOpen: () => void;
+  onDeleteModalClose: () => void;
+  onConfirmDelete: () => void;
+  onVersionChange: (versionId: string | null) => void;
+  onVersionCreate: (versionData: {
+    name: string;
+    description: string;
+    factionData: IFactionFormData;
+  }) => void;
+  onVersionDelete: (versionId: string) => void;
+  onVersionUpdate: (
+    versionId: string,
+    name: string,
+    description?: string
   ) => void;
-  onNewTitleChange: (field: string, value: string | number) => void;
-  onNewMemberChange: (field: string, value: string) => void;
-  onAddObjective: (objective: string) => void;
-  onRemoveObjective: (objective: string) => void;
-  onAddDominatedLocation: (locationId: string) => void;
-  onRemoveDominatedLocation: (location: string) => void;
-  onUpdateTitleLevel: (titleId: string, level: number) => void;
-  onAddTitle: () => void;
-  onAddMember: () => void;
-  getAlignmentColor: (alignment: string) => string;
-  getInfluenceColor: (influence: string) => string;
-  getTitleName: (titleId: string) => string;
-  getLocationIcon: (type: string) => React.ReactNode;
+  onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onEditDataChange: (field: string, value: unknown) => void;
+  onFieldVisibilityToggle: (field: string) => void;
+  onAdvancedSectionToggle: () => void;
 }
+
+// Helper component for field wrapper with visibility toggle
+const FieldWrapper = ({
+  fieldName,
+  label,
+  children,
+  isOptional = true,
+  fieldVisibility,
+  isEditing,
+  onFieldVisibilityToggle,
+  t: _t,
+}: {
+  fieldName: string;
+  label: string;
+  children: React.ReactNode;
+  isOptional?: boolean;
+  fieldVisibility: IFieldVisibility;
+  isEditing: boolean;
+  onFieldVisibilityToggle: (field: string) => void;
+  t: (_key: string) => string;
+}) => {
+  const isVisible = fieldVisibility[fieldName] !== false;
+
+  return (
+    <div
+      className={`space-y-2 transition-all duration-200 ${
+        !isVisible && !isEditing
+          ? "hidden"
+          : !isVisible && isEditing
+            ? "opacity-50 bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30"
+            : ""
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">
+          {label} {!isOptional && "*"}
+        </Label>
+        {isEditing && isOptional && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onFieldVisibilityToggle(fieldName)}
+            className="h-6 w-6 p-0"
+          >
+            {isVisible ? (
+              <Eye className="w-3 h-3" />
+            ) : (
+              <EyeOff className="w-3 h-3" />
+            )}
+          </Button>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+};
+
+// Helper component for empty state
+const EmptyFieldState = ({
+  hint,
+  t,
+}: {
+  hint?: string;
+  t: (key: string) => string;
+}) => (
+  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
+    <p>{t("faction-detail:empty_states.no_data")}</p>
+    {hint && (
+      <p className="text-xs mt-1">
+        {hint || t("faction-detail:empty_states.no_data_hint")}
+      </p>
+    )}
+  </div>
+);
 
 export function FactionDetailView({
   faction,
   editData,
   isEditing,
-  showDeleteDialog,
-  showAddTitleDialog,
-  showAddMemberDialog,
-  newTitle,
-  newMember,
-  availableLocations,
-  availableWorlds,
-  availableContinents,
+  versions,
+  currentVersion,
+  showDeleteModal,
+  isNavigationSidebarOpen,
+  imagePreview,
+  fileInputRef,
+  mockCharacters,
+  mockRaces,
+  mockFactions,
+  statuses,
+  types,
+  influences,
+  reputations,
+  currentStatus,
+  currentType,
+  currentInfluence,
+  currentReputation,
+  StatusIcon,
+  TypeIcon,
+  fieldVisibility,
+  advancedSectionOpen,
   onBack,
+  onNavigationSidebarToggle,
+  onNavigationSidebarClose,
+  onFactionSelect,
   onEdit,
   onSave,
   onCancel,
-  onDelete,
-  onDeleteDialogOpen,
-  onDeleteDialogClose,
-  onAddTitleDialogOpen,
-  onAddTitleDialogClose,
-  onAddMemberDialogOpen,
-  onAddMemberDialogClose,
+  onDeleteModalOpen,
+  onDeleteModalClose,
+  onConfirmDelete,
+  onVersionChange,
+  onVersionCreate,
+  onVersionDelete,
+  onVersionUpdate: _onVersionUpdate,
+  onImageFileChange,
   onEditDataChange,
-  onNewTitleChange,
-  onNewMemberChange,
-  onAddObjective,
-  onRemoveObjective,
-  onAddDominatedLocation,
-  onRemoveDominatedLocation,
-  onUpdateTitleLevel,
-  onAddTitle,
-  onAddMember,
-  getAlignmentColor,
-  getInfluenceColor,
-  getTitleName,
-  getLocationIcon,
-}: PropsFactionDetailView) {
-  if (!faction) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">
-            Organização não encontrada
-          </h1>
-          <Button onClick={onBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  onFieldVisibilityToggle,
+  onAdvancedSectionToggle,
+}: FactionDetailViewProps) {
+  const { t } = useTranslation(["faction-detail", "create-faction"] as any);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{faction.name}</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <Badge variant="outline">{faction.type}</Badge>
-              <Badge className={getAlignmentColor(faction.alignment)}>
-                {faction.alignment}
-              </Badge>
-              <Badge className={getInfluenceColor(faction.influence)}>
-                {faction.influence}
-              </Badge>
+    <div className="relative min-h-screen">
+      <FactionNavigationSidebar
+        isOpen={isNavigationSidebarOpen}
+        onClose={onNavigationSidebarClose}
+        factions={mockFactions.map((faction) => ({
+          id: faction.id,
+          name: faction.name,
+          image: faction.image,
+        }))}
+        currentFactionId={faction.id}
+        onFactionSelect={onFactionSelect}
+      />
+
+      <div className="w-full overflow-hidden">
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          {/* Fixed Header */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 mb-6 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {!isEditing && (
+                  <>
+                    <Button variant="ghost" onClick={onBack}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      {t("faction-detail:header.back")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onNavigationSidebarToggle}
+                      className="hover:bg-muted"
+                    >
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                {isEditing ? (
+                  <>
+                    <Button variant="outline" onClick={onCancel}>
+                      {t("faction-detail:header.cancel")}
+                    </Button>
+                    <Button
+                      variant="magical"
+                      className="animate-glow"
+                      onClick={onSave}
+                    >
+                      {t("faction-detail:header.save")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" size="icon" onClick={onEdit}>
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={onDeleteModalOpen}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          {isEditing ? (
-            <>
-              <Button variant="outline" onClick={onCancel}>
-                Cancelar
-              </Button>
-              <Button variant="magical" onClick={onSave}>
-                Salvar
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" onClick={onEdit}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Editar
-              </Button>
-              <Button variant="destructive" onClick={onDeleteDialogOpen}>
-                <Trash2 className="w-4 h-4 mr-2" />
-                Excluir
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Main Content - 3 columns */}
+            <div
+              className={`${isEditing ? "lg:col-span-4" : "lg:col-span-3"} space-y-6`}
+            >
+              {/* Basic Information Card */}
+              <Card className="card-magical">
+                <CardHeader>
+                  <CardTitle>
+                    {t("faction-detail:sections.basic_info")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isEditing ? (
+                    <div className="space-y-6">
+                      <div className="flex gap-6">
+                        {/* Faction Image Upload */}
+                        <div className="space-y-2">
+                          <Label>{t("faction-detail:fields.image")}</Label>
+                          <div
+                            className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors overflow-hidden"
+                            onClick={() => fileInputRef.current?.click()}
+                            role="button"
+                            tabIndex={0}
+                          >
+                            {imagePreview ? (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src={imagePreview}
+                                  alt="Preview"
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                  <Upload className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-1" />
+                                <p className="text-xs text-muted-foreground">
+                                  {t("faction-detail:upload.click")}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={onImageFileChange}
+                            className="hidden"
+                          />
+                        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="w-5 h-5" />
-                Descrição
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <Textarea
-                  value={editData.description}
-                  onChange={(e) =>
-                    onEditDataChange("description", e.target.value)
-                  }
-                  rows={4}
-                  placeholder="Descrição da organização..."
-                />
-              ) : (
-                <p className="text-muted-foreground leading-relaxed">
-                  {faction.description}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                        {/* Name */}
+                        <div className="flex-1 space-y-2">
+                          <Label htmlFor="name" className="text-sm font-medium">
+                            {t("faction-detail:fields.name")} *
+                          </Label>
+                          <Input
+                            id="name"
+                            value={editData.name}
+                            onChange={(e) =>
+                              onEditDataChange("name", e.target.value)
+                            }
+                            placeholder={t(
+                              "create-faction:modal.name_placeholder"
+                            )}
+                            maxLength={200}
+                            required
+                          />
+                          <div className="flex justify-end text-xs text-muted-foreground">
+                            <span>{editData.name?.length || 0}/200</span>
+                          </div>
+                        </div>
+                      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Objetivos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Novo objetivo..."
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          onAddObjective(e.currentTarget.value);
-                          e.currentTarget.value = "";
-                        }
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={(e) => {
-                        const input = e.currentTarget
-                          .previousElementSibling as HTMLInputElement;
-                        onAddObjective(input.value);
-                        input.value = "";
-                      }}
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {editData.objectives.map((objective, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 rounded bg-muted/30"
-                      >
-                        <span>{objective}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => onRemoveObjective(objective)}
-                        >
-                          <X className="w-3 h-3" />
+                      {/* Status Picker */}
+                      <StatusPicker
+                        value={editData.status || ""}
+                        onChange={(value) => onEditDataChange("status", value)}
+                      />
+
+                      {/* Faction Type Picker */}
+                      <FactionTypePicker
+                        value={editData.factionType || ""}
+                        onChange={(value) => onEditDataChange("factionType", value)}
+                      />
+
+                      {/* Summary */}
+                      <div className="space-y-2">
+                        <Label htmlFor="summary" className="text-sm font-medium">
+                          {t("faction-detail:fields.summary")} *
+                        </Label>
+                        <Textarea
+                          id="summary"
+                          value={editData.summary}
+                          onChange={(e) =>
+                            onEditDataChange("summary", e.target.value)
+                          }
+                          placeholder={t(
+                            "create-faction:modal.summary_placeholder"
+                          )}
+                          rows={8}
+                          maxLength={500}
+                          className="resize-none"
+                          required
+                        />
+                        <div className="flex justify-end text-xs text-muted-foreground">
+                          <span>{editData.summary?.length || 0}/500</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-6">
+                        <Avatar className="w-24 h-24 rounded-lg">
+                          <AvatarImage
+                            src={faction.image}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="text-xl rounded-lg">
+                            <Shield className="w-12 h-12" />
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div className="flex-1">
+                          <h2 className="text-3xl font-bold mb-3">
+                            {faction.name}
+                          </h2>
+
+                          {/* Status and Type badges */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {currentStatus && StatusIcon && (
+                              <Badge
+                                className={`flex items-center gap-1.5 ${currentStatus.bgColorClass} ${currentStatus.colorClass} border px-2 py-1 pointer-events-none`}
+                              >
+                                <StatusIcon className="w-3.5 h-3.5" />
+                                <span className="text-xs">
+                                  {t(`create-faction:status.${faction.status}`)}
+                                </span>
+                              </Badge>
+                            )}
+                            {currentType && TypeIcon && (
+                              <Badge
+                                className={`flex items-center gap-1.5 ${currentType.bgColorClass} ${currentType.colorClass} border px-2 py-1 pointer-events-none`}
+                              >
+                                <TypeIcon className="w-3.5 h-3.5" />
+                                <span className="text-xs">
+                                  {t(`create-faction:faction_type.${faction.factionType}`)}
+                                </span>
+                              </Badge>
+                            )}
+                          </div>
+
+                          <p className="text-foreground text-base">
+                            {faction.summary}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Advanced Section - Collapsible */}
+              <Collapsible
+                open={advancedSectionOpen}
+                onOpenChange={onAdvancedSectionToggle}
+              >
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center justify-between cursor-pointer">
+                        <CardTitle>
+                          {t("faction-detail:sections.advanced_info")}
+                        </CardTitle>
+                        <Button variant="ghost" size="sm">
+                          {advancedSectionOpen
+                            ? t("faction-detail:actions.close")
+                            : t("faction-detail:actions.open")}
                         </Button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {faction.objectives.map((objective, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <span className="text-primary mt-2">•</span>
-                      <span>{objective}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    </CollapsibleTrigger>
+                  </CardHeader>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-6">
+                      {/* Internal Structure Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <Building2 className="w-5 h-5" />
+                          {t("faction-detail:sections.internal_structure")}
+                        </h4>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Membros ({faction.members.length})
-                </CardTitle>
-                {isEditing && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onAddMemberDialogOpen}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Adicionar Membro
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onAddTitleDialogOpen}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Adicionar Título
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-3">Hierarquia de Títulos</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {(isEditing ? editData.titles : faction.titles)
-                      .sort((a, b) => a.level - b.level)
-                      .map((title) => (
-                        <div
-                          key={title.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-muted/30 gap-3"
+                        {/* Government Form - Full width */}
+                        <FieldWrapper
+                          fieldName="governmentForm"
+                          label={t("faction-detail:fields.government_form")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
                         >
-                          <div className="flex-1 min-w-0">
-                            {isEditing ? (
-                              <div className="space-y-2">
-                                <Input
-                                  value={title.name}
-                                  placeholder="Nome do título"
-                                  className="text-sm font-medium"
-                                />
-                                <Input
-                                  value={title.description}
-                                  placeholder="Descrição"
-                                  className="text-xs"
-                                />
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.governmentForm || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("governmentForm", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.government_form_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.governmentForm?.length || 0}/500</span>
                               </div>
-                            ) : (
-                              <>
-                                <span className="font-medium">
-                                  {title.name}
+                            </>
+                          ) : faction.governmentForm ? (
+                            <p className="text-sm whitespace-pre-wrap">{faction.governmentForm}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Economy - Full width */}
+                        <FieldWrapper
+                          fieldName="economy"
+                          label={t("faction-detail:fields.economy")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.economy || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("economy", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.economy_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.economy?.length || 0}/500</span>
+                              </div>
+                            </>
+                          ) : faction.economy ? (
+                            <p className="text-sm whitespace-pre-wrap">{faction.economy}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Symbols and Secrets - Full width */}
+                        <FieldWrapper
+                          fieldName="symbolsAndSecrets"
+                          label={t("faction-detail:fields.symbols_and_secrets")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.symbolsAndSecrets || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "symbolsAndSecrets",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.symbols_and_secrets_placeholder"
+                                )}
+                                rows={6}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.symbolsAndSecrets?.length || 0}/500
                                 </span>
-                                <p className="text-xs text-muted-foreground">
-                                  {title.description}
-                                </p>
-                              </>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            {isEditing ? (
-                              <div className="flex items-center gap-1">
-                                <Label className="text-xs text-muted-foreground">
-                                  Nível
-                                </Label>
-                                <div className="flex items-center border rounded-md">
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 rounded-none border-r"
-                                    onClick={() =>
-                                      onUpdateTitleLevel(
-                                        title.id,
-                                        Math.max(1, title.level - 1)
-                                      )
-                                    }
-                                  >
-                                    <span className="text-xs">-</span>
-                                  </Button>
-                                  <span className="px-2 text-xs font-medium min-w-[2rem] text-center">
-                                    {title.level}
-                                  </span>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 rounded-none border-l"
-                                    onClick={() =>
-                                      onUpdateTitleLevel(
-                                        title.id,
-                                        title.level + 1
-                                      )
-                                    }
-                                  >
-                                    <span className="text-xs">+</span>
-                                  </Button>
-                                </div>
                               </div>
-                            ) : (
-                              <Badge variant="outline" className="text-xs">
-                                Nível {title.level}
-                              </Badge>
-                            )}
-                            {isEditing && title.id !== "default" && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 flex-shrink-0"
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                            </>
+                          ) : faction.symbolsAndSecrets ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.symbolsAndSecrets}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
 
-                <div>
-                  <h4 className="font-medium mb-3">Lista de Membros</h4>
-                  <div className="space-y-3">
-                    {faction.members
-                      .sort((a, b) => {
-                        const titleA = faction.titles.find(
-                          (t) => t.id === a.titleId
-                        );
-                        const titleB = faction.titles.find(
-                          (t) => t.id === b.titleId
-                        );
-                        return (titleA?.level || 999) - (titleB?.level || 999);
-                      })
-                      .map((member, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-4 rounded-lg bg-muted/30"
+                      <Separator />
+
+                      {/* Culture Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <Heart className="w-5 h-5" />
+                          {t("faction-detail:sections.culture")}
+                        </h4>
+
+                        {/* Faction Motto */}
+                        <FieldWrapper
+                          fieldName="factionMotto"
+                          label={t("faction-detail:fields.faction_motto")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
                         >
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              <AvatarFallback className="text-sm">
-                                {member.characterName
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <span className="font-medium">
-                                {member.characterName}
-                              </span>
-                              <p className="text-sm text-muted-foreground">
-                                {getTitleName(member.titleId)} • Desde{" "}
-                                {member.joinDate}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {faction.leaders.includes(
-                              member.characterName
-                            ) && (
-                              <Badge variant="secondary" className="text-xs">
-                                <Crown className="w-3 h-3 mr-1" />
-                                Líder
-                              </Badge>
-                            )}
-                            {isEditing && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.factionMotto || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("factionMotto", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.faction_motto_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={300}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.factionMotto?.length || 0}/300</span>
+                              </div>
+                            </>
+                          ) : faction.factionMotto ? (
+                            <p className="text-sm italic whitespace-pre-wrap">
+                              &quot;{faction.factionMotto}&quot;
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informações Básicas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium">Tipo</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.type}
-                    onValueChange={(value) => onEditDataChange("type", value)}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="Militar">Militar</SelectItem>
-                      <SelectItem value="Comercial">Comercial</SelectItem>
-                      <SelectItem value="Mágica">Mágica</SelectItem>
-                      <SelectItem value="Religiosa">Religiosa</SelectItem>
-                      <SelectItem value="Culto">Culto</SelectItem>
-                      <SelectItem value="Governamental">
-                        Governamental
-                      </SelectItem>
-                      <SelectItem value="Outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.type}
-                  </p>
-                )}
-              </div>
+                        {/* Uniform and Aesthetics */}
+                        <FieldWrapper
+                          fieldName="uniformAndAesthetics"
+                          label={t("faction-detail:fields.uniform_and_aesthetics")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.uniformAndAesthetics || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "uniformAndAesthetics",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.uniform_and_aesthetics_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.uniformAndAesthetics?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.uniformAndAesthetics ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.uniformAndAesthetics}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
 
-              <div>
-                <Label className="text-sm font-medium">Alinhamento</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.alignment}
-                    onValueChange={(value) =>
-                      onEditDataChange("alignment", value)
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione o alinhamento" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="Bem">Bem</SelectItem>
-                      <SelectItem value="Neutro">Neutro</SelectItem>
-                      <SelectItem value="Caótico">Caótico</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.alignment}
-                  </p>
-                )}
-              </div>
+                      <Separator />
 
-              <div>
-                <Label className="text-sm font-medium">Influência</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.influence}
-                    onValueChange={(value) =>
-                      onEditDataChange("influence", value)
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione a influência" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="Inexistente">Inexistente</SelectItem>
-                      <SelectItem value="Baixa">Baixa</SelectItem>
-                      <SelectItem value="Média">Média</SelectItem>
-                      <SelectItem value="Alta">Alta</SelectItem>
-                      <SelectItem value="Dominante">Dominante</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.influence}
-                  </p>
-                )}
-              </div>
+                      {/* History Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <Clock className="w-5 h-5" />
+                          {t("faction-detail:sections.history")}
+                        </h4>
 
-              <div>
-                <Label className="text-sm font-medium">Mundo</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.world}
-                    onValueChange={(value) =>
-                      onEditDataChange("world", value === "none" ? "" : value)
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione o mundo" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      <SelectItem value="Aethermoor">Aethermoor</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.world || "Não especificado"}
-                  </p>
-                )}
-              </div>
+                        {/* Foundation Date */}
+                        <FieldWrapper
+                          fieldName="foundationDate"
+                          label={t("faction-detail:fields.foundation_date")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.foundationDate || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("foundationDate", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.foundation_date_placeholder"
+                                )}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.foundationDate?.length || 0}/200
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.foundationDate ? (
+                            <p className="text-sm">{faction.foundationDate}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
 
-              <div>
-                <Label className="text-sm font-medium">Continente</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.continent}
-                    onValueChange={(value) =>
-                      onEditDataChange(
-                        "continent",
-                        value === "none" ? "" : value
-                      )
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione o continente" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      <SelectItem value="Continente Central">
-                        Continente Central
-                      </SelectItem>
-                      <SelectItem value="Terras Sombrias">
-                        Terras Sombrias
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.continent || "Não especificado"}
-                  </p>
-                )}
-              </div>
+                        {/* Foundation History Summary */}
+                        <FieldWrapper
+                          fieldName="foundationHistorySummary"
+                          label={t("faction-detail:fields.foundation_history_summary")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.foundationHistorySummary || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "foundationHistorySummary",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.foundation_history_summary_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.foundationHistorySummary?.length || 0}/
+                                  500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.foundationHistorySummary ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.foundationHistorySummary}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
 
-              <div>
-                <Label className="text-sm font-medium">Base Principal</Label>
-                {isEditing ? (
-                  <Select
-                    value={editData.baseLocation}
-                    onValueChange={(value) =>
-                      onEditDataChange(
-                        "baseLocation",
-                        value === "none" ? "" : value
-                      )
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione a base" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom">
-                      <SelectItem value="none">Nenhuma</SelectItem>
-                      <SelectItem value="Cidadela da Luz">
-                        Cidadela da Luz
-                      </SelectItem>
-                      <SelectItem value="Torre Sombria">
-                        Torre Sombria
-                      </SelectItem>
-                      <SelectItem value="Aldeia de Pedraverde">
-                        Aldeia de Pedraverde
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {faction.baseLocation || "Não especificado"}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                      <Separator />
 
-          {(isEditing
-            ? editData.dominatedLocations.length > 0
-            : faction.dominatedLocations.length > 0) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Territórios Dominados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Select onValueChange={onAddDominatedLocation}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Adicionar território..." />
-                        </SelectTrigger>
-                        <SelectContent side="bottom">
-                          {availableWorlds
-                            .filter(
-                              (world) =>
-                                !editData.dominatedLocations.includes(
-                                  world.name
-                                )
-                            )
-                            .map((world) => (
-                              <SelectItem key={world.id} value={world.id}>
-                                <div className="flex items-center gap-2">
-                                  <Globe className="w-4 h-4" />
-                                  {world.name}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          {availableContinents
-                            .filter(
-                              (continent) =>
-                                !editData.dominatedLocations.includes(
-                                  continent.name
-                                )
-                            )
-                            .map((continent) => (
-                              <SelectItem
-                                key={continent.id}
-                                value={continent.id}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Mountain className="w-4 h-4" />
-                                  {continent.name}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          {availableLocations
-                            .filter(
-                              (location) =>
-                                !editData.dominatedLocations.includes(
-                                  location.name
-                                )
-                            )
-                            .map((location) => (
-                              <SelectItem key={location.id} value={location.id}>
-                                <div className="flex items-center gap-2">
-                                  <MapPin className="w-4 h-4" />
-                                  {location.name} ({location.type})
-                                </div>
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      {editData.dominatedLocations.map((location, index) => {
-                        const allAvailable = [
-                          ...availableWorlds,
-                          ...availableContinents,
-                          ...availableLocations,
-                        ];
-                        const locationData = allAvailable.find(
-                          (l) => l.name === location
-                        );
-                        const icon = getLocationIcon(
-                          locationData?.type || "Location"
-                        );
+                      {/* Relationships Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <Users className="w-5 h-5" />
+                          {t("faction-detail:sections.relationships")}
+                        </h4>
 
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-2 rounded bg-muted/30"
-                          >
-                            <Badge
-                              variant="outline"
-                              className="flex items-center gap-2"
-                            >
-                              {icon}
-                              {location}
-                            </Badge>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() =>
-                                onRemoveDominatedLocation(location)
+                        {/* Influence */}
+                        <FieldWrapper
+                          fieldName="influence"
+                          label={t("faction-detail:fields.influence")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <Select
+                              value={editData.influence || ""}
+                              onValueChange={(value) =>
+                                onEditDataChange("influence", value)
                               }
                             >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {faction.dominatedLocations.map((location, index) => {
-                      const icon =
-                        location.includes("Continente") ||
-                        location.includes("Terras") ? (
-                          <Mountain className="w-3 h-3" />
-                        ) : location.includes("Aethermoor") ? (
-                          <Globe className="w-3 h-3" />
-                        ) : (
-                          <MapPin className="w-3 h-3" />
-                        );
+                              <SelectTrigger>
+                                <SelectValue
+                                  placeholder={t(
+                                    "create-faction:modal.influence_placeholder"
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {influences.map((influence) => (
+                                  <SelectItem
+                                    key={influence.value}
+                                    value={influence.value}
+                                  >
+                                    {t(
+                                      `create-faction:${influence.translationKey}`
+                                    )}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : faction.influence ? (
+                            <Badge className={currentInfluence?.bgColor}>
+                              {t(`create-faction:influence.${faction.influence}`)}
+                            </Badge>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
 
-                      return (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="mr-2 mb-2 flex items-center gap-1 w-fit"
+                        {/* Public Reputation */}
+                        <FieldWrapper
+                          fieldName="publicReputation"
+                          label={t("faction-detail:fields.public_reputation")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
                         >
-                          {icon}
-                          {location}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                          {isEditing ? (
+                            <Select
+                              value={editData.publicReputation || ""}
+                              onValueChange={(value) =>
+                                onEditDataChange("publicReputation", value)
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue
+                                  placeholder={t(
+                                    "create-faction:modal.reputation_placeholder"
+                                  )}
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {reputations.map((reputation) => (
+                                  <SelectItem
+                                    key={reputation.value}
+                                    value={reputation.value}
+                                  >
+                                    {t(
+                                      `create-faction:${reputation.translationKey}`
+                                    )}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : faction.publicReputation ? (
+                            <Badge className={currentReputation?.bgColor}>
+                              {t(
+                                `create-faction:reputation.${faction.publicReputation}`
+                              )}
+                            </Badge>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* External Influence */}
+                        <FieldWrapper
+                          fieldName="externalInfluence"
+                          label={t("faction-detail:fields.external_influence")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.externalInfluence || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "externalInfluence",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.external_influence_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.externalInfluence?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.externalInfluence ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.externalInfluence}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
+
+                      <Separator />
+
+                      {/* Power Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <Zap className="w-5 h-5" />
+                          {t("faction-detail:sections.power")}
+                        </h4>
+
+                        <p className="text-sm text-muted-foreground">
+                          {t("create-faction:modal.power_description")}
+                        </p>
+
+                        {/* Military Power */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">
+                              {t("faction-detail:fields.military_power")}
+                            </Label>
+                            <span
+                              className={`text-sm font-bold transition-colors ${
+                                (isEditing ? editData.militaryPower || 5 : faction.militaryPower || 5) === 10
+                                  ? "text-amber-500"
+                                  : "text-primary"
+                              }`}
+                            >
+                              {isEditing ? editData.militaryPower || 5 : faction.militaryPower || 5}/10
+                            </span>
+                          </div>
+                          {isEditing ? (
+                            <Slider
+                              value={[editData.militaryPower || 5]}
+                              onValueChange={(value) =>
+                                onEditDataChange("militaryPower", value[0])
+                              }
+                              min={1}
+                              max={10}
+                              step={1}
+                              className={`w-full cursor-pointer ${
+                                (editData.militaryPower || 5) === 10
+                                  ? "[&_.bg-primary]:!bg-gradient-to-r [&_.bg-primary]:from-amber-600 [&_.bg-primary]:via-yellow-400 [&_.bg-primary]:to-amber-600 [&_.bg-primary]:bg-[length:200%_100%] [&_.bg-primary]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:bg-gradient-to-r [&_span[data-radix-collection-item]]:from-amber-600 [&_span[data-radix-collection-item]]:via-yellow-400 [&_span[data-radix-collection-item]]:to-amber-600 [&_span[data-radix-collection-item]]:bg-[length:200%_100%] [&_span[data-radix-collection-item]]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:shadow-lg [&_span[data-radix-collection-item]]:shadow-amber-500/50 [&_span[data-radix-collection-item]]:border-amber-500"
+                                  : ""
+                              }`}
+                            />
+                          ) : (
+                            <div className="flex gap-1">
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const powerValue = faction.militaryPower || 5;
+                                const isFilled = i < powerValue;
+                                const isMaxPower = powerValue === 10;
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`h-2 flex-1 rounded-sm ${
+                                      isFilled
+                                        ? isMaxPower
+                                          ? "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-[length:200%_100%] animate-[flowingEnergy_2s_ease-in-out_infinite]"
+                                          : "bg-primary"
+                                        : "bg-muted"
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Political Power */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">
+                              {t("faction-detail:fields.political_power")}
+                            </Label>
+                            <span
+                              className={`text-sm font-bold transition-colors ${
+                                (isEditing ? editData.politicalPower || 5 : faction.politicalPower || 5) === 10
+                                  ? "text-amber-500"
+                                  : "text-primary"
+                              }`}
+                            >
+                              {isEditing ? editData.politicalPower || 5 : faction.politicalPower || 5}/10
+                            </span>
+                          </div>
+                          {isEditing ? (
+                            <Slider
+                              value={[editData.politicalPower || 5]}
+                              onValueChange={(value) =>
+                                onEditDataChange("politicalPower", value[0])
+                              }
+                              min={1}
+                              max={10}
+                              step={1}
+                              className={`w-full cursor-pointer ${
+                                (editData.politicalPower || 5) === 10
+                                  ? "[&_.bg-primary]:!bg-gradient-to-r [&_.bg-primary]:from-amber-600 [&_.bg-primary]:via-yellow-400 [&_.bg-primary]:to-amber-600 [&_.bg-primary]:bg-[length:200%_100%] [&_.bg-primary]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:bg-gradient-to-r [&_span[data-radix-collection-item]]:from-amber-600 [&_span[data-radix-collection-item]]:via-yellow-400 [&_span[data-radix-collection-item]]:to-amber-600 [&_span[data-radix-collection-item]]:bg-[length:200%_100%] [&_span[data-radix-collection-item]]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:shadow-lg [&_span[data-radix-collection-item]]:shadow-amber-500/50 [&_span[data-radix-collection-item]]:border-amber-500"
+                                  : ""
+                              }`}
+                            />
+                          ) : (
+                            <div className="flex gap-1">
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const powerValue = faction.politicalPower || 5;
+                                const isFilled = i < powerValue;
+                                const isMaxPower = powerValue === 10;
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`h-2 flex-1 rounded-sm ${
+                                      isFilled
+                                        ? isMaxPower
+                                          ? "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-[length:200%_100%] animate-[flowingEnergy_2s_ease-in-out_infinite]"
+                                          : "bg-primary"
+                                        : "bg-muted"
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Cultural Power */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">
+                              {t("faction-detail:fields.cultural_power")}
+                            </Label>
+                            <span
+                              className={`text-sm font-bold transition-colors ${
+                                (isEditing ? editData.culturalPower || 5 : faction.culturalPower || 5) === 10
+                                  ? "text-amber-500"
+                                  : "text-primary"
+                              }`}
+                            >
+                              {isEditing ? editData.culturalPower || 5 : faction.culturalPower || 5}/10
+                            </span>
+                          </div>
+                          {isEditing ? (
+                            <Slider
+                              value={[editData.culturalPower || 5]}
+                              onValueChange={(value) =>
+                                onEditDataChange("culturalPower", value[0])
+                              }
+                              min={1}
+                              max={10}
+                              step={1}
+                              className={`w-full cursor-pointer ${
+                                (editData.culturalPower || 5) === 10
+                                  ? "[&_.bg-primary]:!bg-gradient-to-r [&_.bg-primary]:from-amber-600 [&_.bg-primary]:via-yellow-400 [&_.bg-primary]:to-amber-600 [&_.bg-primary]:bg-[length:200%_100%] [&_.bg-primary]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:bg-gradient-to-r [&_span[data-radix-collection-item]]:from-amber-600 [&_span[data-radix-collection-item]]:via-yellow-400 [&_span[data-radix-collection-item]]:to-amber-600 [&_span[data-radix-collection-item]]:bg-[length:200%_100%] [&_span[data-radix-collection-item]]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:shadow-lg [&_span[data-radix-collection-item]]:shadow-amber-500/50 [&_span[data-radix-collection-item]]:border-amber-500"
+                                  : ""
+                              }`}
+                            />
+                          ) : (
+                            <div className="flex gap-1">
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const powerValue = faction.culturalPower || 5;
+                                const isFilled = i < powerValue;
+                                const isMaxPower = powerValue === 10;
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`h-2 flex-1 rounded-sm ${
+                                      isFilled
+                                        ? isMaxPower
+                                          ? "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-[length:200%_100%] animate-[flowingEnergy_2s_ease-in-out_infinite]"
+                                          : "bg-primary"
+                                        : "bg-muted"
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Economic Power */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-sm font-medium">
+                              {t("faction-detail:fields.economic_power")}
+                            </Label>
+                            <span
+                              className={`text-sm font-bold transition-colors ${
+                                (isEditing ? editData.economicPower || 5 : faction.economicPower || 5) === 10
+                                  ? "text-amber-500"
+                                  : "text-primary"
+                              }`}
+                            >
+                              {isEditing ? editData.economicPower || 5 : faction.economicPower || 5}/10
+                            </span>
+                          </div>
+                          {isEditing ? (
+                            <Slider
+                              value={[editData.economicPower || 5]}
+                              onValueChange={(value) =>
+                                onEditDataChange("economicPower", value[0])
+                              }
+                              min={1}
+                              max={10}
+                              step={1}
+                              className={`w-full cursor-pointer ${
+                                (editData.economicPower || 5) === 10
+                                  ? "[&_.bg-primary]:!bg-gradient-to-r [&_.bg-primary]:from-amber-600 [&_.bg-primary]:via-yellow-400 [&_.bg-primary]:to-amber-600 [&_.bg-primary]:bg-[length:200%_100%] [&_.bg-primary]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:bg-gradient-to-r [&_span[data-radix-collection-item]]:from-amber-600 [&_span[data-radix-collection-item]]:via-yellow-400 [&_span[data-radix-collection-item]]:to-amber-600 [&_span[data-radix-collection-item]]:bg-[length:200%_100%] [&_span[data-radix-collection-item]]:animate-[flowingEnergy_2s_ease-in-out_infinite] [&_span[data-radix-collection-item]]:shadow-lg [&_span[data-radix-collection-item]]:shadow-amber-500/50 [&_span[data-radix-collection-item]]:border-amber-500"
+                                  : ""
+                              }`}
+                            />
+                          ) : (
+                            <div className="flex gap-1">
+                              {Array.from({ length: 10 }, (_, i) => {
+                                const powerValue = faction.economicPower || 5;
+                                const isFilled = i < powerValue;
+                                const isMaxPower = powerValue === 10;
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`h-2 flex-1 rounded-sm ${
+                                      isFilled
+                                        ? isMaxPower
+                                          ? "bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-600 bg-[length:200%_100%] animate-[flowingEnergy_2s_ease-in-out_infinite]"
+                                          : "bg-primary"
+                                        : "bg-muted"
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Alignment Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("faction-detail:sections.alignment")}
+                        </h4>
+
+                        <AlignmentMatrix
+                          value={
+                            isEditing ? editData.alignment : faction.alignment
+                          }
+                          onChange={(value) =>
+                            onEditDataChange("alignment", value)
+                          }
+                          isEditable={isEditing}
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* Narrative Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide flex items-center gap-2">
+                          <BookOpen className="w-5 h-5" />
+                          {t("faction-detail:sections.narrative")}
+                        </h4>
+
+                        {/* Organization Objectives */}
+                        <FieldWrapper
+                          fieldName="organizationObjectives"
+                          label={t("faction-detail:fields.organization_objectives")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.organizationObjectives || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "organizationObjectives",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.organization_objectives_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.organizationObjectives?.length || 0}/
+                                  500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.organizationObjectives ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.organizationObjectives}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Narrative Importance */}
+                        <FieldWrapper
+                          fieldName="narrativeImportance"
+                          label={t("faction-detail:fields.narrative_importance")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.narrativeImportance || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "narrativeImportance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.narrative_importance_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.narrativeImportance?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.narrativeImportance ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.narrativeImportance}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+
+                        {/* Inspirations */}
+                        <FieldWrapper
+                          fieldName="inspirations"
+                          label={t("faction-detail:fields.inspirations")}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                          t={t}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.inspirations || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("inspirations", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-faction:modal.inspirations_placeholder"
+                                )}
+                                rows={4}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.inspirations?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : faction.inspirations ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.inspirations}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </FieldWrapper>
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            </div>
+
+            {/* Sidebar - Versions - 1 column */}
+            {!isEditing && (
+              <div className="lg:col-span-1 space-y-6">
+                <Card className="card-magical sticky top-24">
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      {t("faction-detail:sections.versions")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[600px]">
+                    <VersionManager
+                      versions={versions}
+                      currentVersion={currentVersion}
+                      onVersionChange={onVersionChange}
+                      onVersionCreate={onVersionCreate}
+                      onVersionDelete={onVersionDelete}
+                      isEditMode={isEditing}
+                      mainFactionData={faction}
+                      translationNamespace="faction-detail"
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <Dialog open={showDeleteDialog} onOpenChange={onDeleteDialogClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Excluir Organização</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir &quot;{faction.name}&quot;?
-              Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onDeleteDialogClose}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={onDelete}>
-              Sim, Excluir
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showAddMemberDialog} onOpenChange={onAddMemberDialogClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adicionar Novo Membro</DialogTitle>
-            <DialogDescription>
-              Adicione um personagem como membro desta organização.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="memberCharacter">Personagem</Label>
-              <Select
-                value={newMember.characterId}
-                onValueChange={(value) =>
-                  onNewMemberChange("characterId", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um personagem" />
-                </SelectTrigger>
-                <SelectContent side="bottom">
-                  <SelectItem value="c1">Lyara Moonwhisper</SelectItem>
-                  <SelectItem value="c2">Aelric Valorheart</SelectItem>
-                  <SelectItem value="c3">Sir Marcus Lightbringer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="memberTitle">Título</Label>
-              <Select
-                value={newMember.titleId}
-                onValueChange={(value) => onNewMemberChange("titleId", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um título" />
-                </SelectTrigger>
-                <SelectContent side="bottom">
-                  {faction.titles.map((title) => (
-                    <SelectItem key={title.id} value={title.id}>
-                      {title.name} (Nível {title.level})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="joinDate">Data de Ingresso</Label>
-              <Input
-                id="joinDate"
-                placeholder="Ex: Era Atual, 1115"
-                value={newMember.joinDate}
-                onChange={(e) => onNewMemberChange("joinDate", e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onAddMemberDialogClose}>
-              Cancelar
-            </Button>
-            <Button onClick={onAddMember}>Adicionar Membro</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showAddTitleDialog} onOpenChange={onAddTitleDialogClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adicionar Novo Título</DialogTitle>
-            <DialogDescription>
-              Crie um novo título hierárquico para esta organização.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="titleName">Nome do Título</Label>
-              <Input
-                id="titleName"
-                placeholder="Ex: Capitão, Senhor, etc."
-                value={newTitle.name}
-                onChange={(e) => onNewTitleChange("name", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="titleDescription">Descrição</Label>
-              <Input
-                id="titleDescription"
-                placeholder="Descrição do título..."
-                value={newTitle.description}
-                onChange={(e) =>
-                  onNewTitleChange("description", e.target.value)
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="titleLevel">Nível Hierárquico</Label>
-              <Input
-                id="titleLevel"
-                type="number"
-                min="1"
-                value={newTitle.level}
-                onChange={(e) =>
-                  onNewTitleChange("level", parseInt(e.target.value) || 1)
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                1 = mais alto, números maiores = mais baixo
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onAddTitleDialogClose}>
-              Cancelar
-            </Button>
-            <Button onClick={onAddTitle}>Adicionar Título</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteModal}
+        onClose={onDeleteModalClose}
+        factionName={faction.name}
+        currentVersion={currentVersion}
+        versionName={currentVersion?.name}
+        totalVersions={versions.length}
+        onConfirmDelete={onConfirmDelete}
+      />
     </div>
   );
 }

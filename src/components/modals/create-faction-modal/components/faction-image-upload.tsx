@@ -34,7 +34,7 @@ export function FactionImageUpload({
         id="faction-image-upload"
       />
       <label htmlFor="faction-image-upload" className="cursor-pointer group">
-        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
+        <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors">
           {image ? (
             <div className="relative w-full h-full group">
               <img
@@ -50,7 +50,7 @@ export function FactionImageUpload({
             </div>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-              <Shield className="w-16 h-16 text-muted-foreground mb-2" />
+              <Shield className="w-12 h-12 text-muted-foreground mb-2" />
               <p className="text-xs text-muted-foreground text-center px-3">
                 {t("modal.upload_image")}
               </p>

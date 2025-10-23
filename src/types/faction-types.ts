@@ -143,3 +143,12 @@ export interface IFactionFormData {
   narrativeImportance?: string;
   inspirations?: string;
 }
+
+export interface IFactionVersion {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  isMain: boolean;
+  factionData: IFaction;
+}

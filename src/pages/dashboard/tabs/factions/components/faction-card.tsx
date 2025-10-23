@@ -1,3 +1,4 @@
+import { Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
@@ -32,15 +33,11 @@ export function FactionCard({ faction, onClick }: PropsFactionCard) {
     >
       <CardContent className="p-5">
         <div className="flex gap-4">
-          {/* Faction Symbol - Circular */}
-          <Avatar className="w-16 h-16 flex-shrink-0">
+          {/* Faction Symbol - Square with rounded corners */}
+          <Avatar className="w-24 h-24 rounded-lg flex-shrink-0">
             <AvatarImage src={faction.image} className="object-cover" />
-            <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-              {faction.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .slice(0, 2)}
+            <AvatarFallback className="text-xl rounded-lg">
+              <Shield className="w-12 h-12" />
             </AvatarFallback>
           </Avatar>
 

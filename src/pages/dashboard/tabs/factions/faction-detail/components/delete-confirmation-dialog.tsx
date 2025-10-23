@@ -16,13 +16,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type ICharacterVersion } from "@/types/character-types";
+import { type IFactionVersion } from "@/types/faction-types";
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  characterName: string;
-  currentVersion: ICharacterVersion | null;
+  factionName: string;
+  currentVersion: IFactionVersion | null;
   versionName?: string;
   totalVersions?: number;
   onConfirmDelete: () => void;
@@ -31,20 +31,18 @@ interface DeleteConfirmationDialogProps {
 export function DeleteConfirmationDialog({
   isOpen,
   onClose,
-  characterName,
+  factionName,
   currentVersion,
   versionName,
   totalVersions = 1,
   onConfirmDelete,
 }: DeleteConfirmationDialogProps) {
-  const { t } = useTranslation("character-detail");
+  const { t } = useTranslation("faction-detail");
   const [step, setStep] = useState<1 | 2>(1);
   const [nameInput, setNameInput] = useState("");
 
-  // Check if this is a version deletion (non-main) or character deletion (main)
   const isVersionDeletion = currentVersion && !currentVersion.isMain;
 
-  // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setStep(1);
@@ -52,32 +50,19 @@ export function DeleteConfirmationDialog({
     }
   }, [isOpen]);
 
-  // Validate name input (case-sensitive exact match)
-  const isNameValid = nameInput.trim() === characterName;
+  const isNameValid = nameInput.trim() === factionName;
 
   const handleConfirm = () => {
-    console.log("handleConfirm called", {
-      isVersionDeletion,
-      step,
-      isNameValid,
-    });
     if (isVersionDeletion) {
-      // Simple version deletion
       onConfirmDelete();
       onClose();
     } else {
-      // Character deletion - check step
       if (step === 1) {
         if (!isNameValid) {
-          console.log("Name validation failed", { nameInput, characterName });
           return;
         }
-        // Move to step 2
-        console.log("Moving to step 2");
         setStep(2);
       } else {
-        // Final confirmation - delete character
-        console.log("Deleting character");
         onConfirmDelete();
         onClose();
       }
@@ -90,7 +75,6 @@ export function DeleteConfirmationDialog({
     setNameInput("");
   };
 
-  // Version Deletion Flow (Simple)
   if (isVersionDeletion) {
     return (
       <AlertDialog open={isOpen} onOpenChange={handleCancel}>
@@ -120,7 +104,6 @@ export function DeleteConfirmationDialog({
     );
   }
 
-  // Character Deletion Flow (2 Steps)
   return (
     <AlertDialog open={isOpen} onOpenChange={handleCancel}>
       <AlertDialogContent>
@@ -130,24 +113,24 @@ export function DeleteConfirmationDialog({
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
                 <AlertDialogTitle>
-                  {t("delete.character.title")}
+                  {t("delete.faction.title")}
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-4 space-y-4">
-                <p>{t("delete.character.step1.message", { characterName })}</p>
+                <p>{t("delete.faction.step1.message", { factionName })}</p>
                 <div className="space-y-2">
                   <Label
-                    htmlFor="character-name-input"
+                    htmlFor="faction-name-input"
                     className="text-foreground font-medium"
                   >
-                    {t("delete.character.step1.input_label")}
+                    {t("delete.faction.step1.input_label")}
                   </Label>
                   <Input
-                    id="character-name-input"
+                    id="faction-name-input"
                     type="text"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    placeholder={t("delete.character.step1.input_placeholder")}
+                    placeholder={t("delete.faction.step1.input_placeholder")}
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
@@ -161,7 +144,7 @@ export function DeleteConfirmationDialog({
                   <div className="h-4">
                     {nameInput.length > 0 && !isNameValid && (
                       <p className="text-xs text-destructive">
-                        {t("delete.character.step1.name_mismatch")}
+                        {t("delete.faction.step1.name_mismatch")}
                       </p>
                     )}
                   </div>
@@ -170,7 +153,7 @@ export function DeleteConfirmationDialog({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={handleCancel}>
-                {t("delete.character.step1.cancel")}
+                {t("delete.faction.step1.cancel")}
               </AlertDialogCancel>
               <Button
                 onClick={handleConfirm}
@@ -181,7 +164,7 @@ export function DeleteConfirmationDialog({
                   !isNameValid ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {t("delete.character.step1.continue")}
+                {t("delete.faction.step1.continue")}
               </Button>
             </AlertDialogFooter>
           </>
@@ -191,21 +174,21 @@ export function DeleteConfirmationDialog({
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
                 <AlertDialogTitle>
-                  {t("delete.character.step2.title")}
+                  {t("delete.faction.step2.title")}
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-4">
                 {totalVersions > 1 ? (
                   <p className="font-medium text-foreground">
-                    {t("delete.character.step2.message", {
-                      characterName,
+                    {t("delete.faction.step2.message", {
+                      factionName,
                       totalVersions,
                     })}
                   </p>
                 ) : (
                   <p className="font-medium text-foreground">
-                    {t("delete.character.step2.message_single", {
-                      characterName,
+                    {t("delete.faction.step2.message_single", {
+                      factionName,
                     })}
                   </p>
                 )}
@@ -213,13 +196,13 @@ export function DeleteConfirmationDialog({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={handleCancel}>
-                {t("delete.character.step2.cancel")}
+                {t("delete.faction.step2.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleConfirm}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {t("delete.character.step2.confirm")}
+                {t("delete.faction.step2.confirm")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </>

@@ -1,5 +1,16 @@
 {
-  "title": "Detalhes da Faccao",
+  "loading": "Carregando faccao...",
+  "not_found": {
+    "title": "Faccao Nao Encontrada",
+    "description": "A faccao que voce procura nao existe ou foi excluida."
+  },
+  "header": {
+    "back": "Voltar",
+    "edit": "Editar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
+  },
   "buttons": {
     "back": "Voltar",
     "edit": "Editar",
@@ -7,8 +18,132 @@
     "cancel": "Cancelar",
     "delete": "Excluir"
   },
-  "empty_state": {
-    "title": "Faccao em breve",
-    "description": "A visualizacao detalhada de faccoes estara disponivel em breve."
+  "sections": {
+    "basic_info": "Informacoes Basicas",
+    "advanced_info": "Informacoes Avancadas",
+    "internal_structure": "Estrutura Interna",
+    "relationships": "Relacionamentos",
+    "alignment": "Alinhamento",
+    "culture": "Cultura",
+    "history": "Historia",
+    "power": "Poder",
+    "narrative": "Narrativa",
+    "versions": "Versoes"
+  },
+  "fields": {
+    "image": "Imagem",
+    "name": "Nome",
+    "status": "Status",
+    "faction_type": "Tipo de Faccao",
+    "summary": "Resumo",
+    "government_form": "Forma de Governo",
+    "economy": "Economia",
+    "symbols_and_secrets": "Simbolos e Segredos",
+    "faction_motto": "Lema da Faccao",
+    "uniform_and_aesthetics": "Uniforme e Estetica",
+    "foundation_date": "Data de Fundacao",
+    "foundation_history_summary": "Resumo da Historia de Fundacao",
+    "influence": "Influencia",
+    "public_reputation": "Reputacao Publica",
+    "external_influence": "Influencia Externa",
+    "military_power": "Poder Militar",
+    "political_power": "Poder Politico",
+    "cultural_power": "Poder Cultural",
+    "economic_power": "Poder Economico",
+    "organization_objectives": "Objetivos da Organizacao",
+    "narrative_importance": "Importancia Narrativa",
+    "inspirations": "Inspiracoes"
+  },
+  "actions": {
+    "open": "Abrir",
+    "close": "Fechar"
+  },
+  "quick_nav": {
+    "title": "Navegacao Rapida"
+  },
+  "empty_states": {
+    "no_data": "Nenhuma informacao fornecida",
+    "no_data_hint": "Edite para adicionar informacoes"
+  },
+  "upload": {
+    "click": "Clique"
+  },
+  "delete": {
+    "faction": {
+      "title": "Excluir Faccao",
+      "description": "Tem certeza que deseja excluir \"{{name}}\"? Esta acao nao pode ser desfeita.",
+      "warning": "Todos os dados associados a esta faccao serao removidos permanentemente.",
+      "step1": {
+        "message": "Esta acao excluira a faccao '{{factionName}}' e todas as suas versoes permanentemente.",
+        "input_label": "Digite o nome completo da faccao para confirmar:",
+        "input_placeholder": "Digite o nome da faccao",
+        "name_mismatch": "O nome digitado nao corresponde ao nome da faccao",
+        "cancel": "Cancelar",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Confirmacao Final",
+        "message": "Voce esta prestes a excluir permanentemente a faccao '{{factionName}}' e todas as suas {{totalVersions}} versoes. Esta acao nao pode ser desfeita.",
+        "message_single": "Voce esta prestes a excluir permanentemente a faccao '{{factionName}}' e sua versao. Esta acao nao pode ser desfeita.",
+        "cancel": "Nao, cancelar",
+        "confirm": "Sim, excluir permanentemente",
+        "success": "Faccao excluida com sucesso"
+      }
+    },
+    "version": {
+      "title": "Excluir Versao",
+      "message": "Tem certeza que deseja excluir a versao '{{versionName}}'? Esta acao nao pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versao",
+      "success": "Versao excluida com sucesso"
+    },
+    "cancel": "Cancelar",
+    "confirm": "Excluir Faccao"
+  },
+  "versions": {
+    "title": "Versoes",
+    "main": "Principal",
+    "main_badge": "Principal",
+    "selected": "Versao selecionada",
+    "add_version": "Nova Versao",
+    "create_new": "Nova Versao",
+    "edit_version": "Editar Versao",
+    "delete_version": "Excluir Versao",
+    "version_name": "Nome da Versao",
+    "version_description": "Descricao da Versao",
+    "created_at": "Criada em",
+    "empty_state": {
+      "title": "Apenas a versao principal existe",
+      "description": "Crie versoes alternativas para explorar diferentes estados da faccao"
+    },
+    "hint": {
+      "title": "💡 Dica:",
+      "description": "Crie versoes para explorar diferentes estados da faccao: pre-reforma, apos queda, versao alternativa, etc. Cada versao mantem dados independentes!"
+    },
+    "create_dialog": {
+      "title": "Criar Nova Versao",
+      "info_message": "Primeiro, defina o nome e descricao da versao. Depois voce podera personalizar os dados da faccao.",
+      "name_label": "Nome da Versao",
+      "name_placeholder": "Ex: Versao Original, Apos Reforma, Em Declinio...",
+      "name_required": "Nome e obrigatorio",
+      "description_label": "Descricao",
+      "description_placeholder": "Descreva as diferencas desta versao...",
+      "description_required": "Descricao e obrigatoria",
+      "chars_remaining": "caracteres restantes",
+      "cancel": "Cancelar",
+      "continue": "Continuar",
+      "step1_validation_error": "Preencha todos os campos obrigatorios",
+      "success": "Versao criada com sucesso!"
+    },
+    "coming_soon": "O gerenciamento de versoes estara disponivel em breve."
+  },
+  "messages": {
+    "save_success": "Faccao atualizada com sucesso!",
+    "delete_success": "Faccao excluida com sucesso!"
+  },
+  "errors": {
+    "load_failed": "Falha ao carregar faccao",
+    "save_failed": "Falha ao salvar faccao",
+    "delete_failed": "Falha ao excluir faccao"
   }
 }

@@ -1,6 +1,6 @@
-import { IFaction } from "@/types/faction-types";
+import { IFaction, IFactionVersion } from "@/types/faction-types";
 
-import { DBFaction } from "./types";
+import { DBFaction, DBFactionVersion } from "./types";
 
 import { getDB } from "./index";
 
@@ -325,4 +325,65 @@ export async function updateFaction(
 export async function deleteFaction(id: string): Promise<void> {
   const db = await getDB();
   await db.execute("DELETE FROM factions WHERE id = $1", [id]);
+}
+
+// Version Management Functions
+export async function getFactionVersions(
+  factionId: string
+): Promise<IFactionVersion[]> {
+  const db = await getDB();
+  const result = await db.select<DBFactionVersion[]>(
+    "SELECT * FROM faction_versions WHERE faction_id = $1 ORDER BY created_at DESC",
+    [factionId]
+  );
+
+  return result.map((v) => ({
+    id: v.id,
+    name: v.name,
+    description: v.description || "",
+    createdAt: new Date(v.created_at).toISOString(),
+    isMain: v.is_main === 1,
+    factionData: v.faction_data
+      ? JSON.parse(v.faction_data)
+      : ({} as IFaction),
+  }));
+}
+
+export async function createFactionVersion(
+  factionId: string,
+  version: IFactionVersion
+): Promise<void> {
+  const db = await getDB();
+
+  await db.execute(
+    `INSERT INTO faction_versions (
+      id, faction_id, name, description, is_main, faction_data, created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      version.id,
+      factionId,
+      version.name,
+      version.description,
+      version.isMain ? 1 : 0,
+      JSON.stringify(version.factionData),
+      Date.now(),
+    ]
+  );
+}
+
+export async function deleteFactionVersion(versionId: string): Promise<void> {
+  const db = await getDB();
+  await db.execute("DELETE FROM faction_versions WHERE id = $1", [versionId]);
+}
+
+export async function updateFactionVersion(
+  versionId: string,
+  name: string,
+  description?: string
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE faction_versions SET name = $1, description = $2 WHERE id = $3",
+    [name, description, versionId]
+  );
 }

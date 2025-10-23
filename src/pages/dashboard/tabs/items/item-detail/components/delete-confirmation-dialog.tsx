@@ -173,7 +173,9 @@ export function DeleteConfirmationDialog({
               <Button
                 onClick={handleConfirm}
                 disabled={!isNameValid}
-                className={`${
+                variant="magical"
+                size="lg"
+                className={`animate-glow ${
                   !isNameValid ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
