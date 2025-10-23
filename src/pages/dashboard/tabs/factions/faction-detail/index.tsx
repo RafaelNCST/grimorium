@@ -22,8 +22,8 @@ import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-moda
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
 import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
-import { mockCharacters } from "@/mocks/global";
 import { useRacesStore } from "@/stores/races-store";
+import { useCharactersStore } from "@/stores/characters-store";
 
 import { FactionDetailView } from "./view";
 
@@ -43,6 +43,7 @@ export function FactionDetail() {
   );
   const factionsCache = useFactionsStore((state) => state.cache);
   const racesCache = useRacesStore((state) => state.cache);
+  const charactersCache = useCharactersStore((state) => state.cache);
 
   const emptyFaction: IFaction = {
     id: "",
@@ -70,7 +71,10 @@ export function FactionDetail() {
   const [isDeletingVersion, setIsDeletingVersion] = useState(false);
   const [versionToDelete, setVersionToDelete] = useState<string | null>(null);
   const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean>>(
-    {}
+    {
+      diplomacy: true,
+      hierarchy: true,
+    }
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,11 +148,13 @@ export function FactionDetail() {
 
   // Get characters for the current book
   const characters = useMemo(() => {
-    return mockCharacters.map((char) => ({
+    if (!dashboardId) return [];
+    const bookCharacters = charactersCache[dashboardId]?.characters || [];
+    return bookCharacters.map((char) => ({
       id: char.id,
       name: char.name,
     }));
-  }, []);
+  }, [dashboardId, charactersCache]);
 
   // Get factions for the current book
   const factions = useMemo(() => {

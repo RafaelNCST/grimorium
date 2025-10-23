@@ -7,6 +7,8 @@ import {
   Clock,
   Zap,
   BookOpen,
+  Handshake,
+  Network,
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -40,6 +42,8 @@ export function QuickNavigation({ isOpen, onClose }: QuickNavigationProps) {
     { id: "history", label: t("sections.history"), icon: Clock },
     { id: "power", label: t("sections.power"), icon: Zap },
     { id: "narrative", label: t("sections.narrative"), icon: BookOpen },
+    { id: "diplomacy", label: t("sections.diplomacy"), icon: Handshake },
+    { id: "hierarchy", label: t("sections.hierarchy"), icon: Network },
   ];
 
   const scrollToSection = (sectionId: string) => {

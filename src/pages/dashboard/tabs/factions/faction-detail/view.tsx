@@ -63,6 +63,8 @@ import {
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { VersionManager } from "./components/version-manager";
+import { DiplomacySection } from "./components/diplomacy-section";
+import { HierarchySection } from "./components/hierarchy-section";
 
 interface IFieldVisibility {
   [key: string]: boolean;
@@ -1315,6 +1317,51 @@ export function FactionDetailView({
                   </CollapsibleContent>
                 </Card>
               </Collapsible>
+
+              {/* Diplomacy Section */}
+              <div id="diplomacy">
+                <FieldWrapper
+                  fieldName="diplomacy"
+                  label={t("faction-detail:sections.diplomacy")}
+                  isOptional={true}
+                  fieldVisibility={fieldVisibility}
+                  isEditing={isEditing}
+                  onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  t={t}
+                >
+                  <DiplomacySection
+                    currentFactionId={faction.id}
+                    diplomaticRelations={editData.diplomaticRelations || []}
+                    availableFactions={mockFactions}
+                    isEditing={isEditing}
+                    onRelationsChange={(relations) =>
+                      onEditDataChange("diplomaticRelations", relations)
+                    }
+                  />
+                </FieldWrapper>
+              </div>
+
+              {/* Hierarchy Section */}
+              <div id="hierarchy">
+                <FieldWrapper
+                  fieldName="hierarchy"
+                  label={t("faction-detail:sections.hierarchy")}
+                  isOptional={true}
+                  fieldVisibility={fieldVisibility}
+                  isEditing={isEditing}
+                  onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  t={t}
+                >
+                  <HierarchySection
+                    hierarchy={editData.hierarchy || []}
+                    availableCharacters={mockCharacters}
+                    isEditing={isEditing}
+                    onHierarchyChange={(hierarchy) =>
+                      onEditDataChange("hierarchy", hierarchy)
+                    }
+                  />
+                </FieldWrapper>
+              </div>
             </div>
 
             {/* Sidebar - Versions - 1 column */}

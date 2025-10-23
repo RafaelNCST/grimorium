@@ -28,7 +28,9 @@
     "history": "History",
     "power": "Power",
     "narrative": "Narrative",
-    "versions": "Versions"
+    "versions": "Versions",
+    "diplomacy": "Diplomacy",
+    "hierarchy": "Hierarchy"
   },
   "fields": {
     "image": "Image",
@@ -145,5 +147,63 @@
     "load_failed": "Failed to load faction",
     "save_failed": "Failed to save faction",
     "delete_failed": "Failed to delete faction"
+  },
+  "diplomacy": {
+    "title": "Diplomacy",
+    "add_relation": "Add Relationship",
+    "edit_relation": "Edit Relationship",
+    "no_factions": "No other factions registered",
+    "no_factions_message": "Create other factions to establish diplomatic relationships.",
+    "select_faction": "Select a faction",
+    "select_status": "Select a status",
+    "target_faction": "Target Faction",
+    "diplomatic_status": "Diplomatic Status",
+    "save": "Save Relationship",
+    "cancel": "Cancel",
+    "delete": "Remove Relationship",
+    "cannot_self_relate": "Cannot create relationship with the same faction",
+    "duplicate_relation": "A relationship with this faction already exists",
+    "empty_state": {
+      "title": "No diplomatic relationships",
+      "description": "Add relationships to define this faction's relations with others."
+    }
+  },
+  "diplomatic_status": {
+    "alliance": "Alliance",
+    "alliance_desc": "Allied factions with mutual cooperation",
+    "subordinate": "Vassals",
+    "subordinate_desc": "Factions under the influence or control of this faction",
+    "war": "War",
+    "war_desc": "In active conflict and open hostilities",
+    "peace": "Peace",
+    "peace_desc": "Peaceful relationship without formal alliance",
+    "hatred": "Hatred",
+    "hatred_desc": "Deep animosity and rivalry",
+    "neutral": "Neutral",
+    "neutral_desc": "No defined relationship or neutral position"
+  },
+  "hierarchy": {
+    "title": "Hierarchy",
+    "add_title": "New Title",
+    "edit_title": "Edit Title",
+    "delete_title": "Delete Title",
+    "title_name": "Title Name",
+    "title_order": "Order (lower = more important)",
+    "add_characters": "Add Characters",
+    "no_characters": "No characters registered",
+    "no_characters_message": "Create characters to add them to the faction's hierarchy.",
+    "members_title": "Members",
+    "members_default_name": "Members",
+    "save": "Save Title",
+    "cancel": "Cancel",
+    "delete_confirm": "Are you sure you want to delete this title?",
+    "cannot_delete_members": "The 'Members' title cannot be deleted",
+    "select_characters": "Select characters",
+    "add_selected": "Add Selected",
+    "empty_state": {
+      "title": "No titles defined",
+      "description": "Create titles to organize the faction's hierarchical structure."
+    },
+    "no_characters_in_title": "No characters in this title"
   }
 }

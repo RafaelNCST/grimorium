@@ -28,7 +28,9 @@
     "history": "Historia",
     "power": "Poder",
     "narrative": "Narrativa",
-    "versions": "Versoes"
+    "versions": "Versoes",
+    "diplomacy": "Diplomacia",
+    "hierarchy": "Hierarquia"
   },
   "fields": {
     "image": "Imagem",
@@ -145,5 +147,63 @@
     "load_failed": "Falha ao carregar faccao",
     "save_failed": "Falha ao salvar faccao",
     "delete_failed": "Falha ao excluir faccao"
+  },
+  "diplomacy": {
+    "title": "Diplomacia",
+    "add_relation": "Adicionar Relacionamento",
+    "edit_relation": "Editar Relacionamento",
+    "no_factions": "Nenhuma outra faccao cadastrada",
+    "no_factions_message": "Crie outras faccoes para estabelecer relacionamentos diplomaticos.",
+    "select_faction": "Selecione uma faccao",
+    "select_status": "Selecione um status",
+    "target_faction": "Faccao Alvo",
+    "diplomatic_status": "Status Diplomatico",
+    "save": "Salvar Relacionamento",
+    "cancel": "Cancelar",
+    "delete": "Remover Relacionamento",
+    "cannot_self_relate": "Nao e possivel criar relacionamento com a propria faccao",
+    "duplicate_relation": "Ja existe um relacionamento com esta faccao",
+    "empty_state": {
+      "title": "Nenhum relacionamento diplomatico",
+      "description": "Adicione relacionamentos para definir as relacoes desta faccao com outras."
+    }
+  },
+  "diplomatic_status": {
+    "alliance": "Alianca",
+    "alliance_desc": "Faccoes aliadas com cooperacao mutua",
+    "subordinate": "Vassalos",
+    "subordinate_desc": "Faccoes sob influencia ou controle desta faccao",
+    "war": "Guerra",
+    "war_desc": "Em conflito ativo e hostilidades abertas",
+    "peace": "Paz",
+    "peace_desc": "Relacao pacifica sem alianca formal",
+    "hatred": "Odio",
+    "hatred_desc": "Profunda animosidade e rivalidade",
+    "neutral": "Neutro",
+    "neutral_desc": "Sem relacao definida ou posicao neutra"
+  },
+  "hierarchy": {
+    "title": "Hierarquia",
+    "add_title": "Novo Titulo",
+    "edit_title": "Editar Titulo",
+    "delete_title": "Excluir Titulo",
+    "title_name": "Nome do Titulo",
+    "title_order": "Ordem (menor = mais importante)",
+    "add_characters": "Adicionar Personagens",
+    "no_characters": "Nenhum personagem cadastrado",
+    "no_characters_message": "Crie personagens para adicioná-los à hierarquia da faccao.",
+    "members_title": "Membros",
+    "members_default_name": "Membros",
+    "save": "Salvar Titulo",
+    "cancel": "Cancelar",
+    "delete_confirm": "Tem certeza que deseja excluir este titulo?",
+    "cannot_delete_members": "O titulo 'Membros' nao pode ser excluido",
+    "select_characters": "Selecione os personagens",
+    "add_selected": "Adicionar Selecionados",
+    "empty_state": {
+      "title": "Nenhum titulo definido",
+      "description": "Crie titulos para organizar a estrutura hierarquica da faccao."
+    },
+    "no_characters_in_title": "Nenhum personagem neste titulo"
   }
 }

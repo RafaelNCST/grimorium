@@ -42,6 +42,28 @@ export interface ITimelineEvent {
   description: string;
 }
 
+export type DiplomaticStatus =
+  | "alliance"
+  | "subordinate"
+  | "war"
+  | "peace"
+  | "hatred"
+  | "neutral";
+
+export interface IDiplomaticRelation {
+  id: string;
+  targetFactionId: string;
+  status: DiplomaticStatus;
+}
+
+export interface IHierarchyTitle {
+  id: string;
+  name: string;
+  order?: number; // undefined para título "Membros"
+  isMembersTitle?: boolean;
+  characterIds: string[];
+}
+
 export interface IFaction {
   id: string;
   bookId: string;
@@ -91,6 +113,12 @@ export interface IFaction {
   organizationObjectives?: string;
   narrativeImportance?: string;
   inspirations?: string;
+
+  // Special sections - Diplomacy
+  diplomaticRelations?: IDiplomaticRelation[];
+
+  // Special sections - Hierarchy
+  hierarchy?: IHierarchyTitle[];
 
   createdAt: string;
 }
@@ -142,6 +170,12 @@ export interface IFactionFormData {
   organizationObjectives?: string;
   narrativeImportance?: string;
   inspirations?: string;
+
+  // Special sections - Diplomacy
+  diplomaticRelations?: IDiplomaticRelation[];
+
+  // Special sections - Hierarchy
+  hierarchy?: IHierarchyTitle[];
 }
 
 export interface IFactionVersion {
