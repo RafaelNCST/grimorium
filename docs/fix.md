@@ -1,5 +1,1 @@
-# Faça os fixs nos detalhes da raça: C:\Users\rafae\Desktop\dev\grimorium\src\pages\dashboard\tabs\races\race-detail
-- Revise 'C:\Users\rafae\Desktop\dev\grimorium\src\components\modals\create-race-modal' para deixar todos os campos da mesma forma que estão ali, ou seja, se for input no modal, é input aqui na edição dos detalhes, se for picker, é picker e etc.
-- Revise se todos os campos estão funcionando ou selecionaveis, se necessário pode componentizar globalmente para reutilizar no modal e aqui na edição dos detalhes
-- Vários textos estão duplicados
-- Relacionamentos, ao abrir o modal, não há descrição do que é cada tipo de relacionamento (Ex: Predação - Uma raça preda a outra para sobreviver...). Coloque no topo antes de selecionar um tipo de relacionamento o texto introdutorio explicando que a raça atual (Selecionada pros detalhes) tem um relacionamento com a raça selecionada (Selecionada no modal de relacionamentos) de: (Relação escolhida). Além disse retire os dominios do card que fica no relacionamentos, deixa só imagem e nome da raça.
+# Faça os fixs da task em: C:\Users\rafae\Desktop\dev\grimorium\docs\task.md

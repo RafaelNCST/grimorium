@@ -35,7 +35,7 @@ export function RarityPicker({ value, onChange }: PropsRarityPicker) {
               onClick={() => onChange(rarity.value)}
               className={`flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all ${
                 isSelected
-                  ? `${rarity.bgColorClass} border-2 scale-105 shadow-lg`
+                  ? `${rarity.bgColorClass} border-2 shadow-lg`
                   : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
               }`}
             >

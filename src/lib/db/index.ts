@@ -259,6 +259,62 @@ async function runMigrations(database: Database): Promise<void> {
       UNIQUE(race_id, related_race_id, type)
     );
 
+    -- FACÇÕES/ORGANIZAÇÕES
+    CREATE TABLE IF NOT EXISTS factions (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      status TEXT NOT NULL,
+      faction_type TEXT NOT NULL,
+      image TEXT,
+
+      -- Advanced fields - Alignment
+      alignment TEXT,
+
+      -- Advanced fields - Relationships
+      influence TEXT,
+      public_reputation TEXT,
+      external_influence TEXT,
+
+      -- Advanced fields - Internal Structure
+      government_form TEXT,
+      rules_and_laws TEXT,
+      important_symbols TEXT,
+      main_resources TEXT,
+      economy TEXT,
+      treasures_and_secrets TEXT,
+      currencies TEXT,
+
+      -- Advanced fields - Power (1-10 scale)
+      military_power INTEGER,
+      political_power INTEGER,
+      cultural_power INTEGER,
+      economic_power INTEGER,
+
+      -- Advanced fields - Culture
+      faction_motto TEXT,
+      traditions_and_rituals TEXT,
+      beliefs_and_values TEXT,
+      languages_used TEXT,
+      uniform_and_aesthetics TEXT,
+      races TEXT,
+
+      -- Advanced fields - History
+      foundation_date TEXT,
+      foundation_history_summary TEXT,
+      founders TEXT,
+      chronology TEXT,
+
+      -- Advanced fields - Narrative
+      organization_objectives TEXT,
+      narrative_importance TEXT,
+      inspirations TEXT,
+
+      -- Metadata
+      created_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -276,6 +332,7 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_race_versions_race_id ON race_versions(race_id);
     CREATE INDEX IF NOT EXISTS idx_race_relationships_race ON race_relationships(race_id);
     CREATE INDEX IF NOT EXISTS idx_race_relationships_related ON race_relationships(related_race_id);
+    CREATE INDEX IF NOT EXISTS idx_factions_book_id ON factions(book_id);
   `;
 
     await database.execute(schema);

@@ -217,6 +217,61 @@ export interface DBRaceRelationship {
   created_at: number;
 }
 
+export interface DBFaction {
+  id: string;
+  book_id: string;
+  name: string;
+  summary: string;
+  status: string;
+  faction_type: string;
+  image?: string;
+
+  // Advanced fields - Alignment
+  alignment?: string;
+
+  // Advanced fields - Relationships
+  influence?: string;
+  public_reputation?: string;
+  external_influence?: string;
+
+  // Advanced fields - Internal Structure
+  government_form?: string;
+  rules_and_laws?: string; // JSON array string
+  important_symbols?: string; // JSON array string
+  main_resources?: string; // JSON array string
+  economy?: string;
+  treasures_and_secrets?: string; // JSON array string
+  currencies?: string; // JSON array string
+
+  // Advanced fields - Power (1-10 scale)
+  military_power?: number;
+  political_power?: number;
+  cultural_power?: number;
+  economic_power?: number;
+
+  // Advanced fields - Culture
+  faction_motto?: string;
+  traditions_and_rituals?: string; // JSON array string
+  beliefs_and_values?: string; // JSON array string
+  languages_used?: string; // JSON array string
+  uniform_and_aesthetics?: string;
+  races?: string; // JSON array string
+
+  // Advanced fields - History
+  foundation_date?: string;
+  foundation_history_summary?: string;
+  founders?: string; // JSON array string
+  chronology?: string; // JSON array of ITimelineEvent
+
+  // Advanced fields - Narrative
+  organization_objectives?: string;
+  narrative_importance?: string;
+  inspirations?: string;
+
+  // Metadata
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

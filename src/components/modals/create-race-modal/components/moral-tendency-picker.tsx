@@ -106,7 +106,7 @@ export function MoralTendencyPicker({ value, onChange }: PropsMoralTendencyPicke
               data-tendency={tendency.value}
               className={`moral-tendency-picker-item flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 isSelected
-                  ? `${tendency.bgColor} ${tendency.borderColor} scale-105 shadow-lg`
+                  ? `${tendency.bgColor} ${tendency.borderColor} shadow-lg`
                   : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
               }`}
             >

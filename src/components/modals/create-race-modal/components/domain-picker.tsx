@@ -124,7 +124,7 @@ export function DomainPicker({ value, onChange, error }: PropsDomainPicker) {
               data-domain={domain.value}
               className={`domain-picker-item flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 isSelected
-                  ? `${domain.bgColor} ${domain.borderColor} scale-105 shadow-lg`
+                  ? `${domain.bgColor} ${domain.borderColor} shadow-lg`
                   : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
               }`}
             >

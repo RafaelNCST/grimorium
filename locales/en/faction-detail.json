@@ -1,0 +1,14 @@
+{
+  "title": "Faction Details",
+  "buttons": {
+    "back": "Back",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "empty_state": {
+    "title": "Faction coming soon",
+    "description": "The detailed faction view will be available soon."
+  }
+}

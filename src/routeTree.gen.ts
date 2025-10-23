@@ -22,6 +22,7 @@ import { Route as DashboardDashboardIdTabsRaceRaceIdRouteImport } from './routes
 import { Route as DashboardDashboardIdTabsPlotPlotTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/plot-timeline'
 import { Route as DashboardDashboardIdTabsPlotPlotIdRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/$plotId'
 import { Route as DashboardDashboardIdTabsOrganizationOrgIdRouteImport } from './routes/dashboard/$dashboardId/tabs/organization/$orgId'
+import { Route as DashboardDashboardIdTabsFactionFactionIdRouteImport } from './routes/dashboard/$dashboardId/tabs/faction/$factionId'
 import { Route as DashboardDashboardIdTabsItemItemIdIndexRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/index'
 import { Route as DashboardDashboardIdTabsCharacterCharacterIdIndexRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/index'
 import { Route as DashboardDashboardIdTabsItemItemIdTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/timeline'
@@ -103,6 +104,12 @@ const DashboardDashboardIdTabsOrganizationOrgIdRoute =
     path: '/dashboard/$dashboardId/tabs/organization/$orgId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardDashboardIdTabsFactionFactionIdRoute =
+  DashboardDashboardIdTabsFactionFactionIdRouteImport.update({
+    id: '/dashboard/$dashboardId/tabs/faction/$factionId',
+    path: '/dashboard/$dashboardId/tabs/faction/$factionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardDashboardIdTabsItemItemIdIndexRoute =
   DashboardDashboardIdTabsItemItemIdIndexRouteImport.update({
     id: '/dashboard/$dashboardId/tabs/item/$itemId/',
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
+  '/dashboard/$dashboardId/tabs/faction/$factionId': typeof DashboardDashboardIdTabsFactionFactionIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
+  '/dashboard/$dashboardId/tabs/faction/$factionId': typeof DashboardDashboardIdTabsFactionFactionIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -176,6 +185,7 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters/': typeof DashboardDashboardIdChaptersIndexRoute
   '/dashboard/$dashboardId/notes/': typeof DashboardDashboardIdNotesIndexRoute
+  '/dashboard/$dashboardId/tabs/faction/$factionId': typeof DashboardDashboardIdTabsFactionFactionIdRoute
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
     | '/dashboard/$dashboardId/notes'
+    | '/dashboard/$dashboardId/tabs/faction/$factionId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
     | '/dashboard/$dashboardId/notes'
+    | '/dashboard/$dashboardId/tabs/faction/$factionId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters/'
     | '/dashboard/$dashboardId/notes/'
+    | '/dashboard/$dashboardId/tabs/faction/$factionId'
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
@@ -255,6 +268,7 @@ export interface RootRouteChildren {
   DashboardDashboardIdNotesFileNotesIdRoute: typeof DashboardDashboardIdNotesFileNotesIdRoute
   DashboardDashboardIdChaptersIndexRoute: typeof DashboardDashboardIdChaptersIndexRoute
   DashboardDashboardIdNotesIndexRoute: typeof DashboardDashboardIdNotesIndexRoute
+  DashboardDashboardIdTabsFactionFactionIdRoute: typeof DashboardDashboardIdTabsFactionFactionIdRoute
   DashboardDashboardIdTabsOrganizationOrgIdRoute: typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   DashboardDashboardIdTabsPlotPlotIdRoute: typeof DashboardDashboardIdTabsPlotPlotIdRoute
   DashboardDashboardIdTabsPlotPlotTimelineRoute: typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
@@ -359,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIdTabsOrganizationOrgIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/$dashboardId/tabs/faction/$factionId': {
+      id: '/dashboard/$dashboardId/tabs/faction/$factionId'
+      path: '/dashboard/$dashboardId/tabs/faction/$factionId'
+      fullPath: '/dashboard/$dashboardId/tabs/faction/$factionId'
+      preLoaderRoute: typeof DashboardDashboardIdTabsFactionFactionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/$dashboardId/tabs/item/$itemId/': {
       id: '/dashboard/$dashboardId/tabs/item/$itemId/'
       path: '/dashboard/$dashboardId/tabs/item/$itemId'
@@ -403,6 +424,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardDashboardIdChaptersIndexRoute:
     DashboardDashboardIdChaptersIndexRoute,
   DashboardDashboardIdNotesIndexRoute: DashboardDashboardIdNotesIndexRoute,
+  DashboardDashboardIdTabsFactionFactionIdRoute:
+    DashboardDashboardIdTabsFactionFactionIdRoute,
   DashboardDashboardIdTabsOrganizationOrgIdRoute:
     DashboardDashboardIdTabsOrganizationOrgIdRoute,
   DashboardDashboardIdTabsPlotPlotIdRoute:

@@ -1,74 +1,145 @@
-export type FactionType =
-  | "Militar"
-  | "Comercial"
-  | "Mágica"
-  | "Religiosa"
-  | "Culto"
-  | "Governamental"
-  | "Outros";
+export type FactionStatus =
+  | "active"
+  | "weakened"
+  | "dissolved"
+  | "reformed"
+  | "apex";
 
-export type FactionAlignment = "Bem" | "Neutro" | "Caótico";
+export type FactionType =
+  | "commercial"
+  | "military"
+  | "magical"
+  | "religious"
+  | "cult"
+  | "tribal"
+  | "racial"
+  | "governmental"
+  | "revolutionary"
+  | "academic"
+  | "royalty"
+  | "mercenary";
 
 export type FactionInfluence =
-  | "Inexistente"
-  | "Baixa"
-  | "Média"
-  | "Alta"
-  | "Dominante";
+  | "nonexistent"
+  | "low"
+  | "medium"
+  | "high"
+  | "superior"
+  | "dominant";
 
-export interface IFactionTitle {
+export type FactionReputation =
+  | "unknown"
+  | "hated"
+  | "feared"
+  | "tolerated"
+  | "respected"
+  | "adored";
+
+export interface ITimelineEvent {
   id: string;
-  name: string;
+  title: string;
+  date: string;
   description: string;
-  level: number;
-}
-
-export interface IFactionMember {
-  characterId: string;
-  characterName: string;
-  titleId: string;
-  joinDate: string;
 }
 
 export interface IFaction {
   id: string;
+  bookId: string;
+  image?: string;
   name: string;
-  photo?: string;
-  alignment: FactionAlignment;
-  description: string;
-  type: FactionType;
-  influence: FactionInfluence;
-  leaders: string[];
-  objectives: string[];
-  members: IFactionMember[];
-  titles: IFactionTitle[];
-  dominatedLocations: string[];
-  dominatedContinents: string[];
-  dominatedWorlds: string[];
-  baseLocation?: string;
-  world?: string;
-  continent?: string;
+  summary: string;
+  status: FactionStatus;
+  factionType: FactionType;
+
+  // Advanced fields - Alignment
+  alignment?: string;
+
+  // Advanced fields - Relationships
+  influence?: FactionInfluence;
+  publicReputation?: FactionReputation;
+  externalInfluence?: string;
+
+  // Advanced fields - Internal Structure
+  governmentForm?: string;
+  rulesAndLaws?: string[];
+  mainResources?: string[];
+  economy?: string;
+  symbolsAndSecrets?: string;
+  currencies?: string[];
+
+  // Advanced fields - Power (1-10 scale)
+  militaryPower?: number;
+  politicalPower?: number;
+  culturalPower?: number;
+  economicPower?: number;
+
+  // Advanced fields - Culture
+  factionMotto?: string;
+  traditionsAndRituals?: string[];
+  beliefsAndValues?: string[];
+  languagesUsed?: string[];
+  uniformAndAesthetics?: string;
+  races?: string[];
+
+  // Advanced fields - History
+  foundationDate?: string;
+  foundationHistorySummary?: string;
+  founders?: string[];
+  chronology?: ITimelineEvent[];
+
+  // Advanced fields - Narrative
+  organizationObjectives?: string;
+  narrativeImportance?: string;
+  inspirations?: string;
+
+  createdAt: string;
 }
 
-export interface ILocation {
-  id: string;
+export interface IFactionFormData {
+  image?: string;
   name: string;
-  type: string;
-}
+  summary: string;
+  status: FactionStatus;
+  factionType: FactionType;
 
-export interface IWorld {
-  id: string;
-  name: string;
-  type: string;
-}
+  // Advanced fields - Alignment
+  alignment?: string;
 
-export interface IContinent {
-  id: string;
-  name: string;
-  type: string;
-}
+  // Advanced fields - Relationships
+  influence?: FactionInfluence;
+  publicReputation?: FactionReputation;
+  externalInfluence?: string;
 
-export interface ICharacter {
-  id: string;
-  name: string;
+  // Advanced fields - Internal Structure
+  governmentForm?: string;
+  rulesAndLaws?: string[];
+  mainResources?: string[];
+  economy?: string;
+  symbolsAndSecrets?: string;
+  currencies?: string[];
+
+  // Advanced fields - Power (1-10 scale)
+  militaryPower?: number;
+  politicalPower?: number;
+  culturalPower?: number;
+  economicPower?: number;
+
+  // Advanced fields - Culture
+  factionMotto?: string;
+  traditionsAndRituals?: string[];
+  beliefsAndValues?: string[];
+  languagesUsed?: string[];
+  uniformAndAesthetics?: string;
+  races?: string[];
+
+  // Advanced fields - History
+  foundationDate?: string;
+  foundationHistorySummary?: string;
+  founders?: string[];
+  chronology?: ITimelineEvent[];
+
+  // Advanced fields - Narrative
+  organizationObjectives?: string;
+  narrativeImportance?: string;
+  inspirations?: string;
 }

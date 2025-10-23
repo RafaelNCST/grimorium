@@ -1,0 +1,14 @@
+{
+  "title": "Detalhes da Faccao",
+  "buttons": {
+    "back": "Voltar",
+    "edit": "Editar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
+  },
+  "empty_state": {
+    "title": "Faccao em breve",
+    "description": "A visualizacao detalhada de faccoes estara disponivel em breve."
+  }
+}

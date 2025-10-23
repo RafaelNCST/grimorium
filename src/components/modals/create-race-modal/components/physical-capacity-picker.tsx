@@ -104,7 +104,7 @@ export function PhysicalCapacityPicker({ value, onChange }: PropsPhysicalCapacit
               data-capacity={capacity.value}
               className={`physical-capacity-picker-item flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer ${
                 isSelected
-                  ? `${capacity.bgColor} ${capacity.borderColor} scale-105 shadow-lg`
+                  ? `${capacity.bgColor} ${capacity.borderColor} shadow-lg`
                   : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
               }`}
             >

@@ -114,7 +114,7 @@ export function CommunicationPicker({
                 isOtherOption ? 'col-span-2 md:col-span-4' : ''
               } ${
                 isSelected
-                  ? `${comm.bgColor} ${comm.borderColor} scale-105 shadow-lg`
+                  ? `${comm.bgColor} ${comm.borderColor} shadow-lg`
                   : "border-muted hover:border-muted-foreground/50 hover:bg-muted/50"
               }`}
             >

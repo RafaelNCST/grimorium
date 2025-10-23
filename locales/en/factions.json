@@ -2,28 +2,14 @@
   "page": {
     "title": "Factions",
     "description": "Manage the factions, kingdoms, sects and groups of your world",
-    "new_faction": "New Faction"
+    "new_faction": "New Faction",
+    "total_badge": "Total",
+    "search_placeholder": "Search factions..."
   },
   "empty_state": {
     "no_factions": "No factions created",
     "no_factions_description": "Start by creating the first faction of your world to manage kingdoms, sects and groups.",
     "no_factions_found": "No factions found",
     "no_factions_found_description": "Try adjusting your filters to find factions."
-  },
-  "filters": {
-    "search_placeholder": "Search factions...",
-    "alignment": "Alignment",
-    "world": "World",
-    "all": "All"
-  },
-  "badges": {
-    "total": "Total",
-    "good": "Good",
-    "neutral": "Neutral",
-    "chaotic": "Chaotic"
-  },
-  "details": {
-    "leaders": "Leaders",
-    "main_base": "Main Base"
   }
 }
