@@ -1,0 +1,20 @@
+{
+  "page": {
+    "title": "Narrative Arcs",
+    "description": "Manage your story's structure",
+    "new_arc": "New Arc",
+    "search_placeholder": "Search arcs...",
+    "total_badge": "Total",
+    "filter_all_status": "All status",
+    "filter_in_progress": "In progress",
+    "filter_planning": "Planning",
+    "filter_finished": "Finished",
+    "visual_tree": "Visual Tree"
+  },
+  "empty_state": {
+    "no_arcs": "No narrative arcs created",
+    "no_arcs_description": "Start creating your first narrative arc to structure your story",
+    "no_results": "No narrative arcs found",
+    "no_results_description": "Try adjusting your filters to find arcs"
+  }
+}

@@ -8,8 +8,12 @@ import {
   ArrowUp,
   ArrowDown,
   Filter,
+  BookOpen,
+  SearchX,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
+import { EmptyState } from "@/components/empty-state";
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,39 +72,19 @@ export function PlotView({
   getStatusColor,
   getVisibleEvents,
 }: PropsPlotView) {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Arcos Narrativos</h2>
-          <p className="text-muted-foreground">
-            Gerencie a estrutura da sua história
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {arcs.length > 0 && (
-            <>
-              <Select value={statusFilter} onValueChange={onSetStatusFilter}>
-                <SelectTrigger className="w-48">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os status</SelectItem>
-                  <SelectItem value="andamento">Em andamento</SelectItem>
-                  <SelectItem value="planejamento">Em planejamento</SelectItem>
-                  <SelectItem value="finalizado">Finalizados</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                onClick={() => onPlotTimelineClick(bookId)}
-              >
-                <GitBranch className="w-4 h-4 mr-2" />
-                Árvore Visual
-              </Button>
-            </>
-          )}
+  const { t } = useTranslation("plot");
+
+  // Empty state when no arcs exist
+  if (arcs.length === 0) {
+    return (
+      <div className="flex-1 h-full flex flex-col space-y-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">{t("plot:page.title")}</h2>
+            <p className="text-muted-foreground">
+              {t("plot:page.description")}
+            </p>
+          </div>
           <Button
             variant="magical"
             size="lg"
@@ -108,12 +92,78 @@ export function PlotView({
             className="animate-glow"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Criar Arco
+            {t("plot:page.new_arc")}
+          </Button>
+        </div>
+
+        <EmptyState
+          icon={BookOpen}
+          title={t("plot:empty_state.no_arcs")}
+          description={t("plot:empty_state.no_arcs_description")}
+        />
+
+        <CreatePlotArcModal
+          open={showCreateModal}
+          onOpenChange={onSetShowCreateModal}
+          onCreateArc={onCreateArc}
+          existingArcs={arcs}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 h-full flex flex-col space-y-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">{t("plot:page.title")}</h2>
+          <p className="text-muted-foreground">
+            {t("plot:page.description")}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Select value={statusFilter} onValueChange={onSetStatusFilter}>
+            <SelectTrigger className="w-48">
+              <Filter className="w-4 h-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">{t("plot:page.filter_all_status")}</SelectItem>
+              <SelectItem value="andamento">{t("plot:page.filter_in_progress")}</SelectItem>
+              <SelectItem value="planejamento">{t("plot:page.filter_planning")}</SelectItem>
+              <SelectItem value="finalizado">{t("plot:page.filter_finished")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            onClick={() => onPlotTimelineClick(bookId)}
+          >
+            <GitBranch className="w-4 h-4 mr-2" />
+            {t("plot:page.visual_tree")}
+          </Button>
+          <Button
+            variant="magical"
+            size="lg"
+            onClick={() => onSetShowCreateModal(true)}
+            className="animate-glow"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            {t("plot:page.new_arc")}
           </Button>
         </div>
       </div>
 
-      {arcs.length > 0 && (
+      {/* Empty state when no filtered results */}
+      {filteredAndSortedArcs.length === 0 && (
+        <EmptyState
+          icon={statusFilter !== "todos" ? Filter : SearchX}
+          title={t("plot:empty_state.no_results")}
+          description={t("plot:empty_state.no_results_description")}
+        />
+      )}
+
+      {/* Arcs List */}
+      {filteredAndSortedArcs.length > 0 && (
         <div className="grid gap-6">
           {filteredAndSortedArcs.map((arc, index) => (
             <Card

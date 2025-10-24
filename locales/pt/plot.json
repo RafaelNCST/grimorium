@@ -1,0 +1,20 @@
+{
+  "page": {
+    "title": "Arcos Narrativos",
+    "description": "Gerencie a estrutura da sua história",
+    "new_arc": "Novo Arco",
+    "search_placeholder": "Buscar arcos...",
+    "total_badge": "Total",
+    "filter_all_status": "Todos os status",
+    "filter_in_progress": "Em andamento",
+    "filter_planning": "Em planejamento",
+    "filter_finished": "Finalizados",
+    "visual_tree": "Árvore Visual"
+  },
+  "empty_state": {
+    "no_arcs": "Nenhum arco narrativo criado",
+    "no_arcs_description": "Comece criando seu primeiro arco narrativo para estruturar sua história",
+    "no_results": "Nenhum arco narrativo encontrado",
+    "no_results_description": "Tente ajustar seus filtros para encontrar arcos"
+  }
+}
