@@ -60,7 +60,10 @@ export function ItemSelector({
         </Label>
         {selectedItems.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedItems.length} {selectedItems.length === 1 ? t("modal.selected_singular") : t("modal.selected_plural")}
+            {selectedItems.length}{" "}
+            {selectedItems.length === 1
+              ? t("modal.selected_singular")
+              : t("modal.selected_plural")}
           </span>
         )}
       </div>

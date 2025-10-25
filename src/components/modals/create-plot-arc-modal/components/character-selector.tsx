@@ -64,7 +64,10 @@ export function CharacterSelector({
         </Label>
         {selectedCharacters.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedCharacters.length} {selectedCharacters.length === 1 ? t("modal.selected_singular") : t("modal.selected_plural")}
+            {selectedCharacters.length}{" "}
+            {selectedCharacters.length === 1
+              ? t("modal.selected_singular")
+              : t("modal.selected_plural")}
           </span>
         )}
       </div>
@@ -89,7 +92,10 @@ export function CharacterSelector({
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="w-8 h-8">
-                        <AvatarImage src={character.image} alt={character.name} />
+                        <AvatarImage
+                          src={character.image}
+                          alt={character.name}
+                        />
                         <AvatarFallback className="text-xs !text-foreground">
                           {getInitials(character.name)}
                         </AvatarFallback>
@@ -116,7 +122,9 @@ export function CharacterSelector({
                         {getInitials(character.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium">{character.name}</span>
+                    <span className="text-sm font-medium">
+                      {character.name}
+                    </span>
                     <Button
                       type="button"
                       variant="ghost"

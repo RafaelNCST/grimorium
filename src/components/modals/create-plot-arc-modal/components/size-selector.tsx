@@ -34,8 +34,8 @@ export function SizeSelector({ value, onChange, error }: PropsSizeSelector) {
               onClick={() => onChange(size.value)}
               className={`
                 relative p-4 rounded-lg border-2 transition-all text-left
-                ${isSelected ? size.activeColor + " text-white" : size.color}
-                ${!isSelected ? size.hoverColor + " hover:text-white" : ""}
+                ${isSelected ? `${size.activeColor} text-white` : size.color}
+                ${!isSelected ? `${size.hoverColor} hover:text-white` : ""}
               `}
             >
               <div className="flex items-start gap-3">

@@ -10,7 +10,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-
 export type RaceHabit =
   | "nocturnal"
   | "diurnal"

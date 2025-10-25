@@ -60,7 +60,10 @@ export function FactionSelector({
         </Label>
         {selectedFactions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedFactions.length} {selectedFactions.length === 1 ? t("modal.selected_singular") : t("modal.selected_plural")}
+            {selectedFactions.length}{" "}
+            {selectedFactions.length === 1
+              ? t("modal.selected_singular")
+              : t("modal.selected_plural")}
           </span>
         )}
       </div>

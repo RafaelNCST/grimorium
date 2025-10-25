@@ -10,7 +10,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-
 export type RaceDomain =
   | "aquatic"
   | "terrestrial"

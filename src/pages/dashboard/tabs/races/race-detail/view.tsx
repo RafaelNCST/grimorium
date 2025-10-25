@@ -46,10 +46,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlternativeNamesDisplay } from "./components/alternative-names-display";
 import { CommunicationDisplay } from "./components/communication-display";
 import { HabitatDisplay } from "./components/habitat-display";
-import { RaceRelationshipsSection } from "./components/race-relationships-section";
-import { RaceViewsDisplay } from "./components/race-views-display";
-import { RaceVersionManager } from "./components/race-version-manager";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
+import { RaceRelationshipsSection } from "./components/race-relationships-section";
+import { RaceVersionManager } from "./components/race-version-manager";
+import { RaceViewsDisplay } from "./components/race-views-display";
 
 import type {
   IRaceRelationship,

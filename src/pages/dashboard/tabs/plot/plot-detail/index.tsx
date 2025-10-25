@@ -1,15 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
-import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   getPlotArcById,
   updatePlotArc,
   deletePlotArc,
 } from "@/lib/db/plot.service";
+import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { getSizeColor } from "../utils/get-size-color";
 import { getStatusColor } from "../utils/get-status-color";
@@ -23,38 +26,81 @@ export function PlotArcDetail() {
   });
   const navigate = useNavigate();
   const [arc, setArc] = useState<IPlotArc | null>(null);
+  const [characters, setCharacters] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [factions, setFactions] = useState<
+    Array<{ id: string; name: string; emblem?: string }>
+  >([]);
+  const [items, setItems] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<IPlotArc>>({});
   const [showDeleteArcDialog, setShowDeleteArcDialog] = useState(false);
   const [showDeleteEventDialog, setShowDeleteEventDialog] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Set<string>>(
+    new Set()
+  );
 
   useEffect(() => {
     let mounted = true;
 
-    const loadArc = async () => {
+    const loadData = async () => {
       try {
-        const loadedArc = await getPlotArcById(plotId);
-        if (mounted && loadedArc) {
-          setArc(loadedArc);
-          setEditForm(loadedArc);
+        const [loadedArc, loadedCharacters, loadedFactions, loadedItems] =
+          await Promise.all([
+            getPlotArcById(plotId),
+            getCharactersByBookId(dashboardId),
+            getFactionsByBookId(dashboardId),
+            getItemsByBookId(dashboardId),
+          ]);
+
+        if (mounted) {
+          if (loadedArc) {
+            setArc(loadedArc);
+            setEditForm(loadedArc);
+          }
+          setCharacters(
+            loadedCharacters.map((c) => ({
+              id: c.id,
+              name: c.name,
+              image: c.image,
+            }))
+          );
+          setFactions(
+            loadedFactions.map((f) => ({
+              id: f.id,
+              name: f.name,
+              emblem: f.image,
+            }))
+          );
+          setItems(
+            loadedItems.map((i) => ({
+              id: i.id,
+              name: i.name,
+              image: i.image,
+            }))
+          );
         }
       } catch (error) {
-        console.error("Failed to load plot arc:", error);
+        console.error("Failed to load plot arc data:", error);
       }
     };
 
-    loadArc();
+    loadData();
 
     return () => {
       mounted = false;
     };
-  }, [plotId]);
+  }, [plotId, dashboardId]);
 
   const handleBack = useCallback(() => {
     navigate({
       to: "/dashboard/$dashboardId",
-      params: { dashboardId: dashboardId },
+      params: { dashboardId },
     });
   }, [navigate, dashboardId]);
 
@@ -65,12 +111,19 @@ export function PlotArcDetail() {
   const handleCancel = useCallback(() => {
     if (!arc) return;
     setEditForm(arc);
+    setValidationErrors(new Set());
     setIsEditing(false);
   }, [arc]);
 
   const handleEditFormChange = useCallback(
     <K extends keyof IPlotArc>(field: K, value: IPlotArc[K]) => {
       setEditForm((prev) => ({ ...prev, [field]: value }));
+      // Clear validation error for this field
+      setValidationErrors((prev) => {
+        const newErrors = new Set(prev);
+        newErrors.delete(field as string);
+        return newErrors;
+      });
     },
     []
   );
@@ -146,22 +199,30 @@ export function PlotArcDetail() {
 
   const handleSave = useCallback(async () => {
     if (!arc) return;
-    if (
-      editForm.name &&
-      editForm.focus &&
-      editForm.description &&
-      editForm.size &&
-      editForm.status
-    ) {
-      try {
-        await updatePlotArc(arc.id, editForm);
-        setArc({ ...arc, ...editForm } as IPlotArc);
-        setIsEditing(false);
-        toast.success(t("toast.arc_updated"));
-      } catch (error) {
-        console.error("Failed to update plot arc:", error);
-        toast.error(t("toast.update_failed"));
-      }
+
+    // Validate required fields
+    const errors = new Set<string>();
+    if (!editForm.name?.trim()) errors.add("name");
+    if (!editForm.focus?.trim()) errors.add("focus");
+    if (!editForm.description?.trim()) errors.add("description");
+    if (!editForm.size) errors.add("size");
+    if (!editForm.status) errors.add("status");
+
+    if (errors.size > 0) {
+      setValidationErrors(errors);
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+
+    try {
+      await updatePlotArc(arc.id, editForm);
+      setArc({ ...arc, ...editForm } as IPlotArc);
+      setValidationErrors(new Set());
+      setIsEditing(false);
+      toast.success(t("toast.arc_updated"));
+    } catch (error) {
+      console.error("Failed to update plot arc:", error);
+      toast.error(t("toast.update_failed"));
     }
   }, [arc, editForm, t]);
 
@@ -172,7 +233,7 @@ export function PlotArcDetail() {
       toast.success(t("toast.arc_deleted"));
       navigate({
         to: "/dashboard/$dashboardId",
-        params: { dashboardId: dashboardId },
+        params: { dashboardId },
       });
     } catch (error) {
       console.error("Failed to delete plot arc:", error);
@@ -221,6 +282,10 @@ export function PlotArcDetail() {
     }
   }, []);
 
+  const handleAdvancedSectionToggle = useCallback(() => {
+    setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
   if (!arc) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -239,10 +304,15 @@ export function PlotArcDetail() {
   return (
     <PlotArcDetailView
       arc={arc}
+      characters={characters}
+      factions={factions}
+      items={items}
       isEditing={isEditing}
       editForm={editForm}
       showDeleteArcDialog={showDeleteArcDialog}
       showDeleteEventDialog={showDeleteEventDialog}
+      advancedSectionOpen={advancedSectionOpen}
+      validationErrors={validationErrors}
       onBack={handleBack}
       onEdit={handleEdit}
       onSave={handleSave}
@@ -256,6 +326,7 @@ export function PlotArcDetail() {
       onEventDeleteRequest={handleEventDeleteRequest}
       onReorderEvents={handleReorderEvents}
       onAddEvent={handleAddEvent}
+      onAdvancedSectionToggle={handleAdvancedSectionToggle}
       getSizeColor={getSizeColor}
       getStatusColor={getStatusColor}
     />

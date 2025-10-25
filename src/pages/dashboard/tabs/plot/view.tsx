@@ -172,7 +172,9 @@ function SortableArcCard({
             <div className="flex-1 min-w-0">
               <CardTitle className="flex items-center gap-2 flex-wrap">
                 <span className="truncate">{arc.name}</span>
-                <Badge className={`${getStatusColor(arc.status)} pointer-events-none`}>
+                <Badge
+                  className={`${getStatusColor(arc.status)} pointer-events-none`}
+                >
                   {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
                   {t(
                     `statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
@@ -379,10 +381,10 @@ export function PlotView({
         <div className="flex gap-2">
           <Button
             variant="outline"
+            size="lg"
             onClick={() => onPlotTimelineClick(bookId)}
-            className="hover:bg-muted"
           >
-            <GitBranch className="w-4 h-4 mr-2" />
+            <GitBranch className="w-5 h-5 mr-2" />
             {t("page.visual_tree")}
           </Button>
           <Button

@@ -43,10 +43,42 @@
     "events": "Events",
     "advanced_section": "Advanced Information",
     "arc_not_found": "Arc not found",
-    "confirm_delete_arc": "Confirm Arc Deletion",
-    "confirm_delete_arc_description": "Are you sure you want to delete the arc \"{{name}}\"? This action cannot be undone and all arc events will also be deleted.",
     "confirm_delete_event": "Confirm Event Deletion",
-    "confirm_delete_event_description": "Are you sure you want to delete this event? This action cannot be undone."
+    "confirm_delete_event_description": "Are you sure you want to delete this event? This action cannot be undone.",
+    "open": "Open",
+    "close": "Close"
+  },
+  "delete": {
+    "arc": {
+      "title": "Delete Narrative Arc",
+      "step1": {
+        "message": "You are about to delete the arc \"{{arcName}}\". This action is permanent and cannot be undone.",
+        "input_label": "Type the arc name to confirm:",
+        "input_placeholder": "Arc name",
+        "name_mismatch": "The name does not match the arc",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Final Confirmation",
+        "message": "This will permanently delete the arc \"{{arcName}}\" and all its {{eventCount}} events. This action cannot be undone.",
+        "message_no_events": "This will permanently delete the arc \"{{arcName}}\". This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete Permanently"
+      }
+    }
+  },
+  "empty_states": {
+    "no_characters": "No important characters defined",
+    "no_characters_hint": "Add important characters when editing this arc",
+    "no_factions": "No important factions defined",
+    "no_factions_hint": "Add important factions when editing this arc",
+    "no_items": "No important items defined",
+    "no_items_hint": "Add important items when editing this arc",
+    "no_message": "No arc message defined",
+    "no_message_hint": "Add a message when editing this arc",
+    "no_impact": "No world impact defined",
+    "no_impact_hint": "Add world impact when editing this arc"
   },
   "timeline": {
     "title": "Visual Arc Tree",
@@ -79,12 +111,20 @@
     "arc_summary": "Arc Summary",
     "arc_status": "Arc Status",
     "arc_size": "Arc Size",
+    "arc_size_intro": "Choose the estimated arc size based on the number of chapters you envision:",
     "arc_focus": "Arc Focus",
     "add_event": "Add Event",
     "event_name": "Event Name",
     "event_description": "Event Description",
     "important_characters": "Important Characters",
     "important_factions": "Important Factions",
+    "important_items": "Important Items",
+    "select_character": "Select character",
+    "select_faction": "Select faction",
+    "select_item": "Select item",
+    "no_characters_selected": "No characters selected",
+    "no_factions_selected": "No factions selected",
+    "no_items_selected": "No items selected",
     "arc_message": "Arc Message",
     "world_impact": "World Impact"
   }

@@ -2,15 +2,15 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import type { IPlotArc, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   getPlotArcsByBookId,
   createPlotArc,
   reorderPlotArcs,
 } from "@/lib/db/plot.service";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
+import type { IPlotArc, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
 
 import { getSizeColor } from "./utils/get-size-color";
 import { getStatusColor } from "./utils/get-status-color";
@@ -146,31 +146,28 @@ export function PlotTab({ bookId }: PropsPlotTab) {
     });
   }, []);
 
-  const reorderArcs = useCallback(
-    async (reorderedArcs: IPlotArc[]) => {
-      const updatedArcs = reorderedArcs.map((arc, index) => ({
-        ...arc,
-        order: index + 1,
-      }));
+  const reorderArcs = useCallback(async (reorderedArcs: IPlotArc[]) => {
+    const updatedArcs = reorderedArcs.map((arc, index) => ({
+      ...arc,
+      order: index + 1,
+    }));
 
-      // Optimistic update - update state immediately
-      setArcs((prev) => {
-        const arcMap = new Map(updatedArcs.map((arc) => [arc.id, arc]));
-        return prev.map((arc) => arcMap.get(arc.id) || arc);
-      });
+    // Optimistic update - update state immediately
+    setArcs((prev) => {
+      const arcMap = new Map(updatedArcs.map((arc) => [arc.id, arc]));
+      return prev.map((arc) => arcMap.get(arc.id) || arc);
+    });
 
-      // Save to database in background
-      try {
-        await reorderPlotArcs(
-          updatedArcs.map((arc) => ({ id: arc.id, order: arc.order }))
-        );
-      } catch (error) {
-        console.error("Failed to reorder plot arcs:", error);
-        // TODO: Revert state on error if needed
-      }
-    },
-    []
-  );
+    // Save to database in background
+    try {
+      await reorderPlotArcs(
+        updatedArcs.map((arc) => ({ id: arc.id, order: arc.order }))
+      );
+    } catch (error) {
+      console.error("Failed to reorder plot arcs:", error);
+      // TODO: Revert state on error if needed
+    }
+  }, []);
 
   const handleStatusFilterChange = useCallback((status: PlotArcStatus) => {
     setSelectedStatuses((prev) => {

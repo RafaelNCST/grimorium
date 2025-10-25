@@ -15,7 +15,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, GripVertical } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
@@ -64,12 +64,16 @@ function SortableArcCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: arc.id });
+  } = useSortable({
+    id: arc.id,
+    transition: null,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || undefined,
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : "auto",
   };
 
   const statusConfig = ARC_STATUSES_CONSTANT.find(
@@ -85,28 +89,25 @@ function SortableArcCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex-shrink-0 w-80 relative group ${isCurrentArc ? "scale-105" : ""}`}
+      {...attributes}
+      {...listeners}
+      className={`flex-shrink-0 w-80 relative group cursor-grab active:cursor-grabbing ${isCurrentArc ? "scale-105" : ""}`}
     >
       {/* Timeline Position Number */}
-      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-        <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shadow-lg">
-          {index + 1}
-        </div>
-        <button
-          {...attributes}
-          {...listeners}
-          className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing p-2 rounded-lg bg-card border border-border hover:bg-muted"
-        >
-          <GripVertical className="w-4 h-4" />
-        </button>
+      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 z-20">
+        <span className="text-2xl font-bold text-white">{index + 1}</span>
       </div>
 
       {/* Arc Card */}
       <Card
-        className={`card-magical cursor-pointer transition-all duration-300 hover:scale-105 ${
+        className={`card-magical cursor-pointer relative z-10 ${
           isCurrentArc ? "ring-2 ring-primary shadow-xl" : ""
-        }`}
-        onClick={() => onArcClick(arc.id)}
+        } ${!isDragging ? "hover:scale-105" : ""}`}
+        onClick={(e) => {
+          if (!isDragging) {
+            onArcClick(arc.id);
+          }
+        }}
       >
         <CardHeader className="space-y-3">
           <CardTitle className="flex items-start gap-2 text-lg">
@@ -116,12 +117,16 @@ function SortableArcCard({
                 <span className="line-clamp-2">{arc.name}</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge className={getStatusColor(arc.status)}>
+                <Badge
+                  className={`${getStatusColor(arc.status)} pointer-events-none`}
+                >
                   {t(
                     `statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
                   )}
                 </Badge>
-                <Badge className={getSizeColor(arc.size)}>
+                <Badge
+                  className={`${getSizeColor(arc.size)} pointer-events-none`}
+                >
                   {SizeIcon && <SizeIcon className="w-3 h-3 mr-1" />}
                   {t(
                     `sizes.${arc.size === "mini" ? "mini" : arc.size === "pequeno" ? "small" : arc.size === "médio" ? "medium" : "large"}`
@@ -171,11 +176,6 @@ function SortableArcCard({
           </div>
         </CardContent>
       </Card>
-
-      {/* Connection Line Indicator */}
-      {index > 0 && (
-        <div className="absolute top-1/2 -left-6 w-6 h-1 bg-gradient-to-r from-primary/50 to-primary transform -translate-y-1/2" />
-      )}
     </div>
   );
 }
@@ -210,36 +210,32 @@ export function PlotTimelineView({
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex-1 h-full flex flex-col space-y-6 -mr-2">
       {/* Header */}
-      <div className="bg-card border-b border-border sticky top-0 z-20">
-        <div className="px-6 py-4">
-          <div className="flex items-center gap-4 mb-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBack}
-              className="hover:bg-muted"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-2xl font-bold">{t("timeline.title")}</h1>
-          </div>
-          <p className="text-muted-foreground ml-14">
-            {t("timeline.description")}
-          </p>
+      <div className="flex items-center gap-4 px-6 pt-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onBack}
+          className="hover:bg-muted"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold">{t("timeline.title")}</h1>
+          <p className="text-muted-foreground">{t("timeline.description")}</p>
         </div>
       </div>
 
-      <div className="px-6 py-12">
+      <div>
         {/* Timeline Container */}
         <div className="relative mb-12">
-          {/* Timeline Line */}
-          <div className="absolute top-24 left-20 right-20 h-1 bg-gradient-to-r from-primary/30 via-primary to-primary/30 transform z-0" />
+          {/* Timeline Line - Behind cards in the middle */}
+          <div className="absolute top-1/2 left-20 right-0 h-1 bg-gradient-to-r from-primary/30 via-primary to-primary/30 transform -translate-y-1/2 z-0" />
 
           {/* Timeline Content */}
-          <div className="relative z-10 overflow-x-auto">
-            <div className="flex gap-12 px-20 py-16 min-w-max">
+          <div className="relative overflow-x-auto">
+            <div className="flex gap-12 pl-20 py-16 min-w-max">
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}

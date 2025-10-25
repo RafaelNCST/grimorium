@@ -53,8 +53,8 @@ export function StatusSelector({
                 disabled={isDisabled}
                 className={`
                   w-full flex items-center justify-center gap-3 py-3 transition-all rounded-lg
-                  ${isSelected ? activeColor + " scale-105" : "text-muted-foreground"}
-                  ${!isSelected && !isDisabled ? hoverColor + " hover:scale-105" : ""}
+                  ${isSelected ? `${activeColor} scale-105` : "text-muted-foreground"}
+                  ${!isSelected && !isDisabled ? `${hoverColor} hover:scale-105` : ""}
                   ${isDisabled ? "opacity-30 relative" : "cursor-pointer"}
                 `}
               >

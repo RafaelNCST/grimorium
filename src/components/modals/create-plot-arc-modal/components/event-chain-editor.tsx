@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Plus, Edit2, Trash2, X, Check } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -38,33 +38,39 @@ interface PropsSortableEvent {
 }
 
 function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: event.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: event.id,
+    transition: null,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || undefined,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : "auto",
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-start gap-2 p-3 rounded-lg border border-border bg-card hover:bg-muted/30 transition-colors"
+      {...attributes}
+      {...listeners}
+      className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/30 cursor-grab active:cursor-grabbing"
     >
-      <button
-        {...attributes}
-        {...listeners}
-        className="mt-1 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
-      >
-        <GripVertical className="w-4 h-4" />
-      </button>
-
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-sm text-muted-foreground">
-            #{event.order}
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-semibold text-foreground">
+            {event.order}
           </span>
+          <div className="h-5 w-px bg-border" />
           <h4 className="font-medium truncate">{event.name}</h4>
         </div>
         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -77,7 +83,13 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => onEdit(event)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(event);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-500"
         >
           <Edit2 className="w-4 h-4" />
         </Button>
@@ -85,7 +97,13 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => onDelete(event.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(event.id);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="cursor-pointer hover:bg-red-500/10 hover:text-red-500"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
@@ -94,10 +112,7 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
   );
 }
 
-export function EventChainEditor({
-  events,
-  onChange,
-}: PropsEventChainEditor) {
+export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
   const { t } = useTranslation("create-plot-arc");
   const [isAddingEvent, setIsAddingEvent] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);

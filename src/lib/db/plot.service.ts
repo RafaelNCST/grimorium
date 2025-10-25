@@ -1,6 +1,7 @@
 import { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { DBPlotArc, DBPlotEvent } from "./types";
+
 import { getDB } from "./index";
 
 // Convert IPlotArc to DBPlotArc
@@ -42,7 +43,7 @@ function dbPlotArcToArc(dbArc: DBPlotArc, events: IPlotEvent[]): IPlotArc {
     progress: dbArc.progress,
     status: dbArc.status as IPlotArc["status"],
     order: dbArc.order_index,
-    events: events,
+    events,
     importantCharacters: dbArc.important_characters
       ? JSON.parse(dbArc.important_characters)
       : [],

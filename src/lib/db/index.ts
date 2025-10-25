@@ -393,7 +393,10 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] Added important_items column to plot_arcs table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] important_items column already exists or error:", error);
+      console.log(
+        "[db] important_items column already exists or error:",
+        error
+      );
     }
 
     // Verify books table exists and log count
