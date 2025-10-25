@@ -285,7 +285,7 @@ export function Header({
                 return (
                   <Badge
                     variant="outline"
-                    className={`${STATUS_CONFIG[book.status].color} px-3 py-1.5 text-sm font-medium flex items-center gap-2`}
+                    className={`${STATUS_CONFIG[book.status].color} px-3 py-1.5 text-sm font-medium flex items-center gap-2 pointer-events-none`}
                   >
                     <StatusIcon className="w-4 h-4" />
                     {book.status}
@@ -296,7 +296,7 @@ export function Header({
 
             {/* Visual Style Badge (destacado) */}
             <div className="mb-2">
-              <Badge variant="default" className="text-sm px-3 py-1">
+              <Badge variant="default" className="text-sm px-3 py-1 pointer-events-none">
                 {book.visualStyle}
               </Badge>
             </div>
@@ -304,7 +304,7 @@ export function Header({
             {/* Genre Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {book.genre.map((g, index) => (
-                <Badge key={index} variant="secondary">
+                <Badge key={index} variant="secondary" className="pointer-events-none">
                   {g}
                 </Badge>
               ))}
