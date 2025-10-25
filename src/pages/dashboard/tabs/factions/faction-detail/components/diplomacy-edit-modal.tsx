@@ -197,34 +197,32 @@ export function DiplomacyEditModal({
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  availableFactions.map((faction) => {
-                    return (
-                      <Card
-                        key={faction.id}
-                        className="cursor-pointer transition-all duration-200 border hover:border-primary hover:bg-primary/10"
-                        onClick={() => handleFactionSelect(faction.id)}
-                      >
-                        <CardContent className="p-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="w-12 h-12 rounded-lg">
-                              <AvatarImage
-                                src={faction.image}
-                                className="object-cover"
-                              />
-                              <AvatarFallback className="rounded-lg">
-                                <Shield className="w-6 h-6" />
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <p className="font-semibold text-base">
-                                {faction.name}
-                              </p>
-                            </div>
+                  availableFactions.map((faction) => (
+                    <Card
+                      key={faction.id}
+                      className="cursor-pointer transition-all duration-200 border hover:border-primary hover:bg-primary/10"
+                      onClick={() => handleFactionSelect(faction.id)}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-12 h-12 rounded-lg">
+                            <AvatarImage
+                              src={faction.image}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="rounded-lg">
+                              <Shield className="w-6 h-6" />
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <p className="font-semibold text-base">
+                              {faction.name}
+                            </p>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
                 )}
               </div>
             </ScrollArea>
@@ -245,7 +243,7 @@ export function DiplomacyEditModal({
             <DialogTitle className="flex items-center gap-2 text-xl">
               {editingRelation
                 ? t("diplomacy.edit_relation")
-                : t("diplomacy.add_relation") + " - Passo 2"}
+                : `${t("diplomacy.add_relation")} - Passo 2`}
             </DialogTitle>
           </DialogHeader>
 
@@ -310,7 +308,9 @@ export function DiplomacyEditModal({
                             <div
                               className={`p-2 rounded-lg ${status.bgColorClass} ${status.borderColorClass} border`}
                             >
-                              <Icon className={`w-5 h-5 ${status.colorClass}`} />
+                              <Icon
+                                className={`w-5 h-5 ${status.colorClass}`}
+                              />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">

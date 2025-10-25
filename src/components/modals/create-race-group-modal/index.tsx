@@ -48,7 +48,8 @@ export function CreateRaceGroupModal({
 
   // Check if there are changes when editing
   const hasChanges = isEditMode
-    ? currentName !== initialValues?.name || currentDescription !== initialValues?.description
+    ? currentName !== initialValues?.name ||
+      currentDescription !== initialValues?.description
     : true;
 
   // Reset form when modal closes or load initial values when opening
@@ -79,7 +80,9 @@ export function CreateRaceGroupModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? "Editar Grupo de Raças" : "Criar Grupo de Raças"}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Editar Grupo de Raças" : "Criar Grupo de Raças"}
+          </DialogTitle>
           <DialogDescription>
             {isEditMode
               ? "Edite as informações do grupo de raças."
@@ -133,9 +136,7 @@ export function CreateRaceGroupModal({
                   </FormControl>
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <FormMessage />
-                    <span>
-                      {field.value?.length || 0}/500
-                    </span>
+                    <span>{field.value?.length || 0}/500</span>
                   </div>
                 </FormItem>
               )}

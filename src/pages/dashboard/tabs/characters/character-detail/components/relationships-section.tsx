@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { toast } from "@/hooks/use-toast";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +34,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
+import { toast } from "@/hooks/use-toast";
 
 interface ICharacterRelationship {
   id: string;
@@ -369,7 +368,9 @@ export function RelationshipsSection({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteRelationship(relationship.id)}
+                        onClick={() =>
+                          handleDeleteRelationship(relationship.id)
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -668,14 +669,17 @@ export function RelationshipsSection({
               <X className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.cancel")}
             </Button>
-            <Button variant="default" onClick={handleEditRelationship} disabled={!selectedType}>
+            <Button
+              variant="default"
+              onClick={handleEditRelationship}
+              disabled={!selectedType}
+            >
               <Edit2 className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

@@ -1,7 +1,15 @@
 import { useState } from "react";
-import { useDroppable } from "@dnd-kit/core";
 
-import { ChevronDown, ChevronUp, Pencil, Plus, Trash2, UserPlus, X } from "lucide-react";
+import { useDroppable } from "@dnd-kit/core";
+import {
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Plus,
+  Trash2,
+  UserPlus,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +19,7 @@ import {
 } from "@/components/ui/collapsible";
 
 import { IRace, IRaceGroup } from "../types/race-types";
+
 import { RaceCard } from "./race-card";
 
 interface RaceGroupAccordionProps {
@@ -42,7 +51,7 @@ export function RaceGroupAccordion({
   const { setNodeRef, isOver } = useDroppable({
     id: `group-${group.id}`,
     data: {
-      type: 'group',
+      type: "group",
       groupId: group.id,
     },
   });
@@ -51,7 +60,7 @@ export function RaceGroupAccordion({
   const displayDescription = isDescriptionExpanded
     ? group.description
     : shouldTruncateDescription
-      ? group.description.slice(0, 200) + "..."
+      ? `${group.description.slice(0, 200)}...`
       : group.description;
 
   const handleRaceClick = (raceId: string) => {
@@ -69,10 +78,7 @@ export function RaceGroupAccordion({
         isOver ? "bg-primary/10 border-2 border-primary border-dashed" : ""
       }`}
     >
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-      >
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <div className="p-4 space-y-3">
           {/* Header */}
           <div className="flex items-start justify-between gap-4">
@@ -91,7 +97,8 @@ export function RaceGroupAccordion({
                   <div className="flex items-center gap-2 cursor-pointer">
                     <h3 className="text-xl font-bold">{group.name}</h3>
                     <span className="text-sm text-muted-foreground">
-                      ({group.races.length} {group.races.length === 1 ? "raça" : "raças"})
+                      ({group.races.length}{" "}
+                      {group.races.length === 1 ? "raça" : "raças"})
                     </span>
                   </div>
                 </CollapsibleTrigger>
@@ -167,7 +174,9 @@ export function RaceGroupAccordion({
           <CollapsibleContent>
             <div className="ml-8 mt-4 rounded-lg transition-all min-h-[120px]">
               {group.races.length === 0 ? (
-                <div className={`text-center flex items-center justify-center h-full min-h-[120px] text-muted-foreground ${isOver ? "scale-105" : ""} transition-transform`}>
+                <div
+                  className={`text-center flex items-center justify-center h-full min-h-[120px] text-muted-foreground ${isOver ? "scale-105" : ""} transition-transform`}
+                >
                   <div>
                     <p className="font-medium">
                       {isOver

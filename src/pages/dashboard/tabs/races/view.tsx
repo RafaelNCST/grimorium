@@ -1,19 +1,20 @@
 import { useState } from "react";
+
 import { Filter, Plus, Search, SearchX, Users } from "lucide-react";
 
-import { CreateRaceModal } from "@/components/modals/create-race-modal";
+import { EmptyState } from "@/components/empty-state";
 import { CreateRaceGroupModal } from "@/components/modals/create-race-group-modal";
+import type { RaceGroupFormSchema } from "@/components/modals/create-race-group-modal/use-race-group-validation";
+import { CreateRaceModal } from "@/components/modals/create-race-modal";
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
-import type { RaceGroupFormSchema } from "@/components/modals/create-race-group-modal/use-race-group-validation";
-import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { AddRacesToGroupModal } from "./components/add-races-to-group-modal";
 import { RaceCard } from "./components/race-card";
 import { RaceGroupAccordion } from "./components/race-group-accordion";
-import { AddRacesToGroupModal } from "./components/add-races-to-group-modal";
 import { IRace, IRaceGroup, IRaceTypeStats } from "./types/species-types";
 
 interface PropsSpeciesView {
@@ -43,7 +44,11 @@ interface PropsSpeciesView {
   onDeleteGroup: (groupId: string) => void;
   onToggleRemoveMode: (groupId: string) => void;
   onRemoveRaceFromGroup: (raceId: string) => void;
-  onDropRaceInGroup: (raceId: string, sourceGroupId: string | null, targetGroupId: string | null) => void;
+  onDropRaceInGroup: (
+    raceId: string,
+    sourceGroupId: string | null,
+    targetGroupId: string | null
+  ) => void;
   onRaceClick: (raceId: string) => void;
   onSearchTermChange: (term: string) => void;
   onDomainFilterChange: (domain: string) => void;
@@ -90,7 +95,9 @@ export function SpeciesView({
   const hasUngroupedRaces = ungroupedRaces.length > 0;
   const hasContent = hasGroups || hasUngroupedRaces;
 
-  const selectedGroup = raceGroups.find((g) => g.id === selectedGroupForAddRaces);
+  const selectedGroup = raceGroups.find(
+    (g) => g.id === selectedGroupForAddRaces
+  );
 
   const [isUngroupedDragOver, setIsUngroupedDragOver] = useState(false);
 
@@ -150,54 +157,66 @@ export function SpeciesView({
                 {totalRaces} Total
               </Badge>
               {DOMAIN_CONSTANT.map((domain) => {
-                const count = raceTypeStats[domain.value as keyof IRaceTypeStats];
+                const count =
+                  raceTypeStats[domain.value as keyof IRaceTypeStats];
                 const isSelected = selectedDomains.includes(domain.value);
                 const DomainIcon = domain.icon;
 
-                const colorMap: Record<string, { active: string; base: string; hover: string }> = {
-                  'Aquático': {
-                    active: '!bg-blue-500 !text-white !border-blue-500',
-                    base: 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400',
-                    hover: 'hover:!bg-blue-500 hover:!text-white hover:!border-blue-500'
+                const colorMap: Record<
+                  string,
+                  { active: string; base: string; hover: string }
+                > = {
+                  Aquático: {
+                    active: "!bg-blue-500 !text-black !border-blue-500",
+                    base: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+                    hover:
+                      "hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
                   },
-                  'Terrestre': {
-                    active: '!bg-green-600 !text-white !border-green-600',
-                    base: 'bg-green-600/10 border-green-600/30 text-green-700 dark:text-green-400',
-                    hover: 'hover:!bg-green-600 hover:!text-white hover:!border-green-600'
+                  Terrestre: {
+                    active: "!bg-green-600 !text-black !border-green-600",
+                    base: "bg-green-600/10 border-green-600/30 text-green-700 dark:text-green-400",
+                    hover:
+                      "hover:!bg-green-600 hover:!text-black hover:!border-green-600",
                   },
-                  'Aéreo': {
-                    active: '!bg-cyan-500 !text-white !border-cyan-500',
-                    base: 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400',
-                    hover: 'hover:!bg-cyan-500 hover:!text-white hover:!border-cyan-500'
+                  Aéreo: {
+                    active: "!bg-cyan-500 !text-black !border-cyan-500",
+                    base: "bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400",
+                    hover:
+                      "hover:!bg-cyan-500 hover:!text-black hover:!border-cyan-500",
                   },
-                  'Subterrâneo': {
-                    active: '!bg-orange-600 !text-white !border-orange-600',
-                    base: 'bg-orange-600/10 border-orange-600/30 text-orange-700 dark:text-orange-400',
-                    hover: 'hover:!bg-orange-600 hover:!text-white hover:!border-orange-600'
+                  Subterrâneo: {
+                    active: "!bg-orange-600 !text-black !border-orange-600",
+                    base: "bg-orange-600/10 border-orange-600/30 text-orange-700 dark:text-orange-400",
+                    hover:
+                      "hover:!bg-orange-600 hover:!text-black hover:!border-orange-600",
                   },
-                  'Elevado': {
-                    active: '!bg-sky-500 !text-white !border-sky-500',
-                    base: 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400',
-                    hover: 'hover:!bg-sky-500 hover:!text-white hover:!border-sky-500'
+                  Elevado: {
+                    active: "!bg-sky-500 !text-black !border-sky-500",
+                    base: "bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400",
+                    hover:
+                      "hover:!bg-sky-500 hover:!text-black hover:!border-sky-500",
                   },
-                  'Dimensional': {
-                    active: '!bg-purple-500 !text-white !border-purple-500',
-                    base: 'bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400',
-                    hover: 'hover:!bg-purple-500 hover:!text-white hover:!border-purple-500'
+                  Dimensional: {
+                    active: "!bg-purple-500 !text-black !border-purple-500",
+                    base: "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
+                    hover:
+                      "hover:!bg-purple-500 hover:!text-black hover:!border-purple-500",
                   },
-                  'Espiritual': {
-                    active: '!bg-violet-500 !text-white !border-violet-500',
-                    base: 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400',
-                    hover: 'hover:!bg-violet-500 hover:!text-white hover:!border-violet-500'
+                  Espiritual: {
+                    active: "!bg-violet-500 !text-black !border-violet-500",
+                    base: "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400",
+                    hover:
+                      "hover:!bg-violet-500 hover:!text-black hover:!border-violet-500",
                   },
-                  'Cósmico': {
-                    active: '!bg-indigo-500 !text-white !border-indigo-500',
-                    base: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400',
-                    hover: 'hover:!bg-indigo-500 hover:!text-white hover:!border-indigo-500'
-                  }
+                  Cósmico: {
+                    active: "!bg-indigo-500 !text-black !border-indigo-500",
+                    base: "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
+                    hover:
+                      "hover:!bg-indigo-500 hover:!text-black hover:!border-indigo-500",
+                  },
                 };
 
-                const colors = colorMap[domain.value] || colorMap['Aquático'];
+                const colors = colorMap[domain.value] || colorMap["Aquático"];
 
                 return (
                   <Badge

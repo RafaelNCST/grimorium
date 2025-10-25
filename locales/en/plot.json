@@ -3,18 +3,89 @@
     "title": "Narrative Arcs",
     "description": "Manage your story's structure",
     "new_arc": "New Arc",
-    "search_placeholder": "Search arcs...",
+    "search_placeholder": "Search arcs by name...",
     "total_badge": "Total",
-    "filter_all_status": "All status",
-    "filter_in_progress": "In progress",
-    "filter_planning": "Planning",
-    "filter_finished": "Finished",
+    "total_arcs": "Total Arcs",
+    "filter_all_status": "All statuses",
+    "filter_all_sizes": "All sizes",
     "visual_tree": "Visual Tree"
   },
   "empty_state": {
     "no_arcs": "No narrative arcs created",
     "no_arcs_description": "Start creating your first narrative arc to structure your story",
     "no_results": "No narrative arcs found",
-    "no_results_description": "Try adjusting your filters to find arcs"
+    "no_results_description": "Try adjusting your search filters to find arcs"
+  },
+  "statuses": {
+    "finished": "Finished",
+    "current": "Current",
+    "planning": "Planning"
+  },
+  "sizes": {
+    "mini": "Mini",
+    "mini_description": "Short and sweet - less than 10 chapters to keep it snappy!",
+    "small": "Small",
+    "small_description": "A compact arc - up to 50 chapters of pure adventure!",
+    "medium": "Medium",
+    "medium_description": "Well balanced - up to 200 chapters of great story!",
+    "large": "Large",
+    "large_description": "Truly epic - over 200 chapters, brew some coffee!"
+  },
+  "detail": {
+    "title": "Arc Details",
+    "progress": "Progress",
+    "next_events": "Next Events",
+    "status": "Status",
+    "size": "Size",
+    "focus": "Focus",
+    "event_chain": "Event Chain",
+    "no_events": "No events created yet",
+    "events": "Events",
+    "advanced_section": "Advanced Information",
+    "arc_not_found": "Arc not found",
+    "confirm_delete_arc": "Confirm Arc Deletion",
+    "confirm_delete_arc_description": "Are you sure you want to delete the arc \"{{name}}\"? This action cannot be undone and all arc events will also be deleted.",
+    "confirm_delete_event": "Confirm Event Deletion",
+    "confirm_delete_event_description": "Are you sure you want to delete this event? This action cannot be undone."
+  },
+  "timeline": {
+    "title": "Visual Arc Tree",
+    "description": "Chronological visualization of your story's narrative arcs",
+    "legend": "Legend",
+    "legend_finished": "Arcs that have been completed",
+    "legend_current": "Arc being developed (highlighted)",
+    "legend_planning": "Arcs being planned",
+    "help_text": "Drag the cards to reorganize the arc order in the timeline. Click on a card to view arc details."
+  },
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "delete_arc": "Delete Arc",
+    "add": "Add",
+    "back": "Back"
+  },
+  "toast": {
+    "arc_updated": "Arc updated successfully!",
+    "arc_deleted": "Arc deleted successfully!",
+    "event_deleted": "Event deleted successfully!",
+    "update_failed": "Failed to update. Please try again.",
+    "delete_failed": "Failed to delete. Please try again."
+  },
+  "modal": {
+    "arc_name": "Arc Name",
+    "arc_summary": "Arc Summary",
+    "arc_status": "Arc Status",
+    "arc_size": "Arc Size",
+    "arc_focus": "Arc Focus",
+    "add_event": "Add Event",
+    "event_name": "Event Name",
+    "event_description": "Event Description",
+    "important_characters": "Important Characters",
+    "important_factions": "Important Factions",
+    "arc_message": "Arc Message",
+    "world_impact": "World Impact"
   }
 }

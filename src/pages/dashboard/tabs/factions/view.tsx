@@ -107,19 +107,29 @@ const FactionsViewComponent = function FactionsView({
     // Map colors to badge colors using direct color names
     if (isActive) {
       // Active state - full color background
-      if (statusValue === "active") return "!bg-green-500 !text-black !border-green-500";
-      if (statusValue === "weakened") return "!bg-yellow-500 !text-black !border-yellow-500";
-      if (statusValue === "dissolved") return "!bg-red-500 !text-black !border-red-500";
-      if (statusValue === "reformed") return "!bg-blue-500 !text-black !border-blue-500";
-      if (statusValue === "apex") return "!bg-purple-500 !text-black !border-purple-500";
+      if (statusValue === "active")
+        return "!bg-green-500 !text-black !border-green-500";
+      if (statusValue === "weakened")
+        return "!bg-yellow-500 !text-black !border-yellow-500";
+      if (statusValue === "dissolved")
+        return "!bg-red-500 !text-black !border-red-500";
+      if (statusValue === "reformed")
+        return "!bg-blue-500 !text-black !border-blue-500";
+      if (statusValue === "apex")
+        return "!bg-purple-500 !text-black !border-purple-500";
     }
 
     // Inactive state - subtle background
-    if (statusValue === "active") return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-green-500 hover:!text-black hover:!border-green-500`;
-    if (statusValue === "weakened") return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-500`;
-    if (statusValue === "dissolved") return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-red-500 hover:!text-black hover:!border-red-500`;
-    if (statusValue === "reformed") return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-blue-500 hover:!text-black hover:!border-blue-500`;
-    if (statusValue === "apex") return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-purple-500 hover:!text-black hover:!border-purple-500`;
+    if (statusValue === "active")
+      return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-green-500 hover:!text-black hover:!border-green-500`;
+    if (statusValue === "weakened")
+      return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-500`;
+    if (statusValue === "dissolved")
+      return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-red-500 hover:!text-black hover:!border-red-500`;
+    if (statusValue === "reformed")
+      return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-blue-500 hover:!text-black hover:!border-blue-500`;
+    if (statusValue === "apex")
+      return `${statusData.bgColorClass} ${statusData.colorClass} hover:!bg-purple-500 hover:!text-black hover:!border-purple-500`;
 
     return "";
   };
@@ -134,33 +144,57 @@ const FactionsViewComponent = function FactionsView({
     // Map colors to badge colors using direct color names
     if (isActive) {
       // Active state - full color background
-      if (typeValue === "commercial") return "!bg-emerald-500 !text-black !border-emerald-500";
-      if (typeValue === "military") return "!bg-red-500 !text-black !border-red-500";
-      if (typeValue === "magical") return "!bg-purple-500 !text-black !border-purple-500";
-      if (typeValue === "religious") return "!bg-yellow-500 !text-black !border-yellow-500";
-      if (typeValue === "cult") return "!bg-indigo-500 !text-black !border-indigo-500";
-      if (typeValue === "tribal") return "!bg-orange-500 !text-black !border-orange-500";
-      if (typeValue === "racial") return "!bg-cyan-500 !text-black !border-cyan-500";
-      if (typeValue === "governmental") return "!bg-blue-500 !text-black !border-blue-500";
-      if (typeValue === "revolutionary") return "!bg-rose-500 !text-black !border-rose-500";
-      if (typeValue === "academic") return "!bg-teal-500 !text-black !border-teal-500";
-      if (typeValue === "royalty") return "!bg-amber-500 !text-black !border-amber-500";
-      if (typeValue === "mercenary") return "!bg-slate-500 !text-black !border-slate-500";
+      if (typeValue === "commercial")
+        return "!bg-emerald-500 !text-black !border-emerald-500";
+      if (typeValue === "military")
+        return "!bg-red-500 !text-black !border-red-500";
+      if (typeValue === "magical")
+        return "!bg-purple-500 !text-black !border-purple-500";
+      if (typeValue === "religious")
+        return "!bg-yellow-500 !text-black !border-yellow-500";
+      if (typeValue === "cult")
+        return "!bg-indigo-500 !text-black !border-indigo-500";
+      if (typeValue === "tribal")
+        return "!bg-orange-500 !text-black !border-orange-500";
+      if (typeValue === "racial")
+        return "!bg-cyan-500 !text-black !border-cyan-500";
+      if (typeValue === "governmental")
+        return "!bg-blue-500 !text-black !border-blue-500";
+      if (typeValue === "revolutionary")
+        return "!bg-rose-500 !text-black !border-rose-500";
+      if (typeValue === "academic")
+        return "!bg-teal-500 !text-black !border-teal-500";
+      if (typeValue === "royalty")
+        return "!bg-amber-500 !text-black !border-amber-500";
+      if (typeValue === "mercenary")
+        return "!bg-slate-500 !text-black !border-slate-500";
     }
 
     // Inactive state - subtle background
-    if (typeValue === "commercial") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-emerald-500 hover:!text-black hover:!border-emerald-500`;
-    if (typeValue === "military") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-red-500 hover:!text-black hover:!border-red-500`;
-    if (typeValue === "magical") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-purple-500 hover:!text-black hover:!border-purple-500`;
-    if (typeValue === "religious") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-500`;
-    if (typeValue === "cult") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-indigo-500 hover:!text-black hover:!border-indigo-500`;
-    if (typeValue === "tribal") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-orange-500 hover:!text-black hover:!border-orange-500`;
-    if (typeValue === "racial") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-cyan-500 hover:!text-black hover:!border-cyan-500`;
-    if (typeValue === "governmental") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-blue-500 hover:!text-black hover:!border-blue-500`;
-    if (typeValue === "revolutionary") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-rose-500 hover:!text-black hover:!border-rose-500`;
-    if (typeValue === "academic") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-teal-500 hover:!text-black hover:!border-teal-500`;
-    if (typeValue === "royalty") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-amber-500 hover:!text-black hover:!border-amber-500`;
-    if (typeValue === "mercenary") return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-slate-500 hover:!text-black hover:!border-slate-500`;
+    if (typeValue === "commercial")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-emerald-500 hover:!text-black hover:!border-emerald-500`;
+    if (typeValue === "military")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-red-500 hover:!text-black hover:!border-red-500`;
+    if (typeValue === "magical")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-purple-500 hover:!text-black hover:!border-purple-500`;
+    if (typeValue === "religious")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-500`;
+    if (typeValue === "cult")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-indigo-500 hover:!text-black hover:!border-indigo-500`;
+    if (typeValue === "tribal")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-orange-500 hover:!text-black hover:!border-orange-500`;
+    if (typeValue === "racial")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-cyan-500 hover:!text-black hover:!border-cyan-500`;
+    if (typeValue === "governmental")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-blue-500 hover:!text-black hover:!border-blue-500`;
+    if (typeValue === "revolutionary")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-rose-500 hover:!text-black hover:!border-rose-500`;
+    if (typeValue === "academic")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-teal-500 hover:!text-black hover:!border-teal-500`;
+    if (typeValue === "royalty")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-amber-500 hover:!text-black hover:!border-amber-500`;
+    if (typeValue === "mercenary")
+      return `${typeData.bgColorClass} ${typeData.colorClass} hover:!bg-slate-500 hover:!text-black hover:!border-slate-500`;
 
     return "";
   };

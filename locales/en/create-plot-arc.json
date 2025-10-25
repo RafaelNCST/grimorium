@@ -1,0 +1,71 @@
+{
+  "modal": {
+    "create_arc": "Create New Narrative Arc",
+    "info_message": "Fill in the basic fields to create your arc. You can add advanced information later.",
+    "basic_fields": "Basic Fields",
+    "advanced_fields": "Advanced Fields",
+    "arc_name": "Arc Name",
+    "arc_name_placeholder": "The Hero's Journey",
+    "arc_summary": "Arc Summary",
+    "arc_summary_placeholder": "In this arc, the protagonist embarks on an epic journey to discover their true origins...",
+    "arc_status": "Arc Status",
+    "current_arc_warning": "There is already a current arc. You can only have one current arc at a time.",
+    "arc_size": "Arc Size",
+    "arc_size_intro": "Choose the estimated arc size based on the number of chapters you envision:",
+    "arc_focus": "Arc Focus",
+    "arc_focus_placeholder": "Protagonist development and discovery of their origins",
+    "event_chain": "Event Chain",
+    "add_event": "Add Event",
+    "event_name": "Event Name",
+    "event_name_placeholder": "Meeting with the mentor",
+    "event_description": "Event Description",
+    "event_description_placeholder": "The protagonist meets their mentor for the first time in a busy tavern...",
+    "no_events": "No events added. Add at least one event to continue.",
+    "event_required": "At least one event must be added",
+    "important_characters": "Important Characters",
+    "select_character": "Select character",
+    "no_characters_selected": "No characters selected",
+    "no_characters_available": "No characters registered. Create characters in the characters tab to add them here.",
+    "important_factions": "Important Factions",
+    "select_faction": "Select faction",
+    "no_factions_selected": "No factions selected",
+    "no_factions_available": "No factions registered. Create factions in the factions tab to add them here.",
+    "important_items": "Important Items",
+    "select_item": "Select item",
+    "no_items_selected": "No items selected",
+    "no_items_available": "No items registered. Create items in the items tab to add them here.",
+    "selected_singular": "selected",
+    "selected_plural": "selected",
+    "arc_message": "Arc Message",
+    "arc_message_placeholder": "True strength comes from within, not from external powers",
+    "world_impact": "World Impact",
+    "world_impact_placeholder": "The revelation of the protagonist's origins changes the balance of power between kingdoms..."
+  },
+  "statuses": {
+    "finished": "Finished",
+    "current": "Current",
+    "planning": "Planning"
+  },
+  "sizes": {
+    "mini": "Mini",
+    "mini_description": "Short and sweet - less than 10 chapters to keep it fresh!",
+    "small": "Small",
+    "small_description": "A compact arc - up to 50 chapters of pure adventure!",
+    "medium": "Medium",
+    "medium_description": "Well balanced - up to 200 chapters of great story!",
+    "large": "Large",
+    "large_description": "Epic worthy of respect - over 200 chapters, grab your coffee!"
+  },
+  "button": {
+    "cancel": "Cancel",
+    "create": "Create Arc",
+    "save": "Save",
+    "add": "Add"
+  },
+  "toast": {
+    "fill_required_fields": "Please fill in all required fields",
+    "only_one_current_arc": "You can only have one current arc at a time",
+    "arc_created": "Narrative arc created successfully!",
+    "create_failed": "Failed to create arc. Please try again."
+  }
+}

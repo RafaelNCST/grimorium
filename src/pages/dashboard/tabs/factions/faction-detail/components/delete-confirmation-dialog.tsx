@@ -112,9 +112,7 @@ export function DeleteConfirmationDialog({
             <AlertDialogHeader>
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
-                <AlertDialogTitle>
-                  {t("delete.faction.title")}
-                </AlertDialogTitle>
+                <AlertDialogTitle>{t("delete.faction.title")}</AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-4 space-y-4">
                 <p>{t("delete.faction.step1.message", { factionName })}</p>

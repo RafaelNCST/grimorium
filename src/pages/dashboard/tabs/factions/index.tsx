@@ -3,12 +3,12 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { type IFaction, type IFactionFormData } from "@/types/faction-types";
 import { useFactionsStore } from "@/stores/factions-store";
+import { type IFaction, type IFactionFormData } from "@/types/faction-types";
 
-import { filterFactions } from "./utils/filters/filter-factions";
 import { calculateTotalByStatus } from "./utils/calculators/calculate-total-by-status";
 import { calculateTotalByType } from "./utils/calculators/calculate-total-by-type";
+import { filterFactions } from "./utils/filters/filter-factions";
 import { FactionsView } from "./view";
 
 interface PropsFactionsTab {

@@ -1,5 +1,8 @@
+import {
+  IRaceVersion,
+  IRaceRelationship,
+} from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
-import { IRaceVersion, IRaceRelationship } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 
 import { DBRace, DBRaceVersion, DBRaceRelationship } from "./types";
 
@@ -289,9 +292,7 @@ export async function moveRacesToGroup(
 }
 
 // Race Versions
-export async function getRaceVersions(
-  raceId: string
-): Promise<IRaceVersion[]> {
+export async function getRaceVersions(raceId: string): Promise<IRaceVersion[]> {
   const db = await getDB();
   const result = await db.select<DBRaceVersion[]>(
     "SELECT * FROM race_versions WHERE race_id = $1 ORDER BY created_at DESC",

@@ -20,15 +20,19 @@ export function CreateRaceModal({
   const form = useRaceForm();
   const { handleSubmit, reset } = form;
 
-  const watchedFields = form.watch(["name", "domain", "summary", "diet", "elementalDiet"]);
+  const watchedFields = form.watch([
+    "name",
+    "domain",
+    "summary",
+    "diet",
+    "elementalDiet",
+  ]);
 
   const isValid = useMemo(() => {
     const [name, domain, summary, diet, elementalDiet] = watchedFields;
 
     // Basic required fields validation
-    const basicValid = Boolean(
-      name?.trim() && domain && summary?.trim()
-    );
+    const basicValid = Boolean(name?.trim() && domain && summary?.trim());
 
     // If diet is elemental, elementalDiet is required
     if (diet === "elemental") {

@@ -138,7 +138,10 @@ export function AddRacesToGroupModal({
           {/* Selection Counter */}
           {selectedRaceIds.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              {selectedRaceIds.length} {selectedRaceIds.length === 1 ? "raça selecionada" : "raças selecionadas"}
+              {selectedRaceIds.length}{" "}
+              {selectedRaceIds.length === 1
+                ? "raça selecionada"
+                : "raças selecionadas"}
             </p>
           )}
 
@@ -152,7 +155,8 @@ export function AddRacesToGroupModal({
               onClick={handleConfirm}
               disabled={selectedRaceIds.length === 0}
             >
-              Adicionar {selectedRaceIds.length > 0 && `(${selectedRaceIds.length})`}
+              Adicionar{" "}
+              {selectedRaceIds.length > 0 && `(${selectedRaceIds.length})`}
             </Button>
           </div>
         </div>

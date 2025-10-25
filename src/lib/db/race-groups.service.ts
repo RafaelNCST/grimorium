@@ -126,7 +126,9 @@ export async function deleteRaceGroup(id: string): Promise<void> {
   const db = await getDB();
 
   // First, set group_id to NULL for all races in this group
-  await db.execute("UPDATE races SET group_id = NULL WHERE group_id = $1", [id]);
+  await db.execute("UPDATE races SET group_id = NULL WHERE group_id = $1", [
+    id,
+  ]);
 
   // Then delete the group
   await db.execute("DELETE FROM race_groups WHERE id = $1", [id]);

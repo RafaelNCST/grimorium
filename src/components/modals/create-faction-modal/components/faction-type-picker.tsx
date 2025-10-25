@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import { FACTION_TYPES_CONSTANT } from "../constants/faction-types";
@@ -19,9 +20,7 @@ export function FactionTypePicker({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">
-        {t("modal.faction_type")} *
-      </label>
+      <label className="text-sm font-medium">{t("modal.faction_type")} *</label>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {FACTION_TYPES_CONSTANT.map((type) => {
           const Icon = type.icon;
@@ -43,23 +42,17 @@ export function FactionTypePicker({
             >
               <Icon
                 className={`w-6 h-6 transition-colors ${
-                  isActive
-                    ? type.colorClass
-                    : "text-muted-foreground"
+                  isActive ? type.colorClass : "text-muted-foreground"
                 }`}
               />
               <span
                 className={`text-xs font-medium text-center transition-colors ${
-                  isActive
-                    ? type.colorClass
-                    : "text-muted-foreground"
+                  isActive ? type.colorClass : "text-muted-foreground"
                 }`}
               >
                 {t(type.translationKey)}
               </span>
-              <p
-                className="text-xs text-center text-muted-foreground"
-              >
+              <p className="text-xs text-center text-muted-foreground">
                 {t(type.descriptionKey)}
               </p>
             </button>

@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useParams, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
+import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+
+import { getRaceGroupsByBookId } from "@/lib/db/race-groups.service";
 import {
   getRaceById,
   getRacesByBookId,
@@ -13,12 +15,16 @@ import {
   deleteRaceVersion,
   updateRaceVersion,
 } from "@/lib/db/races.service";
-import { getRaceGroupsByBookId } from "@/lib/db/race-groups.service";
 import { useRacesStore } from "@/stores/races-store";
-import type { IRace, IRaceGroup } from "../types/race-types";
-import type { IRaceRelationship, IRaceVersion, IFieldVisibility } from "./types/race-detail-types";
 
 import { RaceDetailView } from "./view";
+
+import type { IRace, IRaceGroup } from "../types/race-types";
+import type {
+  IRaceRelationship,
+  IRaceVersion,
+  IFieldVisibility,
+} from "./types/race-detail-types";
 
 export function RaceDetail() {
   const { raceId, dashboardId } = useParams({
@@ -46,7 +52,9 @@ export function RaceDetail() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [versions, setVersions] = useState<IRaceVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IRaceVersion | null>(null);
+  const [currentVersion, setCurrentVersion] = useState<IRaceVersion | null>(
+    null
+  );
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [allRaces, setAllRaces] = useState<IRace[]>([]);
@@ -136,7 +144,12 @@ export function RaceDetail() {
           ...mainVersion,
           raceData: updatedRace,
         };
-        await updateRaceVersion(raceId, mainVersion.id, mainVersion.name, mainVersion.description);
+        await updateRaceVersion(
+          raceId,
+          mainVersion.id,
+          mainVersion.name,
+          mainVersion.description
+        );
 
         const updatedVersions = versions.map((v) =>
           v.id === mainVersion.id ? updatedMainVersion : v
@@ -152,7 +165,14 @@ export function RaceDetail() {
       console.error("Error saving race:", error);
       toast.error("Erro ao salvar raça");
     }
-  }, [editData, fieldVisibility, relationships, raceId, updateRaceInCache, versions]);
+  }, [
+    editData,
+    fieldVisibility,
+    relationships,
+    raceId,
+    updateRaceInCache,
+    versions,
+  ]);
 
   const handleEdit = useCallback(() => {
     setEditData(race);

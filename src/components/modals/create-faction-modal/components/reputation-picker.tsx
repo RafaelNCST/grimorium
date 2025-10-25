@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import { FACTION_REPUTATION_CONSTANT } from "../constants/faction-reputation";
@@ -10,7 +11,9 @@ interface PropsReputationPicker {
 
 export function ReputationPicker({ value, onChange }: PropsReputationPicker) {
   const { t } = useTranslation("create-faction");
-  const [hoveredReputation, setHoveredReputation] = useState<string | null>(null);
+  const [hoveredReputation, setHoveredReputation] = useState<string | null>(
+    null
+  );
 
   return (
     <div className="space-y-2">
@@ -38,24 +41,18 @@ export function ReputationPicker({ value, onChange }: PropsReputationPicker) {
             >
               <Icon
                 className={`w-5 h-5 transition-colors ${
-                  isActive
-                    ? reputation.colorClass
-                    : "text-muted-foreground"
+                  isActive ? reputation.colorClass : "text-muted-foreground"
                 }`}
               />
               <div className="space-y-1">
                 <span
                   className={`text-sm font-medium transition-colors ${
-                    isActive
-                      ? reputation.colorClass
-                      : "text-muted-foreground"
+                    isActive ? reputation.colorClass : "text-muted-foreground"
                   }`}
                 >
                   {t(reputation.translationKey)}
                 </span>
-                <p
-                  className="text-xs leading-tight text-muted-foreground"
-                >
+                <p className="text-xs leading-tight text-muted-foreground">
                   {t(reputation.descriptionKey)}
                 </p>
               </div>

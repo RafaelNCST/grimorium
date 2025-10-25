@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+
 import { ArrowRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -7,16 +8,26 @@ import { CreateRaceModal } from "@/components/modals/create-race-modal";
 import { type RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import type { IRace } from "../../types/race-types";
 
 interface CreateRaceVersionDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (data: { name: string; description: string; raceData: RaceFormSchema }) => void;
+  onConfirm: (data: {
+    name: string;
+    description: string;
+    raceData: RaceFormSchema;
+  }) => void;
   baseRace: IRace;
 }
 
@@ -36,7 +47,8 @@ export function CreateRaceVersionDialog({
   const MAX_DESCRIPTION_LENGTH = 150;
 
   const nameCharsRemaining = MAX_NAME_LENGTH - versionName.length;
-  const descriptionCharsRemaining = MAX_DESCRIPTION_LENGTH - versionDescription.length;
+  const descriptionCharsRemaining =
+    MAX_DESCRIPTION_LENGTH - versionDescription.length;
 
   const canProceedToStep2 = useMemo(
     () => versionName.trim().length > 0 && versionDescription.trim().length > 0,
@@ -70,7 +82,7 @@ export function CreateRaceVersionDialog({
       onConfirm({
         name: versionName.trim(),
         description: versionDescription.trim(),
-        raceData: raceData,
+        raceData,
       });
       handleClose();
       toast.success(t("versions.create_dialog.success"));
@@ -138,7 +150,10 @@ export function CreateRaceVersionDialog({
 
             {/* Version Description */}
             <div className="space-y-2">
-              <Label htmlFor="version-description" className="text-sm font-medium">
+              <Label
+                htmlFor="version-description"
+                className="text-sm font-medium"
+              >
                 {t("versions.create_dialog.description_label")} *
               </Label>
               <Textarea
@@ -149,7 +164,9 @@ export function CreateRaceVersionDialog({
                     setVersionDescription(e.target.value);
                   }
                 }}
-                placeholder={t("versions.create_dialog.description_placeholder")}
+                placeholder={t(
+                  "versions.create_dialog.description_placeholder"
+                )}
                 maxLength={MAX_DESCRIPTION_LENGTH}
                 rows={4}
                 className={`resize-none ${

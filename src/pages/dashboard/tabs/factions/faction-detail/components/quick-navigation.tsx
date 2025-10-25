@@ -74,9 +74,7 @@ export function QuickNavigation({ isOpen, onClose }: QuickNavigationProps) {
       `}
       >
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">
-            {t("quick_nav.title")}
-          </CardTitle>
+          <CardTitle className="text-base">{t("quick_nav.title")}</CardTitle>
           <Button
             variant="ghost"
             size="icon"

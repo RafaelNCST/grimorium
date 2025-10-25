@@ -282,6 +282,35 @@ export interface DBFactionVersion {
   created_at: number;
 }
 
+export interface DBPlotArc {
+  id: string;
+  book_id: string;
+  name: string;
+  size: string;
+  focus: string;
+  description: string;
+  progress: number;
+  status: string;
+  order_index: number;
+  important_characters?: string; // JSON array string
+  important_factions?: string; // JSON array string
+  important_items?: string; // JSON array string
+  arc_message?: string;
+  world_impact?: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBPlotEvent {
+  id: string;
+  arc_id: string;
+  name: string;
+  description: string;
+  completed: number; // 0 or 1 (SQLite boolean)
+  order_index: number;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

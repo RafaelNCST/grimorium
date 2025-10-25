@@ -21,12 +21,12 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { FactionNavigationSidebar } from "@/components/faction-navigation-sidebar";
-import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
-import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
+import { FactionTypePicker } from "@/components/modals/create-faction-modal/components/faction-type-picker";
+import { StatusPicker } from "@/components/modals/create-faction-modal/components/status-picker";
 import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
 import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
-import { StatusPicker } from "@/components/modals/create-faction-modal/components/status-picker";
-import { FactionTypePicker } from "@/components/modals/create-faction-modal/components/faction-type-picker";
+import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
+import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -62,9 +62,9 @@ import {
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
-import { VersionManager } from "./components/version-manager";
 import { DiplomacySection } from "./components/diplomacy-section";
 import { HierarchySection } from "./components/hierarchy-section";
+import { VersionManager } from "./components/version-manager";
 
 interface IFieldVisibility {
   [key: string]: boolean;
@@ -87,10 +87,10 @@ interface FactionDetailViewProps {
   types: typeof FACTION_TYPES_CONSTANT;
   influences: typeof FACTION_INFLUENCE_CONSTANT;
   reputations: typeof FACTION_REPUTATION_CONSTANT;
-  currentStatus: typeof FACTION_STATUS_CONSTANT[0] | undefined;
-  currentType: typeof FACTION_TYPES_CONSTANT[0] | undefined;
-  currentInfluence: typeof FACTION_INFLUENCE_CONSTANT[0] | undefined;
-  currentReputation: typeof FACTION_REPUTATION_CONSTANT[0] | undefined;
+  currentStatus: (typeof FACTION_STATUS_CONSTANT)[0] | undefined;
+  currentType: (typeof FACTION_TYPES_CONSTANT)[0] | undefined;
+  currentInfluence: (typeof FACTION_INFLUENCE_CONSTANT)[0] | undefined;
+  currentReputation: (typeof FACTION_REPUTATION_CONSTANT)[0] | undefined;
   StatusIcon: LucideIcon;
   TypeIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
@@ -400,12 +400,17 @@ export function FactionDetailView({
                       {/* Faction Type Picker */}
                       <FactionTypePicker
                         value={editData.factionType || ""}
-                        onChange={(value) => onEditDataChange("factionType", value)}
+                        onChange={(value) =>
+                          onEditDataChange("factionType", value)
+                        }
                       />
 
                       {/* Summary */}
                       <div className="space-y-2">
-                        <Label htmlFor="summary" className="text-sm font-medium">
+                        <Label
+                          htmlFor="summary"
+                          className="text-sm font-medium"
+                        >
                           {t("faction-detail:fields.summary")} *
                         </Label>
                         <Textarea
@@ -463,7 +468,9 @@ export function FactionDetailView({
                               >
                                 <TypeIcon className="w-3.5 h-3.5" />
                                 <span className="text-xs">
-                                  {t(`create-faction:faction_type.${faction.factionType}`)}
+                                  {t(
+                                    `create-faction:faction_type.${faction.factionType}`
+                                  )}
                                 </span>
                               </Badge>
                             )}
@@ -522,7 +529,10 @@ export function FactionDetailView({
                               <Textarea
                                 value={editData.governmentForm || ""}
                                 onChange={(e) =>
-                                  onEditDataChange("governmentForm", e.target.value)
+                                  onEditDataChange(
+                                    "governmentForm",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder={t(
                                   "create-faction:modal.government_form_placeholder"
@@ -532,11 +542,15 @@ export function FactionDetailView({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.governmentForm?.length || 0}/500</span>
+                                <span>
+                                  {editData.governmentForm?.length || 0}/500
+                                </span>
                               </div>
                             </>
                           ) : faction.governmentForm ? (
-                            <p className="text-sm whitespace-pre-wrap">{faction.governmentForm}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.governmentForm}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -570,7 +584,9 @@ export function FactionDetailView({
                               </div>
                             </>
                           ) : faction.economy ? (
-                            <p className="text-sm whitespace-pre-wrap">{faction.economy}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {faction.economy}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -641,7 +657,10 @@ export function FactionDetailView({
                               <Textarea
                                 value={editData.factionMotto || ""}
                                 onChange={(e) =>
-                                  onEditDataChange("factionMotto", e.target.value)
+                                  onEditDataChange(
+                                    "factionMotto",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder={t(
                                   "create-faction:modal.faction_motto_placeholder"
@@ -651,7 +670,9 @@ export function FactionDetailView({
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{editData.factionMotto?.length || 0}/300</span>
+                                <span>
+                                  {editData.factionMotto?.length || 0}/300
+                                </span>
                               </div>
                             </>
                           ) : faction.factionMotto ? (
@@ -666,7 +687,9 @@ export function FactionDetailView({
                         {/* Uniform and Aesthetics */}
                         <FieldWrapper
                           fieldName="uniformAndAesthetics"
-                          label={t("faction-detail:fields.uniform_and_aesthetics")}
+                          label={t(
+                            "faction-detail:fields.uniform_and_aesthetics"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -691,7 +714,8 @@ export function FactionDetailView({
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
                                 <span>
-                                  {editData.uniformAndAesthetics?.length || 0}/500
+                                  {editData.uniformAndAesthetics?.length || 0}
+                                  /500
                                 </span>
                               </div>
                             </>
@@ -728,7 +752,10 @@ export function FactionDetailView({
                               <Input
                                 value={editData.foundationDate || ""}
                                 onChange={(e) =>
-                                  onEditDataChange("foundationDate", e.target.value)
+                                  onEditDataChange(
+                                    "foundationDate",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder={t(
                                   "create-faction:modal.foundation_date_placeholder"
@@ -751,7 +778,9 @@ export function FactionDetailView({
                         {/* Foundation History Summary */}
                         <FieldWrapper
                           fieldName="foundationHistorySummary"
-                          label={t("faction-detail:fields.foundation_history_summary")}
+                          label={t(
+                            "faction-detail:fields.foundation_history_summary"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -776,8 +805,9 @@ export function FactionDetailView({
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
                                 <span>
-                                  {editData.foundationHistorySummary?.length || 0}/
-                                  500
+                                  {editData.foundationHistorySummary?.length ||
+                                    0}
+                                  / 500
                                 </span>
                               </div>
                             </>
@@ -838,7 +868,9 @@ export function FactionDetailView({
                             </Select>
                           ) : faction.influence ? (
                             <Badge className={currentInfluence?.bgColor}>
-                              {t(`create-faction:influence.${faction.influence}`)}
+                              {t(
+                                `create-faction:influence.${faction.influence}`
+                              )}
                             </Badge>
                           ) : (
                             <EmptyFieldState t={t} />
@@ -955,12 +987,17 @@ export function FactionDetailView({
                             </Label>
                             <span
                               className={`text-sm font-bold transition-colors ${
-                                (isEditing ? editData.militaryPower || 5 : faction.militaryPower || 5) === 10
+                                (isEditing
+                                  ? editData.militaryPower || 5
+                                  : faction.militaryPower || 5) === 10
                                   ? "text-amber-500"
                                   : "text-primary"
                               }`}
                             >
-                              {isEditing ? editData.militaryPower || 5 : faction.militaryPower || 5}/10
+                              {isEditing
+                                ? editData.militaryPower || 5
+                                : faction.militaryPower || 5}
+                              /10
                             </span>
                           </div>
                           {isEditing ? (
@@ -1009,12 +1046,17 @@ export function FactionDetailView({
                             </Label>
                             <span
                               className={`text-sm font-bold transition-colors ${
-                                (isEditing ? editData.politicalPower || 5 : faction.politicalPower || 5) === 10
+                                (isEditing
+                                  ? editData.politicalPower || 5
+                                  : faction.politicalPower || 5) === 10
                                   ? "text-amber-500"
                                   : "text-primary"
                               }`}
                             >
-                              {isEditing ? editData.politicalPower || 5 : faction.politicalPower || 5}/10
+                              {isEditing
+                                ? editData.politicalPower || 5
+                                : faction.politicalPower || 5}
+                              /10
                             </span>
                           </div>
                           {isEditing ? (
@@ -1063,12 +1105,17 @@ export function FactionDetailView({
                             </Label>
                             <span
                               className={`text-sm font-bold transition-colors ${
-                                (isEditing ? editData.culturalPower || 5 : faction.culturalPower || 5) === 10
+                                (isEditing
+                                  ? editData.culturalPower || 5
+                                  : faction.culturalPower || 5) === 10
                                   ? "text-amber-500"
                                   : "text-primary"
                               }`}
                             >
-                              {isEditing ? editData.culturalPower || 5 : faction.culturalPower || 5}/10
+                              {isEditing
+                                ? editData.culturalPower || 5
+                                : faction.culturalPower || 5}
+                              /10
                             </span>
                           </div>
                           {isEditing ? (
@@ -1117,12 +1164,17 @@ export function FactionDetailView({
                             </Label>
                             <span
                               className={`text-sm font-bold transition-colors ${
-                                (isEditing ? editData.economicPower || 5 : faction.economicPower || 5) === 10
+                                (isEditing
+                                  ? editData.economicPower || 5
+                                  : faction.economicPower || 5) === 10
                                   ? "text-amber-500"
                                   : "text-primary"
                               }`}
                             >
-                              {isEditing ? editData.economicPower || 5 : faction.economicPower || 5}/10
+                              {isEditing
+                                ? editData.economicPower || 5
+                                : faction.economicPower || 5}
+                              /10
                             </span>
                           </div>
                           {isEditing ? (
@@ -1195,7 +1247,9 @@ export function FactionDetailView({
                         {/* Organization Objectives */}
                         <FieldWrapper
                           fieldName="organizationObjectives"
-                          label={t("faction-detail:fields.organization_objectives")}
+                          label={t(
+                            "faction-detail:fields.organization_objectives"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -1220,8 +1274,8 @@ export function FactionDetailView({
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
                                 <span>
-                                  {editData.organizationObjectives?.length || 0}/
-                                  500
+                                  {editData.organizationObjectives?.length || 0}
+                                  / 500
                                 </span>
                               </div>
                             </>
@@ -1237,7 +1291,9 @@ export function FactionDetailView({
                         {/* Narrative Importance */}
                         <FieldWrapper
                           fieldName="narrativeImportance"
-                          label={t("faction-detail:fields.narrative_importance")}
+                          label={t(
+                            "faction-detail:fields.narrative_importance"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -1262,7 +1318,8 @@ export function FactionDetailView({
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
                                 <span>
-                                  {editData.narrativeImportance?.length || 0}/500
+                                  {editData.narrativeImportance?.length || 0}
+                                  /500
                                 </span>
                               </div>
                             </>
@@ -1289,7 +1346,10 @@ export function FactionDetailView({
                               <Textarea
                                 value={editData.inspirations || ""}
                                 onChange={(e) =>
-                                  onEditDataChange("inspirations", e.target.value)
+                                  onEditDataChange(
+                                    "inspirations",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder={t(
                                   "create-faction:modal.inspirations_placeholder"
@@ -1323,7 +1383,7 @@ export function FactionDetailView({
                 <FieldWrapper
                   fieldName="diplomacy"
                   label={t("faction-detail:sections.diplomacy")}
-                  isOptional={true}
+                  isOptional
                   fieldVisibility={fieldVisibility}
                   isEditing={isEditing}
                   onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -1346,7 +1406,7 @@ export function FactionDetailView({
                 <FieldWrapper
                   fieldName="hierarchy"
                   label={t("faction-detail:sections.hierarchy")}
-                  isOptional={true}
+                  isOptional
                   fieldVisibility={fieldVisibility}
                   isEditing={isEditing}
                   onFieldVisibilityToggle={onFieldVisibilityToggle}

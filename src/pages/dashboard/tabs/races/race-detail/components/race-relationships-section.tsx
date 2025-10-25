@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 
-import {
-  Edit2,
-  Trash2,
-  X,
-  ChevronLeft,
-  UserPlus,
-} from "lucide-react";
+import { Edit2, Trash2, X, ChevronLeft, UserPlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-import { toast } from "@/hooks/use-toast";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/hooks/use-toast";
 
 import { RACE_RELATIONSHIP_TYPES } from "../constants/race-relationship-types";
 import { type IRaceRelationship } from "../types/race-detail-types";
@@ -263,7 +256,9 @@ export function RaceRelationshipsSection({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteRelationship(relationship.id)}
+                        onClick={() =>
+                          handleDeleteRelationship(relationship.id)
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -343,9 +338,19 @@ export function RaceRelationshipsSection({
                     {currentRaceName && selectedType && (
                       <div className="h-full p-4 bg-muted/30 border border-muted rounded-md flex items-center justify-center">
                         <p className="text-sm text-foreground text-center line-clamp-2">
-                          A raça atual <span className="font-semibold text-primary">{currentRaceName}</span> tem um relacionamento com a raça <span className="font-semibold text-primary">{getRaceById(selectedRaceId)?.name}</span> de tipo:{" "}
+                          A raça atual{" "}
                           <span className="font-semibold text-primary">
-                            {t(`race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find(rt => rt.value === selectedType)?.translationKey}`)}
+                            {currentRaceName}
+                          </span>{" "}
+                          tem um relacionamento com a raça{" "}
+                          <span className="font-semibold text-primary">
+                            {getRaceById(selectedRaceId)?.name}
+                          </span>{" "}
+                          de tipo:{" "}
+                          <span className="font-semibold text-primary">
+                            {t(
+                              `race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find((rt) => rt.value === selectedType)?.translationKey}`
+                            )}
                           </span>
                         </p>
                       </div>
@@ -418,7 +423,9 @@ export function RaceRelationshipsSection({
                                 </span>
                               </div>
                               <p className="text-xs text-muted-foreground italic line-clamp-2">
-                                {t(`race-detail:relationship_types.${type.translationKey}_desc`)}
+                                {t(
+                                  `race-detail:relationship_types.${type.translationKey}_desc`
+                                )}
                               </p>
                             </div>
                           </button>
@@ -481,9 +488,19 @@ export function RaceRelationshipsSection({
                 {currentRaceName && editingRelationship && selectedType && (
                   <div className="h-full p-4 bg-muted/30 border border-muted rounded-md flex items-center justify-center">
                     <p className="text-sm text-foreground text-center line-clamp-2">
-                      A raça atual <span className="font-semibold text-primary">{currentRaceName}</span> tem um relacionamento com a raça <span className="font-semibold text-primary">{getRaceById(editingRelationship.raceId)?.name}</span> de tipo:{" "}
+                      A raça atual{" "}
                       <span className="font-semibold text-primary">
-                        {t(`race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find(rt => rt.value === selectedType)?.translationKey}`)}
+                        {currentRaceName}
+                      </span>{" "}
+                      tem um relacionamento com a raça{" "}
+                      <span className="font-semibold text-primary">
+                        {getRaceById(editingRelationship.raceId)?.name}
+                      </span>{" "}
+                      de tipo:{" "}
+                      <span className="font-semibold text-primary">
+                        {t(
+                          `race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find((rt) => rt.value === selectedType)?.translationKey}`
+                        )}
                       </span>
                     </p>
                   </div>
@@ -525,7 +542,9 @@ export function RaceRelationshipsSection({
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground italic line-clamp-2">
-                            {t(`race-detail:relationship_types.${type.translationKey}_desc`)}
+                            {t(
+                              `race-detail:relationship_types.${type.translationKey}_desc`
+                            )}
                           </p>
                         </div>
                       </button>

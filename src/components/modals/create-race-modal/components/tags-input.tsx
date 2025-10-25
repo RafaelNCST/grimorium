@@ -22,7 +22,6 @@ export function TagsInput({
   placeholder,
   maxLength = 50,
 }: PropsTagsInput) {
-  const { t } = useTranslation("create-race");
   const [inputValue, setInputValue] = useState("");
 
   const handleAddTag = () => {

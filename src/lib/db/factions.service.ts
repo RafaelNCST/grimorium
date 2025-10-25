@@ -98,7 +98,8 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
 
     // Advanced fields - Relationships
     influence: dbFaction.influence as IFaction["influence"],
-    publicReputation: dbFaction.public_reputation as IFaction["publicReputation"],
+    publicReputation:
+      dbFaction.public_reputation as IFaction["publicReputation"],
     externalInfluence: dbFaction.external_influence,
 
     // Advanced fields - Internal Structure
@@ -343,9 +344,7 @@ export async function getFactionVersions(
     description: v.description || "",
     createdAt: new Date(v.created_at).toISOString(),
     isMain: v.is_main === 1,
-    factionData: v.faction_data
-      ? JSON.parse(v.faction_data)
-      : ({} as IFaction),
+    factionData: v.faction_data ? JSON.parse(v.faction_data) : ({} as IFaction),
   }));
 }
 

@@ -277,7 +277,9 @@ const CharactersViewComponent = function CharactersView({
               : selectedRoles.length > 0
                 ? t("characters:empty_state.no_role_characters", {
                     role: selectedRoles
-                      .map((role) => t(`create-character:role.${role}`) as string)
+                      .map(
+                        (role) => t(`create-character:role.${role}`) as string
+                      )
                       .join(", ")
                       .toLowerCase(),
                   })

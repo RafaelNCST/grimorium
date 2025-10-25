@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
@@ -13,14 +13,18 @@ interface PropsRaceCard {
   isDragDisabled?: boolean;
 }
 
-export function RaceCard({ race, onClick, isDragDisabled = false }: PropsRaceCard) {
+export function RaceCard({
+  race,
+  onClick,
+  isDragDisabled = false,
+}: PropsRaceCard) {
   const { t } = useTranslation("create-race");
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `race-${race.id}`,
     disabled: isDragDisabled,
     data: {
-      type: 'race',
+      type: "race",
       race,
     },
   });
@@ -57,9 +61,7 @@ export function RaceCard({ race, onClick, isDragDisabled = false }: PropsRaceCar
         <div className="p-4 space-y-3">
           {/* Names Section */}
           <div>
-            <h3 className="font-semibold text-lg leading-tight">
-              {race.name}
-            </h3>
+            <h3 className="font-semibold text-lg leading-tight">{race.name}</h3>
             {race.scientificName && (
               <p className="text-sm italic text-muted-foreground mt-1">
                 {race.scientificName}

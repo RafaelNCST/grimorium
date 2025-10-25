@@ -72,7 +72,10 @@ const getDarkBorderColorFromTailwindClass = (className: string): string => {
   return "currentColor";
 };
 
-export function PhysicalCapacityPicker({ value, onChange }: PropsPhysicalCapacityPicker) {
+export function PhysicalCapacityPicker({
+  value,
+  onChange,
+}: PropsPhysicalCapacityPicker) {
   const { t } = useTranslation("create-race");
 
   return (
@@ -93,8 +96,12 @@ export function PhysicalCapacityPicker({ value, onChange }: PropsPhysicalCapacit
           const darkTextColor = getDarkColorFromTailwindClass(capacity.color);
           const lightBgColor = getBgColorFromTailwindClass(capacity.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(capacity.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(capacity.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(capacity.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            capacity.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            capacity.borderColor
+          );
 
           return (
             <button

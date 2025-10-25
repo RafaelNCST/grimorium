@@ -2,9 +2,13 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Shield, Building2 } from "lucide-react";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
+import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
+import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
+import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
+import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import {
   getFactionById,
   getFactionVersions,
@@ -12,18 +16,14 @@ import {
   deleteFactionVersion,
   updateFactionVersion,
 } from "@/lib/db/factions.service";
+import { useCharactersStore } from "@/stores/characters-store";
 import { useFactionsStore } from "@/stores/factions-store";
+import { useRacesStore } from "@/stores/races-store";
 import {
   type IFaction,
   type IFactionFormData,
   type IFactionVersion,
 } from "@/types/faction-types";
-import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
-import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
-import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
-import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
-import { useRacesStore } from "@/stores/races-store";
-import { useCharactersStore } from "@/stores/characters-store";
 
 import { FactionDetailView } from "./view";
 
@@ -64,18 +64,17 @@ export function FactionDetail() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [versions, setVersions] = useState<IFactionVersion[]>([]);
-  const [selectedVersion, setSelectedVersion] = useState<IFactionVersion | null>(
-    null
-  );
+  const [selectedVersion, setSelectedVersion] =
+    useState<IFactionVersion | null>(null);
   const [isCreatingVersion, setIsCreatingVersion] = useState(false);
   const [isDeletingVersion, setIsDeletingVersion] = useState(false);
   const [versionToDelete, setVersionToDelete] = useState<string | null>(null);
-  const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean>>(
-    {
-      diplomacy: true,
-      hierarchy: true,
-    }
-  );
+  const [fieldVisibility, setFieldVisibility] = useState<
+    Record<string, boolean>
+  >({
+    diplomacy: true,
+    hierarchy: true,
+  });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -320,9 +319,7 @@ export function FactionDetail() {
 
     // Atualizar dados na versão atual
     const updatedVersions = versions.map((v) =>
-      v.id === selectedVersion?.id
-        ? { ...v, factionData: updatedFaction }
-        : v
+      v.id === selectedVersion?.id ? { ...v, factionData: updatedFaction } : v
     );
     setVersions(updatedVersions);
 
@@ -355,7 +352,9 @@ export function FactionDetail() {
   const handleConfirmDelete = useCallback(async () => {
     if (selectedVersion && !selectedVersion.isMain) {
       // Delete version (non-main)
-      const versionToDeleteObj = versions.find((v) => v.id === selectedVersion.id);
+      const versionToDeleteObj = versions.find(
+        (v) => v.id === selectedVersion.id
+      );
 
       if (!versionToDeleteObj) return;
 

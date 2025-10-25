@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 import {
   Heart,
   Scale,
@@ -12,6 +10,7 @@ import {
   Flame,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface IAlignment {
   value: string;

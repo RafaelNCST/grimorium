@@ -35,7 +35,7 @@ export function RaceViewsDisplay({
         views={views}
         onChange={onViewsChange}
         availableRaces={availableRaces}
-        hideLabel={true}
+        hideLabel
       />
     );
   }

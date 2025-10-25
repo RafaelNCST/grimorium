@@ -25,10 +25,7 @@ interface FactionsState {
     factionId: string,
     updates: Partial<IFaction>
   ) => Promise<void>;
-  deleteFactionFromCache: (
-    bookId: string,
-    factionId: string
-  ) => Promise<void>;
+  deleteFactionFromCache: (bookId: string, factionId: string) => Promise<void>;
   invalidateCache: (bookId: string) => void;
   getFactions: (bookId: string) => IFaction[];
   isLoading: (bookId: string) => boolean;

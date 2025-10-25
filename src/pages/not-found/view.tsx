@@ -2,7 +2,7 @@ interface NotFoundViewProps {
   pathname: string;
 }
 
-export function NotFoundView({ pathname }: NotFoundViewProps) {
+export function NotFoundView({ pathname: _pathname }: NotFoundViewProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="text-center">

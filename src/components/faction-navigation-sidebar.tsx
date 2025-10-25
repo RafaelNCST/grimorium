@@ -31,7 +31,9 @@ export function FactionNavigationSidebar({
   const [searchTerm, setSearchTerm] = useState("");
 
   // Separate current faction from others
-  const currentFaction = factions.find((faction) => faction.id === currentFactionId);
+  const currentFaction = factions.find(
+    (faction) => faction.id === currentFactionId
+  );
   const otherFactions = factions.filter(
     (faction) => faction.id !== currentFactionId
   );

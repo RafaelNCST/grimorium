@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -92,11 +91,14 @@ export function RaceViewsManager({
     onChange(views.filter((v) => v.id !== id));
   };
 
-  const canSave = selectedRaceId && description.trim() && description.length <= 500;
+  const canSave =
+    selectedRaceId && description.trim() && description.length <= 500;
 
   return (
     <div className="space-y-3">
-      {!hideLabel && <label className="text-sm font-medium">{t("modal.race_views")}</label>}
+      {!hideLabel && (
+        <label className="text-sm font-medium">{t("modal.race_views")}</label>
+      )}
 
       <Alert className="bg-muted/30 border-muted">
         <Info className="h-4 w-4 text-muted-foreground" />
@@ -180,7 +182,9 @@ export function RaceViewsManager({
               <Label>{t("modal.select_race")} *</Label>
               <Select value={selectedRaceId} onValueChange={setSelectedRaceId}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t("modal.select_race_placeholder")} />
+                  <SelectValue
+                    placeholder={t("modal.select_race_placeholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {availableRaces.map((race) => (
@@ -207,7 +211,11 @@ export function RaceViewsManager({
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleCloseModal}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCloseModal}
+              >
                 {t("button.cancel")}
               </Button>
               <Button type="button" onClick={handleSave} disabled={!canSave}>

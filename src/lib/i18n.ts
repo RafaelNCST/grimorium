@@ -7,6 +7,7 @@ import enCreateBook from "../../locales/en/create-book.json";
 import enCreateCharacter from "../../locales/en/create-character.json";
 import enCreateFaction from "../../locales/en/create-faction.json";
 import enCreateItem from "../../locales/en/create-item.json";
+import enCreatePlotArc from "../../locales/en/create-plot-arc.json";
 import enCreateRace from "../../locales/en/create-race.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
 import enFactions from "../../locales/en/factions.json";
@@ -24,6 +25,7 @@ import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateCharacter from "../../locales/pt/create-character.json";
 import ptCreateFaction from "../../locales/pt/create-faction.json";
 import ptCreateItem from "../../locales/pt/create-item.json";
+import ptCreatePlotArc from "../../locales/pt/create-plot-arc.json";
 import ptCreateRace from "../../locales/pt/create-race.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
 import ptFactions from "../../locales/pt/factions.json";
@@ -46,6 +48,7 @@ const resources = {
     "create-character": enCreateCharacter,
     "create-faction": enCreateFaction,
     "create-item": enCreateItem,
+    "create-plot-arc": enCreatePlotArc,
     "create-race": enCreateRace,
     "faction-detail": enFactionDetail,
     factions: enFactions,
@@ -65,6 +68,7 @@ const resources = {
     "create-character": ptCreateCharacter,
     "create-faction": ptCreateFaction,
     "create-item": ptCreateItem,
+    "create-plot-arc": ptCreatePlotArc,
     "create-race": ptCreateRace,
     "faction-detail": ptFactionDetail,
     factions: ptFactions,

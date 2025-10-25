@@ -1,6 +1,6 @@
-export type PlotArcSize = "pequeno" | "médio" | "grande";
+export type PlotArcSize = "mini" | "pequeno" | "médio" | "grande";
 
-export type PlotArcStatus = "planejamento" | "andamento" | "finalizado";
+export type PlotArcStatus = "planejamento" | "atual" | "finalizado";
 
 export interface IPlotEvent {
   id: string;
@@ -20,4 +20,9 @@ export interface IPlotArc {
   progress: number;
   status: PlotArcStatus;
   order: number;
+  importantCharacters: string[];
+  importantFactions: string[];
+  importantItems: string[];
+  arcMessage?: string;
+  worldImpact?: string;
 }

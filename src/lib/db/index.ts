@@ -326,6 +326,37 @@ async function runMigrations(database: Database): Promise<void> {
       created_at INTEGER NOT NULL
     );
 
+    -- ARCOS NARRATIVOS
+    CREATE TABLE IF NOT EXISTS plot_arcs (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      size TEXT NOT NULL,
+      focus TEXT NOT NULL,
+      description TEXT NOT NULL,
+      progress REAL DEFAULT 0,
+      status TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      important_characters TEXT,
+      important_factions TEXT,
+      important_items TEXT,
+      arc_message TEXT,
+      world_impact TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- EVENTOS DO ARCO
+    CREATE TABLE IF NOT EXISTS plot_events (
+      id TEXT PRIMARY KEY,
+      arc_id TEXT NOT NULL REFERENCES plot_arcs(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL,
+      completed INTEGER DEFAULT 0,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -345,10 +376,25 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_race_relationships_related ON race_relationships(related_race_id);
     CREATE INDEX IF NOT EXISTS idx_factions_book_id ON factions(book_id);
     CREATE INDEX IF NOT EXISTS idx_faction_versions_faction_id ON faction_versions(faction_id);
+    CREATE INDEX IF NOT EXISTS idx_plot_arcs_book_id ON plot_arcs(book_id);
+    CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_plot_events_arc_id ON plot_events(arc_id);
+    CREATE INDEX IF NOT EXISTS idx_plot_events_order ON plot_events(arc_id, order_index);
   `;
 
     await database.execute(schema);
     console.log("[db] Schema migrations executed successfully");
+
+    // Add important_items column to plot_arcs if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE plot_arcs ADD COLUMN important_items TEXT"
+      );
+      console.log("[db] Added important_items column to plot_arcs table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log("[db] important_items column already exists or error:", error);
+    }
 
     // Verify books table exists and log count
     const result = await database.select<{ count: number }[]>(

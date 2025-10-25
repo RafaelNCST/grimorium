@@ -12,8 +12,23 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
+import { DietPicker } from "@/components/modals/create-race-modal/components/diet-picker";
+import { DomainPicker } from "@/components/modals/create-race-modal/components/domain-picker";
+import { HabitsPicker } from "@/components/modals/create-race-modal/components/habits-picker";
+import { MoralTendencyPicker } from "@/components/modals/create-race-modal/components/moral-tendency-picker";
+import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/components/physical-capacity-picker";
+import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
 import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,32 +42,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 import { AlternativeNamesDisplay } from "./components/alternative-names-display";
-import { RaceViewsDisplay } from "./components/race-views-display";
-import { HabitatDisplay } from "./components/habitat-display";
 import { CommunicationDisplay } from "./components/communication-display";
+import { HabitatDisplay } from "./components/habitat-display";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
+import { RaceViewsDisplay } from "./components/race-views-display";
 import { RaceVersionManager } from "./components/race-version-manager";
-import { DomainPicker } from "@/components/modals/create-race-modal/components/domain-picker";
-import { DietPicker } from "@/components/modals/create-race-modal/components/diet-picker";
-import { MoralTendencyPicker } from "@/components/modals/create-race-modal/components/moral-tendency-picker";
-import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/components/physical-capacity-picker";
-import { HabitsPicker } from "@/components/modals/create-race-modal/components/habits-picker";
-import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
+import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 
+import type {
+  IRaceRelationship,
+  IRaceVersion,
+  IFieldVisibility,
+} from "./types/race-detail-types";
 import type { IRace, IRaceGroup } from "../../types/race-types";
-import type { IRaceRelationship, IRaceVersion, IFieldVisibility } from "./types/race-detail-types";
 
 interface RaceDetailViewProps {
   race: IRace;
@@ -80,9 +84,17 @@ interface RaceDetailViewProps {
   onDeleteModalClose: () => void;
   onConfirmDelete: () => void;
   onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (data: { name: string; description: string; raceData: IRace }) => void;
+  onVersionCreate: (data: {
+    name: string;
+    description: string;
+    raceData: IRace;
+  }) => void;
   onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
+  onVersionUpdate: (
+    versionId: string,
+    name: string,
+    description?: string
+  ) => void;
   onImageFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
   onFieldVisibilityToggle: (fieldName: string) => void;
@@ -151,14 +163,10 @@ function RaceDeleteConfirmationDialog({
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
-              <AlertDialogTitle>
-                {t("delete.race.title")}
-              </AlertDialogTitle>
+              <AlertDialogTitle>{t("delete.race.title")}</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="space-y-4">
-              <p>
-                {t("delete.race.step1.message", { raceName })}
-              </p>
+              <p>{t("delete.race.step1.message", { raceName })}</p>
               <div className="space-y-2">
                 <Label htmlFor="race-name-confirm">
                   {t("delete.race.step1.input_label")}
@@ -168,7 +176,9 @@ function RaceDeleteConfirmationDialog({
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
                   placeholder={t("delete.race.step1.input_placeholder")}
-                  className={!isNameValid && nameInput ? "border-destructive" : ""}
+                  className={
+                    !isNameValid && nameInput ? "border-destructive" : ""
+                  }
                 />
                 {!isNameValid && nameInput && (
                   <p className="text-sm text-destructive">
@@ -202,9 +212,7 @@ function RaceDeleteConfirmationDialog({
         <AlertDialogHeader>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <AlertDialogTitle>
-              {t("delete.race.step2.title")}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("delete.race.step2.title")}</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
             {totalVersions > 1
@@ -414,14 +422,13 @@ export function RaceDetailView({
           {/* GRID LAYOUT - 4 colunas */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* MAIN CONTENT - 3 colunas quando não está editando, 4 quando está */}
-            <div className={`${isEditing ? "lg:col-span-4" : "lg:col-span-3"} space-y-6`}>
-
+            <div
+              className={`${isEditing ? "lg:col-span-4" : "lg:col-span-3"} space-y-6`}
+            >
               {/* BASIC INFORMATION CARD */}
               <Card className="card-magical overflow-hidden">
                 <CardHeader>
-                  <CardTitle>
-                    {t("race-detail:sections.basic_info")}
-                  </CardTitle>
+                  <CardTitle>{t("race-detail:sections.basic_info")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {isEditing ? (
@@ -479,8 +486,12 @@ export function RaceDetailView({
                         >
                           <Input
                             value={editData.name || ""}
-                            onChange={(e) => onEditDataChange("name", e.target.value)}
-                            placeholder={t("create-race:modal.name_placeholder")}
+                            onChange={(e) =>
+                              onEditDataChange("name", e.target.value)
+                            }
+                            placeholder={t(
+                              "create-race:modal.name_placeholder"
+                            )}
                             maxLength={150}
                             required
                           />
@@ -501,12 +512,18 @@ export function RaceDetailView({
                         >
                           <Input
                             value={editData.scientificName || ""}
-                            onChange={(e) => onEditDataChange("scientificName", e.target.value)}
-                            placeholder={t("create-race:modal.scientific_name_placeholder")}
+                            onChange={(e) =>
+                              onEditDataChange("scientificName", e.target.value)
+                            }
+                            placeholder={t(
+                              "create-race:modal.scientific_name_placeholder"
+                            )}
                             maxLength={150}
                           />
                           <div className="flex justify-end text-xs text-muted-foreground">
-                            <span>{(editData.scientificName || "").length}/150</span>
+                            <span>
+                              {(editData.scientificName || "").length}/150
+                            </span>
                           </div>
                         </FieldWrapper>
 
@@ -522,7 +539,9 @@ export function RaceDetailView({
                         >
                           <DomainPicker
                             value={editData.domain || []}
-                            onChange={(value) => onEditDataChange("domain", value)}
+                            onChange={(value) =>
+                              onEditDataChange("domain", value)
+                            }
                           />
                         </FieldWrapper>
 
@@ -538,8 +557,12 @@ export function RaceDetailView({
                         >
                           <Textarea
                             value={editData.summary || ""}
-                            onChange={(e) => onEditDataChange("summary", e.target.value)}
-                            placeholder={t("create-race:modal.summary_placeholder")}
+                            onChange={(e) =>
+                              onEditDataChange("summary", e.target.value)
+                            }
+                            placeholder={t(
+                              "create-race:modal.summary_placeholder"
+                            )}
                             rows={4}
                             maxLength={500}
                             className="resize-none"
@@ -592,14 +615,19 @@ export function RaceDetailView({
                           <div className="flex items-center gap-2 flex-wrap">
                             {race.domain.map((d) => {
                               // Find by label (Portuguese) instead of value (English)
-                              const domainConfig = RACE_DOMAINS.find((dc) => dc.label === d);
+                              const domainConfig = RACE_DOMAINS.find(
+                                (dc) => dc.label === d
+                              );
                               if (!domainConfig) {
-                                console.warn('Domain config not found for:', d);
+                                console.warn("Domain config not found for:", d);
                                 return null;
                               }
                               const DomainIcon = domainConfig.icon;
                               return (
-                                <Badge key={d} className={`${domainConfig.color} ${domainConfig.bgColor}`}>
+                                <Badge
+                                  key={d}
+                                  className={`${domainConfig.color} ${domainConfig.bgColor}`}
+                                >
                                   <DomainIcon className="w-3 h-3 mr-1" />
                                   {domainConfig.label}
                                 </Badge>
@@ -640,7 +668,6 @@ export function RaceDetailView({
                   </CardHeader>
                   <CollapsibleContent>
                     <CardContent className="space-y-6">
-
                       {/* CULTURA E MITOS */}
                       <div className="space-y-4">
                         <h4 className="text-base font-bold text-primary uppercase tracking-wide">
@@ -660,9 +687,12 @@ export function RaceDetailView({
                             <AlternativeNamesDisplay
                               names={editData.alternativeNames || []}
                               isEditing={isEditing}
-                              onNamesChange={(names) => onEditDataChange("alternativeNames", names)}
+                              onNamesChange={(names) =>
+                                onEditDataChange("alternativeNames", names)
+                              }
                             />
-                          ) : race.alternativeNames && race.alternativeNames.length > 0 ? (
+                          ) : race.alternativeNames &&
+                            race.alternativeNames.length > 0 ? (
                             <AlternativeNamesDisplay
                               names={race.alternativeNames}
                               isEditing={false}
@@ -687,7 +717,9 @@ export function RaceDetailView({
                               views={editData.raceViews || []}
                               isEditing={isEditing}
                               allRaces={allRaces}
-                              onViewsChange={(views) => onEditDataChange("raceViews", views)}
+                              onViewsChange={(views) =>
+                                onEditDataChange("raceViews", views)
+                              }
                             />
                           ) : race.raceViews && race.raceViews.length > 0 ? (
                             <RaceViewsDisplay
@@ -713,20 +745,31 @@ export function RaceDetailView({
                           {isEditing ? (
                             <Textarea
                               value={editData.culturalNotes || ""}
-                              onChange={(e) => onEditDataChange("culturalNotes", e.target.value)}
-                              placeholder={t("create-race:modal.cultural_notes_placeholder")}
+                              onChange={(e) =>
+                                onEditDataChange(
+                                  "culturalNotes",
+                                  e.target.value
+                                )
+                              }
+                              placeholder={t(
+                                "create-race:modal.cultural_notes_placeholder"
+                              )}
                               rows={6}
                               maxLength={1500}
                               className="resize-none"
                             />
                           ) : race.culturalNotes ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.culturalNotes}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.culturalNotes}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
                           {isEditing && (
                             <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>{(editData.culturalNotes || "").length}/1500</span>
+                              <span>
+                                {(editData.culturalNotes || "").length}/1500
+                              </span>
                             </div>
                           )}
                         </FieldWrapper>
@@ -753,18 +796,30 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.generalAppearance || ""}
-                                onChange={(e) => onEditDataChange("generalAppearance", e.target.value)}
-                                placeholder={t("create-race:modal.general_appearance_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "generalAppearance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.general_appearance_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.generalAppearance || "").length}/500</span>
+                                <span>
+                                  {(editData.generalAppearance || "").length}
+                                  /500
+                                </span>
                               </div>
                             </>
                           ) : race.generalAppearance ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.generalAppearance}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.generalAppearance}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -784,12 +839,21 @@ export function RaceDetailView({
                               <>
                                 <Input
                                   value={editData.lifeExpectancy || ""}
-                                  onChange={(e) => onEditDataChange("lifeExpectancy", e.target.value)}
-                                  placeholder={t("create-race:modal.life_expectancy_placeholder")}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "lifeExpectancy",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "create-race:modal.life_expectancy_placeholder"
+                                  )}
                                   maxLength={100}
                                 />
                                 <div className="flex justify-end text-xs text-muted-foreground">
-                                  <span>{(editData.lifeExpectancy || "").length}/100</span>
+                                  <span>
+                                    {(editData.lifeExpectancy || "").length}/100
+                                  </span>
                                 </div>
                               </>
                             ) : race.lifeExpectancy ? (
@@ -811,12 +875,21 @@ export function RaceDetailView({
                               <>
                                 <Input
                                   value={editData.averageHeight || ""}
-                                  onChange={(e) => onEditDataChange("averageHeight", e.target.value)}
-                                  placeholder={t("create-race:modal.average_height_placeholder")}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "averageHeight",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "create-race:modal.average_height_placeholder"
+                                  )}
                                   maxLength={100}
                                 />
                                 <div className="flex justify-end text-xs text-muted-foreground">
-                                  <span>{(editData.averageHeight || "").length}/100</span>
+                                  <span>
+                                    {(editData.averageHeight || "").length}/100
+                                  </span>
                                 </div>
                               </>
                             ) : race.averageHeight ? (
@@ -838,12 +911,21 @@ export function RaceDetailView({
                               <>
                                 <Input
                                   value={editData.averageWeight || ""}
-                                  onChange={(e) => onEditDataChange("averageWeight", e.target.value)}
-                                  placeholder={t("create-race:modal.average_weight_placeholder")}
+                                  onChange={(e) =>
+                                    onEditDataChange(
+                                      "averageWeight",
+                                      e.target.value
+                                    )
+                                  }
+                                  placeholder={t(
+                                    "create-race:modal.average_weight_placeholder"
+                                  )}
                                   maxLength={100}
                                 />
                                 <div className="flex justify-end text-xs text-muted-foreground">
-                                  <span>{(editData.averageWeight || "").length}/100</span>
+                                  <span>
+                                    {(editData.averageWeight || "").length}/100
+                                  </span>
                                 </div>
                               </>
                             ) : race.averageWeight ? (
@@ -857,7 +939,9 @@ export function RaceDetailView({
                         {/* Special Physical Characteristics */}
                         <FieldWrapper
                           fieldName="specialPhysicalCharacteristics"
-                          label={t("race-detail:fields.special_physical_characteristics")}
+                          label={t(
+                            "race-detail:fields.special_physical_characteristics"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -866,19 +950,38 @@ export function RaceDetailView({
                           {isEditing ? (
                             <>
                               <Textarea
-                                value={editData.specialPhysicalCharacteristics || ""}
-                                onChange={(e) => onEditDataChange("specialPhysicalCharacteristics", e.target.value)}
-                                placeholder={t("create-race:modal.special_physical_characteristics_placeholder")}
+                                value={
+                                  editData.specialPhysicalCharacteristics || ""
+                                }
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "specialPhysicalCharacteristics",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.special_physical_characteristics_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.specialPhysicalCharacteristics || "").length}/500</span>
+                                <span>
+                                  {
+                                    (
+                                      editData.specialPhysicalCharacteristics ||
+                                      ""
+                                    ).length
+                                  }
+                                  /500
+                                </span>
                               </div>
                             </>
                           ) : race.specialPhysicalCharacteristics ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.specialPhysicalCharacteristics}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.specialPhysicalCharacteristics}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -905,10 +1008,14 @@ export function RaceDetailView({
                           {isEditing ? (
                             <HabitsPicker
                               value={editData.habits || ""}
-                              onChange={(value) => onEditDataChange("habits", value)}
+                              onChange={(value) =>
+                                onEditDataChange("habits", value)
+                              }
                             />
                           ) : race.habits ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.habits}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.habits}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -926,12 +1033,20 @@ export function RaceDetailView({
                           {isEditing ? (
                             <ReproductiveCyclePicker
                               value={editData.reproductiveCycle || ""}
-                              onChange={(value) => onEditDataChange("reproductiveCycle", value)}
-                              otherCycleDescription={editData.otherCycleDescription || ""}
-                              onOtherCycleDescriptionChange={(value) => onEditDataChange("otherCycleDescription", value)}
+                              onChange={(value) =>
+                                onEditDataChange("reproductiveCycle", value)
+                              }
+                              otherCycleDescription={
+                                editData.otherCycleDescription || ""
+                              }
+                              onOtherCycleDescriptionChange={(value) =>
+                                onEditDataChange("otherCycleDescription", value)
+                              }
                             />
                           ) : race.reproductiveCycle ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.reproductiveCycle}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.reproductiveCycle}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -949,12 +1064,18 @@ export function RaceDetailView({
                           {isEditing ? (
                             <DietPicker
                               value={editData.diet || ""}
-                              onChange={(value) => onEditDataChange("diet", value)}
+                              onChange={(value) =>
+                                onEditDataChange("diet", value)
+                              }
                               elementalDiet={editData.elementalDiet || ""}
-                              onElementalDietChange={(value) => onEditDataChange("elementalDiet", value)}
+                              onElementalDietChange={(value) =>
+                                onEditDataChange("elementalDiet", value)
+                              }
                             />
                           ) : race.diet ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.diet}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.diet}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -977,7 +1098,8 @@ export function RaceDetailView({
                                 onEditDataChange("communication", communication)
                               }
                             />
-                          ) : race.communication && race.communication.length > 0 ? (
+                          ) : race.communication &&
+                            race.communication.length > 0 ? (
                             <CommunicationDisplay
                               communication={race.communication}
                               isEditing={false}
@@ -1000,7 +1122,9 @@ export function RaceDetailView({
                           {isEditing ? (
                             <MoralTendencyPicker
                               value={editData.moralTendency || ""}
-                              onChange={(value) => onEditDataChange("moralTendency", value)}
+                              onChange={(value) =>
+                                onEditDataChange("moralTendency", value)
+                              }
                             />
                           ) : race.moralTendency ? (
                             <p className="text-sm">{race.moralTendency}</p>
@@ -1022,18 +1146,30 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.socialOrganization || ""}
-                                onChange={(e) => onEditDataChange("socialOrganization", e.target.value)}
-                                placeholder={t("create-race:modal.social_organization_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "socialOrganization",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.social_organization_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.socialOrganization || "").length}/500</span>
+                                <span>
+                                  {(editData.socialOrganization || "").length}
+                                  /500
+                                </span>
                               </div>
                             </>
                           ) : race.socialOrganization ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.socialOrganization}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.socialOrganization}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -1052,7 +1188,9 @@ export function RaceDetailView({
                             <HabitatDisplay
                               habitat={editData.habitat}
                               isEditing={isEditing}
-                              onHabitatChange={(habitat) => onEditDataChange("habitat", habitat)}
+                              onHabitatChange={(habitat) =>
+                                onEditDataChange("habitat", habitat)
+                              }
                             />
                           ) : race.habitat && race.habitat.length > 0 ? (
                             <HabitatDisplay
@@ -1086,10 +1224,14 @@ export function RaceDetailView({
                           {isEditing ? (
                             <PhysicalCapacityPicker
                               value={editData.physicalCapacity || ""}
-                              onChange={(value) => onEditDataChange("physicalCapacity", value)}
+                              onChange={(value) =>
+                                onEditDataChange("physicalCapacity", value)
+                              }
                             />
                           ) : race.physicalCapacity ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.physicalCapacity}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.physicalCapacity}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -1098,7 +1240,9 @@ export function RaceDetailView({
                         {/* Special Characteristics */}
                         <FieldWrapper
                           fieldName="specialCharacteristics"
-                          label={t("race-detail:fields.special_characteristics")}
+                          label={t(
+                            "race-detail:fields.special_characteristics"
+                          )}
                           fieldVisibility={fieldVisibility}
                           isEditing={isEditing}
                           onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -1108,18 +1252,33 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.specialCharacteristics || ""}
-                                onChange={(e) => onEditDataChange("specialCharacteristics", e.target.value)}
-                                placeholder={t("create-race:modal.special_characteristics_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "specialCharacteristics",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.special_characteristics_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.specialCharacteristics || "").length}/500</span>
+                                <span>
+                                  {
+                                    (editData.specialCharacteristics || "")
+                                      .length
+                                  }
+                                  /500
+                                </span>
                               </div>
                             </>
                           ) : race.specialCharacteristics ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.specialCharacteristics}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.specialCharacteristics}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -1138,18 +1297,26 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.weaknesses || ""}
-                                onChange={(e) => onEditDataChange("weaknesses", e.target.value)}
-                                placeholder={t("create-race:modal.weaknesses_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange("weaknesses", e.target.value)
+                                }
+                                placeholder={t(
+                                  "create-race:modal.weaknesses_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.weaknesses || "").length}/500</span>
+                                <span>
+                                  {(editData.weaknesses || "").length}/500
+                                </span>
                               </div>
                             </>
                           ) : race.weaknesses ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.weaknesses}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.weaknesses}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -1177,18 +1344,29 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.storyMotivation || ""}
-                                onChange={(e) => onEditDataChange("storyMotivation", e.target.value)}
-                                placeholder={t("create-race:modal.story_motivation_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "storyMotivation",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.story_motivation_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.storyMotivation || "").length}/500</span>
+                                <span>
+                                  {(editData.storyMotivation || "").length}/500
+                                </span>
                               </div>
                             </>
                           ) : race.storyMotivation ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.storyMotivation}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.storyMotivation}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
@@ -1207,24 +1385,34 @@ export function RaceDetailView({
                             <>
                               <Textarea
                                 value={editData.inspirations || ""}
-                                onChange={(e) => onEditDataChange("inspirations", e.target.value)}
-                                placeholder={t("create-race:modal.inspirations_placeholder")}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "inspirations",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "create-race:modal.inspirations_placeholder"
+                                )}
                                 rows={4}
                                 maxLength={500}
                                 className="resize-none"
                               />
                               <div className="flex justify-end text-xs text-muted-foreground">
-                                <span>{(editData.inspirations || "").length}/500</span>
+                                <span>
+                                  {(editData.inspirations || "").length}/500
+                                </span>
                               </div>
                             </>
                           ) : race.inspirations ? (
-                            <p className="text-sm whitespace-pre-wrap">{race.inspirations}</p>
+                            <p className="text-sm whitespace-pre-wrap">
+                              {race.inspirations}
+                            </p>
                           ) : (
                             <EmptyFieldState t={t} />
                           )}
                         </FieldWrapper>
                       </div>
-
                     </CardContent>
                   </CollapsibleContent>
                 </Card>
@@ -1234,7 +1422,7 @@ export function RaceDetailView({
               <FieldWrapper
                 fieldName="relationships"
                 label={t("race-detail:sections.relationships")}
-                isOptional={true}
+                isOptional
                 fieldVisibility={fieldVisibility}
                 isEditing={isEditing}
                 onFieldVisibilityToggle={onFieldVisibilityToggle}
@@ -1253,7 +1441,6 @@ export function RaceDetailView({
                   </CardContent>
                 </Card>
               </FieldWrapper>
-
             </div>
 
             {/* SIDEBAR - Version Manager (só aparece quando não está editando) */}
@@ -1290,9 +1477,13 @@ export function RaceDetailView({
         <AlertDialog open={showDeleteModal} onOpenChange={onDeleteModalClose}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{t("race-detail:delete.version.title")}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {t("race-detail:delete.version.title")}
+              </AlertDialogTitle>
               <AlertDialogDescription>
-                {t("race-detail:delete.version.message", { versionName: currentVersion.name })}
+                {t("race-detail:delete.version.message", {
+                  versionName: currentVersion.name,
+                })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

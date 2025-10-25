@@ -155,7 +155,11 @@ export function RitesManager({
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleCloseModal}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCloseModal}
+              >
                 {t("button.cancel")}
               </Button>
               <Button type="button" onClick={handleSave} disabled={!canSave}>

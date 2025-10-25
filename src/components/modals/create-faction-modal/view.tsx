@@ -47,8 +47,8 @@ export function CreateFactionModalView({
   onClose,
   onSubmit,
   isValid,
-  hasRaces,
-  hasCharacters,
+  hasRaces: _hasRaces,
+  hasCharacters: _hasCharacters,
   races,
   characters,
 }: PropsCreateFactionModalView) {
@@ -224,7 +224,10 @@ export function CreateFactionModalView({
 
               {/* Symbols and Secrets */}
               <div className="space-y-2">
-                <Label htmlFor="symbolsAndSecrets" className="text-sm font-medium">
+                <Label
+                  htmlFor="symbolsAndSecrets"
+                  className="text-sm font-medium"
+                >
                   {t("modal.symbols_and_secrets")}
                 </Label>
                 <Textarea
@@ -236,7 +239,9 @@ export function CreateFactionModalView({
                   className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{watchedValues.symbolsAndSecrets?.length || 0}/500</span>
+                  <span>
+                    {watchedValues.symbolsAndSecrets?.length || 0}/500
+                  </span>
                 </div>
               </div>
 

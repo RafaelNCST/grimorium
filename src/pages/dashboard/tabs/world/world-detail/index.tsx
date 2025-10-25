@@ -44,7 +44,7 @@ export function WorldDetail() {
   );
   const [editData, setEditData] = useState<IWorldDetailEntity>(emptyEntity);
   const [imagePreview, setImagePreview] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [_selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);

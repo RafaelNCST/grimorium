@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import { FACTION_INFLUENCE_CONSTANT } from "../constants/faction-influence";
@@ -36,24 +37,18 @@ export function InfluencePicker({ value, onChange }: PropsInfluencePicker) {
             >
               <Icon
                 className={`w-5 h-5 transition-colors ${
-                  isActive
-                    ? influence.colorClass
-                    : "text-muted-foreground"
+                  isActive ? influence.colorClass : "text-muted-foreground"
                 }`}
               />
               <div className="space-y-1">
                 <span
                   className={`text-sm font-medium transition-colors ${
-                    isActive
-                      ? influence.colorClass
-                      : "text-muted-foreground"
+                    isActive ? influence.colorClass : "text-muted-foreground"
                   }`}
                 >
                   {t(influence.translationKey)}
                 </span>
-                <p
-                  className="text-xs leading-tight text-muted-foreground"
-                >
+                <p className="text-xs leading-tight text-muted-foreground">
                   {t(influence.descriptionKey)}
                 </p>
               </div>

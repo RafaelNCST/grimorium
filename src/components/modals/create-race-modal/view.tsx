@@ -22,7 +22,10 @@ import { HabitsPicker } from "./components/habits-picker";
 import { MoralTendencyPicker } from "./components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "./components/physical-capacity-picker";
 import { RaceImageUpload } from "./components/race-image-upload";
-import { RaceViewsManager, type RaceView } from "./components/race-views-manager";
+import {
+  RaceViewsManager,
+  type RaceView,
+} from "./components/race-views-manager";
 import { ReproductiveCyclePicker } from "./components/reproductive-cycle-picker";
 import { TagsInput } from "./components/tags-input";
 import { type RaceFormSchema } from "./hooks/use-race-validation";
@@ -198,7 +201,9 @@ export function CreateRaceModalView({
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   {errors.culturalNotes && (
-                    <p className="text-destructive">{t(errors.culturalNotes.message)}</p>
+                    <p className="text-destructive">
+                      {t(errors.culturalNotes.message)}
+                    </p>
                   )}
                   <span className="ml-auto">
                     {watchedValues.culturalNotes?.length || 0}/1500
@@ -291,13 +296,16 @@ export function CreateRaceModalView({
                 </label>
                 <Textarea
                   {...register("specialPhysicalCharacteristics")}
-                  placeholder={t("modal.special_physical_characteristics_placeholder")}
+                  placeholder={t(
+                    "modal.special_physical_characteristics_placeholder"
+                  )}
                   maxLength={500}
                   rows={4}
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span className="ml-auto">
-                    {watchedValues.specialPhysicalCharacteristics?.length || 0}/500
+                    {watchedValues.specialPhysicalCharacteristics?.length || 0}
+                    /500
                   </span>
                 </div>
               </div>
@@ -328,7 +336,9 @@ export function CreateRaceModalView({
                 value={watchedValues.diet || ""}
                 onChange={(value) => setValue("diet", value)}
                 elementalDiet={watchedValues.elementalDiet || ""}
-                onElementalDietChange={(value) => setValue("elementalDiet", value)}
+                onElementalDietChange={(value) =>
+                  setValue("elementalDiet", value)
+                }
                 elementalDietError={errors.elementalDiet?.message}
               />
 

@@ -106,16 +106,14 @@ export function DietPicker({
   onChange,
   elementalDiet,
   onElementalDietChange,
-  elementalDietError
+  elementalDietError,
 }: PropsDietPicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">
-        {t("modal.diet")}
-      </label>
+      <label className="text-sm font-medium">{t("modal.diet")}</label>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {RACE_DIETS.map((diet) => {
@@ -125,8 +123,12 @@ export function DietPicker({
           const darkTextColor = getDarkColorFromTailwindClass(diet.color);
           const lightBgColor = getBgColorFromTailwindClass(diet.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(diet.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(diet.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(diet.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            diet.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            diet.borderColor
+          );
 
           return (
             <button

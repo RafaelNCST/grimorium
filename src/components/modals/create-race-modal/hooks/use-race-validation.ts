@@ -65,7 +65,10 @@ export const raceFormSchema = z
     habits: z.string().optional(),
     reproductiveCycle: z.string().optional(),
     diet: z.string().optional(),
-    elementalDiet: z.string().max(50, "validation.elemental_diet_max_length").optional(),
+    elementalDiet: z
+      .string()
+      .max(50, "validation.elemental_diet_max_length")
+      .optional(),
     communication: z.array(z.string()).optional(),
     moralTendency: z.string().optional(),
     socialOrganization: z

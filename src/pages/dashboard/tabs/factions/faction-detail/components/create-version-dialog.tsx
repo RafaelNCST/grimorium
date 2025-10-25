@@ -16,10 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  type IFaction,
-  type IFactionFormData,
-} from "@/types/faction-types";
+import { type IFaction, type IFactionFormData } from "@/types/faction-types";
 
 interface CreateVersionDialogProps {
   open: boolean;

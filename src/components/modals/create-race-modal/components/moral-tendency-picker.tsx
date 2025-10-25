@@ -78,14 +78,15 @@ const getDarkBorderColorFromTailwindClass = (className: string): string => {
   return "currentColor";
 };
 
-export function MoralTendencyPicker({ value, onChange }: PropsMoralTendencyPicker) {
+export function MoralTendencyPicker({
+  value,
+  onChange,
+}: PropsMoralTendencyPicker) {
   const { t } = useTranslation("create-race");
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">
-        {t("modal.moral_tendency")}
-      </label>
+      <label className="text-sm font-medium">{t("modal.moral_tendency")}</label>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {RACE_MORAL_TENDENCIES.map((tendency) => {
@@ -95,8 +96,12 @@ export function MoralTendencyPicker({ value, onChange }: PropsMoralTendencyPicke
           const darkTextColor = getDarkColorFromTailwindClass(tendency.color);
           const lightBgColor = getBgColorFromTailwindClass(tendency.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(tendency.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(tendency.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(tendency.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            tendency.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            tendency.borderColor
+          );
 
           return (
             <button

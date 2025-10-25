@@ -1,12 +1,6 @@
 import React from "react";
 
-import {
-  ArrowLeft,
-  Edit2,
-  Trash2,
-  Menu,
-  Upload,
-} from "lucide-react";
+import { ArrowLeft, Edit2, Trash2, Menu, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
@@ -64,9 +58,8 @@ export function RaceDetailHeader({
 }: RaceDetailHeaderProps) {
   const { t } = useTranslation("race-detail");
 
-  const getDomainData = (domainLabel: string) => {
-    return RACE_DOMAINS.find((d) => d.label === domainLabel);
-  };
+  const getDomainData = (domainLabel: string) =>
+    RACE_DOMAINS.find((d) => d.label === domainLabel);
 
   return (
     <div className="relative w-full mb-8">

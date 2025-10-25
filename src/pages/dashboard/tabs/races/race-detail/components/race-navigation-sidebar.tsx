@@ -3,19 +3,21 @@ import { useState } from "react";
 import { Search, X, List, FolderTree } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-import { type IRace, type IRaceGroup } from "@/pages/dashboard/tabs/races/types/race-types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  type IRace,
+  type IRaceGroup,
+} from "@/pages/dashboard/tabs/races/types/race-types";
 
 interface RaceNavigationSidebarProps {
   isOpen: boolean;
@@ -188,9 +190,7 @@ export function RaceNavigationSidebar({
                         <AccordionTrigger className="hover:no-underline py-3">
                           <div className="flex items-center gap-2">
                             <FolderTree className="w-4 h-4 text-primary" />
-                            <span className="font-semibold">
-                              {group.name}
-                            </span>
+                            <span className="font-semibold">{group.name}</span>
                             <span className="text-xs text-muted-foreground">
                               ({groupRaces.length})
                             </span>

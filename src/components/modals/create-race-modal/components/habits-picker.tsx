@@ -95,9 +95,7 @@ export function HabitsPicker({ value, onChange }: PropsHabitsPicker) {
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">
-        {t("modal.habits")}
-      </label>
+      <label className="text-sm font-medium">{t("modal.habits")}</label>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {RACE_HABITS.map((habit) => {
@@ -107,8 +105,12 @@ export function HabitsPicker({ value, onChange }: PropsHabitsPicker) {
           const darkTextColor = getDarkColorFromTailwindClass(habit.color);
           const lightBgColor = getBgColorFromTailwindClass(habit.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(habit.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(habit.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(habit.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            habit.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            habit.borderColor
+          );
 
           return (
             <button

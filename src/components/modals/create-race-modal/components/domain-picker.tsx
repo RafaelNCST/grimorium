@@ -96,9 +96,7 @@ export function DomainPicker({ value, onChange, error }: PropsDomainPicker) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">
-        {t("modal.domain")} *
-      </label>
+      <label className="text-sm font-medium">{t("modal.domain")} *</label>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {RACE_DOMAINS.map((domain) => {
           const Icon = domain.icon;
@@ -107,8 +105,12 @@ export function DomainPicker({ value, onChange, error }: PropsDomainPicker) {
           const darkTextColor = getDarkColorFromTailwindClass(domain.color);
           const lightBgColor = getBgColorFromTailwindClass(domain.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(domain.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(domain.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(domain.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            domain.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            domain.borderColor
+          );
 
           return (
             <button

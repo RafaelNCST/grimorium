@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import { FACTION_STATUS_CONSTANT } from "../constants/faction-status";
@@ -15,9 +16,7 @@ export function StatusPicker({ value, onChange, error }: PropsStatusPicker) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">
-        {t("modal.status")} *
-      </label>
+      <label className="text-sm font-medium">{t("modal.status")} *</label>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {FACTION_STATUS_CONSTANT.map((status) => {
           const Icon = status.icon;

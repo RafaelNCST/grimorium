@@ -73,7 +73,7 @@ export function CommunicationPicker({
   onChange,
   otherCommunication,
   onOtherCommunicationChange,
-  otherCommunicationError
+  otherCommunicationError,
 }: PropsCommunicationPicker) {
   const { t } = useTranslation("create-race");
   const isOther = values?.includes("other") ?? false;
@@ -88,9 +88,7 @@ export function CommunicationPicker({
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium">
-        {t("modal.communication")}
-      </label>
+      <label className="text-sm font-medium">{t("modal.communication")}</label>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {RACE_COMMUNICATIONS.map((comm) => {
@@ -100,9 +98,13 @@ export function CommunicationPicker({
           const darkTextColor = getDarkColorFromTailwindClass(comm.color);
           const lightBgColor = getBgColorFromTailwindClass(comm.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(comm.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(comm.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(comm.borderColor);
-          const isOtherOption = comm.value === 'other';
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            comm.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            comm.borderColor
+          );
+          const isOtherOption = comm.value === "other";
 
           return (
             <button
@@ -111,7 +113,7 @@ export function CommunicationPicker({
               onClick={() => toggleCommunication(comm.value)}
               data-communication={comm.value}
               className={`communication-picker-item flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                isOtherOption ? 'col-span-2 md:col-span-4' : ''
+                isOtherOption ? "col-span-2 md:col-span-4" : ""
               } ${
                 isSelected
                   ? `${comm.bgColor} ${comm.borderColor} shadow-lg`
@@ -185,7 +187,9 @@ export function CommunicationPicker({
             <span>{otherCommunication?.length || 0}/300</span>
           </div>
           {otherCommunicationError && (
-            <p className="text-sm text-destructive">{t(otherCommunicationError)}</p>
+            <p className="text-sm text-destructive">
+              {t(otherCommunicationError)}
+            </p>
           )}
         </div>
       )}

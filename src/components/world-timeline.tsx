@@ -356,8 +356,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
     "Personagem não encontrado";
 
   const getOrganizationName = (id: string) =>
-    mockFactions.find((o) => o.id === id)?.name ||
-    "Organização não encontrada";
+    mockFactions.find((o) => o.id === id)?.name || "Organização não encontrada";
 
   if (timeline.length === 0) {
     return (

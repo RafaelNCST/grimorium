@@ -35,12 +35,7 @@ export function CreateFactionModal({
 
   const isValid = useMemo(() => {
     const [name, summary, status, factionType] = watchedFields;
-    return Boolean(
-      name?.trim() &&
-        summary?.trim() &&
-        status &&
-        factionType
-    );
+    return Boolean(name?.trim() && summary?.trim() && status && factionType);
   }, [watchedFields]);
 
   const handleClose = useCallback(() => {

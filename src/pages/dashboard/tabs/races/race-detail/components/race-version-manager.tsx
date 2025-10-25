@@ -17,7 +17,11 @@ interface RaceVersionManagerProps {
   versions: IRaceVersion[];
   currentVersion: IRaceVersion | null;
   onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (data: { name: string; description: string; raceData: IRace }) => void;
+  onVersionCreate: (data: {
+    name: string;
+    description: string;
+    raceData: IRace;
+  }) => void;
   onVersionDelete: (versionId: string) => void;
   isEditMode: boolean;
   mainRaceData: IRace;
@@ -45,7 +49,11 @@ export function RaceVersionManager({
     }
   };
 
-  const handleCreateVersion = (data: { name: string; description: string; raceData: IRace }) => {
+  const handleCreateVersion = (data: {
+    name: string;
+    description: string;
+    raceData: IRace;
+  }) => {
     onVersionCreate(data);
     setIsCreateDialogOpen(false);
   };

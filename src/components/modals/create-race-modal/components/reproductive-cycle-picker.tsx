@@ -112,7 +112,7 @@ export function ReproductiveCyclePicker({
   onChange,
   otherCycleDescription,
   onOtherCycleDescriptionChange,
-  otherCycleError
+  otherCycleError,
 }: PropsReproductiveCyclePicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
@@ -131,8 +131,12 @@ export function ReproductiveCyclePicker({
           const darkTextColor = getDarkColorFromTailwindClass(cycle.color);
           const lightBgColor = getBgColorFromTailwindClass(cycle.bgColor);
           const darkBgColor = getDarkBgColorFromTailwindClass(cycle.bgColor);
-          const lightBorderColor = getBorderColorFromTailwindClass(cycle.borderColor);
-          const darkBorderColor = getDarkBorderColorFromTailwindClass(cycle.borderColor);
+          const lightBorderColor = getBorderColorFromTailwindClass(
+            cycle.borderColor
+          );
+          const darkBorderColor = getDarkBorderColorFromTailwindClass(
+            cycle.borderColor
+          );
 
           return (
             <button

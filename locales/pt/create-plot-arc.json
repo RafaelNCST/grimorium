@@ -1,0 +1,71 @@
+{
+  "modal": {
+    "create_arc": "Criar Novo Arco Narrativo",
+    "info_message": "Preencha os campos básicos para criar seu arco. Você pode adicionar informações avançadas depois.",
+    "basic_fields": "Campos Básicos",
+    "advanced_fields": "Campos Avançados",
+    "arc_name": "Nome do Arco",
+    "arc_name_placeholder": "A Jornada do Herói",
+    "arc_summary": "Resumo do Arco",
+    "arc_summary_placeholder": "Neste arco, o protagonista embarca em uma jornada épica para descobrir suas verdadeiras origens...",
+    "arc_status": "Status do Arco",
+    "current_arc_warning": "Já existe um arco atual. Você pode ter apenas um arco atual por vez.",
+    "arc_size": "Tamanho do Arco",
+    "arc_size_intro": "Escolha o tamanho estimado do arco baseado na quantidade de capítulos que você imagina:",
+    "arc_focus": "Foco do Arco",
+    "arc_focus_placeholder": "Desenvolvimento do protagonista e descoberta de suas origens",
+    "event_chain": "Cadeia de Eventos",
+    "add_event": "Adicionar Evento",
+    "event_name": "Nome do Evento",
+    "event_name_placeholder": "Encontro com o mentor",
+    "event_description": "Descrição do Evento",
+    "event_description_placeholder": "O protagonista encontra seu mentor pela primeira vez em uma taverna movimentada...",
+    "no_events": "Nenhum evento adicionado. Adicione pelo menos um evento para continuar.",
+    "event_required": "É necessário adicionar pelo menos um evento",
+    "important_characters": "Personagens Importantes",
+    "select_character": "Selecionar personagem",
+    "no_characters_selected": "Nenhum personagem selecionado",
+    "no_characters_available": "Nenhum personagem cadastrado. Crie personagens na aba de personagens para adicioná-los aqui.",
+    "important_factions": "Facções Importantes",
+    "select_faction": "Selecionar facção",
+    "no_factions_selected": "Nenhuma facção selecionada",
+    "no_factions_available": "Nenhuma facção cadastrada. Crie facções na aba de facções para adicioná-las aqui.",
+    "important_items": "Itens Importantes",
+    "select_item": "Selecionar item",
+    "no_items_selected": "Nenhum item selecionado",
+    "no_items_available": "Nenhum item cadastrado. Crie itens na aba de itens para adicioná-los aqui.",
+    "selected_singular": "selecionado",
+    "selected_plural": "selecionados",
+    "arc_message": "Mensagem do Arco",
+    "arc_message_placeholder": "A verdadeira força vem de dentro, não de poderes externos",
+    "world_impact": "Impacto no Mundo",
+    "world_impact_placeholder": "A revelação das origens do protagonista muda o equilíbrio de poder entre os reinos..."
+  },
+  "statuses": {
+    "finished": "Finalizado",
+    "current": "Atual",
+    "planning": "Planejamento"
+  },
+  "sizes": {
+    "mini": "Mini",
+    "mini_description": "Curtinho e rápido - menos de 10 capítulos para não cansar!",
+    "small": "Pequeno",
+    "small_description": "Um arco compacto - até 50 capítulos de pura aventura!",
+    "medium": "Médio",
+    "medium_description": "Bem balanceado - até 200 capítulos de boa história!",
+    "large": "Grande",
+    "large_description": "Épico de respeito - mais de 200 capítulos, prepara o café!"
+  },
+  "button": {
+    "cancel": "Cancelar",
+    "create": "Criar Arco",
+    "save": "Salvar",
+    "add": "Adicionar"
+  },
+  "toast": {
+    "fill_required_fields": "Por favor, preencha todos os campos obrigatórios",
+    "only_one_current_arc": "Só pode haver um arco atual por vez",
+    "arc_created": "Arco narrativo criado com sucesso!",
+    "create_failed": "Falha ao criar arco. Tente novamente."
+  }
+}

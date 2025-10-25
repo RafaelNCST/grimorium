@@ -88,9 +88,8 @@ export function DiplomacySection({
     onRelationsChange(diplomaticRelations.filter((r) => r.id !== relationId));
 
   // Get relation for a faction
-  const getRelationForFaction = (factionId: string) => {
-    return diplomaticRelations.find((r) => r.targetFactionId === factionId);
-  };
+  const getRelationForFaction = (factionId: string) =>
+    diplomaticRelations.find((r) => r.targetFactionId === factionId);
 
   // Render faction card
   const renderFactionCard = (
@@ -208,7 +207,9 @@ export function DiplomacySection({
                     value={status.value}
                     className="flex items-center gap-1 sm:gap-2"
                   >
-                    <Icon className={`w-4 h-4 flex-shrink-0 ${status.colorClass}`} />
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 ${status.colorClass}`}
+                    />
                     <span className="hidden md:inline truncate">
                       {t(`diplomatic_status.${status.value}`)}
                     </span>

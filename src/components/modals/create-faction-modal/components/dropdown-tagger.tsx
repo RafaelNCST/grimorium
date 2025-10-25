@@ -38,9 +38,8 @@ export function DropdownTagger({
     onChange(value.filter((v) => v !== id));
   };
 
-  const getName = (id: string) => {
-    return options.find((opt) => opt.id === id)?.name || id;
-  };
+  const getName = (id: string) =>
+    options.find((opt) => opt.id === id)?.name || id;
 
   const availableOptions = options.filter((opt) => !value.includes(opt.id));
 
@@ -49,7 +48,9 @@ export function DropdownTagger({
       <div className="space-y-2">
         <Label className="text-sm font-medium">{label}</Label>
         <Alert className="bg-muted/50">
-          <AlertDescription className="text-xs">{emptyMessage}</AlertDescription>
+          <AlertDescription className="text-xs">
+            {emptyMessage}
+          </AlertDescription>
         </Alert>
       </div>
     );

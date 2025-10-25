@@ -1543,8 +1543,7 @@ export function CharacterDetailView({
                             t={t}
                           >
                             {isEditing ? (
-                              mockFactions &&
-                              mockFactions.length > 0 ? (
+                              mockFactions && mockFactions.length > 0 ? (
                                 <Select
                                   value={editData.organization || ""}
                                   onValueChange={(value) =>
