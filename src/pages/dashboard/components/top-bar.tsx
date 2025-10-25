@@ -48,7 +48,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={onBack}
-              className="hover:bg-muted"
+              className="hover:bg-accent hover:text-accent-foreground"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -67,7 +67,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={() => onShowDeleteDialog(true)}
-              className="hover:bg-destructive/10 text-destructive"
+              className="text-destructive hover:bg-red-500/20 hover:text-red-600"
             >
               <Trash2 className="w-5 h-5" />
             </Button>
@@ -83,7 +83,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={onNavigateToChapters}
-              className="hover:bg-muted"
+              className="hover:bg-accent hover:text-accent-foreground"
             >
               <Book className="w-5 h-5" />
             </Button>
@@ -99,7 +99,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={onNavigateToNotes}
-              className="hover:bg-muted"
+              className="hover:bg-accent hover:text-accent-foreground"
             >
               <NotebookTabs className="w-5 h-5" />
             </Button>
@@ -115,7 +115,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={onCustomizingToggle}
-              className={`hover:bg-muted ${isCustomizing ? "bg-primary/10 text-primary" : ""}`}
+              className={`hover:bg-accent hover:text-accent-foreground ${isCustomizing ? "bg-primary/10 text-primary" : ""}`}
             >
               <Palette className="w-5 h-5" />
             </Button>
@@ -133,7 +133,7 @@ export function TopBar({
               variant="ghost"
               size="icon"
               onClick={() => onHeaderHiddenChange(!isHeaderHidden)}
-              className="hover:bg-muted"
+              className="hover:bg-accent hover:text-accent-foreground"
             >
               {isHeaderHidden ? (
                 <Eye className="w-5 h-5" />
