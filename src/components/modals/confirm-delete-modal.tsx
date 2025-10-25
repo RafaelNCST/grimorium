@@ -91,6 +91,8 @@ export function ConfirmDeleteModal({
           </Button>
           <Button
             variant="destructive"
+            size="lg"
+            className="animate-glow-red"
             onClick={handleConfirm}
             disabled={!isConfirmEnabled}
           >

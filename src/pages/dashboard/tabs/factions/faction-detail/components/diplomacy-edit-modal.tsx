@@ -355,7 +355,12 @@ export function DiplomacyEditModal({
                 </Button>
               )}
               {editingRelation && onDelete && (
-                <Button variant="destructive" onClick={handleDelete}>
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  className="animate-glow-red"
+                  onClick={handleDelete}
+                >
                   {t("diplomacy.delete")}
                 </Button>
               )}

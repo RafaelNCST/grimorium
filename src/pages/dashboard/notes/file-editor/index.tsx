@@ -221,7 +221,12 @@ export default function FileEditor() {
               >
                 Cancelar
               </Button>
-              <Button variant="destructive" onClick={handleDelete}>
+              <Button
+                variant="destructive"
+                size="lg"
+                className="animate-glow-red"
+                onClick={handleDelete}
+              >
                 Excluir
               </Button>
             </div>

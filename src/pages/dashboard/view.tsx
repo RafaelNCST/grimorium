@@ -18,6 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -276,13 +277,15 @@ export function DashboardView({
               >
                 Cancelar
               </AlertDialogCancel>
-              <AlertDialogAction
+              <Button
+                variant="destructive"
+                size="lg"
+                className="animate-glow-red"
                 onClick={onDelete}
                 disabled={deleteInput !== book.title}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 Excluir Livro
-              </AlertDialogAction>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

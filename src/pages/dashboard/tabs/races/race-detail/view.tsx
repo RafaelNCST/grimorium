@@ -176,9 +176,9 @@ function RaceDeleteConfirmationDialog({
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
                   placeholder={t("delete.race.step1.input_placeholder")}
-                  className={
+                  className={`font-mono ${
                     !isNameValid && nameInput ? "border-destructive" : ""
-                  }
+                  }`}
                 />
                 {!isNameValid && nameInput && (
                   <p className="text-sm text-destructive">
@@ -195,7 +195,11 @@ function RaceDeleteConfirmationDialog({
             <Button
               onClick={handleConfirm}
               disabled={!isNameValid}
-              variant="destructive"
+              variant="magical"
+              size="lg"
+              className={`animate-glow ${
+                !isNameValid ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {t("delete.race.step1.continue")}
             </Button>
@@ -224,12 +228,14 @@ function RaceDeleteConfirmationDialog({
           <AlertDialogCancel onClick={handleCancel}>
             {t("delete.race.step2.cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction
+          <Button
+            variant="destructive"
+            size="lg"
+            className="animate-glow-red"
             onClick={handleConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {t("delete.race.step2.confirm")}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

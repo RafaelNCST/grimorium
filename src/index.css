@@ -311,6 +311,28 @@
     }
   }
 
+  /* Glow animation - Red variant */
+  .animate-glow-red {
+    animation: glow-red 2s ease-in-out infinite alternate;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-glow-red:hover {
+    box-shadow:
+      0 0 30px hsl(0 62.8% 50% / 0.4),
+      0 8px 25px hsl(0 62.8% 50% / 0.4);
+    filter: brightness(1.2);
+  }
+
+  @keyframes glow-red {
+    from {
+      box-shadow: 0 0 20px hsl(0 62.8% 50% / 0.2);
+    }
+    to {
+      box-shadow: 0 0 30px hsl(0 62.8% 50% / 0.4);
+    }
+  }
+
   /* Fade in up animation */
   .animate-fade-in-up {
     animation: fadeInUp 0.5s ease-out forwards;

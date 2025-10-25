@@ -1316,7 +1316,12 @@ export function PlotArcDetailView({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("button.cancel")}</AlertDialogCancel>
-            <Button onClick={onDeleteEvent} variant="destructive">
+            <Button
+              onClick={onDeleteEvent}
+              variant="destructive"
+              size="lg"
+              className="animate-glow-red"
+            >
               {t("button.delete")}
             </Button>
           </AlertDialogFooter>

@@ -497,14 +497,16 @@ export function ChaptersPage() {
             >
               Cancelar
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              variant="destructive"
+              size="lg"
+              className="animate-glow-red"
               onClick={() =>
                 chapterToDelete && handleDeleteChapter(chapterToDelete)
               }
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Excluir
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -540,7 +542,10 @@ export function ChaptersPage() {
             <AlertDialogCancel onClick={() => setShowBulkDeleteDialog(false)}>
               Cancelar
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              variant="destructive"
+              size="lg"
+              className="animate-glow-red"
               onClick={(e) => {
                 const input =
                   e.currentTarget.parentElement?.parentElement?.querySelector(
@@ -550,11 +555,10 @@ export function ChaptersPage() {
                   handleBulkDelete();
                 }
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled
             >
               Excluir Capítulos
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

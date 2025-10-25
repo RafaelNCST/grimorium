@@ -107,9 +107,10 @@ export function ResetDatabaseButton() {
             </Button>
             <Button
               variant="destructive"
+              size="lg"
               onClick={handleReset}
               disabled={isResetting}
-              className="gap-2"
+              className="gap-2 animate-glow-red"
             >
               {isResetting ? (
                 <>

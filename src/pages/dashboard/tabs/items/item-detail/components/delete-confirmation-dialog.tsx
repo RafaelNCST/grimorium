@@ -108,12 +108,14 @@ export function DeleteConfirmationDialog({
             <AlertDialogCancel onClick={handleCancel}>
               {t("delete.version.cancel")}
             </AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              variant="destructive"
+              size="lg"
+              className="animate-glow-red"
               onClick={handleConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t("delete.version.confirm")}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -150,7 +152,7 @@ export function DeleteConfirmationDialog({
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck="false"
-                    className={`${
+                    className={`font-mono ${
                       nameInput.length > 0 && !isNameValid
                         ? "border-destructive focus-visible:ring-destructive"
                         : ""
@@ -213,12 +215,14 @@ export function DeleteConfirmationDialog({
               <AlertDialogCancel onClick={handleCancel}>
                 {t("delete.item.step2.cancel")}
               </AlertDialogCancel>
-              <AlertDialogAction
+              <Button
+                variant="destructive"
+                size="lg"
+                className="animate-glow-red"
                 onClick={handleConfirm}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 {t("delete.item.step2.confirm")}
-              </AlertDialogAction>
+              </Button>
             </AlertDialogFooter>
           </>
         )}

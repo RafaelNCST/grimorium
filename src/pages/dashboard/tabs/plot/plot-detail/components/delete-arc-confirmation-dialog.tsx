@@ -95,7 +95,7 @@ export function DeleteArcConfirmationDialog({
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck="false"
-                    className={`${
+                    className={`font-mono ${
                       nameInput.length > 0 && !isNameValid
                         ? "border-destructive focus-visible:ring-destructive"
                         : ""
@@ -158,7 +158,12 @@ export function DeleteArcConfirmationDialog({
               <AlertDialogCancel onClick={handleCancel}>
                 {t("delete.arc.step2.cancel")}
               </AlertDialogCancel>
-              <Button onClick={handleConfirm} variant="destructive">
+              <Button
+                onClick={handleConfirm}
+                variant="destructive"
+                size="lg"
+                className="animate-glow-red"
+              >
                 {t("delete.arc.step2.confirm")}
               </Button>
             </AlertDialogFooter>
