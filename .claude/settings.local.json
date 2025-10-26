@@ -64,7 +64,8 @@
       "Bash(for file in src/pages/dashboard/tabs/races/constants/type-colors-constant.ts src/pages/dashboard/tabs/races/components/add-races-to-group-modal.tsx src/pages/dashboard/tabs/races/components/race-card.tsx src/pages/dashboard/tabs/races/components/race-group-accordion.tsx src/pages/dashboard/tabs/races/components/species-card.tsx src/pages/dashboard/tabs/races/components/stats-badges.tsx src/pages/dashboard/tabs/races/race-detail/index.tsx src/pages/dashboard/tabs/races/race-detail/view.tsx src/lib/db/race-groups.service.ts src/lib/db/races.service.ts)",
       "Bash(do sed -i 's/species-types/race-types/g' \"$file\")",
       "Bash(VITE_PORT=3001 pnpm dev:*)",
-      "Bash(exit 0)"
+      "Bash(exit 0)",
+      "Bash(cmd //c \"taskkill //PID 38932 //F\")"
     ],
     "deny": [],
     "ask": []

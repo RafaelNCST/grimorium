@@ -17,6 +17,7 @@ import enItemDetail from "../../locales/en/item-detail.json";
 import enItems from "../../locales/en/items.json";
 import enOverview from "../../locales/en/overview.json";
 import enPlot from "../../locales/en/plot.json";
+import enPowerSystem from "../../locales/en/power-system.json";
 import enRaceDetail from "../../locales/en/race-detail.json";
 import enRaces from "../../locales/en/races.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
@@ -35,6 +36,7 @@ import ptItemDetail from "../../locales/pt/item-detail.json";
 import ptItems from "../../locales/pt/items.json";
 import ptOverview from "../../locales/pt/overview.json";
 import ptPlot from "../../locales/pt/plot.json";
+import ptPowerSystem from "../../locales/pt/power-system.json";
 import ptRaceDetail from "../../locales/pt/race-detail.json";
 import ptRaces from "../../locales/pt/races.json";
 
@@ -56,6 +58,7 @@ const resources = {
     items: enItems,
     overview: enOverview,
     plot: enPlot,
+    "power-system": enPowerSystem,
     "race-detail": enRaceDetail,
     races: enRaces,
   },
@@ -76,6 +79,7 @@ const resources = {
     items: ptItems,
     overview: ptOverview,
     plot: ptPlot,
+    "power-system": ptPowerSystem,
     "race-detail": ptRaceDetail,
     races: ptRaces,
   },

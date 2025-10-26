@@ -9,11 +9,8 @@ import {
   ArrowLeft,
   Square,
   Zap,
-  Plus,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
-import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 
 import { HelpDialog } from "./components/help-dialog";
@@ -121,47 +118,14 @@ export function PowerSystemView({
   onPropertiesClose,
   onPropertiesDelete,
 }: PropsPowerSystemView) {
-  const { t } = useTranslation("power-system");
-
-  const hasElements = currentMap.elements.length > 0;
-
-  // Empty state when no elements exist and not in edit mode
-  if (!hasElements && !isEditMode) {
-    return (
-      <div className="flex-1 h-full flex flex-col space-y-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">{t("page.title")}</h2>
-            <p className="text-muted-foreground">{t("page.description")}</p>
-          </div>
-          <Button
-            variant="magical"
-            size="lg"
-            onClick={onToggleEditMode}
-            className="animate-glow"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {t("page.new_system")}
-          </Button>
-        </div>
-
-        <EmptyState
-          icon={Zap}
-          title={t("empty_state.no_system")}
-          description={t("empty_state.no_system_description")}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="h-full flex">
       {isEditMode && (
         <div className="w-64 bg-background border-r flex flex-col">
           <div className="p-4 border-b">
-            <h3 className="font-semibold mb-1">{t("page.elements")}</h3>
+            <h3 className="font-semibold mb-1">Elementos</h3>
             <p className="text-xs text-muted-foreground">
-              {t("page.elements_description")}
+              Clique para adicionar ao mapa
             </p>
           </div>
 
@@ -192,7 +156,7 @@ export function PowerSystemView({
               onClick={() => onSetShowTutorialDialog(true)}
             >
               <HelpCircle className="w-4 h-4 mr-2" />
-              {t("page.tutorial")}
+              Tutorial
             </Button>
             <Button
               variant="outline"
@@ -201,7 +165,7 @@ export function PowerSystemView({
               onClick={() => onSetShowTemplateDialog(true)}
             >
               <Copy className="w-4 h-4 mr-2" />
-              {t("page.templates")}
+              Templates
             </Button>
           </div>
         </div>
@@ -211,14 +175,16 @@ export function PowerSystemView({
         <div className="flex items-center justify-between p-4 border-b bg-background">
           <div className="flex items-center gap-4">
             <div>
-              <h2 className="text-2xl font-bold">{t("page.title")}</h2>
-              <p className="text-muted-foreground">{t("page.description")}</p>
+              <h2 className="text-2xl font-bold">Sistema de Poder</h2>
+              <p className="text-muted-foreground">
+                Crie mapas visuais conectáveis do seu sistema
+              </p>
             </div>
 
             {currentMap.parentMapId && (
               <Button variant="outline" size="sm" onClick={onGoBackToParent}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                {t("page.back")}
+                Voltar
               </Button>
             )}
           </div>
@@ -234,13 +200,13 @@ export function PowerSystemView({
               ) : (
                 <Eye className="w-4 h-4 mr-2" />
               )}
-              {isEditMode ? t("page.edit_mode") : t("page.view_mode")}
+              {isEditMode ? "Editando" : "Visualizando"}
             </Button>
 
             {isEditMode && (
               <Button variant="outline" size="sm" onClick={onSave}>
                 <Save className="w-4 h-4 mr-2" />
-                {t("page.save")}
+                Salvar
               </Button>
             )}
 
@@ -250,7 +216,7 @@ export function PowerSystemView({
               onClick={() => onSetShowHelpDialog(true)}
             >
               <HelpCircle className="w-4 h-4 mr-2" />
-              {t("page.help")}
+              Ajuda
             </Button>
           </div>
         </div>
@@ -287,18 +253,26 @@ export function PowerSystemView({
               />
             ))}
 
-            {currentMap.elements.length === 0 && isEditMode && (
+            {currentMap.elements.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                     <Zap className="w-8 h-8 text-muted-foreground" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">
-                    {t("empty_state.no_system")}
+                    Sistema de Poder Vazio
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    {t("empty_state.edit_mode_hint")}
+                    {isEditMode
+                      ? "Use a barra lateral para adicionar elementos"
+                      : "Ative o modo de edição para começar"}
                   </p>
+                  {!isEditMode && (
+                    <Button onClick={onToggleEditMode}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Entrar no Modo Edição
+                    </Button>
+                  )}
                 </div>
               </div>
             )}

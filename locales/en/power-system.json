@@ -1,0 +1,23 @@
+{
+  "page": {
+    "title": "Power System",
+    "description": "Create connectable visual maps of your power system",
+    "new_system": "New System",
+    "edit_mode": "Editing",
+    "view_mode": "Viewing",
+    "save": "Save",
+    "help": "Help",
+    "back": "Back",
+    "elements": "Elements",
+    "elements_description": "Click to add to map",
+    "tutorial": "Tutorial",
+    "templates": "Templates"
+  },
+  "empty_state": {
+    "no_system": "Empty Power System",
+    "no_system_description": "Create your first element to start building your power system",
+    "edit_mode_hint": "Use the sidebar to add elements",
+    "view_mode_hint": "Enable edit mode to get started",
+    "enter_edit_mode": "Enter Edit Mode"
+  }
+}
