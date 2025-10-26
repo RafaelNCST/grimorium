@@ -247,12 +247,6 @@
     @apply bg-muted-foreground/50;
   }
 
-  /* Prevent content shift when scrollbar appears */
-  .overflow-y-auto,
-  .overflow-auto {
-    scrollbar-gutter: stable;
-  }
-
   /* Custom scrollbar for specific containers */
   .custom-scrollbar::-webkit-scrollbar {
     @apply w-1.5;
