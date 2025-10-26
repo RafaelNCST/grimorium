@@ -65,7 +65,8 @@
       "Bash(do sed -i 's/species-types/race-types/g' \"$file\")",
       "Bash(VITE_PORT=3001 pnpm dev:*)",
       "Bash(exit 0)",
-      "Bash(cmd //c \"taskkill //PID 38932 //F\")"
+      "Bash(cmd //c \"taskkill //PID 38932 //F\")",
+      "Bash(Select-String -Pattern \"error TS\")"
     ],
     "deny": [],
     "ask": []

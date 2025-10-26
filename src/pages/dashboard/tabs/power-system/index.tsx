@@ -11,10 +11,12 @@ import {
 } from "./types/power-system-types";
 import { PowerSystemView } from "./view";
 
-export function PowerSystemTab() {
-  const canvasRef = useRef<HTMLDivElement>(null);
+interface PropsPowerSystemTab {
+  isHeaderHidden: boolean;
+}
 
-  const [isEditMode, setIsEditMode] = useState(false);
+export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
+  const canvasRef = useRef<HTMLDivElement>(null);
   const [currentMap, setCurrentMap] = useState<IPowerMap>({
     id: "main",
     name: "Sistema de Poder Principal",
@@ -24,11 +26,7 @@ export function PowerSystemTab() {
   const [maps, setMaps] = useState<IPowerMap[]>([]);
   const [templates, setTemplates] = useState<ITemplate[]>([]);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [viewOffset, setViewOffset] = useState({ x: 0, y: 0 });
-  const [isViewDragging, setIsViewDragging] = useState(false);
-  const [viewDragStart, setViewDragStart] = useState({ x: 0, y: 0 });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newElementType, setNewElementType] =
     useState<ElementType>("section-card");
@@ -45,31 +43,20 @@ export function PowerSystemTab() {
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (!isEditMode) {
-        setIsViewDragging(true);
-        setViewDragStart({
-          x: e.clientX - viewOffset.x,
-          y: e.clientY - viewOffset.y,
-        });
-      }
+      // Removido - sempre em modo edição
     },
-    [isEditMode, viewOffset]
+    []
   );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      if (isViewDragging && !isEditMode) {
-        setViewOffset({
-          x: e.clientX - viewDragStart.x,
-          y: e.clientY - viewDragStart.y,
-        });
-      }
+      // Removido - sempre em modo edição
     },
-    [isViewDragging, isEditMode, viewDragStart]
+    []
   );
 
   const handleMouseUp = useCallback(() => {
-    setIsViewDragging(false);
+    // Removido - sempre em modo edição
   }, []);
 
   const handleCreateElement = useCallback(
@@ -183,25 +170,13 @@ export function PowerSystemTab() {
     }
   }, [currentMap.parentMapId, maps]);
 
-  const handleToggleEditMode = useCallback(() => {
-    setIsEditMode((prev) => !prev);
-    setShowPropertiesPanel(false);
-    setSelectedElement(null);
-  }, []);
-
   const handleElementClick = useCallback(
     (element: IPowerElement) => {
-      if (isEditMode) {
-        setSelectedElement(element.id);
-        setShowPropertiesPanel(true);
-      } else if (element.canOpenSubmap) {
-        handleSubmapOpen(element);
-      }
+      setSelectedElement(element.id);
+      setShowPropertiesPanel(true);
     },
-    [isEditMode, handleSubmapOpen]
+    []
   );
-
-  const handleSave = useCallback(() => {}, []);
 
   const handleTutorialNext = useCallback(
     () => setTutorialStep((prev) => prev + 1),
@@ -233,7 +208,7 @@ export function PowerSystemTab() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Delete" && selectedElement && isEditMode) {
+      if (e.key === "Delete" && selectedElement) {
         handleDeleteElement(selectedElement);
         setSelectedElement(null);
       }
@@ -241,11 +216,11 @@ export function PowerSystemTab() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedElement, isEditMode, handleDeleteElement]);
+  }, [selectedElement, handleDeleteElement]);
 
   return (
     <PowerSystemView
-      isEditMode={isEditMode}
+      isHeaderHidden={isHeaderHidden}
       currentMap={currentMap}
       maps={maps}
       templates={templates}
@@ -263,8 +238,6 @@ export function PowerSystemTab() {
       defaultColors={DEFAULT_COLORS_CONSTANT}
       tutorialSteps={TUTORIAL_STEPS_CONSTANT}
       canvasRef={canvasRef}
-      onToggleEditMode={handleToggleEditMode}
-      onSave={handleSave}
       onSetShowHelpDialog={setShowHelpDialog}
       onGoBackToParent={handleGoBackToParent}
       onMouseDown={handleMouseDown}

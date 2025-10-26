@@ -3,8 +3,6 @@
     "title": "Sistema de Poder",
     "description": "Crie mapas visuais conectáveis do seu sistema de poder",
     "new_system": "Novo Sistema",
-    "edit_mode": "Editando",
-    "view_mode": "Visualizando",
     "save": "Salvar",
     "help": "Ajuda",
     "back": "Voltar",
@@ -16,8 +14,6 @@
   "empty_state": {
     "no_system": "Sistema de Poder Vazio",
     "no_system_description": "Crie seu primeiro elemento para começar a construir seu sistema de poder",
-    "edit_mode_hint": "Use a barra lateral para adicionar elementos",
-    "view_mode_hint": "Ative o modo de edição para começar",
-    "enter_edit_mode": "Entrar no Modo Edição"
+    "edit_mode_hint": "Use a barra lateral para adicionar elementos"
   }
 }

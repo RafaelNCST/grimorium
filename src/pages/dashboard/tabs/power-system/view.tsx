@@ -1,19 +1,15 @@
 import { RefObject } from "react";
 
 import {
-  Eye,
-  Edit,
-  Save,
   HelpCircle,
   Copy,
   ArrowLeft,
   Square,
   Zap,
-  Plus,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 
 import { HelpDialog } from "./components/help-dialog";
@@ -41,7 +37,7 @@ interface ITutorialStep {
 }
 
 interface PropsPowerSystemView {
-  isEditMode: boolean;
+  isHeaderHidden: boolean;
   currentMap: IPowerMap;
   maps: IPowerMap[];
   templates: ITemplate[];
@@ -59,8 +55,6 @@ interface PropsPowerSystemView {
   defaultColors: string[];
   tutorialSteps: ITutorialStep[];
   canvasRef: RefObject<HTMLDivElement>;
-  onToggleEditMode: () => void;
-  onSave: () => void;
   onSetShowHelpDialog: (show: boolean) => void;
   onGoBackToParent: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
@@ -82,7 +76,7 @@ interface PropsPowerSystemView {
 }
 
 export function PowerSystemView({
-  isEditMode,
+  isHeaderHidden,
   currentMap,
   maps,
   templates,
@@ -100,8 +94,6 @@ export function PowerSystemView({
   defaultColors,
   tutorialSteps,
   canvasRef,
-  onToggleEditMode,
-  onSave,
   onSetShowHelpDialog,
   onGoBackToParent,
   onMouseDown,
@@ -123,42 +115,15 @@ export function PowerSystemView({
 }: PropsPowerSystemView) {
   const { t } = useTranslation("power-system");
 
-  const hasElements = currentMap.elements.length > 0;
-
-  // Empty state when no elements exist and not in edit mode
-  if (!hasElements && !isEditMode) {
-    return (
-      <div className="flex-1 h-full flex flex-col space-y-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">{t("page.title")}</h2>
-            <p className="text-muted-foreground">{t("page.description")}</p>
-          </div>
-          <Button
-            variant="magical"
-            size="lg"
-            onClick={onToggleEditMode}
-            className="animate-glow"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {t("page.new_system")}
-          </Button>
-        </div>
-
-        <EmptyState
-          icon={Zap}
-          title={t("empty_state.no_system")}
-          description={t("empty_state.no_system_description")}
-        />
-      </div>
-    );
-  }
+  // Calculate header height based on isHeaderHidden to align with TabsBar padding
+  // TabsBar uses pt-2 (8px) when hidden, pt-6 (24px) when visible
+  // We need to compensate the 16px difference (24px - 8px)
+  const headerHeight = isHeaderHidden ? "h-[88px]" : "h-[72px]";
 
   return (
     <div className="h-full flex">
-      {isEditMode && (
-        <div className="w-64 bg-background border-r flex flex-col">
-          <div className="p-4 border-b">
+      <div className="w-64 bg-background border-r flex flex-col">
+          <div className={`${headerHeight} px-4 py-4 flex flex-col justify-center border-b`}>
             <h3 className="font-semibold mb-1">{t("page.elements")}</h3>
             <p className="text-xs text-muted-foreground">
               {t("page.elements_description")}
@@ -183,32 +148,10 @@ export function PowerSystemView({
               </Button>
             ))}
           </div>
-
-          <div className="p-4 border-t space-y-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => onSetShowTutorialDialog(true)}
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              {t("page.tutorial")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => onSetShowTemplateDialog(true)}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              {t("page.templates")}
-            </Button>
-          </div>
         </div>
-      )}
 
       <div className="flex-1 flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b bg-background">
+        <div className={`${headerHeight} flex items-center justify-between px-4 py-4 border-b bg-background`}>
           <div className="flex items-center gap-4">
             <div>
               <h2 className="text-2xl font-bold">{t("page.title")}</h2>
@@ -225,24 +168,22 @@ export function PowerSystemView({
 
           <div className="flex items-center gap-2">
             <Button
-              variant={isEditMode ? "default" : "outline"}
+              variant="outline"
               size="sm"
-              onClick={onToggleEditMode}
+              onClick={() => onSetShowTutorialDialog(true)}
             >
-              {isEditMode ? (
-                <Edit className="w-4 h-4 mr-2" />
-              ) : (
-                <Eye className="w-4 h-4 mr-2" />
-              )}
-              {isEditMode ? t("page.edit_mode") : t("page.view_mode")}
+              <BookOpen className="w-4 h-4 mr-2" />
+              {t("page.tutorial")}
             </Button>
 
-            {isEditMode && (
-              <Button variant="outline" size="sm" onClick={onSave}>
-                <Save className="w-4 h-4 mr-2" />
-                {t("page.save")}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSetShowTemplateDialog(true)}
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              {t("page.templates")}
+            </Button>
 
             <Button
               variant="outline"
@@ -282,12 +223,12 @@ export function PowerSystemView({
                 element={element}
                 viewOffset={viewOffset}
                 isSelected={selectedElement === element.id}
-                isEditMode={isEditMode}
+                isEditMode={true}
                 onClick={() => onElementClick(element)}
               />
             ))}
 
-            {currentMap.elements.length === 0 && isEditMode && (
+            {currentMap.elements.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
@@ -304,7 +245,7 @@ export function PowerSystemView({
             )}
           </div>
 
-          {isEditMode && showPropertiesPanel && selectedElementData && (
+          {showPropertiesPanel && selectedElementData && (
             <div className="w-80 bg-background border-l">
               <PropertiesPanel
                 element={selectedElementData}

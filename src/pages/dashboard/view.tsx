@@ -231,10 +231,10 @@ export function DashboardView({
               <MemoizedPlotTab bookId={bookId} />
             </div>
             <div
-              className="absolute inset-0 overflow-y-auto px-6 py-6"
+              className="absolute inset-0 overflow-hidden"
               style={{ display: activeTab === "magic" ? "block" : "none" }}
             >
-              <MemoizedPowerSystemTab />
+              <MemoizedPowerSystemTab isHeaderHidden={isHeaderHidden} />
             </div>
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"
