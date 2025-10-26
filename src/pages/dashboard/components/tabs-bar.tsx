@@ -54,7 +54,7 @@ export function TabsBar({
   if (isCustomizing) {
     return (
       <>
-        <div className={`px-6 mb-4 ${isHeaderHidden ? "pt-4" : "pt-10"}`}>
+        <div className={`px-6 mb-4 ${isHeaderHidden ? "pt-2" : "pt-10"}`}>
           <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
             <Palette className="w-5 h-5" />
             Personalizar Abas
@@ -92,7 +92,7 @@ export function TabsBar({
   }
 
   return (
-    <div className="pointer-events-none pb-3 px-6 pt-6">
+    <div className={`pointer-events-none pb-3 px-6 ${isHeaderHidden ? "pt-2" : "pt-6"}`}>
       <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
         {visibleTabs.map((tab, index) => (
           <SortableTab
