@@ -2,18 +2,175 @@
   "page": {
     "title": "Power System",
     "description": "Create connectable visual maps of your power system",
-    "new_system": "New System",
+    "back": "Back",
     "save": "Save",
     "help": "Help",
-    "back": "Back",
-    "elements": "Elements",
-    "elements_description": "Click to add to map",
     "tutorial": "Tutorial",
     "templates": "Templates"
   },
+  "toolbar": {
+    "title": "Tools",
+    "select": "Select",
+    "basic_section": "Basic Section",
+    "detailed_section": "Detailed Section",
+    "visual_section": "Visual Section",
+    "text": "Text",
+    "arrow": "Arrow",
+    "line": "Line",
+    "grid_toggle": "Toggle Grid",
+    "hand": "Hand"
+  },
+  "toolbar_tooltips": {
+    "select": "Select and move elements (V)",
+    "basic_section": "Create basic section - Rectangular with title and description",
+    "detailed_section": "Create detailed section - With circular image and subtitle",
+    "circle": "Circle Shape - Circular shape with image or color",
+    "square": "Square Shape - Square shape with rounded corners",
+    "diamond": "Diamond Shape - Diamond shape with rounded corners",
+    "text": "Create text box - Free text without background",
+    "arrow": "Create arrow - Points from element to anywhere",
+    "line": "Create line - Connects two elements",
+    "grid_on": "Grid enabled - Elements snap to grid",
+    "grid_off": "Grid disabled - Free movement",
+    "hand": "Hand (H) - Navigate canvas"
+  },
+  "canvas": {
+    "zoom_in": "Zoom In (Ctrl + Scroll)",
+    "zoom_out": "Zoom Out (Ctrl + Scroll)",
+    "reset_view": "Reset View"
+  },
+  "elements": {
+    "basic_section": {
+      "default_title": "New Section",
+      "default_description": "Section description...",
+      "title_placeholder": "Section title",
+      "description_placeholder": "Description..."
+    },
+    "detailed_section": {
+      "default_title": "Detailed Section",
+      "default_subtitle": "Subtitle",
+      "default_description": "Detailed description...",
+      "title_placeholder": "Title",
+      "subtitle_placeholder": "Subtitle",
+      "description_placeholder": "Description...",
+      "add_image": "Add Image",
+      "change_image": "Change Image",
+      "remove_image": "Remove Image"
+    },
+    "visual_section": {
+      "default_hover_title": "Visual Element",
+      "default_hover_subtitle": "Subtitle",
+      "default_hover_description": "Hover to see details",
+      "add_image": "Add Image",
+      "change_image": "Change Image",
+      "remove_image": "Remove Image",
+      "select_shape": "Select Shape",
+      "shape_circle": "Circle",
+      "shape_square": "Square",
+      "shape_rounded_square": "Rounded Square",
+      "shape_triangle": "Triangle"
+    },
+    "text": {
+      "default_content": "Write here",
+      "content_placeholder": "Write here..."
+    }
+  },
+  "properties_panel": {
+    "title": "Properties",
+    "close": "Close",
+    "delete": "Delete",
+    "section_appearance": "Appearance",
+    "section_navigation": "Navigation",
+    "section_hover_card": "Hover Card",
+    "section_text": "Text",
+    "background_color": "Background Color",
+    "text_color": "Text Color",
+    "shape": "Shape",
+    "image": "Image",
+    "image_profile": "Profile Image",
+    "image_background": "Background Image",
+    "upload_image": "Choose image...",
+    "remove_image": "Remove image",
+    "enable_navigation": "Enable Navigation",
+    "disable_navigation": "Disable Navigation",
+    "navigation_hint": "Allows opening a new area on click",
+    "show_hover_card": "Show Hover Card",
+    "hide_hover_card": "Hide Hover Card",
+    "hover_title": "Hover Title",
+    "hover_subtitle": "Hover Subtitle",
+    "hover_description": "Hover Description",
+    "font_size": "Font Size",
+    "font_weight": "Font Weight",
+    "font_weight_normal": "Normal",
+    "font_weight_bold": "Bold",
+    "text_align": "Alignment",
+    "text_align_left": "Left",
+    "text_align_center": "Center",
+    "text_align_right": "Right",
+    "connection_color": "Connection Color",
+    "connection_width": "Thickness",
+    "connection_label": "Label"
+  },
+  "breadcrumb": {
+    "root": "Main System",
+    "separator": "/"
+  },
+  "context_menu": {
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "bring_to_front": "Bring to Front",
+    "send_to_back": "Send to Back",
+    "open_submap": "Open Submap",
+    "create_submap": "Create Submap"
+  },
   "empty_state": {
-    "no_system": "Empty Power System",
-    "no_system_description": "Create your first element to start building your power system",
-    "edit_mode_hint": "Use the sidebar to add elements"
+    "title": "Empty Area",
+    "description": "Use the toolbar on the left to add elements",
+    "hint_edit": "Select a tool and click on the area",
+    "hint_hand": "Switch to Select tool to interact with elements"
+  },
+  "dialogs": {
+    "delete_element": {
+      "title": "Delete Element",
+      "description": "Are you sure you want to delete this element?",
+      "description_with_submap": "This element has an associated submap. Deleting it will also remove the submap.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "delete_connection": {
+      "title": "Delete Connection",
+      "description": "Are you sure you want to delete this connection?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "select": "V - Selection Tool",
+    "hand": "H - Hand Tool",
+    "basic_section": "B - Basic Section",
+    "detailed_section": "D - Detailed Section",
+    "circle": "C - Circle Shape",
+    "square": "S - Square Shape",
+    "diamond": "L - Diamond Shape",
+    "text": "T - Text",
+    "arrow": "A - Arrow",
+    "line": "R - Line",
+    "delete": "Delete - Delete Selected",
+    "duplicate": "Ctrl+D - Duplicate",
+    "undo": "Ctrl+Z - Undo",
+    "redo": "Ctrl+Y - Redo",
+    "grid_toggle": "G - Toggle Grid",
+    "zoom": "Ctrl + Scroll - Zoom In/Out",
+    "pan": "Drag Canvas - Move View"
+  },
+  "notifications": {
+    "saved": "Map saved successfully",
+    "save_error": "Error saving map",
+    "element_created": "Element created",
+    "element_deleted": "Element deleted",
+    "connection_created": "Connection created",
+    "connection_deleted": "Connection deleted"
   }
 }

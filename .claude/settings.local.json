@@ -66,7 +66,11 @@
       "Bash(VITE_PORT=3001 pnpm dev:*)",
       "Bash(exit 0)",
       "Bash(cmd //c \"taskkill //PID 38932 //F\")",
-      "Bash(Select-String -Pattern \"error TS\")"
+      "Bash(Select-String -Pattern \"error TS\")",
+      "Bash(node:*)",
+      "Bash(cmd //c \"taskkill //PID 21184 //F\")",
+      "Bash(cmd //c \"taskkill //PID 10028 //F\")",
+      "Bash(cmd //c \"taskkill //PID 29148 //F\")"
     ],
     "deny": [],
     "ask": []

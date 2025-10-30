@@ -2,18 +2,175 @@
   "page": {
     "title": "Sistema de Poder",
     "description": "Crie mapas visuais conectáveis do seu sistema de poder",
-    "new_system": "Novo Sistema",
+    "back": "Voltar",
     "save": "Salvar",
     "help": "Ajuda",
-    "back": "Voltar",
-    "elements": "Elementos",
-    "elements_description": "Clique para adicionar ao mapa",
     "tutorial": "Tutorial",
     "templates": "Templates"
   },
+  "toolbar": {
+    "title": "Ferramentas",
+    "select": "Selecionar",
+    "basic_section": "Seção Básica",
+    "detailed_section": "Seção Detalhada",
+    "visual_section": "Seção Visual",
+    "text": "Texto",
+    "arrow": "Seta",
+    "line": "Linha",
+    "grid_toggle": "Alternar Grid",
+    "hand": "Mão"
+  },
+  "toolbar_tooltips": {
+    "select": "Selecionar e mover elementos (V)",
+    "basic_section": "Criar seção básica - Retangular com título e descrição",
+    "detailed_section": "Criar seção detalhada - Com imagem circular e subtítulo",
+    "circle": "Forma Circular - Forma circular com imagem ou cor",
+    "square": "Forma Quadrada - Forma quadrada com bordas arredondadas",
+    "diamond": "Forma Losango - Forma de losango com bordas arredondadas",
+    "text": "Criar caixa de texto - Texto livre sem fundo",
+    "arrow": "Criar seta - Aponta de um elemento para qualquer lugar",
+    "line": "Criar linha - Conecta dois elementos",
+    "grid_on": "Grid ativado - Elementos se encaixam na grade",
+    "grid_off": "Grid desativado - Movimento livre",
+    "hand": "Mão (H) - Navegar pelo canvas"
+  },
+  "canvas": {
+    "zoom_in": "Aumentar Zoom (Ctrl + Scroll)",
+    "zoom_out": "Diminuir Zoom (Ctrl + Scroll)",
+    "reset_view": "Resetar Visualização"
+  },
+  "elements": {
+    "basic_section": {
+      "default_title": "Nova Seção",
+      "default_description": "Descrição da seção...",
+      "title_placeholder": "Título da seção",
+      "description_placeholder": "Descrição..."
+    },
+    "detailed_section": {
+      "default_title": "Seção Detalhada",
+      "default_subtitle": "Subtítulo",
+      "default_description": "Descrição detalhada...",
+      "title_placeholder": "Título",
+      "subtitle_placeholder": "Subtítulo",
+      "description_placeholder": "Descrição...",
+      "add_image": "Adicionar Imagem",
+      "change_image": "Alterar Imagem",
+      "remove_image": "Remover Imagem"
+    },
+    "visual_section": {
+      "default_hover_title": "Elemento Visual",
+      "default_hover_subtitle": "Subtítulo",
+      "default_hover_description": "Passe o mouse para ver detalhes",
+      "add_image": "Adicionar Imagem",
+      "change_image": "Alterar Imagem",
+      "remove_image": "Remover Imagem",
+      "select_shape": "Selecionar Forma",
+      "shape_circle": "Circular",
+      "shape_square": "Quadrado",
+      "shape_rounded_square": "Quadrado Arredondado",
+      "shape_triangle": "Triângulo"
+    },
+    "text": {
+      "default_content": "Escreva aqui",
+      "content_placeholder": "Escreva aqui..."
+    }
+  },
+  "properties_panel": {
+    "title": "Propriedades",
+    "close": "Fechar",
+    "delete": "Excluir",
+    "section_appearance": "Aparência",
+    "section_navigation": "Navegação",
+    "section_hover_card": "Card Hover",
+    "section_text": "Texto",
+    "background_color": "Cor de Fundo",
+    "text_color": "Cor do Texto",
+    "shape": "Forma",
+    "image": "Imagem",
+    "image_profile": "Imagem do Perfil",
+    "image_background": "Imagem de Fundo",
+    "upload_image": "Escolher imagem...",
+    "remove_image": "Remover imagem",
+    "enable_navigation": "Habilitar Navegação",
+    "disable_navigation": "Desabilitar Navegação",
+    "navigation_hint": "Permite abrir uma nova área ao clicar",
+    "show_hover_card": "Mostrar Card Hover",
+    "hide_hover_card": "Ocultar Card Hover",
+    "hover_title": "Título do Hover",
+    "hover_subtitle": "Subtítulo do Hover",
+    "hover_description": "Descrição do Hover",
+    "font_size": "Tamanho da Fonte",
+    "font_weight": "Peso da Fonte",
+    "font_weight_normal": "Normal",
+    "font_weight_bold": "Negrito",
+    "text_align": "Alinhamento",
+    "text_align_left": "Esquerda",
+    "text_align_center": "Centro",
+    "text_align_right": "Direita",
+    "connection_color": "Cor da Conexão",
+    "connection_width": "Espessura",
+    "connection_label": "Rótulo"
+  },
+  "breadcrumb": {
+    "root": "Área Principal",
+    "separator": "/"
+  },
+  "context_menu": {
+    "edit": "Editar",
+    "duplicate": "Duplicar",
+    "delete": "Excluir",
+    "bring_to_front": "Trazer para Frente",
+    "send_to_back": "Enviar para Trás",
+    "open_submap": "Abrir Submapa",
+    "create_submap": "Criar Submapa"
+  },
   "empty_state": {
-    "no_system": "Sistema de Poder Vazio",
-    "no_system_description": "Crie seu primeiro elemento para começar a construir seu sistema de poder",
-    "edit_mode_hint": "Use a barra lateral para adicionar elementos"
+    "title": "Área Vazia",
+    "description": "Use a barra de ferramentas à esquerda para adicionar elementos",
+    "hint_edit": "Selecione uma ferramenta e clique na área",
+    "hint_hand": "Mude para a ferramenta Selecionar para interagir com elementos"
+  },
+  "dialogs": {
+    "delete_element": {
+      "title": "Excluir Elemento",
+      "description": "Tem certeza que deseja excluir este elemento?",
+      "description_with_submap": "Este elemento possui um submapa associado. Ao excluí-lo, o submapa também será removido.",
+      "confirm": "Excluir",
+      "cancel": "Cancelar"
+    },
+    "delete_connection": {
+      "title": "Excluir Conexão",
+      "description": "Tem certeza que deseja excluir esta conexão?",
+      "confirm": "Excluir",
+      "cancel": "Cancelar"
+    }
+  },
+  "shortcuts": {
+    "title": "Atalhos do Teclado",
+    "select": "V - Ferramenta de Seleção",
+    "hand": "H - Ferramenta Mão",
+    "basic_section": "B - Seção Básica",
+    "detailed_section": "D - Seção Detalhada",
+    "circle": "C - Forma Circular",
+    "square": "S - Forma Quadrada",
+    "diamond": "L - Forma Losango",
+    "text": "T - Texto",
+    "arrow": "A - Seta",
+    "line": "R - Linha",
+    "delete": "Delete - Excluir Selecionado",
+    "duplicate": "Ctrl+D - Duplicar",
+    "undo": "Ctrl+Z - Desfazer",
+    "redo": "Ctrl+Y - Refazer",
+    "grid_toggle": "G - Alternar Grid",
+    "zoom": "Ctrl + Scroll - Zoom In/Out",
+    "pan": "Arrastar Canvas - Mover Visualização"
+  },
+  "notifications": {
+    "saved": "Mapa salvo com sucesso",
+    "save_error": "Erro ao salvar mapa",
+    "element_created": "Elemento criado",
+    "element_deleted": "Elemento excluído",
+    "connection_created": "Conexão criada",
+    "connection_deleted": "Conexão excluída"
   }
 }
