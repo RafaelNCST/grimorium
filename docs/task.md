@@ -1,67 +1,30 @@
-# Refatorar formas e cards na tab sistema de poder
+## Bloco de imagem (Novo Bloco)
 
-## Cards
+Agora, ao lado do botão nova imagem que fica no menu lateral    
+  do bloco de imagem, coloque um botão entre o botão nova imagem  
+  e o de excluir que abrirá um modal que permitirá escolher o     
+  enquadramento da imagem no espaço disponivel, permitindo ver a  
+  area que será visivel e permitir arrastar até ter a area        
+  visivel que o usuário quer da imagem 
 
-### Card básico
-**Importante**
-- Note que tudo que eu falar aqui é no modo edição (Cursor de edição), para casos que não for eu deixo claro que é de visualização
+**Design**
+> Ele terá um formato e bordas iguais ao bloco de paragrafo. Seu tamanho será todo de imagem com um input de uma linha embaixo pra escrever legenda. A imagem deve estar dentro do background com um espaçamento da borda igual ao que existe em paragrafo. O input deve ter uma borda no seu input igual ao que existe no bloco de paragrafo. A imagem terá o mesmo formato do bloco. Deve haver um leve espaçamento entre imagem e input de texto. O tamanho pode 800x400
 
-**Default**
-> Ao ser criado clicando na área de edição, ele ainda será um card "não alterado" (sem redimensionamento) e não terá foco em nenhum input
-- Quando ele for redimensionado pelo usuário manualmente (Puxando diagonais, horizontais ou vertices) ele deixa de ser não alterado
-- Por padrão, ele deve ter a width suficiente para englobar os textos e mostrar seus placeholders e seus espaçamentos internos. Quanto a altura, ela deve ser a altura suficiente para ter uma linha de cada placeholder e seus espaçamentos internos
+**Comportamento ao criar**
+> Ao ser criado na área de edição, o bloco aparecerá na área clicada com foco nele, mas com nenhum input focado.
 
-**Digitar**
-> Para digitar, o usuário precisa clicar duas vezes em cima da caixa de input no card para que o input habilite
-- Se o card for não alterado, qualquer digito dele irá aumentar a width do card e do input até onde o usuário quiser digitar
-- Se o card já foi alterado, qualquer digito dele irá quebrar linha e aumentar a height do input, consequentemente aumentando o height do card, isso para qualquer input titulo ou descrição
+**Comportamento ao dar foco/selecionar bloco**
+> Para selecionar, basta clicar uma vez em cima do bloco, selecionando ele. Ao selecionar, um wrapper roxo especial (o mesmo usado nos blocos de paragrafo e imagem) que irá encobrir o bloco inteiro e permitir e arrasto pela área.
 
-**Redimensionar**
-> Haverá três tipos de redimensionamento, horizontal, vertical e diagonal:
-- Horizontal irá aumentar a width do card infinitamente até onde o usuário quiser. Ele também pode diminuir a width, ao diminuir a width, os textos internos quebram as linhas e aumentam a altura do card para caber, o limite minimo é de ter pelo menos uma quatro letras por linha em cada input
-- Vertical e Diagonal serão iguais, quando puxados irão aumentar tanto a width, quanto a height do card e a fonte do texto proporcionalmente, até chegar no limite. O limite máximo é a fonte, sendo 64 para o máximo e 8 para o minimo. Uma vez que chegue no limite minimo ou maximo, o aumento do width e height do card também devem travar com o limite de fonte.
+**Comportamento ao escrever**
+> Para escrever, deve clicar 2x dentro da área do input e assim liberar a caixa de texto. Deve quebrar quando o texto chegar no limite do width, adicionando uma nova linha para baixo no input e fazendo todo o bloco acompanhar a altura (Não coloque animações, apenas deixe a altura do bloco encobrir o texto).
 
-**Wrapper**
-> É a borda roxa que permite demarcar qual card tá selecionado. Use o wrapper do texto que fizemos para usar aqui com o mesmo design.
+**Menu lateral de edição**
+> Ao clicar no bloco e selecionar ele, um menu lateral de edição se abre. No geral, ele vai ser igual aos menus de bloco de paragrafo, contendo propriedades permitindo ativar/desativar navegações, bordas. Permite ver alinhamento do texto embaixo da imagem, cor do bloco, cor do texto, cor da borda.
 
-**Arrastar**
-> A lógica de mover o card é a mesma do texto, pode mover em qualquer area interna do card.
-- Note que se eu apertar apenas uma vez o card, ele seleciona o card e não o input, já que preciso clicar 2x em cima do input para liberar o input
+**Navegação pelo card**
+> O bloco permite navegação da mesma forma que os blocos de paragrafo e sessão
 
-**Menu de edição**
-> Adicione a modificação de fonte dentro do menu lateral, com os limites de 8 a 64 px. Faça o feedback ser em tempo real para mudanças na fonte usando redimensionamento
-
-**Visualização**
-> No modo visualização (Cursor com a mãozinha quando apertamos h) tudo será desabilitado, permitindo apenas arrastar pelo card ou selecionar um texto para copiar e colar no máximo, mas sempre deixe a mãozinha no cursor.
-
-### Card detalhado
-**Importante**
-- Note que tudo que eu falar aqui é no modo edição (Cursor de edição), para casos que não for eu deixo claro que é de visualização
-
-**Default**
-> Ao ser criado clicando na área de edição, ele ainda será um card "não alterado" (sem redimensionamento) e não terá foco em nenhum input
-- Quando ele for redimensionado pelo usuário manualmente (Puxando diagonais, horizontais ou vertices) ele deixa de ser não alterado
-- Por padrão, ele deve ter a width suficiente para englobar os textos e mostrar seus placeholders e seus espaçamentos internos. Quanto a altura, ela deve ser a altura suficiente para ter uma linha de cada placeholder e seus espaçamentos internos
-
-**Digitar**
-> Para digitar, o usuário precisa clicar duas vezes em cima da caixa de input no card para que o input habilite
-- Se o card for não alterado, qualquer digito dele irá aumentar a width do card e do input até onde o usuário quiser digitar
-- Se o card já foi alterado, qualquer digito dele irá quebrar linha e aumentar a height do input, consequentemente aumentando o height do card, isso para qualquer input titulo ou descrição
-
-**Redimensionar**
-> Haverá três tipos de redimensionamento, horizontal, vertical e diagonal:
-- Horizontal irá aumentar a width do card infinitamente até onde o usuário quiser. Ele também pode diminuir a width, ao diminuir a width, os textos internos quebram as linhas e aumentam a altura do card para caber, o limite minimo é de ter pelo menos uma letra por linha em cada input
-- Vertical e Diagonal serão iguais, quando puxados irão aumentar tanto a width, quanto a height do card, a imagem e a fonte do texto proporcionalmente, até chegar no limite. O limite máximo é a fonte, sendo 64 para o máximo e 8 para o minimo. Uma vez que chegue no limite minimo ou maximo, o aumento do width e height do card e o tamanho da imagem também devem travar com o limite de fonte.
-
-**Wrapper**
-> É a borda roxa que permite demarcar qual card tá selecionado. Use o wrapper do texto que fizemos para usar aqui com o mesmo design.
-
-**Arrastar**
-> A lógica de mover o card é a mesma do texto, pode mover em qualquer area interna do card.
-- Note que se eu apertar apenas uma vez o card, ele seleciona o card e não o input, já que preciso clicar 2x em cima do input para liberar o input
-
-**Menu de edição**
-> Adicione a modificação de fonte dentro do menu lateral, com os limites de 8 a 64 px. Faça o feedback ser em tempo real para mudanças na fonte usando redimensionamento
-
-**Visualização**
-> No modo visualização (Cursor com a mãozinha quando apertamos h) tudo será desabilitado, permitindo apenas arrastar pelo card ou selecionar um texto para copiar e colar no máximo, mas sempre deixe a mãozinha no cursor.
+**Outros pontos**
+- A fonte base dos blocos será alguma fonte mono espaçada
+- O font size dos textos será de 16px

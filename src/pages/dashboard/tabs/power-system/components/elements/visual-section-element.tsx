@@ -1,13 +1,14 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@/components/ui/hover-card';
+} from "@/components/ui/hover-card";
 
-import { IVisualSection, ShapeType } from '../../types/power-system-types';
-import { DraggableElementWrapper } from './draggable-element-wrapper';
+import { IVisualSection, ShapeType } from "../../types/power-system-types";
+
+import { DraggableElementWrapper } from "./draggable-element-wrapper";
 
 interface PropsVisualSectionElement {
   element: IVisualSection;
@@ -20,7 +21,11 @@ interface PropsVisualSectionElement {
   onPositionChange: (x: number, y: number) => void;
   onDragMove?: (x: number, y: number) => void;
   onDragEnd?: () => void;
-  onResizeMove?: (width: number, height: number, mode?: 'diagonal' | 'horizontal' | 'vertical') => void;
+  onResizeMove?: (
+    width: number,
+    height: number,
+    mode?: "diagonal" | "horizontal" | "vertical"
+  ) => void;
   onResizeEnd?: () => void;
   onClick: (e?: React.MouseEvent) => void;
   onNavigate?: () => void;
@@ -44,7 +49,7 @@ export function VisualSectionElement({
   onNavigate,
   isMultiSelected = false,
 }: PropsVisualSectionElement) {
-  const { t } = useTranslation('power-system');
+  const { t } = useTranslation("power-system");
 
   const handleDoubleClick = () => {
     if (element.canNavigate && onNavigate && !isEditMode) {
@@ -59,26 +64,30 @@ export function VisualSectionElement({
   };
 
   const renderShape = () => {
-    const backgroundColor = element.imageUrl ? 'transparent' : element.backgroundColor || '#6366f1';
-    const needsBorder = !element.imageUrl && backgroundColor === '#ffffff';
+    const backgroundColor = element.imageUrl
+      ? "transparent"
+      : element.backgroundColor || "#6366f1";
+    const needsBorder = !element.imageUrl && backgroundColor === "#ffffff";
 
     const baseStyle = {
       backgroundColor,
-      backgroundImage: element.imageUrl ? `url(${element.imageUrl})` : undefined,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      border: needsBorder ? '2px solid #e5e7eb' : undefined,
+      backgroundImage: element.imageUrl
+        ? `url(${element.imageUrl})`
+        : undefined,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      border: needsBorder ? "2px solid #e5e7eb" : undefined,
     };
 
     // Triangle shape needs special handling
-    if (element.shape === 'triangle') {
+    if (element.shape === "triangle") {
       return (
         <div className="relative w-full h-full">
           <div
             className="absolute inset-0 shadow-lg"
             style={{
               ...baseStyle,
-              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+              clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
             }}
           />
         </div>
@@ -86,17 +95,17 @@ export function VisualSectionElement({
     }
 
     // Diamond shape needs special handling - rotated square with rounded corners
-    if (element.shape === 'diamond') {
+    if (element.shape === "diamond") {
       return (
         <div className="relative w-full h-full flex items-center justify-center">
           <div
             className="shadow-lg"
             style={{
               ...baseStyle,
-              width: '70.71%', // sqrt(2)/2 to fit rotated square in container
-              height: '70.71%',
-              borderRadius: '10%', // Rounded corners
-              transform: 'rotate(45deg)', // Rotate to create diamond shape
+              width: "70.71%", // sqrt(2)/2 to fit rotated square in container
+              height: "70.71%",
+              borderRadius: "10%", // Rounded corners
+              transform: "rotate(45deg)", // Rotate to create diamond shape
             }}
           />
         </div>
@@ -104,23 +113,18 @@ export function VisualSectionElement({
     }
 
     // All other shapes use the same structure
-    return (
-      <div
-        className="w-full h-full shadow-lg"
-        style={baseStyle}
-      />
-    );
+    return <div className="w-full h-full shadow-lg" style={baseStyle} />;
   };
 
   const getWrapperClassName = () => {
-    const baseClasses = 'overflow-hidden';
+    const baseClasses = "overflow-hidden";
     switch (element.shape) {
-      case 'circle':
+      case "circle":
         return `${baseClasses} rounded-full`;
-      case 'rounded-square':
+      case "rounded-square":
         return `${baseClasses} rounded-2xl`;
-      case 'square':
-      case 'triangle':
+      case "square":
+      case "triangle":
       default:
         return baseClasses;
     }
@@ -136,34 +140,43 @@ export function VisualSectionElement({
     e.stopPropagation();
   };
 
-  const content = element.showHoverCard && !isEditMode ? (
-    <HoverCard openDelay={500} closeDelay={100}>
-      <HoverCardTrigger className="w-full h-full block cursor-grab" style={{ pointerEvents: 'auto' }}>
+  const content =
+    element.showHoverCard && !isEditMode ? (
+      <HoverCard openDelay={500} closeDelay={100}>
+        <HoverCardTrigger
+          className="w-full h-full block cursor-grab"
+          style={{ pointerEvents: "auto" }}
+        >
+          {renderShape()}
+        </HoverCardTrigger>
+        <HoverCardContent
+          className="w-80 select-text cursor-auto"
+          side="top"
+          sideOffset={15}
+          onMouseDown={handleHoverCardMouseDown}
+          onMouseMove={handleHoverCardMouseMove}
+        >
+          <div className="space-y-3">
+            <h4 className="text-lg font-semibold">
+              {element.hoverTitle ||
+                t("elements.visual_section.default_hover_title")}
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              {element.hoverSubtitle ||
+                t("elements.visual_section.default_hover_subtitle")}
+            </p>
+            <p className="text-xs">
+              {element.hoverDescription ||
+                t("elements.visual_section.default_hover_description")}
+            </p>
+          </div>
+        </HoverCardContent>
+      </HoverCard>
+    ) : (
+      <div className={`w-full h-full ${!isEditMode ? "cursor-grab" : ""}`}>
         {renderShape()}
-      </HoverCardTrigger>
-      <HoverCardContent
-        className="w-80 select-text cursor-auto"
-        side="top"
-        sideOffset={15}
-        onMouseDown={handleHoverCardMouseDown}
-        onMouseMove={handleHoverCardMouseMove}
-      >
-        <div className="space-y-3">
-          <h4 className="text-lg font-semibold">
-            {element.hoverTitle || t('elements.visual_section.default_hover_title')}
-          </h4>
-          <p className="text-sm text-muted-foreground">
-            {element.hoverSubtitle || t('elements.visual_section.default_hover_subtitle')}
-          </p>
-          <p className="text-xs">
-            {element.hoverDescription || t('elements.visual_section.default_hover_description')}
-          </p>
-        </div>
-      </HoverCardContent>
-    </HoverCard>
-  ) : (
-    <div className={`w-full h-full ${!isEditMode ? 'cursor-grab' : ''}`}>{renderShape()}</div>
-  );
+      </div>
+    );
 
   return (
     <DraggableElementWrapper

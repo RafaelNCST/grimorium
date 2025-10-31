@@ -53,7 +53,13 @@ export function isConnectionInViewport(
     toX?: number;
     toY?: number;
   },
-  elements: Array<{ id: string; x: number; y: number; width: number; height: number }>,
+  elements: Array<{
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>,
   viewport: Viewport
 ): boolean {
   // Find source element
@@ -71,7 +77,10 @@ export function isConnectionInViewport(
     if (!toElement) return false;
 
     // Render if either source or target is in viewport
-    return isElementInViewport(fromElement, viewport) || isElementInViewport(toElement, viewport);
+    return (
+      isElementInViewport(fromElement, viewport) ||
+      isElementInViewport(toElement, viewport)
+    );
   }
 
   // For arrow connections to coordinates, check if endpoint is in viewport

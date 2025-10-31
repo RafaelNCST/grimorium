@@ -1,19 +1,20 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
-import { ITextElement } from '../../types/power-system-types';
-import { DraggableElementWrapper } from './draggable-element-wrapper';
+import { ITextElement } from "../../types/power-system-types";
 
-// Simplified helper function to measure text dimensions
+import { DraggableElementWrapper } from "./draggable-element-wrapper";
+
+// Clean helper function to measure text dimensions
 function measureTextDimensions(
   text: string,
   fontSize: number,
   fontWeight: string,
   maxWidth?: number
 ): { width: number; height: number } {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
   if (!context) return { width: 50, height: 24 };
 
   context.font = `${fontWeight} ${fontSize}px Inter, system-ui, sans-serif`;
@@ -22,20 +23,20 @@ function measureTextDimensions(
   const horizontalPadding = 8;
   const verticalPadding = 8;
 
-  // Se texto vazio, retorna tamanho mínimo (apenas cursor)
+  // Empty text - return minimum size (just cursor space)
   if (!text || text.trim().length === 0) {
     return {
       width: 16,
-      height: Math.max(Math.ceil(lineHeight) + verticalPadding, 24)
+      height: Math.max(Math.ceil(lineHeight) + verticalPadding, 24),
     };
   }
 
-  const lines = text.split('\n');
+  const lines = text.split("\n");
 
-  // Se NÃO tem maxWidth (modo virgem), calcula width natural SEM quebra
+  // No maxWidth - calculate natural width WITHOUT wrapping
   if (!maxWidth) {
     let maxLineWidth = 0;
-    lines.forEach(line => {
+    lines.forEach((line) => {
       if (line.length === 0) {
         maxLineWidth = Math.max(maxLineWidth, fontSize);
       } else {
@@ -46,37 +47,38 @@ function measureTextDimensions(
 
     return {
       width: Math.max(Math.ceil(maxLineWidth) + horizontalPadding, 16),
-      height: Math.max(Math.ceil(lines.length * lineHeight) + verticalPadding, 24)
+      height: Math.max(
+        Math.ceil(lines.length * lineHeight) + verticalPadding,
+        24
+      ),
     };
   }
 
-  // Se TEM maxWidth (modo redimensionado), calcula COM quebra de linha
+  // With maxWidth - calculate WITH line wrapping
   const contentWidth = Math.max(maxWidth - horizontalPadding, 8);
   let totalLines = 0;
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.length === 0) {
       totalLines += 1;
     } else {
-      const words = line.split(' ');
-      let currentLine = '';
+      const words = line.split(" ");
+      let currentLine = "";
       let lineCount = 0;
 
       words.forEach((word) => {
-        // Check if the word itself is too long to fit
         const wordWidth = context.measureText(word).width;
 
         if (wordWidth > contentWidth) {
-          // Word is too long, need to break it
+          // Word is too long, break it character by character
           if (currentLine) {
             lineCount++;
-            currentLine = '';
+            currentLine = "";
           }
 
-          // Break word character by character
           let remainingWord = word;
           while (remainingWord.length > 0) {
-            let chunk = '';
+            let chunk = "";
             for (let i = 0; i < remainingWord.length; i++) {
               const testChunk = chunk + remainingWord[i];
               const testWidth = context.measureText(testChunk).width;
@@ -96,7 +98,7 @@ function measureTextDimensions(
           }
         } else {
           // Normal word, try to fit in current line
-          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          const testLine = currentLine + (currentLine ? " " : "") + word;
           const metrics = context.measureText(testLine);
 
           if (metrics.width > contentWidth && currentLine) {
@@ -113,11 +115,14 @@ function measureTextDimensions(
     }
   });
 
-  const calculatedHeight = Math.max(Math.ceil(totalLines * lineHeight) + verticalPadding, 24);
+  const calculatedHeight = Math.max(
+    Math.ceil(totalLines * lineHeight) + verticalPadding,
+    24
+  );
 
   return {
     width: maxWidth,
-    height: calculatedHeight
+    height: calculatedHeight,
   };
 }
 
@@ -133,11 +138,11 @@ interface PropsTextElement {
   onSizeChange: (width: number, height: number) => void;
   onDragMove?: (x: number, y: number) => void;
   onDragEnd?: () => void;
-  onResizeMove?: (width: number, height: number, mode?: 'diagonal' | 'horizontal' | 'vertical') => void;
-  onResizeEnd?: (mode?: 'diagonal' | 'horizontal' | 'vertical') => void;
+  onResizeMove?: (width: number, height: number, mode?: "horizontal") => void;
+  onResizeEnd?: (mode?: "horizontal") => void;
   onClick: (e?: React.MouseEvent) => void;
   isMultiSelected?: boolean;
-  tempSize?: { width: number; height: number; scale?: number };
+  tempSize?: { width: number; height: number };
   onFirstInput?: () => void;
 }
 
@@ -160,18 +165,12 @@ export function TextElement({
   tempSize,
   onFirstInput,
 }: PropsTextElement) {
-  const { t } = useTranslation('power-system');
-  const [isEditing, setIsEditing] = useState(element.content === '');
+  const { t } = useTranslation("power-system");
+  const [isEditing, setIsEditing] = useState(element.content === "");
   const [content, setContent] = useState(element.content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isResizingRef = useRef(false);
 
-  // Calculate display font size during resize
-  const displayFontSize = tempSize?.scale
-    ? Math.max(8, Math.min(64, Math.round(element.fontSize * tempSize.scale)))
-    : element.fontSize;
-
-  // Calculate display dimensions
+  // Display dimensions (use tempSize during resize for real-time feedback)
   const displayWidth = tempSize?.width ?? element.width;
   const displayHeight = tempSize?.height ?? element.height;
 
@@ -186,244 +185,186 @@ export function TextElement({
     }
   }, [isEditing]);
 
+  // Get font weight string for measurement
+  const getFontWeight = () =>
+    element.fontWeight === "bold" ? "bold" : "normal";
+
   // Handle content change
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
 
     // First input callback
-    if (element.content === '' && newContent.length === 1 && onFirstInput) {
+    if (element.content === "" && newContent.length === 1 && onFirstInput) {
       onFirstInput();
     }
 
-    // Se vazio, não atualiza dimensões
+    // Empty content - don't update dimensions
     if (newContent.trim().length === 0) {
       onUpdate({ content: newContent });
       return;
     }
 
-    // COMPORTAMENTO VIRGEM: Width infinita, sem quebra
-    if (!element.wasManuallyResized) {
-      const dimensions = measureTextDimensions(
-        newContent,
-        element.fontSize,
-        element.fontWeight === 'bold' ? 'bold' : 'normal'
-        // SEM maxWidth
-      );
+    // Calculate new dimensions based on manual resize state
+    const dimensions = measureTextDimensions(
+      newContent,
+      element.fontSize,
+      getFontWeight(),
+      element.wasManuallyResized ? element.width : undefined
+    );
 
-      const newWidth = Math.max(element.width, dimensions.width);
-      const newHeight = Math.max(element.height, dimensions.height);
-
-      if (newWidth !== element.width || newHeight !== element.height) {
-        onUpdate({
-          content: newContent,
-          width: newWidth,
-          height: newHeight
-        });
-        onSizeChange(newWidth, newHeight);
-      } else {
-        onUpdate({ content: newContent });
-      }
+    // Update dimensions only if they changed
+    if (
+      dimensions.width !== element.width ||
+      dimensions.height !== element.height
+    ) {
+      onUpdate({
+        content: newContent,
+        width: dimensions.width,
+        height: dimensions.height,
+      });
+      onSizeChange(dimensions.width, dimensions.height);
     } else {
-      // COMPORTAMENTO REDIMENSIONADO: Width fixa, quebra linha, aumenta height
-      const dimensions = measureTextDimensions(
-        newContent,
-        element.fontSize,
-        element.fontWeight === 'bold' ? 'bold' : 'normal',
-        element.width // maxWidth = width atual
-      );
-
-      if (dimensions.height !== element.height) {
-        onUpdate({
-          content: newContent,
-          height: dimensions.height
-        });
-        onSizeChange(element.width, dimensions.height);
-      } else {
-        onUpdate({ content: newContent });
-      }
+      onUpdate({ content: newContent });
     }
   };
 
-  // Handle horizontal resize
-  const handleHorizontalResize = (newWidth: number, newHeight: number, mode?: 'diagonal' | 'horizontal' | 'vertical') => {
-    isResizingRef.current = true;
-
-    // Marca como manualmente redimensionado
-    if (!element.wasManuallyResized) {
-      onUpdate({ wasManuallyResized: true });
+  // Handle horizontal resize (width changes, height recalculates)
+  const handleHorizontalResize = (newWidth: number) => {
+    if (!element.content || element.content.trim().length === 0) {
+      onUpdate({
+        width: Math.max(newWidth, 16),
+        wasManuallyResized: true,
+      });
+      onSizeChange(Math.max(newWidth, 16), element.height);
+      return;
     }
 
-    if (element.content && element.content.trim().length > 0) {
-      if (mode === 'diagonal' || mode === 'vertical') {
-        // REDIMENSIONAMENTO DIAGONAL/VERTICAL: Aumenta fontSize proporcionalmente
-        const scale = mode === 'diagonal'
-          ? (newWidth / element.width)
-          : (newHeight / element.height);
-        const newFontSize = Math.max(8, Math.min(64, Math.round(element.fontSize * scale)));
+    const dimensions = measureTextDimensions(
+      element.content,
+      element.fontSize,
+      getFontWeight(),
+      newWidth
+    );
 
-        // Calcula novo width escalado (mantém proporção)
-        const scaledWidth = element.width * scale;
-
-        // Calcula dimensões com novo fontSize e width escalada (mantém quebra de linhas)
-        const dimensions = measureTextDimensions(
-          element.content,
-          newFontSize,
-          element.fontWeight === 'bold' ? 'bold' : 'normal',
-          scaledWidth // Passa maxWidth escalada para manter quebras de linha
-        );
-
-        onUpdate({
-          width: dimensions.width,
-          height: dimensions.height,
-          fontSize: newFontSize,
-          wasManuallyResized: true
-        });
-        onSizeChange(dimensions.width, dimensions.height);
-      } else {
-        // REDIMENSIONAMENTO HORIZONTAL: Width muda, texto quebra, height ajusta
-        const dimensions = measureTextDimensions(
-          element.content,
-          element.fontSize,
-          element.fontWeight === 'bold' ? 'bold' : 'normal',
-          newWidth // maxWidth
-        );
-
-        onUpdate({
-          width: dimensions.width,
-          height: dimensions.height,
-          wasManuallyResized: true
-        });
-        onSizeChange(dimensions.width, dimensions.height);
-      }
-    } else {
-      // Sem conteúdo, usa tamanho mínimo
-      onUpdate({ wasManuallyResized: true });
-      onSizeChange(Math.max(newWidth, 16), Math.max(newHeight, 24));
-    }
-
-    setTimeout(() => {
-      isResizingRef.current = false;
-    }, 100);
+    onUpdate({
+      width: dimensions.width,
+      height: dimensions.height,
+      wasManuallyResized: true,
+    });
+    onSizeChange(dimensions.width, dimensions.height);
   };
 
-  // Handle resize move (feedback em tempo real)
-  const handleResizeMove = (newWidth: number, newHeight: number, mode?: 'diagonal' | 'horizontal' | 'vertical') => {
-    if (element.content && element.content.trim().length > 0) {
-      if (mode === 'diagonal' || mode === 'vertical') {
-        // Calcula novo fontSize
-        const scale = mode === 'diagonal'
-          ? (newWidth / element.width)
-          : (newHeight / element.height);
-        const newFontSize = Math.max(8, Math.min(64, Math.round(element.fontSize * scale)));
-
-        // Calcula novo width escalado (mantém proporção e quebra de linhas)
-        const scaledWidth = element.width * scale;
-
-        // Calcula dimensões COM novo fontSize e width escalada
-        const dimensions = measureTextDimensions(
-          element.content,
-          newFontSize,
-          element.fontWeight === 'bold' ? 'bold' : 'normal',
-          scaledWidth // Passa maxWidth escalada para manter quebras de linha
-        );
-
-        onResizeMove?.(dimensions.width, dimensions.height, mode);
-      } else {
-        // Horizontal: calcula height com wrapping
-        const dimensions = measureTextDimensions(
-          element.content,
-          element.fontSize,
-          element.fontWeight === 'bold' ? 'bold' : 'normal',
-          newWidth
-        );
-
-        onResizeMove?.(dimensions.width, dimensions.height, mode);
-      }
-    } else {
+  // Handle resize move (real-time feedback during resize)
+  const handleResizeMove = (
+    newWidth: number,
+    newHeight: number,
+    mode?: "horizontal"
+  ) => {
+    if (!element.content || element.content.trim().length === 0) {
       onResizeMove?.(Math.max(newWidth, 16), Math.max(newHeight, 24), mode);
+      return;
     }
-  };
 
-  // Handle size change from wrapper
-  const handleSizeChange = (newWidth: number, newHeight: number) => {
-    // Ignorado, será tratado em handleResizeEnd
+    // Only horizontal resize: width changes, height recalculates
+    // Clamp width between min and max
+    const widthLimits = calculateWidthLimits();
+    const clampedWidth = Math.max(
+      widthLimits.minWidth,
+      Math.min(widthLimits.maxWidth, newWidth)
+    );
+
+    const dimensions = measureTextDimensions(
+      element.content,
+      element.fontSize,
+      getFontWeight(),
+      clampedWidth
+    );
+
+    onResizeMove?.(dimensions.width, dimensions.height, mode);
   };
 
   // Handle resize end
-  const handleResizeEnd = (mode?: 'diagonal' | 'horizontal' | 'vertical') => {
+  const handleResizeEnd = (mode?: "horizontal") => {
     if (tempSize) {
-      handleHorizontalResize(tempSize.width, tempSize.height, mode);
+      handleHorizontalResize(tempSize.width);
     }
     onResizeEnd?.(mode);
   };
 
   // Handle blur (deselect)
-  const handleBlur = (e: React.FocusEvent) => {
-    // Se vazio, marca para exclusão
-    if (content.trim().length === 0 && element.content === '') {
-      onUpdate({ content: '__DELETE__' });
+  const handleBlur = () => {
+    // Empty content - mark for deletion
+    if (content.trim().length === 0 && element.content === "") {
+      onUpdate({ content: "__DELETE__" });
     } else if (content.trim().length > 0) {
-      // Salva conteúdo
+      // Save content
       const dimensions = measureTextDimensions(
         content,
         element.fontSize,
-        element.fontWeight === 'bold' ? 'bold' : 'normal',
+        getFontWeight(),
         element.wasManuallyResized ? element.width : undefined
       );
 
       onUpdate({
         content,
         width: dimensions.width,
-        height: dimensions.height
+        height: dimensions.height,
       });
       onSizeChange(dimensions.width, dimensions.height);
       setIsEditing(false);
     }
   };
 
-  // Handle double click
+  // Handle double click to edit
   const handleDoubleClick = () => {
     if (!element.canNavigate && isEditMode) {
       setIsEditing(true);
     }
   };
 
-  // Calcular largura mínima baseada na letra mais larga do conteúdo
-  const calculateMinWidth = (): number => {
-    if (!element.content || element.content.length === 0) return 16;
+  // Calculate minimum and maximum width based on content
+  const calculateWidthLimits = (): { minWidth: number; maxWidth: number } => {
+    if (!element.content || element.content.length === 0) {
+      return { minWidth: 16, maxWidth: 200 };
+    }
 
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    if (!context) return 16;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) return { minWidth: 16, maxWidth: 200 };
 
-    const fontWeight = element.fontWeight === 'bold' ? 'bold' : 'normal';
-    context.font = `${fontWeight} ${displayFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+    context.font = `${getFontWeight()} ${element.fontSize}px Inter, system-ui, sans-serif`;
 
-    // Encontrar a letra/caractere mais largo
+    // Calculate minimum width: widest single character
     let maxCharWidth = 0;
     for (let i = 0; i < element.content.length; i++) {
       const char = element.content[i];
-      if (char !== '\n' && char !== ' ') {
+      if (char !== "\n" && char !== " ") {
         const charWidth = context.measureText(char).width;
         maxCharWidth = Math.max(maxCharWidth, charWidth);
       }
     }
+    const minWidth = Math.max(16, Math.ceil(maxCharWidth) + 8);
 
-    // Adicionar padding para o container (2px de cada lado = 4px total)
-    return Math.max(16, Math.ceil(maxCharWidth) + 8);
+    // Calculate maximum width: natural width without wrapping
+    const naturalDimensions = measureTextDimensions(
+      element.content,
+      element.fontSize,
+      getFontWeight()
+      // No maxWidth parameter = natural width calculation
+    );
+    const maxWidth = naturalDimensions.width;
+
+    return { minWidth, maxWidth };
   };
 
-  // Size limits - mínimos dinâmicos baseados no conteúdo, sem máximos fixos
-  // Os limites de fontSize (8-64px) são tratados em handleElementResizeMove
+  // Size limits
+  const widthLimits = calculateWidthLimits();
   const sizeLimits = {
-    minWidth: calculateMinWidth(),
-    maxWidth: Infinity,
-    minHeight: 24,
-    maxHeight: Infinity
+    minWidth: widthLimits.minWidth,
+    maxWidth: widthLimits.maxWidth,
+    minHeight: Math.max(element.fontSize * 1.5 + 8, 24),
+    maxHeight: Infinity,
   };
-
-  // Check if empty and editing (para mostrar apenas cursor)
-  const isEmptyAndEditing = content === '' && isEditing && isEditMode;
 
   return (
     <DraggableElementWrapper
@@ -436,7 +377,7 @@ export function TextElement({
       isEditMode={isEditMode}
       isEditing={isEditing}
       onPositionChange={onPositionChange}
-      onSizeChange={handleSizeChange}
+      onSizeChange={onSizeChange}
       onDragMove={onDragMove}
       onDragEnd={onDragEnd}
       onResizeMove={handleResizeMove}
@@ -451,107 +392,76 @@ export function TextElement({
       maxWidth={sizeLimits.maxWidth}
       minHeight={sizeLimits.minHeight}
       maxHeight={sizeLimits.maxHeight}
-      disableVerticalResize={false}
+      disableVerticalResize
       disableDrag={isMultiSelected}
       disableResize={isMultiSelected}
     >
       <div
         className="h-full w-full"
         style={{
-          padding: '2px',
+          padding: "4px",
           color: element.textColor,
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: element.textAlign === 'center' ? 'center' : element.textAlign === 'right' ? 'flex-end' : 'flex-start',
-          boxSizing: 'border-box',
+          display: "flex",
+          alignItems: element.textAlign === "center" ? "center" : "flex-start",
+          justifyContent:
+            element.textAlign === "center"
+              ? "center"
+              : element.textAlign === "right"
+                ? "flex-end"
+                : "flex-start",
+          boxSizing: "border-box",
         }}
       >
         {isEditing && isEditMode ? (
-          <div className="relative w-full h-full">
-            {/* Blinking cursor - apenas quando vazio */}
-            {isEmptyAndEditing && (
-              <div
-                className="absolute"
-                style={{
-                  left: '0px',
-                  top: '0px',
-                  width: '2px',
-                  height: `${element.fontSize}px`,
-                  backgroundColor: element.textColor,
-                  animation: 'blink 1.06s steps(2, start) infinite',
-                  zIndex: 1,
-                  pointerEvents: 'none',
-                }}
-              />
-            )}
-
-            {/* Textarea */}
-            <textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  if (element.content === '' && content.trim().length === 0) {
-                    // Novo elemento, sem conteúdo - deletar
-                    onUpdate({ content: '__DELETE__' });
-                  } else {
-                    setContent(element.content);
-                    setIsEditing(false);
-                  }
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => handleContentChange(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                if (element.content === "" && content.trim().length === 0) {
+                  onUpdate({ content: "__DELETE__" });
+                } else {
+                  setContent(element.content);
+                  setIsEditing(false);
                 }
-              }}
-              spellCheck={false}
-              className="bg-transparent focus:outline-none resize-none border-none"
-              style={{
-                fontSize: `${displayFontSize}px`,
-                fontWeight: element.fontWeight === 'bold' ? 'bold' : 'normal',
-                textDecoration: element.fontWeight === 'underline' ? 'underline' : 'none',
-                textAlign: 'left',
-                color: element.textColor,
-                caretColor: element.textColor,
-                wordWrap: element.wasManuallyResized ? 'break-word' : 'normal',
-                overflowWrap: element.wasManuallyResized ? 'break-word' : 'normal',
-                whiteSpace: element.wasManuallyResized ? 'pre-wrap' : 'nowrap',
-                width: element.wasManuallyResized ? `${displayWidth - 8}px` : `${Math.max(displayWidth - 8, 200)}px`,
-                height: element.wasManuallyResized ? `${displayHeight - 8}px` : `${Math.max(displayHeight - 8, 24)}px`,
-                overflow: 'hidden',
-                willChange: 'contents',
-                transform: 'translate3d(0, 0, 0)',
-              }}
-              onClick={(e) => e.stopPropagation()}
-            />
-
-            {/* CSS for blinking animation */}
-            <style>{`
-              @keyframes blink {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0; }
               }
-            `}</style>
-          </div>
+            }}
+            spellCheck={false}
+            className="bg-transparent focus:outline-none resize-none border-none w-full h-full"
+            style={{
+              fontSize: `${element.fontSize}px`,
+              fontWeight: element.fontWeight === "bold" ? "bold" : "normal",
+              textDecoration:
+                element.fontWeight === "underline" ? "underline" : "none",
+              textAlign: element.textAlign,
+              color: element.textColor,
+              caretColor: element.textColor,
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              whiteSpace: "pre-wrap",
+              overflow: "hidden",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
         ) : (
           <div
-            className={`${isEditMode ? '' : 'cursor-grab select-none'}`}
+            className={`w-full h-full ${isEditMode ? "" : "cursor-grab select-none"}`}
             style={{
-              fontSize: `${displayFontSize}px`,
-              fontWeight: element.fontWeight === 'bold' ? 'bold' : 'normal',
-              textDecoration: element.fontWeight === 'underline' ? 'underline' : 'none',
+              fontSize: `${element.fontSize}px`,
+              fontWeight: element.fontWeight === "bold" ? "bold" : "normal",
+              textDecoration:
+                element.fontWeight === "underline" ? "underline" : "none",
               textAlign: element.textAlign,
-              whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              wordBreak: 'break-word',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              MozUserSelect: 'none',
-              msUserSelect: 'none',
-              width: '100%',
-              maxWidth: `${displayWidth - 8}px`,
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "hidden",
+              userSelect: "none",
             }}
           >
-            {element.content || t('elements.text.default_content')}
+            {element.content || t("elements.text.default_content")}
           </div>
         )}
       </div>

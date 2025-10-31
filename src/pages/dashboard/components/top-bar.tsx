@@ -40,7 +40,9 @@ export function TopBar({
   const { t } = useLanguageStore();
 
   return (
-    <div className={`flex items-center justify-between ${isHeaderHidden ? "mb-0" : "mb-4"}`}>
+    <div
+      className={`flex items-center justify-between ${isHeaderHidden ? "mb-0" : "mb-4"}`}
+    >
       <div className="flex items-center gap-4">
         <Tooltip>
           <TooltipTrigger asChild>

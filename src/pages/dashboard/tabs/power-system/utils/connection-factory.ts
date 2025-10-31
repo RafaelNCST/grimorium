@@ -1,5 +1,5 @@
-import { IConnection, ConnectionType } from '../types/power-system-types';
-import { DEFAULT_CONNECTION_COLOR } from '../constants/default-colors-constant';
+import { DEFAULT_CONNECTION_COLOR } from "../constants/default-colors-constant";
+import { IConnection, ConnectionType } from "../types/power-system-types";
 
 export function createArrowConnection(
   fromElementId: string,
@@ -10,7 +10,7 @@ export function createArrowConnection(
 
   return {
     id: `arrow-${now}`,
-    type: 'arrow',
+    type: "arrow",
     fromElementId,
     toX,
     toY,
@@ -28,7 +28,7 @@ export function createLineConnection(
 
   return {
     id: `line-${now}`,
-    type: 'line',
+    type: "line",
     fromElementId,
     toElementId,
     color: DEFAULT_CONNECTION_COLOR,

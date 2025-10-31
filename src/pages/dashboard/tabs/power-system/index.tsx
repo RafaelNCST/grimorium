@@ -1,12 +1,23 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
-import { IPowerMap, IPowerElement, IConnection, ToolType, ITemplate, ElementType } from './types/power-system-types';
-import { PowerSystemView } from './view';
-import { createElement } from './utils/element-factory';
-import { createArrowConnection, createLineConnection } from './utils/connection-factory';
-import { snapPositionToGrid } from './utils/grid-utils';
-import { TUTORIAL_STEPS_CONSTANT } from './constants/tutorial-steps-constant';
-import { toast } from '@/hooks/use-toast';
+import { toast } from "@/hooks/use-toast";
+
+import { TUTORIAL_STEPS_CONSTANT } from "./constants/tutorial-steps-constant";
+import {
+  IPowerMap,
+  IPowerElement,
+  IConnection,
+  ToolType,
+  ITemplate,
+  ElementType,
+} from "./types/power-system-types";
+import {
+  createArrowConnection,
+  createLineConnection,
+} from "./utils/connection-factory";
+import { createElement } from "./utils/element-factory";
+import { snapPositionToGrid } from "./utils/grid-utils";
+import { PowerSystemView } from "./view";
 
 interface PropsPowerSystemTab {
   isHeaderHidden: boolean;
@@ -17,9 +28,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
   // Main state
   const initialMainMap: IPowerMap = {
-    id: 'main',
-    bookId: 'temp-book-id',
-    name: 'Sistema de Poder Principal',
+    id: "main",
+    bookId: "temp-book-id",
+    name: "Sistema de Poder Principal",
     gridEnabled: true,
     gridSize: 20,
     elements: [],
@@ -40,9 +51,11 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   }, [currentMap]);
 
   // UI state
-  const [activeTool, setActiveTool] = useState<ToolType>('select');
+  const [activeTool, setActiveTool] = useState<ToolType>("select");
   const [selectedElementIds, setSelectedElementIds] = useState<string[]>([]);
-  const [selectedConnectionId, setSelectedConnectionId] = useState<string | null>(null);
+  const [selectedConnectionId, setSelectedConnectionId] = useState<
+    string | null
+  >(null);
   const [viewOffset, setViewOffset] = useState({ x: 100, y: 100 });
   const [zoom, setZoom] = useState(1);
 
@@ -65,7 +78,7 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
   // Connection creation state
   const [pendingConnection, setPendingConnection] = useState<{
-    type: 'arrow' | 'line';
+    type: "arrow" | "line";
     fromElementId: string;
   } | null>(null);
 
@@ -88,23 +101,33 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
 
   // Clipboard state
-  const [copiedElement, setCopiedElement] = useState<IPowerElement | null>(null);
+  const [copiedElement, setCopiedElement] = useState<IPowerElement | null>(
+    null
+  );
 
   // Undo/Redo state
   const [history, setHistory] = useState<IPowerMap[]>([initialMainMap]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
   // Real-time drag/resize tracking state (for wrapper updates during interaction)
-  const [dragPositions, setDragPositions] = useState<Record<string, { x: number; y: number }>>({});
-  const [resizeSizes, setResizeSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>({});
+  const [dragPositions, setDragPositions] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
+
+  // Real-time resize tracking state (for text element resize feedback)
+  const [resizeSizes, setResizeSizes] = useState<
+    Record<string, { width: number; height: number; scale?: number }>
+  >({});
 
   // Real-time connection positions during drag/resize
-  const [tempConnectionPositions, setTempConnectionPositions] = useState<Record<string, { x1: number; y1: number; x2: number; y2: number }>>({});
+  const [tempConnectionPositions, setTempConnectionPositions] = useState<
+    Record<string, { x1: number; y1: number; x2: number; y2: number }>
+  >({});
 
   // Breadcrumb items
   const breadcrumbItems = useMemo(() => {
     const items: Array<{ id: string; name: string }> = [
-      { id: 'main', name: 'Sistema Principal' },
+      { id: "main", name: "Sistema Principal" },
     ];
 
     // Build breadcrumb trail
@@ -122,7 +145,10 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       items.push({ id: map.id, name: map.name });
     });
 
-    if (currentMap.id !== 'main' && !trail.find((m) => m.id === currentMap.id)) {
+    if (
+      currentMap.id !== "main" &&
+      !trail.find((m) => m.id === currentMap.id)
+    ) {
       items.push({ id: currentMap.id, name: currentMap.name });
     }
 
@@ -135,8 +161,10 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       // Only save if the map actually changed (deep comparison on relevant fields)
       const lastHistoryItem = history[historyIndex];
       const hasChanged =
-        JSON.stringify(lastHistoryItem?.elements) !== JSON.stringify(currentMap.elements) ||
-        JSON.stringify(lastHistoryItem?.connections) !== JSON.stringify(currentMap.connections) ||
+        JSON.stringify(lastHistoryItem?.elements) !==
+          JSON.stringify(currentMap.elements) ||
+        JSON.stringify(lastHistoryItem?.connections) !==
+          JSON.stringify(currentMap.connections) ||
         lastHistoryItem?.gridEnabled !== currentMap.gridEnabled ||
         lastHistoryItem?.gridSize !== currentMap.gridSize;
 
@@ -194,41 +222,44 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     setSelectedElementIds([]);
   }, []);
 
-  const handleElementDuplicate = useCallback((elementId?: string) => {
-    const element = elementId
-      ? currentMap.elements.find(el => el.id === elementId)
-      : copiedElement;
+  const handleElementDuplicate = useCallback(
+    (elementId?: string) => {
+      const element = elementId
+        ? currentMap.elements.find((el) => el.id === elementId)
+        : copiedElement;
 
-    if (!element) return;
+      if (!element) return;
 
-    // Calculate center of visible viewport
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      // Calculate center of visible viewport
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const centerX = (rect.width / 2 - viewOffset.x) / zoom;
-    const centerY = (rect.height / 2 - viewOffset.y) / zoom;
+      const rect = canvas.getBoundingClientRect();
+      const centerX = (rect.width / 2 - viewOffset.x) / zoom;
+      const centerY = (rect.height / 2 - viewOffset.y) / zoom;
 
-    // Create duplicate with new ID and centered position
-    const now = Date.now();
-    const duplicatedElement: IPowerElement = {
-      ...element,
-      id: `${element.type}-${now}`,
-      x: centerX - element.width / 2,
-      y: centerY - element.height / 2,
-      submapId: undefined, // Don't copy submap reference
-      createdAt: now,
-      updatedAt: now,
-    };
+      // Create duplicate with new ID and centered position
+      const now = Date.now();
+      const duplicatedElement: IPowerElement = {
+        ...element,
+        id: `${element.type}-${now}`,
+        x: centerX - element.width / 2,
+        y: centerY - element.height / 2,
+        submapId: undefined, // Don't copy submap reference
+        createdAt: now,
+        updatedAt: now,
+      };
 
-    setCurrentMap((prev) => ({
-      ...prev,
-      elements: [...prev.elements, duplicatedElement],
-      updatedAt: Date.now(),
-    }));
+      setCurrentMap((prev) => ({
+        ...prev,
+        elements: [...prev.elements, duplicatedElement],
+        updatedAt: Date.now(),
+      }));
 
-    setSelectedElementIds([duplicatedElement.id]);
-  }, [currentMap.elements, copiedElement, viewOffset, zoom]);
+      setSelectedElementIds([duplicatedElement.id]);
+    },
+    [currentMap.elements, copiedElement, viewOffset, zoom]
+  );
 
   const handleConnectionDelete = useCallback((id: string) => {
     setCurrentMap((prev) => ({
@@ -247,12 +278,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
       // Check if user is typing in any input field
       const isTyping =
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.contentEditable === 'true' ||
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.contentEditable === "true" ||
         target.isContentEditable; // More reliable check for contentEditable
 
-      console.log('[DEBUG] Keyboard event:', {
+      console.log("[DEBUG] Keyboard event:", {
         key: e.key,
         target: target.tagName,
         contentEditable: target.contentEditable,
@@ -263,12 +294,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       });
 
       if (isTyping) {
-        console.log('[DEBUG] Ignoring keyboard shortcut - user is typing');
+        console.log("[DEBUG] Ignoring keyboard shortcut - user is typing");
         return;
       }
 
       // Deselect with Escape
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setSelectedElementIds([]);
         setSelectedConnectionId(null);
         setSelectionBox(null);
@@ -276,10 +307,10 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       }
 
       // Delete selected elements or connection
-      if (e.key === 'Delete') {
+      if (e.key === "Delete") {
         if (selectedElementIds.length > 0) {
           // Delete all selected elements
-          selectedElementIds.forEach(id => handleElementDelete(id));
+          selectedElementIds.forEach((id) => handleElementDelete(id));
         } else if (selectedConnectionId) {
           handleConnectionDelete(selectedConnectionId);
         }
@@ -287,8 +318,14 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       }
 
       // Copy element (Ctrl+C) - only for single selection
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedElementIds.length === 1) {
-        const element = currentMap.elements.find(el => el.id === selectedElementIds[0]);
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key === "c" &&
+        selectedElementIds.length === 1
+      ) {
+        const element = currentMap.elements.find(
+          (el) => el.id === selectedElementIds[0]
+        );
         if (element) {
           setCopiedElement(element);
         }
@@ -296,20 +333,23 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       }
 
       // Paste element (Ctrl+V)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && copiedElement) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "v" && copiedElement) {
         handleElementDuplicate();
         return;
       }
 
       // Undo (Ctrl+Z)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
         return;
       }
 
       // Redo (Ctrl+Y or Ctrl+Shift+Z)
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === "y" || (e.key === "z" && e.shiftKey))
+      ) {
         e.preventDefault();
         handleRedo();
         return;
@@ -318,31 +358,31 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       // Tool shortcuts
       if (e.ctrlKey || e.metaKey) return; // Skip if modifier keys are pressed
 
-      const toolShortcuts: Record<string, ToolType | 'grid'> = {
-        'v': 'select',
-        'h': 'hand',
-        'b': 'basic-section',
-        'd': 'detailed-section',
-        'c': 'circle',
-        's': 'square',
-        'l': 'diamond',
-        't': 'text',
-        'a': 'arrow',
-        'r': 'line',
-        'g': 'grid',
+      const toolShortcuts: Record<string, ToolType | "grid"> = {
+        v: "select",
+        h: "hand",
+        b: "paragraph-block",
+        d: "section-block",
+        c: "circle",
+        s: "square",
+        l: "diamond",
+        t: "text",
+        a: "arrow",
+        r: "line",
+        g: "grid",
       };
 
       const keyLower = e.key.toLowerCase();
       const toolAction = toolShortcuts[keyLower];
 
       if (toolAction) {
-        console.log('[DEBUG] Tool shortcut activated:', {
+        console.log("[DEBUG] Tool shortcut activated:", {
           key: keyLower,
           tool: toolAction,
           previousTool: activeTool,
         });
 
-        if (toolAction === 'grid') {
+        if (toolAction === "grid") {
           handleToggleGrid();
         } else {
           setActiveTool(toolAction as ToolType);
@@ -350,9 +390,19 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [selectedElementIds, selectedConnectionId, currentMap.elements, copiedElement, handleElementDuplicate, handleElementDelete, handleConnectionDelete, handleUndo, handleRedo]);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [
+    selectedElementIds,
+    selectedConnectionId,
+    currentMap.elements,
+    copiedElement,
+    handleElementDuplicate,
+    handleElementDelete,
+    handleConnectionDelete,
+    handleUndo,
+    handleRedo,
+  ]);
 
   // Zoom with Ctrl/Cmd + Scroll
   useEffect(() => {
@@ -390,8 +440,8 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.addEventListener('wheel', handleWheel, { passive: false });
-      return () => canvas.removeEventListener('wheel', handleWheel);
+      canvas.addEventListener("wheel", handleWheel, { passive: false });
+      return () => canvas.removeEventListener("wheel", handleWheel);
     }
   }, [zoom, viewOffset]);
 
@@ -419,9 +469,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       // Check if clicked on canvas itself or the canvas content container
       const isCanvasBackground =
         e.target === e.currentTarget ||
-        target.dataset?.canvasContent === 'true';
+        target.dataset?.canvasContent === "true";
 
-      console.log('[DEBUG] handleCanvasClick:', {
+      console.log("[DEBUG] handleCanvasClick:", {
         activeTool,
         isCanvasBackground,
         targetElement: target.tagName,
@@ -431,21 +481,24 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       });
 
       // Handle panning with hand tool or middle mouse button
-      if (activeTool === 'hand' || e.button === 1) {
+      if (activeTool === "hand" || e.button === 1) {
         setIsPanning(true);
-        setPanStart({ x: e.clientX - viewOffset.x, y: e.clientY - viewOffset.y });
+        setPanStart({
+          x: e.clientX - viewOffset.x,
+          y: e.clientY - viewOffset.y,
+        });
         return;
       }
 
       // Handle element creation (only on canvas background)
       if (
         isCanvasBackground &&
-        activeTool !== 'select' &&
-        activeTool !== 'arrow' &&
-        activeTool !== 'line' &&
-        activeTool !== 'hand'
+        activeTool !== "select" &&
+        activeTool !== "arrow" &&
+        activeTool !== "line" &&
+        activeTool !== "hand"
       ) {
-        console.log('[DEBUG] Creating element:', { activeTool });
+        console.log("[DEBUG] Creating element:", { activeTool });
 
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -454,30 +507,56 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         const x = (e.clientX - rect.left - viewOffset.x) / zoom;
         const y = (e.clientY - rect.top - viewOffset.y) / zoom;
 
-        const snappedPos = snapPositionToGrid({ x, y }, currentMap.gridEnabled, currentMap.gridSize);
+        const snappedPos = snapPositionToGrid(
+          { x, y },
+          currentMap.gridEnabled,
+          currentMap.gridSize
+        );
 
         let newElement: IPowerElement;
 
         // Map shape tools to visual-section with specific shape
-        if (activeTool === 'circle') {
-          newElement = createElement('visual-section', snappedPos.x, snappedPos.y);
+        if (activeTool === "circle") {
+          newElement = createElement(
+            "visual-section",
+            snappedPos.x,
+            snappedPos.y
+          );
           // Shape is already 'circle' by default
-        } else if (activeTool === 'square') {
-          const baseElement = createElement('visual-section', snappedPos.x, snappedPos.y);
-          newElement = { ...baseElement, shape: 'rounded-square' } as IPowerElement;
-        } else if (activeTool === 'diamond') {
-          const baseElement = createElement('visual-section', snappedPos.x, snappedPos.y);
-          newElement = { ...baseElement, shape: 'diamond' } as IPowerElement;
+        } else if (activeTool === "square") {
+          const baseElement = createElement(
+            "visual-section",
+            snappedPos.x,
+            snappedPos.y
+          );
+          newElement = {
+            ...baseElement,
+            shape: "rounded-square",
+          } as IPowerElement;
+        } else if (activeTool === "diamond") {
+          const baseElement = createElement(
+            "visual-section",
+            snappedPos.x,
+            snappedPos.y
+          );
+          newElement = { ...baseElement, shape: "diamond" } as IPowerElement;
         } else {
-          newElement = createElement(activeTool as ElementType, snappedPos.x, snappedPos.y);
+          newElement = createElement(
+            activeTool as ElementType,
+            snappedPos.x,
+            snappedPos.y
+          );
         }
 
-        console.log('[DEBUG] Element created:', {
+        console.log("[DEBUG] Element created:", {
           elementId: newElement.id,
           type: newElement.type,
           position: { x: newElement.x, y: newElement.y },
           size: { width: newElement.width, height: newElement.height },
-          content: newElement.type === 'text' ? (newElement as any).content : undefined
+          content:
+            newElement.type === "text"
+              ? (newElement as any).content
+              : undefined,
         });
 
         setCurrentMap((prev) => {
@@ -486,10 +565,10 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
             elements: [...prev.elements, newElement],
             updatedAt: Date.now(),
           };
-          console.log('[DEBUG] Element added to map:', {
+          console.log("[DEBUG] Element added to map:", {
             elementId: newElement.id,
             totalElements: newMap.elements.length,
-            elements: newMap.elements.map(e => ({ id: e.id, type: e.type })),
+            elements: newMap.elements.map((e) => ({ id: e.id, type: e.type })),
           });
           return newMap;
         });
@@ -498,15 +577,18 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
         // Always switch to select tool after creating any element
         // This allows users to click outside to deselect and interact normally
-        setActiveTool('select');
+        setActiveTool("select");
         return;
       }
 
       // Handle arrow/line creation (only on canvas background for arrow, on elements handled in handleElementClick)
-      if ((activeTool === 'arrow' || activeTool === 'line') && activeTool !== 'hand') {
+      if (
+        (activeTool === "arrow" || activeTool === "line") &&
+        activeTool !== "hand"
+      ) {
         if (pendingConnection) {
           // Second click: create arrow to coordinates
-          if (activeTool === 'arrow' && isCanvasBackground) {
+          if (activeTool === "arrow" && isCanvasBackground) {
             const canvas = canvasRef.current;
             if (!canvas) return;
 
@@ -514,7 +596,11 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
             const x = (e.clientX - rect.left - viewOffset.x) / zoom;
             const y = (e.clientY - rect.top - viewOffset.y) / zoom;
 
-            const newConnection = createArrowConnection(pendingConnection.fromElementId, x, y);
+            const newConnection = createArrowConnection(
+              pendingConnection.fromElementId,
+              x,
+              y
+            );
 
             setCurrentMap((prev) => ({
               ...prev,
@@ -524,14 +610,14 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
             setPendingConnection(null);
             setConnectionDraft(null);
-            setActiveTool('select');
+            setActiveTool("select");
             return;
           }
         }
       }
 
       // Deselect if clicking on canvas background with select tool
-      if (isCanvasBackground && activeTool === 'select') {
+      if (isCanvasBackground && activeTool === "select") {
         // If not holding shift, deselect all
         if (!e.shiftKey) {
           setSelectedElementIds([]);
@@ -552,51 +638,63 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         }
       }
     },
-    [activeTool, viewOffset, zoom, currentMap.gridEnabled, currentMap.gridSize, pendingConnection]
+    [
+      activeTool,
+      viewOffset,
+      zoom,
+      currentMap.gridEnabled,
+      currentMap.gridSize,
+      pendingConnection,
+    ]
   );
 
-  const handleElementUpdate = useCallback((id: string, updates: Partial<IPowerElement>) => {
+  const handleElementUpdate = useCallback(
+    (id: string, updates: Partial<IPowerElement>) => {
+      // Check if element should be deleted (empty text element)
+      if (updates.content === "__DELETE__") {
+        setCurrentMap((prev) => {
+          const newMap = {
+            ...prev,
+            elements: prev.elements.filter((el) => el.id !== id),
+            connections: prev.connections.filter(
+              (conn) => conn.fromElementId !== id && conn.toElementId !== id
+            ),
+            updatedAt: Date.now(),
+          };
+          console.log(
+            "[DEBUG] Element deleted, totalElements:",
+            newMap.elements.length
+          );
+          return newMap;
+        });
+        setSelectedElementIds([]);
+        return;
+      }
 
-    // Check if element should be deleted (empty text element)
-    if (updates.content === '__DELETE__') {
-      setCurrentMap((prev) => {
-        const newMap = {
+      // If multiple elements are selected, apply updates to all of them
+      if (selectedElementIds.length > 1 && selectedElementIds.includes(id)) {
+        setCurrentMap((prev) => ({
           ...prev,
-          elements: prev.elements.filter((el) => el.id !== id),
-          connections: prev.connections.filter(
-            (conn) => conn.fromElementId !== id && conn.toElementId !== id
+          elements: prev.elements.map((el) =>
+            selectedElementIds.includes(el.id)
+              ? { ...el, ...updates, updatedAt: Date.now() }
+              : el
           ),
           updatedAt: Date.now(),
-        };
-        console.log('[DEBUG] Element deleted, totalElements:', newMap.elements.length);
-        return newMap;
-      });
-      setSelectedElementIds([]);
-      return;
-    }
-
-    // If multiple elements are selected, apply updates to all of them
-    if (selectedElementIds.length > 1 && selectedElementIds.includes(id)) {
-      setCurrentMap((prev) => ({
-        ...prev,
-        elements: prev.elements.map((el) =>
-          selectedElementIds.includes(el.id)
-            ? { ...el, ...updates, updatedAt: Date.now() }
-            : el
-        ),
-        updatedAt: Date.now(),
-      }));
-    } else {
-      // Single element update
-      setCurrentMap((prev) => ({
-        ...prev,
-        elements: prev.elements.map((el) =>
-          el.id === id ? { ...el, ...updates, updatedAt: Date.now() } : el
-        ),
-        updatedAt: Date.now(),
-      }));
-    }
-  }, [selectedElementIds]);
+        }));
+      } else {
+        // Single element update
+        setCurrentMap((prev) => ({
+          ...prev,
+          elements: prev.elements.map((el) =>
+            el.id === id ? { ...el, ...updates, updatedAt: Date.now() } : el
+          ),
+          updatedAt: Date.now(),
+        }));
+      }
+    },
+    [selectedElementIds]
+  );
 
   const handleElementPositionChange = useCallback(
     (id: string, x: number, y: number) => {
@@ -607,199 +705,122 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   );
 
   // Helper function to calculate connection positions
-  const calculateConnectionPositions = useCallback((
-    connection: IConnection,
-    fromElement: IPowerElement | undefined,
-    toElement: IPowerElement | undefined
-  ): { x1: number; y1: number; x2: number; y2: number } | null => {
-    if (!fromElement) return null;
+  const calculateConnectionPositions = useCallback(
+    (
+      connection: IConnection,
+      fromElement: IPowerElement | undefined,
+      toElement: IPowerElement | undefined
+    ): { x1: number; y1: number; x2: number; y2: number } | null => {
+      if (!fromElement) return null;
 
-    const x1 = fromElement.x + fromElement.width / 2;
-    const y1 = fromElement.y + fromElement.height / 2;
+      const x1 = fromElement.x + fromElement.width / 2;
+      const y1 = fromElement.y + fromElement.height / 2;
 
-    let x2: number;
-    let y2: number;
+      let x2: number;
+      let y2: number;
 
-    if (connection.type === 'arrow' && connection.toX !== undefined && connection.toY !== undefined) {
-      // Arrow: free-form endpoint
-      x2 = connection.toX;
-      y2 = connection.toY;
-    } else if (connection.type === 'line' && toElement) {
-      // Line: connected to another element
-      x2 = toElement.x + toElement.width / 2;
-      y2 = toElement.y + toElement.height / 2;
-    } else {
-      return null;
-    }
+      if (
+        connection.type === "arrow" &&
+        connection.toX !== undefined &&
+        connection.toY !== undefined
+      ) {
+        // Arrow: free-form endpoint
+        x2 = connection.toX;
+        y2 = connection.toY;
+      } else if (connection.type === "line" && toElement) {
+        // Line: connected to another element
+        x2 = toElement.x + toElement.width / 2;
+        y2 = toElement.y + toElement.height / 2;
+      } else {
+        return null;
+      }
 
-    return { x1, y1, x2, y2 };
-  }, []);
+      return { x1, y1, x2, y2 };
+    },
+    []
+  );
 
   // Real-time drag callback (called during mousemove)
-  const handleElementDragMove = useCallback((id: string, x: number, y: number) => {
-    setDragPositions(prev => ({ ...prev, [id]: { x, y } }));
+  const handleElementDragMove = useCallback(
+    (id: string, x: number, y: number) => {
+      setDragPositions((prev) => ({ ...prev, [id]: { x, y } }));
 
-    // Update connections linked to this element in real-time
-    const relatedConnections = currentMap.connections.filter(
-      conn => conn.fromElementId === id || conn.toElementId === id
-    );
+      // Update connections linked to this element in real-time
+      const relatedConnections = currentMap.connections.filter(
+        (conn) => conn.fromElementId === id || conn.toElementId === id
+      );
 
-    if (relatedConnections.length > 0) {
-      const newTempPositions: Record<string, { x1: number; y1: number; x2: number; y2: number }> = {};
+      if (relatedConnections.length > 0) {
+        const newTempPositions: Record<
+          string,
+          { x1: number; y1: number; x2: number; y2: number }
+        > = {};
 
-      relatedConnections.forEach(conn => {
-        // Get elements with temporary positions
-        const fromElement = currentMap.elements.find(el => el.id === conn.fromElementId);
-        const toElement = conn.toElementId ? currentMap.elements.find(el => el.id === conn.toElementId) : undefined;
+        relatedConnections.forEach((conn) => {
+          // Get elements with temporary positions
+          const fromElement = currentMap.elements.find(
+            (el) => el.id === conn.fromElementId
+          );
+          const toElement = conn.toElementId
+            ? currentMap.elements.find((el) => el.id === conn.toElementId)
+            : undefined;
 
-        if (!fromElement) return;
+          if (!fromElement) return;
 
-        // Create temp element data with dragged position
-        const tempFromElement = conn.fromElementId === id
-          ? { ...fromElement, x, y }
-          : fromElement;
+          // Create temp element data with dragged position
+          const tempFromElement =
+            conn.fromElementId === id ? { ...fromElement, x, y } : fromElement;
 
-        const tempToElement = toElement && conn.toElementId === id
-          ? { ...toElement, x, y }
-          : toElement;
+          const tempToElement =
+            toElement && conn.toElementId === id
+              ? { ...toElement, x, y }
+              : toElement;
 
-        const positions = calculateConnectionPositions(conn, tempFromElement, tempToElement);
-        if (positions) {
-          newTempPositions[conn.id] = positions;
-        }
-      });
+          const positions = calculateConnectionPositions(
+            conn,
+            tempFromElement,
+            tempToElement
+          );
+          if (positions) {
+            newTempPositions[conn.id] = positions;
+          }
+        });
 
-      setTempConnectionPositions(prev => ({ ...prev, ...newTempPositions }));
-    }
-  }, [currentMap.connections, currentMap.elements, calculateConnectionPositions]);
+        setTempConnectionPositions((prev) => ({
+          ...prev,
+          ...newTempPositions,
+        }));
+      }
+    },
+    [currentMap.connections, currentMap.elements, calculateConnectionPositions]
+  );
 
   // Clear drag position when drag ends
-  const handleElementDragEnd = useCallback((id: string) => {
-    setDragPositions(prev => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-
-    // Clear temp connection positions for this element
-    const relatedConnections = currentMap.connections.filter(
-      conn => conn.fromElementId === id || conn.toElementId === id
-    );
-
-    if (relatedConnections.length > 0) {
-      setTempConnectionPositions(prev => {
+  const handleElementDragEnd = useCallback(
+    (id: string) => {
+      setDragPositions((prev) => {
         const next = { ...prev };
-        relatedConnections.forEach(conn => {
-          delete next[conn.id];
-        });
+        delete next[id];
         return next;
       });
-    }
-  }, [currentMap.connections]);
 
-  // Real-time resize callback (called during mousemove)
-  const handleElementResizeMove = useCallback((id: string, width: number, height: number, mode?: 'diagonal' | 'horizontal' | 'vertical', scale?: number) => {
-    const element = currentMap.elements.find(e => e.id === id);
-    if (!element) return;
+      // Clear temp connection positions for this element
+      const relatedConnections = currentMap.connections.filter(
+        (conn) => conn.fromElementId === id || conn.toElementId === id
+      );
 
-    // Usar scale que vem do componente (se disponível), ou calcular se necessário
-    let finalScale: number | undefined = scale;
-    let finalWidth = width;
-    let finalHeight = height;
-
-    if (mode === 'diagonal' || mode === 'vertical') {
-      // Se scale não foi passado, calcula
-      if (finalScale === undefined) {
-        finalScale = width / element.width;
-      }
-
-      // Para elementos de texto, verificar limites de fontSize
-      if (element.type === 'text' && 'fontSize' in element) {
-        const currentFontSize = element.fontSize;
-        const newFontSize = currentFontSize * finalScale;
-
-        // Se fontSize sair dos limites (8-64px), ajustar scale para o limite
-        if (newFontSize < 8) {
-          finalScale = 8 / currentFontSize;
-          finalWidth = element.width * finalScale;
-          finalHeight = element.height * finalScale;
-        } else if (newFontSize > 64) {
-          finalScale = 64 / currentFontSize;
-          finalWidth = element.width * finalScale;
-          finalHeight = element.height * finalScale;
-        }
-      }
-    }
-
-    // LOG TEMPORÁRIO
-    console.log('[INDEX handleElementResizeMove]', id, {
-      receivedScale: scale,
-      finalScale,
-      finalWidth,
-      finalHeight,
-      'element.width': element.width,
-      'element.height': element.height
-    });
-
-    setResizeSizes(prev => ({ ...prev, [id]: { width: finalWidth, height: finalHeight, scale: finalScale } }));
-
-    // Update connections linked to this element in real-time
-    const relatedConnections = currentMap.connections.filter(
-      conn => conn.fromElementId === id || conn.toElementId === id
-    );
-
-    if (relatedConnections.length > 0) {
-      const newTempPositions: Record<string, { x1: number; y1: number; x2: number; y2: number }> = {};
-
-      relatedConnections.forEach(conn => {
-        // Get elements with temporary sizes
-        const fromElement = currentMap.elements.find(el => el.id === conn.fromElementId);
-        const toElement = conn.toElementId ? currentMap.elements.find(el => el.id === conn.toElementId) : undefined;
-
-        if (!fromElement) return;
-
-        // Create temp element data with resized dimensions
-        const tempFromElement = conn.fromElementId === id
-          ? { ...fromElement, width, height }
-          : fromElement;
-
-        const tempToElement = toElement && conn.toElementId === id
-          ? { ...toElement, width, height }
-          : toElement;
-
-        const positions = calculateConnectionPositions(conn, tempFromElement, tempToElement);
-        if (positions) {
-          newTempPositions[conn.id] = positions;
-        }
-      });
-
-      setTempConnectionPositions(prev => ({ ...prev, ...newTempPositions }));
-    }
-  }, [currentMap.connections, currentMap.elements, calculateConnectionPositions]);
-
-  // Clear resize size when resize ends
-  const handleElementResizeEnd = useCallback((id: string) => {
-    setResizeSizes(prev => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-
-    // Clear temp connection positions for this element
-    const relatedConnections = currentMap.connections.filter(
-      conn => conn.fromElementId === id || conn.toElementId === id
-    );
-
-    if (relatedConnections.length > 0) {
-      setTempConnectionPositions(prev => {
-        const next = { ...prev };
-        relatedConnections.forEach(conn => {
-          delete next[conn.id];
+      if (relatedConnections.length > 0) {
+        setTempConnectionPositions((prev) => {
+          const next = { ...prev };
+          relatedConnections.forEach((conn) => {
+            delete next[conn.id];
+          });
+          return next;
         });
-        return next;
-      });
-    }
-  }, [currentMap.connections]);
+      }
+    },
+    [currentMap.connections]
+  );
 
   const handleMultipleElementsPositionChange = useCallback(
     (updates: Array<{ id: string; x: number; y: number }>) => {
@@ -807,7 +828,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         ...prev,
         elements: prev.elements.map((el) => {
           const update = updates.find((u) => u.id === el.id);
-          return update ? { ...el, x: update.x, y: update.y, updatedAt: Date.now() } : el;
+          return update
+            ? { ...el, x: update.x, y: update.y, updatedAt: Date.now() }
+            : el;
         }),
         updatedAt: Date.now(),
       }));
@@ -821,7 +844,14 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         ...prev,
         elements: prev.elements.map((el) => {
           const update = updates.find((u) => u.id === el.id);
-          return update ? { ...el, width: update.width, height: update.height, updatedAt: Date.now() } : el;
+          return update
+            ? {
+                ...el,
+                width: update.width,
+                height: update.height,
+                updatedAt: Date.now(),
+              }
+            : el;
         }),
         updatedAt: Date.now(),
       }));
@@ -830,55 +860,101 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   );
 
   // Real-time drag callback for multiple elements (called during mousemove)
-  const handleMultipleElementsDragMove = useCallback((updates: Array<{ id: string; x: number; y: number }>) => {
-    // Update dragPositions for all elements
-    const newDragPositions: Record<string, { x: number; y: number }> = {};
-    updates.forEach(update => {
-      newDragPositions[update.id] = { x: update.x, y: update.y };
-    });
-    setDragPositions(prev => ({ ...prev, ...newDragPositions }));
-
-    // Update connections linked to these elements in real-time
-    const elementIds = new Set(updates.map(u => u.id));
-    const relatedConnections = currentMap.connections.filter(
-      conn => elementIds.has(conn.fromElementId) || (conn.toElementId && elementIds.has(conn.toElementId))
-    );
-
-    if (relatedConnections.length > 0) {
-      const newTempPositions: Record<string, { x1: number; y1: number; x2: number; y2: number }> = {};
-
-      relatedConnections.forEach(conn => {
-        // Get elements with temporary positions
-        const fromElement = currentMap.elements.find(el => el.id === conn.fromElementId);
-        const toElement = conn.toElementId ? currentMap.elements.find(el => el.id === conn.toElementId) : undefined;
-
-        if (!fromElement) return;
-
-        // Create temp element data with dragged positions
-        const fromUpdate = updates.find(u => u.id === conn.fromElementId);
-        const tempFromElement = fromUpdate
-          ? { ...fromElement, x: fromUpdate.x, y: fromUpdate.y }
-          : fromElement;
-
-        const toUpdate = toElement ? updates.find(u => u.id === conn.toElementId) : undefined;
-        const tempToElement = toElement && toUpdate
-          ? { ...toElement, x: toUpdate.x, y: toUpdate.y }
-          : toElement;
-
-        const positions = calculateConnectionPositions(conn, tempFromElement, tempToElement);
-        if (positions) {
-          newTempPositions[conn.id] = positions;
-        }
+  const handleMultipleElementsDragMove = useCallback(
+    (updates: Array<{ id: string; x: number; y: number }>) => {
+      // Update dragPositions for all elements
+      const newDragPositions: Record<string, { x: number; y: number }> = {};
+      updates.forEach((update) => {
+        newDragPositions[update.id] = { x: update.x, y: update.y };
       });
+      setDragPositions((prev) => ({ ...prev, ...newDragPositions }));
 
-      setTempConnectionPositions(prev => ({ ...prev, ...newTempPositions }));
-    }
-  }, [currentMap.connections, currentMap.elements, calculateConnectionPositions]);
+      // Update connections linked to these elements in real-time
+      const elementIds = new Set(updates.map((u) => u.id));
+      const relatedConnections = currentMap.connections.filter(
+        (conn) =>
+          elementIds.has(conn.fromElementId) ||
+          (conn.toElementId && elementIds.has(conn.toElementId))
+      );
+
+      if (relatedConnections.length > 0) {
+        const newTempPositions: Record<
+          string,
+          { x1: number; y1: number; x2: number; y2: number }
+        > = {};
+
+        relatedConnections.forEach((conn) => {
+          // Get elements with temporary positions
+          const fromElement = currentMap.elements.find(
+            (el) => el.id === conn.fromElementId
+          );
+          const toElement = conn.toElementId
+            ? currentMap.elements.find((el) => el.id === conn.toElementId)
+            : undefined;
+
+          if (!fromElement) return;
+
+          // Create temp element data with dragged positions
+          const fromUpdate = updates.find((u) => u.id === conn.fromElementId);
+          const tempFromElement = fromUpdate
+            ? { ...fromElement, x: fromUpdate.x, y: fromUpdate.y }
+            : fromElement;
+
+          const toUpdate = toElement
+            ? updates.find((u) => u.id === conn.toElementId)
+            : undefined;
+          const tempToElement =
+            toElement && toUpdate
+              ? { ...toElement, x: toUpdate.x, y: toUpdate.y }
+              : toElement;
+
+          const positions = calculateConnectionPositions(
+            conn,
+            tempFromElement,
+            tempToElement
+          );
+          if (positions) {
+            newTempPositions[conn.id] = positions;
+          }
+        });
+
+        setTempConnectionPositions((prev) => ({
+          ...prev,
+          ...newTempPositions,
+        }));
+      }
+    },
+    [currentMap.connections, currentMap.elements, calculateConnectionPositions]
+  );
 
   // Clear drag positions when multi-element drag ends
   const handleMultipleElementsDragEnd = useCallback(() => {
     setDragPositions({});
     setTempConnectionPositions({});
+  }, []);
+
+  // Real-time resize callback (called during resize)
+  const handleElementResizeMove = useCallback(
+    (
+      id: string,
+      width: number,
+      height: number,
+      mode?: "diagonal" | "horizontal" | "vertical"
+    ) => {
+      // For text elements, no scaling - just update dimensions
+      // Font size changes are handled via properties panel only
+      setResizeSizes((prev) => ({ ...prev, [id]: { width, height } }));
+    },
+    []
+  );
+
+  // Clear resize size when resize ends
+  const handleElementResizeEnd = useCallback((id: string) => {
+    setResizeSizes((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }, []);
 
   const handleElementClick = useCallback(
@@ -902,11 +978,17 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       }
 
       // Handle connection creation
-      if ((activeTool === 'arrow' || activeTool === 'line') && activeTool !== 'hand') {
+      if (
+        (activeTool === "arrow" || activeTool === "line") &&
+        activeTool !== "hand"
+      ) {
         if (pendingConnection) {
           // Second click: create line connection
-          if (activeTool === 'line') {
-            const newConnection = createLineConnection(pendingConnection.fromElementId, id);
+          if (activeTool === "line") {
+            const newConnection = createLineConnection(
+              pendingConnection.fromElementId,
+              id
+            );
 
             setCurrentMap((prev) => ({
               ...prev,
@@ -916,7 +998,7 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
             setPendingConnection(null);
             setConnectionDraft(null);
-            setActiveTool('select');
+            setActiveTool("select");
           }
         } else {
           // First click: start connection
@@ -926,7 +1008,7 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
           });
 
           // Start draft for visual feedback
-          const element = currentMap.elements.find(el => el.id === id);
+          const element = currentMap.elements.find((el) => el.id === id);
           if (element) {
             setConnectionDraft({
               fromElementId: id,
@@ -959,9 +1041,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       if (depth >= 3) {
         // Show toast notification
         toast({
-          title: 'Limite de navegação atingido',
-          description: 'Você atingiu o limite máximo de 3 níveis de navegação.',
-          variant: 'destructive',
+          title: "Limite de navegação atingido",
+          description: "Você atingiu o limite máximo de 3 níveis de navegação.",
+          variant: "destructive",
         });
         return;
       }
@@ -975,17 +1057,21 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         }
       } else {
         // Get name for the new area based on element type
-        let defaultName = 'Nova Área';
+        let defaultName = "Nova Área";
 
-        if (element.type === 'basic-section' && element.title) {
+        if (element.type === "paragraph-block" && element.content) {
+          defaultName =
+            element.content.substring(0, 20) +
+            (element.content.length > 20 ? "..." : "");
+        } else if (element.type === "section-block" && element.title) {
           defaultName = element.title;
-        } else if (element.type === 'detailed-section' && element.title) {
-          defaultName = element.title;
-        } else if (element.type === 'visual-section' && element.hoverTitle) {
+        } else if (element.type === "visual-section" && element.hoverTitle) {
           defaultName = element.hoverTitle;
-        } else if (element.type === 'text' && element.content) {
+        } else if (element.type === "text" && element.content) {
           // Use first 20 characters of text content
-          defaultName = element.content.substring(0, 20) + (element.content.length > 20 ? '...' : '');
+          defaultName =
+            element.content.substring(0, 20) +
+            (element.content.length > 20 ? "..." : "");
         }
 
         const newSubmap: IPowerMap = {
@@ -1010,16 +1096,20 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     [maps, currentMap, handleElementUpdate]
   );
 
-
   // Arrow handle drag handlers
-  const handleArrowHandleDragStart = useCallback((connectionId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const connection = currentMap.connections.find(c => c.id === connectionId);
-    if (!connection || connection.type !== 'arrow') return;
+  const handleArrowHandleDragStart = useCallback(
+    (connectionId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      const connection = currentMap.connections.find(
+        (c) => c.id === connectionId
+      );
+      if (!connection || connection.type !== "arrow") return;
 
-    setDraggingArrowHandle({ connectionId });
-    setSelectedConnectionId(connectionId);
-  }, [currentMap.connections]);
+      setDraggingArrowHandle({ connectionId });
+      setSelectedConnectionId(connectionId);
+    },
+    [currentMap.connections]
+  );
 
   const handleConnectionClick = useCallback((id: string) => {
     setSelectedConnectionId(id);
@@ -1043,7 +1133,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   }, []);
 
   const handleTutorialNext = useCallback(() => {
-    setTutorialStep((prev) => Math.min(prev + 1, TUTORIAL_STEPS_CONSTANT.length - 1));
+    setTutorialStep((prev) =>
+      Math.min(prev + 1, TUTORIAL_STEPS_CONSTANT.length - 1)
+    );
   }, []);
 
   const handleTutorialPrev = useCallback(() => {
@@ -1056,7 +1148,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   }, []);
 
   const handleElementFirstInput = useCallback(() => {
-    console.log('[DEBUG] handleElementFirstInput - keeping text tool active to maintain focus');
+    console.log(
+      "[DEBUG] handleElementFirstInput - keeping text tool active to maintain focus"
+    );
     // Don't change tool to prevent deselection and maintain textarea focus
     // User can manually switch to select tool by pressing 'V' or clicking elsewhere
   }, []);
@@ -1076,12 +1170,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       setIsPanning(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isPanning, panStart]);
 
@@ -1111,12 +1205,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       // Don't clear draft on mouse up - only when connection is completed or cancelled
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [connectionDraft, viewOffset, zoom]);
 
@@ -1147,12 +1241,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       setDraggingArrowHandle(null);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [draggingArrowHandle, viewOffset, zoom]);
 
@@ -1209,7 +1303,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         const selectedElements = currentMap.elements.filter((element) => {
           const centerX = element.x + element.width / 2;
           const centerY = element.y + element.height / 2;
-          return centerX >= minX && centerX <= maxX && centerY >= minY && centerY <= maxY;
+          return (
+            centerX >= minX &&
+            centerX <= maxX &&
+            centerY >= minY &&
+            centerY <= maxY
+          );
         });
 
         // Select found elements
@@ -1224,12 +1323,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       selectionStartRef.current = null;
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [selectionBox, viewOffset, zoom, currentMap.elements]);
 

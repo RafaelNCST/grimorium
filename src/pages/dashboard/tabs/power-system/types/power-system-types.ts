@@ -1,35 +1,37 @@
 // Element Types
 export type ElementType =
-  | 'basic-section'      // Seção Básica: Retangular, título + descrição
-  | 'detailed-section'   // Seção Detalhada: Retangular, título + subtítulo + imagem circular + descrição
-  | 'visual-section'     // Seção Visual: Formas variadas, imagem ou cor, hover card
-  | 'text';              // Texto: Caixa de texto livre sem fundo
+  | "paragraph-block" // Bloco de Parágrafo: Retangular, área de parágrafo editável
+  | "section-block" // Bloco de Sessão: Retangular, título + área de parágrafo editável
+  | "image-block" // Bloco de Imagem: Retangular, imagem + legenda editável
+  | "visual-section" // Seção Visual: Formas variadas, imagem ou cor, hover card
+  | "text"; // Texto: Caixa de texto livre sem fundo
 
 // Shape Types (para visual-section)
 export type ShapeType =
-  | 'circle'           // Circular (padrão)
-  | 'square'           // Quadrado
-  | 'rounded-square'   // Quadrado arredondado
-  | 'triangle'         // Triângulo
-  | 'diamond';         // Losango
+  | "circle" // Circular (padrão)
+  | "square" // Quadrado
+  | "rounded-square" // Quadrado arredondado
+  | "triangle" // Triângulo
+  | "diamond"; // Losango
 
 // Connection Types
 export type ConnectionType =
-  | 'arrow'  // Seta: Sai de um elemento, aponta para qualquer lugar
-  | 'line';  // Ligação: Conecta dois elementos específicos
+  | "arrow" // Seta: Sai de um elemento, aponta para qualquer lugar
+  | "line"; // Ligação: Conecta dois elementos específicos
 
 // Tool Types for Toolbar
 export type ToolType =
-  | 'select'           // Ferramenta de seleção (padrão)
-  | 'hand'             // Ferramenta mão - Apenas navegar/arrastar canvas
-  | 'basic-section'    // Criar seção básica
-  | 'detailed-section' // Criar seção detalhada
-  | 'circle'           // Criar forma circular
-  | 'square'           // Criar forma quadrada
-  | 'diamond'          // Criar forma losango
-  | 'text'             // Criar texto
-  | 'arrow'            // Criar seta
-  | 'line';            // Criar linha
+  | "select" // Ferramenta de seleção (padrão)
+  | "hand" // Ferramenta mão - Apenas navegar/arrastar canvas
+  | "paragraph-block" // Criar bloco de parágrafo
+  | "section-block" // Criar bloco de sessão
+  | "image-block" // Criar bloco de imagem
+  | "circle" // Criar forma circular
+  | "square" // Criar forma quadrada
+  | "diamond" // Criar forma losango
+  | "text" // Criar texto
+  | "arrow" // Criar seta
+  | "line"; // Criar linha
 
 // Base Element Interface
 interface IBaseElement {
@@ -41,44 +43,65 @@ interface IBaseElement {
   height: number;
 
   // Navegação
-  canNavigate: boolean;  // Se clicável para abrir submapa
-  submapId?: string;     // ID do submapa associado
+  canNavigate: boolean; // Se clicável para abrir submapa
+  submapId?: string; // ID do submapa associado
 
   // Metadata
   createdAt: number;
   updatedAt: number;
 }
 
-// Seção Básica: Título + Descrição
-export interface IBasicSection extends IBaseElement {
-  type: 'basic-section';
-  title: string;
-  description: string;
+// Bloco de Parágrafo: Área de parágrafo editável
+export interface IParagraphBlock extends IBaseElement {
+  type: "paragraph-block";
+  content: string;
   backgroundColor: string;
   textColor: string;
-  wasManuallyResized?: boolean;  // Se foi redimensionado manualmente
-  fontScale?: number;             // Escala de fonte (1.0 = padrão, limites: 8-64px)
+  borderColor?: string; // Cor da borda interna
+  fontSize: number; // Tamanho da fonte (padrão: 16px)
+  textAlign: "left" | "center" | "right" | "justify";
+  showContentBorder?: boolean; // Se true, mostra borda do conteúdo (padrão: true)
 }
 
-// Seção Detalhada: Título + Subtítulo + Imagem Circular + Descrição
-export interface IDetailedSection extends IBaseElement {
-  type: 'detailed-section';
+// Bloco de Sessão: Título + Área de parágrafo editável
+export interface ISectionBlock extends IBaseElement {
+  type: "section-block";
   title: string;
-  subtitle: string;
-  description: string;
-  imageUrl?: string;        // Imagem circular (opcional)
+  content: string;
   backgroundColor: string;
   textColor: string;
-  wasManuallyResized?: boolean;  // Se foi redimensionado manualmente
-  fontScale?: number;             // Escala de fonte (1.0 = padrão, limites: 8-64px)
+  borderColor?: string; // Cor da borda interna
+  titleFontSize: number; // Tamanho da fonte do título (padrão: 24px)
+  contentFontSize: number; // Tamanho da fonte do conteúdo (padrão: 16px)
+  titleAlign: "left" | "center" | "right" | "justify";
+  contentAlign: "left" | "center" | "right" | "justify";
+  showTitleBorder?: boolean; // Se true, mostra borda do título (padrão: true)
+  showContentBorder?: boolean; // Se true, mostra borda do conteúdo (padrão: true)
+}
+
+// Bloco de Imagem: Imagem + Legenda editável
+export interface IImageBlock extends IBaseElement {
+  type: "image-block";
+  imageUrl?: string; // URL da imagem
+  imageMode?: "fill" | "fit" | "tile" | "crop"; // Modo de exibição da imagem (padrão: fill)
+  imageOffsetX?: number; // Deslocamento horizontal da imagem para enquadramento (usado em modo crop)
+  imageOffsetY?: number; // Deslocamento vertical da imagem para enquadramento (usado em modo crop)
+  imageAreaHeight?: number; // Altura customizada da área da imagem em pixels (padrão: 300px, range: 200-1200px)
+  caption: string; // Legenda da imagem
+  backgroundColor: string;
+  textColor: string;
+  borderColor?: string; // Cor da borda interna
+  captionAlign: "left" | "center" | "right" | "justify";
+  captionFontSize: number; // Tamanho da fonte da legenda (padrão: 16px)
+  showCaptionBorder?: boolean; // Se true, mostra borda da legenda (padrão: true)
 }
 
 // Seção Visual: Formas variadas com imagem ou cor
 export interface IVisualSection extends IBaseElement {
-  type: 'visual-section';
+  type: "visual-section";
   shape: ShapeType;
-  imageUrl?: string;        // Se tiver imagem, usa a imagem
-  backgroundColor?: string;  // Se não tiver imagem, usa cor sólida
+  imageUrl?: string; // Se tiver imagem, usa a imagem
+  backgroundColor?: string; // Se não tiver imagem, usa cor sólida
 
   // Hover card (opcional)
   showHoverCard: boolean;
@@ -89,19 +112,20 @@ export interface IVisualSection extends IBaseElement {
 
 // Texto: Caixa de texto livre
 export interface ITextElement extends IBaseElement {
-  type: 'text';
+  type: "text";
   content: string;
   textColor: string;
-  fontSize: number;        // Tamanho da fonte (8-64)
-  fontWeight: 'normal' | 'bold' | 'underline';
-  textAlign: 'left' | 'center' | 'right' | 'justify';
+  fontSize: number; // Tamanho da fonte (8-64)
+  fontWeight: "normal" | "bold" | "underline";
+  textAlign: "left" | "center" | "right" | "justify";
   wasManuallyResized?: boolean; // Flag para saber se foi redimensionado manualmente
 }
 
 // Union type para todos os elementos
 export type IPowerElement =
-  | IBasicSection
-  | IDetailedSection
+  | IParagraphBlock
+  | ISectionBlock
+  | IImageBlock
   | IVisualSection
   | ITextElement;
 
@@ -113,14 +137,14 @@ export interface IConnection {
   // Arrow: sai de um elemento, aponta para coordenadas
   // Line: conecta dois elementos
   fromElementId: string;
-  toElementId?: string;  // Opcional: se undefined, é uma seta livre
-  toX?: number;          // Opcional: coordenadas de destino para setas livres
+  toElementId?: string; // Opcional: se undefined, é uma seta livre
+  toX?: number; // Opcional: coordenadas de destino para setas livres
   toY?: number;
 
   // Aparência
   color: string;
   strokeWidth: number;
-  label?: string;        // Texto opcional na conexão
+  label?: string; // Texto opcional na conexão
 
   // Metadata
   createdAt: number;
@@ -129,12 +153,12 @@ export interface IConnection {
 // Canvas/Map Interface
 export interface IPowerMap {
   id: string;
-  bookId: string;        // Referência ao livro
+  bookId: string; // Referência ao livro
   name: string;
 
   // Configurações
   gridEnabled: boolean;
-  gridSize: number;      // Tamanho do grid para snap (padrão: 20px)
+  gridSize: number; // Tamanho do grid para snap (padrão: 20px)
 
   // Elementos
   elements: IPowerElement[];
@@ -185,28 +209,40 @@ export interface ISelectionBox {
 }
 
 // Type Guards
-export function isBasicSection(element: IPowerElement): element is IBasicSection {
-  return element.type === 'basic-section';
+export function isParagraphBlock(
+  element: IPowerElement
+): element is IParagraphBlock {
+  return element.type === "paragraph-block";
 }
 
-export function isDetailedSection(element: IPowerElement): element is IDetailedSection {
-  return element.type === 'detailed-section';
+export function isSectionBlock(
+  element: IPowerElement
+): element is ISectionBlock {
+  return element.type === "section-block";
 }
 
-export function isVisualSection(element: IPowerElement): element is IVisualSection {
-  return element.type === 'visual-section';
+export function isImageBlock(
+  element: IPowerElement
+): element is IImageBlock {
+  return element.type === "image-block";
+}
+
+export function isVisualSection(
+  element: IPowerElement
+): element is IVisualSection {
+  return element.type === "visual-section";
 }
 
 export function isTextElement(element: IPowerElement): element is ITextElement {
-  return element.type === 'text';
+  return element.type === "text";
 }
 
 export function isArrowConnection(connection: IConnection): boolean {
-  return connection.type === 'arrow';
+  return connection.type === "arrow";
 }
 
 export function isLineConnection(connection: IConnection): boolean {
-  return connection.type === 'line';
+  return connection.type === "line";
 }
 
 // Helper Types

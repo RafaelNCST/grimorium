@@ -296,7 +296,10 @@ export function Header({
 
             {/* Visual Style Badge (destacado) */}
             <div className="mb-2">
-              <Badge variant="default" className="text-sm px-3 py-1 pointer-events-none">
+              <Badge
+                variant="default"
+                className="text-sm px-3 py-1 pointer-events-none"
+              >
                 {book.visualStyle}
               </Badge>
             </div>
@@ -304,7 +307,11 @@ export function Header({
             {/* Genre Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {book.genre.map((g, index) => (
-                <Badge key={index} variant="secondary" className="pointer-events-none">
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="pointer-events-none"
+                >
                   {g}
                 </Badge>
               ))}

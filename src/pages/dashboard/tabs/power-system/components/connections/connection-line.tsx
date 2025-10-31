@@ -1,4 +1,4 @@
-import { IConnection, IPowerElement } from '../../types/power-system-types';
+import { IConnection, IPowerElement } from "../../types/power-system-types";
 
 interface PropsConnectionLine {
   connection: IConnection;
@@ -38,11 +38,15 @@ export function ConnectionLine({
     startX = fromElement.x + fromElement.width / 2;
     startY = fromElement.y + fromElement.height / 2;
 
-    if (connection.type === 'arrow' && connection.toX !== undefined && connection.toY !== undefined) {
+    if (
+      connection.type === "arrow" &&
+      connection.toX !== undefined &&
+      connection.toY !== undefined
+    ) {
       // Arrow: free-form endpoint
       endX = connection.toX;
       endY = connection.toY;
-    } else if (connection.type === 'line' && connection.toElementId) {
+    } else if (connection.type === "line" && connection.toElementId) {
       // Line: connected to another element
       const toElement = elements.find((el) => el.id === connection.toElementId);
       if (!toElement) return null;
@@ -84,14 +88,14 @@ export function ConnectionLine({
         stroke={connection.color}
         strokeWidth={connection.strokeWidth}
         strokeLinecap="round"
-        className={`transition-all ${isSelected ? 'stroke-primary' : ''}`}
+        className={`transition-all ${isSelected ? "stroke-primary" : ""}`}
       />
 
       {/* Arrow head (for both types) */}
       <polygon
         points={`${endX},${endY} ${arrowPoint1X},${arrowPoint1Y} ${arrowPoint2X},${arrowPoint2Y}`}
         fill={connection.color}
-        className={isSelected ? 'fill-primary' : ''}
+        className={isSelected ? "fill-primary" : ""}
       />
 
       {/* Selection indicator */}
@@ -147,7 +151,7 @@ export function ConnectionLine({
       />
 
       {/* Draggable handle for arrow head (only for arrows when selected) */}
-      {connection.type === 'arrow' && isSelected && onArrowHandleMouseDown && (
+      {connection.type === "arrow" && isSelected && onArrowHandleMouseDown && (
         <g>
           {/* Invisible larger circle for better click area */}
           <circle

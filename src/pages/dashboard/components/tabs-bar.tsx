@@ -92,7 +92,9 @@ export function TabsBar({
   }
 
   return (
-    <div className={`pointer-events-none pb-3 px-6 ${isHeaderHidden ? "pt-2" : "pt-6"}`}>
+    <div
+      className={`pointer-events-none pb-3 px-6 ${isHeaderHidden ? "pt-2" : "pt-6"}`}
+    >
       <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
         {visibleTabs.map((tab, index) => (
           <SortableTab

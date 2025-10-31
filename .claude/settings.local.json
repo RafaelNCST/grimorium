@@ -70,7 +70,13 @@
       "Bash(node:*)",
       "Bash(cmd //c \"taskkill //PID 21184 //F\")",
       "Bash(cmd //c \"taskkill //PID 10028 //F\")",
-      "Bash(cmd //c \"taskkill //PID 29148 //F\")"
+      "Bash(cmd //c \"taskkill //PID 29148 //F\")",
+      "Bash(Select-Object -First 20)",
+      "Bash(cmd //c \"taskkill //PID 13436 //F\")",
+      "Bash(npx kill-port:*)",
+      "Bash(cmd.exe //c taskkill //PID 13120 //F)",
+      "Bash(cmd /c \"taskkill /PID 28684 /F\")",
+      "Bash(cmd //c \"taskkill //PID 28684 //F\")"
     ],
     "deny": [],
     "ask": []

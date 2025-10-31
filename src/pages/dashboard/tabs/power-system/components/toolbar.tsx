@@ -3,6 +3,7 @@ import {
   Hand,
   RectangleHorizontal,
   SquareStack,
+  Image,
   Circle,
   Square,
   Diamond,
@@ -10,18 +11,18 @@ import {
   ArrowUpRight,
   Minus,
   Grid3x3,
-} from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
-import { ToolType } from '../types/power-system-types';
+import { ToolType } from "../types/power-system-types";
 
 interface PropsToolbar {
   activeTool: ToolType;
@@ -36,74 +37,80 @@ export function Toolbar({
   onToolChange,
   onToggleGrid,
 }: PropsToolbar) {
-  const { t } = useTranslation('power-system');
+  const { t } = useTranslation("power-system");
 
   const tools = [
     {
-      type: 'select' as ToolType,
+      type: "select" as ToolType,
       icon: MousePointer2,
-      tooltip: 'toolbar_tooltips.select',
-      shortcut: 'V',
+      tooltip: "toolbar_tooltips.select",
+      shortcut: "V",
     },
     {
-      type: 'hand' as ToolType,
+      type: "hand" as ToolType,
       icon: Hand,
-      tooltip: 'toolbar_tooltips.hand',
-      shortcut: 'H',
+      tooltip: "toolbar_tooltips.hand",
+      shortcut: "H",
     },
   ];
 
   const elementTools = [
     {
-      type: 'basic-section' as ToolType,
+      type: "paragraph-block" as ToolType,
       icon: RectangleHorizontal,
-      tooltip: 'toolbar_tooltips.basic_section',
-      shortcut: 'B',
+      tooltip: "toolbar_tooltips.paragraph_block",
+      shortcut: "B",
     },
     {
-      type: 'detailed-section' as ToolType,
+      type: "section-block" as ToolType,
       icon: SquareStack,
-      tooltip: 'toolbar_tooltips.detailed_section',
-      shortcut: 'D',
+      tooltip: "toolbar_tooltips.section_block",
+      shortcut: "D",
     },
     {
-      type: 'circle' as ToolType,
+      type: "image-block" as ToolType,
+      icon: Image,
+      tooltip: "toolbar_tooltips.image_block",
+      shortcut: "I",
+    },
+    {
+      type: "circle" as ToolType,
       icon: Circle,
-      tooltip: 'toolbar_tooltips.circle',
-      shortcut: 'C',
+      tooltip: "toolbar_tooltips.circle",
+      shortcut: "C",
     },
     {
-      type: 'square' as ToolType,
+      type: "square" as ToolType,
       icon: Square,
-      tooltip: 'toolbar_tooltips.square',
-      shortcut: 'S',
+      tooltip: "toolbar_tooltips.square",
+      shortcut: "S",
     },
     {
-      type: 'diamond' as ToolType,
+      type: "diamond" as ToolType,
       icon: Diamond,
-      tooltip: 'toolbar_tooltips.diamond',
-      shortcut: 'L',
+      tooltip: "toolbar_tooltips.diamond",
+      shortcut: "L",
     },
     {
-      type: 'text' as ToolType,
+      type: "text" as ToolType,
       icon: Type,
-      tooltip: 'toolbar_tooltips.text',
-      shortcut: 'T',
+      tooltip: "toolbar_tooltips.text",
+      shortcut: "T",
     },
   ];
 
   const connectionTools = [
     {
-      type: 'arrow' as ToolType,
+      type: "arrow" as ToolType,
       icon: ArrowUpRight,
-      tooltip: 'toolbar_tooltips.arrow',
-      shortcut: 'A',
+      tooltip: "toolbar_tooltips.arrow",
+      shortcut: "A",
     },
     {
-      type: 'line' as ToolType,
+      type: "line" as ToolType,
       icon: Minus,
-      tooltip: 'toolbar_tooltips.line',
-      shortcut: 'R',
+      tooltip: "toolbar_tooltips.line",
+      shortcut: "R",
     },
   ];
 
@@ -120,9 +127,9 @@ export function Toolbar({
       <Tooltip key={tool.type}>
         <TooltipTrigger asChild>
           <Button
-            variant={isActive ? 'default' : 'ghost'}
+            variant={isActive ? "default" : "ghost"}
             size="icon"
-            className={`w-full ${isActive ? 'bg-primary text-primary-foreground hover:bg-primary hover:shadow-glow hover:translate-y-0' : 'hover:bg-accent'}`}
+            className={`w-full ${isActive ? "bg-primary text-primary-foreground hover:bg-primary hover:shadow-glow hover:translate-y-0" : "hover:bg-accent"}`}
             onClick={() => onToolChange(tool.type)}
           >
             <Icon className="w-5 h-5" />
@@ -171,9 +178,9 @@ export function Toolbar({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant={gridEnabled ? 'default' : 'ghost'}
+              variant={gridEnabled ? "default" : "ghost"}
               size="icon"
-              className={`w-full ${gridEnabled ? 'bg-primary text-primary-foreground hover:bg-primary hover:shadow-glow hover:translate-y-0' : 'hover:bg-accent'}`}
+              className={`w-full ${gridEnabled ? "bg-primary text-primary-foreground hover:bg-primary hover:shadow-glow hover:translate-y-0" : "hover:bg-accent"}`}
               onClick={onToggleGrid}
             >
               <Grid3x3 className="w-5 h-5" />
@@ -182,7 +189,11 @@ export function Toolbar({
           <TooltipContent side="right">
             <div className="flex flex-col gap-1">
               <p className="text-sm font-medium">
-                {t(gridEnabled ? 'toolbar_tooltips.grid_on' : 'toolbar_tooltips.grid_off')}
+                {t(
+                  gridEnabled
+                    ? "toolbar_tooltips.grid_on"
+                    : "toolbar_tooltips.grid_off"
+                )}
               </p>
               <p className="text-xs text-muted-foreground">Atalho: G</p>
             </div>

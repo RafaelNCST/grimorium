@@ -11,8 +11,9 @@
   "toolbar": {
     "title": "Ferramentas",
     "select": "Selecionar",
-    "basic_section": "Seção Básica",
-    "detailed_section": "Seção Detalhada",
+    "paragraph_block": "Bloco de Parágrafo",
+    "section_block": "Bloco de Sessão",
+    "image_block": "Bloco de Imagem",
     "visual_section": "Seção Visual",
     "text": "Texto",
     "arrow": "Seta",
@@ -22,8 +23,9 @@
   },
   "toolbar_tooltips": {
     "select": "Selecionar e mover elementos (V)",
-    "basic_section": "Criar seção básica - Retangular com título e descrição",
-    "detailed_section": "Criar seção detalhada - Com imagem circular e subtítulo",
+    "paragraph_block": "Criar bloco de parágrafo - Retangular com área de parágrafo editável",
+    "section_block": "Criar bloco de sessão - Com título e área de parágrafo editável",
+    "image_block": "Criar bloco de imagem - Retangular com imagem e legenda editável",
     "circle": "Forma Circular - Forma circular com imagem ou cor",
     "square": "Forma Quadrada - Forma quadrada com bordas arredondadas",
     "diamond": "Forma Losango - Forma de losango com bordas arredondadas",
@@ -40,22 +42,19 @@
     "reset_view": "Resetar Visualização"
   },
   "elements": {
-    "basic_section": {
-      "default_title": "Nova Seção",
-      "default_description": "Descrição da seção...",
-      "title_placeholder": "Título da seção",
-      "description_placeholder": "Descrição..."
+    "paragraph_block": {
+      "default_content": "",
+      "content_placeholder": "Aqui vai o seu texto..."
     },
-    "detailed_section": {
-      "default_title": "Seção Detalhada",
-      "default_subtitle": "Subtítulo",
-      "default_description": "Descrição detalhada...",
-      "title_placeholder": "Título",
-      "subtitle_placeholder": "Subtítulo",
-      "description_placeholder": "Descrição...",
-      "add_image": "Adicionar Imagem",
-      "change_image": "Alterar Imagem",
-      "remove_image": "Remover Imagem"
+    "section_block": {
+      "default_title": "",
+      "default_content": "",
+      "title_placeholder": "Aqui vai o seu título...",
+      "content_placeholder": "Aqui vai o seu texto..."
+    },
+    "image_block": {
+      "caption_placeholder": "Digite a legenda...",
+      "image_placeholder": "Clique para adicionar imagem"
     },
     "visual_section": {
       "default_hover_title": "Elemento Visual",
@@ -79,12 +78,19 @@
     "title": "Propriedades",
     "close": "Fechar",
     "delete": "Excluir",
+    "duplicate": "Duplicar",
+    "properties": "Propriedades",
     "section_appearance": "Aparência",
     "section_navigation": "Navegação",
     "section_hover_card": "Card Hover",
     "section_text": "Texto",
+    "section_height": "Travamento de Altura",
     "background_color": "Cor de Fundo",
     "text_color": "Cor do Texto",
+    "border_color": "Cor da Borda",
+    "border_visibility": "Visibilidade da Borda",
+    "show_title_border": "Mostrar Borda do Título",
+    "show_content_border": "Mostrar Borda do Conteúdo",
     "shape": "Forma",
     "image": "Imagem",
     "image_profile": "Imagem do Perfil",
@@ -100,16 +106,34 @@
     "hover_subtitle": "Subtítulo do Hover",
     "hover_description": "Descrição do Hover",
     "font_size": "Tamanho da Fonte",
+    "title_font_size": "Tamanho da Fonte do Título",
+    "content_font_size": "Tamanho da Fonte do Conteúdo",
     "font_weight": "Peso da Fonte",
     "font_weight_normal": "Normal",
     "font_weight_bold": "Negrito",
     "text_align": "Alinhamento",
+    "title_align": "Alinhamento do Título",
+    "content_align": "Alinhamento do Conteúdo",
     "text_align_left": "Esquerda",
     "text_align_center": "Centro",
     "text_align_right": "Direita",
+    "text_align_justify": "Justificar",
+    "caption_align": "Alinhamento da Legenda",
+    "show_caption_border": "Mostrar Borda da Legenda",
+    "adjust_frame": "Ajustar Enquadramento",
+    "image_area_height": "Altura da Imagem",
     "connection_color": "Cor da Conexão",
     "connection_width": "Espessura",
     "connection_label": "Rótulo"
+  },
+  "image_frame_modal": {
+    "title": "Ajustar Enquadramento da Imagem",
+    "instruction": "Arraste a imagem para ajustar o enquadramento",
+    "cancel": "Cancelar",
+    "apply": "Aplicar"
+  },
+  "properties": {
+    "border_color": "Cor da Borda"
   },
   "breadcrumb": {
     "root": "Área Principal",
@@ -149,8 +173,8 @@
     "title": "Atalhos do Teclado",
     "select": "V - Ferramenta de Seleção",
     "hand": "H - Ferramenta Mão",
-    "basic_section": "B - Seção Básica",
-    "detailed_section": "D - Seção Detalhada",
+    "paragraph_block": "B - Bloco de Parágrafo",
+    "section_block": "D - Bloco de Sessão",
     "circle": "C - Forma Circular",
     "square": "S - Forma Quadrada",
     "diamond": "L - Forma Losango",

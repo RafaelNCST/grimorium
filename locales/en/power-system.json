@@ -11,8 +11,9 @@
   "toolbar": {
     "title": "Tools",
     "select": "Select",
-    "basic_section": "Basic Section",
-    "detailed_section": "Detailed Section",
+    "paragraph_block": "Paragraph Block",
+    "section_block": "Section Block",
+    "image_block": "Image Block",
     "visual_section": "Visual Section",
     "text": "Text",
     "arrow": "Arrow",
@@ -22,8 +23,9 @@
   },
   "toolbar_tooltips": {
     "select": "Select and move elements (V)",
-    "basic_section": "Create basic section - Rectangular with title and description",
-    "detailed_section": "Create detailed section - With circular image and subtitle",
+    "paragraph_block": "Create paragraph block - Rectangular with editable paragraph area",
+    "section_block": "Create section block - With title and editable paragraph area",
+    "image_block": "Create image block - Rectangular with image and editable caption",
     "circle": "Circle Shape - Circular shape with image or color",
     "square": "Square Shape - Square shape with rounded corners",
     "diamond": "Diamond Shape - Diamond shape with rounded corners",
@@ -40,22 +42,19 @@
     "reset_view": "Reset View"
   },
   "elements": {
-    "basic_section": {
-      "default_title": "New Section",
-      "default_description": "Section description...",
-      "title_placeholder": "Section title",
-      "description_placeholder": "Description..."
+    "paragraph_block": {
+      "default_content": "",
+      "content_placeholder": "Your text goes here..."
     },
-    "detailed_section": {
-      "default_title": "Detailed Section",
-      "default_subtitle": "Subtitle",
-      "default_description": "Detailed description...",
-      "title_placeholder": "Title",
-      "subtitle_placeholder": "Subtitle",
-      "description_placeholder": "Description...",
-      "add_image": "Add Image",
-      "change_image": "Change Image",
-      "remove_image": "Remove Image"
+    "section_block": {
+      "default_title": "",
+      "default_content": "",
+      "title_placeholder": "Your title goes here...",
+      "content_placeholder": "Your text goes here..."
+    },
+    "image_block": {
+      "caption_placeholder": "Enter caption...",
+      "image_placeholder": "Click to add image"
     },
     "visual_section": {
       "default_hover_title": "Visual Element",
@@ -79,12 +78,19 @@
     "title": "Properties",
     "close": "Close",
     "delete": "Delete",
+    "duplicate": "Duplicate",
+    "properties": "Properties",
     "section_appearance": "Appearance",
     "section_navigation": "Navigation",
     "section_hover_card": "Hover Card",
     "section_text": "Text",
+    "section_height": "Height Lock",
     "background_color": "Background Color",
     "text_color": "Text Color",
+    "border_color": "Border Color",
+    "border_visibility": "Border Visibility",
+    "show_title_border": "Show Title Border",
+    "show_content_border": "Show Content Border",
     "shape": "Shape",
     "image": "Image",
     "image_profile": "Profile Image",
@@ -100,16 +106,34 @@
     "hover_subtitle": "Hover Subtitle",
     "hover_description": "Hover Description",
     "font_size": "Font Size",
+    "title_font_size": "Title Font Size",
+    "content_font_size": "Content Font Size",
     "font_weight": "Font Weight",
     "font_weight_normal": "Normal",
     "font_weight_bold": "Bold",
     "text_align": "Alignment",
+    "title_align": "Title Alignment",
+    "content_align": "Content Alignment",
     "text_align_left": "Left",
     "text_align_center": "Center",
     "text_align_right": "Right",
+    "text_align_justify": "Justify",
+    "caption_align": "Caption Alignment",
+    "show_caption_border": "Show Caption Border",
+    "adjust_frame": "Adjust Frame",
+    "image_area_height": "Image Height",
     "connection_color": "Connection Color",
     "connection_width": "Thickness",
     "connection_label": "Label"
+  },
+  "image_frame_modal": {
+    "title": "Adjust Image Frame",
+    "instruction": "Drag the image to adjust framing",
+    "cancel": "Cancel",
+    "apply": "Apply"
+  },
+  "properties": {
+    "border_color": "Border Color"
   },
   "breadcrumb": {
     "root": "Main System",
@@ -149,8 +173,8 @@
     "title": "Keyboard Shortcuts",
     "select": "V - Selection Tool",
     "hand": "H - Hand Tool",
-    "basic_section": "B - Basic Section",
-    "detailed_section": "D - Detailed Section",
+    "paragraph_block": "B - Paragraph Block",
+    "section_block": "D - Section Block",
     "circle": "C - Circle Shape",
     "square": "S - Square Shape",
     "diamond": "L - Diamond Shape",

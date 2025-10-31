@@ -1,9 +1,12 @@
-import { GRID_CONFIG } from '../constants/default-dimensions-constant';
+import { GRID_CONFIG } from "../constants/default-dimensions-constant";
 
 /**
  * Snaps a coordinate to the nearest grid point
  */
-export function snapToGrid(value: number, gridSize: number = GRID_CONFIG.size): number {
+export function snapToGrid(
+  value: number,
+  gridSize: number = GRID_CONFIG.size
+): number {
   return Math.round(value / gridSize) * gridSize;
 }
 

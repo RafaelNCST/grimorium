@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 
-import { IPowerElement } from '../../types/power-system-types';
+import { IPowerElement } from "../../types/power-system-types";
 
 interface PropsMultiSelectionDraggableWrapper {
   elements: IPowerElement[];
@@ -9,7 +9,9 @@ interface PropsMultiSelectionDraggableWrapper {
   gridSize: number;
   zoom: number;
   dragPositions?: Record<string, { x: number; y: number }>;
-  onPositionChange: (updates: Array<{ id: string; x: number; y: number }>) => void;
+  onPositionChange: (
+    updates: Array<{ id: string; x: number; y: number }>
+  ) => void;
   onDragMove?: (updates: Array<{ id: string; x: number; y: number }>) => void;
   onDragEnd?: () => void;
 }
@@ -33,7 +35,13 @@ function MultiSelectionDraggableWrapperComponent({
     isDragging: false,
     startX: 0,
     startY: 0,
-    initialElements: [] as Array<{ id: string; x: number; y: number; width: number; height: number }>,
+    initialElements: [] as Array<{
+      id: string;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>,
     boundingBox: { x: 0, y: 0, width: 0, height: 0 },
   });
 
@@ -42,22 +50,30 @@ function MultiSelectionDraggableWrapperComponent({
     if (elements.length === 0) return { x: 0, y: 0, width: 0, height: 0 };
 
     // Use drag positions if available, otherwise use element positions
-    const minX = Math.min(...elements.map((el) => {
-      const pos = dragPositions?.[el.id];
-      return pos ? pos.x : el.x;
-    }));
-    const minY = Math.min(...elements.map((el) => {
-      const pos = dragPositions?.[el.id];
-      return pos ? pos.y : el.y;
-    }));
-    const maxX = Math.max(...elements.map((el) => {
-      const pos = dragPositions?.[el.id];
-      return (pos ? pos.x : el.x) + el.width;
-    }));
-    const maxY = Math.max(...elements.map((el) => {
-      const pos = dragPositions?.[el.id];
-      return (pos ? pos.y : el.y) + el.height;
-    }));
+    const minX = Math.min(
+      ...elements.map((el) => {
+        const pos = dragPositions?.[el.id];
+        return pos ? pos.x : el.x;
+      })
+    );
+    const minY = Math.min(
+      ...elements.map((el) => {
+        const pos = dragPositions?.[el.id];
+        return pos ? pos.y : el.y;
+      })
+    );
+    const maxX = Math.max(
+      ...elements.map((el) => {
+        const pos = dragPositions?.[el.id];
+        return (pos ? pos.x : el.x) + el.width;
+      })
+    );
+    const maxY = Math.max(
+      ...elements.map((el) => {
+        const pos = dragPositions?.[el.id];
+        return (pos ? pos.y : el.y) + el.height;
+      })
+    );
 
     return {
       x: minX,
@@ -105,7 +121,9 @@ function MultiSelectionDraggableWrapperComponent({
           tempUpdates.push({ id: initial.id, x: newX, y: newY });
 
           // Also update DOM for immediate visual feedback
-          const element = document.querySelector(`[data-element-id="${initial.id}"]`) as HTMLElement;
+          const element = document.querySelector(
+            `[data-element-id="${initial.id}"]`
+          ) as HTMLElement;
           if (element) {
             element.style.left = `${newX}px`;
             element.style.top = `${newY}px`;
@@ -123,7 +141,9 @@ function MultiSelectionDraggableWrapperComponent({
         const updates: Array<{ id: string; x: number; y: number }> = [];
 
         dragStateRef.current.initialElements.forEach((initial) => {
-          const element = document.querySelector(`[data-element-id="${initial.id}"]`) as HTMLElement;
+          const element = document.querySelector(
+            `[data-element-id="${initial.id}"]`
+          ) as HTMLElement;
           if (element) {
             let finalX = parseFloat(element.style.left);
             let finalY = parseFloat(element.style.top);
@@ -145,14 +165,23 @@ function MultiSelectionDraggableWrapperComponent({
       }
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, isEditMode, gridEnabled, gridSize, zoom, onPositionChange, onDragMove, onDragEnd]);
+  }, [
+    isDragging,
+    isEditMode,
+    gridEnabled,
+    gridSize,
+    zoom,
+    onPositionChange,
+    onDragMove,
+    onDragEnd,
+  ]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isEditMode) return;
@@ -160,9 +189,9 @@ function MultiSelectionDraggableWrapperComponent({
     // Prevent drag if clicking on input elements
     const target = e.target as HTMLElement;
     if (
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA' ||
-      target.contentEditable === 'true'
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.contentEditable === "true"
     ) {
       return;
     }
@@ -191,10 +220,10 @@ function MultiSelectionDraggableWrapperComponent({
       ref={wrapperRef}
       className={`absolute pointer-events-auto ${
         isDragging
-          ? 'cursor-grabbing opacity-80'
+          ? "cursor-grabbing opacity-80"
           : isEditMode
-            ? 'cursor-move'
-            : 'cursor-default'
+            ? "cursor-move"
+            : "cursor-default"
       }`}
       style={{
         left: `${boundingBox.x - padding}px`,
@@ -202,9 +231,9 @@ function MultiSelectionDraggableWrapperComponent({
         width: `${boundingBox.width + padding * 2}px`,
         height: `${boundingBox.height + padding * 2}px`,
         zIndex: 98,
-        willChange: isDragging ? 'transform, left, top' : 'auto',
-        transform: 'translateZ(0)',
-        backfaceVisibility: 'hidden',
+        willChange: isDragging ? "transform, left, top" : "auto",
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
       }}
       onMouseDown={isEditMode ? handleMouseDown : undefined}
     >
@@ -214,4 +243,5 @@ function MultiSelectionDraggableWrapperComponent({
   );
 }
 
-export const MultiSelectionDraggableWrapper = MultiSelectionDraggableWrapperComponent;
+export const MultiSelectionDraggableWrapper =
+  MultiSelectionDraggableWrapperComponent;
