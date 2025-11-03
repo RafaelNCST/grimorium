@@ -10,6 +10,7 @@ interface PropsConnectionsLayer {
   selectedConnectionId: string | null;
   onConnectionClick: (connectionId: string) => void;
   onArrowHandleDragStart: (connectionId: string, e: React.MouseEvent) => void;
+  onMidpointHandleDragStart: (connectionId: string, e: React.MouseEvent) => void;
   connectionDraft?: {
     fromElementId: string;
     currentX: number;
@@ -28,6 +29,7 @@ export const ConnectionsLayer = memo(
     selectedConnectionId,
     onConnectionClick,
     onArrowHandleDragStart,
+    onMidpointHandleDragStart,
     connectionDraft,
     tempConnectionPositions,
   }: PropsConnectionsLayer) => {
@@ -57,6 +59,9 @@ export const ConnectionsLayer = memo(
               onClick={() => onConnectionClick(connection.id)}
               onArrowHandleMouseDown={(e) =>
                 onArrowHandleDragStart(connection.id, e)
+              }
+              onMidpointHandleMouseDown={(e) =>
+                onMidpointHandleDragStart(connection.id, e)
               }
               tempPositions={tempConnectionPositions?.[connection.id]}
             />

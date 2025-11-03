@@ -185,10 +185,17 @@ export const CardWrapper = memo(
     };
 
     const handleDoubleClick = (e: React.MouseEvent) => {
+      // Prevent default double-click behavior (text selection)
+      e.preventDefault();
+
       // Only stop propagation in edit mode
       if (isEditMode) {
         e.stopPropagation();
       }
+
+      // Clear any existing text selection to prevent it from persisting after navigation
+      window.getSelection()?.removeAllRanges();
+
       onDoubleClick?.();
     };
 

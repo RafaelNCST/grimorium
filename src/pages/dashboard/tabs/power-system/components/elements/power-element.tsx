@@ -2,7 +2,9 @@ import { memo } from "react";
 
 import { IPowerElement } from "../../types/power-system-types";
 
+import { AdvancedBlock } from "./advanced-block";
 import { ImageBlock } from "./image-block";
+import { InformativeBlock } from "./informative-block";
 import { ParagraphBlock } from "./paragraph-block";
 import { SectionBlock } from "./section-block";
 import { TextElement } from "./text-element";
@@ -31,6 +33,7 @@ interface PropsPowerElement {
   isMultiSelected?: boolean;
   tempSize?: { width: number; height: number; scale?: number };
   isHandMode?: boolean;
+  hasCreationToolActive?: boolean;
 }
 
 export const PowerElement = memo(
@@ -53,6 +56,7 @@ export const PowerElement = memo(
     isMultiSelected = false,
     tempSize,
     isHandMode = false,
+    hasCreationToolActive = false,
   }: PropsPowerElement) => {
     // Common props for all element types
     const commonProps = {
@@ -72,6 +76,7 @@ export const PowerElement = memo(
       isMultiSelected,
       tempSize,
       isHandMode,
+      hasCreationToolActive,
     };
 
     switch (element.type) {
@@ -96,6 +101,24 @@ export const PowerElement = memo(
       case "image-block":
         return (
           <ImageBlock
+            {...commonProps}
+            onSizeChange={(width, height) => onUpdate({ width, height })}
+            onNavigate={onNavigate}
+          />
+        );
+
+      case "advanced-block":
+        return (
+          <AdvancedBlock
+            {...commonProps}
+            onSizeChange={(width, height) => onUpdate({ width, height })}
+            onNavigate={onNavigate}
+          />
+        );
+
+      case "informative-block":
+        return (
+          <InformativeBlock
             {...commonProps}
             onSizeChange={(width, height) => onUpdate({ width, height })}
             onNavigate={onNavigate}

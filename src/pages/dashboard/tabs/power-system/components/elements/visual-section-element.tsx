@@ -8,7 +8,7 @@ import {
 
 import { IVisualSection, ShapeType } from "../../types/power-system-types";
 
-import { DraggableElementWrapper } from "./draggable-element-wrapper";
+import { ShapeWrapper } from "./shape-wrapper";
 
 interface PropsVisualSectionElement {
   element: IVisualSection;
@@ -30,6 +30,7 @@ interface PropsVisualSectionElement {
   onClick: (e?: React.MouseEvent) => void;
   onNavigate?: () => void;
   isMultiSelected?: boolean;
+  hasCreationToolActive?: boolean;
 }
 
 export function VisualSectionElement({
@@ -48,6 +49,7 @@ export function VisualSectionElement({
   onClick,
   onNavigate,
   isMultiSelected = false,
+  hasCreationToolActive = false,
 }: PropsVisualSectionElement) {
   const { t } = useTranslation("power-system");
 
@@ -76,7 +78,7 @@ export function VisualSectionElement({
         : undefined,
       backgroundSize: "cover",
       backgroundPosition: "center",
-      border: needsBorder ? "2px solid #e5e7eb" : undefined,
+      border: needsBorder ? "2px solid #e5e7eb" : "1px solid rgba(0, 0, 0, 0.2)",
     };
 
     // Triangle shape needs special handling
@@ -84,7 +86,7 @@ export function VisualSectionElement({
       return (
         <div className="relative w-full h-full">
           <div
-            className="absolute inset-0 shadow-lg"
+            className="absolute inset-0"
             style={{
               ...baseStyle,
               clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
@@ -94,17 +96,15 @@ export function VisualSectionElement({
       );
     }
 
-    // Diamond shape needs special handling - rotated square with rounded corners
+    // Diamond shape needs special handling - rotated square
     if (element.shape === "diamond") {
       return (
         <div className="relative w-full h-full flex items-center justify-center">
           <div
-            className="shadow-lg"
             style={{
               ...baseStyle,
               width: "70.71%", // sqrt(2)/2 to fit rotated square in container
               height: "70.71%",
-              borderRadius: "10%", // Rounded corners
               transform: "rotate(45deg)", // Rotate to create diamond shape
             }}
           />
@@ -112,25 +112,33 @@ export function VisualSectionElement({
       );
     }
 
-    // All other shapes use the same structure
-    return <div className="w-full h-full shadow-lg" style={baseStyle} />;
+    // Get border-radius based on shape
+    const getBorderRadius = () => {
+      switch (element.shape) {
+        case "circle":
+          return "50%";
+        case "rounded-square":
+        case "square":
+        default:
+          return undefined;
+      }
+    };
+
+    // All other shapes use the same structure with appropriate border-radius
+    return (
+      <div
+        className="w-full h-full"
+        style={{
+          ...baseStyle,
+          borderRadius: getBorderRadius(),
+        }}
+      />
+    );
   };
 
-  const getWrapperClassName = () => {
-    const baseClasses = "overflow-hidden";
-    switch (element.shape) {
-      case "circle":
-        return `${baseClasses} rounded-full`;
-      case "rounded-square":
-        return `${baseClasses} rounded-2xl`;
-      case "square":
-      case "triangle":
-      default:
-        return baseClasses;
-    }
-  };
-
-  const wrapperClassName = getWrapperClassName();
+  // The wrapper just needs overflow-hidden to clip the content
+  // The actual border-radius is now applied directly to the shape
+  const wrapperClassName = "overflow-hidden";
 
   const handleHoverCardMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -179,7 +187,7 @@ export function VisualSectionElement({
     );
 
   return (
-    <DraggableElementWrapper
+    <ShapeWrapper
       id={element.id}
       x={element.x}
       y={element.y}
@@ -198,15 +206,15 @@ export function VisualSectionElement({
       className={wrapperClassName}
       gridEnabled={gridEnabled}
       gridSize={gridSize}
-      elementType="visual-section"
       shape={element.shape}
       zoom={zoom}
-      minWidth={60}
-      maxWidth={500}
-      minHeight={60}
-      maxHeight={500}
+      minWidth={30}
+      maxWidth={5000}
+      minHeight={30}
+      maxHeight={5000}
       disableDrag={isMultiSelected}
       disableResize={isMultiSelected}
+      hasCreationToolActive={hasCreationToolActive}
     >
       {content}
 
@@ -216,6 +224,6 @@ export function VisualSectionElement({
           ↓ Clique duplo
         </div>
       )}
-    </DraggableElementWrapper>
+    </ShapeWrapper>
   );
 }

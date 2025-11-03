@@ -10,31 +10,36 @@
   },
   "toolbar": {
     "title": "Tools",
-    "select": "Select",
+    "select": "Interact",
     "paragraph_block": "Paragraph Block",
     "section_block": "Section Block",
     "image_block": "Image Block",
+    "advanced_block": "Advanced Block",
+    "informative_block": "Informative Block",
     "visual_section": "Visual Section",
     "text": "Text",
     "arrow": "Arrow",
     "line": "Line",
     "grid_toggle": "Toggle Grid",
-    "hand": "Hand"
+    "hand": "Navigate"
   },
   "toolbar_tooltips": {
-    "select": "Select and move elements (V)",
-    "paragraph_block": "Create paragraph block - Rectangular with editable paragraph area",
-    "section_block": "Create section block - With title and editable paragraph area",
-    "image_block": "Create image block - Rectangular with image and editable caption",
-    "circle": "Circle Shape - Circular shape with image or color",
-    "square": "Square Shape - Square shape with rounded corners",
-    "diamond": "Diamond Shape - Diamond shape with rounded corners",
-    "text": "Create text box - Free text without background",
-    "arrow": "Create arrow - Points from element to anywhere",
-    "line": "Create line - Connects two elements",
-    "grid_on": "Grid enabled - Elements snap to grid",
-    "grid_off": "Grid disabled - Free movement",
-    "hand": "Hand (H) - Navigate canvas"
+    "select": "Interact (V)",
+    "paragraph_block": "Paragraph Block (B)",
+    "section_block": "Section Block (D)",
+    "image_block": "Image Block (I)",
+    "advanced_block": "Advanced Block (F)",
+    "informative_block": "Informative Block (O)",
+    "circle": "Circle Shape (C)",
+    "square": "Square Shape (S)",
+    "diamond": "Diamond Shape (L)",
+    "text": "Text (T)",
+    "arrow": "Arrow (A)",
+    "line": "Line (R)",
+    "grid_on": "Grid Enabled (G)",
+    "grid_off": "Grid Disabled (G)",
+    "hand": "Navigate (H)",
+    "shortcut": "Shortcut"
   },
   "canvas": {
     "zoom_in": "Zoom In (Ctrl + Scroll)",
@@ -55,6 +60,16 @@
     "image_block": {
       "caption_placeholder": "Enter caption...",
       "image_placeholder": "Click to add image"
+    },
+    "informative_block": {
+      "default_content": "",
+      "content_placeholder": "Your observation goes here...",
+      "icon_info": "Information",
+      "icon_warning": "Warning",
+      "icon_check": "Check",
+      "icon_star": "Star",
+      "icon_lightbulb": "Lightbulb",
+      "icon_bookmark": "Bookmark"
     },
     "visual_section": {
       "default_hover_title": "Visual Element",
@@ -79,19 +94,30 @@
     "close": "Close",
     "delete": "Delete",
     "duplicate": "Duplicate",
+    "multi_selection_title": "Multiple Elements Selected",
+    "multi_selection_count": "{{count}} elements selected",
+    "multi_selection_mixed_types": "Elements of different types selected.",
+    "multi_selection_apply_to_all": "Changes will be applied to all",
+    "multi_selection_use_buttons": "Use the buttons below to duplicate or delete.",
+    "duplicate_multiple": "Duplicate ({{count}})",
+    "delete_multiple": "Delete ({{count}})",
     "properties": "Properties",
     "section_appearance": "Appearance",
     "section_navigation": "Navigation",
     "section_hover_card": "Hover Card",
     "section_text": "Text",
     "section_height": "Height Lock",
+    "section_icon": "Icon",
     "background_color": "Background Color",
     "text_color": "Text Color",
+    "icon_color": "Icon Color",
     "border_color": "Border Color",
     "border_visibility": "Border Visibility",
     "show_title_border": "Show Title Border",
     "show_content_border": "Show Content Border",
     "shape": "Shape",
+    "icon": "Icon",
+    "select_icon": "Select Icon",
     "image": "Image",
     "image_profile": "Profile Image",
     "image_background": "Background Image",
@@ -139,6 +165,12 @@
     "root": "Main System",
     "separator": "/"
   },
+  "clear_area_dialog": {
+    "title": "Clear Area",
+    "description": "Are you sure you want to clear the area \"{{areaName}}\"? All elements from this area and all subsequent (child) areas will be removed. This action cannot be undone.",
+    "cancel": "Cancel",
+    "clear": "Clear"
+  },
   "context_menu": {
     "edit": "Edit",
     "duplicate": "Duplicate",
@@ -152,7 +184,7 @@
     "title": "Empty Area",
     "description": "Use the toolbar on the left to add elements",
     "hint_edit": "Select a tool and click on the area",
-    "hint_hand": "Switch to Select tool to interact with elements"
+    "hint_hand": "Switch to Interact tool to interact with elements"
   },
   "dialogs": {
     "delete_element": {
@@ -171,8 +203,8 @@
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",
-    "select": "V - Selection Tool",
-    "hand": "H - Hand Tool",
+    "select": "V - Interact",
+    "hand": "H - Navigate",
     "paragraph_block": "B - Paragraph Block",
     "section_block": "D - Section Block",
     "circle": "C - Circle Shape",

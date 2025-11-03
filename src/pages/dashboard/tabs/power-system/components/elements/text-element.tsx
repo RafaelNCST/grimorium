@@ -144,6 +144,7 @@ interface PropsTextElement {
   isMultiSelected?: boolean;
   tempSize?: { width: number; height: number };
   onFirstInput?: () => void;
+  hasCreationToolActive?: boolean;
 }
 
 export function TextElement({
@@ -164,6 +165,7 @@ export function TextElement({
   isMultiSelected = false,
   tempSize,
   onFirstInput,
+  hasCreationToolActive = false,
 }: PropsTextElement) {
   const { t } = useTranslation("power-system");
   const [isEditing, setIsEditing] = useState(element.content === "");
@@ -395,6 +397,7 @@ export function TextElement({
       disableVerticalResize
       disableDrag={isMultiSelected}
       disableResize={isMultiSelected}
+      hasCreationToolActive={hasCreationToolActive}
     >
       <div
         className="h-full w-full"

@@ -3,6 +3,8 @@ export type ElementType =
   | "paragraph-block" // Bloco de Parágrafo: Retangular, área de parágrafo editável
   | "section-block" // Bloco de Sessão: Retangular, título + área de parágrafo editável
   | "image-block" // Bloco de Imagem: Retangular, imagem + legenda editável
+  | "advanced-block" // Bloco Avançado: Imagem (80x80) + título + parágrafo
+  | "informative-block" // Bloco Informativo: Ícone + texto dinâmico
   | "visual-section" // Seção Visual: Formas variadas, imagem ou cor, hover card
   | "text"; // Texto: Caixa de texto livre sem fundo
 
@@ -26,6 +28,8 @@ export type ToolType =
   | "paragraph-block" // Criar bloco de parágrafo
   | "section-block" // Criar bloco de sessão
   | "image-block" // Criar bloco de imagem
+  | "advanced-block" // Criar bloco avançado
+  | "informative-block" // Criar bloco informativo
   | "circle" // Criar forma circular
   | "square" // Criar forma quadrada
   | "diamond" // Criar forma losango
@@ -86,6 +90,16 @@ export interface IImageBlock extends IBaseElement {
   imageMode?: "fill" | "fit" | "tile" | "crop"; // Modo de exibição da imagem (padrão: fill)
   imageOffsetX?: number; // Deslocamento horizontal da imagem para enquadramento (usado em modo crop)
   imageOffsetY?: number; // Deslocamento vertical da imagem para enquadramento (usado em modo crop)
+  cropX?: number; // Posição X do crop (react-easy-crop)
+  cropY?: number; // Posição Y do crop (react-easy-crop)
+  cropZoom?: number; // Nível de zoom do crop (react-easy-crop)
+  croppedArea?: {
+    // Área cortada em pixels (react-easy-crop)
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
   imageAreaHeight?: number; // Altura customizada da área da imagem em pixels (padrão: 300px, range: 200-1200px)
   caption: string; // Legenda da imagem
   backgroundColor: string;
@@ -93,7 +107,35 @@ export interface IImageBlock extends IBaseElement {
   borderColor?: string; // Cor da borda interna
   captionAlign: "left" | "center" | "right" | "justify";
   captionFontSize: number; // Tamanho da fonte da legenda (padrão: 16px)
-  showCaptionBorder?: boolean; // Se true, mostra borda da legenda (padrão: true)
+  showImageBorder?: boolean; // Se true, mostra borda da imagem (padrão: true)
+}
+
+// Bloco Avançado: Imagem (80x80) + Título + Parágrafo
+export interface IAdvancedBlock extends IBaseElement {
+  type: "advanced-block";
+  imageUrl?: string; // URL da imagem
+  imagePosition: "start" | "center" | "end"; // Posição da imagem (padrão: center)
+  imageShape: "circle" | "rounded-square" | "diamond"; // Forma da imagem (padrão: circle)
+  title: string; // Título (1 linha)
+  paragraph: string; // Parágrafo com scroll
+  backgroundColor: string;
+  textColor: string; // Cor do texto (título e parágrafo)
+  borderColor?: string; // Cor da borda
+  titleAlign: "left" | "center" | "right"; // Alinhamento do título
+  paragraphAlign: "left" | "center" | "right" | "justify"; // Alinhamento do parágrafo
+  titleFontSize: number; // Tamanho da fonte do título (padrão: 16px)
+  paragraphFontSize: number; // Tamanho da fonte do parágrafo (padrão: 12px)
+  showImageBorder?: boolean; // Se true, mostra borda da imagem (padrão: true)
+}
+
+// Bloco Informativo: Ícone + Texto dinâmico
+export interface IInformativeBlock extends IBaseElement {
+  type: "informative-block";
+  content: string; // Texto da observação
+  icon: "info" | "warning" | "check" | "star" | "lightbulb" | "bookmark"; // Ícone escolhível
+  backgroundColor: string; // Cor de fundo do bloco
+  textColor: string; // Cor do texto
+  iconColor: string; // Cor do ícone (separada do texto)
 }
 
 // Seção Visual: Formas variadas com imagem ou cor
@@ -126,6 +168,8 @@ export type IPowerElement =
   | IParagraphBlock
   | ISectionBlock
   | IImageBlock
+  | IAdvancedBlock
+  | IInformativeBlock
   | IVisualSection
   | ITextElement;
 
@@ -140,6 +184,9 @@ export interface IConnection {
   toElementId?: string; // Opcional: se undefined, é uma seta livre
   toX?: number; // Opcional: coordenadas de destino para setas livres
   toY?: number;
+
+  // Ponto intermediário (para criar linhas com dobra)
+  midpoint?: { x: number; y: number } | null;
 
   // Aparência
   color: string;
@@ -221,10 +268,18 @@ export function isSectionBlock(
   return element.type === "section-block";
 }
 
-export function isImageBlock(
-  element: IPowerElement
-): element is IImageBlock {
+export function isImageBlock(element: IPowerElement): element is IImageBlock {
   return element.type === "image-block";
+}
+
+export function isAdvancedBlock(element: IPowerElement): element is IAdvancedBlock {
+  return element.type === "advanced-block";
+}
+
+export function isInformativeBlock(
+  element: IPowerElement
+): element is IInformativeBlock {
+  return element.type === "informative-block";
 }
 
 export function isVisualSection(

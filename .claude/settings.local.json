@@ -76,7 +76,18 @@
       "Bash(npx kill-port:*)",
       "Bash(cmd.exe //c taskkill //PID 13120 //F)",
       "Bash(cmd /c \"taskkill /PID 28684 /F\")",
-      "Bash(cmd //c \"taskkill //PID 28684 //F\")"
+      "Bash(cmd //c \"taskkill //PID 28684 //F\")",
+      "Bash(cmd /c \"taskkill /PID 11840 /F\")",
+      "Bash(cmd /c \"taskkill /PID 32864 /F\")",
+      "Bash(nul)",
+      "Bash(ping:*)",
+      "Bash(cmd /c \"taskkill /PID 31184 /F\")",
+      "Bash(del \"C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\pages\\dashboard\\tabs\\power-system\\components\\breadcrumb-navigation.tsx\")",
+      "Bash(cmd /c \"taskkill /PID 41492 /F\")",
+      "Bash(cmd //c \"taskkill //PID 41492 //F\")",
+      "Bash(cmd /c \"taskkill /PID 37056 /F\")",
+      "Bash(cmd //c \"taskkill //PID 37056 //F\")",
+      "Bash(cmd //c \"taskkill //PID 37608 //F\")"
     ],
     "deny": [],
     "ask": []

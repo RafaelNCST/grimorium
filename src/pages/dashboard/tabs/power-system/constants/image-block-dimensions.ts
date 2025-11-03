@@ -22,7 +22,7 @@ export const IMAGE_BLOCK_CAPTION_LINE_HEIGHT = 1.2;
 export const IMAGE_BLOCK_CAPTION_PADDING = 8;
 
 // Calculated dimensions for the image area
-export const IMAGE_AREA_WIDTH = IMAGE_BLOCK_WIDTH - (IMAGE_BLOCK_PADDING * 2); // 768px
+export const IMAGE_AREA_WIDTH = IMAGE_BLOCK_WIDTH - IMAGE_BLOCK_PADDING * 2; // 768px
 
 // Default image area height (can be customized per element via imageAreaHeight property)
 // Range: 200px - 1200px

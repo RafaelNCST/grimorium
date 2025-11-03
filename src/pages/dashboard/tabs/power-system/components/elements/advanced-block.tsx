@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
+import { ImageIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -8,17 +9,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { ISectionBlock } from "../../types/power-system-types";
+import { IAdvancedBlock } from "../../types/power-system-types";
 
 import { DraggableElementWrapper } from "./draggable-element-wrapper";
 
-interface PropsSectionBlock {
-  element: ISectionBlock;
+interface PropsAdvancedBlock {
+  element: IAdvancedBlock;
   isSelected: boolean;
   isEditMode: boolean;
   gridEnabled: boolean;
   gridSize: number;
-  onUpdate: (updates: Partial<ISectionBlock>) => void;
+  onUpdate: (updates: Partial<IAdvancedBlock>) => void;
   onPositionChange: (x: number, y: number) => void;
   onSizeChange: (width: number, height: number) => void;
   onDragMove?: (x: number, y: number) => void;
@@ -30,21 +31,27 @@ interface PropsSectionBlock {
   zoom?: number;
   isMultiSelected?: boolean;
   tempSize?: { width: number; height: number };
-  isHandMode?: boolean; // Modo de interação (tecla 'h')
+  isHandMode?: boolean;
   hasCreationToolActive?: boolean;
 }
 
-// Limite máximo de caracteres no título
-const MAX_TITLE_CHARS = 200;
+// Constantes
+const BLOCK_WIDTH = 400;
+const BLOCK_HEIGHT = 350;
+const IMAGE_SIZE = 80;
+const TITLE_FONT_SIZE = 16;
+const PARAGRAPH_FONT_SIZE = 12;
+const BLOCK_PADDING = 16;
+const GAP = 12;
 
 // Função para calcular altura de 1 linha baseada no fontSize
 const calculateSingleLineHeight = (fontSize: number) => {
-  const lineHeight = 1.2; // Mesmo lineHeight do CSS
-  const padding = 16; // 8px top + 8px bottom (p-2)
+  const lineHeight = 1.2;
+  const padding = 16; // 8px top + 8px bottom
   return Math.ceil(fontSize * lineHeight) + padding;
 };
 
-export function SectionBlock({
+export function AdvancedBlock({
   element,
   isSelected,
   isEditMode,
@@ -64,38 +71,38 @@ export function SectionBlock({
   tempSize,
   isHandMode = false,
   hasCreationToolActive = false,
-}: PropsSectionBlock) {
+}: PropsAdvancedBlock) {
   const { t } = useTranslation("power-system");
 
-  // Estados essenciais
+  // Estados de edição
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [isEditingContent, setIsEditingContent] = useState(false);
+  const [isEditingParagraph, setIsEditingParagraph] = useState(false);
   const [title, setTitle] = useState(element.title);
-  const [content, setContent] = useState(element.content);
+  const [paragraph, setParagraph] = useState(element.paragraph);
 
   // Refs
   const titleRef = useRef<HTMLTextAreaElement>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-
-  // Constantes dinâmicas baseadas no fontSize
-  const PADDING = 16;
-  const GAP = 8;
-  const LINE_HEIGHT = 1.2;
-  const TITLE_HEIGHT = calculateSingleLineHeight(element.titleFontSize); // Sempre 1 linha
-  const MIN_BLOCK_HEIGHT = 240; // Altura mínima aumentada de 200 para 240
+  const paragraphRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Display dimensions
-  const displayWidth = tempSize?.width ?? element.width;
+  const displayWidth = BLOCK_WIDTH;
+  const displayHeight = BLOCK_HEIGHT;
+
+  // Calcular altura do título (sempre 1 linha)
+  const titleHeight = calculateSingleLineHeight(
+    element.titleFontSize || TITLE_FONT_SIZE
+  );
+
+  // Calcular altura do parágrafo (restante da altura)
+  const paragraphHeight =
+    BLOCK_HEIGHT - BLOCK_PADDING * 2 - IMAGE_SIZE - titleHeight - GAP * 2;
 
   // Sync local state
   useEffect(() => {
     setTitle(element.title);
-    setContent(element.content);
-  }, [element.title, element.content]);
-
-  // Cálculos de altura - Título sempre 1 linha
-  const totalBlockHeight = MIN_BLOCK_HEIGHT;
-  const paragraphHeight = totalBlockHeight - TITLE_HEIGHT - PADDING - GAP;
+    setParagraph(element.paragraph);
+  }, [element.title, element.paragraph]);
 
   // Auto-focus quando entrar em edição
   useEffect(() => {
@@ -105,22 +112,20 @@ export function SectionBlock({
   }, [isEditingTitle]);
 
   useEffect(() => {
-    if (isEditingContent && contentRef.current) {
-      contentRef.current.focus();
+    if (isEditingParagraph && paragraphRef.current) {
+      paragraphRef.current.focus();
     }
-  }, [isEditingContent]);
+  }, [isEditingParagraph]);
 
   // Handlers
   const handleTitleChange = (newTitle: string) => {
-    // Limitar a 200 caracteres
-    const limitedTitle = newTitle.slice(0, MAX_TITLE_CHARS);
-    setTitle(limitedTitle);
-    onUpdate({ title: limitedTitle });
+    setTitle(newTitle);
+    onUpdate({ title: newTitle });
   };
 
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent);
-    onUpdate({ content: newContent });
+  const handleParagraphChange = (newParagraph: string) => {
+    setParagraph(newParagraph);
+    onUpdate({ paragraph: newParagraph });
   };
 
   const handleTitleBlur = () => {
@@ -128,15 +133,9 @@ export function SectionBlock({
     setIsEditingTitle(false);
   };
 
-  const handleContentBlur = () => {
-    onUpdate({ content });
-    setIsEditingContent(false);
-  };
-
-  const handleDoubleClick = () => {
-    if (element.canNavigate && onNavigate && !isEditMode) {
-      onNavigate();
-    }
+  const handleParagraphBlur = () => {
+    onUpdate({ paragraph });
+    setIsEditingParagraph(false);
   };
 
   const handleTitleDoubleClick = (e: React.MouseEvent) => {
@@ -146,10 +145,34 @@ export function SectionBlock({
     }
   };
 
-  const handleContentDoubleClick = (e: React.MouseEvent) => {
+  const handleParagraphDoubleClick = (e: React.MouseEvent) => {
     if (isEditMode) {
       e.stopPropagation();
-      setIsEditingContent(true);
+      setIsEditingParagraph(true);
+    }
+  };
+
+  const handleDoubleClick = () => {
+    if (element.canNavigate && onNavigate && !isEditMode) {
+      onNavigate();
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        onUpdate({ imageUrl: event.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isEditMode && isSelected) {
+      fileInputRef.current?.click();
     }
   };
 
@@ -168,16 +191,87 @@ export function SectionBlock({
     onResizeEnd?.(mode);
   };
 
+  // Obter estilos da imagem com base na forma
+  const getImageStyles = (): React.CSSProperties => {
+    const baseStyles: React.CSSProperties = {
+      width: `${IMAGE_SIZE}px`,
+      height: `${IMAGE_SIZE}px`,
+      objectFit: "cover",
+      userSelect: "none",
+      border:
+        element.showImageBorder !== false && element.borderColor
+          ? `2px solid ${element.borderColor}`
+          : "2px solid transparent",
+    };
+
+    switch (element.imageShape) {
+      case "circle":
+        return {
+          ...baseStyles,
+          borderRadius: "50%",
+        };
+      case "rounded-square":
+        return {
+          ...baseStyles,
+          borderRadius: "8px",
+        };
+      case "diamond":
+        return {
+          ...baseStyles,
+          borderRadius: "4px",
+          transform: "rotate(45deg)",
+        };
+      default:
+        return baseStyles;
+    }
+  };
+
+  // Obter estilos do container da imagem (para compensar a rotação do losango)
+  const getImageContainerStyles = (): React.CSSProperties => {
+    const baseStyles: React.CSSProperties = {
+      width: `${IMAGE_SIZE}px`,
+      height: `${IMAGE_SIZE}px`,
+      flexShrink: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+    };
+
+    if (element.imageShape === "diamond") {
+      return {
+        ...baseStyles,
+        width: `${IMAGE_SIZE}px`,
+        height: `${IMAGE_SIZE}px`,
+      };
+    }
+
+    return baseStyles;
+  };
+
+  // Obter justifyContent baseado na posição da imagem
+  const getImageJustifyContent = () => {
+    switch (element.imagePosition) {
+      case "start":
+        return "flex-start";
+      case "end":
+        return "flex-end";
+      case "center":
+      default:
+        return "center";
+    }
+  };
+
   return (
     <DraggableElementWrapper
       id={element.id}
       x={element.x}
       y={element.y}
       width={displayWidth}
-      height={totalBlockHeight}
+      height={displayHeight}
       isSelected={isSelected}
       isEditMode={isEditMode}
-      isEditing={isEditingTitle || isEditingContent}
+      isEditing={isEditingTitle || isEditingParagraph}
       onPositionChange={onPositionChange}
       onSizeChange={onSizeChange}
       onDragMove={onDragMove}
@@ -190,10 +284,10 @@ export function SectionBlock({
       gridSize={gridSize}
       elementType="text"
       zoom={zoom}
-      minWidth={800}
-      maxWidth={800}
-      minHeight={200}
-      maxHeight={1000}
+      minWidth={400}
+      maxWidth={400}
+      minHeight={350}
+      maxHeight={350}
       disableVerticalResize
       disableDrag={isMultiSelected}
       disableResize
@@ -201,20 +295,62 @@ export function SectionBlock({
       hasCreationToolActive={hasCreationToolActive}
     >
       <div
-        className="w-full"
+        id={`element-${element.id}`}
+        className="h-full w-full"
         style={{
           backgroundColor: element.backgroundColor,
-          color: element.textColor,
-          padding: "16px",
+          padding: `${BLOCK_PADDING}px`,
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          gap: "8px",
-          height: `${totalBlockHeight}px`,
+          gap: `${GAP}px`,
           border: "1px solid rgba(0, 0, 0, 0.2)",
         }}
       >
-        {/* Title Area - Sempre 1 linha */}
+        {/* Image Area */}
+        <div
+          className="w-full flex"
+          style={{
+            justifyContent: getImageJustifyContent(),
+          }}
+        >
+          <div
+            style={getImageContainerStyles()}
+            onDoubleClick={handleImageDoubleClick}
+            className={`cursor-pointer ${!element.imageUrl ? "opacity-40" : ""}`}
+          >
+            {element.imageUrl ? (
+              <img
+                src={element.imageUrl}
+                alt={element.title || "Info image"}
+                style={getImageStyles()}
+                draggable={false}
+                onMouseDown={(e) => e.preventDefault()}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  ...getImageStyles(),
+                  backgroundColor: "rgba(0, 0, 0, 0.05)",
+                }}
+              >
+                <ImageIcon
+                  className="w-8 h-8"
+                  style={{
+                    color: element.textColor,
+                    transform:
+                      element.imageShape === "diamond"
+                        ? "rotate(-45deg)"
+                        : "none",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Title Area - Sempre 1 linha com tooltip */}
         {isEditingTitle && isEditMode ? (
           <textarea
             ref={titleRef}
@@ -231,23 +367,18 @@ export function SectionBlock({
                 handleTitleBlur();
               }
             }}
-            id={`title-${element.id}`}
-            maxLength={MAX_TITLE_CHARS}
             spellCheck={false}
             className="font-mono bg-transparent border rounded font-semibold focus:outline-none resize-none w-full scrollbar-hide"
             style={{
-              fontSize: `${element.titleFontSize}px`,
+              fontSize: `${element.titleFontSize || TITLE_FONT_SIZE}px`,
               lineHeight: "1.2",
               textAlign: element.titleAlign,
               color: element.textColor,
-              borderColor:
-                element.showTitleBorder !== false
-                  ? element.borderColor || "#4A5568"
-                  : "transparent",
+              borderColor: element.borderColor || "#4A5568",
               padding: "8px",
               overflow: "hidden",
               overflowX: "auto",
-              height: `${TITLE_HEIGHT}px`,
+              height: `${titleHeight}px`,
               whiteSpace: "nowrap",
               textOverflow: "ellipsis",
               cursor: "text",
@@ -261,22 +392,19 @@ export function SectionBlock({
           <Tooltip open={isHandMode ? undefined : false}>
             <TooltipTrigger asChild>
               <div
-                id={`title-${element.id}`}
                 className={`font-mono w-full font-semibold rounded border ${!element.title ? "opacity-40" : ""}`}
                 style={{
-                  fontSize: `${element.titleFontSize}px`,
+                  fontSize: `${element.titleFontSize || TITLE_FONT_SIZE}px`,
                   lineHeight: "1.2",
                   textAlign: element.titleAlign,
-                  borderColor:
-                    element.showTitleBorder !== false
-                      ? element.borderColor || "#4A5568"
-                      : "transparent",
+                  borderColor: element.borderColor || "#4A5568",
                   padding: "8px",
                   overflow: "hidden",
-                  height: `${TITLE_HEIGHT}px`,
+                  height: `${titleHeight}px`,
                   whiteSpace: "nowrap",
                   textOverflow: "ellipsis",
                   userSelect: "none",
+                  color: element.textColor,
                 }}
                 onDoubleClick={handleTitleDoubleClick}
               >
@@ -304,31 +432,27 @@ export function SectionBlock({
           </Tooltip>
         )}
 
-        {/* Content Area - Altura FIXA com scroll (igual ParagraphBlock) */}
-        {isEditingContent && isEditMode ? (
+        {/* Paragraph Area - Scroll vertical */}
+        {isEditingParagraph && isEditMode ? (
           <textarea
-            ref={contentRef}
-            value={content}
-            onChange={(e) => handleContentChange(e.target.value)}
-            onBlur={handleContentBlur}
+            ref={paragraphRef}
+            value={paragraph}
+            onChange={(e) => handleParagraphChange(e.target.value)}
+            onBlur={handleParagraphBlur}
             onKeyDown={(e) => {
               if (e.key === "Escape") {
-                setContent(element.content);
-                setIsEditingContent(false);
+                setParagraph(element.paragraph);
+                setIsEditingParagraph(false);
               }
             }}
-            id={`content-${element.id}`}
             spellCheck={false}
             className="font-mono bg-transparent border rounded focus:outline-none resize-none w-full [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-200/30 [&::-webkit-scrollbar-thumb]:bg-gray-500/60 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-600/70"
             style={{
-              fontSize: `${element.contentFontSize}px`,
+              fontSize: `${element.paragraphFontSize || PARAGRAPH_FONT_SIZE}px`,
               lineHeight: "1.5",
-              textAlign: element.contentAlign,
+              textAlign: element.paragraphAlign,
               color: element.textColor,
-              borderColor:
-                element.showContentBorder !== false
-                  ? element.borderColor || "#4A5568"
-                  : "transparent",
+              borderColor: element.borderColor || "#4A5568",
               padding: "8px",
               overflow: "auto",
               overflowY: "auto",
@@ -337,21 +461,20 @@ export function SectionBlock({
               scrollbarColor:
                 "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
             }}
-            placeholder={t("elements.section_block.content_placeholder")}
+            placeholder={
+              t("elements.paragraph_block.content_placeholder") ||
+              "Texto do parágrafo..."
+            }
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
           <div
-            id={`content-${element.id}`}
-            className={`font-mono w-full rounded border ${!element.content ? "opacity-40" : ""} [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-200/30 [&::-webkit-scrollbar-thumb]:bg-gray-500/60 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-600/70`}
+            className={`font-mono w-full rounded border ${!element.paragraph ? "opacity-40" : ""} [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-200/30 [&::-webkit-scrollbar-thumb]:bg-gray-500/60 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-600/70`}
             style={{
-              fontSize: `${element.contentFontSize}px`,
+              fontSize: `${element.paragraphFontSize || PARAGRAPH_FONT_SIZE}px`,
               lineHeight: "1.5",
-              textAlign: element.contentAlign,
-              borderColor:
-                element.showContentBorder !== false
-                  ? element.borderColor || "#4A5568"
-                  : "transparent",
+              textAlign: element.paragraphAlign,
+              borderColor: element.borderColor || "#4A5568",
               padding: "8px",
               overflow: "auto",
               overflowY: "auto",
@@ -359,15 +482,27 @@ export function SectionBlock({
               whiteSpace: "pre-wrap",
               wordWrap: "break-word",
               userSelect: "none",
+              color: element.textColor,
               scrollbarWidth: "thin",
               scrollbarColor:
                 "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
             }}
-            onDoubleClick={handleContentDoubleClick}
+            onDoubleClick={handleParagraphDoubleClick}
           >
-            {element.content || t("elements.section_block.content_placeholder")}
+            {element.paragraph ||
+              t("elements.paragraph_block.content_placeholder") ||
+              "Texto do parágrafo..."}
           </div>
         )}
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageSelect}
+        />
 
         {/* Navigation Indicator */}
         {element.canNavigate && element.submapId && !isEditMode && (

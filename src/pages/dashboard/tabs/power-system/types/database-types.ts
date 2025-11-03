@@ -88,6 +88,10 @@ export interface DBPowerConnection {
   to_x?: number; // Se to_element_id for null, usa coordenadas
   to_y?: number;
 
+  // Ponto intermediário (para criar linhas com dobra)
+  midpoint_x?: number;
+  midpoint_y?: number;
+
   // Aparência
   color: string;
   stroke_width: number;
@@ -195,6 +199,10 @@ export const POWER_SYSTEM_SCHEMA = `
     to_element_id TEXT REFERENCES power_elements(id) ON DELETE CASCADE,
     to_x REAL,
     to_y REAL,
+
+    -- Ponto intermediário
+    midpoint_x REAL,
+    midpoint_y REAL,
 
     -- Aparência
     color TEXT NOT NULL,

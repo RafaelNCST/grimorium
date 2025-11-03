@@ -36,6 +36,7 @@ interface PropsDraggableElementWrapper {
   disableVerticalResize?: boolean;
   disableDrag?: boolean;
   disableResize?: boolean;
+  hasCreationToolActive?: boolean;
 }
 
 export const DraggableElementWrapper = memo(
@@ -71,6 +72,7 @@ export const DraggableElementWrapper = memo(
     disableVerticalResize = false,
     disableDrag = false,
     disableResize = false,
+    hasCreationToolActive = false,
   }: PropsDraggableElementWrapper) => {
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
@@ -363,7 +365,17 @@ export const DraggableElementWrapper = memo(
     ]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
+      // If a creation tool is active, don't handle drag - let the canvas create new element
+      if (hasCreationToolActive) {
+        return;
+      }
+
       if (!isEditMode || disableDrag) return;
+
+      // Ignore middle mouse button (button 1) - let canvas handle pan
+      if (e.button === 1) {
+        return;
+      }
 
       // Prevent drag if clicking on input elements
       const target = e.target as HTMLElement;
@@ -385,6 +397,12 @@ export const DraggableElementWrapper = memo(
     };
 
     const handleClick = (e: React.MouseEvent) => {
+      // If a creation tool is active, don't intercept the click - let it propagate to canvas
+      // This allows creating new elements on top of existing ones
+      if (hasCreationToolActive) {
+        return;
+      }
+
       // Only stop propagation in edit mode to allow hover cards in view mode
       if (isEditMode) {
         e.stopPropagation();
@@ -393,15 +411,27 @@ export const DraggableElementWrapper = memo(
     };
 
     const handleDoubleClick = (e: React.MouseEvent) => {
+      // Prevent default double-click behavior (text selection)
+      e.preventDefault();
+
       // Only stop propagation in edit mode
       if (isEditMode) {
         e.stopPropagation();
       }
+
+      // Clear any existing text selection to prevent it from persisting after navigation
+      window.getSelection()?.removeAllRanges();
+
       onDoubleClick?.();
     };
 
     const handleResizeStart = (e: React.MouseEvent, direction: string) => {
       if (!isEditMode || !onSizeChange || disableResize) return;
+
+      // Ignore middle mouse button (button 1) - let canvas handle pan
+      if (e.button === 1) {
+        return;
+      }
 
       e.stopPropagation();
       e.preventDefault();
@@ -441,7 +471,7 @@ export const DraggableElementWrapper = memo(
         data-element-id={id}
         className={`absolute ${
           isDragging
-            ? "cursor-grabbing opacity-80"
+            ? "cursor-grabbing"
             : isEditMode
               ? "cursor-move"
               : "cursor-default"
@@ -451,7 +481,7 @@ export const DraggableElementWrapper = memo(
           top: `${y}px`,
           width: `${width}px`,
           height: `${height}px`,
-          zIndex: isSelected ? 100 : 10,
+          zIndex: 10,
           // Performance optimizations for smooth dragging/resizing at any zoom level
           willChange:
             isDragging || isResizing
@@ -476,263 +506,267 @@ export const DraggableElementWrapper = memo(
 
         {/* Resize Handles - Invisible hit areas for resizing */}
         {/* Block elements don't have resize handles */}
-        {isSelected && isEditMode && onSizeChange && !disableResize && !isBlockElement && (
-          <>
-            {elementType === "visual-section" ? (
-              <>
-                {/* Visual sections: optimized border handles */}
-                {/* Corner handles - positioned at corners */}
-                <div
-                  className="absolute cursor-nwse-resize"
-                  style={{
-                    top: "-5px",
-                    left: "-5px",
-                    width: "10px",
-                    height: "10px",
-                    zIndex: 3,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "nw")}
-                />
-                <div
-                  className="absolute cursor-nesw-resize"
-                  style={{
-                    top: "-5px",
-                    right: "-5px",
-                    width: "10px",
-                    height: "10px",
-                    zIndex: 3,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "ne")}
-                />
-                <div
-                  className="absolute cursor-nwse-resize"
-                  style={{
-                    bottom: "-5px",
-                    right: "-5px",
-                    width: "10px",
-                    height: "10px",
-                    zIndex: 3,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "se")}
-                />
-                <div
-                  className="absolute cursor-nesw-resize"
-                  style={{
-                    bottom: "-5px",
-                    left: "-5px",
-                    width: "10px",
-                    height: "10px",
-                    zIndex: 3,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "sw")}
-                />
+        {isSelected &&
+          isEditMode &&
+          onSizeChange &&
+          !disableResize &&
+          !isBlockElement && (
+            <>
+              {elementType === "visual-section" ? (
+                <>
+                  {/* Visual sections: optimized border handles */}
+                  {/* Corner handles - positioned at corners */}
+                  <div
+                    className="absolute cursor-nwse-resize"
+                    style={{
+                      top: "-5px",
+                      left: "-5px",
+                      width: "10px",
+                      height: "10px",
+                      zIndex: 3,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "nw")}
+                  />
+                  <div
+                    className="absolute cursor-nesw-resize"
+                    style={{
+                      top: "-5px",
+                      right: "-5px",
+                      width: "10px",
+                      height: "10px",
+                      zIndex: 3,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "ne")}
+                  />
+                  <div
+                    className="absolute cursor-nwse-resize"
+                    style={{
+                      bottom: "-5px",
+                      right: "-5px",
+                      width: "10px",
+                      height: "10px",
+                      zIndex: 3,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "se")}
+                  />
+                  <div
+                    className="absolute cursor-nesw-resize"
+                    style={{
+                      bottom: "-5px",
+                      left: "-5px",
+                      width: "10px",
+                      height: "10px",
+                      zIndex: 3,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "sw")}
+                  />
 
-                {/* Edge handles - strips (10px) on the edge */}
-                {/* Top edge */}
-                <div
-                  className="absolute cursor-ns-resize"
-                  style={{
-                    top: "-5px",
-                    left: "10px",
-                    right: "10px",
-                    height: "10px",
-                    zIndex: 2,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "n")}
-                />
+                  {/* Edge handles - strips (10px) on the edge */}
+                  {/* Top edge */}
+                  <div
+                    className="absolute cursor-ns-resize"
+                    style={{
+                      top: "-5px",
+                      left: "10px",
+                      right: "10px",
+                      height: "10px",
+                      zIndex: 2,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "n")}
+                  />
 
-                {/* Right edge */}
-                <div
-                  className="absolute cursor-ew-resize"
-                  style={{
-                    right: "-5px",
-                    top: "10px",
-                    bottom: "10px",
-                    width: "10px",
-                    zIndex: 2,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "e")}
-                />
+                  {/* Right edge */}
+                  <div
+                    className="absolute cursor-ew-resize"
+                    style={{
+                      right: "-5px",
+                      top: "10px",
+                      bottom: "10px",
+                      width: "10px",
+                      zIndex: 2,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "e")}
+                  />
 
-                {/* Bottom edge */}
-                <div
-                  className="absolute cursor-ns-resize"
-                  style={{
-                    bottom: "-5px",
-                    left: "10px",
-                    right: "10px",
-                    height: "10px",
-                    zIndex: 2,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "s")}
-                />
+                  {/* Bottom edge */}
+                  <div
+                    className="absolute cursor-ns-resize"
+                    style={{
+                      bottom: "-5px",
+                      left: "10px",
+                      right: "10px",
+                      height: "10px",
+                      zIndex: 2,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "s")}
+                  />
 
-                {/* Left edge */}
-                <div
-                  className="absolute cursor-ew-resize"
-                  style={{
-                    left: "-5px",
-                    top: "10px",
-                    bottom: "10px",
-                    width: "10px",
-                    zIndex: 2,
-                  }}
-                  onMouseDown={(e) => handleResizeStart(e, "w")}
-                />
+                  {/* Left edge */}
+                  <div
+                    className="absolute cursor-ew-resize"
+                    style={{
+                      left: "-5px",
+                      top: "10px",
+                      bottom: "10px",
+                      width: "10px",
+                      zIndex: 2,
+                    }}
+                    onMouseDown={(e) => handleResizeStart(e, "w")}
+                  />
 
-                {/* Circle-specific: additional diagonal handles on the circumference */}
-                {shape === "circle" && (
-                  <>
-                    <div
-                      className="absolute cursor-nwse-resize"
-                      style={{
-                        top: "15%",
-                        left: "15%",
-                        transform: "translate(-50%, -50%)",
-                        width: "12px",
-                        height: "12px",
-                        zIndex: 2,
-                      }}
-                      onMouseDown={(e) => handleResizeStart(e, "nw")}
-                    />
-                    <div
-                      className="absolute cursor-nesw-resize"
-                      style={{
-                        top: "15%",
-                        left: "85%",
-                        transform: "translate(-50%, -50%)",
-                        width: "12px",
-                        height: "12px",
-                        zIndex: 2,
-                      }}
-                      onMouseDown={(e) => handleResizeStart(e, "ne")}
-                    />
-                    <div
-                      className="absolute cursor-nwse-resize"
-                      style={{
-                        top: "85%",
-                        left: "85%",
-                        transform: "translate(-50%, -50%)",
-                        width: "12px",
-                        height: "12px",
-                        zIndex: 2,
-                      }}
-                      onMouseDown={(e) => handleResizeStart(e, "se")}
-                    />
-                    <div
-                      className="absolute cursor-nesw-resize"
-                      style={{
-                        top: "85%",
-                        left: "15%",
-                        transform: "translate(-50%, -50%)",
-                        width: "12px",
-                        height: "12px",
-                        zIndex: 2,
-                      }}
-                      onMouseDown={(e) => handleResizeStart(e, "sw")}
-                    />
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                {/* Standard handles for other element types (paragraph-block, section-block, text) */}
-                {/* Visual border: for non-block elements only (block elements use outline) */}
-                {/* Hide when editing or when block element (block elements use outline instead) */}
-                {!isEditing && !isBlockElement && (
-                  <>
-                    {/* Top border */}
-                    <div
-                      className="absolute"
-                      style={{
-                        top: "-1px",
-                        left: "-1px",
-                        right: "-1px",
-                        height: "2px",
-                        backgroundColor: "hsl(var(--primary))",
-                        pointerEvents: "none",
-                      }}
-                    />
-                    {/* Right border */}
-                    <div
-                      className="absolute"
-                      style={{
-                        right: "-1px",
-                        top: "-1px",
-                        bottom: "-1px",
-                        width: "2px",
-                        backgroundColor: "hsl(var(--primary))",
-                        pointerEvents: "none",
-                      }}
-                    />
-                    {/* Bottom border */}
-                    <div
-                      className="absolute"
-                      style={{
-                        bottom: "-1px",
-                        left: "-1px",
-                        right: "-1px",
-                        height: "2px",
-                        backgroundColor: "hsl(var(--primary))",
-                        pointerEvents: "none",
-                      }}
-                    />
-                    {/* Left border */}
-                    <div
-                      className="absolute"
-                      style={{
-                        left: "-1px",
-                        top: "-1px",
-                        bottom: "-1px",
-                        width: "2px",
-                        backgroundColor: "hsl(var(--primary))",
-                        pointerEvents: "none",
-                      }}
-                    />
-                  </>
-                )}
-
-                {/* Vertical resize handles - only if vertical resize is not disabled and not a text element */}
-                {!disableVerticalResize &&
-                  !isEditing &&
-                  elementType !== "text" && (
+                  {/* Circle-specific: additional diagonal handles on the circumference */}
+                  {shape === "circle" && (
                     <>
-                      {/* Top edge handle - invisible hit area */}
                       <div
-                        className="absolute left-0 right-0 cursor-ns-resize"
-                        style={{ top: "-4px", height: "8px" }}
-                        onMouseDown={(e) => handleResizeStart(e, "n")}
+                        className="absolute cursor-nwse-resize"
+                        style={{
+                          top: "15%",
+                          left: "15%",
+                          transform: "translate(-50%, -50%)",
+                          width: "12px",
+                          height: "12px",
+                          zIndex: 2,
+                        }}
+                        onMouseDown={(e) => handleResizeStart(e, "nw")}
                       />
-                      {/* Bottom edge handle - invisible hit area */}
                       <div
-                        className="absolute left-0 right-0 cursor-ns-resize"
-                        style={{ bottom: "-4px", height: "8px" }}
-                        onMouseDown={(e) => handleResizeStart(e, "s")}
+                        className="absolute cursor-nesw-resize"
+                        style={{
+                          top: "15%",
+                          left: "85%",
+                          transform: "translate(-50%, -50%)",
+                          width: "12px",
+                          height: "12px",
+                          zIndex: 2,
+                        }}
+                        onMouseDown={(e) => handleResizeStart(e, "ne")}
+                      />
+                      <div
+                        className="absolute cursor-nwse-resize"
+                        style={{
+                          top: "85%",
+                          left: "85%",
+                          transform: "translate(-50%, -50%)",
+                          width: "12px",
+                          height: "12px",
+                          zIndex: 2,
+                        }}
+                        onMouseDown={(e) => handleResizeStart(e, "se")}
+                      />
+                      <div
+                        className="absolute cursor-nesw-resize"
+                        style={{
+                          top: "85%",
+                          left: "15%",
+                          transform: "translate(-50%, -50%)",
+                          width: "12px",
+                          height: "12px",
+                          zIndex: 2,
+                        }}
+                        onMouseDown={(e) => handleResizeStart(e, "sw")}
+                      />
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* Standard handles for other element types (paragraph-block, section-block, text) */}
+                  {/* Visual border: for non-block elements only (block elements use outline) */}
+                  {/* Hide when editing or when block element (block elements use outline instead) */}
+                  {!isEditing && !isBlockElement && (
+                    <>
+                      {/* Top border */}
+                      <div
+                        className="absolute"
+                        style={{
+                          top: "-1px",
+                          left: "-1px",
+                          right: "-1px",
+                          height: "2px",
+                          backgroundColor: "hsl(var(--primary))",
+                          pointerEvents: "none",
+                        }}
+                      />
+                      {/* Right border */}
+                      <div
+                        className="absolute"
+                        style={{
+                          right: "-1px",
+                          top: "-1px",
+                          bottom: "-1px",
+                          width: "2px",
+                          backgroundColor: "hsl(var(--primary))",
+                          pointerEvents: "none",
+                        }}
+                      />
+                      {/* Bottom border */}
+                      <div
+                        className="absolute"
+                        style={{
+                          bottom: "-1px",
+                          left: "-1px",
+                          right: "-1px",
+                          height: "2px",
+                          backgroundColor: "hsl(var(--primary))",
+                          pointerEvents: "none",
+                        }}
+                      />
+                      {/* Left border */}
+                      <div
+                        className="absolute"
+                        style={{
+                          left: "-1px",
+                          top: "-1px",
+                          bottom: "-1px",
+                          width: "2px",
+                          backgroundColor: "hsl(var(--primary))",
+                          pointerEvents: "none",
+                        }}
                       />
                     </>
                   )}
 
-                {/* Horizontal resize handles - hide when editing */}
-                {!isEditing && (
-                  <>
-                    {/* Left edge handle - invisible hit area */}
-                    <div
-                      className="absolute top-0 bottom-0 cursor-ew-resize"
-                      style={{ left: "-4px", width: "8px" }}
-                      onMouseDown={(e) => handleResizeStart(e, "w")}
-                    />
-                    {/* Right edge handle - invisible hit area */}
-                    <div
-                      className="absolute top-0 bottom-0 cursor-ew-resize"
-                      style={{ right: "-4px", width: "8px" }}
-                      onMouseDown={(e) => handleResizeStart(e, "e")}
-                    />
-                  </>
-                )}
-              </>
-            )}
-          </>
-        )}
+                  {/* Vertical resize handles - only if vertical resize is not disabled and not a text element */}
+                  {!disableVerticalResize &&
+                    !isEditing &&
+                    elementType !== "text" && (
+                      <>
+                        {/* Top edge handle - invisible hit area */}
+                        <div
+                          className="absolute left-0 right-0 cursor-ns-resize"
+                          style={{ top: "-4px", height: "8px" }}
+                          onMouseDown={(e) => handleResizeStart(e, "n")}
+                        />
+                        {/* Bottom edge handle - invisible hit area */}
+                        <div
+                          className="absolute left-0 right-0 cursor-ns-resize"
+                          style={{ bottom: "-4px", height: "8px" }}
+                          onMouseDown={(e) => handleResizeStart(e, "s")}
+                        />
+                      </>
+                    )}
+
+                  {/* Horizontal resize handles - hide when editing */}
+                  {!isEditing && (
+                    <>
+                      {/* Left edge handle - invisible hit area */}
+                      <div
+                        className="absolute top-0 bottom-0 cursor-ew-resize"
+                        style={{ left: "-4px", width: "8px" }}
+                        onMouseDown={(e) => handleResizeStart(e, "w")}
+                      />
+                      {/* Right edge handle - invisible hit area */}
+                      <div
+                        className="absolute top-0 bottom-0 cursor-ew-resize"
+                        style={{ right: "-4px", width: "8px" }}
+                        onMouseDown={(e) => handleResizeStart(e, "e")}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          )}
       </div>
     );
   }

@@ -4,14 +4,16 @@ import {
   RectangleHorizontal,
   SquareStack,
   Image,
+  FileText,
+  AlertCircle,
   Circle,
   Square,
   Diamond,
   Type,
   ArrowUpRight,
   Minus,
-  Grid3x3,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -26,16 +28,12 @@ import { ToolType } from "../types/power-system-types";
 
 interface PropsToolbar {
   activeTool: ToolType;
-  gridEnabled: boolean;
   onToolChange: (tool: ToolType) => void;
-  onToggleGrid: () => void;
 }
 
 export function Toolbar({
   activeTool,
-  gridEnabled,
   onToolChange,
-  onToggleGrid,
 }: PropsToolbar) {
   const { t } = useTranslation("power-system");
 
@@ -72,6 +70,18 @@ export function Toolbar({
       icon: Image,
       tooltip: "toolbar_tooltips.image_block",
       shortcut: "I",
+    },
+    {
+      type: "advanced-block" as ToolType,
+      icon: FileText,
+      tooltip: "toolbar_tooltips.advanced_block",
+      shortcut: "F",
+    },
+    {
+      type: "informative-block" as ToolType,
+      icon: AlertCircle,
+      tooltip: "toolbar_tooltips.informative_block",
+      shortcut: "O",
     },
     {
       type: "circle" as ToolType,
@@ -114,17 +124,18 @@ export function Toolbar({
     },
   ];
 
-  const renderToolButton = (tool: {
+  const ToolButton = ({ tool }: { tool: {
     type: ToolType;
     icon: React.ElementType;
     tooltip: string;
     shortcut?: string;
-  }) => {
+  } }) => {
     const Icon = tool.icon;
     const isActive = activeTool === tool.type;
+    const [open, setOpen] = useState(false);
 
     return (
-      <Tooltip key={tool.type}>
+      <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger asChild>
           <Button
             variant={isActive ? "default" : "ghost"}
@@ -135,12 +146,19 @@ export function Toolbar({
             <Icon className="w-5 h-5" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right">
+        <TooltipContent
+          side="right"
+          align="start"
+          alignOffset={32}
+          sideOffset={5}
+          className="animate-none"
+          onPointerEnter={() => setOpen(false)}
+        >
           <div className="flex flex-col gap-1">
             <p className="text-sm font-medium">{t(tool.tooltip)}</p>
             {tool.shortcut && (
               <p className="text-xs text-muted-foreground">
-                Atalho: {tool.shortcut}
+                {t("toolbar_tooltips.shortcut")}: {tool.shortcut}
               </p>
             )}
           </div>
@@ -150,55 +168,24 @@ export function Toolbar({
   };
 
   return (
-    <div className="w-16 bg-background border-r flex flex-col items-center py-4 gap-2">
+    <div className="w-36 bg-background border-r flex flex-col items-center py-4 gap-3">
       {/* Select and Hand Tools */}
-      <div className="flex flex-col gap-2 w-full px-2">
-        {tools.map(renderToolButton)}
+      <div className="grid grid-cols-2 gap-2 w-full px-3">
+        {tools.map((tool) => <ToolButton key={tool.type} tool={tool} />)}
       </div>
 
       <Separator className="my-2" />
 
       {/* Element Creation Tools */}
-      <div className="flex flex-col gap-2 w-full px-2">
-        {elementTools.map(renderToolButton)}
+      <div className="grid grid-cols-2 gap-2 w-full px-3">
+        {elementTools.map((tool) => <ToolButton key={tool.type} tool={tool} />)}
       </div>
 
       <Separator className="my-2" />
 
       {/* Connection Tools */}
-      <div className="flex flex-col gap-2 w-full px-2">
-        {connectionTools.map(renderToolButton)}
-      </div>
-
-      <Separator className="my-2" />
-
-      {/* Settings Tools */}
-      <div className="flex flex-col gap-2 w-full px-2">
-        {/* Grid Toggle */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={gridEnabled ? "default" : "ghost"}
-              size="icon"
-              className={`w-full ${gridEnabled ? "bg-primary text-primary-foreground hover:bg-primary hover:shadow-glow hover:translate-y-0" : "hover:bg-accent"}`}
-              onClick={onToggleGrid}
-            >
-              <Grid3x3 className="w-5 h-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium">
-                {t(
-                  gridEnabled
-                    ? "toolbar_tooltips.grid_on"
-                    : "toolbar_tooltips.grid_off"
-                )}
-              </p>
-              <p className="text-xs text-muted-foreground">Atalho: G</p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
+      <div className="grid grid-cols-2 gap-2 w-full px-3">
+        {connectionTools.map((tool) => <ToolButton key={tool.type} tool={tool} />)}
       </div>
     </div>
   );

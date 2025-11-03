@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import {
   X,
@@ -14,6 +14,12 @@ import {
   Square,
   Minus,
   Plus,
+  Info,
+  AlertTriangle,
+  Check,
+  Star,
+  Lightbulb,
+  Bookmark,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -32,10 +38,15 @@ import {
 import { DEFAULT_COLORS_CONSTANT } from "../constants/default-colors-constant";
 import { SHAPES_CONSTANT } from "../constants/shapes-constant";
 import { IPowerElement } from "../types/power-system-types";
+import {
+  analyzeSelection,
+  shouldHideImageSection,
+  getCommonValue,
+  type MultiSelectionAnalysis,
+} from "../utils/multi-selection-helpers";
 
 interface PropsPropertiesPanel {
-  element: IPowerElement;
-  selectedCount?: number;
+  elements: IPowerElement[]; // Agora recebe array de elementos
   onUpdate: (updates: Partial<IPowerElement>) => void;
   onDelete: () => void;
   onDuplicate: () => void;
@@ -43,15 +54,22 @@ interface PropsPropertiesPanel {
 }
 
 export function PropertiesPanel({
-  element,
-  selectedCount = 1,
+  elements,
   onUpdate,
   onDelete,
   onDuplicate,
   onClose,
 }: PropsPropertiesPanel) {
   const { t } = useTranslation("power-system");
-  const isMultiSelection = selectedCount > 1;
+  const isMultiSelection = elements.length > 1;
+
+  // Usar o primeiro elemento como representativo para renderização
+  const element = elements[0];
+
+  // Análise de multi-seleção com todos os elementos
+  const analysis: MultiSelectionAnalysis = useMemo(() => {
+    return analyzeSelection(elements);
+  }, [elements]);
   const [fontSizeInput, setFontSizeInput] = useState(
     element.type === "text" ? String(element.fontSize) : ""
   );
@@ -66,26 +84,33 @@ export function PropertiesPanel({
   const renderColorPicker = (
     label: string,
     value: string | undefined,
-    onChange: (color: string) => void
-  ) => (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium">{label}</Label>
-      <div className="grid grid-cols-6 gap-2">
-        {DEFAULT_COLORS_CONSTANT.map((color) => (
-          <button
-            key={color}
-            className={`w-8 h-8 rounded-md border-2 transition-transform hover:scale-110 ${
-              value === color
-                ? "border-primary ring-2 ring-primary"
-                : "border-transparent"
-            }`}
-            style={{ backgroundColor: color }}
-            onClick={() => onChange(color)}
-          />
-        ))}
+    onChange: (color: string) => void,
+    extraColors?: string[]
+  ) => {
+    const colors = extraColors
+      ? [...DEFAULT_COLORS_CONSTANT, ...extraColors]
+      : DEFAULT_COLORS_CONSTANT;
+
+    return (
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">{label}</Label>
+        <div className="grid grid-cols-6 gap-2">
+          {colors.map((color) => (
+            <button
+              key={color}
+              className={`w-8 h-8 rounded-md border-2 transition-transform hover:scale-110 ${
+                value === color
+                  ? "border-primary ring-2 ring-primary"
+                  : "border-transparent"
+              }`}
+              style={{ backgroundColor: color }}
+              onClick={() => onChange(color)}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderParagraphBlockProperties = () => {
     if (element.type !== "paragraph-block") return null;
@@ -112,7 +137,9 @@ export function PropertiesPanel({
             </span>
             <Switch
               checked={element.showContentBorder !== false}
-              onCheckedChange={(checked) => onUpdate({ showContentBorder: checked })}
+              onCheckedChange={(checked) =>
+                onUpdate({ showContentBorder: checked })
+              }
             />
           </div>
         </div>
@@ -128,6 +155,11 @@ export function PropertiesPanel({
             <Button
               variant={element.textAlign === "left" ? "default" : "outline"}
               size="sm"
+              className={
+                element.textAlign === "left"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ textAlign: "left" })}
             >
               <AlignLeft className="h-4 w-4" />
@@ -135,6 +167,11 @@ export function PropertiesPanel({
             <Button
               variant={element.textAlign === "center" ? "default" : "outline"}
               size="sm"
+              className={
+                element.textAlign === "center"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ textAlign: "center" })}
             >
               <AlignCenter className="h-4 w-4" />
@@ -142,6 +179,11 @@ export function PropertiesPanel({
             <Button
               variant={element.textAlign === "right" ? "default" : "outline"}
               size="sm"
+              className={
+                element.textAlign === "right"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ textAlign: "right" })}
             >
               <AlignRight className="h-4 w-4" />
@@ -149,6 +191,11 @@ export function PropertiesPanel({
             <Button
               variant={element.textAlign === "justify" ? "default" : "outline"}
               size="sm"
+              className={
+                element.textAlign === "justify"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ textAlign: "justify" })}
             >
               <AlignJustify className="h-4 w-4" />
@@ -191,7 +238,7 @@ export function PropertiesPanel({
             imageUrl: event.target?.result as string,
             // Reset offsets when new image is loaded
             imageOffsetX: 0,
-            imageOffsetY: 0
+            imageOffsetY: 0,
           });
         };
         reader.readAsDataURL(file);
@@ -216,27 +263,27 @@ export function PropertiesPanel({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {t("properties_panel.show_caption_border")}
+              Mostrar borda da imagem
             </span>
             <Switch
-              checked={element.showCaptionBorder !== false}
-              onCheckedChange={(checked) => onUpdate({ showCaptionBorder: checked })}
+              checked={element.showImageBorder !== false}
+              onCheckedChange={(checked) =>
+                onUpdate({ showImageBorder: checked })
+              }
             />
           </div>
         </div>
 
         <Separator />
 
-        {/* Image Upload Section - Hidden in multi-selection */}
+        {/* Image Section - Hidden in multi-selection */}
         {!isMultiSelection && (
           <>
             <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                {t("properties_panel.upload_image")}
-              </Label>
+              <Label className="text-sm font-medium">Imagem</Label>
 
               {element.imageUrl ? (
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col gap-3">
                   {/* Image Preview */}
                   <div className="w-full h-32 rounded overflow-hidden border-2">
                     <img
@@ -246,13 +293,8 @@ export function PropertiesPanel({
                     />
                   </div>
 
-                  {/* Image Name */}
-                  <p className="text-xs text-center text-muted-foreground">
-                    {element.imageUrl.substring(0, 30)}...
-                  </p>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 w-full">
+                  {/* Image Mode & Upload Button */}
+                  <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -270,6 +312,149 @@ export function PropertiesPanel({
                       onClick={() => onUpdate({ imageUrl: undefined })}
                     >
                       <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  {/* Image Modes */}
+                  <div className="grid grid-cols-4 gap-2">
+                    <Button
+                      variant={
+                        !element.imageMode || element.imageMode === "fill"
+                          ? "default"
+                          : "outline"
+                      }
+                      size="sm"
+                      className={`text-xs ${!element.imageMode || element.imageMode === "fill" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                      onClick={() =>
+                        onUpdate({
+                          imageMode: "fill",
+                          imageOffsetX: 0,
+                          imageOffsetY: 0,
+                        })
+                      }
+                    >
+                      Fill
+                    </Button>
+                    <Button
+                      variant={
+                        element.imageMode === "fit" ? "default" : "outline"
+                      }
+                      size="sm"
+                      className={`text-xs ${element.imageMode === "fit" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                      onClick={() =>
+                        onUpdate({
+                          imageMode: "fit",
+                          imageOffsetX: 0,
+                          imageOffsetY: 0,
+                        })
+                      }
+                    >
+                      Fit
+                    </Button>
+                    <Button
+                      variant={
+                        element.imageMode === "tile" ? "default" : "outline"
+                      }
+                      size="sm"
+                      className={`text-xs ${element.imageMode === "tile" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                      onClick={() =>
+                        onUpdate({
+                          imageMode: "tile",
+                          imageOffsetX: 0,
+                          imageOffsetY: 0,
+                        })
+                      }
+                    >
+                      Tile
+                    </Button>
+                    <Button
+                      variant={
+                        element.imageMode === "crop" ? "default" : "outline"
+                      }
+                      size="sm"
+                      className={`text-xs ${element.imageMode === "crop" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                      onClick={() => onUpdate({ imageMode: "crop" })}
+                    >
+                      Crop
+                    </Button>
+                  </div>
+
+                  {/* Dimensions Control - Cruz Layout */}
+                  <div className="flex flex-col items-center gap-2">
+                    {/* Top - Height Plus */}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        const currentHeight = element.imageAreaHeight ?? 300;
+                        const newHeight = Math.min(1200, currentHeight + 50);
+                        onUpdate({ imageAreaHeight: newHeight });
+                      }}
+                      disabled={(element.imageAreaHeight ?? 300) >= 1200}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+
+                    {/* Middle Row - Width controls and center display */}
+                    <div className="flex items-center gap-2">
+                      {/* Left - Width Minus */}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          const currentWidth = element.width;
+                          const newWidth = Math.max(200, currentWidth - 50);
+                          onUpdate({ width: newWidth });
+                        }}
+                        disabled={element.width <= 200}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+
+                      {/* Center - Display */}
+                      <div className="bg-muted rounded px-3 py-2 text-center min-w-[80px]">
+                        <div className="text-xs font-mono">
+                          {element.width}px
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          ×
+                        </div>
+                        <div className="text-xs font-mono">
+                          {element.imageAreaHeight ?? 300}px
+                        </div>
+                      </div>
+
+                      {/* Right - Width Plus */}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          const currentWidth = element.width;
+                          const newWidth = Math.min(1200, currentWidth + 50);
+                          onUpdate({ width: newWidth });
+                        }}
+                        disabled={element.width >= 1200}
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+
+                    {/* Bottom - Height Minus */}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => {
+                        const currentHeight = element.imageAreaHeight ?? 300;
+                        const newHeight = Math.max(200, currentHeight - 50);
+                        onUpdate({ imageAreaHeight: newHeight });
+                      }}
+                      disabled={(element.imageAreaHeight ?? 300) <= 200}
+                    >
+                      <Minus className="h-3 w-3" />
                     </Button>
                   </div>
 
@@ -311,128 +496,6 @@ export function PropertiesPanel({
           </>
         )}
 
-        {/* Image Area Width Control */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Largura da Imagem</Label>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const currentWidth = element.width;
-                const newWidth = Math.max(200, currentWidth - 50);
-                onUpdate({ width: newWidth });
-              }}
-              disabled={element.width <= 200}
-            >
-              <Minus className="h-3 w-3 mr-1" />
-              50
-            </Button>
-            <div className="flex-1 text-center font-mono text-sm">
-              {element.width}px
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const currentWidth = element.width;
-                const newWidth = Math.min(1200, currentWidth + 50);
-                onUpdate({ width: newWidth });
-              }}
-              disabled={element.width >= 1200}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              50
-            </Button>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Image Area Height Control */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">
-            {t("properties_panel.image_area_height")}
-          </Label>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const currentHeight = element.imageAreaHeight ?? 300;
-                const newHeight = Math.max(200, currentHeight - 50);
-                onUpdate({ imageAreaHeight: newHeight });
-              }}
-              disabled={(element.imageAreaHeight ?? 300) <= 200}
-            >
-              <Minus className="h-3 w-3 mr-1" />
-              50
-            </Button>
-            <div className="flex-1 text-center font-mono text-sm">
-              {element.imageAreaHeight ?? 300}px
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const currentHeight = element.imageAreaHeight ?? 300;
-                const newHeight = Math.min(1200, currentHeight + 50);
-                onUpdate({ imageAreaHeight: newHeight });
-              }}
-              disabled={(element.imageAreaHeight ?? 300) >= 1200}
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              50
-            </Button>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Image Mode Selector */}
-        {element.imageUrl && (
-          <>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Modo de Preenchimento</Label>
-              <div className="grid grid-cols-4 gap-2">
-                <Button
-                  variant={(!element.imageMode || element.imageMode === "fill") ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onUpdate({ imageMode: "fill", imageOffsetX: 0, imageOffsetY: 0 })}
-                  className={`text-xs ${(!element.imageMode || element.imageMode === "fill") ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none" : ""}`}
-                >
-                  Fill
-                </Button>
-                <Button
-                  variant={element.imageMode === "fit" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onUpdate({ imageMode: "fit", imageOffsetX: 0, imageOffsetY: 0 })}
-                  className={`text-xs ${element.imageMode === "fit" ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none" : ""}`}
-                >
-                  Fit
-                </Button>
-                <Button
-                  variant={element.imageMode === "tile" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onUpdate({ imageMode: "tile", imageOffsetX: 0, imageOffsetY: 0 })}
-                  className={`text-xs ${element.imageMode === "tile" ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none" : ""}`}
-                >
-                  Tile
-                </Button>
-                <Button
-                  variant={element.imageMode === "crop" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onUpdate({ imageMode: "crop" })}
-                  className={`text-xs ${element.imageMode === "crop" ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none" : ""}`}
-                >
-                  Crop
-                </Button>
-              </div>
-            </div>
-            <Separator />
-          </>
-        )}
-
         {/* Caption Alignment */}
         <div className="space-y-2">
           <Label className="text-sm font-medium">
@@ -442,13 +505,25 @@ export function PropertiesPanel({
             <Button
               variant={element.captionAlign === "left" ? "default" : "outline"}
               size="sm"
+              className={
+                element.captionAlign === "left"
+                  ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none"
+                  : ""
+              }
               onClick={() => onUpdate({ captionAlign: "left" })}
             >
               <AlignLeft className="h-4 w-4" />
             </Button>
             <Button
-              variant={element.captionAlign === "center" ? "default" : "outline"}
+              variant={
+                element.captionAlign === "center" ? "default" : "outline"
+              }
               size="sm"
+              className={
+                element.captionAlign === "center"
+                  ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none"
+                  : ""
+              }
               onClick={() => onUpdate({ captionAlign: "center" })}
             >
               <AlignCenter className="h-4 w-4" />
@@ -456,13 +531,25 @@ export function PropertiesPanel({
             <Button
               variant={element.captionAlign === "right" ? "default" : "outline"}
               size="sm"
+              className={
+                element.captionAlign === "right"
+                  ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none"
+                  : ""
+              }
               onClick={() => onUpdate({ captionAlign: "right" })}
             >
               <AlignRight className="h-4 w-4" />
             </Button>
             <Button
-              variant={element.captionAlign === "justify" ? "default" : "outline"}
+              variant={
+                element.captionAlign === "justify" ? "default" : "outline"
+              }
               size="sm"
+              className={
+                element.captionAlign === "justify"
+                  ? "hover:bg-primary hover:shadow-glow hover:!translate-y-0 hover:!transform-none"
+                  : ""
+              }
               onClick={() => onUpdate({ captionAlign: "justify" })}
             >
               <AlignJustify className="h-4 w-4" />
@@ -518,7 +605,9 @@ export function PropertiesPanel({
             </span>
             <Switch
               checked={element.showTitleBorder !== false}
-              onCheckedChange={(checked) => onUpdate({ showTitleBorder: checked })}
+              onCheckedChange={(checked) =>
+                onUpdate({ showTitleBorder: checked })
+              }
             />
           </div>
           <div className="flex items-center justify-between">
@@ -527,7 +616,9 @@ export function PropertiesPanel({
             </span>
             <Switch
               checked={element.showContentBorder !== false}
-              onCheckedChange={(checked) => onUpdate({ showContentBorder: checked })}
+              onCheckedChange={(checked) =>
+                onUpdate({ showContentBorder: checked })
+              }
             />
           </div>
         </div>
@@ -543,6 +634,11 @@ export function PropertiesPanel({
             <Button
               variant={element.titleAlign === "left" ? "default" : "outline"}
               size="sm"
+              className={
+                element.titleAlign === "left"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ titleAlign: "left" })}
             >
               <AlignLeft className="h-4 w-4" />
@@ -550,6 +646,11 @@ export function PropertiesPanel({
             <Button
               variant={element.titleAlign === "center" ? "default" : "outline"}
               size="sm"
+              className={
+                element.titleAlign === "center"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ titleAlign: "center" })}
             >
               <AlignCenter className="h-4 w-4" />
@@ -557,6 +658,11 @@ export function PropertiesPanel({
             <Button
               variant={element.titleAlign === "right" ? "default" : "outline"}
               size="sm"
+              className={
+                element.titleAlign === "right"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ titleAlign: "right" })}
             >
               <AlignRight className="h-4 w-4" />
@@ -564,6 +670,11 @@ export function PropertiesPanel({
             <Button
               variant={element.titleAlign === "justify" ? "default" : "outline"}
               size="sm"
+              className={
+                element.titleAlign === "justify"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ titleAlign: "justify" })}
             >
               <AlignJustify className="h-4 w-4" />
@@ -582,6 +693,11 @@ export function PropertiesPanel({
             <Button
               variant={element.contentAlign === "left" ? "default" : "outline"}
               size="sm"
+              className={
+                element.contentAlign === "left"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ contentAlign: "left" })}
             >
               <AlignLeft className="h-4 w-4" />
@@ -591,6 +707,11 @@ export function PropertiesPanel({
                 element.contentAlign === "center" ? "default" : "outline"
               }
               size="sm"
+              className={
+                element.contentAlign === "center"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ contentAlign: "center" })}
             >
               <AlignCenter className="h-4 w-4" />
@@ -598,6 +719,11 @@ export function PropertiesPanel({
             <Button
               variant={element.contentAlign === "right" ? "default" : "outline"}
               size="sm"
+              className={
+                element.contentAlign === "right"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ contentAlign: "right" })}
             >
               <AlignRight className="h-4 w-4" />
@@ -607,6 +733,11 @@ export function PropertiesPanel({
                 element.contentAlign === "justify" ? "default" : "outline"
               }
               size="sm"
+              className={
+                element.contentAlign === "justify"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
               onClick={() => onUpdate({ contentAlign: "justify" })}
             >
               <AlignJustify className="h-4 w-4" />
@@ -653,9 +784,9 @@ export function PropertiesPanel({
 
     return (
       <>
-        {/* Configurações da Form */}
+        {/* Configurações da Forma */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Configurações da Form</Label>
+          <Label className="text-sm font-medium">Configurações da Forma</Label>
 
           {/* Navigation Toggle */}
           <div className="flex items-center justify-between">
@@ -668,18 +799,112 @@ export function PropertiesPanel({
             />
           </div>
 
-          {/* Hover Card Toggle */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              Mostrar card ao passar o mouse
-            </span>
-            <Switch
-              checked={element.showHoverCard}
-              onCheckedChange={(checked) =>
-                onUpdate({ showHoverCard: checked })
-              }
-            />
-          </div>
+          {/* Hover Card Toggle - Hidden in multi-selection (Regra 4) */}
+          {!isMultiSelection && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                Mostrar card ao passar o mouse
+              </span>
+              <Switch
+                checked={element.showHoverCard}
+                onCheckedChange={(checked) =>
+                  onUpdate({ showHoverCard: checked })
+                }
+              />
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        {/* Appearance Section */}
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Aparência</Label>
+
+          {/* Color Picker - Always visible */}
+          {renderColorPicker(
+            "Cor da Forma",
+            element.backgroundColor,
+            (color) => onUpdate({ backgroundColor: color })
+          )}
+
+          {/* Image Section - Hidden in multi-selection */}
+          {!isMultiSelection && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <Label className="text-sm">
+                  {t("properties_panel.image_background")}
+                </Label>
+
+                {element.imageUrl ? (
+                  <div className="flex flex-col items-center gap-3">
+                    {/* Image Preview */}
+                    <div className="w-full h-32 rounded overflow-hidden border-2">
+                      <img
+                        src={element.imageUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 w-full">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() =>
+                          document.getElementById("visual-image-input")?.click()
+                        }
+                      >
+                        <ImageIcon className="w-3 h-3 mr-2" />
+                        Nova Imagem
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onUpdate({ imageUrl: undefined })}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+
+                    <input
+                      id="visual-image-input"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageSelect}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 p-6 border-2 border-dashed rounded-lg">
+                    <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        document
+                          .getElementById("visual-image-input-empty")
+                          ?.click()
+                      }
+                    >
+                      <ImageIcon className="w-3 h-3 mr-2" />
+                      Escolher Arquivo
+                    </Button>
+                    <input
+                      id="visual-image-input-empty"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageSelect}
+                    />
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Hover Card Fields - Hidden in multi-selection */}
@@ -730,100 +955,8 @@ export function PropertiesPanel({
                 />
               </div>
             </div>
-
-            <Separator />
           </>
         )}
-
-        {/* Appearance Section - Hidden in multi-selection */}
-        {!isMultiSelection && (
-          <>
-            <Separator />
-            <div className="space-y-3">
-              <Label>{t("properties_panel.image_background")}</Label>
-
-              {element.imageUrl ? (
-                <div className="flex flex-col items-center gap-3">
-                  {/* Image Preview */}
-                  <div className="w-full h-32 rounded overflow-hidden border-2">
-                    <img
-                      src={element.imageUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Image Name */}
-                  <p className="text-xs text-center text-muted-foreground">
-                    {element.imageUrl.substring(0, 30)}...
-                  </p>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() =>
-                        document.getElementById("visual-image-input")?.click()
-                      }
-                    >
-                      <ImageIcon className="w-3 h-3 mr-2" />
-                      Nova Imagem
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => onUpdate({ imageUrl: undefined })}
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-
-                  <input
-                    id="visual-image-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageSelect}
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2 p-6 border-2 border-dashed rounded-lg">
-                  <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      document
-                        .getElementById("visual-image-input-empty")
-                        ?.click()
-                    }
-                  >
-                    <ImageIcon className="w-3 h-3 mr-2" />
-                    Escolher Arquivo
-                  </Button>
-                  <input
-                    id="visual-image-input-empty"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageSelect}
-                  />
-                </div>
-              )}
-            </div>
-
-            <Separator />
-          </>
-        )}
-
-        {!element.imageUrl &&
-          renderColorPicker(
-            t("properties_panel.background_color"),
-            element.backgroundColor,
-            (color) => onUpdate({ backgroundColor: color })
-          )}
       </>
     );
   };
@@ -968,6 +1101,438 @@ export function PropertiesPanel({
       width: dimensions.width,
       height: dimensions.height,
     });
+  };
+
+  const renderAdvancedBlockProperties = () => {
+    if (element.type !== "advanced-block") return null;
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          onUpdate({ imageUrl: event.target?.result as string });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    return (
+      <>
+        {/* Properties Section */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            {t("properties_panel.properties")}
+          </Label>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              {t("properties_panel.navigation_hint")}
+            </span>
+            <Switch
+              checked={element.canNavigate}
+              onCheckedChange={(checked) => onUpdate({ canNavigate: checked })}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              Mostrar borda da imagem
+            </span>
+            <Switch
+              checked={element.showImageBorder !== false}
+              onCheckedChange={(checked) =>
+                onUpdate({ showImageBorder: checked })
+              }
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Image Section - Hidden in multi-selection */}
+        {!isMultiSelection && (
+          <>
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Imagem</Label>
+
+              {element.imageUrl ? (
+                <div className="flex flex-col gap-3">
+                  {/* Image Preview */}
+                  <div className="w-full h-32 rounded overflow-hidden border-2">
+                    <img
+                      src={element.imageUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Upload & Remove Button */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() =>
+                        document.getElementById("advanced-block-input")?.click()
+                      }
+                    >
+                      <ImageIcon className="w-3 h-3 mr-2" />
+                      Nova Imagem
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => onUpdate({ imageUrl: undefined })}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  <input
+                    id="advanced-block-input"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageSelect}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 p-6 border-2 border-dashed rounded-lg">
+                  <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      document.getElementById("advanced-block-input-empty")?.click()
+                    }
+                  >
+                    <ImageIcon className="w-3 h-3 mr-2" />
+                    Escolher Arquivo
+                  </Button>
+                  <input
+                    id="advanced-block-input-empty"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageSelect}
+                  />
+                </div>
+              )}
+
+              {/* Image Position & Shape - Always visible */}
+              <div className="space-y-2 mt-3">
+                <Label className="text-xs">Posição da Imagem</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant={
+                      element.imagePosition === "start"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={`text-xs ${element.imagePosition === "start" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                    onClick={() => onUpdate({ imagePosition: "start" })}
+                  >
+                    Início
+                  </Button>
+                  <Button
+                    variant={
+                      element.imagePosition === "center"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={`text-xs ${element.imagePosition === "center" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                    onClick={() => onUpdate({ imagePosition: "center" })}
+                  >
+                    Meio
+                  </Button>
+                  <Button
+                    variant={
+                      element.imagePosition === "end"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={`text-xs ${element.imagePosition === "end" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                    onClick={() => onUpdate({ imagePosition: "end" })}
+                  >
+                    Final
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs">Forma da Imagem</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant={
+                      element.imageShape === "circle"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={`text-xs ${element.imageShape === "circle" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                    onClick={() => onUpdate({ imageShape: "circle" })}
+                  >
+                    Círculo
+                  </Button>
+                  <Button
+                    variant={
+                      element.imageShape === "rounded-square"
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className={`text-xs ${element.imageShape === "rounded-square" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+                    onClick={() =>
+                      onUpdate({ imageShape: "rounded-square" })
+                    }
+                  >
+                    Quadrado
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+          </>
+        )}
+
+        {/* Title Alignment */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Alinhamento do Título</Label>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant={element.titleAlign === "left" ? "default" : "outline"}
+              size="sm"
+              className={
+                element.titleAlign === "left"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ titleAlign: "left" })}
+            >
+              <AlignLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={element.titleAlign === "center" ? "default" : "outline"}
+              size="sm"
+              className={
+                element.titleAlign === "center"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ titleAlign: "center" })}
+            >
+              <AlignCenter className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={element.titleAlign === "right" ? "default" : "outline"}
+              size="sm"
+              className={
+                element.titleAlign === "right"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ titleAlign: "right" })}
+            >
+              <AlignRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Paragraph Alignment */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            Alinhamento do Parágrafo
+          </Label>
+          <div className="grid grid-cols-4 gap-2">
+            <Button
+              variant={
+                element.paragraphAlign === "left" ? "default" : "outline"
+              }
+              size="sm"
+              className={
+                element.paragraphAlign === "left"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ paragraphAlign: "left" })}
+            >
+              <AlignLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={
+                element.paragraphAlign === "center" ? "default" : "outline"
+              }
+              size="sm"
+              className={
+                element.paragraphAlign === "center"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ paragraphAlign: "center" })}
+            >
+              <AlignCenter className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={
+                element.paragraphAlign === "right" ? "default" : "outline"
+              }
+              size="sm"
+              className={
+                element.paragraphAlign === "right"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ paragraphAlign: "right" })}
+            >
+              <AlignRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={
+                element.paragraphAlign === "justify" ? "default" : "outline"
+              }
+              size="sm"
+              className={
+                element.paragraphAlign === "justify"
+                  ? "hover:bg-primary hover:shadow-none hover:translate-y-0"
+                  : ""
+              }
+              onClick={() => onUpdate({ paragraphAlign: "justify" })}
+            >
+              <AlignJustify className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <Separator />
+
+        {renderColorPicker(
+          t("properties_panel.background_color"),
+          element.backgroundColor,
+          (color) => onUpdate({ backgroundColor: color })
+        )}
+        <Separator />
+        {renderColorPicker("Cor do Texto", element.textColor, (color) =>
+          onUpdate({ textColor: color })
+        )}
+        <Separator />
+        {renderColorPicker(
+          t("properties_panel.border_color"),
+          element.borderColor,
+          (color) => onUpdate({ borderColor: color })
+        )}
+      </>
+    );
+  };
+
+  const renderInformativeBlockProperties = () => {
+    if (element.type !== "informative-block") return null;
+
+    const iconSize = 18;
+
+    return (
+      <>
+        {/* Properties Section */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            {t("properties_panel.properties")}
+          </Label>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
+              {t("properties_panel.navigation_hint")}
+            </span>
+            <Switch
+              checked={element.canNavigate}
+              onCheckedChange={(checked) => onUpdate({ canNavigate: checked })}
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Icon Selection - Visual Icons */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            {t("properties_panel.select_icon")}
+          </Label>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant={element.icon === "info" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "info" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "info" })}
+            >
+              <Info size={iconSize} />
+            </Button>
+            <Button
+              variant={element.icon === "warning" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "warning" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "warning" })}
+            >
+              <AlertTriangle size={iconSize} />
+            </Button>
+            <Button
+              variant={element.icon === "check" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "check" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "check" })}
+            >
+              <Check size={iconSize} />
+            </Button>
+            <Button
+              variant={element.icon === "star" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "star" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "star" })}
+            >
+              <Star size={iconSize} />
+            </Button>
+            <Button
+              variant={element.icon === "lightbulb" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "lightbulb" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "lightbulb" })}
+            >
+              <Lightbulb size={iconSize} />
+            </Button>
+            <Button
+              variant={element.icon === "bookmark" ? "default" : "outline"}
+              size="sm"
+              className={`${element.icon === "bookmark" ? "hover:bg-primary hover:shadow-none hover:translate-y-0" : ""}`}
+              onClick={() => onUpdate({ icon: "bookmark" })}
+            >
+              <Bookmark size={iconSize} />
+            </Button>
+          </div>
+        </div>
+
+        <Separator />
+
+        {renderColorPicker(
+          t("properties_panel.background_color"),
+          element.backgroundColor,
+          (color) => onUpdate({ backgroundColor: color }),
+          ["#FEF3C7", "#F3F4F6", "#DBEAFE", "#FEE2E2", "#DCFCE7"]
+        )}
+        <Separator />
+        {renderColorPicker(
+          t("properties_panel.text_color"),
+          element.textColor,
+          (color) => onUpdate({ textColor: color })
+        )}
+        <Separator />
+        {renderColorPicker(
+          t("properties_panel.icon_color"),
+          element.iconColor,
+          (color) => onUpdate({ iconColor: color })
+        )}
+      </>
+    );
   };
 
   const renderTextElementProperties = () => {
@@ -1155,6 +1720,53 @@ export function PropertiesPanel({
     );
   };
 
+  // Regra 1: Tipos Misturados - Apenas título, indicador e botões
+  if (isMultiSelection && analysis.isMixed) {
+    return (
+      <div className="absolute top-0 right-0 bottom-0 w-80 bg-background border-l flex flex-col shadow-2xl z-50">
+        {/* Header */}
+        <div className="p-4 border-b flex items-center justify-between">
+          <h3 className="font-semibold">{t("properties_panel.title")}</h3>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center space-y-4">
+            <div className="bg-primary/10 border border-primary/20 rounded-md p-4">
+              <p className="text-sm font-medium text-primary">
+                {t("properties_panel.multi_selection_count", {
+                  count: elements.length,
+                })}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t("properties_panel.multi_selection_mixed_types")}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("properties_panel.multi_selection_use_buttons")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t space-y-2">
+          <Button variant="outline" className="w-full" onClick={onDuplicate}>
+            <Copy className="w-4 h-4 mr-2" />
+            {t("properties_panel.duplicate_multiple", { count: elements.length })}
+          </Button>
+          <Button variant="destructive" className="w-full" onClick={onDelete}>
+            <Trash2 className="w-4 h-4 mr-2" />
+            {t("properties_panel.delete_multiple", { count: elements.length })}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Regra 2-5: Todos os outros casos
   return (
     <div className="absolute top-0 right-0 bottom-0 w-80 bg-background border-l flex flex-col shadow-2xl z-50">
       {/* Header */}
@@ -1170,10 +1782,12 @@ export function PropertiesPanel({
         <div className="px-4 pt-4">
           <div className="bg-primary/10 border border-primary/20 rounded-md p-3">
             <p className="text-sm font-medium text-primary">
-              {selectedCount} elementos selecionados
+              {t("properties_panel.multi_selection_count", {
+                count: elements.length,
+              })}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              As alterações serão aplicadas a todos
+              {t("properties_panel.multi_selection_apply_to_all")}
             </p>
           </div>
         </div>
@@ -1187,6 +1801,8 @@ export function PropertiesPanel({
             {renderParagraphBlockProperties()}
             {renderSectionBlockProperties()}
             {renderImageBlockProperties()}
+            {renderAdvancedBlockProperties()}
+            {renderInformativeBlockProperties()}
             {renderVisualSectionProperties()}
             {renderTextElementProperties()}
           </div>
@@ -1197,14 +1813,17 @@ export function PropertiesPanel({
       <div className="p-4 border-t space-y-2">
         <Button variant="outline" className="w-full" onClick={onDuplicate}>
           <Copy className="w-4 h-4 mr-2" />
-          Duplicar
+          {isMultiSelection
+            ? t("properties_panel.duplicate_multiple", { count: elements.length })
+            : t("properties_panel.duplicate")}
         </Button>
         <Button variant="destructive" className="w-full" onClick={onDelete}>
           <Trash2 className="w-4 h-4 mr-2" />
-          {t("properties_panel.delete")}
+          {isMultiSelection
+            ? t("properties_panel.delete_multiple", { count: elements.length })
+            : t("properties_panel.delete")}
         </Button>
       </div>
-
     </div>
   );
 }

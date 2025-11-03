@@ -1,11 +1,15 @@
 import { RefObject, useMemo } from "react";
 
-import { HelpCircle, BookOpen, Copy, Zap, Undo, Redo } from "lucide-react";
+import { HelpCircle, Copy, Zap, Undo, Redo, Grid3x3, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-import { BreadcrumbNavigation } from "./components/breadcrumb-navigation";
 import { Canvas } from "./components/canvas";
 import { ConnectionsLayer } from "./components/connections/connections-layer";
 import { MultiSelectionDraggableWrapper } from "./components/elements/multi-selection-draggable-wrapper";
@@ -13,6 +17,7 @@ import { MultiSelectionWrapper } from "./components/elements/multi-selection-wra
 import { PowerElement } from "./components/elements/power-element";
 import { SelectionWrapper } from "./components/elements/selection-wrapper";
 import { HelpDialog } from "./components/help-dialog";
+import { NavigationHeader } from "./components/navigation-header";
 import { PropertiesPanel } from "./components/properties-panel";
 import { TemplateDialog } from "./components/template-dialog";
 import { Toolbar } from "./components/toolbar";
@@ -29,11 +34,6 @@ import {
   Viewport,
 } from "./utils/viewport-utils";
 
-interface BreadcrumbItem {
-  id: string;
-  name: string;
-}
-
 interface ITutorialStep {
   title: string;
   content: string;
@@ -49,7 +49,6 @@ interface PropsPowerSystemViewNew {
   activeTool: ToolType;
   viewOffset: { x: number; y: number };
   zoom: number;
-  breadcrumbItems: BreadcrumbItem[];
   selectionBox: {
     startX: number;
     startY: number;
@@ -76,6 +75,11 @@ interface PropsPowerSystemViewNew {
     string,
     { x1: number; y1: number; x2: number; y2: number }
   >;
+  canGoBack: boolean;
+  canGoForward: boolean;
+  navigationIndex: number;
+  currentAreaName: string;
+  isMainArea: boolean;
   onToolChange: (tool: ToolType) => void;
   onToggleGrid: () => void;
   onCanvasClick: (e: React.MouseEvent) => void;
@@ -108,7 +112,14 @@ interface PropsPowerSystemViewNew {
   onConnectionClick: (id: string) => void;
   onConnectionDelete: (id: string) => void;
   onArrowHandleDragStart: (connectionId: string, e: React.MouseEvent) => void;
-  onBreadcrumbNavigate: (mapId: string) => void;
+  onMidpointHandleDragStart: (
+    connectionId: string,
+    e: React.MouseEvent
+  ) => void;
+  onNavigateBack: () => void;
+  onNavigateForward: () => void;
+  onAreaNameChange: (name: string) => void;
+  onClearAreaClick: () => void;
   onPropertiesClose: () => void;
   onSetShowHelpDialog: (show: boolean) => void;
   onSetShowTemplateDialog: (show: boolean) => void;
@@ -131,7 +142,6 @@ export function PowerSystemView({
   activeTool,
   viewOffset,
   zoom,
-  breadcrumbItems,
   selectionBox,
   connectionDraft,
   showHelpDialog,
@@ -143,6 +153,11 @@ export function PowerSystemView({
   dragPositions,
   resizeSizes,
   tempConnectionPositions,
+  canGoBack,
+  canGoForward,
+  navigationIndex,
+  currentAreaName,
+  isMainArea,
   onToolChange,
   onToggleGrid,
   onCanvasClick,
@@ -164,7 +179,11 @@ export function PowerSystemView({
   onConnectionClick,
   onConnectionDelete,
   onArrowHandleDragStart,
-  onBreadcrumbNavigate,
+  onMidpointHandleDragStart,
+  onNavigateBack,
+  onNavigateForward,
+  onAreaNameChange,
+  onClearAreaClick,
   onPropertiesClose,
   onSetShowHelpDialog,
   onSetShowTemplateDialog,
@@ -183,6 +202,13 @@ export function PowerSystemView({
   const selectedElements = currentMap.elements.filter((el) =>
     selectedElementIds.includes(el.id)
   );
+
+  // Determine if a creation tool is active (any tool except select, hand, arrow, line)
+  const hasCreationToolActive =
+    activeTool !== "select" &&
+    activeTool !== "hand" &&
+    activeTool !== "arrow" &&
+    activeTool !== "line";
 
   // Determine if properties panel should be shown and which element to show
   const shouldShowPropertiesPanel = () => {
@@ -214,15 +240,13 @@ export function PowerSystemView({
     return false;
   };
 
-  // Get representative element for properties panel
-  const selectedElement =
-    selectedElementIds.length === 1
-      ? currentMap.elements.find((el) => el.id === selectedElementIds[0]) ||
-        null
-      : selectedElementIds.length > 1 && shouldShowPropertiesPanel()
-        ? currentMap.elements.find((el) => el.id === selectedElementIds[0]) ||
-          null
-        : null;
+  // Get all selected elements for properties panel
+  const selectedElementsForPanel = useMemo(() => {
+    if (selectedElementIds.length === 0 || activeTool === "hand") {
+      return [];
+    }
+    return currentMap.elements.filter((el) => selectedElementIds.includes(el.id));
+  }, [selectedElementIds, currentMap.elements, activeTool]);
 
   // Calculate viewport for culling
   const viewport = useMemo<Viewport>(() => {
@@ -279,15 +303,6 @@ export function PowerSystemView({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onSetShowTutorialDialog(true)}
-          >
-            <BookOpen className="w-4 h-4 mr-2" />
-            {t("page.tutorial")}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => onSetShowTemplateDialog(true)}
           >
             <Copy className="w-4 h-4 mr-2" />
@@ -308,18 +323,13 @@ export function PowerSystemView({
       {/* Content Area: Toolbar + Canvas */}
       <div className="flex-1 flex">
         {/* Toolbar */}
-        <Toolbar
-          activeTool={activeTool}
-          gridEnabled={currentMap.gridEnabled}
-          onToolChange={onToolChange}
-          onToggleGrid={onToggleGrid}
-        />
+        <Toolbar activeTool={activeTool} onToolChange={onToolChange} />
 
         {/* Canvas Area */}
         <div className="flex-1 flex flex-col relative">
-          {/* Breadcrumb - Centralizado na área de edição com botões de undo/redo */}
+          {/* Header Secundário - Navigation Header */}
           <div className="w-full flex items-center justify-between px-4 py-3 border-b bg-background/95 backdrop-blur-sm z-10">
-            {/* Undo/Redo buttons */}
+            {/* Undo/Redo buttons and Grid Toggle */}
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -341,18 +351,67 @@ export function PowerSystemView({
               >
                 <Redo className="w-4 h-4" />
               </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={currentMap.gridEnabled ? "default" : "ghost"}
+                    size="icon"
+                    onClick={onToggleGrid}
+                    className={`h-8 w-8 ${currentMap.gridEnabled ? "[&:hover]:shadow-none [&:hover]:bg-primary [&:hover]:text-primary-foreground [&:hover]:scale-100 [&:hover]:brightness-100 [&:hover]:saturate-100" : ""}`}
+                    style={
+                      currentMap.gridEnabled
+                        ? { pointerEvents: "auto", cursor: "pointer" }
+                        : undefined
+                    }
+                    onMouseEnter={(e) => {
+                      if (currentMap.gridEnabled) {
+                        e.currentTarget.style.transform = "none";
+                      }
+                    }}
+                  >
+                    <Grid3x3 className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p className="text-sm font-medium">
+                    {currentMap.gridEnabled
+                      ? "Desativar Grade (G)"
+                      : "Ativar Grade (G)"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
 
-            {/* Breadcrumb - Centered */}
+            {/* Navigation Header - Centralizado */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <BreadcrumbNavigation
-                items={breadcrumbItems}
-                onNavigate={onBreadcrumbNavigate}
+              <NavigationHeader
+                canGoBack={canGoBack}
+                canGoForward={canGoForward}
+                currentIndex={navigationIndex}
+                currentAreaName={currentAreaName}
+                isMainArea={isMainArea}
+                onNavigateBack={onNavigateBack}
+                onNavigateForward={onNavigateForward}
+                onNameChange={onAreaNameChange}
               />
             </div>
 
-            {/* Empty div for layout balance */}
-            <div className="w-[72px]" />
+            {/* Botão de Limpar Área */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClearAreaClick}
+                  className="h-8 w-8 text-destructive hover:bg-red-500/20 hover:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p className="text-sm font-medium">Limpar Área</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           <Canvas
@@ -375,6 +434,7 @@ export function PowerSystemView({
               selectedConnectionId={selectedConnectionId}
               onConnectionClick={onConnectionClick}
               onArrowHandleDragStart={onArrowHandleDragStart}
+              onMidpointHandleDragStart={onMidpointHandleDragStart}
               connectionDraft={connectionDraft}
               tempConnectionPositions={tempConnectionPositions}
             />
@@ -414,6 +474,7 @@ export function PowerSystemView({
                   }
                   tempSize={tempSize}
                   isHandMode={activeTool === "hand"}
+                  hasCreationToolActive={hasCreationToolActive}
                 />
               );
             })}
@@ -492,7 +553,7 @@ export function PowerSystemView({
 
           {/* Empty State - Positioned outside canvas transform to be centered on viewport */}
           {currentMap.elements.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                   <Zap className="w-8 h-8 text-muted-foreground" />
@@ -513,22 +574,27 @@ export function PowerSystemView({
           )}
 
           {/* Properties Panel */}
-          {selectedElement && shouldShowPropertiesPanel() && (
+          {selectedElementsForPanel.length > 0 && shouldShowPropertiesPanel() && (
             <PropertiesPanel
-              element={selectedElement}
-              selectedCount={selectedElementIds.length}
-              onUpdate={(updates) =>
-                onElementUpdate(selectedElement.id, updates)
-              }
+              elements={selectedElementsForPanel}
+              onUpdate={(updates) => {
+                // Apply updates to all selected elements
+                selectedElementsForPanel.forEach((element) => {
+                  onElementUpdate(element.id, updates);
+                });
+              }}
               onDelete={() => {
                 // Delete all selected elements
-                if (selectedElementIds.length > 1) {
-                  selectedElementIds.forEach((id) => onElementDelete(id));
-                } else {
-                  onElementDelete(selectedElement.id);
+                selectedElementsForPanel.forEach((element) => {
+                  onElementDelete(element.id);
+                });
+              }}
+              onDuplicate={() => {
+                // Duplicate the first selected element
+                if (selectedElementsForPanel.length > 0) {
+                  onElementDuplicate(selectedElementsForPanel[0].id);
                 }
               }}
-              onDuplicate={() => onElementDuplicate(selectedElement.id)}
               onClose={onPropertiesClose}
             />
           )}

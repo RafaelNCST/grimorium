@@ -18,6 +18,7 @@ import {
 import { createElement } from "./utils/element-factory";
 import { snapPositionToGrid } from "./utils/grid-utils";
 import { PowerSystemView } from "./view";
+import { ClearAreaDialog } from "./components/clear-area-dialog";
 
 interface PropsPowerSystemTab {
   isHeaderHidden: boolean;
@@ -42,6 +43,14 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   const [currentMap, setCurrentMap] = useState<IPowerMap>(initialMainMap);
   const [maps, setMaps] = useState<IPowerMap[]>([initialMainMap]);
   const [templates] = useState<ITemplate[]>([]);
+
+  // Navigation stack state
+  const [navigationStack, setNavigationStack] = useState<string[]>(["main"]);
+  const [navigationIndex, setNavigationIndex] = useState<number>(0);
+
+  // Computed properties for navigation
+  const canGoBack = navigationIndex > 0;
+  const canGoForward = navigationIndex < navigationStack.length - 1;
 
   // Sync currentMap changes back to maps array
   useEffect(() => {
@@ -75,6 +84,7 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [showTutorialDialog, setShowTutorialDialog] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
+  const [clearAreaDialogOpen, setClearAreaDialogOpen] = useState(false);
 
   // Connection creation state
   const [pendingConnection, setPendingConnection] = useState<{
@@ -94,6 +104,11 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     connectionId: string;
     startX: number;
     startY: number;
+  } | null>(null);
+
+  // Midpoint handle dragging state (for moving midpoint)
+  const [draggingMidpoint, setDraggingMidpoint] = useState<{
+    connectionId: string;
   } | null>(null);
 
   // Pan state
@@ -123,37 +138,6 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   const [tempConnectionPositions, setTempConnectionPositions] = useState<
     Record<string, { x1: number; y1: number; x2: number; y2: number }>
   >({});
-
-  // Breadcrumb items
-  const breadcrumbItems = useMemo(() => {
-    const items: Array<{ id: string; name: string }> = [
-      { id: "main", name: "Sistema Principal" },
-    ];
-
-    // Build breadcrumb trail
-    let current = currentMap;
-    const trail: IPowerMap[] = [];
-
-    while (current.parentMapId) {
-      const parent = maps.find((m) => m.id === current.parentMapId);
-      if (!parent) break;
-      trail.unshift(current);
-      current = parent;
-    }
-
-    trail.forEach((map) => {
-      items.push({ id: map.id, name: map.name });
-    });
-
-    if (
-      currentMap.id !== "main" &&
-      !trail.find((m) => m.id === currentMap.id)
-    ) {
-      items.push({ id: currentMap.id, name: currentMap.name });
-    }
-
-    return items;
-  }, [currentMap, maps]);
 
   // Save to history when currentMap changes (with debounce to avoid saving every drag frame)
   useEffect(() => {
@@ -208,6 +192,109 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
       setSelectedConnectionId(null);
     }
   }, [historyIndex, history]);
+
+  // Navigation handlers
+  const handleNavigateBack = useCallback(() => {
+    if (canGoBack) {
+      const newIndex = navigationIndex - 1;
+      const targetMapId = navigationStack[newIndex];
+      const targetMap = maps.find((m) => m.id === targetMapId);
+
+      if (targetMap) {
+        setNavigationIndex(newIndex);
+        setCurrentMap(targetMap);
+        setViewOffset({ x: 100, y: 100 });
+        setSelectedElementIds([]);
+        setSelectedConnectionId(null);
+      }
+    }
+  }, [navigationIndex, navigationStack, maps, canGoBack]);
+
+  const handleNavigateForward = useCallback(() => {
+    if (canGoForward) {
+      const newIndex = navigationIndex + 1;
+      const targetMapId = navigationStack[newIndex];
+      const targetMap = maps.find((m) => m.id === targetMapId);
+
+      if (targetMap) {
+        setNavigationIndex(newIndex);
+        setCurrentMap(targetMap);
+        setViewOffset({ x: 100, y: 100 });
+        setSelectedElementIds([]);
+        setSelectedConnectionId(null);
+      }
+    }
+  }, [navigationIndex, navigationStack, maps, canGoForward]);
+
+  const handleAreaNameChange = useCallback(
+    (newName: string) => {
+      if (currentMap.id === "main") return;
+
+      const trimmedName = newName.trim();
+      if (!trimmedName) return; // Não permite nome vazio
+
+      setCurrentMap((prev) => ({
+        ...prev,
+        name: trimmedName,
+        updatedAt: Date.now(),
+      }));
+
+      setMaps((prev) =>
+        prev.map((m) =>
+          m.id === currentMap.id
+            ? { ...m, name: trimmedName, updatedAt: Date.now() }
+            : m
+        )
+      );
+    },
+    [currentMap.id]
+  );
+
+  // Função recursiva para encontrar todos os submapas filhos
+  const findAllChildMapIds = useCallback((mapId: string, allMaps: IPowerMap[]): string[] => {
+    const children = allMaps.filter(m => m.parentMapId === mapId);
+    const childIds = children.map(c => c.id);
+
+    // Recursivamente encontrar filhos dos filhos
+    children.forEach(child => {
+      const grandchildren = findAllChildMapIds(child.id, allMaps);
+      childIds.push(...grandchildren);
+    });
+
+    return childIds;
+  }, []);
+
+  // Handler de limpar área
+  const handleClearArea = useCallback(() => {
+    // Encontrar todos os submapas filhos recursivamente
+    const childMapIds = findAllChildMapIds(currentMap.id, maps);
+
+    // Limpar elementos e conexões da área atual
+    setCurrentMap(prev => ({
+      ...prev,
+      elements: [],
+      connections: [],
+      updatedAt: Date.now(),
+    }));
+
+    // Remover todos os submapas filhos
+    setMaps(prev => {
+      const updated = prev.map(m =>
+        m.id === currentMap.id
+          ? { ...m, elements: [], connections: [], updatedAt: Date.now() }
+          : m
+      ).filter(m => !childMapIds.includes(m.id));
+
+      return updated;
+    });
+
+    // Limpar seleções
+    setSelectedElementIds([]);
+    setSelectedConnectionId(null);
+
+    // Fechar o modal
+    setClearAreaDialogOpen(false);
+  }, [currentMap, maps, findAllChildMapIds]);
 
   // Event handlers
   const handleElementDelete = useCallback((id: string) => {
@@ -300,9 +387,51 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
 
       // Deselect with Escape
       if (e.key === "Escape") {
-        setSelectedElementIds([]);
-        setSelectedConnectionId(null);
-        setSelectionBox(null);
+        // Priority 1: Cancel pending connection (incomplete arrow/line)
+        if (pendingConnection || connectionDraft) {
+          setPendingConnection(null);
+          setConnectionDraft(null);
+          setActiveTool("select");
+          // Remove focus from active element to clear any focus rings
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          return;
+        }
+
+        // Priority 2: Deselect elements and switch to select tool
+        if (selectedElementIds.length > 0 || selectedConnectionId) {
+          setSelectedElementIds([]);
+          setSelectedConnectionId(null);
+          setSelectionBox(null);
+          setActiveTool("select");
+          // Remove focus from active element to clear any focus rings/borders
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          return;
+        }
+
+        // Priority 3: Clear selection box if active
+        if (selectionBox) {
+          setSelectionBox(null);
+          // Remove focus from active element to clear any focus rings
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          return;
+        }
+
+        // Priority 4: Switch to select tool if any other tool is active
+        if (activeTool !== "select") {
+          setActiveTool("select");
+          // Remove focus from active element to clear any focus rings
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+          return;
+        }
+
         return;
       }
 
@@ -363,6 +492,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         h: "hand",
         b: "paragraph-block",
         d: "section-block",
+        i: "image-block",
+        f: "advanced-block",
+        o: "informative-block",
         c: "circle",
         s: "square",
         l: "diamond",
@@ -397,6 +529,10 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     selectedConnectionId,
     currentMap.elements,
     copiedElement,
+    pendingConnection,
+    connectionDraft,
+    selectionBox,
+    activeTool,
     handleElementDuplicate,
     handleElementDelete,
     handleConnectionDelete,
@@ -404,10 +540,11 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     handleRedo,
   ]);
 
-  // Zoom with Ctrl/Cmd + Scroll
+  // Zoom with Ctrl/Cmd + Scroll, Pan with regular Scroll
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey || e.metaKey) {
+        // ZOOM mode (Ctrl/Cmd + Scroll)
         e.preventDefault();
 
         // Calculate zoom delta (smoother zoom)
@@ -435,6 +572,18 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
           x: mouseX - canvasX * newZoom,
           y: mouseY - canvasY * newZoom,
         });
+      } else {
+        // PAN mode (regular Scroll)
+        e.preventDefault();
+
+        // Scroll sensitivity (adjust if needed)
+        const sensitivity = 1.0;
+
+        // Vertical pan only
+        setViewOffset((prev) => ({
+          x: prev.x, // Keep X unchanged
+          y: prev.y - e.deltaY * sensitivity, // Move Y based on scroll
+        }));
       }
     };
 
@@ -490,9 +639,9 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         return;
       }
 
-      // Handle element creation (only on canvas background)
+      // Handle element creation
+      // IMPORTANT: Create element on ANY click (even over existing elements) when creation tool is active
       if (
-        isCanvasBackground &&
         activeTool !== "select" &&
         activeTool !== "arrow" &&
         activeTool !== "line" &&
@@ -504,14 +653,8 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left - viewOffset.x) / zoom;
-        const y = (e.clientY - rect.top - viewOffset.y) / zoom;
-
-        const snappedPos = snapPositionToGrid(
-          { x, y },
-          currentMap.gridEnabled,
-          currentMap.gridSize
-        );
+        const clickX = (e.clientX - rect.left - viewOffset.x) / zoom;
+        const clickY = (e.clientY - rect.top - viewOffset.y) / zoom;
 
         let newElement: IPowerElement;
 
@@ -519,15 +662,15 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         if (activeTool === "circle") {
           newElement = createElement(
             "visual-section",
-            snappedPos.x,
-            snappedPos.y
+            clickX,
+            clickY
           );
           // Shape is already 'circle' by default
         } else if (activeTool === "square") {
           const baseElement = createElement(
             "visual-section",
-            snappedPos.x,
-            snappedPos.y
+            clickX,
+            clickY
           );
           newElement = {
             ...baseElement,
@@ -536,17 +679,34 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         } else if (activeTool === "diamond") {
           const baseElement = createElement(
             "visual-section",
-            snappedPos.x,
-            snappedPos.y
+            clickX,
+            clickY
           );
           newElement = { ...baseElement, shape: "diamond" } as IPowerElement;
         } else {
           newElement = createElement(
             activeTool as ElementType,
-            snappedPos.x,
-            snappedPos.y
+            clickX,
+            clickY
           );
         }
+
+        // Centralize element at click position
+        // The element was created with top-left corner at click position,
+        // now we adjust to center it on the click point
+        const centeredX = clickX - newElement.width / 2;
+        const centeredY = clickY - newElement.height / 2;
+
+        // Apply grid snapping to the centered position
+        const snappedPos = snapPositionToGrid(
+          { x: centeredX, y: centeredY },
+          currentMap.gridEnabled,
+          currentMap.gridSize
+        );
+
+        // Update element position to centered and snapped position
+        newElement.x = snappedPos.x;
+        newElement.y = snappedPos.y;
 
         console.log("[DEBUG] Element created:", {
           elementId: newElement.id,
@@ -1054,6 +1214,12 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         if (submap) {
           setCurrentMap(submap);
           setViewOffset({ x: 100, y: 100 });
+
+          // Update navigation stack - remove future history and add existing submap
+          const newStack = navigationStack.slice(0, navigationIndex + 1);
+          newStack.push(submap.id);
+          setNavigationStack(newStack);
+          setNavigationIndex(newStack.length - 1);
         }
       } else {
         // Get name for the new area based on element type
@@ -1091,9 +1257,15 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
         handleElementUpdate(element.id, { submapId: newSubmap.id });
         setCurrentMap(newSubmap);
         setViewOffset({ x: 100, y: 100 });
+
+        // Update navigation stack - remove future history and add new map
+        const newStack = navigationStack.slice(0, navigationIndex + 1);
+        newStack.push(newSubmap.id);
+        setNavigationStack(newStack);
+        setNavigationIndex(newStack.length - 1);
       }
     },
-    [maps, currentMap, handleElementUpdate]
+    [maps, currentMap, handleElementUpdate, navigationStack, navigationIndex]
   );
 
   // Arrow handle drag handlers
@@ -1111,21 +1283,25 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     [currentMap.connections]
   );
 
+  // Midpoint handle drag handlers
+  const handleMidpointHandleDragStart = useCallback(
+    (connectionId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      const connection = currentMap.connections.find(
+        (c) => c.id === connectionId
+      );
+      if (!connection) return;
+
+      setDraggingMidpoint({ connectionId });
+      setSelectedConnectionId(connectionId);
+    },
+    [currentMap.connections]
+  );
+
   const handleConnectionClick = useCallback((id: string) => {
     setSelectedConnectionId(id);
     setSelectedElementIds([]);
   }, []);
-
-  const handleBreadcrumbNavigate = useCallback(
-    (mapId: string) => {
-      const map = maps.find((m) => m.id === mapId);
-      if (map) {
-        setCurrentMap(map);
-        setViewOffset({ x: 100, y: 100 });
-      }
-    },
-    [maps]
-  );
 
   const handlePropertiesClose = useCallback(() => {
     setSelectedElementIds([]);
@@ -1250,6 +1426,42 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
     };
   }, [draggingArrowHandle, viewOffset, zoom]);
 
+  // Midpoint handle drag handlers
+  useEffect(() => {
+    if (!draggingMidpoint) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left - viewOffset.x) / zoom;
+      const y = (e.clientY - rect.top - viewOffset.y) / zoom;
+
+      // Atualizar posição do midpoint da conexão
+      setCurrentMap((prev) => ({
+        ...prev,
+        connections: prev.connections.map((conn) =>
+          conn.id === draggingMidpoint.connectionId
+            ? { ...conn, midpoint: { x, y } }
+            : conn
+        ),
+      }));
+    };
+
+    const handleMouseUp = () => {
+      setDraggingMidpoint(null);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [draggingMidpoint, viewOffset, zoom]);
+
   // Selection box handlers - sempre ativo para detectar arrasto
   useEffect(() => {
     const threshold = 5; // pixels mínimos para considerar arrasto
@@ -1333,60 +1545,77 @@ export function PowerSystemTab({ isHeaderHidden }: PropsPowerSystemTab) {
   }, [selectionBox, viewOffset, zoom, currentMap.elements]);
 
   return (
-    <PowerSystemView
-      isHeaderHidden={isHeaderHidden}
-      currentMap={currentMap}
-      templates={templates}
-      selectedElementIds={selectedElementIds}
-      selectedConnectionId={selectedConnectionId}
-      activeTool={activeTool}
-      viewOffset={viewOffset}
-      zoom={zoom}
-      breadcrumbItems={breadcrumbItems}
-      selectionBox={selectionBox}
-      connectionDraft={connectionDraft}
-      showHelpDialog={showHelpDialog}
-      showTemplateDialog={showTemplateDialog}
-      showTutorialDialog={showTutorialDialog}
-      tutorialStep={tutorialStep}
-      tutorialSteps={TUTORIAL_STEPS_CONSTANT}
-      canvasRef={canvasRef}
-      dragPositions={dragPositions}
-      resizeSizes={resizeSizes}
-      tempConnectionPositions={tempConnectionPositions}
-      onToolChange={handleToolChange}
-      onToggleGrid={handleToggleGrid}
-      onCanvasClick={handleCanvasClick}
-      onElementUpdate={handleElementUpdate}
-      onElementPositionChange={handleElementPositionChange}
-      onElementDragMove={handleElementDragMove}
-      onElementDragEnd={handleElementDragEnd}
-      onElementResizeMove={handleElementResizeMove}
-      onElementResizeEnd={handleElementResizeEnd}
-      onMultipleElementsPositionChange={handleMultipleElementsPositionChange}
-      onMultipleElementsSizeChange={handleMultipleElementsSizeChange}
-      onMultipleElementsDragMove={handleMultipleElementsDragMove}
-      onMultipleElementsDragEnd={handleMultipleElementsDragEnd}
-      onElementClick={handleElementClick}
-      onElementNavigate={handleElementNavigate}
-      onElementDelete={handleElementDelete}
-      onElementDuplicate={handleElementDuplicate}
-      onElementFirstInput={handleElementFirstInput}
-      onConnectionClick={handleConnectionClick}
-      onConnectionDelete={handleConnectionDelete}
-      onArrowHandleDragStart={handleArrowHandleDragStart}
-      onBreadcrumbNavigate={handleBreadcrumbNavigate}
-      onPropertiesClose={handlePropertiesClose}
-      onSetShowHelpDialog={setShowHelpDialog}
-      onSetShowTemplateDialog={setShowTemplateDialog}
-      onSetShowTutorialDialog={setShowTutorialDialog}
-      onTutorialNext={handleTutorialNext}
-      onTutorialPrev={handleTutorialPrev}
-      onTutorialClose={handleTutorialClose}
-      canUndo={historyIndex > 0}
-      canRedo={historyIndex < history.length - 1}
-      onUndo={handleUndo}
-      onRedo={handleRedo}
-    />
+    <>
+      <ClearAreaDialog
+        open={clearAreaDialogOpen}
+        onOpenChange={setClearAreaDialogOpen}
+        onConfirm={handleClearArea}
+        areaName={currentMap.name}
+      />
+
+      <PowerSystemView
+        isHeaderHidden={isHeaderHidden}
+        currentMap={currentMap}
+        templates={templates}
+        selectedElementIds={selectedElementIds}
+        selectedConnectionId={selectedConnectionId}
+        activeTool={activeTool}
+        viewOffset={viewOffset}
+        zoom={zoom}
+        selectionBox={selectionBox}
+        connectionDraft={connectionDraft}
+        showHelpDialog={showHelpDialog}
+        showTemplateDialog={showTemplateDialog}
+        showTutorialDialog={showTutorialDialog}
+        tutorialStep={tutorialStep}
+        tutorialSteps={TUTORIAL_STEPS_CONSTANT}
+        canvasRef={canvasRef}
+        dragPositions={dragPositions}
+        resizeSizes={resizeSizes}
+        tempConnectionPositions={tempConnectionPositions}
+        canGoBack={canGoBack}
+        canGoForward={canGoForward}
+        navigationIndex={navigationIndex}
+        currentAreaName={currentMap.name}
+        isMainArea={currentMap.id === "main"}
+        onToolChange={handleToolChange}
+        onToggleGrid={handleToggleGrid}
+        onCanvasClick={handleCanvasClick}
+        onElementUpdate={handleElementUpdate}
+        onElementPositionChange={handleElementPositionChange}
+        onElementDragMove={handleElementDragMove}
+        onElementDragEnd={handleElementDragEnd}
+        onElementResizeMove={handleElementResizeMove}
+        onElementResizeEnd={handleElementResizeEnd}
+        onMultipleElementsPositionChange={handleMultipleElementsPositionChange}
+        onMultipleElementsSizeChange={handleMultipleElementsSizeChange}
+        onMultipleElementsDragMove={handleMultipleElementsDragMove}
+        onMultipleElementsDragEnd={handleMultipleElementsDragEnd}
+        onElementClick={handleElementClick}
+        onElementNavigate={handleElementNavigate}
+        onElementDelete={handleElementDelete}
+        onElementDuplicate={handleElementDuplicate}
+        onElementFirstInput={handleElementFirstInput}
+        onConnectionClick={handleConnectionClick}
+        onConnectionDelete={handleConnectionDelete}
+        onArrowHandleDragStart={handleArrowHandleDragStart}
+        onMidpointHandleDragStart={handleMidpointHandleDragStart}
+        onNavigateBack={handleNavigateBack}
+        onNavigateForward={handleNavigateForward}
+        onAreaNameChange={handleAreaNameChange}
+        onClearAreaClick={() => setClearAreaDialogOpen(true)}
+        onPropertiesClose={handlePropertiesClose}
+        onSetShowHelpDialog={setShowHelpDialog}
+        onSetShowTemplateDialog={setShowTemplateDialog}
+        onSetShowTutorialDialog={setShowTutorialDialog}
+        onTutorialNext={handleTutorialNext}
+        onTutorialPrev={handleTutorialPrev}
+        onTutorialClose={handleTutorialClose}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+      />
+    </>
   );
 }

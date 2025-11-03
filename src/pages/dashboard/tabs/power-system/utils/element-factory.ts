@@ -7,6 +7,8 @@ import {
   IParagraphBlock,
   ISectionBlock,
   IImageBlock,
+  IAdvancedBlock,
+  IInformativeBlock,
   IVisualSection,
   ITextElement,
   ElementType,
@@ -83,7 +85,59 @@ export function createImageBlock(x: number, y: number): IImageBlock {
     borderColor: "#4A5568", // Gray-600 (dark gray)
     captionAlign: "left",
     captionFontSize: 16, // Default caption font size (16px)
-    showCaptionBorder: true, // Mostrar borda da legenda por padrão
+    showImageBorder: true, // Mostrar borda da imagem por padrão
+    canNavigate: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export function createAdvancedBlock(x: number, y: number): IAdvancedBlock {
+  const now = Date.now();
+
+  return {
+    id: `advanced-${now}`,
+    type: "advanced-block",
+    x,
+    y,
+    width: 400, // Default width (400px)
+    height: 350, // Default height (350px)
+    imagePosition: "center", // Default image position
+    imageShape: "circle", // Default image shape
+    title: "",
+    paragraph: "",
+    backgroundColor: "#F5F5F5", // Light grayish white
+    textColor: "#000000", // Black
+    borderColor: "#4A5568", // Gray-600 (dark gray)
+    titleAlign: "left", // Default title alignment
+    paragraphAlign: "left", // Default paragraph alignment
+    titleFontSize: 16, // Default title font size (16px)
+    paragraphFontSize: 12, // Default paragraph font size (12px)
+    showImageBorder: true, // Mostrar borda da imagem por padrão
+    canNavigate: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export function createInformativeBlock(
+  x: number,
+  y: number
+): IInformativeBlock {
+  const now = Date.now();
+
+  return {
+    id: `informative-${now}`,
+    type: "informative-block",
+    x,
+    y,
+    width: 800, // Fixed width (800px)
+    height: 50, // Minimum height (grows dynamically)
+    content: "",
+    icon: "info", // Default icon
+    backgroundColor: "#FFFFFF", // White background
+    textColor: "#000000", // Black text
+    iconColor: "#000000", // Black icon
     canNavigate: false,
     createdAt: now,
     updatedAt: now,
@@ -97,15 +151,18 @@ export function createVisualSection(
 ): IVisualSection {
   const now = Date.now();
 
+  // Tamanho padrão único para todas as 3 formas (circle, square, diamond)
+  const DEFAULT_SHAPE_SIZE = 150;
+
   return {
     id: `visual-${now}`,
     type: "visual-section",
     x,
     y,
-    width: 120,
-    height: 120,
+    width: DEFAULT_SHAPE_SIZE,
+    height: DEFAULT_SHAPE_SIZE,
     shape,
-    backgroundColor: DEFAULT_BACKGROUND_COLOR,
+    backgroundColor: "#FFFFFF", // Cor branca padrão
     showHoverCard: true,
     hoverTitle: "",
     hoverSubtitle: "",
@@ -150,6 +207,10 @@ export function createElement(
       return createSectionBlock(x, y);
     case "image-block":
       return createImageBlock(x, y);
+    case "advanced-block":
+      return createAdvancedBlock(x, y);
+    case "informative-block":
+      return createInformativeBlock(x, y);
     case "visual-section":
       return createVisualSection(x, y);
     case "text":

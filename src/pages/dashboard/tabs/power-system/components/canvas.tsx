@@ -53,7 +53,7 @@ export const Canvas = forwardRef<HTMLDivElement, PropsCanvas>(
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            opacity: 0.2,
+            opacity: 0.5,
             backgroundImage: `
                 linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px),
                 linear-gradient(180deg, hsl(var(--border)) 1px, transparent 1px)

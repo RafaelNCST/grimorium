@@ -10,31 +10,36 @@
   },
   "toolbar": {
     "title": "Ferramentas",
-    "select": "Selecionar",
+    "select": "Interagir",
     "paragraph_block": "Bloco de Parágrafo",
     "section_block": "Bloco de Sessão",
     "image_block": "Bloco de Imagem",
+    "advanced_block": "Bloco Avançado",
+    "informative_block": "Bloco Informativo",
     "visual_section": "Seção Visual",
     "text": "Texto",
     "arrow": "Seta",
     "line": "Linha",
     "grid_toggle": "Alternar Grid",
-    "hand": "Mão"
+    "hand": "Navegar"
   },
   "toolbar_tooltips": {
-    "select": "Selecionar e mover elementos (V)",
-    "paragraph_block": "Criar bloco de parágrafo - Retangular com área de parágrafo editável",
-    "section_block": "Criar bloco de sessão - Com título e área de parágrafo editável",
-    "image_block": "Criar bloco de imagem - Retangular com imagem e legenda editável",
-    "circle": "Forma Circular - Forma circular com imagem ou cor",
-    "square": "Forma Quadrada - Forma quadrada com bordas arredondadas",
-    "diamond": "Forma Losango - Forma de losango com bordas arredondadas",
-    "text": "Criar caixa de texto - Texto livre sem fundo",
-    "arrow": "Criar seta - Aponta de um elemento para qualquer lugar",
-    "line": "Criar linha - Conecta dois elementos",
-    "grid_on": "Grid ativado - Elementos se encaixam na grade",
-    "grid_off": "Grid desativado - Movimento livre",
-    "hand": "Mão (H) - Navegar pelo canvas"
+    "select": "Interagir (V)",
+    "paragraph_block": "Bloco de Parágrafo (B)",
+    "section_block": "Bloco de Sessão (D)",
+    "image_block": "Bloco de Imagem (I)",
+    "advanced_block": "Bloco Avançado (F)",
+    "informative_block": "Bloco Informativo (O)",
+    "circle": "Forma Circular (C)",
+    "square": "Forma Quadrada (S)",
+    "diamond": "Forma Losango (L)",
+    "text": "Texto (T)",
+    "arrow": "Seta (A)",
+    "line": "Linha (R)",
+    "grid_on": "Grid Ativado (G)",
+    "grid_off": "Grid Desativado (G)",
+    "hand": "Navegar (H)",
+    "shortcut": "Atalho"
   },
   "canvas": {
     "zoom_in": "Aumentar Zoom (Ctrl + Scroll)",
@@ -55,6 +60,16 @@
     "image_block": {
       "caption_placeholder": "Digite a legenda...",
       "image_placeholder": "Clique para adicionar imagem"
+    },
+    "informative_block": {
+      "default_content": "",
+      "content_placeholder": "Aqui vai a sua observação...",
+      "icon_info": "Informação",
+      "icon_warning": "Aviso",
+      "icon_check": "Verificado",
+      "icon_star": "Estrela",
+      "icon_lightbulb": "Lâmpada",
+      "icon_bookmark": "Marcador"
     },
     "visual_section": {
       "default_hover_title": "Elemento Visual",
@@ -79,19 +94,30 @@
     "close": "Fechar",
     "delete": "Excluir",
     "duplicate": "Duplicar",
+    "multi_selection_title": "Múltiplos Elementos Selecionados",
+    "multi_selection_count": "{{count}} elementos selecionados",
+    "multi_selection_mixed_types": "Elementos de tipos diferentes selecionados.",
+    "multi_selection_apply_to_all": "As alterações serão aplicadas a todos",
+    "multi_selection_use_buttons": "Use os botões abaixo para duplicar ou excluir.",
+    "duplicate_multiple": "Duplicar ({{count}})",
+    "delete_multiple": "Excluir ({{count}})",
     "properties": "Propriedades",
     "section_appearance": "Aparência",
     "section_navigation": "Navegação",
     "section_hover_card": "Card Hover",
     "section_text": "Texto",
     "section_height": "Travamento de Altura",
+    "section_icon": "Ícone",
     "background_color": "Cor de Fundo",
     "text_color": "Cor do Texto",
+    "icon_color": "Cor do Ícone",
     "border_color": "Cor da Borda",
     "border_visibility": "Visibilidade da Borda",
     "show_title_border": "Mostrar Borda do Título",
     "show_content_border": "Mostrar Borda do Conteúdo",
     "shape": "Forma",
+    "icon": "Ícone",
+    "select_icon": "Selecionar Ícone",
     "image": "Imagem",
     "image_profile": "Imagem do Perfil",
     "image_background": "Imagem de Fundo",
@@ -139,6 +165,12 @@
     "root": "Área Principal",
     "separator": "/"
   },
+  "clear_area_dialog": {
+    "title": "Limpar Área",
+    "description": "Tem certeza que deseja limpar a área \"{{areaName}}\"? Todos os elementos desta área e de todas as áreas subsequentes (filhas) serão removidos. Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
+    "clear": "Limpar"
+  },
   "context_menu": {
     "edit": "Editar",
     "duplicate": "Duplicar",
@@ -152,7 +184,7 @@
     "title": "Área Vazia",
     "description": "Use a barra de ferramentas à esquerda para adicionar elementos",
     "hint_edit": "Selecione uma ferramenta e clique na área",
-    "hint_hand": "Mude para a ferramenta Selecionar para interagir com elementos"
+    "hint_hand": "Mude para a ferramenta Interagir para interagir com elementos"
   },
   "dialogs": {
     "delete_element": {
@@ -171,8 +203,8 @@
   },
   "shortcuts": {
     "title": "Atalhos do Teclado",
-    "select": "V - Ferramenta de Seleção",
-    "hand": "H - Ferramenta Mão",
+    "select": "V - Interagir",
+    "hand": "H - Navegar",
     "paragraph_block": "B - Bloco de Parágrafo",
     "section_block": "D - Bloco de Sessão",
     "circle": "C - Forma Circular",

@@ -24,6 +24,7 @@ interface PropsParagraphBlock {
   zoom?: number;
   isMultiSelected?: boolean;
   tempSize?: { width: number; height: number };
+  hasCreationToolActive?: boolean;
 }
 
 export function ParagraphBlock({
@@ -44,6 +45,7 @@ export function ParagraphBlock({
   zoom = 1,
   isMultiSelected = false,
   tempSize,
+  hasCreationToolActive = false,
 }: PropsParagraphBlock) {
   const { t } = useTranslation("power-system");
   const [isEditing, setIsEditing] = useState(false);
@@ -52,7 +54,7 @@ export function ParagraphBlock({
 
   // Display dimensions (use tempSize during resize for real-time feedback)
   const displayWidth = tempSize?.width ?? element.width;
-  const displayHeight = tempSize?.height ?? element.height;
+  const FIXED_HEIGHT = 240; // Altura fixa igual ao SectionBlock
 
   // Sync local state
   useEffect(() => {
@@ -109,7 +111,7 @@ export function ParagraphBlock({
       x={element.x}
       y={element.y}
       width={displayWidth}
-      height={displayHeight}
+      height={FIXED_HEIGHT}
       isSelected={isSelected}
       isEditMode={isEditMode}
       isEditing={isEditing}
@@ -127,16 +129,17 @@ export function ParagraphBlock({
       zoom={zoom}
       minWidth={800}
       maxWidth={800}
-      minHeight={200}
-      maxHeight={200}
-      disableVerticalResize={true}
+      minHeight={240}
+      maxHeight={240}
+      disableVerticalResize
       disableDrag={isMultiSelected}
-      disableResize={true}
-      isBlockElement={true}
+      disableResize
+      isBlockElement
+      hasCreationToolActive={hasCreationToolActive}
     >
       <div
         id={`element-${element.id}`}
-        className="h-full w-full rounded-[2px]"
+        className="h-full w-full"
         style={{
           backgroundColor: element.backgroundColor,
           color: element.textColor,
@@ -144,6 +147,7 @@ export function ParagraphBlock({
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
+          border: "1px solid rgba(0, 0, 0, 0.2)",
         }}
       >
         {/* Content Area */}
@@ -166,12 +170,16 @@ export function ParagraphBlock({
               lineHeight: "1.5",
               textAlign: element.textAlign,
               color: element.textColor,
-              borderColor: element.showContentBorder !== false ? (element.borderColor || "#4A5568") : "transparent",
+              borderColor:
+                element.showContentBorder !== false
+                  ? element.borderColor || "#4A5568"
+                  : "transparent",
               padding: "8px",
               overflow: "auto",
               overflowY: "auto",
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
+              scrollbarColor:
+                "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
             }}
             placeholder={t("elements.paragraph_block.content_placeholder")}
             onClick={(e) => e.stopPropagation()}
@@ -183,7 +191,10 @@ export function ParagraphBlock({
               fontSize: `${element.fontSize}px`,
               lineHeight: "1.5",
               textAlign: element.textAlign,
-              borderColor: element.showContentBorder !== false ? (element.borderColor || "#4A5568") : "transparent",
+              borderColor:
+                element.showContentBorder !== false
+                  ? element.borderColor || "#4A5568"
+                  : "transparent",
               padding: "8px",
               overflow: "auto",
               overflowY: "auto",
@@ -191,7 +202,8 @@ export function ParagraphBlock({
               wordWrap: "break-word",
               userSelect: "none",
               scrollbarWidth: "thin",
-              scrollbarColor: "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
+              scrollbarColor:
+                "rgba(107, 114, 128, 0.6) rgba(229, 231, 235, 0.3)",
             }}
             onDoubleClick={(e) => {
               e.stopPropagation();

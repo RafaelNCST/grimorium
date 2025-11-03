@@ -6,6 +6,7 @@ interface PropsConnectionLine {
   isSelected: boolean;
   onClick: () => void;
   onArrowHandleMouseDown?: (e: React.MouseEvent) => void;
+  onMidpointHandleMouseDown?: (e: React.MouseEvent) => void;
   tempPositions?: { x1: number; y1: number; x2: number; y2: number };
 }
 
@@ -15,6 +16,7 @@ export function ConnectionLine({
   isSelected,
   onClick,
   onArrowHandleMouseDown,
+  onMidpointHandleMouseDown,
   tempPositions,
 }: PropsConnectionLine) {
   const fromElement = elements.find((el) => el.id === connection.fromElementId);
@@ -57,8 +59,16 @@ export function ConnectionLine({
     }
   }
 
-  // Calculate angle for arrow head
-  const angle = Math.atan2(endY - startY, endX - startX);
+  // Calculate midpoint position (use connection.midpoint if exists, otherwise geometric center)
+  const hasMidpoint = connection.midpoint && connection.midpoint.x !== undefined && connection.midpoint.y !== undefined;
+  const midX = hasMidpoint ? connection.midpoint!.x : (startX + endX) / 2;
+  const midY = hasMidpoint ? connection.midpoint!.y : (startY + endY) / 2;
+
+  // Calculate angle for arrow head (use last segment if midpoint exists)
+  const angle = hasMidpoint
+    ? Math.atan2(endY - midY, endX - midX)
+    : Math.atan2(endY - startY, endX - startX);
+
   const arrowLength = 12;
   const arrowAngle = Math.PI / 6;
 
@@ -73,23 +83,51 @@ export function ConnectionLine({
   const lineEndX = endX - lineOffset * Math.cos(angle);
   const lineEndY = endY - lineOffset * Math.sin(angle);
 
-  // Calculate label position (midpoint)
+  // Calculate label position (always at geometric midpoint)
   const labelX = (startX + endX) / 2;
   const labelY = (startY + endY) / 2;
 
   return (
     <g onClick={onClick} className="cursor-pointer">
-      {/* Main line */}
-      <line
-        x1={startX}
-        y1={startY}
-        x2={lineEndX}
-        y2={lineEndY}
-        stroke={connection.color}
-        strokeWidth={connection.strokeWidth}
-        strokeLinecap="round"
-        className={`transition-all ${isSelected ? "stroke-primary" : ""}`}
-      />
+      {/* Main line - render 2 segments if midpoint exists */}
+      {hasMidpoint ? (
+        <>
+          {/* Segment 1: start to midpoint */}
+          <line
+            x1={startX}
+            y1={startY}
+            x2={midX}
+            y2={midY}
+            stroke={connection.color}
+            strokeWidth={connection.strokeWidth}
+            strokeLinecap="round"
+            className={`transition-all ${isSelected ? "stroke-primary" : ""}`}
+          />
+          {/* Segment 2: midpoint to end */}
+          <line
+            x1={midX}
+            y1={midY}
+            x2={lineEndX}
+            y2={lineEndY}
+            stroke={connection.color}
+            strokeWidth={connection.strokeWidth}
+            strokeLinecap="round"
+            className={`transition-all ${isSelected ? "stroke-primary" : ""}`}
+          />
+        </>
+      ) : (
+        /* Single straight line when no midpoint */
+        <line
+          x1={startX}
+          y1={startY}
+          x2={lineEndX}
+          y2={lineEndY}
+          stroke={connection.color}
+          strokeWidth={connection.strokeWidth}
+          strokeLinecap="round"
+          className={`transition-all ${isSelected ? "stroke-primary" : ""}`}
+        />
+      )}
 
       {/* Arrow head (for both types) */}
       <polygon
@@ -100,17 +138,48 @@ export function ConnectionLine({
 
       {/* Selection indicator */}
       {isSelected && (
-        <line
-          x1={startX}
-          y1={startY}
-          x2={lineEndX}
-          y2={lineEndY}
-          stroke="hsl(var(--primary))"
-          strokeWidth={connection.strokeWidth + 6}
-          strokeLinecap="round"
-          opacity={0.3}
-          pointerEvents="none"
-        />
+        <>
+          {hasMidpoint ? (
+            <>
+              {/* Segment 1 selection */}
+              <line
+                x1={startX}
+                y1={startY}
+                x2={midX}
+                y2={midY}
+                stroke="hsl(var(--primary))"
+                strokeWidth={connection.strokeWidth + 6}
+                strokeLinecap="round"
+                opacity={0.3}
+                pointerEvents="none"
+              />
+              {/* Segment 2 selection */}
+              <line
+                x1={midX}
+                y1={midY}
+                x2={lineEndX}
+                y2={lineEndY}
+                stroke="hsl(var(--primary))"
+                strokeWidth={connection.strokeWidth + 6}
+                strokeLinecap="round"
+                opacity={0.3}
+                pointerEvents="none"
+              />
+            </>
+          ) : (
+            <line
+              x1={startX}
+              y1={startY}
+              x2={lineEndX}
+              y2={lineEndY}
+              stroke="hsl(var(--primary))"
+              strokeWidth={connection.strokeWidth + 6}
+              strokeLinecap="round"
+              opacity={0.3}
+              pointerEvents="none"
+            />
+          )}
+        </>
       )}
 
       {/* Label */}
@@ -139,16 +208,71 @@ export function ConnectionLine({
       )}
 
       {/* Interactive hit area (wider than visible line) */}
-      <line
-        x1={startX}
-        y1={startY}
-        x2={lineEndX}
-        y2={lineEndY}
-        stroke="transparent"
-        strokeWidth={Math.max(connection.strokeWidth + 10, 20)}
-        strokeLinecap="round"
-        className="hover:stroke-primary/20"
-      />
+      {hasMidpoint ? (
+        <>
+          {/* Segment 1 hit area */}
+          <line
+            x1={startX}
+            y1={startY}
+            x2={midX}
+            y2={midY}
+            stroke="transparent"
+            strokeWidth={Math.max(connection.strokeWidth + 10, 20)}
+            strokeLinecap="round"
+            className="hover:stroke-primary/20"
+          />
+          {/* Segment 2 hit area */}
+          <line
+            x1={midX}
+            y1={midY}
+            x2={lineEndX}
+            y2={lineEndY}
+            stroke="transparent"
+            strokeWidth={Math.max(connection.strokeWidth + 10, 20)}
+            strokeLinecap="round"
+            className="hover:stroke-primary/20"
+          />
+        </>
+      ) : (
+        <line
+          x1={startX}
+          y1={startY}
+          x2={lineEndX}
+          y2={lineEndY}
+          stroke="transparent"
+          strokeWidth={Math.max(connection.strokeWidth + 10, 20)}
+          strokeLinecap="round"
+          className="hover:stroke-primary/20"
+        />
+      )}
+
+      {/* Draggable handle for midpoint (for both arrow and line when selected) */}
+      {isSelected && onMidpointHandleMouseDown && (
+        <g>
+          {/* Invisible larger circle for better click area */}
+          <circle
+            cx={midX}
+            cy={midY}
+            r={12}
+            fill="transparent"
+            className="cursor-move"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              onMidpointHandleMouseDown(e);
+            }}
+          />
+          {/* Visible smaller circle for visual feedback */}
+          <circle
+            cx={midX}
+            cy={midY}
+            r={5}
+            fill="hsl(var(--primary))"
+            stroke="hsl(var(--background))"
+            strokeWidth={2}
+            className="cursor-move pointer-events-none"
+          />
+        </g>
+      )}
 
       {/* Draggable handle for arrow head (only for arrows when selected) */}
       {connection.type === "arrow" && isSelected && onArrowHandleMouseDown && (
