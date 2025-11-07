@@ -359,6 +359,15 @@ export interface DBPowerBlock {
   updated_at: number;
 }
 
+export interface DBPowerCharacterLink {
+  id: string;
+  character_id: string;
+  page_id?: string;
+  section_id?: string;
+  custom_label?: string;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

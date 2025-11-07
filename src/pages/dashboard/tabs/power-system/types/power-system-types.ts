@@ -163,3 +163,12 @@ export interface IPowerBlock {
   createdAt: number;
   updatedAt: number;
 }
+
+export interface IPowerCharacterLink {
+  id: string;
+  characterId: string;
+  pageId?: string;
+  sectionId?: string;
+  customLabel?: string;
+  createdAt: string;
+}

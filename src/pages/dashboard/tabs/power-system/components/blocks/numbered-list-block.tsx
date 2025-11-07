@@ -225,30 +225,17 @@ export function NumberedListBlock({
     );
   }
 
+  // In view mode, render simple list without DndContext
   return content.items.length > 0 ? (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={content.items.map((item) => item.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <ol className="space-y-2">
-          {content.items.map((item, index) => (
-            <SortableItem
-              key={item.id}
-              id={item.id}
-              text={item.text}
-              number={index + 1}
-              isEditMode={isEditMode}
-              onTextChange={(text) => handleUpdateItem(item.id, text)}
-              onDelete={() => handleDeleteItem(item.id)}
-            />
-          ))}
-        </ol>
-      </SortableContext>
-    </DndContext>
+    <ol className="space-y-2">
+      {content.items.map((item, index) => (
+        <li key={item.id} className="flex items-center gap-2">
+          <span className="text-muted-foreground font-medium min-w-[1.5rem]">
+            {index + 1}.
+          </span>
+          <span className="text-sm">{item.text}</span>
+        </li>
+      ))}
+    </ol>
   ) : null;
 }

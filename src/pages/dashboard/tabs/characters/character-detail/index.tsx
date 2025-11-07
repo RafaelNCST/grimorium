@@ -19,6 +19,20 @@ import {
   deleteCharacterVersion,
   updateCharacterVersion,
 } from "@/lib/db/characters.service";
+import {
+  getPowerLinksByCharacterId,
+  updatePowerCharacterLinkLabel,
+  deletePowerCharacterLink,
+  getPowerPageById,
+  getPowerSectionById,
+} from "@/lib/db/power-system.service";
+import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
+
+// Extended type to include page/section titles
+interface IPowerLinkWithTitles extends IPowerCharacterLink {
+  pageTitle?: string;
+  sectionTitle?: string;
+}
 import { mockLocations, mockFactions } from "@/mocks/global";
 import { useCharactersStore } from "@/stores/characters-store";
 import {
@@ -112,6 +126,11 @@ export function CharacterDetail() {
   const [_isLoading, setIsLoading] = useState(true);
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
 
+  // Power links state
+  const [characterPowerLinks, setCharacterPowerLinks] = useState<IPowerLinkWithTitles[]>([]);
+  const [isEditLinkModalOpen, setIsEditLinkModalOpen] = useState(false);
+  const [selectedLinkForEdit, setSelectedLinkForEdit] = useState<IPowerCharacterLink | null>(null);
+
   // Load character from database
   useEffect(() => {
     const loadCharacter = async () => {
@@ -193,6 +212,45 @@ export function CharacterDetail() {
 
     loadCharacter();
   }, [characterId, dashboardId]);
+
+  // Load power links when character loads
+  useEffect(() => {
+    if (characterId) {
+      loadPowerLinks();
+    }
+  }, [characterId]);
+
+  async function loadPowerLinks() {
+    try {
+      const links = await getPowerLinksByCharacterId(characterId);
+
+      // Fetch page/section titles for each link
+      const linksWithTitles = await Promise.all(
+        links.map(async (link) => {
+          let pageTitle: string | undefined;
+          let sectionTitle: string | undefined;
+
+          if (link.pageId) {
+            const page = await getPowerPageById(link.pageId);
+            pageTitle = page?.name;
+          } else if (link.sectionId) {
+            const section = await getPowerSectionById(link.sectionId);
+            sectionTitle = section?.title;
+          }
+
+          return {
+            ...link,
+            pageTitle,
+            sectionTitle,
+          };
+        })
+      );
+
+      setCharacterPowerLinks(linksWithTitles);
+    } catch (error) {
+      console.error("Error loading power links:", error);
+    }
+  }
 
   const currentRole = useMemo(
     () => CHARACTER_ROLES_CONSTANT.find((r) => r.value === character.role),
@@ -691,6 +749,42 @@ export function CharacterDetail() {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
 
+  // Power links handlers
+  const handleNavigateToPowerInstance = useCallback((linkId: string) => {
+    if (!dashboardId) return;
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId",
+      params: { dashboardId, characterId, linkId }
+    });
+  }, [navigate, dashboardId, characterId]);
+
+  const handleEditLink = useCallback((link: IPowerCharacterLink) => {
+    setSelectedLinkForEdit(link);
+    setIsEditLinkModalOpen(true);
+  }, []);
+
+  const handleSaveLink = useCallback(async (linkId: string, customLabel: string) => {
+    try {
+      await updatePowerCharacterLinkLabel(linkId, customLabel);
+      await loadPowerLinks();
+      toast.success(t("character-detail:power_links.link_updated"));
+      setIsEditLinkModalOpen(false);
+    } catch (error) {
+      toast.error(t("character-detail:power_links.error_updating_link"));
+    }
+  }, [t]);
+
+  const handleDeleteLink = useCallback(async (linkId: string) => {
+    try {
+      await deletePowerCharacterLink(linkId);
+      await loadPowerLinks();
+      toast.success(t("character-detail:power_links.link_deleted"));
+      setIsEditLinkModalOpen(false);
+    } catch (error) {
+      toast.error(t("character-detail:power_links.error_deleting_link"));
+    }
+  }, [t]);
+
   return (
     <CharacterDetailView
       character={character}
@@ -719,6 +813,7 @@ export function CharacterDetail() {
       RoleIcon={RoleIcon}
       fieldVisibility={fieldVisibility}
       advancedSectionOpen={advancedSectionOpen}
+      powerLinks={characterPowerLinks}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}
@@ -745,6 +840,13 @@ export function CharacterDetail() {
       onFieldVisibilityToggle={handleFieldVisibilityToggle}
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
       getRelationshipTypeData={getRelationshipTypeData}
+      onNavigateToPowerInstance={handleNavigateToPowerInstance}
+      onEditPowerLink={handleEditLink}
+      onDeletePowerLink={handleDeleteLink}
+      isEditLinkModalOpen={isEditLinkModalOpen}
+      selectedLinkForEdit={selectedLinkForEdit}
+      onCloseEditLinkModal={() => setIsEditLinkModalOpen(false)}
+      onSavePowerLink={handleSaveLink}
     />
   );
 }

@@ -111,6 +111,13 @@ interface PowerSystemDetailViewProps {
   onCloseSelectBlockModal: () => void;
   onOpenDeleteSystemModal: () => void;
   onCloseDeleteSystemModal: () => void;
+
+  // Link Handlers
+  onManagePageLinks?: (pageId: string) => void;
+  onManageSectionLinks?: (sectionId: string) => void;
+
+  // Children (for modals)
+  children?: React.ReactNode;
 }
 
 export function PowerSystemDetailView({
@@ -190,6 +197,13 @@ export function PowerSystemDetailView({
   onCloseSelectBlockModal,
   onOpenDeleteSystemModal,
   onCloseDeleteSystemModal,
+
+  // Link Handlers
+  onManagePageLinks,
+  onManageSectionLinks,
+
+  // Children
+  children,
 }: PowerSystemDetailViewProps) {
   const { t } = useTranslation("power-system");
 
@@ -583,6 +597,8 @@ export function PowerSystemDetailView({
             onDeleteBlock={onDeleteBlock}
             onReorderBlocks={onReorderBlocks}
             onPageSelect={onPageSelect}
+            onManagePageLinks={onManagePageLinks}
+            onManageSectionLinks={onManageSectionLinks}
           />
         )}
       </div>
@@ -679,6 +695,9 @@ export function PowerSystemDetailView({
         onConfirm={onDeleteSystem}
         systemName={system.name}
       />
+
+      {/* Render children (for ManageLinksModal) */}
+      {children}
     </div>
   );
 }

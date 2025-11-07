@@ -323,6 +323,38 @@
     "section_deleted": "Section deleted successfully",
     "block_created": "Block added successfully",
     "block_deleted": "Block deleted successfully",
+    "link_added": "Link added successfully",
+    "link_removed": "Link removed successfully",
+    "link_updated": "Link updated successfully",
     "error_generic": "An error occurred. Please try again."
+  },
+  "links": {
+    "manage": "Manage Links",
+    "linked_characters": "Linked Characters",
+    "available_characters": "Available Characters",
+    "no_characters": "No characters available",
+    "no_linked": "No linked characters",
+    "custom_label": "Custom Label",
+    "edit_link": "Edit Link",
+    "delete_link": "Delete Link",
+    "link_label_placeholder": "Optional custom name for this link",
+    "untitled_link": "Untitled Link",
+    "edit_link_description": "Customize the display name for this power link",
+    "delete_confirm": "Are you sure you want to delete this link?",
+    "linked": "Linked",
+    "remove": "Remove",
+    "add": "Add Link",
+    "already_linked_in_hierarchy": "Characters already linked to this page or its sections cannot be added again"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "move_up": "Move up",
+    "move_down": "Move down",
+    "close": "Close"
   }
 }

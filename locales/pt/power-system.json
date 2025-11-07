@@ -323,6 +323,38 @@
     "section_deleted": "Seção excluída com sucesso",
     "block_created": "Bloco adicionado com sucesso",
     "block_deleted": "Bloco excluído com sucesso",
+    "link_added": "Link adicionado com sucesso",
+    "link_removed": "Link removido com sucesso",
+    "link_updated": "Link atualizado com sucesso",
     "error_generic": "Ocorreu um erro. Por favor, tente novamente."
+  },
+  "links": {
+    "manage": "Gerenciar Links",
+    "linked_characters": "Personagens Linkados",
+    "available_characters": "Personagens Disponíveis",
+    "no_characters": "Nenhum personagem disponível",
+    "no_linked": "Nenhum personagem linkado",
+    "custom_label": "Identificador",
+    "edit_link": "Editar Link",
+    "delete_link": "Excluir Link",
+    "link_label_placeholder": "Nome personalizado opcional para este link",
+    "untitled_link": "Link Sem Título",
+    "edit_link_description": "Personalize o nome de exibição para este link de poder",
+    "delete_confirm": "Tem certeza de que deseja excluir este link?",
+    "linked": "Linkado",
+    "remove": "Remover",
+    "add": "Adicionar",
+    "already_linked_in_hierarchy": "Personagens já linkados nesta página ou suas seções não podem ser adicionados novamente"
+  },
+  "actions": {
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "deleting": "Excluindo...",
+    "edit": "Editar",
+    "move_up": "Mover para cima",
+    "move_down": "Mover para baixo",
+    "close": "Fechar"
   }
 }

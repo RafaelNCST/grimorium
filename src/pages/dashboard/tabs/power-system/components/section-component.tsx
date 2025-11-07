@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ChevronDown, ChevronRight, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, Plus, Trash2, Link } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -52,6 +52,7 @@ interface SectionComponentProps {
   blocks: IPowerBlock[];
   pages?: IPowerPage[]; // Available pages for navigator block
   isEditMode: boolean;
+  isReadOnlyView?: boolean; // For controlling dropdown visibility (default: false)
   isFirst?: boolean;
   isLast?: boolean;
   onUpdateSection: (title: string) => void;
@@ -63,12 +64,14 @@ interface SectionComponentProps {
   onPageSelect?: (pageId: string) => void; // For navigator block
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  onManageSectionLinks?: () => void; // For managing character links
 }
 
 interface SortableBlockProps {
   block: IPowerBlock;
   pages?: IPowerPage[];
   isEditMode: boolean;
+  isReadOnlyView?: boolean;
   onUpdate: (content: BlockContent) => void;
   onDelete: () => void;
   onPageSelect?: (pageId: string) => void;
@@ -78,6 +81,7 @@ function SortableBlock({
   block,
   pages,
   isEditMode,
+  isReadOnlyView = false,
   onUpdate,
   onDelete,
   onPageSelect,
@@ -112,9 +116,9 @@ function SortableBlock({
       case "tag-list":
         return <TagListBlock {...commonProps} />;
       case "dropdown":
-        return <DropdownBlock {...commonProps} />;
+        return <DropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} />;
       case "multi-dropdown":
-        return <MultiDropdownBlock {...commonProps} />;
+        return <MultiDropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} />;
       case "image":
         return <ImageBlock {...commonProps} />;
       case "icon":
@@ -185,6 +189,7 @@ export function SectionComponent({
   blocks,
   pages,
   isEditMode,
+  isReadOnlyView = false,
   isFirst = false,
   isLast = false,
   onUpdateSection,
@@ -196,6 +201,7 @@ export function SectionComponent({
   onPageSelect,
   onMoveUp,
   onMoveDown,
+  onManageSectionLinks,
 }: SectionComponentProps) {
   const { t } = useTranslation("power-system");
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -269,6 +275,27 @@ export function SectionComponent({
               className="flex-1 text-lg font-semibold border-0 shadow-none px-2 h-auto focus-visible:ring-0"
               placeholder={t("section.title_placeholder")}
             />
+
+            {/* Manage Links Button */}
+            {onManageSectionLinks && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onManageSectionLinks}
+                    className="h-8 w-8 cursor-pointer"
+                  >
+                    <Link className="w-5 h-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium">
+                    {t("links.manage")}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {/* Reorder Buttons */}
             {onMoveUp && (
@@ -373,6 +400,7 @@ export function SectionComponent({
                     block={block}
                     pages={pages}
                     isEditMode={isEditMode}
+                    isReadOnlyView={isReadOnlyView}
                     onUpdate={(content) => onUpdateBlock(block.id, content)}
                     onDelete={() => onDeleteBlock(block.id)}
                     onPageSelect={onPageSelect}
@@ -387,6 +415,7 @@ export function SectionComponent({
                       block={activeBlock}
                       pages={pages}
                       isEditMode={isEditMode}
+                      isReadOnlyView={isReadOnlyView}
                       onUpdate={(content) => onUpdateBlock(activeBlock.id, content)}
                       onDelete={() => onDeleteBlock(activeBlock.id)}
                       onPageSelect={onPageSelect}

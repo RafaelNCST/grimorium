@@ -15,10 +15,12 @@ import {
   type IPowerBlock,
   type DropdownContent,
 } from "../../types/power-system-types";
+import { cn } from "@/lib/utils";
 
 interface DropdownBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
+  isReadOnlyView?: boolean;
   onUpdate: (content: DropdownContent) => void;
   onDelete: () => void;
 }
@@ -26,6 +28,7 @@ interface DropdownBlockProps {
 export function DropdownBlock({
   block,
   isEditMode,
+  isReadOnlyView = false,
   onUpdate,
   onDelete,
 }: DropdownBlockProps) {
@@ -52,10 +55,6 @@ export function DropdownBlock({
         content.selectedValue === option ? undefined : content.selectedValue,
     });
   };
-
-  if (!isEditMode && !content.selectedValue) {
-    return null;
-  }
 
   if (isEditMode) {
     return (
@@ -145,8 +144,12 @@ export function DropdownBlock({
       onValueChange={(value) =>
         onUpdate({ ...content, selectedValue: value })
       }
+      disabled={isReadOnlyView}
     >
-      <SelectTrigger data-no-drag="true" className="w-full">
+      <SelectTrigger
+        data-no-drag="true"
+        className={cn("w-full", isReadOnlyView && "!cursor-default")}
+      >
         <SelectValue
           placeholder={t("blocks.dropdown.select_placeholder")}
         />

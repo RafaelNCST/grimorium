@@ -54,6 +54,9 @@ import { RelationshipsSection } from "./components/relationships-section";
 import { VersionManager } from "./components/version-manager";
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
+import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
+import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
+import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 
 interface ICharacter {
   id: string;
@@ -141,6 +144,7 @@ interface CharacterDetailViewProps {
   RoleIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
+  powerLinks: IPowerCharacterLink[];
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -178,6 +182,13 @@ interface CharacterDetailViewProps {
   onFieldVisibilityToggle: (field: string) => void;
   onAdvancedSectionToggle: () => void;
   getRelationshipTypeData: (type: string) => IRelationshipType;
+  onNavigateToPowerInstance: (linkId: string) => void;
+  onEditPowerLink: (link: IPowerCharacterLink) => void;
+  onDeletePowerLink: (linkId: string) => void;
+  isEditLinkModalOpen: boolean;
+  selectedLinkForEdit: IPowerCharacterLink | null;
+  onCloseEditLinkModal: () => void;
+  onSavePowerLink: (linkId: string, customLabel: string) => Promise<void>;
 }
 
 // Helper component for field wrapper with visibility toggle
@@ -281,6 +292,7 @@ export function CharacterDetailView({
   RoleIcon,
   fieldVisibility,
   advancedSectionOpen,
+  powerLinks,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -307,6 +319,13 @@ export function CharacterDetailView({
   onFieldVisibilityToggle,
   onAdvancedSectionToggle,
   getRelationshipTypeData: _getRelationshipTypeData,
+  onNavigateToPowerInstance,
+  onEditPowerLink,
+  onDeletePowerLink,
+  isEditLinkModalOpen,
+  selectedLinkForEdit,
+  onCloseEditLinkModal,
+  onSavePowerLink,
 }: CharacterDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["character-detail", "create-character"] as any);
@@ -1642,6 +1661,31 @@ export function CharacterDetailView({
                   />
                 </CardContent>
               </Card>
+
+              {/* Powers Card */}
+              {powerLinks && powerLinks.length > 0 && (
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CardTitle>{t("character-detail:sections.powers")}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {powerLinks.map((link) => (
+                        <PowerLinkCard
+                          key={link.id}
+                          link={link}
+                          pageTitle={(link as any).pageTitle}
+                          sectionTitle={(link as any).sectionTitle}
+                          isEditing={isEditing}
+                          onClick={() => onNavigateToPowerInstance(link.id)}
+                          onEdit={() => onEditPowerLink(link)}
+                          onDelete={() => onDeletePowerLink(link.id)}
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar - Versions - 1 column */}
@@ -1680,6 +1724,14 @@ export function CharacterDetailView({
         versionName={currentVersion?.name}
         totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
+      />
+
+      {/* Edit Power Link Modal */}
+      <EditPowerLinkModal
+        isOpen={isEditLinkModalOpen}
+        onClose={onCloseEditLinkModal}
+        link={selectedLinkForEdit}
+        onSave={onSavePowerLink}
       />
     </div>
   );

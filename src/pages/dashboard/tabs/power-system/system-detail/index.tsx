@@ -37,6 +37,7 @@ import type {
   BlockContent,
 } from "../types/power-system-types";
 import { PowerSystemDetailView } from "./view";
+import { ManageLinksModal } from "../components/manage-links-modal";
 
 interface PowerSystemDetailProps {
   bookId: string;
@@ -71,10 +72,13 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [isCreateSectionModalOpen, setIsCreateSectionModalOpen] = useState(false);
   const [isSelectBlockModalOpen, setIsSelectBlockModalOpen] = useState(false);
   const [isDeleteSystemModalOpen, setIsDeleteSystemModalOpen] = useState(false);
+  const [isManageLinksModalOpen, setIsManageLinksModalOpen] = useState(false);
 
   // Modal Context
   const [selectedGroupForPage, setSelectedGroupForPage] = useState<string | undefined>();
   const [selectedSectionForBlock, setSelectedSectionForBlock] = useState<string | undefined>();
+  const [selectedLinkPageId, setSelectedLinkPageId] = useState<string | undefined>();
+  const [selectedLinkSectionId, setSelectedLinkSectionId] = useState<string | undefined>();
 
   // Loading States
   const [isLoadingGroups, setIsLoadingGroups] = useState(false);
@@ -628,6 +632,24 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     setIsSelectBlockModalOpen(true);
   };
 
+  const handleManagePageLinks = (pageId: string) => {
+    setSelectedLinkPageId(pageId);
+    setSelectedLinkSectionId(undefined);
+    setIsManageLinksModalOpen(true);
+  };
+
+  const handleManageSectionLinks = (sectionId: string) => {
+    setSelectedLinkSectionId(sectionId);
+    setSelectedLinkPageId(undefined);
+    setIsManageLinksModalOpen(true);
+  };
+
+  const handleCloseManageLinks = () => {
+    setIsManageLinksModalOpen(false);
+    setSelectedLinkPageId(undefined);
+    setSelectedLinkSectionId(undefined);
+  };
+
   // ============================================================================
   // RENDER
   // ============================================================================
@@ -719,6 +741,20 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       onCloseSelectBlockModal={() => setIsSelectBlockModalOpen(false)}
       onOpenDeleteSystemModal={() => setIsDeleteSystemModalOpen(true)}
       onCloseDeleteSystemModal={() => setIsDeleteSystemModalOpen(false)}
-    />
+      onManagePageLinks={handleManagePageLinks}
+      onManageSectionLinks={handleManageSectionLinks}
+    >
+      {/* Manage Links Modal */}
+      <ManageLinksModal
+        isOpen={isManageLinksModalOpen}
+        onClose={handleCloseManageLinks}
+        bookId={bookId}
+        pageId={selectedLinkPageId}
+        sectionId={selectedLinkSectionId}
+        onLinksChanged={() => {
+          // Optional: Refresh data if needed
+        }}
+      />
+    </PowerSystemDetailView>
   );
 }

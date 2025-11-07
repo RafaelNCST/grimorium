@@ -28,6 +28,7 @@ import { Route as DashboardDashboardIdTabsItemItemIdIndexRouteImport } from './r
 import { Route as DashboardDashboardIdTabsCharacterCharacterIdIndexRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/index'
 import { Route as DashboardDashboardIdTabsItemItemIdTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/timeline'
 import { Route as DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/family-tree'
+import { Route as DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/power.$linkId'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
@@ -141,6 +142,12 @@ const DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute =
     path: '/dashboard/$dashboardId/tabs/character/$characterId/family-tree',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute =
+  DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRouteImport.update({
+    id: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId',
+    path: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/character/$characterId': typeof DashboardDashboardIdTabsCharacterCharacterIdIndexRoute
   '/dashboard/$dashboardId/tabs/item/$itemId': typeof DashboardDashboardIdTabsItemItemIdIndexRoute
+  '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId': typeof DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -183,6 +191,7 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/character/$characterId': typeof DashboardDashboardIdTabsCharacterCharacterIdIndexRoute
   '/dashboard/$dashboardId/tabs/item/$itemId': typeof DashboardDashboardIdTabsItemItemIdIndexRoute
+  '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId': typeof DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +214,7 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/character/$characterId/': typeof DashboardDashboardIdTabsCharacterCharacterIdIndexRoute
   '/dashboard/$dashboardId/tabs/item/$itemId/': typeof DashboardDashboardIdTabsItemItemIdIndexRoute
+  '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId': typeof DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/character/$characterId'
     | '/dashboard/$dashboardId/tabs/item/$itemId'
+    | '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/character/$characterId'
     | '/dashboard/$dashboardId/tabs/item/$itemId'
+    | '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
   id:
     | '__root__'
     | '/'
@@ -270,6 +282,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/character/$characterId/'
     | '/dashboard/$dashboardId/tabs/item/$itemId/'
+    | '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -292,6 +305,7 @@ export interface RootRouteChildren {
   DashboardDashboardIdTabsItemItemIdTimelineRoute: typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   DashboardDashboardIdTabsCharacterCharacterIdIndexRoute: typeof DashboardDashboardIdTabsCharacterCharacterIdIndexRoute
   DashboardDashboardIdTabsItemItemIdIndexRoute: typeof DashboardDashboardIdTabsItemItemIdIndexRoute
+  DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute: typeof DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -429,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId': {
+      id: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
+      path: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
+      fullPath: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
+      preLoaderRoute: typeof DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -467,6 +488,8 @@ const rootRouteChildren: RootRouteChildren = {
     DashboardDashboardIdTabsCharacterCharacterIdIndexRoute,
   DashboardDashboardIdTabsItemItemIdIndexRoute:
     DashboardDashboardIdTabsItemItemIdIndexRoute,
+  DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute:
+    DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

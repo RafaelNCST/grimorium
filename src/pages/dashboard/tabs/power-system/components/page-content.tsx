@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Link } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -27,6 +27,7 @@ interface PageContentProps {
   sections: IPowerSection[];
   blocks: IPowerBlock[];
   isEditMode: boolean;
+  isReadOnlyView?: boolean; // For controlling dropdown visibility (default: false)
   onUpdatePageName: (name: string) => void;
   onAddSection: () => void;
   onUpdateSection: (sectionId: string, title: string) => void;
@@ -37,6 +38,8 @@ interface PageContentProps {
   onDeleteBlock: (blockId: string) => void;
   onReorderBlocks: (sectionId: string, blocks: IPowerBlock[]) => void;
   onPageSelect?: (pageId: string) => void; // For navigator block
+  onManagePageLinks?: (pageId: string) => void; // For managing character links
+  onManageSectionLinks?: (sectionId: string) => void; // For managing section character links
 }
 
 interface SectionWrapperProps {
@@ -44,6 +47,7 @@ interface SectionWrapperProps {
   blocks: IPowerBlock[];
   pages?: IPowerPage[];
   isEditMode: boolean;
+  isReadOnlyView?: boolean;
   isFirst: boolean;
   isLast: boolean;
   onUpdateSection: (title: string) => void;
@@ -55,6 +59,7 @@ interface SectionWrapperProps {
   onPageSelect?: (pageId: string) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onManageSectionLinks?: () => void;
 }
 
 function SectionWrapper({
@@ -62,6 +67,7 @@ function SectionWrapper({
   blocks,
   pages,
   isEditMode,
+  isReadOnlyView = false,
   isFirst,
   isLast,
   onUpdateSection,
@@ -73,6 +79,7 @@ function SectionWrapper({
   onPageSelect,
   onMoveUp,
   onMoveDown,
+  onManageSectionLinks,
 }: SectionWrapperProps) {
   return (
     <SectionComponent
@@ -80,6 +87,7 @@ function SectionWrapper({
       blocks={blocks}
       pages={pages}
       isEditMode={isEditMode}
+      isReadOnlyView={isReadOnlyView}
       isFirst={isFirst}
       isLast={isLast}
       onUpdateSection={onUpdateSection}
@@ -91,6 +99,7 @@ function SectionWrapper({
       onPageSelect={onPageSelect}
       onMoveUp={onMoveUp}
       onMoveDown={onMoveDown}
+      onManageSectionLinks={onManageSectionLinks}
     />
   );
 }
@@ -102,6 +111,7 @@ export function PageContent({
   sections,
   blocks,
   isEditMode,
+  isReadOnlyView = false,
   onUpdatePageName,
   onAddSection,
   onUpdateSection,
@@ -112,6 +122,8 @@ export function PageContent({
   onDeleteBlock,
   onReorderBlocks,
   onPageSelect,
+  onManagePageLinks,
+  onManageSectionLinks,
 }: PageContentProps) {
   const { t } = useTranslation("power-system");
   const [sectionFilter, setSectionFilter] = useState("");
@@ -182,6 +194,27 @@ export function PageContent({
             )}
           </div>
 
+          {/* Manage Links Button (Edit Mode Only) */}
+          {isEditMode && onManagePageLinks && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onManagePageLinks(page.id)}
+                  className="cursor-pointer"
+                >
+                  <Link className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm font-medium">
+                  {t("links.manage")}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           {/* Add Section Button (Edit Mode Only) */}
           {isEditMode && (
             <Tooltip>
@@ -236,6 +269,7 @@ export function PageContent({
                   blocks={getBlocksForSection(section.id)}
                   pages={pages}
                   isEditMode={isEditMode}
+                  isReadOnlyView={isReadOnlyView}
                   isFirst={index === 0}
                   isLast={index === sortedSections.length - 1}
                   onUpdateSection={(title) =>
@@ -254,6 +288,7 @@ export function PageContent({
                   onPageSelect={onPageSelect}
                   onMoveUp={() => handleMoveSectionUp(section.id)}
                   onMoveDown={() => handleMoveSectionDown(section.id)}
+                  onManageSectionLinks={onManageSectionLinks ? () => onManageSectionLinks(section.id) : undefined}
                 />
               ))}
             </div>

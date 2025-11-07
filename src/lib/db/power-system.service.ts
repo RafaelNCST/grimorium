@@ -4,6 +4,7 @@ import {
   IPowerPage,
   IPowerSection,
   IPowerBlock,
+  IPowerCharacterLink,
   BlockType,
   BlockContent,
 } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
@@ -14,6 +15,7 @@ import {
   DBPowerPage,
   DBPowerSection,
   DBPowerBlock,
+  DBPowerCharacterLink,
 } from "./types";
 
 import { getDB } from "./index";
@@ -81,6 +83,20 @@ function dbPowerBlockToPowerBlock(db: DBPowerBlock): IPowerBlock {
     content: JSON.parse(db.content_json) as BlockContent,
     createdAt: db.created_at,
     updatedAt: db.updated_at,
+  };
+}
+
+// Power Character Link converters
+function dbPowerCharacterLinkToPowerCharacterLink(
+  db: DBPowerCharacterLink
+): IPowerCharacterLink {
+  return {
+    id: db.id,
+    characterId: db.character_id,
+    pageId: db.page_id,
+    sectionId: db.section_id,
+    customLabel: db.custom_label,
+    createdAt: new Date(db.created_at).toISOString(),
   };
 }
 
@@ -167,12 +183,6 @@ export async function deletePowerSystem(systemId: string): Promise<void> {
     const db = await getDB();
 
     // Delete all related data (cascade)
-    // First get all groups
-    const groups = await db.select<DBPowerGroup[]>(
-      "SELECT id FROM power_groups WHERE system_id = $1",
-      [systemId]
-    );
-
     // Get all pages
     const pages = await db.select<DBPowerPage[]>(
       "SELECT id FROM power_pages WHERE system_id = $1",
@@ -512,7 +522,12 @@ export async function duplicatePowerPage(pageId: string): Promise<string> {
            SET order_index = order_index + 1
            WHERE system_id = $1 AND group_id IS NULL AND order_index > $2 AND id != $3`,
       originalPage.groupId
-        ? [originalPage.systemId, originalPage.groupId, originalPage.orderIndex, newPageId]
+        ? [
+            originalPage.systemId,
+            originalPage.groupId,
+            originalPage.orderIndex,
+            newPageId,
+          ]
         : [originalPage.systemId, originalPage.orderIndex, newPageId]
     );
 
@@ -539,7 +554,9 @@ export async function duplicatePowerPage(pageId: string): Promise<string> {
       );
 
       // Get all blocks from the original section
-      const originalBlocks = await getPowerBlocksBySectionId(originalSection.id);
+      const originalBlocks = await getPowerBlocksBySectionId(
+        originalSection.id
+      );
 
       // Copy blocks
       for (const originalBlock of originalBlocks) {
@@ -584,6 +601,22 @@ export async function getPowerSectionsByPageId(
     return result.map(dbPowerSectionToPowerSection);
   } catch (error) {
     console.error("Error fetching power sections:", error);
+    throw error;
+  }
+}
+
+export async function getPowerSectionById(
+  sectionId: string
+): Promise<IPowerSection | null> {
+  try {
+    const db = await getDB();
+    const result = await db.select<DBPowerSection[]>(
+      "SELECT * FROM power_sections WHERE id = $1",
+      [sectionId]
+    );
+    return result.length > 0 ? dbPowerSectionToPowerSection(result[0]) : null;
+  } catch (error) {
+    console.error("Error fetching power section:", error);
     throw error;
   }
 }
@@ -769,6 +802,249 @@ export async function reorderPowerBlocks(blockIds: string[]): Promise<void> {
     }
   } catch (error) {
     console.error("Error reordering power blocks:", error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// POWER CHARACTER LINK FUNCTIONS
+// ============================================================================
+
+export async function getPowerLinksByCharacterId(
+  characterId: string
+): Promise<IPowerCharacterLink[]> {
+  try {
+    const db = await getDB();
+    const result = await db.select<DBPowerCharacterLink[]>(
+      "SELECT * FROM power_character_links WHERE character_id = $1 ORDER BY created_at DESC",
+      [characterId]
+    );
+    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+  } catch (error) {
+    console.error("Error fetching power links by character:", error);
+    throw error;
+  }
+}
+
+export async function getPowerLinksByPageId(
+  pageId: string
+): Promise<IPowerCharacterLink[]> {
+  try {
+    const db = await getDB();
+    const result = await db.select<DBPowerCharacterLink[]>(
+      "SELECT * FROM power_character_links WHERE page_id = $1 ORDER BY created_at DESC",
+      [pageId]
+    );
+    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+  } catch (error) {
+    console.error("Error fetching power links by page:", error);
+    throw error;
+  }
+}
+
+export async function getPowerLinksBySectionId(
+  sectionId: string
+): Promise<IPowerCharacterLink[]> {
+  try {
+    const db = await getDB();
+    const result = await db.select<DBPowerCharacterLink[]>(
+      "SELECT * FROM power_character_links WHERE section_id = $1 ORDER BY created_at DESC",
+      [sectionId]
+    );
+    return result.map(dbPowerCharacterLinkToPowerCharacterLink);
+  } catch (error) {
+    console.error("Error fetching power links by section:", error);
+    throw error;
+  }
+}
+
+export async function createPowerCharacterLink(
+  characterId: string,
+  pageId?: string,
+  sectionId?: string,
+  customLabel?: string
+): Promise<string> {
+  try {
+    const db = await getDB();
+    const id = crypto.randomUUID();
+    const now = Date.now();
+
+    await db.execute(
+      `INSERT INTO power_character_links (id, character_id, page_id, section_id, custom_label, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        id,
+        characterId,
+        pageId || null,
+        sectionId || null,
+        customLabel || null,
+        now,
+      ]
+    );
+
+    return id;
+  } catch (error) {
+    console.error("Error creating power character link:", error);
+    throw error;
+  }
+}
+
+export async function updatePowerCharacterLinkLabel(
+  linkId: string,
+  customLabel: string
+): Promise<void> {
+  try {
+    const db = await getDB();
+
+    await db.execute(
+      "UPDATE power_character_links SET custom_label = $1 WHERE id = $2",
+      [customLabel || null, linkId]
+    );
+  } catch (error) {
+    console.error("Error updating power character link label:", error);
+    throw error;
+  }
+}
+
+export async function deletePowerCharacterLink(linkId: string): Promise<void> {
+  try {
+    const db = await getDB();
+
+    await db.execute("DELETE FROM power_character_links WHERE id = $1", [
+      linkId,
+    ]);
+  } catch (error) {
+    console.error("Error deleting power character link:", error);
+    throw error;
+  }
+}
+
+export async function getPowerLinkById(
+  linkId: string
+): Promise<IPowerCharacterLink | null> {
+  try {
+    const db = await getDB();
+    const result = await db.select<DBPowerCharacterLink[]>(
+      "SELECT * FROM power_character_links WHERE id = $1",
+      [linkId]
+    );
+    return result.length > 0
+      ? dbPowerCharacterLinkToPowerCharacterLink(result[0])
+      : null;
+  } catch (error) {
+    console.error("Error fetching power link by ID:", error);
+    throw error;
+  }
+}
+
+export async function checkPowerLinkExists(
+  characterId: string,
+  pageId?: string,
+  sectionId?: string
+): Promise<boolean> {
+  try {
+    const db = await getDB();
+
+    if (pageId) {
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE character_id = $1 AND page_id = $2",
+        [characterId, pageId]
+      );
+      return result.length > 0;
+    } else if (sectionId) {
+      const result = await db.select<DBPowerCharacterLink[]>(
+        "SELECT * FROM power_character_links WHERE character_id = $1 AND section_id = $2",
+        [characterId, sectionId]
+      );
+      return result.length > 0;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking power link existence:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get all character IDs that are already linked in a page hierarchy.
+ * This includes:
+ * - Characters linked directly to the page
+ * - Characters linked to any section of the page
+ *
+ * Used to prevent duplicate links in the hierarchy.
+ */
+export async function getLinkedCharacterIdsInPageHierarchy(
+  pageId: string
+): Promise<string[]> {
+  try {
+    const db = await getDB();
+
+    // Get character IDs linked directly to the page
+    const pageLinks = await db.select<DBPowerCharacterLink[]>(
+      "SELECT character_id FROM power_character_links WHERE page_id = $1",
+      [pageId]
+    );
+
+    // Get all sections of this page
+    const sections = await db.select<DBPowerSection[]>(
+      "SELECT id FROM power_sections WHERE page_id = $1",
+      [pageId]
+    );
+
+    const sectionIds = sections.map((s) => s.id);
+
+    // Get character IDs linked to any section of this page
+    let sectionLinks: DBPowerCharacterLink[] = [];
+    if (sectionIds.length > 0) {
+      const placeholders = sectionIds.map(() => "?").join(",");
+      sectionLinks = await db.select<DBPowerCharacterLink[]>(
+        `SELECT DISTINCT character_id FROM power_character_links WHERE section_id IN (${placeholders})`,
+        sectionIds
+      );
+    }
+
+    // Combine and deduplicate character IDs
+    const allCharacterIds = new Set<string>();
+    pageLinks.forEach((link) => allCharacterIds.add(link.character_id));
+    sectionLinks.forEach((link) => allCharacterIds.add(link.character_id));
+
+    return Array.from(allCharacterIds);
+  } catch (error) {
+    console.error(
+      "Error getting linked character IDs in page hierarchy:",
+      error
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get all character IDs that are already linked in a section hierarchy.
+ * This includes:
+ * - Characters linked to the parent page of the section
+ * - Characters linked to the section itself
+ * - Characters linked to sibling sections
+ *
+ * Used to prevent duplicate links in the hierarchy.
+ */
+export async function getLinkedCharacterIdsInSectionHierarchy(
+  sectionId: string
+): Promise<string[]> {
+  try {
+    // Get the section to find its parent page
+    const section = await getPowerSectionById(sectionId);
+    if (!section) {
+      throw new Error(`Section with id ${sectionId} not found`);
+    }
+
+    // Use the page hierarchy function since we want all links in the page
+    return await getLinkedCharacterIdsInPageHierarchy(section.pageId);
+  } catch (error) {
+    console.error(
+      "Error getting linked character IDs in section hierarchy:",
+      error
+    );
     throw error;
   }
 }

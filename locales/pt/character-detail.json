@@ -17,7 +17,8 @@
     "locations_orgs": "Localizações e Organizações",
     "relationships": "Relacionamentos",
     "family": "Relações Familiares",
-    "versions": "Versões"
+    "versions": "Versões",
+    "powers": "Poderes"
   },
   "fields": {
     "image": "Imagem",
@@ -211,5 +212,16 @@
   },
   "upload": {
     "click": "Clique"
+  },
+  "powers": {
+    "no_powers": "Nenhum poder linkado",
+    "view_power": "Ver Poder",
+    "back_to_character": "Voltar para Personagem"
+  },
+  "power_links": {
+    "link_updated": "Link atualizado com sucesso",
+    "link_deleted": "Link deletado com sucesso",
+    "error_updating_link": "Erro ao atualizar link",
+    "error_deleting_link": "Erro ao deletar link"
   }
 }

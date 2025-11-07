@@ -408,6 +408,19 @@ async function runMigrations(database: Database): Promise<void> {
       updated_at INTEGER NOT NULL
     );
 
+    -- LINKS DE PODER PARA PERSONAGENS
+    CREATE TABLE IF NOT EXISTS power_character_links (
+      id TEXT PRIMARY KEY,
+      character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+      page_id TEXT REFERENCES power_pages(id) ON DELETE CASCADE,
+      section_id TEXT REFERENCES power_sections(id) ON DELETE CASCADE,
+      custom_label TEXT,
+      created_at INTEGER NOT NULL,
+      CHECK ((page_id IS NOT NULL AND section_id IS NULL) OR (page_id IS NULL AND section_id IS NOT NULL)),
+      UNIQUE(character_id, page_id),
+      UNIQUE(character_id, section_id)
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -441,6 +454,9 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_power_sections_order ON power_sections(page_id, order_index);
     CREATE INDEX IF NOT EXISTS idx_power_blocks_section_id ON power_blocks(section_id);
     CREATE INDEX IF NOT EXISTS idx_power_blocks_order ON power_blocks(section_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_power_links_character ON power_character_links(character_id);
+    CREATE INDEX IF NOT EXISTS idx_power_links_page ON power_character_links(page_id);
+    CREATE INDEX IF NOT EXISTS idx_power_links_section ON power_character_links(section_id);
   `;
 
     await database.execute(schema);

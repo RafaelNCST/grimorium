@@ -100,7 +100,10 @@
       "Bash(cmd /c \"taskkill /PID 25856 /F\")",
       "Bash(cmd //c \"taskkill //PID 25856 //F\")",
       "Bash(cmd /c \"taskkill /PID 25964 /F\")",
-      "Bash(cmd /c \"taskkill /PID 21172 /F\")"
+      "Bash(cmd /c \"taskkill /PID 21172 /F\")",
+      "Bash(cmd /c 'taskkill /PID 13436 /F' 2)",
+      "Bash(cmd /c \"taskkill /PID 8580 /F\")",
+      "Bash(cmd //c \"taskkill //PID 8580 //F\")"
     ],
     "deny": [],
     "ask": []

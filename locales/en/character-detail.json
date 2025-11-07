@@ -17,7 +17,8 @@
     "locations_orgs": "Locations and Organizations",
     "relationships": "Relationships",
     "family": "Family Relations",
-    "versions": "Versions"
+    "versions": "Versions",
+    "powers": "Powers"
   },
   "fields": {
     "image": "Image",
@@ -211,5 +212,16 @@
   },
   "upload": {
     "click": "Click"
+  },
+  "powers": {
+    "no_powers": "No powers linked",
+    "view_power": "View Power",
+    "back_to_character": "Back to Character"
+  },
+  "power_links": {
+    "link_updated": "Link updated successfully",
+    "link_deleted": "Link deleted successfully",
+    "error_updating_link": "Error updating link",
+    "error_deleting_link": "Error deleting link"
   }
 }

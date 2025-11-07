@@ -16,10 +16,12 @@ import {
   type IPowerBlock,
   type MultiDropdownContent,
 } from "../../types/power-system-types";
+import { cn } from "@/lib/utils";
 
 interface MultiDropdownBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
+  isReadOnlyView?: boolean;
   onUpdate: (content: MultiDropdownContent) => void;
   onDelete: () => void;
 }
@@ -27,6 +29,7 @@ interface MultiDropdownBlockProps {
 export function MultiDropdownBlock({
   block,
   isEditMode,
+  isReadOnlyView = false,
   onUpdate,
   onDelete,
 }: MultiDropdownBlockProps) {
@@ -72,10 +75,6 @@ export function MultiDropdownBlock({
   const availableOptions = content.options.filter(
     (option) => !content.selectedValues.includes(option)
   );
-
-  if (!isEditMode && content.selectedValues.length === 0 && availableOptions.length === 0) {
-    return null;
-  }
 
   if (isEditMode) {
     return (
@@ -179,8 +178,15 @@ export function MultiDropdownBlock({
 
   return (
     <div className="space-y-3">
-      <Select value="" onValueChange={handleSelectValue}>
-        <SelectTrigger data-no-drag="true" disabled={availableOptions.length === 0} className="cursor-pointer">
+      <Select
+        value=""
+        onValueChange={handleSelectValue}
+        disabled={isReadOnlyView || availableOptions.length === 0}
+      >
+        <SelectTrigger
+          data-no-drag="true"
+          className={cn(isReadOnlyView && "!cursor-default")}
+        >
           <SelectValue
             placeholder={
               availableOptions.length === 0
@@ -207,13 +213,15 @@ export function MultiDropdownBlock({
               className="px-3 py-1 text-sm group"
             >
               {value}
-              <button
-                data-no-drag="true"
-                onClick={() => handleRemoveSelectedValue(value)}
-                className="ml-2 hover:text-red-600 transition-colors cursor-pointer"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              {!isReadOnlyView && (
+                <button
+                  data-no-drag="true"
+                  onClick={() => handleRemoveSelectedValue(value)}
+                  className="ml-2 hover:text-red-600 transition-colors cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </Badge>
           ))}
         </div>
