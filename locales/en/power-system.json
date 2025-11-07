@@ -1,232 +1,328 @@
 {
   "page": {
-    "title": "Power System",
-    "description": "Create connectable visual maps of your power system",
-    "back": "Back",
-    "save": "Save",
-    "help": "Help",
-    "tutorial": "Tutorial",
-    "templates": "Templates"
-  },
-  "toolbar": {
-    "title": "Tools",
-    "select": "Interact",
-    "paragraph_block": "Paragraph Block",
-    "section_block": "Section Block",
-    "image_block": "Image Block",
-    "advanced_block": "Advanced Block",
-    "informative_block": "Informative Block",
-    "visual_section": "Visual Section",
-    "text": "Text",
-    "arrow": "Arrow",
-    "line": "Line",
-    "grid_toggle": "Toggle Grid",
-    "hand": "Navigate"
-  },
-  "toolbar_tooltips": {
-    "select": "Interact (V)",
-    "paragraph_block": "Paragraph Block (B)",
-    "section_block": "Section Block (D)",
-    "image_block": "Image Block (I)",
-    "advanced_block": "Advanced Block (F)",
-    "informative_block": "Informative Block (O)",
-    "circle": "Circle Shape (C)",
-    "square": "Square Shape (S)",
-    "diamond": "Diamond Shape (L)",
-    "text": "Text (T)",
-    "arrow": "Arrow (A)",
-    "line": "Line (R)",
-    "grid_on": "Grid Enabled (G)",
-    "grid_off": "Grid Disabled (G)",
-    "hand": "Navigate (H)",
-    "shortcut": "Shortcut"
-  },
-  "canvas": {
-    "zoom_in": "Zoom In (Ctrl + Scroll)",
-    "zoom_out": "Zoom Out (Ctrl + Scroll)",
-    "reset_view": "Reset View"
-  },
-  "elements": {
-    "paragraph_block": {
-      "default_content": "",
-      "content_placeholder": "Your text goes here..."
-    },
-    "section_block": {
-      "default_title": "",
-      "default_content": "",
-      "title_placeholder": "Your title goes here...",
-      "content_placeholder": "Your text goes here..."
-    },
-    "image_block": {
-      "caption_placeholder": "Enter caption...",
-      "image_placeholder": "Click to add image"
-    },
-    "informative_block": {
-      "default_content": "",
-      "content_placeholder": "Your observation goes here...",
-      "icon_info": "Information",
-      "icon_warning": "Warning",
-      "icon_check": "Check",
-      "icon_star": "Star",
-      "icon_lightbulb": "Lightbulb",
-      "icon_bookmark": "Bookmark"
-    },
-    "visual_section": {
-      "default_hover_title": "Visual Element",
-      "default_hover_subtitle": "Subtitle",
-      "default_hover_description": "Hover to see details",
-      "add_image": "Add Image",
-      "change_image": "Change Image",
-      "remove_image": "Remove Image",
-      "select_shape": "Select Shape",
-      "shape_circle": "Circle",
-      "shape_square": "Square",
-      "shape_rounded_square": "Rounded Square",
-      "shape_triangle": "Triangle"
-    },
-    "text": {
-      "default_content": "Write here",
-      "content_placeholder": "Write here..."
-    }
-  },
-  "properties_panel": {
-    "title": "Properties",
-    "close": "Close",
-    "delete": "Delete",
-    "duplicate": "Duplicate",
-    "multi_selection_title": "Multiple Elements Selected",
-    "multi_selection_count": "{{count}} elements selected",
-    "multi_selection_mixed_types": "Elements of different types selected.",
-    "multi_selection_apply_to_all": "Changes will be applied to all",
-    "multi_selection_use_buttons": "Use the buttons below to duplicate or delete.",
-    "duplicate_multiple": "Duplicate ({{count}})",
-    "delete_multiple": "Delete ({{count}})",
-    "properties": "Properties",
-    "section_appearance": "Appearance",
-    "section_navigation": "Navigation",
-    "section_hover_card": "Hover Card",
-    "section_text": "Text",
-    "section_height": "Height Lock",
-    "section_icon": "Icon",
-    "background_color": "Background Color",
-    "text_color": "Text Color",
-    "icon_color": "Icon Color",
-    "border_color": "Border Color",
-    "border_visibility": "Border Visibility",
-    "show_title_border": "Show Title Border",
-    "show_content_border": "Show Content Border",
-    "shape": "Shape",
-    "icon": "Icon",
-    "select_icon": "Select Icon",
-    "image": "Image",
-    "image_profile": "Profile Image",
-    "image_background": "Background Image",
-    "upload_image": "Choose image...",
-    "remove_image": "Remove image",
-    "enable_navigation": "Enable Navigation",
-    "disable_navigation": "Disable Navigation",
-    "navigation_hint": "Allows opening a new area on click",
-    "show_hover_card": "Show Hover Card",
-    "hide_hover_card": "Hide Hover Card",
-    "hover_title": "Hover Title",
-    "hover_subtitle": "Hover Subtitle",
-    "hover_description": "Hover Description",
-    "font_size": "Font Size",
-    "title_font_size": "Title Font Size",
-    "content_font_size": "Content Font Size",
-    "font_weight": "Font Weight",
-    "font_weight_normal": "Normal",
-    "font_weight_bold": "Bold",
-    "text_align": "Alignment",
-    "title_align": "Title Alignment",
-    "content_align": "Content Alignment",
-    "text_align_left": "Left",
-    "text_align_center": "Center",
-    "text_align_right": "Right",
-    "text_align_justify": "Justify",
-    "caption_align": "Caption Alignment",
-    "show_caption_border": "Show Caption Border",
-    "adjust_frame": "Adjust Frame",
-    "image_area_height": "Image Height",
-    "connection_color": "Connection Color",
-    "connection_width": "Thickness",
-    "connection_label": "Label"
-  },
-  "image_frame_modal": {
-    "title": "Adjust Image Frame",
-    "instruction": "Drag the image to adjust framing",
-    "cancel": "Cancel",
-    "apply": "Apply"
-  },
-  "properties": {
-    "border_color": "Border Color"
-  },
-  "breadcrumb": {
-    "root": "Main System",
-    "separator": "/"
-  },
-  "clear_area_dialog": {
-    "title": "Clear Area",
-    "description": "Are you sure you want to clear the area \"{{areaName}}\"? All elements from this area and all subsequent (child) areas will be removed. This action cannot be undone.",
-    "cancel": "Cancel",
-    "clear": "Clear"
-  },
-  "context_menu": {
-    "edit": "Edit",
-    "duplicate": "Duplicate",
-    "delete": "Delete",
-    "bring_to_front": "Bring to Front",
-    "send_to_back": "Send to Back",
-    "open_submap": "Open Submap",
-    "create_submap": "Create Submap"
+    "title": "Power Systems",
+    "description": "Create and organize power systems with groups, pages, and content blocks"
   },
   "empty_state": {
-    "title": "Empty Area",
-    "description": "Use the toolbar on the left to add elements",
-    "hint_edit": "Select a tool and click on the area",
-    "hint_hand": "Switch to Interact tool to interact with elements"
+    "title": "No power systems yet",
+    "description": "Create your first power system to start organizing your world's magic, abilities, and powers",
+    "action": "Create Power System"
   },
-  "dialogs": {
-    "delete_element": {
-      "title": "Delete Element",
-      "description": "Are you sure you want to delete this element?",
-      "description_with_submap": "This element has an associated submap. Deleting it will also remove the submap.",
+  "system_list": {
+    "title": "Power Systems",
+    "description": "Manage your power systems and select one to view",
+    "new_system": "New System",
+    "search_placeholder": "Search systems...",
+    "no_results": "No systems found",
+    "edit_tooltip": "Edit system"
+  },
+  "empty": {
+    "no_pages_title": "No pages yet",
+    "no_pages_description": "Create your first page to start adding content",
+    "create_first_page": "Create First Page"
+  },
+  "loading": {
+    "systems": "Loading power systems..."
+  },
+  "header": {
+    "select_system": "Select a system",
+    "view_mode": "View Mode",
+    "edit_mode": "Edit Mode"
+  },
+  "modes": {
+    "edit": "Edit Mode",
+    "view": "View Mode"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "sidebar_toggle": "Toggle navigation",
+    "empty_pages": "No pages created yet",
+    "create_group": "Create Group",
+    "create_page": "Create Page"
+  },
+  "system": {
+    "delete_confirm": "Are you sure you want to delete this power system? All groups, pages, sections, and blocks will be permanently lost."
+  },
+  "groups": {
+    "create": "Create Group",
+    "edit": "Rename",
+    "delete": "Delete Group",
+    "delete_confirm": "Are you sure you want to delete this group? Pages inside will become ungrouped.",
+    "confirm_delete": "Are you sure you want to delete this group? Pages inside will become ungrouped.",
+    "add_page": "Add Page"
+  },
+  "pages": {
+    "create": "Create Page",
+    "create_in_group": "Create Page in Group",
+    "edit": "Rename",
+    "duplicate": "Duplicate",
+    "delete": "Delete Page",
+    "delete_confirm": "Are you sure you want to delete this page? All sections and blocks will be lost.",
+    "confirm_delete": "Are you sure you want to delete this page? All sections and blocks will be lost.",
+    "empty_sections": "No sections created yet",
+    "empty_sections_edit": "No sections yet. Add your first section to start organizing content.",
+    "add_section": "Add Section",
+    "add_first_section": "Add First Section",
+    "filter_sections": "Filter sections...",
+    "name_placeholder": "Page name"
+  },
+  "sections": {
+    "create": "Create Section",
+    "edit": "Edit Section",
+    "delete": "Delete Section",
+    "delete_confirm": "Are you sure you want to delete this section? All blocks inside will be lost.",
+    "confirm_delete": "Are you sure you want to delete this section? All blocks inside will be lost.",
+    "default_title": "Section",
+    "add_block": "Add Block",
+    "filter_placeholder": "Filter sections...",
+    "title_placeholder": "Section title",
+    "empty_blocks": "No blocks in this section yet",
+    "move_up": "Move section up",
+    "move_down": "Move section down"
+  },
+  "section": {
+    "title_placeholder": "Section title",
+    "untitled": "Untitled",
+    "empty_blocks": "No blocks in this section yet",
+    "add_block": "Add Block"
+  },
+  "blocks": {
+    "select_type": "Select Block Type",
+    "confirm_delete": "Are you sure you want to delete this block?",
+    "heading": {
+      "name": "Heading",
+      "description": "Title with hierarchy levels (appears in outline)",
+      "text_placeholder": "Heading text...",
+      "level_label": "Level",
+      "alignment_label": "Alignment",
+      "alignment_left": "Left",
+      "alignment_center": "Center",
+      "alignment_right": "Right"
+    },
+    "paragraph": {
+      "name": "Paragraph",
+      "description": "Text content block",
+      "text_placeholder": "Enter your text here...",
+      "lock_height": "Lock height",
+      "unlock_height": "Unlock height"
+    },
+    "unordered_list": {
+      "name": "Unordered List",
+      "description": "Bullet point list with draggable items",
+      "item_placeholder": "Add item...",
+      "add_item": "Add item",
+      "add_button": "Add"
+    },
+    "numbered_list": {
+      "name": "Numbered List",
+      "description": "Ordered list with draggable items",
+      "item_placeholder": "Add item...",
+      "add_item": "Add item",
+      "add_button": "Add"
+    },
+    "tag_list": {
+      "name": "Tag List",
+      "description": "Horizontal list of tags",
+      "tag_placeholder": "Add tag...",
+      "add_tag": "Add",
+      "add_button": "Add"
+    },
+    "dropdown": {
+      "name": "Dropdown",
+      "description": "Single selection dropdown",
+      "option_placeholder": "Add option...",
+      "add_option": "Add option",
+      "add_option_button": "Add",
+      "select_placeholder": "Select an option..."
+    },
+    "multi_dropdown": {
+      "name": "Multi Dropdown",
+      "description": "Multiple selection dropdown with tags",
+      "option_placeholder": "Add option...",
+      "add_option": "Add option",
+      "add_option_button": "Add",
+      "select_placeholder": "Select options...",
+      "no_options_available": "No options available"
+    },
+    "image": {
+      "name": "Image",
+      "description": "Large square image with caption",
+      "caption_placeholder": "Caption (optional)",
+      "upload": "Upload Image",
+      "upload_image": "Upload Image",
+      "change": "Change Image",
+      "change_image": "Change Image",
+      "object_fit_label": "Image fit",
+      "fill": "Fill",
+      "fit": "Fit",
+      "crop": "Crop",
+      "crop_image_title": "Crop Image",
+      "crop_save": "Save Crop",
+      "crop_cancel": "Cancel"
+    },
+    "icon": {
+      "name": "Icon",
+      "description": "Circular image with title and description",
+      "title_placeholder": "Title",
+      "description_placeholder": "Description",
+      "upload": "Upload Icon",
+      "alignment_label": "Alignment",
+      "align_start": "Start",
+      "align_center": "Center",
+      "align_end": "End"
+    },
+    "icon_group": {
+      "name": "Icon Group",
+      "description": "Grid of icon cards (max 4 per row)",
+      "add_icon": "Add Icon",
+      "edit_icon": "Edit Icon",
+      "icon_title_placeholder": "Icon title",
+      "icon_description_placeholder": "Icon description",
+      "title_placeholder": "Title",
+      "description_placeholder": "Description",
+      "add_icon_button": "Add Icon",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "informative": {
+      "name": "Informative Block",
+      "description": "Icon with multi-line text",
+      "text_placeholder": "Enter information...",
+      "icons": {
+        "alert": "Alert",
+        "info": "Information",
+        "star": "Star",
+        "idea": "Idea",
+        "check": "Check",
+        "x": "Wrong"
+      }
+    },
+    "divider": {
+      "name": "Divider",
+      "description": "Visual separator line"
+    },
+    "stars": {
+      "name": "Stars",
+      "description": "5-star rating with half stars",
+      "size_label": "Size",
+      "size_small": "Small",
+      "size_medium": "Medium",
+      "size_large": "Large"
+    },
+    "attributes": {
+      "name": "Attributes",
+      "description": "Progress bar with segments (1-10)",
+      "max_segments": "Max segments",
+      "max_label": "Max",
+      "current_value": "Current value",
+      "current_label": "Current",
+      "bar": "bar",
+      "bars": "bars",
+      "color_picker": "Bar color",
+      "colors": {
+        "purple": "Purple",
+        "blue": "Blue",
+        "green": "Green",
+        "red": "Red",
+        "orange": "Orange",
+        "pink": "Pink",
+        "yellow": "Yellow",
+        "cyan": "Cyan"
+      }
+    },
+    "navigator": {
+      "name": "Navigator",
+      "description": "Link to another page",
+      "select_page": "Select page",
+      "change_page": "Change page",
+      "no_page_selected": "No page selected",
+      "click_to_navigate": "Click here to navigate",
+      "title_placeholder": "Optional title",
+      "page_not_found": "Page not found"
+    }
+  },
+  "modals": {
+    "create_system": {
+      "title": "Create Power System",
+      "name_label": "System Name",
+      "name_placeholder": "e.g., Magic System, Abilities, Powers",
+      "icon_label": "System Icon (optional)",
+      "icon_placeholder": "Upload an icon image",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "edit_system": {
+      "title": "Edit System",
+      "name_label": "System Name",
+      "name_placeholder": "Enter system name",
+      "icon_label": "System Icon (optional)",
+      "icon_placeholder": "Upload an icon image",
+      "cancel": "Cancel",
+      "submit": "Save Changes"
+    },
+    "create_group": {
+      "title": "Create Group",
+      "name_label": "Group Name",
+      "name_placeholder": "e.g., Basic Powers, Advanced Techniques",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "create_page": {
+      "title": "Create Page",
+      "name_label": "Page Name",
+      "name_placeholder": "e.g., Fire Magic, Healing Abilities",
+      "group_label": "Group (optional)",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "create_section": {
+      "title": "Create Section",
+      "title_label": "Section Title",
+      "title_placeholder": "e.g., Overview, Requirements, Effects",
+      "submit": "Create",
+      "cancel": "Cancel"
+    },
+    "delete_section": {
+      "title": "Delete Section",
+      "description_with_content": "This section contains blocks. Are you sure you want to delete it? All blocks inside will be permanently lost.",
+      "description_empty": "Are you sure you want to delete this empty section?",
       "confirm": "Delete",
       "cancel": "Cancel"
     },
-    "delete_connection": {
-      "title": "Delete Connection",
-      "description": "Are you sure you want to delete this connection?",
+    "delete_block": {
+      "title": "Delete Block",
+      "description_with_content": "This block contains content. Are you sure you want to delete it? All content will be permanently lost.",
+      "description_empty": "Are you sure you want to delete this empty block?",
       "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "delete_system": {
+      "title": "Delete System",
+      "description": "This action cannot be undone. All groups, pages, sections, and blocks within this system will be permanently lost.",
+      "confirm": "Delete System",
       "cancel": "Cancel"
     }
   },
-  "shortcuts": {
-    "title": "Keyboard Shortcuts",
-    "select": "V - Interact",
-    "hand": "H - Navigate",
-    "paragraph_block": "B - Paragraph Block",
-    "section_block": "D - Section Block",
-    "circle": "C - Circle Shape",
-    "square": "S - Square Shape",
-    "diamond": "L - Diamond Shape",
-    "text": "T - Text",
-    "arrow": "A - Arrow",
-    "line": "R - Line",
-    "delete": "Delete - Delete Selected",
-    "duplicate": "Ctrl+D - Duplicate",
-    "undo": "Ctrl+Z - Undo",
-    "redo": "Ctrl+Y - Redo",
-    "grid_toggle": "G - Toggle Grid",
-    "zoom": "Ctrl + Scroll - Zoom In/Out",
-    "pan": "Drag Canvas - Move View"
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "move_up": "Move up",
+    "move_down": "Move down"
   },
   "notifications": {
-    "saved": "Map saved successfully",
-    "save_error": "Error saving map",
-    "element_created": "Element created",
-    "element_deleted": "Element deleted",
-    "connection_created": "Connection created",
-    "connection_deleted": "Connection deleted"
+    "system_created": "Power system created successfully",
+    "system_updated": "Power system updated successfully",
+    "system_deleted": "Power system deleted successfully",
+    "group_created": "Group created successfully",
+    "group_deleted": "Group deleted successfully",
+    "page_created": "Page created successfully",
+    "page_deleted": "Page deleted successfully",
+    "section_created": "Section created successfully",
+    "section_deleted": "Section deleted successfully",
+    "block_created": "Block added successfully",
+    "block_deleted": "Block deleted successfully",
+    "error_generic": "An error occurred. Please try again."
   }
 }

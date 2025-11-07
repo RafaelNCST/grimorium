@@ -525,3 +525,33 @@ button:not(:disabled) *,
 [role="button"]:not(:disabled) * {
   cursor: pointer !important;
 }
+
+/* Prevent drag on interactive elements within draggable blocks */
+.cursor-grab input,
+.cursor-grab textarea,
+.cursor-grab [contenteditable] {
+  cursor: text !important;
+  touch-action: auto !important;
+}
+
+.cursor-grab select,
+.cursor-grab button,
+.cursor-grab [role="button"],
+.cursor-grab [data-radix-select-trigger],
+.cursor-grab [data-radix-dropdown-menu-trigger] {
+  cursor: pointer !important;
+  touch-action: auto !important;
+}
+
+/* Disable pointer events on drag listeners for interactive elements */
+.cursor-grab input:hover,
+.cursor-grab textarea:hover,
+.cursor-grab [contenteditable]:hover {
+  cursor: text !important;
+}
+
+.cursor-grab select:hover,
+.cursor-grab button:hover,
+.cursor-grab [role="button"]:hover {
+  cursor: pointer !important;
+}

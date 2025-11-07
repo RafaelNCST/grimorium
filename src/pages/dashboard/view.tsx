@@ -234,7 +234,7 @@ export function DashboardView({
               className="absolute inset-0 overflow-hidden"
               style={{ display: activeTab === "magic" ? "block" : "none" }}
             >
-              <MemoizedPowerSystemTab isHeaderHidden={isHeaderHidden} />
+              <MemoizedPowerSystemTab bookId={bookId} />
             </div>
             <div
               className="absolute inset-0 overflow-y-auto px-6 py-6"

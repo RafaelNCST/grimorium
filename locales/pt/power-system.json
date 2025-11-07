@@ -1,232 +1,328 @@
 {
   "page": {
-    "title": "Sistema de Poder",
-    "description": "Crie mapas visuais conectáveis do seu sistema de poder",
-    "back": "Voltar",
-    "save": "Salvar",
-    "help": "Ajuda",
-    "tutorial": "Tutorial",
-    "templates": "Templates"
-  },
-  "toolbar": {
-    "title": "Ferramentas",
-    "select": "Interagir",
-    "paragraph_block": "Bloco de Parágrafo",
-    "section_block": "Bloco de Sessão",
-    "image_block": "Bloco de Imagem",
-    "advanced_block": "Bloco Avançado",
-    "informative_block": "Bloco Informativo",
-    "visual_section": "Seção Visual",
-    "text": "Texto",
-    "arrow": "Seta",
-    "line": "Linha",
-    "grid_toggle": "Alternar Grid",
-    "hand": "Navegar"
-  },
-  "toolbar_tooltips": {
-    "select": "Interagir (V)",
-    "paragraph_block": "Bloco de Parágrafo (B)",
-    "section_block": "Bloco de Sessão (D)",
-    "image_block": "Bloco de Imagem (I)",
-    "advanced_block": "Bloco Avançado (F)",
-    "informative_block": "Bloco Informativo (O)",
-    "circle": "Forma Circular (C)",
-    "square": "Forma Quadrada (S)",
-    "diamond": "Forma Losango (L)",
-    "text": "Texto (T)",
-    "arrow": "Seta (A)",
-    "line": "Linha (R)",
-    "grid_on": "Grid Ativado (G)",
-    "grid_off": "Grid Desativado (G)",
-    "hand": "Navegar (H)",
-    "shortcut": "Atalho"
-  },
-  "canvas": {
-    "zoom_in": "Aumentar Zoom (Ctrl + Scroll)",
-    "zoom_out": "Diminuir Zoom (Ctrl + Scroll)",
-    "reset_view": "Resetar Visualização"
-  },
-  "elements": {
-    "paragraph_block": {
-      "default_content": "",
-      "content_placeholder": "Aqui vai o seu texto..."
-    },
-    "section_block": {
-      "default_title": "",
-      "default_content": "",
-      "title_placeholder": "Aqui vai o seu título...",
-      "content_placeholder": "Aqui vai o seu texto..."
-    },
-    "image_block": {
-      "caption_placeholder": "Digite a legenda...",
-      "image_placeholder": "Clique para adicionar imagem"
-    },
-    "informative_block": {
-      "default_content": "",
-      "content_placeholder": "Aqui vai a sua observação...",
-      "icon_info": "Informação",
-      "icon_warning": "Aviso",
-      "icon_check": "Verificado",
-      "icon_star": "Estrela",
-      "icon_lightbulb": "Lâmpada",
-      "icon_bookmark": "Marcador"
-    },
-    "visual_section": {
-      "default_hover_title": "Elemento Visual",
-      "default_hover_subtitle": "Subtítulo",
-      "default_hover_description": "Passe o mouse para ver detalhes",
-      "add_image": "Adicionar Imagem",
-      "change_image": "Alterar Imagem",
-      "remove_image": "Remover Imagem",
-      "select_shape": "Selecionar Forma",
-      "shape_circle": "Circular",
-      "shape_square": "Quadrado",
-      "shape_rounded_square": "Quadrado Arredondado",
-      "shape_triangle": "Triângulo"
-    },
-    "text": {
-      "default_content": "Escreva aqui",
-      "content_placeholder": "Escreva aqui..."
-    }
-  },
-  "properties_panel": {
-    "title": "Propriedades",
-    "close": "Fechar",
-    "delete": "Excluir",
-    "duplicate": "Duplicar",
-    "multi_selection_title": "Múltiplos Elementos Selecionados",
-    "multi_selection_count": "{{count}} elementos selecionados",
-    "multi_selection_mixed_types": "Elementos de tipos diferentes selecionados.",
-    "multi_selection_apply_to_all": "As alterações serão aplicadas a todos",
-    "multi_selection_use_buttons": "Use os botões abaixo para duplicar ou excluir.",
-    "duplicate_multiple": "Duplicar ({{count}})",
-    "delete_multiple": "Excluir ({{count}})",
-    "properties": "Propriedades",
-    "section_appearance": "Aparência",
-    "section_navigation": "Navegação",
-    "section_hover_card": "Card Hover",
-    "section_text": "Texto",
-    "section_height": "Travamento de Altura",
-    "section_icon": "Ícone",
-    "background_color": "Cor de Fundo",
-    "text_color": "Cor do Texto",
-    "icon_color": "Cor do Ícone",
-    "border_color": "Cor da Borda",
-    "border_visibility": "Visibilidade da Borda",
-    "show_title_border": "Mostrar Borda do Título",
-    "show_content_border": "Mostrar Borda do Conteúdo",
-    "shape": "Forma",
-    "icon": "Ícone",
-    "select_icon": "Selecionar Ícone",
-    "image": "Imagem",
-    "image_profile": "Imagem do Perfil",
-    "image_background": "Imagem de Fundo",
-    "upload_image": "Escolher imagem...",
-    "remove_image": "Remover imagem",
-    "enable_navigation": "Habilitar Navegação",
-    "disable_navigation": "Desabilitar Navegação",
-    "navigation_hint": "Permite abrir uma nova área ao clicar",
-    "show_hover_card": "Mostrar Card Hover",
-    "hide_hover_card": "Ocultar Card Hover",
-    "hover_title": "Título do Hover",
-    "hover_subtitle": "Subtítulo do Hover",
-    "hover_description": "Descrição do Hover",
-    "font_size": "Tamanho da Fonte",
-    "title_font_size": "Tamanho da Fonte do Título",
-    "content_font_size": "Tamanho da Fonte do Conteúdo",
-    "font_weight": "Peso da Fonte",
-    "font_weight_normal": "Normal",
-    "font_weight_bold": "Negrito",
-    "text_align": "Alinhamento",
-    "title_align": "Alinhamento do Título",
-    "content_align": "Alinhamento do Conteúdo",
-    "text_align_left": "Esquerda",
-    "text_align_center": "Centro",
-    "text_align_right": "Direita",
-    "text_align_justify": "Justificar",
-    "caption_align": "Alinhamento da Legenda",
-    "show_caption_border": "Mostrar Borda da Legenda",
-    "adjust_frame": "Ajustar Enquadramento",
-    "image_area_height": "Altura da Imagem",
-    "connection_color": "Cor da Conexão",
-    "connection_width": "Espessura",
-    "connection_label": "Rótulo"
-  },
-  "image_frame_modal": {
-    "title": "Ajustar Enquadramento da Imagem",
-    "instruction": "Arraste a imagem para ajustar o enquadramento",
-    "cancel": "Cancelar",
-    "apply": "Aplicar"
-  },
-  "properties": {
-    "border_color": "Cor da Borda"
-  },
-  "breadcrumb": {
-    "root": "Área Principal",
-    "separator": "/"
-  },
-  "clear_area_dialog": {
-    "title": "Limpar Área",
-    "description": "Tem certeza que deseja limpar a área \"{{areaName}}\"? Todos os elementos desta área e de todas as áreas subsequentes (filhas) serão removidos. Esta ação não pode ser desfeita.",
-    "cancel": "Cancelar",
-    "clear": "Limpar"
-  },
-  "context_menu": {
-    "edit": "Editar",
-    "duplicate": "Duplicar",
-    "delete": "Excluir",
-    "bring_to_front": "Trazer para Frente",
-    "send_to_back": "Enviar para Trás",
-    "open_submap": "Abrir Submapa",
-    "create_submap": "Criar Submapa"
+    "title": "Sistemas de Poder",
+    "description": "Crie e organize sistemas de poder com grupos, páginas e blocos de conteúdo"
   },
   "empty_state": {
-    "title": "Área Vazia",
-    "description": "Use a barra de ferramentas à esquerda para adicionar elementos",
-    "hint_edit": "Selecione uma ferramenta e clique na área",
-    "hint_hand": "Mude para a ferramenta Interagir para interagir com elementos"
+    "title": "Nenhum sistema de poder ainda",
+    "description": "Crie seu primeiro sistema de poder para começar a organizar a magia, habilidades e poderes do seu mundo",
+    "action": "Criar Sistema de Poder"
   },
-  "dialogs": {
-    "delete_element": {
-      "title": "Excluir Elemento",
-      "description": "Tem certeza que deseja excluir este elemento?",
-      "description_with_submap": "Este elemento possui um submapa associado. Ao excluí-lo, o submapa também será removido.",
+  "system_list": {
+    "title": "Sistemas de Poder",
+    "description": "Gerencie seus sistemas de poder e selecione um para visualizar",
+    "new_system": "Novo Sistema",
+    "search_placeholder": "Buscar sistemas...",
+    "no_results": "Nenhum sistema encontrado",
+    "edit_tooltip": "Editar sistema"
+  },
+  "empty": {
+    "no_pages_title": "Nenhuma página ainda",
+    "no_pages_description": "Crie sua primeira página para começar a adicionar conteúdo",
+    "create_first_page": "Criar Primeira Página"
+  },
+  "loading": {
+    "systems": "Carregando sistemas de poder..."
+  },
+  "header": {
+    "select_system": "Selecione um sistema",
+    "view_mode": "Modo Visualização",
+    "edit_mode": "Modo Edição"
+  },
+  "modes": {
+    "edit": "Modo Edição",
+    "view": "Modo Visualização"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "sidebar_toggle": "Alternar navegação",
+    "empty_pages": "Nenhuma página criada ainda",
+    "create_group": "Criar Grupo",
+    "create_page": "Criar Página"
+  },
+  "system": {
+    "delete_confirm": "Tem certeza que deseja excluir este sistema de poder? Todos os grupos, páginas, seções e blocos serão permanentemente perdidos."
+  },
+  "groups": {
+    "create": "Criar Grupo",
+    "edit": "Renomear",
+    "delete": "Excluir Grupo",
+    "delete_confirm": "Tem certeza que deseja excluir este grupo? As páginas dentro ficarão sem grupo.",
+    "confirm_delete": "Tem certeza que deseja excluir este grupo? As páginas dentro ficarão sem grupo.",
+    "add_page": "Adicionar Página"
+  },
+  "pages": {
+    "create": "Criar Página",
+    "create_in_group": "Criar Página no Grupo",
+    "edit": "Renomear",
+    "duplicate": "Duplicar",
+    "delete": "Excluir Página",
+    "delete_confirm": "Tem certeza que deseja excluir esta página? Todas as seções e blocos serão perdidos.",
+    "confirm_delete": "Tem certeza que deseja excluir esta página? Todas as seções e blocos serão perdidos.",
+    "empty_sections": "Nenhuma seção criada ainda",
+    "empty_sections_edit": "Nenhuma seção ainda. Adicione sua primeira seção para começar a organizar conteúdo.",
+    "add_section": "Adicionar Seção",
+    "add_first_section": "Adicionar Primeira Seção",
+    "filter_sections": "Filtrar seções...",
+    "name_placeholder": "Nome da página"
+  },
+  "sections": {
+    "create": "Criar Seção",
+    "edit": "Editar Seção",
+    "delete": "Excluir Seção",
+    "delete_confirm": "Tem certeza que deseja excluir esta seção? Todos os blocos dentro serão perdidos.",
+    "confirm_delete": "Tem certeza que deseja excluir esta seção? Todos os blocos dentro serão perdidos.",
+    "default_title": "Seção",
+    "add_block": "Adicionar Bloco",
+    "filter_placeholder": "Filtrar seções...",
+    "title_placeholder": "Título da seção",
+    "empty_blocks": "Nenhum bloco nesta seção ainda",
+    "move_up": "Mover seção para cima",
+    "move_down": "Mover seção para baixo"
+  },
+  "section": {
+    "title_placeholder": "Título da seção",
+    "untitled": "Sem nome",
+    "empty_blocks": "Nenhum bloco nesta seção ainda",
+    "add_block": "Adicionar Bloco"
+  },
+  "blocks": {
+    "select_type": "Selecionar Tipo de Bloco",
+    "confirm_delete": "Tem certeza que deseja excluir este bloco?",
+    "heading": {
+      "name": "Título",
+      "description": "Título com níveis hierárquicos (aparece na estrutura)",
+      "text_placeholder": "Texto do título...",
+      "level_label": "Nível",
+      "alignment_label": "Alinhamento",
+      "alignment_left": "Esquerda",
+      "alignment_center": "Centro",
+      "alignment_right": "Direita"
+    },
+    "paragraph": {
+      "name": "Parágrafo",
+      "description": "Bloco de conteúdo de texto",
+      "text_placeholder": "Digite seu texto aqui...",
+      "lock_height": "Travar altura",
+      "unlock_height": "Destravar altura"
+    },
+    "unordered_list": {
+      "name": "Lista Não Ordenada",
+      "description": "Lista com marcadores e itens arrastáveis",
+      "item_placeholder": "Adicionar item...",
+      "add_item": "Adicionar item",
+      "add_button": "Adicionar"
+    },
+    "numbered_list": {
+      "name": "Lista Numerada",
+      "description": "Lista ordenada com itens arrastáveis",
+      "item_placeholder": "Adicionar item...",
+      "add_item": "Adicionar item",
+      "add_button": "Adicionar"
+    },
+    "tag_list": {
+      "name": "Lista de Tags",
+      "description": "Lista horizontal de tags",
+      "tag_placeholder": "Adicionar tag...",
+      "add_tag": "Adicionar",
+      "add_button": "Adicionar"
+    },
+    "dropdown": {
+      "name": "Dropdown",
+      "description": "Dropdown de seleção única",
+      "option_placeholder": "Adicionar opção...",
+      "add_option": "Adicionar opção",
+      "add_option_button": "Adicionar",
+      "select_placeholder": "Selecione uma opção..."
+    },
+    "multi_dropdown": {
+      "name": "Dropdown Múltiplo",
+      "description": "Dropdown de múltipla seleção com tags",
+      "option_placeholder": "Adicionar opção...",
+      "add_option": "Adicionar opção",
+      "add_option_button": "Adicionar",
+      "select_placeholder": "Selecione opções...",
+      "no_options_available": "Não há opções disponíveis"
+    },
+    "image": {
+      "name": "Imagem",
+      "description": "Imagem quadrada grande com legenda",
+      "caption_placeholder": "Legenda (opcional)",
+      "upload": "Enviar Imagem",
+      "upload_image": "Enviar Imagem",
+      "change": "Trocar Imagem",
+      "change_image": "Trocar Imagem",
+      "object_fit_label": "Ajuste da imagem",
+      "fill": "Preencher",
+      "fit": "Ajustar",
+      "crop": "Recortar",
+      "crop_image_title": "Recortar Imagem",
+      "crop_save": "Salvar Recorte",
+      "crop_cancel": "Cancelar"
+    },
+    "icon": {
+      "name": "Ícone",
+      "description": "Imagem circular com título e descrição",
+      "title_placeholder": "Título",
+      "description_placeholder": "Descrição",
+      "upload": "Enviar Ícone",
+      "alignment_label": "Alinhamento",
+      "align_start": "Início",
+      "align_center": "Centro",
+      "align_end": "Fim"
+    },
+    "icon_group": {
+      "name": "Grupo de Ícones",
+      "description": "Grade de cards de ícones (máx 4 por linha)",
+      "add_icon": "Adicionar Ícone",
+      "edit_icon": "Editar Ícone",
+      "icon_title_placeholder": "Título do ícone",
+      "icon_description_placeholder": "Descrição do ícone",
+      "title_placeholder": "Título",
+      "description_placeholder": "Descrição",
+      "add_icon_button": "Adicionar Ícone",
+      "cancel": "Cancelar",
+      "save": "Salvar"
+    },
+    "informative": {
+      "name": "Bloco Informativo",
+      "description": "Ícone com texto multilinha",
+      "text_placeholder": "Digite a informação...",
+      "icons": {
+        "alert": "Alerta",
+        "info": "Informação",
+        "star": "Estrela",
+        "idea": "Ideia",
+        "check": "Check",
+        "x": "Errado"
+      }
+    },
+    "divider": {
+      "name": "Divisor",
+      "description": "Linha separadora visual"
+    },
+    "stars": {
+      "name": "Estrelas",
+      "description": "Avaliação de 5 estrelas com meias estrelas",
+      "size_label": "Tamanho",
+      "size_small": "Pequeno",
+      "size_medium": "Médio",
+      "size_large": "Grande"
+    },
+    "attributes": {
+      "name": "Atributos",
+      "description": "Barra de progresso com segmentos (1-10)",
+      "max_segments": "Segmentos máximos",
+      "max_label": "Máximo",
+      "current_value": "Valor atual",
+      "current_label": "Atual",
+      "bar": "barra",
+      "bars": "barras",
+      "color_picker": "Cor das barras",
+      "colors": {
+        "purple": "Roxo",
+        "blue": "Azul",
+        "green": "Verde",
+        "red": "Vermelho",
+        "orange": "Laranja",
+        "pink": "Rosa",
+        "yellow": "Amarelo",
+        "cyan": "Ciano"
+      }
+    },
+    "navigator": {
+      "name": "Navegador",
+      "description": "Link para outra página",
+      "select_page": "Selecionar página",
+      "change_page": "Mudar página",
+      "no_page_selected": "Nenhuma página selecionada",
+      "click_to_navigate": "Clique aqui para navegar",
+      "title_placeholder": "Título opcional",
+      "page_not_found": "Página não encontrada"
+    }
+  },
+  "modals": {
+    "create_system": {
+      "title": "Criar Sistema de Poder",
+      "name_label": "Nome do Sistema",
+      "name_placeholder": "ex: Sistema de Magia, Habilidades, Poderes",
+      "icon_label": "Ícone do Sistema (opcional)",
+      "icon_placeholder": "Enviar uma imagem de ícone",
+      "submit": "Criar",
+      "cancel": "Cancelar"
+    },
+    "edit_system": {
+      "title": "Editar Sistema",
+      "name_label": "Nome do Sistema",
+      "name_placeholder": "Digite o nome do sistema",
+      "icon_label": "Ícone do Sistema (opcional)",
+      "icon_placeholder": "Enviar uma imagem de ícone",
+      "cancel": "Cancelar",
+      "submit": "Salvar Alterações"
+    },
+    "create_group": {
+      "title": "Criar Grupo",
+      "name_label": "Nome do Grupo",
+      "name_placeholder": "ex: Poderes Básicos, Técnicas Avançadas",
+      "submit": "Criar",
+      "cancel": "Cancelar"
+    },
+    "create_page": {
+      "title": "Criar Página",
+      "name_label": "Nome da Página",
+      "name_placeholder": "ex: Magia de Fogo, Habilidades de Cura",
+      "group_label": "Grupo (opcional)",
+      "submit": "Criar",
+      "cancel": "Cancelar"
+    },
+    "create_section": {
+      "title": "Criar Seção",
+      "title_label": "Título da Seção",
+      "title_placeholder": "ex: Visão Geral, Requisitos, Efeitos",
+      "submit": "Criar",
+      "cancel": "Cancelar"
+    },
+    "delete_section": {
+      "title": "Excluir Seção",
+      "description_with_content": "Esta seção contém blocos. Tem certeza que deseja excluí-la? Todos os blocos dentro serão permanentemente perdidos.",
+      "description_empty": "Tem certeza que deseja excluir esta seção vazia?",
       "confirm": "Excluir",
       "cancel": "Cancelar"
     },
-    "delete_connection": {
-      "title": "Excluir Conexão",
-      "description": "Tem certeza que deseja excluir esta conexão?",
+    "delete_block": {
+      "title": "Excluir Bloco",
+      "description_with_content": "Este bloco contém conteúdo. Tem certeza que deseja excluí-lo? Todo o conteúdo será permanentemente perdido.",
+      "description_empty": "Tem certeza que deseja excluir este bloco vazio?",
       "confirm": "Excluir",
+      "cancel": "Cancelar"
+    },
+    "delete_system": {
+      "title": "Excluir Sistema",
+      "description": "Esta ação não pode ser desfeita. Todos os grupos, páginas, seções e blocos dentro deste sistema serão permanentemente perdidos.",
+      "confirm": "Excluir Sistema",
       "cancel": "Cancelar"
     }
   },
-  "shortcuts": {
-    "title": "Atalhos do Teclado",
-    "select": "V - Interagir",
-    "hand": "H - Navegar",
-    "paragraph_block": "B - Bloco de Parágrafo",
-    "section_block": "D - Bloco de Sessão",
-    "circle": "C - Forma Circular",
-    "square": "S - Forma Quadrada",
-    "diamond": "L - Forma Losango",
-    "text": "T - Texto",
-    "arrow": "A - Seta",
-    "line": "R - Linha",
-    "delete": "Delete - Excluir Selecionado",
-    "duplicate": "Ctrl+D - Duplicar",
-    "undo": "Ctrl+Z - Desfazer",
-    "redo": "Ctrl+Y - Refazer",
-    "grid_toggle": "G - Alternar Grid",
-    "zoom": "Ctrl + Scroll - Zoom In/Out",
-    "pan": "Arrastar Canvas - Mover Visualização"
+  "actions": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "move_up": "Mover para cima",
+    "move_down": "Mover para baixo"
   },
   "notifications": {
-    "saved": "Mapa salvo com sucesso",
-    "save_error": "Erro ao salvar mapa",
-    "element_created": "Elemento criado",
-    "element_deleted": "Elemento excluído",
-    "connection_created": "Conexão criada",
-    "connection_deleted": "Conexão excluída"
+    "system_created": "Sistema de poder criado com sucesso",
+    "system_updated": "Sistema de poder atualizado com sucesso",
+    "system_deleted": "Sistema de poder excluído com sucesso",
+    "group_created": "Grupo criado com sucesso",
+    "group_deleted": "Grupo excluído com sucesso",
+    "page_created": "Página criada com sucesso",
+    "page_deleted": "Página excluída com sucesso",
+    "section_created": "Seção criada com sucesso",
+    "section_deleted": "Seção excluída com sucesso",
+    "block_created": "Bloco adicionado com sucesso",
+    "block_deleted": "Bloco excluído com sucesso",
+    "error_generic": "Ocorreu um erro. Por favor, tente novamente."
   }
 }

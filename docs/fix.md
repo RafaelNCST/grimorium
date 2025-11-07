@@ -1,44 +1,9 @@
-# Refatorar tab sistema de poder
+# O que vamos fazer?
+- Refinar o que foi feito na tab sistema de poder, ajeitando tudo que for possível com vários ajustes
 
-## Problema
-> Anteriormente, tentamos criar features de redimensionamento e controle de tamanho de formas e cards, mas não deu muito certo, então decidi mudar a estrategia.
+# Ajustes a se fazer
+- Garante que todo input de um bloco no modo edição tenha seu proprio cursor de texto e esteja por cima do seu container (Atualmente temos o problema do cursor ser o da maozinha, já que a area de arrasto é o card todo, mas não deveria contar os inputs, dropdown ou outras partes interativeis. Detalhe que não é pra mexer na logica de arraste, apenas fazer esses campos interativeis no bloco não serem possivel arrastar o bloco e terem o cursor correto)
+- Verifique porque as vezes quando crio um bloco embaixo, ele continua normal na edição, mas no modo visualização ele fica quebrado fora da sessão
 
-## Nova estratégia
-> Agora, teremos uma novo estrutura com elementos chamados blocos, além das formas, tendo blocos e formas para o usuário usar
-
-## O que precisamos fazer
-
-### 1. Limpeza
-> Sempre que for fazer qualquer nova aplicação pedida nessa task, limpe lógicas anteriores para evitar que lixos influenciem no resultado final
-
-### 2. Blocos
-> Blocos são elementos visuais e textuais que ajudam a agrupar informações, eles são:
-
-**Bloco de paragrafo**
-> Bloco simples contendo background e o seu conteudo textual
-
-- Ao atingir o limite da width, quebra pra próxima linha, ao atingir o limite de height, ele cria um scroll
-- Tamanho padrão é 800x200
-
-**Bloco de imagem**
-> Bloco simples com background em volta e dentro do background uma imagem contendo 90% da area e um texto que começa com uma linha embaixo
-
-- Tamanho padrão é 900x300
-- O texto começa com apenas uma linha, mas quando chega ao limite da width, ele começa a quebrar linha automaticamente aumentando o tamanho do bloco até onde o usuário desejar escrever
-
-**Bloco de sessão**
-> Bloco simples contendo background, título e texto
-
-- Titulo deve ser por padrão uma linha e o texto por padrão cobre o resto da altura
-- Tamanho padrão é 800x200
-
-**Bloco avançado**
-> Bloco mais complexo contendo background, imagem circular pequena no topo, embaixo titulo e embaixo um texto.
-
-- **Bloco de paragrafo**
-- **Bloco de sessão**
-
-- **Bloco de imagem**
-- **Bloco avançado**
-- **Bloco de nota**
-
+- Templates
+- Links

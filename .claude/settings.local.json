@@ -87,7 +87,20 @@
       "Bash(cmd //c \"taskkill //PID 41492 //F\")",
       "Bash(cmd /c \"taskkill /PID 37056 /F\")",
       "Bash(cmd //c \"taskkill //PID 37056 //F\")",
-      "Bash(cmd //c \"taskkill //PID 37608 //F\")"
+      "Bash(cmd //c \"taskkill //PID 37608 //F\")",
+      "Bash(cmd /c \"taskkill /PID 32604 /F\")",
+      "Bash(cmd //c \"taskkill //PID 32604 //F\")",
+      "Bash(NUL)",
+      "Bash(cmd //c \"taskkill //F //IM node.exe //T\" 2)",
+      "Bash(cmd //c \"taskkill //F //PID 34464\")",
+      "Bash(cmd /c \"taskkill /PID 32200 /F\")",
+      "Bash(cmd //c \"taskkill //PID 32200 //F\")",
+      "Bash(cmd /c \"taskkill /F /IM node.exe /T\" 2)",
+      "Bash(VITE_PORT=3001 pnpm tauri dev:*)",
+      "Bash(cmd /c \"taskkill /PID 25856 /F\")",
+      "Bash(cmd //c \"taskkill //PID 25856 //F\")",
+      "Bash(cmd /c \"taskkill /PID 25964 /F\")",
+      "Bash(cmd /c \"taskkill /PID 21172 /F\")"
     ],
     "deny": [],
     "ask": []

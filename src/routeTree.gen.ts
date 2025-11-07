@@ -19,6 +19,7 @@ import { Route as DashboardDashboardIdNotesEditorNotesIdRouteImport } from './ro
 import { Route as DashboardDashboardIdChaptersEditorChaptersIdRouteImport } from './routes/dashboard/$dashboardId/chapters/$editor-chapters-id'
 import { Route as DashboardDashboardIdTabsWorldWorldIdRouteImport } from './routes/dashboard/$dashboardId/tabs/world/$worldId'
 import { Route as DashboardDashboardIdTabsRaceRaceIdRouteImport } from './routes/dashboard/$dashboardId/tabs/race/$raceId'
+import { Route as DashboardDashboardIdTabsPowerSystemSystemIdRouteImport } from './routes/dashboard/$dashboardId/tabs/power-system/$systemId'
 import { Route as DashboardDashboardIdTabsPlotPlotTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/plot-timeline'
 import { Route as DashboardDashboardIdTabsPlotPlotIdRouteImport } from './routes/dashboard/$dashboardId/tabs/plot/$plotId'
 import { Route as DashboardDashboardIdTabsOrganizationOrgIdRouteImport } from './routes/dashboard/$dashboardId/tabs/organization/$orgId'
@@ -86,6 +87,12 @@ const DashboardDashboardIdTabsRaceRaceIdRoute =
     path: '/dashboard/$dashboardId/tabs/race/$raceId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardDashboardIdTabsPowerSystemSystemIdRoute =
+  DashboardDashboardIdTabsPowerSystemSystemIdRouteImport.update({
+    id: '/dashboard/$dashboardId/tabs/power-system/$systemId',
+    path: '/dashboard/$dashboardId/tabs/power-system/$systemId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardDashboardIdTabsPlotPlotTimelineRoute =
   DashboardDashboardIdTabsPlotPlotTimelineRouteImport.update({
     id: '/dashboard/$dashboardId/tabs/plot/plot-timeline',
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
+  '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
   '/dashboard/$dashboardId/tabs/world/$worldId': typeof DashboardDashboardIdTabsWorldWorldIdRoute
   '/dashboard/$dashboardId/tabs/character/$characterId/family-tree': typeof DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute
@@ -168,6 +176,7 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
+  '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
   '/dashboard/$dashboardId/tabs/world/$worldId': typeof DashboardDashboardIdTabsWorldWorldIdRoute
   '/dashboard/$dashboardId/tabs/character/$characterId/family-tree': typeof DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute
@@ -189,6 +198,7 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/tabs/organization/$orgId': typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   '/dashboard/$dashboardId/tabs/plot/$plotId': typeof DashboardDashboardIdTabsPlotPlotIdRoute
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
+  '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
   '/dashboard/$dashboardId/tabs/world/$worldId': typeof DashboardDashboardIdTabsWorldWorldIdRoute
   '/dashboard/$dashboardId/tabs/character/$characterId/family-tree': typeof DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
+    | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
     | '/dashboard/$dashboardId/tabs/world/$worldId'
     | '/dashboard/$dashboardId/tabs/character/$characterId/family-tree'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
+    | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
     | '/dashboard/$dashboardId/tabs/world/$worldId'
     | '/dashboard/$dashboardId/tabs/character/$characterId/family-tree'
@@ -251,6 +263,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/organization/$orgId'
     | '/dashboard/$dashboardId/tabs/plot/$plotId'
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
+    | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
     | '/dashboard/$dashboardId/tabs/world/$worldId'
     | '/dashboard/$dashboardId/tabs/character/$characterId/family-tree'
@@ -272,6 +285,7 @@ export interface RootRouteChildren {
   DashboardDashboardIdTabsOrganizationOrgIdRoute: typeof DashboardDashboardIdTabsOrganizationOrgIdRoute
   DashboardDashboardIdTabsPlotPlotIdRoute: typeof DashboardDashboardIdTabsPlotPlotIdRoute
   DashboardDashboardIdTabsPlotPlotTimelineRoute: typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
+  DashboardDashboardIdTabsPowerSystemSystemIdRoute: typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   DashboardDashboardIdTabsRaceRaceIdRoute: typeof DashboardDashboardIdTabsRaceRaceIdRoute
   DashboardDashboardIdTabsWorldWorldIdRoute: typeof DashboardDashboardIdTabsWorldWorldIdRoute
   DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute: typeof DashboardDashboardIdTabsCharacterCharacterIdFamilyTreeRoute
@@ -350,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/$dashboardId/tabs/race/$raceId'
       fullPath: '/dashboard/$dashboardId/tabs/race/$raceId'
       preLoaderRoute: typeof DashboardDashboardIdTabsRaceRaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/tabs/power-system/$systemId': {
+      id: '/dashboard/$dashboardId/tabs/power-system/$systemId'
+      path: '/dashboard/$dashboardId/tabs/power-system/$systemId'
+      fullPath: '/dashboard/$dashboardId/tabs/power-system/$systemId'
+      preLoaderRoute: typeof DashboardDashboardIdTabsPowerSystemSystemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/$dashboardId/tabs/plot/plot-timeline': {
@@ -432,6 +453,8 @@ const rootRouteChildren: RootRouteChildren = {
     DashboardDashboardIdTabsPlotPlotIdRoute,
   DashboardDashboardIdTabsPlotPlotTimelineRoute:
     DashboardDashboardIdTabsPlotPlotTimelineRoute,
+  DashboardDashboardIdTabsPowerSystemSystemIdRoute:
+    DashboardDashboardIdTabsPowerSystemSystemIdRoute,
   DashboardDashboardIdTabsRaceRaceIdRoute:
     DashboardDashboardIdTabsRaceRaceIdRoute,
   DashboardDashboardIdTabsWorldWorldIdRoute:

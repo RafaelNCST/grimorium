@@ -357,6 +357,57 @@ async function runMigrations(database: Database): Promise<void> {
       created_at INTEGER NOT NULL
     );
 
+    -- SISTEMAS DE PODER
+    CREATE TABLE IF NOT EXISTS power_systems (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- GRUPOS DE PÁGINAS DE PODER
+    CREATE TABLE IF NOT EXISTS power_groups (
+      id TEXT PRIMARY KEY,
+      system_id TEXT NOT NULL REFERENCES power_systems(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL
+    );
+
+    -- PÁGINAS DE PODER
+    CREATE TABLE IF NOT EXISTS power_pages (
+      id TEXT PRIMARY KEY,
+      system_id TEXT NOT NULL REFERENCES power_systems(id) ON DELETE CASCADE,
+      group_id TEXT REFERENCES power_groups(id) ON DELETE SET NULL,
+      name TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- SEÇÕES DE PÁGINAS DE PODER
+    CREATE TABLE IF NOT EXISTS power_sections (
+      id TEXT PRIMARY KEY,
+      page_id TEXT NOT NULL REFERENCES power_pages(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      collapsed INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- BLOCOS DE CONTEÚDO DE PODER
+    CREATE TABLE IF NOT EXISTS power_blocks (
+      id TEXT PRIMARY KEY,
+      section_id TEXT NOT NULL REFERENCES power_sections(id) ON DELETE CASCADE,
+      type TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      content_json TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -380,6 +431,16 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index);
     CREATE INDEX IF NOT EXISTS idx_plot_events_arc_id ON plot_events(arc_id);
     CREATE INDEX IF NOT EXISTS idx_plot_events_order ON plot_events(arc_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_power_systems_book_id ON power_systems(book_id);
+    CREATE INDEX IF NOT EXISTS idx_power_groups_system_id ON power_groups(system_id);
+    CREATE INDEX IF NOT EXISTS idx_power_groups_order ON power_groups(system_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_power_pages_system_id ON power_pages(system_id);
+    CREATE INDEX IF NOT EXISTS idx_power_pages_group_id ON power_pages(group_id);
+    CREATE INDEX IF NOT EXISTS idx_power_pages_order ON power_pages(system_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_power_sections_page_id ON power_sections(page_id);
+    CREATE INDEX IF NOT EXISTS idx_power_sections_order ON power_sections(page_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_power_blocks_section_id ON power_blocks(section_id);
+    CREATE INDEX IF NOT EXISTS idx_power_blocks_order ON power_blocks(section_id, order_index);
   `;
 
     await database.execute(schema);
@@ -395,6 +456,20 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists or other error - safe to ignore
       console.log(
         "[db] important_items column already exists or error:",
+        error
+      );
+    }
+
+    // Add icon_image column to power_systems if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE power_systems ADD COLUMN icon_image TEXT"
+      );
+      console.log("[db] Added icon_image column to power_systems table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log(
+        "[db] icon_image column already exists or error:",
         error
       );
     }

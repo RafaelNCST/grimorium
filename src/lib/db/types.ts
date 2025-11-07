@@ -311,6 +311,54 @@ export interface DBPlotEvent {
   created_at: number;
 }
 
+// Power System
+export interface DBPowerSystem {
+  id: string;
+  book_id: string;
+  name: string;
+  icon_image?: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBPowerGroup {
+  id: string;
+  system_id: string;
+  name: string;
+  order_index: number;
+  created_at: number;
+}
+
+export interface DBPowerPage {
+  id: string;
+  system_id: string;
+  group_id?: string;
+  name: string;
+  order_index: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBPowerSection {
+  id: string;
+  page_id: string;
+  title: string;
+  order_index: number;
+  collapsed: number; // 0 or 1 (SQLite boolean)
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBPowerBlock {
+  id: string;
+  section_id: string;
+  type: string;
+  order_index: number;
+  content_json: string; // JSON string
+  created_at: number;
+  updated_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];
