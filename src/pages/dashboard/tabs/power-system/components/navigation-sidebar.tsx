@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 import { motion } from "framer-motion";
 import {
   ChevronDown,
@@ -49,6 +50,7 @@ import { cn } from "@/lib/utils";
 import type { IPowerGroup, IPowerPage } from "../types/power-system-types";
 
 interface NavigationSidebarProps {
+  systemId: string;
   isOpen: boolean;
   onToggle: () => void;
   groups: IPowerGroup[];
@@ -79,6 +81,7 @@ interface DragItem {
 }
 
 export function NavigationSidebar({
+  systemId,
   isOpen,
   onToggle,
   groups,
@@ -98,7 +101,14 @@ export function NavigationSidebar({
   onReorderGroups,
 }: NavigationSidebarProps) {
   const { t } = useTranslation("power-system");
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+
+  // UI Store for persisting expanded groups
+  const { getExpandedGroups, setExpandedGroups: saveExpandedGroups, toggleGroup: toggleGroupInStore } = usePowerSystemUIStore();
+
+  // Initialize expanded groups from store
+  const [expandedGroups, setExpandedGroupsLocal] = useState<Set<string>>(
+    () => getExpandedGroups(systemId)
+  );
   const [activeItem, setActiveItem] = useState<DragItem | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
@@ -110,14 +120,22 @@ export function NavigationSidebar({
     })
   );
 
+  // Sync expanded groups with store when systemId changes
+  useEffect(() => {
+    const savedExpandedGroups = getExpandedGroups(systemId);
+    setExpandedGroupsLocal(savedExpandedGroups);
+  }, [systemId, getExpandedGroups]);
+
   const toggleGroup = (groupId: string) => {
-    setExpandedGroups((prev) => {
+    setExpandedGroupsLocal((prev) => {
       const next = new Set(prev);
       if (next.has(groupId)) {
         next.delete(groupId);
       } else {
         next.add(groupId);
       }
+      // Save to store
+      saveExpandedGroups(systemId, next);
       return next;
     });
   };
@@ -161,7 +179,11 @@ export function NavigationSidebar({
         if (draggedPage.groupId !== targetGroupId && onMovePage) {
           onMovePage(draggedPage.id, targetGroupId);
           // Auto-expand the group when a page is dropped into it
-          setExpandedGroups((prev) => new Set(prev).add(targetGroupId));
+          setExpandedGroupsLocal((prev) => {
+            const next = new Set(prev).add(targetGroupId);
+            saveExpandedGroups(systemId, next);
+            return next;
+          });
         }
         return;
       }
@@ -222,7 +244,11 @@ export function NavigationSidebar({
 
           // Auto-expand the group if the page was moved into one
           if (targetGroupId) {
-            setExpandedGroups((prev) => new Set(prev).add(targetGroupId));
+            setExpandedGroupsLocal((prev) => {
+              const next = new Set(prev).add(targetGroupId);
+              saveExpandedGroups(systemId, next);
+              return next;
+            });
           }
         }
         return;

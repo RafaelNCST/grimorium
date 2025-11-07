@@ -220,6 +220,7 @@ export function PowerSystemDetailView({
           isLeftSidebarOpen ? "w-80" : "w-0"
         )}>
           <NavigationSidebar
+            systemId={system.id}
             isOpen={isLeftSidebarOpen}
             onToggle={onToggleLeftSidebar}
             groups={groups}
@@ -456,6 +457,7 @@ export function PowerSystemDetailView({
         isLeftSidebarOpen ? "w-80" : "w-0"
       )}>
         <NavigationSidebar
+          systemId={system.id}
           isOpen={isLeftSidebarOpen}
           onToggle={onToggleLeftSidebar}
           groups={groups}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { usePowerSystemStore } from "@/stores/power-system-store";
+import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 import {
   getPowerGroupsBySystemId,
   getPowerPagesBySystemId,
@@ -54,6 +55,16 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const systems = getSystems(bookId);
   const currentSystem = systems.find((s) => s.id === systemId) || null;
 
+  // UI Store
+  const {
+    getCurrentPageId,
+    setCurrentPageId,
+    getEditMode,
+    setEditMode,
+    getSidebarOpen,
+    setSidebarOpen,
+  } = usePowerSystemUIStore();
+
   // State
   const [currentPage, setCurrentPage] = useState<IPowerPage | null>(null);
   const [groups, setGroups] = useState<IPowerGroup[]>([]);
@@ -61,9 +72,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [sections, setSections] = useState<IPowerSection[]>([]);
   const [blocks, setBlocks] = useState<IPowerBlock[]>([]);
 
-  // UI State
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
+  // UI State - using local state to avoid re-renders from store
+  const [isEditMode, setIsEditModeLocal] = useState(false);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpenLocal] = useState(true);
 
   // Modal States
   const [isEditSystemModalOpen, setIsEditSystemModalOpen] = useState(false);
@@ -85,6 +96,18 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [isLoadingSections, setIsLoadingSections] = useState(false);
   const [isLoadingBlocks, setIsLoadingBlocks] = useState(false);
+
+  // Restore UI state from store when system changes
+  useEffect(() => {
+    if (!systemId) return;
+
+    // Restore UI state
+    const savedEditMode = getEditMode(systemId);
+    const savedSidebarOpen = getSidebarOpen(systemId);
+
+    setIsEditModeLocal(savedEditMode);
+    setIsLeftSidebarOpenLocal(savedSidebarOpen);
+  }, [systemId, getEditMode, getSidebarOpen]);
 
   // Fetch systems if not loaded
   useEffect(() => {
@@ -125,11 +148,24 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         setGroups(fetchedGroups);
         setPages(fetchedPages);
 
-        // Set first page as current if available
-        if (fetchedPages.length > 0 && !currentPage) {
-          setCurrentPage(fetchedPages[0]);
-        } else if (fetchedPages.length === 0) {
+        // Restore saved page or set first page
+        const savedPageId = getCurrentPageId(currentSystem.id);
+        const savedPage = savedPageId
+          ? fetchedPages.find((p) => p.id === savedPageId)
+          : null;
+
+        if (savedPage) {
+          // Restore previously selected page
+          setCurrentPage(savedPage);
+        } else if (fetchedPages.length > 0) {
+          // Set first page as current if no saved page
+          const firstPage = fetchedPages[0];
+          setCurrentPage(firstPage);
+          setCurrentPageId(currentSystem.id, firstPage.id);
+        } else {
+          // No pages available
           setCurrentPage(null);
+          setCurrentPageId(currentSystem.id, null);
         }
       } catch (error) {
         console.error("Error loading system data:", error);
@@ -140,7 +176,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     };
 
     loadSystemData();
-  }, [currentSystem]);
+  }, [currentSystem, getCurrentPageId, setCurrentPageId]);
 
   // Fetch sections and blocks when page changes
   useEffect(() => {
@@ -286,8 +322,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
   const handlePageSelect = (pageId: string) => {
     const page = pages.find((p) => p.id === pageId);
-    if (page) {
+    if (page && systemId) {
       setCurrentPage(page);
+      setCurrentPageId(systemId, page.id);
     }
   };
 
@@ -310,6 +347,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setPages([...pages, newPage]);
       setCurrentPage(newPage);
+      setCurrentPageId(currentSystem.id, newPage.id);
       setIsCreatePageModalOpen(false);
     } catch (error) {
       console.error("Error creating page:", error);
@@ -353,6 +391,8 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   };
 
   const handleDeletePage = async (pageId: string) => {
+    if (!systemId) return;
+
     try {
       await deletePowerPage(pageId);
 
@@ -360,7 +400,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       if (currentPage?.id === pageId) {
         const remainingPages = pages.filter((p) => p.id !== pageId);
-        setCurrentPage(remainingPages.length > 0 ? remainingPages[0] : null);
+        const newCurrentPage = remainingPages.length > 0 ? remainingPages[0] : null;
+        setCurrentPage(newCurrentPage);
+        setCurrentPageId(systemId, newCurrentPage?.id || null);
       }
     } catch (error) {
       console.error("Error deleting page:", error);
@@ -390,6 +432,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         const duplicatedPage = fetchedPages.find((p) => p.id === newPageId);
         if (duplicatedPage) {
           setCurrentPage(duplicatedPage);
+          setCurrentPageId(currentSystem.id, duplicatedPage.id);
         }
       }
     } catch (error) {
@@ -721,13 +764,23 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       onReorderBlocks={handleReorderBlocks}
       // UI Handlers
       onToggleEditMode={async () => {
+        if (!systemId) return;
+
         // If turning OFF edit mode, delete empty blocks first
         if (isEditMode) {
           await deleteEmptyBlocks();
         }
-        setIsEditMode(!isEditMode);
+        const newEditMode = !isEditMode;
+        setIsEditModeLocal(newEditMode);
+        setEditMode(systemId, newEditMode);
       }}
-      onToggleLeftSidebar={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
+      onToggleLeftSidebar={() => {
+        if (!systemId) return;
+
+        const newSidebarOpen = !isLeftSidebarOpen;
+        setIsLeftSidebarOpenLocal(newSidebarOpen);
+        setSidebarOpen(systemId, newSidebarOpen);
+      }}
       // Modal Handlers
       onOpenEditSystemModal={() => setIsEditSystemModalOpen(true)}
       onCloseEditSystemModal={() => setIsEditSystemModalOpen(false)}
