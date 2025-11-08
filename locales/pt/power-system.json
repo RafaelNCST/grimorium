@@ -135,8 +135,11 @@
       "add_option_button": "Adicionar",
       "select_placeholder": "Selecione uma opção...",
       "data_source_label": "Fonte de Dados",
-      "data_source_manual": "Opções Manuais",
+      "data_source_manual": "Manual",
       "data_source_characters": "Personagens",
+      "data_source_factions": "Facções",
+      "data_source_items": "Itens",
+      "data_source_races": "Raças",
       "select_entity": "Selecione uma entidade...",
       "loading_entities": "Carregando entidades...",
       "no_entities": "Nenhuma entidade disponível"
@@ -362,5 +365,11 @@
     "move_up": "Mover para cima",
     "move_down": "Mover para baixo",
     "close": "Fechar"
+  },
+  "hover_card": {
+    "character_not_found": "Personagem não encontrado",
+    "faction_not_found": "Facção não encontrada",
+    "item_not_found": "Item não encontrado",
+    "race_not_found": "Raça não encontrada"
   }
 }

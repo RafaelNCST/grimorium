@@ -40,7 +40,7 @@ export interface TagListContent {
   tags: string[];
 }
 
-export type DataSourceType = 'manual' | 'characters';
+export type DataSourceType = 'manual' | 'characters' | 'factions' | 'items' | 'races';
 
 export interface DropdownContent {
   dataSource?: DataSourceType; // Default 'manual' para retrocompatibilidade

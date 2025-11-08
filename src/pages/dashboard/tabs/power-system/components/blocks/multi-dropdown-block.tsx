@@ -22,6 +22,9 @@ import { EntitySelect } from "./shared/entity-select";
 import { useEntityData } from "../../hooks/useEntityData";
 import { useEntityResolver } from "../../hooks/useEntityResolver";
 import { CharacterHoverCard } from "../entity-views/character-hover-card";
+import { FactionHoverCard } from "../entity-views/faction-hover-card";
+import { ItemHoverCard } from "../entity-views/item-hover-card";
+import { RaceHoverCard } from "../entity-views/race-hover-card";
 
 interface MultiDropdownBlockProps {
   block: IPowerBlock;
@@ -55,7 +58,7 @@ export function MultiDropdownBlock({
     bookId
   );
 
-  const handleDataSourceChange = (newSource: 'manual' | 'characters') => {
+  const handleDataSourceChange = (newSource: typeof content.dataSource) => {
     onUpdate({
       ...content,
       dataSource: newSource,
@@ -125,23 +128,42 @@ export function MultiDropdownBlock({
     (entity) => !(content.selectedEntityIds || []).includes(entity.id)
   );
 
+  // Helper function to render the appropriate hover card based on dataSource
+  const renderHoverCard = (entityId: string, children: React.ReactNode) => {
+    switch (dataSource) {
+      case 'characters':
+        return <CharacterHoverCard characterId={entityId}>{children}</CharacterHoverCard>;
+      case 'factions':
+        return <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>;
+      case 'items':
+        return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
+      case 'races':
+        return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
+      default:
+        return <>{children}</>;
+    }
+  };
+
   if (isEditMode) {
     return (
       <div className="space-y-3 p-4 rounded-lg border bg-card">
+        {/* Top row: Data source selector and delete button */}
         <div className="flex items-center justify-between gap-2 mb-2">
+          {/* Data Source Selector */}
+          <div className="flex-1">
+            <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
+          </div>
+
           <Button
             data-no-drag="true"
             variant="ghost"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"
+            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
         </div>
-
-        {/* Data Source Selector */}
-        <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
 
         {/* Manual Mode */}
         {dataSource === 'manual' && (
@@ -230,8 +252,8 @@ export function MultiDropdownBlock({
           </>
         )}
 
-        {/* Characters Mode */}
-        {dataSource === 'characters' && (
+        {/* Entity Modes (Characters, Factions, Items, Races) */}
+        {dataSource !== 'manual' && (
           <>
             <Select value="" onValueChange={handleSelectEntity}>
               <SelectTrigger data-no-drag="true" disabled={availableEntities.length === 0 || isLoadingEntities}>
@@ -257,20 +279,27 @@ export function MultiDropdownBlock({
             {resolvedEntities.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {resolvedEntities.map((entity) => (
-                  <Badge
-                    key={entity.id}
-                    variant="secondary"
-                    className="px-3 py-1 text-sm group"
-                  >
-                    {entity.name}
-                    <button
-                      data-no-drag="true"
-                      onClick={() => handleRemoveSelectedEntity(entity.id)}
-                      className="ml-2 hover:text-red-600 transition-colors cursor-pointer"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                  renderHoverCard(
+                    entity.id,
+                    <span key={entity.id} className="inline-block">
+                      <Badge
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-secondary/80 flex items-center gap-1 px-3 py-1 text-sm"
+                      >
+                        {entity.name}
+                        <button
+                          data-no-drag="true"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveSelectedEntity(entity.id);
+                          }}
+                          className="ml-1 hover:text-red-600 transition-colors cursor-pointer"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    </span>
+                  )
                 ))}
               </div>
             )}
@@ -336,8 +365,8 @@ export function MultiDropdownBlock({
     );
   }
 
-  // View Mode - Characters
-  if (dataSource === 'characters') {
+  // View Mode - Entity modes (Characters, Factions, Items, Races)
+  if (dataSource !== 'manual') {
     return (
       <div className="space-y-3">
         <Select
@@ -369,26 +398,29 @@ export function MultiDropdownBlock({
         {resolvedEntities.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {resolvedEntities.map((entity) => (
-              <CharacterHoverCard key={entity.id} characterId={entity.id}>
-                <Badge
-                  variant="secondary"
-                  className="cursor-pointer hover:bg-secondary/80 flex items-center gap-1 px-3 py-1 text-sm"
-                >
-                  {entity.name}
-                  {!isReadOnlyView && (
-                    <button
-                      data-no-drag="true"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveSelectedEntity(entity.id);
-                      }}
-                      className="ml-1 hover:text-red-600 transition-colors cursor-pointer"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </Badge>
-              </CharacterHoverCard>
+              renderHoverCard(
+                entity.id,
+                <span key={entity.id} className="inline-block">
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-secondary/80 flex items-center gap-1 px-3 py-1 text-sm"
+                  >
+                    {entity.name}
+                    {!isReadOnlyView && (
+                      <button
+                        data-no-drag="true"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveSelectedEntity(entity.id);
+                        }}
+                        className="ml-1 hover:text-red-600 transition-colors cursor-pointer"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </Badge>
+                </span>
+              )
             ))}
           </div>
         )}

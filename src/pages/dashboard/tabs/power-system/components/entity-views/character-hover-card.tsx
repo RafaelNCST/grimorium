@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Calendar } from 'lucide-react';
 import {
   HoverCard,
   HoverCardContent,
@@ -9,9 +11,12 @@ import {
   AvatarImage,
   AvatarFallback,
 } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { getCharacterById } from '@/lib/db/characters.service';
 import type { ICharacter } from '@/types/character-types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CHARACTER_ROLES_CONSTANT } from '@/components/modals/create-character-modal/constants/character-roles';
+import { GENDERS_CONSTANT } from '@/components/modals/create-character-modal/constants/genders';
 
 interface CharacterHoverCardProps {
   characterId: string;
@@ -22,6 +27,7 @@ export function CharacterHoverCard({
   characterId,
   children,
 }: CharacterHoverCardProps) {
+  const { t } = useTranslation(['power-system', 'create-character']);
   const [character, setCharacter] = useState<ICharacter | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -62,53 +68,103 @@ export function CharacterHoverCard({
   return (
     <HoverCard openDelay={300} closeDelay={100}>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent className="w-80" align="start">
+      <HoverCardContent className="w-[400px]" align="start">
         {isLoading ? (
-          <div className="flex gap-4">
-            <Skeleton className="h-16 w-16 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-full" />
+          <div className="p-1 space-y-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-20 w-20 rounded-full flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-full" />
+              </div>
             </div>
+            <Skeleton className="h-12 w-full" />
           </div>
         ) : error || !character ? (
           <div className="text-sm text-muted-foreground">
-            Character not found
+            {t('power-system:hover_card.character_not_found')}
           </div>
         ) : (
-          <div className="flex gap-4">
-            <Avatar className="h-16 w-16">
-              {character.image && (
-                <AvatarImage src={character.image} alt={character.name} />
-              )}
-              <AvatarFallback className="text-lg font-semibold">
-                {character.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 space-y-1">
-              <h4 className="text-sm font-semibold leading-none">
-                {character.name}
-              </h4>
-              {character.role && (
-                <p className="text-xs text-muted-foreground leading-none">
-                  {character.role}
-                </p>
-              )}
-              <div className="flex gap-2 text-xs text-muted-foreground pt-1">
-                {character.age && <span>{character.age}</span>}
-                {character.age && character.gender && <span>•</span>}
-                {character.gender && <span>{character.gender}</span>}
+          <div className="p-1 space-y-4">
+            {/* Top Section: Image + Name/Age/Gender/Role */}
+            <div className="flex gap-4">
+              {/* Character Image - Circular */}
+              <Avatar className="w-20 h-20 flex-shrink-0">
+                <AvatarImage
+                  src={character.image}
+                  className="object-cover"
+                />
+                <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                  {character.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Name, Age, Gender, and Role */}
+              <div className="flex-1 min-w-0 space-y-2">
+                <h4 className="text-base font-bold line-clamp-2">
+                  {character.name}
+                </h4>
+
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {character.age && (
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-sm font-medium text-muted-foreground">
+                        {character.age}
+                      </span>
+                    </div>
+                  )}
+                  {character.gender && (() => {
+                    const genderData = GENDERS_CONSTANT.find(
+                      (g) => g.value === character.gender
+                    );
+                    const GenderIcon = genderData?.icon;
+                    return GenderIcon ? (
+                      <div className="flex items-center gap-1.5">
+                        <GenderIcon className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-sm font-medium text-muted-foreground capitalize">
+                          {t(`create-character:gender.${character.gender}`)}
+                        </span>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+
+                {/* Role Badge */}
+                {character.role && (() => {
+                  const roleData = CHARACTER_ROLES_CONSTANT.find(
+                    (r) => r.value === character.role
+                  );
+                  const RoleIcon = roleData?.icon;
+                  return (
+                    <div className="flex">
+                      <Badge
+                        className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
+                      >
+                        {RoleIcon && (
+                          <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        <span className="text-xs font-medium">
+                          {t(`create-character:role.${character.role}`)}
+                        </span>
+                      </Badge>
+                    </div>
+                  );
+                })()}
               </div>
-              {character.description && (
-                <p className="text-xs text-muted-foreground line-clamp-3 pt-2">
-                  {character.description.length > 150
-                    ? `${character.description.substring(0, 150)}...`
-                    : character.description}
-                </p>
-              )}
             </div>
+
+            {/* Description */}
+            {character.description && (
+              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                {character.description}
+              </p>
+            )}
           </div>
         )}
       </HoverCardContent>

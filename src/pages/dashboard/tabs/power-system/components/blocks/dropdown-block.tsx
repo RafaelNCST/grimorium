@@ -21,6 +21,9 @@ import { EntitySelect } from "./shared/entity-select";
 import { useEntityData } from "../../hooks/useEntityData";
 import { useEntityResolver } from "../../hooks/useEntityResolver";
 import { CharacterHoverCard } from "../entity-views/character-hover-card";
+import { FactionHoverCard } from "../entity-views/faction-hover-card";
+import { ItemHoverCard } from "../entity-views/item-hover-card";
+import { RaceHoverCard } from "../entity-views/race-hover-card";
 
 interface DropdownBlockProps {
   block: IPowerBlock;
@@ -56,7 +59,7 @@ export function DropdownBlock({
 
   const selectedEntity = resolvedEntities[0];
 
-  const handleDataSourceChange = (newSource: 'manual' | 'characters') => {
+  const handleDataSourceChange = (newSource: typeof content.dataSource) => {
     onUpdate({
       ...content,
       dataSource: newSource,
@@ -93,23 +96,42 @@ export function DropdownBlock({
     });
   };
 
+  // Helper function to render the appropriate hover card based on dataSource
+  const renderHoverCard = (entityId: string, children: React.ReactNode) => {
+    switch (dataSource) {
+      case 'characters':
+        return <CharacterHoverCard characterId={entityId}>{children}</CharacterHoverCard>;
+      case 'factions':
+        return <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>;
+      case 'items':
+        return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
+      case 'races':
+        return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
+      default:
+        return <>{children}</>;
+    }
+  };
+
   if (isEditMode) {
     return (
       <div className="space-y-3 p-4 rounded-lg border bg-card">
+        {/* Top row: Data source selector and delete button */}
         <div className="flex items-center justify-between gap-2 mb-2">
+          {/* Data Source Selector */}
+          <div className="flex-1">
+            <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
+          </div>
+
           <Button
             data-no-drag="true"
             variant="ghost"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"
+            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
         </div>
-
-        {/* Data Source Selector */}
-        <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
 
         {/* Manual Mode */}
         {dataSource === 'manual' && (
@@ -180,8 +202,8 @@ export function DropdownBlock({
           </>
         )}
 
-        {/* Characters Mode */}
-        {dataSource === 'characters' && (
+        {/* Entity Modes (Characters, Factions, Items, Races) */}
+        {dataSource !== 'manual' && (
           <EntitySelect
             entities={entities}
             selectedId={content.selectedEntityId}
@@ -223,8 +245,8 @@ export function DropdownBlock({
     ) : null;
   }
 
-  // View Mode - Characters
-  if (dataSource === 'characters') {
+  // View Mode - Entity modes (Characters, Factions, Items, Races)
+  if (dataSource !== 'manual') {
     // If no entity is selected, show the select dropdown
     if (!content.selectedEntityId) {
       return (
@@ -250,15 +272,16 @@ export function DropdownBlock({
       );
     }
 
-    // If entity is selected, wrap it in HoverCard
+    // If entity is selected, wrap the SelectTrigger in appropriate HoverCard
     return (
-      <CharacterHoverCard characterId={content.selectedEntityId}>
-        <div className="cursor-pointer">
-          <Select
-            value={content.selectedEntityId}
-            onValueChange={(value) => handleSelectEntity(value)}
-            disabled={isReadOnlyView}
-          >
+      <Select
+        value={content.selectedEntityId}
+        onValueChange={(value) => handleSelectEntity(value)}
+        disabled={isReadOnlyView}
+      >
+        {renderHoverCard(
+          content.selectedEntityId,
+          <span className="inline-block w-full">
             <SelectTrigger
               data-no-drag="true"
               className={cn("w-full", isReadOnlyView && "!cursor-default")}
@@ -267,18 +290,18 @@ export function DropdownBlock({
                 {selectedEntity?.name ?? 'Loading...'}
               </SelectValue>
             </SelectTrigger>
-            {!isReadOnlyView && (
-              <SelectContent>
-                {entities.map((entity) => (
-                  <SelectItem key={entity.id} value={entity.id}>
-                    {entity.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            )}
-          </Select>
-        </div>
-      </CharacterHoverCard>
+          </span>
+        )}
+        {!isReadOnlyView && (
+          <SelectContent>
+            {entities.map((entity) => (
+              <SelectItem key={entity.id} value={entity.id}>
+                {entity.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        )}
+      </Select>
     );
   }
 

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getCharacterById } from '@/lib/db/characters.service';
+import { getFactionById } from '@/lib/db/factions.service';
+import { getItemById } from '@/lib/db/items.service';
+import { getRaceById } from '@/lib/db/races.service';
 
 interface ResolvedEntity {
   id: string;
@@ -16,7 +19,7 @@ export function useEntityResolver(
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (dataSource !== 'characters' || entityIds.length === 0) {
+    if (!dataSource || dataSource === 'manual' || entityIds.length === 0) {
       setResolvedEntities([]);
       return;
     }
@@ -28,11 +31,27 @@ export function useEntityResolver(
         const resolved = await Promise.all(
           entityIds.map(async (id) => {
             try {
-              const char = await getCharacterById(id);
+              let entity = null;
+
+              switch (dataSource) {
+                case 'characters':
+                  entity = await getCharacterById(id);
+                  break;
+                case 'factions':
+                  entity = await getFactionById(id);
+                  break;
+                case 'items':
+                  entity = await getItemById(id);
+                  break;
+                case 'races':
+                  entity = await getRaceById(id);
+                  break;
+              }
+
               return {
                 id,
-                name: char?.name ?? '[Deleted]',
-                exists: !!char,
+                name: entity?.name ?? '[Deleted]',
+                exists: !!entity,
               };
             } catch {
               return {
