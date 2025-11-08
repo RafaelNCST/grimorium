@@ -1,5 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -60,7 +61,7 @@ export function CreatePageModal({
     },
   });
 
-  // Reset form when modal opens with preselectedGroupId
+  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       form.reset({
@@ -93,8 +94,13 @@ export function CreatePageModal({
         <DialogHeader>
           <DialogTitle>{t("modals.create_page.title")}</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            {/* Page Name Input */}
             <FormField
               control={form.control}
               name="name"
@@ -111,7 +117,9 @@ export function CreatePageModal({
                 </FormItem>
               )}
             />
-            {groups.length > 0 && !preselectedGroupId && (
+
+            {/* Group Selection - Only shows when opened from group menu */}
+            {preselectedGroupId && groups.length > 0 && (
               <FormField
                 control={form.control}
                 name="groupId"
@@ -121,10 +129,13 @@ export function CreatePageModal({
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t("modals.create_page.group_label")} />
+                          <SelectValue
+                            placeholder={t("modals.create_page.group_label")}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -140,6 +151,8 @@ export function CreatePageModal({
                 )}
               />
             )}
+
+            {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"

@@ -42,6 +42,9 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
+import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
+import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import {
   type ICharacterVersion,
   type ICharacterFormData,
@@ -54,9 +57,6 @@ import { RelationshipsSection } from "./components/relationships-section";
 import { VersionManager } from "./components/version-manager";
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
-import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
-import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
-import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 
 interface ICharacter {
   id: string;
@@ -1666,7 +1666,9 @@ export function CharacterDetailView({
               {powerLinks && powerLinks.length > 0 && (
                 <Card className="card-magical">
                   <CardHeader>
-                    <CardTitle>{t("character-detail:sections.powers")}</CardTitle>
+                    <CardTitle>
+                      {t("character-detail:sections.powers")}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">

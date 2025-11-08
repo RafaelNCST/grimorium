@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   DndContext,
   closestCenter,
@@ -15,8 +17,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ChevronDown, ChevronRight, ChevronUp, Plus, Trash2, Link } from "lucide-react";
-import { useState } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Plus,
+  Trash2,
+  Link,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -28,7 +36,6 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-import type { IPowerBlock, IPowerSection, IPowerPage, BlockContent } from "../types/power-system-types";
 import {
   HeadingBlock,
   ParagraphBlock,
@@ -46,6 +53,13 @@ import {
   AttributesBlock,
   NavigatorBlock,
 } from "./blocks";
+
+import type {
+  IPowerBlock,
+  IPowerSection,
+  IPowerPage,
+  BlockContent,
+} from "../types/power-system-types";
 
 interface SectionComponentProps {
   section: IPowerSection;
@@ -89,8 +103,14 @@ function SortableBlock({
   onDelete,
   onPageSelect,
 }: SortableBlockProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: block.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -119,9 +139,21 @@ function SortableBlock({
       case "tag-list":
         return <TagListBlock {...commonProps} />;
       case "dropdown":
-        return <DropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} bookId={bookId} />;
+        return (
+          <DropdownBlock
+            {...commonProps}
+            isReadOnlyView={isReadOnlyView}
+            bookId={bookId}
+          />
+        );
       case "multi-dropdown":
-        return <MultiDropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} bookId={bookId} />;
+        return (
+          <MultiDropdownBlock
+            {...commonProps}
+            isReadOnlyView={isReadOnlyView}
+            bookId={bookId}
+          />
+        );
       case "image":
         return <ImageBlock {...commonProps} />;
       case "icon":
@@ -137,7 +169,13 @@ function SortableBlock({
       case "attributes":
         return <AttributesBlock {...commonProps} />;
       case "navigator":
-        return <NavigatorBlock {...commonProps} pages={pages} onPageSelect={onPageSelect} />;
+        return (
+          <NavigatorBlock
+            {...commonProps}
+            pages={pages}
+            onPageSelect={onPageSelect}
+          />
+        );
       default:
         return null;
     }
@@ -145,20 +183,23 @@ function SortableBlock({
 
   // Filter listeners to prevent dragging when clicking on elements with data-no-drag
   const filteredListeners = isEditMode
-    ? Object.entries(listeners || {}).reduce((acc, [key, handler]) => {
-        acc[key] = (event: React.SyntheticEvent) => {
-          const target = event.target as HTMLElement;
-          // Check if the target or any parent has data-no-drag="true"
-          if (target.closest('[data-no-drag="true"]')) {
-            return;
-          }
-          // Call the original handler
-          if (handler) {
-            handler(event);
-          }
-        };
-        return acc;
-      }, {} as typeof listeners)
+    ? Object.entries(listeners || {}).reduce(
+        (acc, [key, handler]) => {
+          acc[key] = (event: React.SyntheticEvent) => {
+            const target = event.target as HTMLElement;
+            // Check if the target or any parent has data-no-drag="true"
+            if (target.closest('[data-no-drag="true"]')) {
+              return;
+            }
+            // Call the original handler
+            if (handler) {
+              handler(event);
+            }
+          };
+          return acc;
+        },
+        {} as typeof listeners
+      )
     : {};
 
   // In edit mode, the entire block is draggable using the listeners
@@ -178,10 +219,7 @@ function SortableBlock({
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-    >
+    <div ref={setNodeRef} style={style}>
       {renderBlock()}
     </div>
   );
@@ -231,7 +269,9 @@ export function SectionComponent({
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const oldIndex = sortedBlocks.findIndex((block) => block.id === active.id);
+      const oldIndex = sortedBlocks.findIndex(
+        (block) => block.id === active.id
+      );
       const newIndex = sortedBlocks.findIndex((block) => block.id === over.id);
 
       const reorderedBlocks = arrayMove(sortedBlocks, oldIndex, newIndex).map(
@@ -245,12 +285,13 @@ export function SectionComponent({
     }
   };
 
-  const activeBlock = activeId ? sortedBlocks.find(block => block.id === activeId) : null;
+  const activeBlock = activeId
+    ? sortedBlocks.find((block) => block.id === activeId)
+    : null;
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
-
 
   return (
     <div className="border rounded-lg bg-card" id={`section-${section.id}`}>
@@ -294,9 +335,7 @@ export function SectionComponent({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-sm font-medium">
-                    {t("links.manage")}
-                  </p>
+                  <p className="text-sm font-medium">{t("links.manage")}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -316,9 +355,7 @@ export function SectionComponent({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-sm font-medium">
-                    {t("sections.move_up")}
-                  </p>
+                  <p className="text-sm font-medium">{t("sections.move_up")}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -357,9 +394,7 @@ export function SectionComponent({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm font-medium">
-                  {t("sections.delete")}
-                </p>
+                <p className="text-sm font-medium">{t("sections.delete")}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -422,7 +457,9 @@ export function SectionComponent({
                       bookId={bookId}
                       isEditMode={isEditMode}
                       isReadOnlyView={isReadOnlyView}
-                      onUpdate={(content) => onUpdateBlock(activeBlock.id, content)}
+                      onUpdate={(content) =>
+                        onUpdateBlock(activeBlock.id, content)
+                      }
                       onDelete={() => onDeleteBlock(activeBlock.id)}
                       onPageSelect={onPageSelect}
                     />

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { Plus, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -12,19 +13,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+
+import { useEntityData } from "../../hooks/useEntityData";
+import { useEntityResolver } from "../../hooks/useEntityResolver";
 import {
   type IPowerBlock,
   type MultiDropdownContent,
 } from "../../types/power-system-types";
-import { cn } from "@/lib/utils";
-import { DataSourceSelector } from "./shared/data-source-selector";
-import { EntitySelect } from "./shared/entity-select";
-import { useEntityData } from "../../hooks/useEntityData";
-import { useEntityResolver } from "../../hooks/useEntityResolver";
 import { CharacterHoverCard } from "../entity-views/character-hover-card";
 import { FactionHoverCard } from "../entity-views/faction-hover-card";
 import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
+
+import { DataSourceSelector } from "./shared/data-source-selector";
+import { EntitySelect } from "./shared/entity-select";
 
 interface MultiDropdownBlockProps {
   block: IPowerBlock;
@@ -48,10 +51,13 @@ export function MultiDropdownBlock({
   const [newOption, setNewOption] = useState("");
 
   // Default to 'manual' for retrocompatibility
-  const dataSource = content.dataSource || 'manual';
+  const dataSource = content.dataSource || "manual";
 
   // Hooks for entity data
-  const { entities, isLoading: isLoadingEntities } = useEntityData(dataSource, bookId);
+  const { entities, isLoading: isLoadingEntities } = useEntityData(
+    dataSource,
+    bookId
+  );
   const { resolvedEntities } = useEntityResolver(
     dataSource,
     content.selectedEntityIds || [],
@@ -116,7 +122,9 @@ export function MultiDropdownBlock({
   const handleRemoveSelectedEntity = (entityId: string) => {
     onUpdate({
       ...content,
-      selectedEntityIds: (content.selectedEntityIds || []).filter((id) => id !== entityId),
+      selectedEntityIds: (content.selectedEntityIds || []).filter(
+        (id) => id !== entityId
+      ),
     });
   };
 
@@ -131,13 +139,19 @@ export function MultiDropdownBlock({
   // Helper function to render the appropriate hover card based on dataSource
   const renderHoverCard = (entityId: string, children: React.ReactNode) => {
     switch (dataSource) {
-      case 'characters':
-        return <CharacterHoverCard characterId={entityId}>{children}</CharacterHoverCard>;
-      case 'factions':
-        return <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>;
-      case 'items':
+      case "characters":
+        return (
+          <CharacterHoverCard characterId={entityId}>
+            {children}
+          </CharacterHoverCard>
+        );
+      case "factions":
+        return (
+          <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>
+        );
+      case "items":
         return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
-      case 'races':
+      case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
       default:
         return <>{children}</>;
@@ -151,7 +165,10 @@ export function MultiDropdownBlock({
         <div className="flex items-center justify-between gap-2 mb-2">
           {/* Data Source Selector */}
           <div className="flex-1">
-            <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
+            <DataSourceSelector
+              value={dataSource}
+              onChange={handleDataSourceChange}
+            />
           </div>
 
           <Button
@@ -166,7 +183,7 @@ export function MultiDropdownBlock({
         </div>
 
         {/* Manual Mode */}
-        {dataSource === 'manual' && (
+        {dataSource === "manual" && (
           <>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -183,7 +200,13 @@ export function MultiDropdownBlock({
                   }}
                   className="flex-1"
                 />
-                <Button data-no-drag="true" onClick={handleAddOption} size="sm" variant="outline" className="cursor-pointer">
+                <Button
+                  data-no-drag="true"
+                  onClick={handleAddOption}
+                  size="sm"
+                  variant="outline"
+                  className="cursor-pointer"
+                >
                   <Plus className="h-4 w-4 mr-1" />
                   {t("blocks.multi_dropdown.add_option_button")}
                 </Button>
@@ -211,7 +234,10 @@ export function MultiDropdownBlock({
             </div>
 
             <Select value="" onValueChange={handleSelectValue}>
-              <SelectTrigger data-no-drag="true" disabled={availableOptions.length === 0}>
+              <SelectTrigger
+                data-no-drag="true"
+                disabled={availableOptions.length === 0}
+              >
                 <SelectValue
                   placeholder={
                     availableOptions.length === 0
@@ -253,17 +279,20 @@ export function MultiDropdownBlock({
         )}
 
         {/* Entity Modes (Characters, Factions, Items, Races) */}
-        {dataSource !== 'manual' && (
+        {dataSource !== "manual" && (
           <>
             <Select value="" onValueChange={handleSelectEntity}>
-              <SelectTrigger data-no-drag="true" disabled={availableEntities.length === 0 || isLoadingEntities}>
+              <SelectTrigger
+                data-no-drag="true"
+                disabled={availableEntities.length === 0 || isLoadingEntities}
+              >
                 <SelectValue
                   placeholder={
                     isLoadingEntities
                       ? t("blocks.dropdown.loading_entities")
                       : availableEntities.length === 0
-                      ? t("blocks.multi_dropdown.no_options_available")
-                      : t("blocks.dropdown.select_entity")
+                        ? t("blocks.multi_dropdown.no_options_available")
+                        : t("blocks.dropdown.select_entity")
                   }
                 />
               </SelectTrigger>
@@ -278,7 +307,7 @@ export function MultiDropdownBlock({
 
             {resolvedEntities.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {resolvedEntities.map((entity) => (
+                {resolvedEntities.map((entity) =>
                   renderHoverCard(
                     entity.id,
                     <span key={entity.id} className="inline-block">
@@ -300,7 +329,7 @@ export function MultiDropdownBlock({
                       </Badge>
                     </span>
                   )
-                ))}
+                )}
               </div>
             )}
           </>
@@ -310,7 +339,7 @@ export function MultiDropdownBlock({
   }
 
   // View Mode - Manual
-  if (dataSource === 'manual') {
+  if (dataSource === "manual") {
     return (
       <div className="space-y-3">
         <Select
@@ -366,7 +395,7 @@ export function MultiDropdownBlock({
   }
 
   // View Mode - Entity modes (Characters, Factions, Items, Races)
-  if (dataSource !== 'manual') {
+  if (dataSource !== "manual") {
     return (
       <div className="space-y-3">
         <Select
@@ -397,7 +426,7 @@ export function MultiDropdownBlock({
 
         {resolvedEntities.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {resolvedEntities.map((entity) => (
+            {resolvedEntities.map((entity) =>
               renderHoverCard(
                 entity.id,
                 <span key={entity.id} className="inline-block">
@@ -421,7 +450,7 @@ export function MultiDropdownBlock({
                   </Badge>
                 </span>
               )
-            ))}
+            )}
           </div>
         )}
       </div>

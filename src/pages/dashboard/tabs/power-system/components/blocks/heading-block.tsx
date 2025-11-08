@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import {
   type HeadingContent,
   type IPowerBlock,
@@ -62,7 +63,10 @@ export function HeadingBlock({
       right: "text-right",
     };
 
-    return alignmentClasses[alignment as keyof typeof alignmentClasses] || "text-left";
+    return (
+      alignmentClasses[alignment as keyof typeof alignmentClasses] ||
+      "text-left"
+    );
   };
 
   const HeadingTag = `h${content.level}` as keyof JSX.IntrinsicElements;
@@ -77,7 +81,10 @@ export function HeadingBlock({
             <Select
               value={String(content.level)}
               onValueChange={(value) =>
-                onUpdate({ ...content, level: Number(value) as 1 | 2 | 3 | 4 | 5 })
+                onUpdate({
+                  ...content,
+                  level: Number(value) as 1 | 2 | 3 | 4 | 5,
+                })
               }
             >
               <SelectTrigger data-no-drag="true" className="w-20">

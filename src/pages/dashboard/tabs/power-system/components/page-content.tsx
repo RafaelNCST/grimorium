@@ -1,5 +1,6 @@
-import { Plus, Search, Link } from "lucide-react";
 import { useState } from "react";
+
+import { Plus, Search, Link } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { SectionComponent } from "./section-component";
+
 import type {
   IPowerBlock,
   IPowerPage,
@@ -18,7 +21,6 @@ import type {
   IPowerSystem,
   BlockContent,
 } from "../types/power-system-types";
-import { SectionComponent } from "./section-component";
 
 interface PageContentProps {
   system: IPowerSystem;
@@ -139,9 +141,8 @@ export function PageContent({
     )
     .sort((a, b) => a.orderIndex - b.orderIndex);
 
-  const getBlocksForSection = (sectionId: string) => {
-    return blocks.filter((block) => block.sectionId === sectionId);
-  };
+  const getBlocksForSection = (sectionId: string) =>
+    blocks.filter((block) => block.sectionId === sectionId);
 
   const handleMoveSectionUp = (sectionId: string) => {
     const currentIndex = sortedSections.findIndex((s) => s.id === sectionId);
@@ -179,7 +180,6 @@ export function PageContent({
     onReorderSections(reorderedSections);
   };
 
-
   return (
     <div className="flex-1 flex flex-col h-full bg-background">
       {/* Page Header */}
@@ -213,9 +213,7 @@ export function PageContent({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm font-medium">
-                  {t("links.manage")}
-                </p>
+                <p className="text-sm font-medium">{t("links.manage")}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -234,9 +232,7 @@ export function PageContent({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="text-sm font-medium">
-                  {t("pages.add_section")}
-                </p>
+                <p className="text-sm font-medium">{t("pages.add_section")}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -283,7 +279,10 @@ export function PageContent({
                   }
                   onDeleteSection={() => onDeleteSection(section.id)}
                   onAddBlock={() => {
-                    console.log("onAddBlock called in page-content for section:", section.id);
+                    console.log(
+                      "onAddBlock called in page-content for section:",
+                      section.id
+                    );
                     onAddBlock(section.id);
                   }}
                   onUpdateBlock={onUpdateBlock}
@@ -294,7 +293,11 @@ export function PageContent({
                   onPageSelect={onPageSelect}
                   onMoveUp={() => handleMoveSectionUp(section.id)}
                   onMoveDown={() => handleMoveSectionDown(section.id)}
-                  onManageSectionLinks={onManageSectionLinks ? () => onManageSectionLinks(section.id) : undefined}
+                  onManageSectionLinks={
+                    onManageSectionLinks
+                      ? () => onManageSectionLinks(section.id)
+                      : undefined
+                  }
                 />
               ))}
             </div>

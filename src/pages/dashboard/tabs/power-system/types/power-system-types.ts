@@ -40,7 +40,12 @@ export interface TagListContent {
   tags: string[];
 }
 
-export type DataSourceType = 'manual' | 'characters' | 'factions' | 'items' | 'races';
+export type DataSourceType =
+  | "manual"
+  | "characters"
+  | "factions"
+  | "items"
+  | "races";
 
 export interface DropdownContent {
   dataSource?: DataSourceType; // Default 'manual' para retrocompatibilidade
@@ -69,7 +74,7 @@ export interface ImageContent {
   originalImageUrl?: string; // The original uploaded image (preserved for reverting from crop)
   croppedImageUrl?: string; // The cropped image data (preserved when switching modes)
   caption?: string;
-  objectFit?: 'fill' | 'fit' | 'crop'; // default: 'fill' (equivalente a cover)
+  objectFit?: "fill" | "fit" | "crop"; // default: 'fill' (equivalente a cover)
 }
 
 export interface IconContent {

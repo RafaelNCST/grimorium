@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -76,11 +77,7 @@ export function EditPowerLinkModal({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             {t("actions.cancel")}
           </Button>
           <Button

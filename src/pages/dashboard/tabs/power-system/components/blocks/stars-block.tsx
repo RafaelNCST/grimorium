@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   type IPowerBlock,
   type StarsContent,
@@ -135,13 +136,19 @@ export function StarsBlock({
                   className="relative cursor-pointer hover:scale-110 transition-transform"
                 >
                   {state === "full" && (
-                    <Star className={`${starSize} fill-yellow-500 text-yellow-500`} />
+                    <Star
+                      className={`${starSize} fill-yellow-500 text-yellow-500`}
+                    />
                   )}
                   {state === "half" && (
                     <div className={`relative ${starSize}`}>
-                      <Star className={`${starSize} text-muted-foreground absolute inset-0`} />
+                      <Star
+                        className={`${starSize} text-muted-foreground absolute inset-0`}
+                      />
                       <div className="absolute inset-0 overflow-hidden w-1/2">
-                        <Star className={`${starSize} fill-yellow-500 text-yellow-500`} />
+                        <Star
+                          className={`${starSize} fill-yellow-500 text-yellow-500`}
+                        />
                       </div>
                     </div>
                   )}
@@ -172,9 +179,13 @@ export function StarsBlock({
             )}
             {state === "half" && (
               <div className={`relative ${starSize}`}>
-                <Star className={`${starSize} text-muted-foreground absolute inset-0`} />
+                <Star
+                  className={`${starSize} text-muted-foreground absolute inset-0`}
+                />
                 <div className="absolute inset-0 overflow-hidden w-1/2">
-                  <Star className={`${starSize} fill-yellow-500 text-yellow-500`} />
+                  <Star
+                    className={`${starSize} fill-yellow-500 text-yellow-500`}
+                  />
                 </div>
               </div>
             )}

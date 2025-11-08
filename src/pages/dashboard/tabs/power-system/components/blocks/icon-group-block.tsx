@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
+
 import { Plus, Trash2, UserCircle, Upload, Edit2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +11,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
 import {
   type IPowerBlock,
   type IconGroupContent,
@@ -113,7 +115,11 @@ function IconCardDialog({
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <label htmlFor="icon-group-upload" className="cursor-pointer" data-no-drag="true">
+                    <label
+                      htmlFor="icon-group-upload"
+                      className="cursor-pointer"
+                      data-no-drag="true"
+                    >
                       <Upload className="h-5 w-5 text-white" />
                     </label>
                   </div>
@@ -173,7 +179,12 @@ function IconCardDialog({
         </div>
 
         <DialogFooter>
-          <Button data-no-drag="true" variant="outline" onClick={onClose} className="cursor-pointer">
+          <Button
+            data-no-drag="true"
+            variant="outline"
+            onClick={onClose}
+            className="cursor-pointer"
+          >
             {t("blocks.icon_group.cancel")}
           </Button>
           <Button
@@ -264,7 +275,13 @@ export function IconGroupBlock({
     return (
       <div className="space-y-3 p-4 rounded-lg border bg-card">
         <div className="flex items-center justify-between gap-2 mb-2">
-          <Button data-no-drag="true" onClick={openAddDialog} size="sm" variant="outline" className="cursor-pointer">
+          <Button
+            data-no-drag="true"
+            onClick={openAddDialog}
+            size="sm"
+            variant="outline"
+            className="cursor-pointer"
+          >
             <Plus className="h-4 w-4 mr-2" />
             {t("blocks.icon_group.add_icon_button")}
           </Button>
@@ -301,7 +318,9 @@ export function IconGroupBlock({
                   )}
                 </div>
                 <div className="flex-1 space-y-1 w-full min-w-0">
-                  <h4 className="font-semibold text-sm truncate w-full">{icon.title}</h4>
+                  <h4 className="font-semibold text-sm truncate w-full">
+                    {icon.title}
+                  </h4>
                   <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words overflow-wrap-anywhere w-full pr-2">
                     {icon.description}
                   </p>
@@ -364,7 +383,9 @@ export function IconGroupBlock({
                 )}
               </div>
               <div className="flex-1 space-y-1 w-full min-w-0">
-                <h4 className="font-semibold text-sm truncate w-full">{icon.title}</h4>
+                <h4 className="font-semibold text-sm truncate w-full">
+                  {icon.title}
+                </h4>
                 <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words overflow-wrap-anywhere w-full pr-2">
                   {icon.description}
                 </p>

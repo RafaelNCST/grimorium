@@ -103,7 +103,11 @@
       "Bash(cmd /c \"taskkill /PID 21172 /F\")",
       "Bash(cmd /c 'taskkill /PID 13436 /F' 2)",
       "Bash(cmd /c \"taskkill /PID 8580 /F\")",
-      "Bash(cmd //c \"taskkill //PID 8580 //F\")"
+      "Bash(cmd //c \"taskkill //PID 8580 //F\")",
+      "Bash(Get-Process)",
+      "Bash(Where-Object {$_rocessName -match \"node\"})",
+      "Bash(Select-Object ProcessName,Id,CommandLine)",
+      "Bash(cmd.exe //c taskkill //PID 29836 //F)"
     ],
     "deny": [],
     "ask": []

@@ -44,7 +44,9 @@ export function DeleteSystemModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{t("modals.delete_system.cancel")}</AlertDialogCancel>
+          <AlertDialogCancel>
+            {t("modals.delete_system.cancel")}
+          </AlertDialogCancel>
           <Button
             variant="destructive"
             size="lg"

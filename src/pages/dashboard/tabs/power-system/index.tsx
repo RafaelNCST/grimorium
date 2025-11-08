@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 
 import { usePowerSystemStore } from "@/stores/power-system-store";
+import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
+
+import { executeTemplate } from "./utils/template-builder";
+import { PowerSystemView } from "./view";
 
 import type { IPowerSystem } from "./types/power-system-types";
-import { PowerSystemView } from "./view";
 
 interface PowerSystemTabProps {
   bookId: string;
@@ -11,9 +14,16 @@ interface PowerSystemTabProps {
 
 export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
   // Store
-  const { fetchSystems, getSystems, isLoading: isStoreLoading } = usePowerSystemStore();
+  const {
+    fetchSystems,
+    getSystems,
+    isLoading: isStoreLoading,
+  } = usePowerSystemStore();
   const systems = getSystems(bookId);
   const isLoadingSystems = isStoreLoading(bookId);
+
+  // UI Store
+  const { setCurrentPageId } = usePowerSystemUIStore();
 
   // UI State
   const [isEditMode, setIsEditMode] = useState(false);
@@ -35,9 +45,31 @@ export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
   // SYSTEM HANDLERS
   // ============================================================================
 
-  const handleCreateSystem = async (name: string, iconImage?: string) => {
+  const handleCreateSystem = async (
+    name: string,
+    iconImage?: string,
+    templateId?: string,
+    language?: string
+  ) => {
     try {
-      await usePowerSystemStore.getState().addSystem(bookId, name, iconImage);
+      const systemId = await usePowerSystemStore
+        .getState()
+        .addSystem(bookId, name, iconImage);
+
+      // If a template was selected, execute it
+      if (templateId && language) {
+        const pageId = await executeTemplate(
+          systemId,
+          templateId,
+          language as "pt" | "en"
+        );
+
+        // Advanced templates return a pageId for navigation
+        // Basic templates return null (no navigation)
+        if (pageId) {
+          setCurrentPageId(systemId, pageId);
+        }
+      }
 
       setIsEditMode(true); // Enable edit mode when creating a new system
       setIsCreateSystemModalOpen(false);
@@ -46,9 +78,15 @@ export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
     }
   };
 
-  const handleUpdateSystem = async (systemId: string, name: string, iconImage?: string) => {
+  const handleUpdateSystem = async (
+    systemId: string,
+    name: string,
+    iconImage?: string
+  ) => {
     try {
-      await usePowerSystemStore.getState().updateSystemInCache(systemId, name, iconImage);
+      await usePowerSystemStore
+        .getState()
+        .updateSystemInCache(systemId, name, iconImage);
 
       setIsEditSystemModalOpen(false);
       setSystemToEdit(null);
@@ -64,7 +102,9 @@ export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
 
   const handleDeleteSystem = async (systemId: string) => {
     try {
-      await usePowerSystemStore.getState().deleteSystemFromCache(bookId, systemId);
+      await usePowerSystemStore
+        .getState()
+        .deleteSystemFromCache(bookId, systemId);
     } catch (error) {
       console.error("Error deleting system:", error);
     }

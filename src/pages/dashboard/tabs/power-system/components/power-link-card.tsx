@@ -32,7 +32,8 @@ export function PowerLinkCard({
 }: PowerLinkCardProps) {
   const { t } = useTranslation("power-system");
 
-  const displayLabel = link.customLabel || pageTitle || sectionTitle || t("links.untitled_link");
+  const displayLabel =
+    link.customLabel || pageTitle || sectionTitle || t("links.untitled_link");
 
   return (
     <div
@@ -55,7 +56,10 @@ export function PowerLinkCard({
         </div>
 
         {isEditing && onEdit && onDelete ? (
-          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

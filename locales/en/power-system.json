@@ -258,7 +258,27 @@
       "icon_label": "System Icon (optional)",
       "icon_placeholder": "Upload an icon image",
       "submit": "Create",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "templates_section": "Start with a Template",
+      "templates_section_description": "Choose a template to learn how to use the power system",
+      "no_template": "Start from Scratch",
+      "no_template_description": "Create an empty system and build your own structure",
+      "duplicate_warning": {
+        "title": "Duplicate system name",
+        "description": "A system with the name \"{{name}}\" already exists. Do you want to create it anyway?",
+        "confirm": "Yes, create anyway",
+        "cancel": "Cancel"
+      },
+      "templates": {
+        "magic": {
+          "name": "Magic System",
+          "description": "Educational template showing magic with mana, spells, and elements. Demonstrates use of blocks, sections, and groups."
+        },
+        "martial": {
+          "name": "Martial Arts",
+          "description": "Educational template showing martial arts with Ki, techniques, and fighting styles. Demonstrates use of blocks, sections, and groups."
+        }
+      }
     },
     "edit_system": {
       "title": "Edit System",
@@ -282,7 +302,31 @@
       "name_placeholder": "e.g., Fire Magic, Healing Abilities",
       "group_label": "Group (optional)",
       "submit": "Create",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "templates_section": "Start with a Template",
+      "templates_section_description": "Choose a template to quickly set up your power system page",
+      "category_basic": "Basic",
+      "category_advanced": "Advanced",
+      "no_template": "Start from Scratch",
+      "no_template_description": "Create an empty page and build your own structure",
+      "templates": {
+        "simple_ability": {
+          "name": "Simple Ability",
+          "description": "Basic structure for a single power or ability with name, description, and effects"
+        },
+        "tiered_power": {
+          "name": "Tiered Power",
+          "description": "Power system with multiple levels or tiers of progression"
+        },
+        "combat_technique": {
+          "name": "Combat Technique",
+          "description": "Advanced combat ability with prerequisites, execution, and combinations"
+        },
+        "elemental_mastery": {
+          "name": "Elemental Mastery",
+          "description": "Comprehensive elemental magic system with attributes, skills, and synergies"
+        }
+      }
     },
     "create_section": {
       "title": "Create Section",

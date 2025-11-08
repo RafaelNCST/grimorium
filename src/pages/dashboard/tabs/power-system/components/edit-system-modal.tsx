@@ -1,9 +1,10 @@
 import { useEffect } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+
 import { type IPowerSystem } from "../types/power-system-types";
 
 interface EditSystemModalProps {
@@ -99,7 +101,10 @@ export function EditSystemModal({
           <DialogTitle>{t("modals.edit_system.title")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <FormLabel>{t("modals.edit_system.name_label")}</FormLabel>
               <div className="flex items-center gap-3">

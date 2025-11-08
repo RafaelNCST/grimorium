@@ -123,7 +123,8 @@ export function ManageLinksModal({
           if (pageId) {
             hierarchyIds = await getLinkedCharacterIdsInPageHierarchy(pageId);
           } else if (sectionId) {
-            hierarchyIds = await getLinkedCharacterIdsInSectionHierarchy(sectionId);
+            hierarchyIds =
+              await getLinkedCharacterIdsInSectionHierarchy(sectionId);
           }
           setHierarchyLinkedCharacterIds(hierarchyIds);
 
@@ -139,7 +140,8 @@ export function ManageLinksModal({
         if (pageId) {
           hierarchyIds = await getLinkedCharacterIdsInPageHierarchy(pageId);
         } else if (sectionId) {
-          hierarchyIds = await getLinkedCharacterIdsInSectionHierarchy(sectionId);
+          hierarchyIds =
+            await getLinkedCharacterIdsInSectionHierarchy(sectionId);
         }
         setHierarchyLinkedCharacterIds(hierarchyIds);
 

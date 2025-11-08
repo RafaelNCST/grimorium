@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
 import {
   getPowerLinkById,
   getPowerPageById,
@@ -13,13 +13,15 @@ import {
   getPowerSectionsByPageId,
   getPowerBlocksBySectionId,
 } from "@/lib/db/power-system.service";
+
+import { SectionComponent } from "./section-component";
+
 import type {
   IPowerCharacterLink,
   IPowerPage,
   IPowerSection,
   IPowerBlock,
 } from "../types/power-system-types";
-import { SectionComponent } from "./section-component";
 
 interface PowerInstanceViewProps {
   linkId: string;
@@ -27,7 +29,11 @@ interface PowerInstanceViewProps {
   onBack: () => void;
 }
 
-export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewProps) {
+export function PowerInstanceView({
+  linkId,
+  bookId,
+  onBack,
+}: PowerInstanceViewProps) {
   const { t } = useTranslation("power-system");
   const [link, setLink] = useState<IPowerCharacterLink | null>(null);
   const [page, setPage] = useState<IPowerPage | null>(null);
@@ -88,7 +94,9 @@ export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewP
         setSections([powerSection]);
 
         // Load blocks for this section
-        const sectionBlocks = await getPowerBlocksBySectionId(powerLink.sectionId);
+        const sectionBlocks = await getPowerBlocksBySectionId(
+          powerLink.sectionId
+        );
         setBlocks(sectionBlocks);
       }
     } catch (error) {
@@ -143,9 +151,7 @@ export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewP
               {link.customLabel || page?.name || "Power Instance"}
             </h1>
             {link.customLabel && page?.name && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {page.name}
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">{page.name}</p>
             )}
           </div>
         </div>
@@ -156,9 +162,7 @@ export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewP
         <div className="px-6 py-6 pb-20 max-w-4xl mx-auto">
           {sections.length === 0 ? (
             <div className="flex items-center justify-center h-64">
-              <p className="text-muted-foreground">
-                No content available
-              </p>
+              <p className="text-muted-foreground">No content available</p>
             </div>
           ) : (
             <div className="space-y-8">
@@ -169,7 +173,7 @@ export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewP
                   blocks={blocks.filter((b) => b.sectionId === section.id)}
                   bookId={bookId}
                   isEditMode={false}
-                  isReadOnlyView={true}
+                  isReadOnlyView
                   onUpdateSection={() => {}}
                   onDeleteSection={() => {}}
                   onAddBlock={() => {}}

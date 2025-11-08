@@ -1,31 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Dna } from 'lucide-react';
+import { useEffect, useState } from "react";
+
+import { Dna } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@/components/ui/hover-card';
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { getRaceById } from '@/lib/db/races.service';
-import type { IRace } from '@/pages/dashboard/tabs/races/types/race-types';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getRaceById } from "@/lib/db/races.service";
+import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
 interface RaceHoverCardProps {
   raceId: string;
   children: React.ReactNode;
 }
 
-export function RaceHoverCard({
-  raceId,
-  children,
-}: RaceHoverCardProps) {
-  const { t } = useTranslation(['power-system', 'create-race']);
+export function RaceHoverCard({ raceId, children }: RaceHoverCardProps) {
+  const { t } = useTranslation(["power-system", "create-race"]);
   const [race, setRace] = useState<IRace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -45,7 +40,7 @@ export function RaceHoverCard({
           }
         }
       } catch (err) {
-        console.error('Error loading race:', err);
+        console.error("Error loading race:", err);
         if (mounted) {
           setError(true);
         }
@@ -81,7 +76,7 @@ export function RaceHoverCard({
           </div>
         ) : error || !race ? (
           <div className="text-sm text-muted-foreground">
-            {t('power-system:hover_card.race_not_found')}
+            {t("power-system:hover_card.race_not_found")}
           </div>
         ) : (
           <div className="p-1 space-y-4">
@@ -89,15 +84,12 @@ export function RaceHoverCard({
             <div className="flex gap-4">
               {/* Race Image - Circular */}
               <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage
-                  src={race.image}
-                  className="object-cover"
-                />
+                <AvatarImage src={race.image} className="object-cover" />
                 <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
                   {race.name
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
@@ -126,9 +118,7 @@ export function RaceHoverCard({
                         variant="secondary"
                         className="px-2 py-0.5"
                       >
-                        <span className="text-xs font-medium">
-                          {domain}
-                        </span>
+                        <span className="text-xs font-medium">{domain}</span>
                       </Badge>
                     ))}
                   </div>

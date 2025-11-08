@@ -1,7 +1,8 @@
-import { Image as ImageIcon, Trash2, Upload } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+
+import { Image as ImageIcon, Trash2, Upload } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   type IPowerBlock,
   type ImageContent,
@@ -29,8 +31,8 @@ interface ImageBlockProps {
 const createCroppedImage = async (
   imageSrc: string,
   croppedAreaPixels: Area
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
+): Promise<string> =>
+  new Promise((resolve, reject) => {
     const image = new Image();
     image.src = imageSrc;
     image.onload = () => {
@@ -76,7 +78,6 @@ const createCroppedImage = async (
       reject(new Error("Failed to load image"));
     };
   });
-};
 
 export function ImageBlock({
   block,
@@ -127,7 +128,7 @@ export function ImageBlock({
           ...content,
           imageUrl: result,
           originalImageUrl: result,
-          croppedImageUrl: undefined
+          croppedImageUrl: undefined,
         });
       };
       reader.readAsDataURL(file);
@@ -153,7 +154,7 @@ export function ImageBlock({
         onUpdate({
           ...content,
           imageUrl: content.croppedImageUrl,
-          objectFit: "crop"
+          objectFit: "crop",
         });
       }
       setShowCropModal(true);
@@ -166,7 +167,7 @@ export function ImageBlock({
       onUpdate({
         ...content,
         imageUrl: originalImage,
-        objectFit: value as "fill" | "fit"
+        objectFit: value as "fill" | "fit",
       });
     }
   };
@@ -195,8 +196,8 @@ export function ImageBlock({
         ...content,
         imageUrl: croppedImageUrl, // Display the cropped image
         originalImageUrl: originalImage, // Keep original for reverting
-        croppedImageUrl: croppedImageUrl, // Store crop for mode switching
-        objectFit: "crop"
+        croppedImageUrl, // Store crop for mode switching
+        objectFit: "crop",
       });
 
       setShowCropModal(false);
@@ -362,7 +363,7 @@ export function ImageBlock({
         </div>
 
         {/* Crop Modal - Separado do container do bloco */}
-        <Dialog open={showCropModal} onOpenChange={setShowCropModal} modal={true}>
+        <Dialog open={showCropModal} onOpenChange={setShowCropModal} modal>
           <DialogContent
             className="sm:max-w-3xl z-50"
             onPointerDownOutside={(e) => e.preventDefault()}
@@ -399,7 +400,7 @@ export function ImageBlock({
                     onCropChange={setCrop}
                     onCropComplete={onCropComplete}
                     cropShape="rect"
-                    showGrid={true}
+                    showGrid
                   />
                 )}
               </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   DndContext,
   closestCenter,
@@ -19,6 +20,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   type IPowerBlock,
   type NumberedListContent,
@@ -189,7 +191,13 @@ export function NumberedListBlock({
             }}
             className="flex-1"
           />
-          <Button data-no-drag="true" onClick={handleAddItem} size="sm" variant="outline" className="cursor-pointer">
+          <Button
+            data-no-drag="true"
+            onClick={handleAddItem}
+            size="sm"
+            variant="outline"
+            className="cursor-pointer"
+          >
             <Plus className="h-4 w-4 mr-1" />
             {t("blocks.numbered_list.add_button")}
           </Button>

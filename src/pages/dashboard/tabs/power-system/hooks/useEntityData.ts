@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
-import { getCharactersByBookId } from '@/lib/db/characters.service';
-import { getFactionsByBookId } from '@/lib/db/factions.service';
-import { getItemsByBookId } from '@/lib/db/items.service';
-import { getRacesByBookId } from '@/lib/db/races.service';
-import type { ICharacter } from '@/types/character-types';
-import type { IFaction } from '@/types/faction-types';
-import type { IItem } from '@/lib/db/items.service';
-import type { IRace } from '@/pages/dashboard/tabs/races/types/race-types';
+import { useState, useEffect } from "react";
+
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import type { IItem } from "@/lib/db/items.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import type { ICharacter } from "@/types/character-types";
+import type { IFaction } from "@/types/faction-types";
 
 interface EntityOption {
   id: string;
@@ -20,7 +21,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!dataSource || dataSource === 'manual') {
+    if (!dataSource || dataSource === "manual") {
       setEntities([]);
       return;
     }
@@ -33,7 +34,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
         let options: EntityOption[] = [];
 
         switch (dataSource) {
-          case 'characters': {
+          case "characters": {
             const characters = await getCharactersByBookId(bookId);
             options = characters.map((char: ICharacter) => ({
               id: char.id,
@@ -42,7 +43,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
             }));
             break;
           }
-          case 'factions': {
+          case "factions": {
             const factions = await getFactionsByBookId(bookId);
             options = factions.map((faction: IFaction) => ({
               id: faction.id,
@@ -51,7 +52,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
             }));
             break;
           }
-          case 'items': {
+          case "items": {
             const items = await getItemsByBookId(bookId);
             options = items.map((item: IItem) => ({
               id: item.id,
@@ -60,7 +61,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
             }));
             break;
           }
-          case 'races': {
+          case "races": {
             const races = await getRacesByBookId(bookId);
             options = races.map((race: IRace) => ({
               id: race.id,
@@ -73,7 +74,7 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
 
         setEntities(options);
       } catch (err) {
-        setError('Failed to load entities');
+        setError("Failed to load entities");
         console.error(err);
       } finally {
         setIsLoading(false);

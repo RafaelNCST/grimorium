@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   type IPowerBlock,
   type IconContent,
@@ -220,9 +221,7 @@ export function IconBlock({
           <h3 className="font-semibold text-lg">{content.title}</h3>
         )}
         {content.description && (
-          <p className="text-sm text-muted-foreground">
-            {content.description}
-          </p>
+          <p className="text-sm text-muted-foreground">{content.description}</p>
         )}
       </div>
     </div>

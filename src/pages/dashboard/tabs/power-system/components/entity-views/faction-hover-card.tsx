@@ -1,20 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Shield } from 'lucide-react';
+import { useEffect, useState } from "react";
+
+import { Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@/components/ui/hover-card';
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { getFactionById } from '@/lib/db/factions.service';
-import type { IFaction } from '@/types/faction-types';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getFactionById } from "@/lib/db/factions.service";
+import type { IFaction } from "@/types/faction-types";
 
 interface FactionHoverCardProps {
   factionId: string;
@@ -25,7 +23,7 @@ export function FactionHoverCard({
   factionId,
   children,
 }: FactionHoverCardProps) {
-  const { t } = useTranslation(['power-system', 'create-faction']);
+  const { t } = useTranslation(["power-system", "create-faction"]);
   const [faction, setFaction] = useState<IFaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -45,7 +43,7 @@ export function FactionHoverCard({
           }
         }
       } catch (err) {
-        console.error('Error loading faction:', err);
+        console.error("Error loading faction:", err);
         if (mounted) {
           setError(true);
         }
@@ -81,7 +79,7 @@ export function FactionHoverCard({
           </div>
         ) : error || !faction ? (
           <div className="text-sm text-muted-foreground">
-            {t('power-system:hover_card.faction_not_found')}
+            {t("power-system:hover_card.faction_not_found")}
           </div>
         ) : (
           <div className="p-1 space-y-4">
@@ -89,15 +87,12 @@ export function FactionHoverCard({
             <div className="flex gap-4">
               {/* Faction Image - Circular */}
               <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage
-                  src={faction.image}
-                  className="object-cover"
-                />
+                <AvatarImage src={faction.image} className="object-cover" />
                 <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
                   {faction.name
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
@@ -113,7 +108,9 @@ export function FactionHoverCard({
                     <div className="flex items-center gap-1.5">
                       <Shield className="w-3.5 h-3.5 text-primary" />
                       <span className="text-sm font-medium text-muted-foreground capitalize">
-                        {t(`create-faction:faction_type.${faction.factionType}`)}
+                        {t(
+                          `create-faction:faction_type.${faction.factionType}`
+                        )}
                       </span>
                     </div>
                   )}
@@ -122,10 +119,7 @@ export function FactionHoverCard({
                 {/* Status Badge */}
                 {faction.status && (
                   <div className="flex">
-                    <Badge
-                      variant="secondary"
-                      className="px-3 py-1"
-                    >
+                    <Badge variant="secondary" className="px-3 py-1">
                       <span className="text-xs font-medium capitalize">
                         {t(`create-faction:status.${faction.status}`)}
                       </span>

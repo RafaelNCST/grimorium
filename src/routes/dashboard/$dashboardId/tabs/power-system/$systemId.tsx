@@ -4,7 +4,7 @@ import { PowerSystemDetail } from "@/pages/dashboard/tabs/power-system/system-de
 
 const PowerSystemDetailPage = () => {
   const { dashboardId } = useParams({
-    from: "/dashboard/$dashboardId/tabs/power-system/$systemId"
+    from: "/dashboard/$dashboardId/tabs/power-system/$systemId",
   });
 
   return <PowerSystemDetail bookId={dashboardId} />;

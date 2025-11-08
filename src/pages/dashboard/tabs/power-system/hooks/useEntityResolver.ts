@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { getCharacterById } from '@/lib/db/characters.service';
-import { getFactionById } from '@/lib/db/factions.service';
-import { getItemById } from '@/lib/db/items.service';
-import { getRaceById } from '@/lib/db/races.service';
+import { useState, useEffect } from "react";
+
+import { getCharacterById } from "@/lib/db/characters.service";
+import { getFactionById } from "@/lib/db/factions.service";
+import { getItemById } from "@/lib/db/items.service";
+import { getRaceById } from "@/lib/db/races.service";
 
 interface ResolvedEntity {
   id: string;
@@ -15,11 +16,13 @@ export function useEntityResolver(
   entityIds: string[],
   bookId: string
 ) {
-  const [resolvedEntities, setResolvedEntities] = useState<ResolvedEntity[]>([]);
+  const [resolvedEntities, setResolvedEntities] = useState<ResolvedEntity[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!dataSource || dataSource === 'manual' || entityIds.length === 0) {
+    if (!dataSource || dataSource === "manual" || entityIds.length === 0) {
       setResolvedEntities([]);
       return;
     }
@@ -34,29 +37,29 @@ export function useEntityResolver(
               let entity = null;
 
               switch (dataSource) {
-                case 'characters':
+                case "characters":
                   entity = await getCharacterById(id);
                   break;
-                case 'factions':
+                case "factions":
                   entity = await getFactionById(id);
                   break;
-                case 'items':
+                case "items":
                   entity = await getItemById(id);
                   break;
-                case 'races':
+                case "races":
                   entity = await getRaceById(id);
                   break;
               }
 
               return {
                 id,
-                name: entity?.name ?? '[Deleted]',
+                name: entity?.name ?? "[Deleted]",
                 exists: !!entity,
               };
             } catch {
               return {
                 id,
-                name: '[Deleted]',
+                name: "[Deleted]",
                 exists: false,
               };
             }

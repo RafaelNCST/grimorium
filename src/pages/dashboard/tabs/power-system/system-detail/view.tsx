@@ -1,6 +1,7 @@
-import { ArrowLeft, Pencil, PanelLeft, Trash2, Zap } from "lucide-react";
+import { ArrowLeft, Pencil, PanelLeft, Trash2, Zap, Undo2, Redo2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -9,8 +10,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+
+import { CreateGroupModal } from "../components/create-group-modal";
+import { CreatePageModal } from "../components/create-page-modal";
+import { CreateSectionModal } from "../components/create-section-modal";
+import { DeleteSystemModal } from "../components/delete-system-modal";
+import { EditSystemModal } from "../components/edit-system-modal";
+import { NavigationSidebar } from "../components/navigation-sidebar";
+import { PageContent } from "../components/page-content";
+import { SelectBlockModal } from "../components/select-block-modal";
 
 import type {
   IPowerSystem,
@@ -21,15 +30,6 @@ import type {
   BlockType,
   BlockContent,
 } from "../types/power-system-types";
-
-import { NavigationSidebar } from "../components/navigation-sidebar";
-import { PageContent } from "../components/page-content";
-import { EditSystemModal } from "../components/edit-system-modal";
-import { CreateGroupModal } from "../components/create-group-modal";
-import { CreatePageModal } from "../components/create-page-modal";
-import { CreateSectionModal } from "../components/create-section-modal";
-import { SelectBlockModal } from "../components/select-block-modal";
-import { DeleteSystemModal } from "../components/delete-system-modal";
 
 interface PowerSystemDetailViewProps {
   // Data
@@ -44,6 +44,12 @@ interface PowerSystemDetailViewProps {
   // UI State
   isEditMode: boolean;
   isLeftSidebarOpen: boolean;
+
+  // Undo/Redo State
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
 
   // Loading States
   isLoadingGroups: boolean;
@@ -90,7 +96,11 @@ interface PowerSystemDetailViewProps {
   onReorderSections: (sections: IPowerSection[]) => void;
 
   // Block Handlers
-  onCreateBlock: (sectionId: string, type: BlockType, content: BlockContent) => void;
+  onCreateBlock: (
+    sectionId: string,
+    type: BlockType,
+    content: BlockContent
+  ) => void;
   onUpdateBlock: (blockId: string, content: BlockContent) => void;
   onDeleteBlock: (blockId: string) => void;
   onReorderBlocks: (sectionId: string, blocks: IPowerBlock[]) => void;
@@ -117,6 +127,9 @@ interface PowerSystemDetailViewProps {
   onManagePageLinks?: (pageId: string) => void;
   onManageSectionLinks?: (sectionId: string) => void;
 
+  // Selection tracking for keyboard shortcuts
+  onItemSelect?: (itemId: string, itemType: "page" | "group") => void;
+
   // Children (for modals)
   children?: React.ReactNode;
 }
@@ -134,6 +147,12 @@ export function PowerSystemDetailView({
   // UI State
   isEditMode,
   isLeftSidebarOpen,
+
+  // Undo/Redo State
+  canUndo = false,
+  canRedo = false,
+  onUndo,
+  onRedo,
 
   // Loading States
   isLoadingPages,
@@ -204,6 +223,9 @@ export function PowerSystemDetailView({
   onManagePageLinks,
   onManageSectionLinks,
 
+  // Selection tracking
+  onItemSelect,
+
   // Children
   children,
 }: PowerSystemDetailViewProps) {
@@ -217,10 +239,12 @@ export function PowerSystemDetailView({
     return (
       <div className="flex h-full overflow-hidden">
         {/* Navigation Sidebar */}
-        <div className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isLeftSidebarOpen ? "w-80" : "w-0"
-        )}>
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLeftSidebarOpen ? "w-80" : "w-0"
+          )}
+        >
           <NavigationSidebar
             systemId={system.id}
             isOpen={isLeftSidebarOpen}
@@ -239,19 +263,24 @@ export function PowerSystemDetailView({
             onDuplicatePage={onDuplicatePage}
             onMovePage={onMovePage}
             onReorderPages={(pageIds) => {
-              const reorderedPages = pageIds.map((id, index) => {
-                const page = pages.find((p) => p.id === id);
-                return page ? { ...page, orderIndex: index } : null;
-              }).filter(Boolean) as IPowerPage[];
+              const reorderedPages = pageIds
+                .map((id, index) => {
+                  const page = pages.find((p) => p.id === id);
+                  return page ? { ...page, orderIndex: index } : null;
+                })
+                .filter(Boolean) as IPowerPage[];
               onReorderPages(reorderedPages);
             }}
             onReorderGroups={(groupIds) => {
-              const reorderedGroups = groupIds.map((id, index) => {
-                const group = groups.find((g) => g.id === id);
-                return group ? { ...group, orderIndex: index } : null;
-              }).filter(Boolean) as IPowerGroup[];
+              const reorderedGroups = groupIds
+                .map((id, index) => {
+                  const group = groups.find((g) => g.id === id);
+                  return group ? { ...group, orderIndex: index } : null;
+                })
+                .filter(Boolean) as IPowerGroup[];
               onReorderGroups(reorderedGroups);
             }}
+            onItemSelect={onItemSelect}
           />
         </div>
 
@@ -314,7 +343,10 @@ export function PowerSystemDetailView({
             <div className="flex items-center gap-4">
               {/* Edit Mode Toggle Switch */}
               <div className="flex items-center gap-2">
-                <Label htmlFor="edit-mode-toggle-no-page" className="text-sm cursor-pointer">
+                <Label
+                  htmlFor="edit-mode-toggle-no-page"
+                  className="text-sm cursor-pointer"
+                >
                   {isEditMode ? t("modes.edit") : t("modes.view")}
                 </Label>
                 <Switch
@@ -454,10 +486,12 @@ export function PowerSystemDetailView({
   return (
     <div className="flex h-full overflow-hidden">
       {/* Navigation Sidebar */}
-      <div className={cn(
-        "transition-all duration-300 ease-in-out overflow-hidden",
-        isLeftSidebarOpen ? "w-80" : "w-0"
-      )}>
+      <div
+        className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isLeftSidebarOpen ? "w-80" : "w-0"
+        )}
+      >
         <NavigationSidebar
           systemId={system.id}
           isOpen={isLeftSidebarOpen}
@@ -476,19 +510,24 @@ export function PowerSystemDetailView({
           onDuplicatePage={onDuplicatePage}
           onMovePage={onMovePage}
           onReorderPages={(pageIds) => {
-            const reorderedPages = pageIds.map((id, index) => {
-              const page = pages.find((p) => p.id === id);
-              return page ? { ...page, orderIndex: index } : null;
-            }).filter(Boolean) as IPowerPage[];
+            const reorderedPages = pageIds
+              .map((id, index) => {
+                const page = pages.find((p) => p.id === id);
+                return page ? { ...page, orderIndex: index } : null;
+              })
+              .filter(Boolean) as IPowerPage[];
             onReorderPages(reorderedPages);
           }}
           onReorderGroups={(groupIds) => {
-            const reorderedGroups = groupIds.map((id, index) => {
-              const group = groups.find((g) => g.id === id);
-              return group ? { ...group, orderIndex: index } : null;
-            }).filter(Boolean) as IPowerGroup[];
+            const reorderedGroups = groupIds
+              .map((id, index) => {
+                const group = groups.find((g) => g.id === id);
+                return group ? { ...group, orderIndex: index } : null;
+              })
+              .filter(Boolean) as IPowerGroup[];
             onReorderGroups(reorderedGroups);
           }}
+          onItemSelect={onItemSelect}
         />
       </div>
 
@@ -549,9 +588,55 @@ export function PowerSystemDetailView({
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Undo/Redo Buttons - Only visible in edit mode */}
+            {isEditMode && (
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onUndo}
+                      disabled={!canUndo}
+                      className="cursor-pointer"
+                    >
+                      <Undo2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm font-medium">
+                      Undo (Ctrl+Z)
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onRedo}
+                      disabled={!canRedo}
+                      className="cursor-pointer"
+                    >
+                      <Redo2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm font-medium">
+                      Redo (Ctrl+Y)
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            )}
+
             {/* Edit Mode Toggle Switch */}
             <div className="flex items-center gap-2">
-              <Label htmlFor="edit-mode-toggle" className="text-sm cursor-pointer">
+              <Label
+                htmlFor="edit-mode-toggle"
+                className="text-sm cursor-pointer"
+              >
                 {isEditMode ? t("modes.edit") : t("modes.view")}
               </Label>
               <Switch

@@ -1,5 +1,12 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EntityOption {
   id: string;
@@ -20,14 +27,14 @@ export function EntitySelect({
   selectedId,
   onSelect,
   isLoading,
-  placeholder
+  placeholder,
 }: EntitySelectProps) {
-  const { t } = useTranslation('power-system');
+  const { t } = useTranslation("power-system");
 
   if (isLoading) {
     return (
       <div className="text-sm text-muted-foreground">
-        {t('blocks.dropdown.loading_entities')}
+        {t("blocks.dropdown.loading_entities")}
       </div>
     );
   }
@@ -35,7 +42,7 @@ export function EntitySelect({
   if (entities.length === 0) {
     return (
       <div className="text-sm text-muted-foreground">
-        {t('blocks.dropdown.no_entities')}
+        {t("blocks.dropdown.no_entities")}
       </div>
     );
   }
@@ -43,7 +50,9 @@ export function EntitySelect({
   return (
     <Select value={selectedId} onValueChange={onSelect}>
       <SelectTrigger data-no-drag="true">
-        <SelectValue placeholder={placeholder ?? t('blocks.dropdown.select_entity')} />
+        <SelectValue
+          placeholder={placeholder ?? t("blocks.dropdown.select_entity")}
+        />
       </SelectTrigger>
       <SelectContent>
         {entities.map((entity) => (

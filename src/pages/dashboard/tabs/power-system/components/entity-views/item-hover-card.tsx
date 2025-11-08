@@ -1,30 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Package } from 'lucide-react';
+import { useEffect, useState } from "react";
+
+import { Package } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@/components/ui/hover-card';
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { getItemById, type IItem } from '@/lib/db/items.service';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getItemById, type IItem } from "@/lib/db/items.service";
 
 interface ItemHoverCardProps {
   itemId: string;
   children: React.ReactNode;
 }
 
-export function ItemHoverCard({
-  itemId,
-  children,
-}: ItemHoverCardProps) {
-  const { t } = useTranslation(['power-system', 'create-item']);
+export function ItemHoverCard({ itemId, children }: ItemHoverCardProps) {
+  const { t } = useTranslation(["power-system", "create-item"]);
   const [item, setItem] = useState<IItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -44,7 +39,7 @@ export function ItemHoverCard({
           }
         }
       } catch (err) {
-        console.error('Error loading item:', err);
+        console.error("Error loading item:", err);
         if (mounted) {
           setError(true);
         }
@@ -80,7 +75,7 @@ export function ItemHoverCard({
           </div>
         ) : error || !item ? (
           <div className="text-sm text-muted-foreground">
-            {t('power-system:hover_card.item_not_found')}
+            {t("power-system:hover_card.item_not_found")}
           </div>
         ) : (
           <div className="p-1 space-y-4">
@@ -88,15 +83,12 @@ export function ItemHoverCard({
             <div className="flex gap-4">
               {/* Item Image - Circular */}
               <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage
-                  src={item.image}
-                  className="object-cover"
-                />
+                <AvatarImage src={item.image} className="object-cover" />
                 <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
                   {item.name
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
@@ -112,7 +104,8 @@ export function ItemHoverCard({
                     <div className="flex items-center gap-1.5">
                       <Package className="w-3.5 h-3.5 text-primary" />
                       <span className="text-sm font-medium text-muted-foreground capitalize">
-                        {item.customCategory || t(`create-item:category.${item.category}`)}
+                        {item.customCategory ||
+                          t(`create-item:category.${item.category}`)}
                       </span>
                     </div>
                   )}
@@ -121,10 +114,7 @@ export function ItemHoverCard({
                 {/* Status Badge */}
                 {item.status && (
                   <div className="flex">
-                    <Badge
-                      variant="secondary"
-                      className="px-3 py-1"
-                    >
+                    <Badge variant="secondary" className="px-3 py-1">
                       <span className="text-xs font-medium capitalize">
                         {t(`create-item:status.${item.status}`)}
                       </span>

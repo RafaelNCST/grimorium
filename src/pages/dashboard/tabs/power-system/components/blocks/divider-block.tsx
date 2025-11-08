@@ -2,6 +2,7 @@ import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+
 import {
   type IPowerBlock,
   type DividerContent,
@@ -14,10 +15,7 @@ interface DividerBlockProps {
   onDelete: () => void;
 }
 
-export function DividerBlock({
-  isEditMode,
-  onDelete,
-}: DividerBlockProps) {
+export function DividerBlock({ isEditMode, onDelete }: DividerBlockProps) {
   if (isEditMode) {
     return (
       <div className="space-y-3 p-4 rounded-lg border bg-card">

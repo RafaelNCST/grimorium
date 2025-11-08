@@ -1,22 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Calendar } from 'lucide-react';
+import { useEffect, useState } from "react";
+
+import { Calendar } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
+import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from '@/components/ui/hover-card';
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { getCharacterById } from '@/lib/db/characters.service';
-import type { ICharacter } from '@/types/character-types';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CHARACTER_ROLES_CONSTANT } from '@/components/modals/create-character-modal/constants/character-roles';
-import { GENDERS_CONSTANT } from '@/components/modals/create-character-modal/constants/genders';
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getCharacterById } from "@/lib/db/characters.service";
+import type { ICharacter } from "@/types/character-types";
 
 interface CharacterHoverCardProps {
   characterId: string;
@@ -27,7 +25,7 @@ export function CharacterHoverCard({
   characterId,
   children,
 }: CharacterHoverCardProps) {
-  const { t } = useTranslation(['power-system', 'create-character']);
+  const { t } = useTranslation(["power-system", "create-character"]);
   const [character, setCharacter] = useState<ICharacter | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -47,7 +45,7 @@ export function CharacterHoverCard({
           }
         }
       } catch (err) {
-        console.error('Error loading character:', err);
+        console.error("Error loading character:", err);
         if (mounted) {
           setError(true);
         }
@@ -83,7 +81,7 @@ export function CharacterHoverCard({
           </div>
         ) : error || !character ? (
           <div className="text-sm text-muted-foreground">
-            {t('power-system:hover_card.character_not_found')}
+            {t("power-system:hover_card.character_not_found")}
           </div>
         ) : (
           <div className="p-1 space-y-4">
@@ -91,15 +89,12 @@ export function CharacterHoverCard({
             <div className="flex gap-4">
               {/* Character Image - Circular */}
               <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage
-                  src={character.image}
-                  className="object-cover"
-                />
+                <AvatarImage src={character.image} className="object-cover" />
                 <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
                   {character.name
-                    .split(' ')
+                    .split(" ")
                     .map((n) => n[0])
-                    .join('')
+                    .join("")
                     .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
@@ -119,43 +114,45 @@ export function CharacterHoverCard({
                       </span>
                     </div>
                   )}
-                  {character.gender && (() => {
-                    const genderData = GENDERS_CONSTANT.find(
-                      (g) => g.value === character.gender
-                    );
-                    const GenderIcon = genderData?.icon;
-                    return GenderIcon ? (
-                      <div className="flex items-center gap-1.5">
-                        <GenderIcon className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-sm font-medium text-muted-foreground capitalize">
-                          {t(`create-character:gender.${character.gender}`)}
-                        </span>
-                      </div>
-                    ) : null;
-                  })()}
+                  {character.gender &&
+                    (() => {
+                      const genderData = GENDERS_CONSTANT.find(
+                        (g) => g.value === character.gender
+                      );
+                      const GenderIcon = genderData?.icon;
+                      return GenderIcon ? (
+                        <div className="flex items-center gap-1.5">
+                          <GenderIcon className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-sm font-medium text-muted-foreground capitalize">
+                            {t(`create-character:gender.${character.gender}`)}
+                          </span>
+                        </div>
+                      ) : null;
+                    })()}
                 </div>
 
                 {/* Role Badge */}
-                {character.role && (() => {
-                  const roleData = CHARACTER_ROLES_CONSTANT.find(
-                    (r) => r.value === character.role
-                  );
-                  const RoleIcon = roleData?.icon;
-                  return (
-                    <div className="flex">
-                      <Badge
-                        className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
-                      >
-                        {RoleIcon && (
-                          <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
-                        )}
-                        <span className="text-xs font-medium">
-                          {t(`create-character:role.${character.role}`)}
-                        </span>
-                      </Badge>
-                    </div>
-                  );
-                })()}
+                {character.role &&
+                  (() => {
+                    const roleData = CHARACTER_ROLES_CONSTANT.find(
+                      (r) => r.value === character.role
+                    );
+                    const RoleIcon = roleData?.icon;
+                    return (
+                      <div className="flex">
+                        <Badge
+                          className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
+                        >
+                          {RoleIcon && (
+                            <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
+                          )}
+                          <span className="text-xs font-medium">
+                            {t(`create-character:role.${character.role}`)}
+                          </span>
+                        </Badge>
+                      </div>
+                    );
+                  })()}
               </div>
             </div>
 

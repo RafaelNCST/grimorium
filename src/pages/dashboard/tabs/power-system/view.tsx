@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 
-import type { IPowerSystem } from "./types/power-system-types";
-
-import { SystemListView } from "./components/system-list-view";
 import { CreateSystemModal } from "./components/create-system-modal";
-import { EditSystemModal } from "./components/edit-system-modal";
 import { DeleteSystemModal } from "./components/delete-system-modal";
+import { EditSystemModal } from "./components/edit-system-modal";
+import { SystemListView } from "./components/system-list-view";
+
+import type { IPowerSystem } from "./types/power-system-types";
 
 interface PowerSystemViewProps {
   // Data
@@ -125,6 +125,7 @@ export function PowerSystemView({
           isOpen={isCreateSystemModalOpen}
           onClose={onCloseCreateSystemModal}
           onSubmit={onCreateSystem}
+          existingSystems={systems}
         />
         <EditSystemModal
           isOpen={isEditSystemModalOpen}
@@ -154,6 +155,7 @@ export function PowerSystemView({
         isOpen={isCreateSystemModalOpen}
         onClose={onCloseCreateSystemModal}
         onSubmit={onCreateSystem}
+        existingSystems={systems}
       />
       <EditSystemModal
         isOpen={isEditSystemModalOpen}

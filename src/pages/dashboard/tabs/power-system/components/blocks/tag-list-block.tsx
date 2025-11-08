@@ -1,10 +1,12 @@
 import { useState } from "react";
+
 import { Plus, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   type IPowerBlock,
   type TagListContent,
@@ -77,7 +79,13 @@ export function TagListBlock({
             }}
             className="flex-1"
           />
-          <Button data-no-drag="true" onClick={handleAddTag} size="sm" variant="outline" className="cursor-pointer">
+          <Button
+            data-no-drag="true"
+            onClick={handleAddTag}
+            size="sm"
+            variant="outline"
+            className="cursor-pointer"
+          >
             <Plus className="h-4 w-4 mr-1" />
             {t("blocks.tag_list.add_button")}
           </Button>

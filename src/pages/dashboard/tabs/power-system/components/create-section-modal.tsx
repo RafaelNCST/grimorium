@@ -64,13 +64,18 @@ export function CreateSectionModal({
           <DialogTitle>{t("modals.create_section.title")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("modals.create_section.title_label")}</FormLabel>
+                  <FormLabel>
+                    {t("modals.create_section.title_label")}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t("modals.create_section.title_placeholder")}

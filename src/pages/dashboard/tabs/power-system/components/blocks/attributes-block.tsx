@@ -1,6 +1,7 @@
+import { useState } from "react";
+
 import { Trash2, Plus, Minus, Palette, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+
 import {
   type IPowerBlock,
   type AttributesContent,
@@ -113,7 +115,10 @@ export function AttributesBlock({
               <Plus className="w-4 h-4" />
             </Button>
 
-            <Popover open={isColorPickerOpen} onOpenChange={setIsColorPickerOpen}>
+            <Popover
+              open={isColorPickerOpen}
+              onOpenChange={setIsColorPickerOpen}
+            >
               <PopoverTrigger asChild>
                 <Button
                   data-no-drag="true"
@@ -146,7 +151,10 @@ export function AttributesBlock({
                         aria-label={t(`blocks.attributes.colors.${color}`)}
                       >
                         {currentColor === color && (
-                          <Check className="w-5 h-5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" strokeWidth={3} />
+                          <Check
+                            className="w-5 h-5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                            strokeWidth={3}
+                          />
                         )}
                       </button>
                     ))}
@@ -175,18 +183,18 @@ export function AttributesBlock({
                 data-no-drag="true"
                 onClick={() => handleBarClick(index)}
                 className={`flex-1 border-r-[3px] border-r-border/60 last:border-r-0 transition-all cursor-pointer hover:opacity-80 ${
-                  index < content.current
-                    ? barColorClass
-                    : "bg-muted"
+                  index < content.current ? barColorClass : "bg-muted"
                 }`}
               />
             ))}
           </div>
           <div className="flex justify-end text-xs text-muted-foreground">
             <span>
-              {content.current}/{content.max} ({content.max > 0
+              {content.current}/{content.max} (
+              {content.max > 0
                 ? Math.round((content.current / content.max) * 100)
-                : 0}%)
+                : 0}
+              %)
             </span>
           </div>
         </div>
@@ -201,18 +209,18 @@ export function AttributesBlock({
           <div
             key={index}
             className={`flex-1 border-r-[3px] border-r-border/60 last:border-r-0 transition-colors ${
-              index < content.current
-                ? barColorClass
-                : "bg-muted"
+              index < content.current ? barColorClass : "bg-muted"
             }`}
           />
         ))}
       </div>
       <div className="flex justify-end text-xs text-muted-foreground">
         <span>
-          {content.current}/{content.max} ({content.max > 0
+          {content.current}/{content.max} (
+          {content.max > 0
             ? Math.round((content.current / content.max) * 100)
-            : 0}%)
+            : 0}
+          %)
         </span>
       </div>
     </div>

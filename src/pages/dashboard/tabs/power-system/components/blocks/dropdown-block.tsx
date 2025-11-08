@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { Plus, Trash2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -11,19 +12,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+
+import { useEntityData } from "../../hooks/useEntityData";
+import { useEntityResolver } from "../../hooks/useEntityResolver";
 import {
   type IPowerBlock,
   type DropdownContent,
 } from "../../types/power-system-types";
-import { cn } from "@/lib/utils";
-import { DataSourceSelector } from "./shared/data-source-selector";
-import { EntitySelect } from "./shared/entity-select";
-import { useEntityData } from "../../hooks/useEntityData";
-import { useEntityResolver } from "../../hooks/useEntityResolver";
 import { CharacterHoverCard } from "../entity-views/character-hover-card";
 import { FactionHoverCard } from "../entity-views/faction-hover-card";
 import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
+
+import { DataSourceSelector } from "./shared/data-source-selector";
+import { EntitySelect } from "./shared/entity-select";
 
 interface DropdownBlockProps {
   block: IPowerBlock;
@@ -47,10 +50,13 @@ export function DropdownBlock({
   const [newOption, setNewOption] = useState("");
 
   // Default to 'manual' for retrocompatibility
-  const dataSource = content.dataSource || 'manual';
+  const dataSource = content.dataSource || "manual";
 
   // Hooks for entity data
-  const { entities, isLoading: isLoadingEntities } = useEntityData(dataSource, bookId);
+  const { entities, isLoading: isLoadingEntities } = useEntityData(
+    dataSource,
+    bookId
+  );
   const { resolvedEntities } = useEntityResolver(
     dataSource,
     content.selectedEntityId ? [content.selectedEntityId] : [],
@@ -99,13 +105,19 @@ export function DropdownBlock({
   // Helper function to render the appropriate hover card based on dataSource
   const renderHoverCard = (entityId: string, children: React.ReactNode) => {
     switch (dataSource) {
-      case 'characters':
-        return <CharacterHoverCard characterId={entityId}>{children}</CharacterHoverCard>;
-      case 'factions':
-        return <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>;
-      case 'items':
+      case "characters":
+        return (
+          <CharacterHoverCard characterId={entityId}>
+            {children}
+          </CharacterHoverCard>
+        );
+      case "factions":
+        return (
+          <FactionHoverCard factionId={entityId}>{children}</FactionHoverCard>
+        );
+      case "items":
         return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
-      case 'races':
+      case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
       default:
         return <>{children}</>;
@@ -119,7 +131,10 @@ export function DropdownBlock({
         <div className="flex items-center justify-between gap-2 mb-2">
           {/* Data Source Selector */}
           <div className="flex-1">
-            <DataSourceSelector value={dataSource} onChange={handleDataSourceChange} />
+            <DataSourceSelector
+              value={dataSource}
+              onChange={handleDataSourceChange}
+            />
           </div>
 
           <Button
@@ -134,7 +149,7 @@ export function DropdownBlock({
         </div>
 
         {/* Manual Mode */}
-        {dataSource === 'manual' && (
+        {dataSource === "manual" && (
           <>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -151,7 +166,13 @@ export function DropdownBlock({
                   }}
                   className="flex-1"
                 />
-                <Button data-no-drag="true" onClick={handleAddOption} size="sm" variant="outline" className="cursor-pointer">
+                <Button
+                  data-no-drag="true"
+                  onClick={handleAddOption}
+                  size="sm"
+                  variant="outline"
+                  className="cursor-pointer"
+                >
                   <Plus className="h-4 w-4 mr-1" />
                   {t("blocks.dropdown.add_option_button")}
                 </Button>
@@ -203,13 +224,13 @@ export function DropdownBlock({
         )}
 
         {/* Entity Modes (Characters, Factions, Items, Races) */}
-        {dataSource !== 'manual' && (
+        {dataSource !== "manual" && (
           <EntitySelect
             entities={entities}
             selectedId={content.selectedEntityId}
             onSelect={handleSelectEntity}
             isLoading={isLoadingEntities}
-            placeholder={t('blocks.dropdown.select_entity')}
+            placeholder={t("blocks.dropdown.select_entity")}
           />
         )}
       </div>
@@ -217,7 +238,7 @@ export function DropdownBlock({
   }
 
   // View Mode - Manual
-  if (dataSource === 'manual') {
+  if (dataSource === "manual") {
     return content.options.length > 0 ? (
       <Select
         value={content.selectedValue || ""}
@@ -230,9 +251,7 @@ export function DropdownBlock({
           data-no-drag="true"
           className={cn("w-full", isReadOnlyView && "!cursor-default")}
         >
-          <SelectValue
-            placeholder={t("blocks.dropdown.select_placeholder")}
-          />
+          <SelectValue placeholder={t("blocks.dropdown.select_placeholder")} />
         </SelectTrigger>
         <SelectContent>
           {content.options.map((option) => (
@@ -246,7 +265,7 @@ export function DropdownBlock({
   }
 
   // View Mode - Entity modes (Characters, Factions, Items, Races)
-  if (dataSource !== 'manual') {
+  if (dataSource !== "manual") {
     // If no entity is selected, show the select dropdown
     if (!content.selectedEntityId) {
       return (
@@ -286,9 +305,7 @@ export function DropdownBlock({
               data-no-drag="true"
               className={cn("w-full", isReadOnlyView && "!cursor-default")}
             >
-              <SelectValue>
-                {selectedEntity?.name ?? 'Loading...'}
-              </SelectValue>
+              <SelectValue>{selectedEntity?.name ?? "Loading..."}</SelectValue>
             </SelectTrigger>
           </span>
         )}

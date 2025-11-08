@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { usePowerSystemStore } from "@/stores/power-system-store";
-import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 import {
   getPowerGroupsBySystemId,
   getPowerPagesBySystemId,
@@ -27,6 +26,14 @@ import {
   movePowerPage,
   duplicatePowerPage,
 } from "@/lib/db/power-system.service";
+import { usePowerSystemStore } from "@/stores/power-system-store";
+import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
+
+import { ManageLinksModal } from "../components/manage-links-modal";
+import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+
+import { PowerSystemDetailView } from "./view";
 
 import type {
   IPowerSystem,
@@ -37,8 +44,6 @@ import type {
   BlockType,
   BlockContent,
 } from "../types/power-system-types";
-import { PowerSystemDetailView } from "./view";
-import { ManageLinksModal } from "../components/manage-links-modal";
 
 interface PowerSystemDetailProps {
   bookId: string;
@@ -46,7 +51,7 @@ interface PowerSystemDetailProps {
 
 export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const { systemId } = useParams({
-    from: "/dashboard/$dashboardId/tabs/power-system/$systemId"
+    from: "/dashboard/$dashboardId/tabs/power-system/$systemId",
   });
   const navigate = useNavigate();
 
@@ -63,6 +68,8 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     setEditMode,
     getSidebarOpen,
     setSidebarOpen,
+    getSelectedItem,
+    setSelectedItem,
   } = usePowerSystemUIStore();
 
   // State
@@ -80,22 +87,45 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [isEditSystemModalOpen, setIsEditSystemModalOpen] = useState(false);
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [isCreatePageModalOpen, setIsCreatePageModalOpen] = useState(false);
-  const [isCreateSectionModalOpen, setIsCreateSectionModalOpen] = useState(false);
+  const [isCreateSectionModalOpen, setIsCreateSectionModalOpen] =
+    useState(false);
   const [isSelectBlockModalOpen, setIsSelectBlockModalOpen] = useState(false);
   const [isDeleteSystemModalOpen, setIsDeleteSystemModalOpen] = useState(false);
   const [isManageLinksModalOpen, setIsManageLinksModalOpen] = useState(false);
 
   // Modal Context
-  const [selectedGroupForPage, setSelectedGroupForPage] = useState<string | undefined>();
-  const [selectedSectionForBlock, setSelectedSectionForBlock] = useState<string | undefined>();
-  const [selectedLinkPageId, setSelectedLinkPageId] = useState<string | undefined>();
-  const [selectedLinkSectionId, setSelectedLinkSectionId] = useState<string | undefined>();
+  const [selectedGroupForPage, setSelectedGroupForPage] = useState<
+    string | undefined
+  >();
+  const [selectedSectionForBlock, setSelectedSectionForBlock] = useState<
+    string | undefined
+  >();
+  const [selectedLinkPageId, setSelectedLinkPageId] = useState<
+    string | undefined
+  >();
+  const [selectedLinkSectionId, setSelectedLinkSectionId] = useState<
+    string | undefined
+  >();
 
   // Loading States
   const [isLoadingGroups, setIsLoadingGroups] = useState(false);
   const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [isLoadingSections, setIsLoadingSections] = useState(false);
   const [isLoadingBlocks, setIsLoadingBlocks] = useState(false);
+
+  // Undo/Redo Hook
+  const {
+    pushSnapshot,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    clearHistory,
+    isApplyingSnapshot,
+  } = useUndoRedo({
+    maxHistorySize: 50,
+    pageId: currentPage?.id || null,
+  });
 
   // Restore UI state from store when system changes
   useEffect(() => {
@@ -121,7 +151,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (systems.length > 0 && !currentSystem) {
       navigate({
         to: "/dashboard/$dashboardId",
-        params: { dashboardId: bookId }
+        params: { dashboardId: bookId },
       });
     }
   }, [systems, currentSystem, bookId, navigate]);
@@ -201,6 +231,22 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
           allBlocks.push(...sectionBlocks);
         }
         setBlocks(allBlocks);
+
+        // Save initial snapshot when entering edit mode with loaded data
+        if (isEditMode && !isApplyingSnapshot) {
+          const snapshot: Snapshot = {
+            pageId: currentPage.id,
+            // Deep clone sections to preserve all properties
+            sections: fetchedSections.map((section) => ({ ...section })),
+            // Deep clone blocks to preserve content including images
+            blocks: allBlocks.map((block) => ({
+              ...block,
+              content: JSON.parse(JSON.stringify(block.content)),
+            })),
+            timestamp: Date.now(),
+          };
+          pushSnapshot(snapshot);
+        }
       } catch (error) {
         console.error("Error loading page data:", error);
       } finally {
@@ -210,7 +256,159 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     };
 
     loadPageData();
-  }, [currentPage]);
+  }, [currentPage?.id]);
+
+  // ============================================================================
+  // HISTORY MANAGEMENT
+  // ============================================================================
+
+  /**
+   * Save current snapshot after an action is completed.
+   * This should be called AFTER create/update/delete/reorder operations.
+   * Uses deep clone to preserve all data including images and complex content.
+   */
+  const saveSnapshot = useCallback(() => {
+    if (!currentPage || !isEditMode || isApplyingSnapshot) return;
+
+    const snapshot: Snapshot = {
+      pageId: currentPage.id,
+      // Deep clone sections to preserve all properties
+      sections: sections.map((section) => ({ ...section })),
+      // Deep clone blocks to preserve content including images
+      blocks: blocks.map((block) => ({
+        ...block,
+        content: JSON.parse(JSON.stringify(block.content)), // Deep clone content
+      })),
+      timestamp: Date.now(),
+    };
+    pushSnapshot(snapshot);
+  }, [currentPage, sections, blocks, isEditMode, isApplyingSnapshot, pushSnapshot]);
+
+  /**
+   * Handle undo action
+   */
+  const handleUndo = useCallback(async () => {
+    if (!canUndo || !currentPage) return;
+
+    const result = await undo();
+    if (result) {
+      setSections(result.sections);
+      setBlocks(result.blocks);
+    }
+  }, [canUndo, currentPage, undo]);
+
+  /**
+   * Handle redo action
+   */
+  const handleRedo = useCallback(async () => {
+    if (!canRedo || !currentPage) return;
+
+    const result = await redo();
+    if (result) {
+      setSections(result.sections);
+      setBlocks(result.blocks);
+    }
+  }, [canRedo, currentPage, redo]);
+
+  // Clear history when page changes
+  useEffect(() => {
+    clearHistory();
+  }, [currentPage?.id, clearHistory]);
+
+  // Clear history when system changes
+  useEffect(() => {
+    clearHistory();
+  }, [systemId, clearHistory]);
+
+  // Clear history when exiting edit mode, save initial snapshot when entering
+  useEffect(() => {
+    if (!isEditMode) {
+      clearHistory();
+    } else if (isEditMode && currentPage && sections.length > 0 && !isApplyingSnapshot) {
+      // Save initial snapshot when entering edit mode with existing data
+      const snapshot: Snapshot = {
+        pageId: currentPage.id,
+        // Deep clone sections to preserve all properties
+        sections: sections.map((section) => ({ ...section })),
+        // Deep clone blocks to preserve content including images
+        blocks: blocks.map((block) => ({
+          ...block,
+          content: JSON.parse(JSON.stringify(block.content)),
+        })),
+        timestamp: Date.now(),
+      };
+      pushSnapshot(snapshot);
+    }
+  }, [isEditMode]);
+
+  // ============================================================================
+  // KEYBOARD SHORTCUTS
+  // ============================================================================
+
+  /**
+   * Handle rename shortcut (F2)
+   */
+  const handleRenameShortcut = useCallback(() => {
+    if (!systemId) return;
+    const selectedItem = getSelectedItem(systemId);
+
+    if (!selectedItem.id || !selectedItem.type) {
+      // If no item is selected, try to use current page
+      if (currentPage) {
+        setSelectedItem(systemId, currentPage.id, "page");
+        // Trigger rename on current page - this will be handled by the sidebar
+        const event = new CustomEvent("power-system:rename-item", {
+          detail: { id: currentPage.id, type: "page" },
+        });
+        window.dispatchEvent(event);
+      }
+      return;
+    }
+
+    // Trigger rename event for selected item
+    const event = new CustomEvent("power-system:rename-item", {
+      detail: { id: selectedItem.id, type: selectedItem.type },
+    });
+    window.dispatchEvent(event);
+  }, [systemId, currentPage, getSelectedItem, setSelectedItem]);
+
+  /**
+   * Handle delete shortcut (Delete)
+   */
+  const handleDeleteShortcut = useCallback(() => {
+    if (!systemId) return;
+    const selectedItem = getSelectedItem(systemId);
+
+    if (!selectedItem.id || !selectedItem.type) {
+      // If no item is selected, try to use current page
+      if (currentPage) {
+        setSelectedItem(systemId, currentPage.id, "page");
+        // Trigger delete on current page
+        const event = new CustomEvent("power-system:delete-item", {
+          detail: { id: currentPage.id, type: "page" },
+        });
+        window.dispatchEvent(event);
+      }
+      return;
+    }
+
+    // Trigger delete event for selected item
+    const event = new CustomEvent("power-system:delete-item", {
+      detail: { id: selectedItem.id, type: selectedItem.type },
+    });
+    window.dispatchEvent(event);
+  }, [systemId, currentPage, getSelectedItem, setSelectedItem]);
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts({
+    enabled: isEditMode,
+    handlers: {
+      onUndo: handleUndo,
+      onRedo: handleRedo,
+      onRename: handleRenameShortcut,
+      onDelete: handleDeleteShortcut,
+    },
+  });
 
   // ============================================================================
   // SYSTEM HANDLERS
@@ -220,13 +418,19 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     navigate({
       to: "/dashboard/$dashboardId",
       params: { dashboardId: bookId },
-      search: { tab: "magic" } as any
+      search: { tab: "magic" } as any,
     });
   };
 
-  const handleUpdateSystem = async (systemId: string, name: string, iconImage?: string) => {
+  const handleUpdateSystem = async (
+    systemId: string,
+    name: string,
+    iconImage?: string
+  ) => {
     try {
-      await usePowerSystemStore.getState().updateSystemInCache(systemId, name, iconImage);
+      await usePowerSystemStore
+        .getState()
+        .updateSystemInCache(systemId, name, iconImage);
       setIsEditSystemModalOpen(false);
     } catch (error) {
       console.error("Error updating system:", error);
@@ -237,13 +441,15 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (!currentSystem) return;
 
     try {
-      await usePowerSystemStore.getState().deleteSystemFromCache(bookId, currentSystem.id);
+      await usePowerSystemStore
+        .getState()
+        .deleteSystemFromCache(bookId, currentSystem.id);
 
       // Navigate back to list after deletion
       navigate({
         to: "/dashboard/$dashboardId",
         params: { dashboardId: bookId },
-        search: { tab: "magic" } as any
+        search: { tab: "magic" } as any,
       });
     } catch (error) {
       console.error("Error deleting system:", error);
@@ -259,7 +465,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
     try {
       const orderIndex = groups.length;
-      const groupId = await createPowerGroup(currentSystem.id, name, orderIndex);
+      const groupId = await createPowerGroup(
+        currentSystem.id,
+        name,
+        orderIndex
+      );
 
       const newGroup: IPowerGroup = {
         id: groupId,
@@ -333,7 +543,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
     try {
       const orderIndex = pages.length;
-      const pageId = await createPowerPage(currentSystem.id, name, groupId, orderIndex);
+      const pageId = await createPowerPage(
+        currentSystem.id,
+        name,
+        groupId,
+        orderIndex
+      );
 
       const newPage: IPowerPage = {
         id: pageId,
@@ -360,9 +575,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setPages(
         pages.map((page) =>
-          page.id === pageId
-            ? { ...page, name, updatedAt: Date.now() }
-            : page
+          page.id === pageId ? { ...page, name, updatedAt: Date.now() } : page
         )
       );
 
@@ -400,7 +613,8 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       if (currentPage?.id === pageId) {
         const remainingPages = pages.filter((p) => p.id !== pageId);
-        const newCurrentPage = remainingPages.length > 0 ? remainingPages[0] : null;
+        const newCurrentPage =
+          remainingPages.length > 0 ? remainingPages[0] : null;
         setCurrentPage(newCurrentPage);
         setCurrentPageId(systemId, newCurrentPage?.id || null);
       }
@@ -449,7 +663,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
     try {
       const orderIndex = sections.length;
-      const sectionId = await createPowerSection(currentPage.id, title, orderIndex);
+      const sectionId = await createPowerSection(
+        currentPage.id,
+        title,
+        orderIndex
+      );
 
       const newSection: IPowerSection = {
         id: sectionId,
@@ -463,6 +681,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setSections([...sections, newSection]);
       setIsCreateSectionModalOpen(false);
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error creating section:", error);
     }
@@ -479,6 +700,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
             : section
         )
       );
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error updating section:", error);
     }
@@ -490,6 +714,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setSections(sections.filter((section) => section.id !== sectionId));
       setBlocks(blocks.filter((block) => block.sectionId !== sectionId));
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error deleting section:", error);
     }
@@ -499,6 +726,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       setSections(reorderedSections);
       await reorderPowerSections(reorderedSections.map((s) => s.id));
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error reordering sections:", error);
     }
@@ -517,7 +747,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       const sectionBlocks = blocks.filter((b) => b.sectionId === sectionId);
       const orderIndex = sectionBlocks.length;
 
-      const blockId = await createPowerBlock(sectionId, type, content, orderIndex);
+      const blockId = await createPowerBlock(
+        sectionId,
+        type,
+        content,
+        orderIndex
+      );
 
       const newBlock: IPowerBlock = {
         id: blockId,
@@ -531,6 +766,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setBlocks([...blocks, newBlock]);
       setIsSelectBlockModalOpen(false);
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error creating block:", error);
     }
@@ -547,6 +785,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
             : block
         )
       );
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error updating block:", error);
     }
@@ -557,6 +798,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       await deletePowerBlock(blockId);
 
       setBlocks(blocks.filter((block) => block.id !== blockId));
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error deleting block:", error);
     }
@@ -574,82 +818,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       });
 
       await reorderPowerBlocks(reorderedBlocks.map((b) => b.id));
+
+      // Save snapshot AFTER action is completed
+      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error reordering blocks:", error);
-    }
-  };
-
-  // ============================================================================
-  // HELPER FUNCTIONS
-  // ============================================================================
-
-  const isBlockEmpty = (block: IPowerBlock): boolean => {
-    const { type, content } = block;
-
-    if (!content) return true;
-
-    switch (type) {
-      case "heading":
-        return !(content as any).text || (content as any).text.trim() === "";
-      case "paragraph":
-        return !(content as any).text || (content as any).text.trim() === "";
-      case "unordered-list":
-      case "numbered-list":
-        return !(content as any).items || (content as any).items.length === 0;
-      case "tag-list":
-        return !(content as any).tags || (content as any).tags.length === 0;
-      case "dropdown":
-        return !(content as any).options || (content as any).options.length === 0;
-      case "multi-dropdown":
-        return !(content as any).options || (content as any).options.length === 0;
-      case "image":
-        return !(content as any).imageUrl || (content as any).imageUrl.trim() === "";
-      case "icon":
-        const hasTitle = (content as any).title && (content as any).title.trim() !== "";
-        const hasDescription = (content as any).description && (content as any).description.trim() !== "";
-        return !hasTitle && !hasDescription;
-      case "icon-group":
-        return !(content as any).icons || (content as any).icons.length === 0;
-      case "informative":
-        return !(content as any).text || (content as any).text.trim() === "";
-      case "divider":
-        // Dividers are never empty (they're just a visual element)
-        return false;
-      case "stars":
-        // Consider empty if rating is 0 or undefined
-        return (content as any).rating === 0 || (content as any).rating === undefined || (content as any).rating === null;
-      case "attributes":
-        // Consider empty if both current and max are at their default values (max=5, current=0)
-        // OR if max is 0 or undefined
-        const max = (content as any).max;
-        const current = (content as any).current;
-        return max === undefined || max === null || max === 0 || (max === 5 && current === 0);
-      case "navigator":
-        // Consider empty if no page is linked
-        return !(content as any).linkedPageId;
-      default:
-        return true;
-    }
-  };
-
-  const deleteEmptyBlocks = async () => {
-    const emptyBlocks = blocks.filter((block) => isBlockEmpty(block));
-
-    if (emptyBlocks.length === 0) return;
-
-    // Delete all empty blocks in parallel
-    try {
-      await Promise.all(
-        emptyBlocks.map(async (block) => {
-          await deletePowerBlock(block.id);
-        })
-      );
-
-      // Update local state once after all deletions
-      const emptyBlockIds = new Set(emptyBlocks.map(b => b.id));
-      setBlocks(blocks.filter(block => !emptyBlockIds.has(block.id)));
-    } catch (error) {
-      console.error("Error deleting empty blocks:", error);
     }
   };
 
@@ -721,6 +894,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       // UI State
       isEditMode={isEditMode}
       isLeftSidebarOpen={isLeftSidebarOpen}
+      // Undo/Redo State
+      canUndo={canUndo}
+      canRedo={canRedo}
+      onUndo={handleUndo}
+      onRedo={handleRedo}
       // Loading States
       isLoadingGroups={isLoadingGroups}
       isLoadingPages={isLoadingPages}
@@ -764,13 +942,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       onDeleteBlock={handleDeleteBlock}
       onReorderBlocks={handleReorderBlocks}
       // UI Handlers
-      onToggleEditMode={async () => {
+      onToggleEditMode={() => {
         if (!systemId) return;
 
-        // If turning OFF edit mode, delete empty blocks first
-        if (isEditMode) {
-          await deleteEmptyBlocks();
-        }
         const newEditMode = !isEditMode;
         setIsEditModeLocal(newEditMode);
         setEditMode(systemId, newEditMode);
@@ -797,6 +971,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       onCloseDeleteSystemModal={() => setIsDeleteSystemModalOpen(false)}
       onManagePageLinks={handleManagePageLinks}
       onManageSectionLinks={handleManageSectionLinks}
+      onItemSelect={(itemId, itemType) => {
+        if (systemId) {
+          setSelectedItem(systemId, itemId, itemType);
+        }
+      }}
     >
       {/* Manage Links Modal */}
       <ManageLinksModal

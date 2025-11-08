@@ -9,6 +9,8 @@ interface PowerSystemUIState {
   currentPageId: string | null;
   isEditMode: boolean;
   isLeftSidebarOpen: boolean;
+  selectedItemId: string | null;
+  selectedItemType: "page" | "group" | null;
 }
 
 /**
@@ -30,6 +32,7 @@ interface PowerSystemUIStoreState {
   getCurrentPageId: (systemId: string) => string | null;
   getEditMode: (systemId: string) => boolean;
   getSidebarOpen: (systemId: string) => boolean;
+  getSelectedItem: (systemId: string) => { id: string | null; type: "page" | "group" | null };
 
   // Setters
   setExpandedGroups: (systemId: string, groups: Set<string>) => void;
@@ -37,6 +40,7 @@ interface PowerSystemUIStoreState {
   setCurrentPageId: (systemId: string, pageId: string | null) => void;
   setEditMode: (systemId: string, isEdit: boolean) => void;
   setSidebarOpen: (systemId: string, isOpen: boolean) => void;
+  setSelectedItem: (systemId: string, itemId: string | null, itemType: "page" | "group" | null) => void;
 
   // Utilities
   clearSystemState: (systemId: string) => void;
@@ -49,8 +53,10 @@ interface PowerSystemUIStoreState {
 const getDefaultState = (): PowerSystemUIState => ({
   expandedGroups: [],
   currentPageId: null,
-  isEditMode: false,
+  isEditMode: true, // New systems start in edit mode by default
   isLeftSidebarOpen: true,
+  selectedItemId: null,
+  selectedItemType: null,
 });
 
 /**
@@ -94,6 +100,14 @@ export const usePowerSystemUIStore = create<PowerSystemUIStoreState>()(
       getSidebarOpen: (systemId: string) => {
         const state = get().getSystemState(systemId);
         return state.isLeftSidebarOpen;
+      },
+
+      getSelectedItem: (systemId: string) => {
+        const state = get().getSystemState(systemId);
+        return {
+          id: state.selectedItemId,
+          type: state.selectedItemType,
+        };
       },
 
       // ========================================================================
@@ -166,6 +180,19 @@ export const usePowerSystemUIStore = create<PowerSystemUIStoreState>()(
             [systemId]: {
               ...(state.cache[systemId] || getDefaultState()),
               isLeftSidebarOpen: isOpen,
+            },
+          },
+        }));
+      },
+
+      setSelectedItem: (systemId: string, itemId: string | null, itemType: "page" | "group" | null) => {
+        set((state) => ({
+          cache: {
+            ...state.cache,
+            [systemId]: {
+              ...(state.cache[systemId] || getDefaultState()),
+              selectedItemId: itemId,
+              selectedItemType: itemType,
             },
           },
         }));

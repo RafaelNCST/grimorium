@@ -258,7 +258,27 @@
       "icon_label": "Ícone do Sistema (opcional)",
       "icon_placeholder": "Enviar uma imagem de ícone",
       "submit": "Criar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "templates_section": "Começar com um Template",
+      "templates_section_description": "Escolha um template para aprender como usar o sistema de poder",
+      "no_template": "Começar do Zero",
+      "no_template_description": "Crie um sistema vazio e construa sua própria estrutura",
+      "duplicate_warning": {
+        "title": "Sistema com nome duplicado",
+        "description": "Já existe um sistema com o nome \"{{name}}\". Deseja criar mesmo assim?",
+        "confirm": "Sim, criar mesmo assim",
+        "cancel": "Cancelar"
+      },
+      "templates": {
+        "magic": {
+          "name": "Sistema de Magia",
+          "description": "Template didático mostrando magia com mana, feitiços e elementos. Demonstra uso de blocos, seções e grupos."
+        },
+        "martial": {
+          "name": "Artes Marciais",
+          "description": "Template didático mostrando artes marciais com Ki, técnicas e estilos de luta. Demonstra uso de blocos, seções e grupos."
+        }
+      }
     },
     "edit_system": {
       "title": "Editar Sistema",
@@ -282,7 +302,31 @@
       "name_placeholder": "ex: Magia de Fogo, Habilidades de Cura",
       "group_label": "Grupo (opcional)",
       "submit": "Criar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "templates_section": "Começar com um Template",
+      "templates_section_description": "Escolha um template para configurar rapidamente sua página de sistema de poder",
+      "category_basic": "Básico",
+      "category_advanced": "Avançado",
+      "no_template": "Começar do Zero",
+      "no_template_description": "Crie uma página vazia e construa sua própria estrutura",
+      "templates": {
+        "simple_ability": {
+          "name": "Habilidade Simples",
+          "description": "Estrutura básica para um único poder ou habilidade com nome, descrição e efeitos"
+        },
+        "tiered_power": {
+          "name": "Poder em Níveis",
+          "description": "Sistema de poder com múltiplos níveis ou camadas de progressão"
+        },
+        "combat_technique": {
+          "name": "Técnica de Combate",
+          "description": "Habilidade de combate avançada com pré-requisitos, execução e combinações"
+        },
+        "elemental_mastery": {
+          "name": "Maestria Elemental",
+          "description": "Sistema de magia elemental completo com atributos, habilidades e sinergias"
+        }
+      }
     },
     "create_section": {
       "title": "Criar Seção",

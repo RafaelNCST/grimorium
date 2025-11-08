@@ -1,17 +1,19 @@
 import React from "react";
+
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { Pencil, Plus, Search, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "@tanstack/react-router";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 import { type IPowerSystem } from "../types/power-system-types";
 
 interface SystemListViewProps {

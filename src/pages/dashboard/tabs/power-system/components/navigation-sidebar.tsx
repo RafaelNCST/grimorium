@@ -1,18 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
-import { motion } from "framer-motion";
-import {
-  ChevronDown,
-  ChevronRight,
-  File,
-  Folder,
-  FolderPlus,
-  MoreVertical,
-  PanelLeftOpen,
-  Plus,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
 import {
   DndContext,
   DragEndEvent,
@@ -30,6 +17,18 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
+import {
+  ChevronDown,
+  ChevronRight,
+  File,
+  Folder,
+  FolderPlus,
+  MoreVertical,
+  PanelLeftOpen,
+  Plus,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +45,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 
 import type { IPowerGroup, IPowerPage } from "../types/power-system-types";
 
@@ -69,6 +69,8 @@ interface NavigationSidebarProps {
   onMovePage?: (pageId: string, newGroupId?: string) => void;
   onReorderPages?: (pageIds: string[], groupId?: string) => void;
   onReorderGroups?: (groupIds: string[]) => void;
+  // Selection tracking for keyboard shortcuts
+  onItemSelect?: (itemId: string, itemType: "page" | "group") => void;
 }
 
 // Types for drag items
@@ -99,15 +101,20 @@ export function NavigationSidebar({
   onMovePage,
   onReorderPages,
   onReorderGroups,
+  onItemSelect,
 }: NavigationSidebarProps) {
   const { t } = useTranslation("power-system");
 
   // UI Store for persisting expanded groups
-  const { getExpandedGroups, setExpandedGroups: saveExpandedGroups, toggleGroup: toggleGroupInStore } = usePowerSystemUIStore();
+  const {
+    getExpandedGroups,
+    setExpandedGroups: saveExpandedGroups,
+    toggleGroup: toggleGroupInStore,
+  } = usePowerSystemUIStore();
 
   // Initialize expanded groups from store
-  const [expandedGroups, setExpandedGroupsLocal] = useState<Set<string>>(
-    () => getExpandedGroups(systemId)
+  const [expandedGroups, setExpandedGroupsLocal] = useState<Set<string>>(() =>
+    getExpandedGroups(systemId)
   );
   const [activeItem, setActiveItem] = useState<DragItem | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
@@ -437,7 +444,10 @@ export function NavigationSidebar({
                             isEditMode={isEditMode}
                             isDragging={activeItem?.id === page.id}
                             isOver={overId === page.id}
-                            onSelect={onPageSelect}
+                            onSelect={(pageId) => {
+                              onPageSelect(pageId);
+                              onItemSelect?.(pageId, "page");
+                            }}
                             onEdit={onEditPage}
                             onDelete={onDeletePage}
                             onDuplicate={onDuplicatePage}
@@ -470,6 +480,7 @@ export function NavigationSidebar({
                             onEdit={onEditGroup}
                             onDelete={onDeleteGroup}
                             onCreatePage={() => onCreatePage(group.id)}
+                            onSelect={() => onItemSelect?.(group.id, "group")}
                           />
                           {isExpanded && (
                             <SortableContext
@@ -485,7 +496,10 @@ export function NavigationSidebar({
                                     isEditMode={isEditMode}
                                     isDragging={activeItem?.id === page.id}
                                     isOver={overId === page.id}
-                                    onSelect={onPageSelect}
+                                    onSelect={(pageId) => {
+                                      onPageSelect(pageId);
+                                      onItemSelect?.(pageId, "page");
+                                    }}
                                     onEdit={onEditPage}
                                     onDelete={onDeletePage}
                                     onDuplicate={onDuplicatePage}
@@ -547,6 +561,7 @@ interface SortableGroupItemProps {
   onEdit: (groupId: string, newName: string) => void;
   onDelete: (groupId: string) => void;
   onCreatePage: () => void;
+  onSelect?: () => void;
 }
 
 function SortableGroupItem({
@@ -559,6 +574,7 @@ function SortableGroupItem({
   onEdit,
   onDelete,
   onCreatePage,
+  onSelect,
 }: SortableGroupItemProps) {
   const {
     attributes,
@@ -598,6 +614,7 @@ function SortableGroupItem({
         onEdit={onEdit}
         onDelete={onDelete}
         onCreatePage={onCreatePage}
+        onSelect={onSelect}
         dragHandleProps={
           isEditMode ? { ...attributes, ...listeners } : undefined
         }
@@ -616,6 +633,7 @@ interface GroupItemProps {
   onEdit: (groupId: string, newName: string) => void;
   onDelete: (groupId: string) => void;
   onCreatePage: () => void;
+  onSelect?: () => void;
   dragHandleProps?: any;
   isOver?: boolean;
 }
@@ -628,6 +646,7 @@ function GroupItem({
   onEdit,
   onDelete,
   onCreatePage,
+  onSelect,
   dragHandleProps,
   isOver,
 }: GroupItemProps) {
@@ -636,6 +655,31 @@ function GroupItem({
   const [editValue, setEditValue] = useState(group.name);
   const [isTruncated, setIsTruncated] = useState(false);
   const textRef = useRef<HTMLSpanElement>(null);
+
+  // Listen for rename/delete events
+  useEffect(() => {
+    const handleRenameEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.id === group.id && detail.type === "group") {
+        setIsEditing(true);
+      }
+    };
+
+    const handleDeleteEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.id === group.id && detail.type === "group") {
+        onDelete(group.id);
+      }
+    };
+
+    window.addEventListener("power-system:rename-item", handleRenameEvent);
+    window.addEventListener("power-system:delete-item", handleDeleteEvent);
+
+    return () => {
+      window.removeEventListener("power-system:rename-item", handleRenameEvent);
+      window.removeEventListener("power-system:delete-item", handleDeleteEvent);
+    };
+  }, [group.id, onDelete]);
 
   // Check if text is truncated
   useEffect(() => {
@@ -668,7 +712,10 @@ function GroupItem({
         isOver && "bg-primary/10 ring-2 ring-primary/30"
       )}
       {...(dragHandleProps && !isEditing ? dragHandleProps : {})}
-      onClick={!isEditing ? onToggle : undefined}
+      onClick={!isEditing ? () => {
+        onToggle();
+        onSelect?.();
+      } : undefined}
     >
       {isEditing ? (
         <div className="flex items-center gap-2 px-2 w-full">
@@ -700,7 +747,9 @@ function GroupItem({
                   <div
                     className="flex items-center gap-2 min-w-0 flex-1"
                     style={{
-                      maxWidth: isEditMode ? "calc(320px - 76px)" : "calc(320px - 52px)",
+                      maxWidth: isEditMode
+                        ? "calc(320px - 76px)"
+                        : "calc(320px - 52px)",
                     }}
                   >
                     {isExpanded ? (
@@ -730,7 +779,9 @@ function GroupItem({
               <div
                 className="flex items-center gap-2 min-w-0 flex-1"
                 style={{
-                  maxWidth: isEditMode ? "calc(320px - 76px)" : "calc(320px - 52px)",
+                  maxWidth: isEditMode
+                    ? "calc(320px - 76px)"
+                    : "calc(320px - 52px)",
                 }}
               >
                 {isExpanded ? (
@@ -746,7 +797,7 @@ function GroupItem({
                   {group.name}
                 </span>
               </div>
-          )}
+            )}
           </div>
 
           {isEditMode && (
@@ -889,6 +940,31 @@ function PageItem({
   const [editValue, setEditValue] = useState(page.name);
   const [isTruncated, setIsTruncated] = useState(false);
   const textRef = useRef<HTMLSpanElement>(null);
+
+  // Listen for rename/delete events
+  useEffect(() => {
+    const handleRenameEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.id === page.id && detail.type === "page") {
+        setIsEditing(true);
+      }
+    };
+
+    const handleDeleteEvent = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.id === page.id && detail.type === "page") {
+        onDelete(page.id);
+      }
+    };
+
+    window.addEventListener("power-system:rename-item", handleRenameEvent);
+    window.addEventListener("power-system:delete-item", handleDeleteEvent);
+
+    return () => {
+      window.removeEventListener("power-system:rename-item", handleRenameEvent);
+      window.removeEventListener("power-system:delete-item", handleDeleteEvent);
+    };
+  }, [page.id, onDelete]);
 
   // Check if text is truncated
   useEffect(() => {

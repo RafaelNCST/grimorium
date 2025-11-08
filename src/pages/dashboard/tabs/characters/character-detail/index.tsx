@@ -26,14 +26,8 @@ import {
   getPowerPageById,
   getPowerSectionById,
 } from "@/lib/db/power-system.service";
-import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
-
-// Extended type to include page/section titles
-interface IPowerLinkWithTitles extends IPowerCharacterLink {
-  pageTitle?: string;
-  sectionTitle?: string;
-}
 import { mockLocations, mockFactions } from "@/mocks/global";
+import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import { useCharactersStore } from "@/stores/characters-store";
 import {
   type ICharacterVersion,
@@ -48,6 +42,12 @@ import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-cons
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
+
+// Extended type to include page/section titles
+interface IPowerLinkWithTitles extends IPowerCharacterLink {
+  pageTitle?: string;
+  sectionTitle?: string;
+}
 
 export function CharacterDetail() {
   const { dashboardId, characterId } = useParams({
@@ -127,9 +127,12 @@ export function CharacterDetail() {
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
 
   // Power links state
-  const [characterPowerLinks, setCharacterPowerLinks] = useState<IPowerLinkWithTitles[]>([]);
+  const [characterPowerLinks, setCharacterPowerLinks] = useState<
+    IPowerLinkWithTitles[]
+  >([]);
   const [isEditLinkModalOpen, setIsEditLinkModalOpen] = useState(false);
-  const [selectedLinkForEdit, setSelectedLinkForEdit] = useState<IPowerCharacterLink | null>(null);
+  const [selectedLinkForEdit, setSelectedLinkForEdit] =
+    useState<IPowerCharacterLink | null>(null);
 
   // Load character from database
   useEffect(() => {
@@ -750,40 +753,49 @@ export function CharacterDetail() {
   }, []);
 
   // Power links handlers
-  const handleNavigateToPowerInstance = useCallback((linkId: string) => {
-    if (!dashboardId) return;
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId",
-      params: { dashboardId, characterId, linkId }
-    });
-  }, [navigate, dashboardId, characterId]);
+  const handleNavigateToPowerInstance = useCallback(
+    (linkId: string) => {
+      if (!dashboardId) return;
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId",
+        params: { dashboardId, characterId, linkId },
+      });
+    },
+    [navigate, dashboardId, characterId]
+  );
 
   const handleEditLink = useCallback((link: IPowerCharacterLink) => {
     setSelectedLinkForEdit(link);
     setIsEditLinkModalOpen(true);
   }, []);
 
-  const handleSaveLink = useCallback(async (linkId: string, customLabel: string) => {
-    try {
-      await updatePowerCharacterLinkLabel(linkId, customLabel);
-      await loadPowerLinks();
-      toast.success(t("character-detail:power_links.link_updated"));
-      setIsEditLinkModalOpen(false);
-    } catch (error) {
-      toast.error(t("character-detail:power_links.error_updating_link"));
-    }
-  }, [t]);
+  const handleSaveLink = useCallback(
+    async (linkId: string, customLabel: string) => {
+      try {
+        await updatePowerCharacterLinkLabel(linkId, customLabel);
+        await loadPowerLinks();
+        toast.success(t("character-detail:power_links.link_updated"));
+        setIsEditLinkModalOpen(false);
+      } catch (error) {
+        toast.error(t("character-detail:power_links.error_updating_link"));
+      }
+    },
+    [t]
+  );
 
-  const handleDeleteLink = useCallback(async (linkId: string) => {
-    try {
-      await deletePowerCharacterLink(linkId);
-      await loadPowerLinks();
-      toast.success(t("character-detail:power_links.link_deleted"));
-      setIsEditLinkModalOpen(false);
-    } catch (error) {
-      toast.error(t("character-detail:power_links.error_deleting_link"));
-    }
-  }, [t]);
+  const handleDeleteLink = useCallback(
+    async (linkId: string) => {
+      try {
+        await deletePowerCharacterLink(linkId);
+        await loadPowerLinks();
+        toast.success(t("character-detail:power_links.link_deleted"));
+        setIsEditLinkModalOpen(false);
+      } catch (error) {
+        toast.error(t("character-detail:power_links.error_deleting_link"));
+      }
+    },
+    [t]
+  );
 
   return (
     <CharacterDetailView

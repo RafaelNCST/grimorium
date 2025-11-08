@@ -1,5 +1,5 @@
-import { create } from "zustand";
 import { toast } from "sonner";
+import { create } from "zustand";
 
 import {
   getPowerSystemsByBookId,
@@ -21,7 +21,11 @@ interface PowerSystemCache {
 interface PowerSystemState {
   cache: PowerSystemCache;
   fetchSystems: (bookId: string, forceRefresh?: boolean) => Promise<void>;
-  addSystem: (bookId: string, name: string, iconImage?: string) => Promise<string>;
+  addSystem: (
+    bookId: string,
+    name: string,
+    iconImage?: string
+  ) => Promise<string>;
   updateSystemInCache: (
     systemId: string,
     name: string,
@@ -142,7 +146,11 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
     }
   },
 
-  updateSystemInCache: async (systemId: string, name: string, iconImage?: string) => {
+  updateSystemInCache: async (
+    systemId: string,
+    name: string,
+    iconImage?: string
+  ) => {
     try {
       await updatePowerSystem(systemId, name, iconImage);
 

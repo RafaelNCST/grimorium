@@ -45,7 +45,7 @@ function useAutoResizeTextarea(
     textarea.style.height = "auto";
 
     // Calculate new height
-    const scrollHeight = textarea.scrollHeight;
+    const { scrollHeight } = textarea;
 
     // Only grow if content exceeds minimum height
     if (scrollHeight > MIN_HEIGHT_PX) {
@@ -174,11 +174,13 @@ export function ParagraphBlock({
   }
 
   return content.text ? (
-    <div className={`${
-      isLocked
-        ? "h-[200px] overflow-y-auto border border-border rounded-lg p-4"
-        : ""
-    }`}>
+    <div
+      className={`${
+        isLocked
+          ? "h-[200px] overflow-y-auto border border-border rounded-lg p-4"
+          : ""
+      }`}
+    >
       <p className="text-sm text-muted-foreground whitespace-pre-wrap">
         {content.text}
       </p>

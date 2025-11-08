@@ -484,10 +484,7 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] Added icon_image column to power_systems table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log(
-        "[db] icon_image column already exists or error:",
-        error
-      );
+      console.log("[db] icon_image column already exists or error:", error);
     }
 
     // Verify books table exists and log count
