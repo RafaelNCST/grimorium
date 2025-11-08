@@ -51,6 +51,7 @@ interface SectionComponentProps {
   section: IPowerSection;
   blocks: IPowerBlock[];
   pages?: IPowerPage[]; // Available pages for navigator block
+  bookId: string; // For entity data loading
   isEditMode: boolean;
   isReadOnlyView?: boolean; // For controlling dropdown visibility (default: false)
   isFirst?: boolean;
@@ -70,6 +71,7 @@ interface SectionComponentProps {
 interface SortableBlockProps {
   block: IPowerBlock;
   pages?: IPowerPage[];
+  bookId: string;
   isEditMode: boolean;
   isReadOnlyView?: boolean;
   onUpdate: (content: BlockContent) => void;
@@ -80,6 +82,7 @@ interface SortableBlockProps {
 function SortableBlock({
   block,
   pages,
+  bookId,
   isEditMode,
   isReadOnlyView = false,
   onUpdate,
@@ -116,9 +119,9 @@ function SortableBlock({
       case "tag-list":
         return <TagListBlock {...commonProps} />;
       case "dropdown":
-        return <DropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} />;
+        return <DropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} bookId={bookId} />;
       case "multi-dropdown":
-        return <MultiDropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} />;
+        return <MultiDropdownBlock {...commonProps} isReadOnlyView={isReadOnlyView} bookId={bookId} />;
       case "image":
         return <ImageBlock {...commonProps} />;
       case "icon":
@@ -188,6 +191,7 @@ export function SectionComponent({
   section,
   blocks,
   pages,
+  bookId,
   isEditMode,
   isReadOnlyView = false,
   isFirst = false,
@@ -399,6 +403,7 @@ export function SectionComponent({
                     key={block.id}
                     block={block}
                     pages={pages}
+                    bookId={bookId}
                     isEditMode={isEditMode}
                     isReadOnlyView={isReadOnlyView}
                     onUpdate={(content) => onUpdateBlock(block.id, content)}
@@ -414,6 +419,7 @@ export function SectionComponent({
                     <SortableBlock
                       block={activeBlock}
                       pages={pages}
+                      bookId={bookId}
                       isEditMode={isEditMode}
                       isReadOnlyView={isReadOnlyView}
                       onUpdate={(content) => onUpdateBlock(activeBlock.id, content)}

@@ -133,7 +133,13 @@
       "option_placeholder": "Adicionar opção...",
       "add_option": "Adicionar opção",
       "add_option_button": "Adicionar",
-      "select_placeholder": "Selecione uma opção..."
+      "select_placeholder": "Selecione uma opção...",
+      "data_source_label": "Fonte de Dados",
+      "data_source_manual": "Opções Manuais",
+      "data_source_characters": "Personagens",
+      "select_entity": "Selecione uma entidade...",
+      "loading_entities": "Carregando entidades...",
+      "no_entities": "Nenhuma entidade disponível"
     },
     "multi_dropdown": {
       "name": "Dropdown Múltiplo",

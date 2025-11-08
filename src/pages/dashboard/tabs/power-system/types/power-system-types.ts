@@ -40,14 +40,28 @@ export interface TagListContent {
   tags: string[];
 }
 
+export type DataSourceType = 'manual' | 'characters';
+
 export interface DropdownContent {
+  dataSource?: DataSourceType; // Default 'manual' para retrocompatibilidade
+
+  // Modo manual
   options: string[];
   selectedValue?: string;
+
+  // Modo characters
+  selectedEntityId?: string;
 }
 
 export interface MultiDropdownContent {
+  dataSource?: DataSourceType;
+
+  // Modo manual
   options: string[];
   selectedValues: string[];
+
+  // Modo characters
+  selectedEntityIds?: string[];
 }
 
 export interface ImageContent {

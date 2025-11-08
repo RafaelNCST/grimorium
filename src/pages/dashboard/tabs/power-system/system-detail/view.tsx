@@ -39,6 +39,7 @@ interface PowerSystemDetailViewProps {
   pages: IPowerPage[];
   sections: IPowerSection[];
   blocks: IPowerBlock[];
+  bookId: string; // For entity data loading
 
   // UI State
   isEditMode: boolean;
@@ -128,6 +129,7 @@ export function PowerSystemDetailView({
   pages,
   sections,
   blocks,
+  bookId,
 
   // UI State
   isEditMode,
@@ -588,6 +590,7 @@ export function PowerSystemDetailView({
             pages={pages}
             sections={sections}
             blocks={blocks}
+            bookId={bookId}
             isEditMode={isEditMode}
             onUpdatePageName={(name) => onUpdatePage(currentPage.id, name)}
             onAddSection={onOpenCreateSectionModal}

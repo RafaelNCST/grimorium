@@ -26,6 +26,7 @@ interface PageContentProps {
   pages?: IPowerPage[]; // Available pages for navigator block
   sections: IPowerSection[];
   blocks: IPowerBlock[];
+  bookId: string; // For entity data loading
   isEditMode: boolean;
   isReadOnlyView?: boolean; // For controlling dropdown visibility (default: false)
   onUpdatePageName: (name: string) => void;
@@ -46,6 +47,7 @@ interface SectionWrapperProps {
   section: IPowerSection;
   blocks: IPowerBlock[];
   pages?: IPowerPage[];
+  bookId: string;
   isEditMode: boolean;
   isReadOnlyView?: boolean;
   isFirst: boolean;
@@ -66,6 +68,7 @@ function SectionWrapper({
   section,
   blocks,
   pages,
+  bookId,
   isEditMode,
   isReadOnlyView = false,
   isFirst,
@@ -86,6 +89,7 @@ function SectionWrapper({
       section={section}
       blocks={blocks}
       pages={pages}
+      bookId={bookId}
       isEditMode={isEditMode}
       isReadOnlyView={isReadOnlyView}
       isFirst={isFirst}
@@ -110,6 +114,7 @@ export function PageContent({
   pages,
   sections,
   blocks,
+  bookId,
   isEditMode,
   isReadOnlyView = false,
   onUpdatePageName,
@@ -268,6 +273,7 @@ export function PageContent({
                   section={section}
                   blocks={getBlocksForSection(section.id)}
                   pages={pages}
+                  bookId={bookId}
                   isEditMode={isEditMode}
                   isReadOnlyView={isReadOnlyView}
                   isFirst={index === 0}

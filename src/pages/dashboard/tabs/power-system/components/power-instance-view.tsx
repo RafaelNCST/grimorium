@@ -23,10 +23,11 @@ import { SectionComponent } from "./section-component";
 
 interface PowerInstanceViewProps {
   linkId: string;
+  bookId: string;
   onBack: () => void;
 }
 
-export function PowerInstanceView({ linkId, onBack }: PowerInstanceViewProps) {
+export function PowerInstanceView({ linkId, bookId, onBack }: PowerInstanceViewProps) {
   const { t } = useTranslation("power-system");
   const [link, setLink] = useState<IPowerCharacterLink | null>(null);
   const [page, setPage] = useState<IPowerPage | null>(null);
@@ -166,6 +167,7 @@ export function PowerInstanceView({ linkId, onBack }: PowerInstanceViewProps) {
                   key={section.id}
                   section={section}
                   blocks={blocks.filter((b) => b.sectionId === section.id)}
+                  bookId={bookId}
                   isEditMode={false}
                   isReadOnlyView={true}
                   onUpdateSection={() => {}}

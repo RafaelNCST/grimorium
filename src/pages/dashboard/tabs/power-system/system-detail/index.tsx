@@ -717,6 +717,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       pages={pages}
       sections={sections}
       blocks={blocks}
+      bookId={bookId}
       // UI State
       isEditMode={isEditMode}
       isLeftSidebarOpen={isLeftSidebarOpen}

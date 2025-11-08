@@ -133,7 +133,13 @@
       "option_placeholder": "Add option...",
       "add_option": "Add option",
       "add_option_button": "Add",
-      "select_placeholder": "Select an option..."
+      "select_placeholder": "Select an option...",
+      "data_source_label": "Data Source",
+      "data_source_manual": "Manual Options",
+      "data_source_characters": "Characters",
+      "select_entity": "Select an entity...",
+      "loading_entities": "Loading entities...",
+      "no_entities": "No entities available"
     },
     "multi_dropdown": {
       "name": "Multi Dropdown",
