@@ -1,13 +1,12 @@
 import { Plus, Search, MapPin, Mountain, Globe } from "lucide-react";
 
-import { EmptyState as GlobalEmptyState } from "@/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { CreateContinentModal } from "@/components/modals/create-continent-modal";
 import { CreateLocationModal } from "@/components/modals/create-location-modal";
 import { CreateWorldModal } from "@/components/modals/create-world-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { EmptyState } from "./components/empty-state";
 import { EntityCard } from "./components/entity-card";
 import { SectionHeader } from "./components/section-header";
 import { StatsInfo } from "./components/stats-info";
@@ -75,8 +74,8 @@ export function WorldView({
 }: PropsWorldView) {
   if (worldEntities.length === 0) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex-1 h-full flex flex-col space-y-6">
+        <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl font-bold">Mundo</h2>
             <p className="text-muted-foreground">
@@ -90,11 +89,52 @@ export function WorldView({
             className="animate-glow"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Criar Mundo
+            Novo Mundo
           </Button>
         </div>
 
-        <EmptyState />
+        <EmptyState
+          icon={Globe}
+          title="Nenhum mundo criado"
+          description="Comece criando o primeiro mundo da sua história para organizar continentes e locais."
+        />
+
+        <CreateWorldModal
+          open={showCreateWorldModal}
+          onClose={() => onSetShowCreateWorldModal(false)}
+          onWorldCreated={onWorldCreated}
+          bookId={bookId}
+        />
+
+        <CreateContinentModal
+          open={showCreateContinentModal}
+          onClose={() => onSetShowCreateContinentModal(false)}
+          onContinentCreated={onContinentCreated}
+          bookId={bookId}
+          availableWorlds={availableWorlds.map((w) => ({
+            id: w.id,
+            name: w.name,
+          }))}
+        />
+
+        <CreateLocationModal
+          open={showCreateLocationModal}
+          onClose={() => onSetShowCreateLocationModal(false)}
+          onLocationCreated={onLocationCreated}
+          bookId={bookId}
+          availableParents={[
+            ...availableWorlds.map((w) => ({
+              id: w.id,
+              name: w.name,
+              type: "World",
+            })),
+            ...availableContinents.map((c) => ({
+              id: c.id,
+              name: c.name,
+              type: "Continent",
+            })),
+          ]}
+        />
       </div>
     );
   }
@@ -147,12 +187,10 @@ export function WorldView({
             ))}
           </div>
         ) : (
-          <GlobalEmptyState
+          <EmptyState
             icon={Globe}
             title="Nenhum mundo criado"
             description="Crie o primeiro mundo da sua história para organizar continentes e locais."
-            actionLabel="Criar Mundo"
-            onAction={onCreateWorld}
           />
         )}
       </div>
@@ -179,12 +217,10 @@ export function WorldView({
             ))}
           </div>
         ) : (
-          <GlobalEmptyState
+          <EmptyState
             icon={Mountain}
             title="Nenhum continente criado"
             description="Crie continentes para organizar melhor os locais da sua história."
-            actionLabel="Criar Continente"
-            onAction={onCreateContinent}
           />
         )}
       </div>
@@ -211,12 +247,10 @@ export function WorldView({
             ))}
           </div>
         ) : (
-          <GlobalEmptyState
+          <EmptyState
             icon={MapPin}
             title="Nenhum local criado"
             description="Crie locais específicos onde sua história acontece."
-            actionLabel="Criar Local"
-            onAction={onCreateLocation}
           />
         )}
       </div>
