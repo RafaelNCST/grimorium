@@ -3,8 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { open } from "@tauri-apps/plugin-dialog";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   Dialog,
   DialogContent,
@@ -106,25 +104,16 @@ export function CreateRegionModal({
     }
   }, [editRegion, form]);
 
-  const handleImageSelect = async () => {
-    try {
-      const selected = await open({
-        multiple: false,
-        filters: [
-          {
-            name: "Image",
-            extensions: ["png", "jpg", "jpeg", "webp", "gif"],
-          },
-        ],
-      });
-
-      if (selected && typeof selected === "string") {
-        const imageUrl = convertFileSrc(selected);
-        form.setValue("image", selected);
-        setImageSrc(imageUrl);
-      }
-    } catch (error) {
-      console.error("Error selecting image:", error);
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        form.setValue("image", result);
+        setImageSrc(result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -173,6 +162,13 @@ export function CreateRegionModal({
                   <FormLabel>{t("create_region.image_label")}</FormLabel>
                   <FormControl>
                     <div className="space-y-3">
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        id="region-image-upload"
+                      />
                       {imageSrc ? (
                         <div className="relative w-full aspect-video rounded-lg overflow-hidden border">
                           <img
@@ -191,19 +187,14 @@ export function CreateRegionModal({
                           </Button>
                         </div>
                       ) : (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full h-40 border-dashed"
-                          onClick={handleImageSelect}
-                        >
-                          <div className="flex flex-col items-center gap-2">
+                        <label htmlFor="region-image-upload" className="cursor-pointer">
+                          <div className="w-full h-40 border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
                             <ImagePlus className="h-8 w-8 text-muted-foreground" />
                             <span className="text-sm text-muted-foreground">
                               {t("create_region.upload_image")}
                             </span>
                           </div>
-                        </Button>
+                        </label>
                       )}
                     </div>
                   </FormControl>
