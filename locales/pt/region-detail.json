@@ -1,0 +1,100 @@
+{
+  "header": {
+    "back": "Voltar",
+    "region_details": "Detalhes da região",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "quick_navigation": "Navegação Rápida"
+  },
+  "sections": {
+    "basic_info": "Informações Básicas",
+    "versions": "Versões"
+  },
+  "fields": {
+    "image": "Imagem",
+    "name": "Nome",
+    "parent": "Região Pai",
+    "parent_of": "Parte de",
+    "scale": "Escala",
+    "summary": "Resumo"
+  },
+  "empty_states": {
+    "no_data": "Nada foi adicionado ainda",
+    "no_data_hint": "Edite para adicionar informações"
+  },
+  "versions": {
+    "title": "Versões",
+    "main": "Principal",
+    "main_badge": "Principal",
+    "selected": "Versão selecionada",
+    "add_version": "Nova Versão",
+    "create_button": "Nova Versão",
+    "create_new": "Nova Versão",
+    "edit_version": "Editar Versão",
+    "delete_version": "Excluir Versão",
+    "version_name": "Nome da Versão",
+    "version_description": "Descrição da Versão",
+    "created_at": "Criada em",
+    "empty_state": {
+      "title": "Apenas a versão principal existe",
+      "description": "Crie versões alternativas para explorar diferentes estados da região"
+    },
+    "hint": {
+      "title": "💡 Dica:",
+      "description": "Crie versões para explorar diferentes estados da região: antes da guerra, pós-catástrofe, versão alternativa, etc. Cada versão mantém dados independentes!"
+    },
+    "create_dialog": {
+      "title": "Criar Nova Versão",
+      "info_message": "Primeiro, defina o nome e descrição da versão. Depois você poderá personalizar os dados da região.",
+      "name_label": "Nome da Versão",
+      "name_placeholder": "Ex: Versão Original, Antes da Guerra, Pós-Catástrofe...",
+      "name_required": "Nome é obrigatório",
+      "description_label": "Descrição",
+      "description_placeholder": "Descreva as diferenças desta versão...",
+      "description_required": "Descrição é obrigatória",
+      "chars_remaining": "caracteres restantes",
+      "cancel": "Cancelar",
+      "continue": "Continuar",
+      "step1_validation_error": "Preencha todos os campos obrigatórios",
+      "success": "Versão criada com sucesso!"
+    },
+    "delete_dialog": {
+      "title": "Excluir Versão",
+      "description": "Tem certeza que deseja excluir a versão \"{{name}}\"? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versão"
+    }
+  },
+  "delete": {
+    "cancel": "Cancelar",
+    "region": {
+      "title": "Excluir Região",
+      "step1": {
+        "description": "Você está prestes a excluir permanentemente a região \"{{name}}\".",
+        "warning": "⚠️ Esta ação é irreversível e todos os dados desta região serão perdidos."
+      },
+      "step2": {
+        "confirm": "Eu entendo que esta ação é permanente e irreversível",
+        "confirm_button": "Excluir Região",
+        "success": "Região excluída com sucesso"
+      }
+    },
+    "version": {
+      "title": "Excluir Versão",
+      "description": "Você está prestes a excluir a versão \"{{name}}\" da região \"{{regionName}}\".",
+      "info": "Você ainda terá {{remaining}} versão(ões) após a exclusão.",
+      "confirm": "Eu entendo que esta ação é permanente",
+      "confirm_button": "Excluir Versão",
+      "success": "Versão excluída com sucesso"
+    }
+  },
+  "actions": {
+    "open": "Abrir",
+    "close": "Fechar"
+  },
+  "upload": {
+    "click": "Clique para enviar"
+  }
+}

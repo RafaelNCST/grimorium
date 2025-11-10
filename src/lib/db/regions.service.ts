@@ -265,3 +265,96 @@ export async function getRegionHierarchy(
 
   return rootRegions;
 }
+
+/**
+ * Region Version Types
+ */
+export interface IRegionVersion {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  isMain: boolean;
+  regionData: IRegion;
+}
+
+interface DBRegionVersion {
+  id: string;
+  region_id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  is_main: number;
+  region_data: string;
+}
+
+/**
+ * Get all versions for a region
+ */
+export async function getRegionVersions(
+  regionId: string
+): Promise<IRegionVersion[]> {
+  const db = await getDB();
+  const result = await db.select<DBRegionVersion[]>(
+    "SELECT * FROM region_versions WHERE region_id = $1 ORDER BY created_at DESC",
+    [regionId]
+  );
+
+  return result.map((dbVersion) => ({
+    id: dbVersion.id,
+    name: dbVersion.name,
+    description: dbVersion.description || undefined,
+    createdAt: dbVersion.created_at,
+    isMain: dbVersion.is_main === 1,
+    regionData: JSON.parse(dbVersion.region_data),
+  }));
+}
+
+/**
+ * Create a new region version
+ */
+export async function createRegionVersion(
+  regionId: string,
+  version: IRegionVersion
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    `INSERT INTO region_versions (
+      id, region_id, name, description, created_at, is_main, region_data
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7
+    )`,
+    [
+      version.id,
+      regionId,
+      version.name,
+      version.description || null,
+      version.createdAt,
+      version.isMain ? 1 : 0,
+      JSON.stringify(version.regionData),
+    ]
+  );
+}
+
+/**
+ * Delete a region version
+ */
+export async function deleteRegionVersion(versionId: string): Promise<void> {
+  const db = await getDB();
+  await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
+}
+
+/**
+ * Update a region version name and description
+ */
+export async function updateRegionVersion(
+  versionId: string,
+  name: string,
+  description?: string
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE region_versions SET name = $1, description = $2 WHERE id = $3",
+    [name, description, versionId]
+  );
+}

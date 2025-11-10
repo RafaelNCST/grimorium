@@ -1,0 +1,100 @@
+{
+  "header": {
+    "back": "Back",
+    "region_details": "Region details",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "quick_navigation": "Quick Navigation"
+  },
+  "sections": {
+    "basic_info": "Basic Information",
+    "versions": "Versions"
+  },
+  "fields": {
+    "image": "Image",
+    "name": "Name",
+    "parent": "Parent Region",
+    "parent_of": "Part of",
+    "scale": "Scale",
+    "summary": "Summary"
+  },
+  "empty_states": {
+    "no_data": "Nothing added yet",
+    "no_data_hint": "Edit to add information"
+  },
+  "versions": {
+    "title": "Versions",
+    "main": "Main",
+    "main_badge": "Main",
+    "selected": "Selected version",
+    "add_version": "New Version",
+    "create_button": "New Version",
+    "create_new": "New Version",
+    "edit_version": "Edit Version",
+    "delete_version": "Delete Version",
+    "version_name": "Version Name",
+    "version_description": "Version Description",
+    "created_at": "Created at",
+    "empty_state": {
+      "title": "Only main version exists",
+      "description": "Create alternative versions to explore different region states"
+    },
+    "hint": {
+      "title": "💡 Tip:",
+      "description": "Create versions to explore different region states: pre-war, post-catastrophe, alternative version, etc. Each version maintains independent data!"
+    },
+    "create_dialog": {
+      "title": "Create New Version",
+      "info_message": "First, define the version name and description. Then you can customize the region data.",
+      "name_label": "Version Name",
+      "name_placeholder": "E.g.: Original Version, Pre-War, Post-Catastrophe...",
+      "name_required": "Name is required",
+      "description_label": "Description",
+      "description_placeholder": "Describe the differences of this version...",
+      "description_required": "Description is required",
+      "chars_remaining": "characters remaining",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "step1_validation_error": "Fill all required fields",
+      "success": "Version created successfully!"
+    },
+    "delete_dialog": {
+      "title": "Delete Version",
+      "description": "Are you sure you want to delete version \"{{name}}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Version"
+    }
+  },
+  "delete": {
+    "cancel": "Cancel",
+    "region": {
+      "title": "Delete Region",
+      "step1": {
+        "description": "You are about to permanently delete region \"{{name}}\".",
+        "warning": "⚠️ This action is irreversible and all data from this region will be lost."
+      },
+      "step2": {
+        "confirm": "I understand this action is permanent and irreversible",
+        "confirm_button": "Delete Region",
+        "success": "Region deleted successfully"
+      }
+    },
+    "version": {
+      "title": "Delete Version",
+      "description": "You are about to delete version \"{{name}}\" from region \"{{regionName}}\".",
+      "info": "You will still have {{remaining}} version(s) after deletion.",
+      "confirm": "I understand this action is permanent",
+      "confirm_button": "Delete Version",
+      "success": "Version deleted successfully"
+    }
+  },
+  "actions": {
+    "open": "Open",
+    "close": "Close"
+  },
+  "upload": {
+    "click": "Click to upload"
+  }
+}

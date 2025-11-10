@@ -150,17 +150,15 @@ export function WorldTab({ bookId }: WorldTabProps) {
     [bookId, toast, loadRegions]
   );
 
-  // Handle region card click (future navigation)
+  // Handle region card click - navigate to region detail
   const handleRegionClick = useCallback(
     (regionId: string) => {
-      // TODO: Navigate to region detail page when implemented
-      console.log("Region clicked:", regionId);
-      // navigate({
-      //   to: "/dashboard/$dashboardId/tabs/world/$regionId",
-      //   params: { dashboardId: bookId, regionId },
-      // });
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/world/$regionId",
+        params: { dashboardId: bookId, regionId },
+      });
     },
-    [bookId]
+    [navigate, bookId]
   );
 
   return (

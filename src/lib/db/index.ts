@@ -436,6 +436,17 @@ async function runMigrations(database: Database): Promise<void> {
       FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
     );
 
+    -- VERSÕES DE REGIÕES
+    CREATE TABLE IF NOT EXISTS region_versions (
+      id TEXT PRIMARY KEY,
+      region_id TEXT NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      is_main INTEGER DEFAULT 0,
+      region_data TEXT,
+      created_at TEXT NOT NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -474,6 +485,7 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_power_links_section ON power_character_links(section_id);
     CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
     CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
+    CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
   `;
 
     await database.execute(schema);
