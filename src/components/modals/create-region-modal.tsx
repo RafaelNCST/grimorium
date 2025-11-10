@@ -320,12 +320,15 @@ export function CreateRegionModal({
               >
                 {t("create_region.cancel_button")}
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                variant="magical"
+                className="animate-glow"
+                disabled={isSubmitting || !form.formState.isValid}
+              >
                 {isSubmitting
-                  ? editRegion
-                    ? t("create_region.updating")
-                    : t("create_region.creating")
-                  : t("create_region.save_button")}
+                  ? editRegion ? t("create_region.updating") : t("create_region.creating")
+                  : editRegion ? t("create_region.save_button") : t("create_region.create_button")}
               </Button>
             </DialogFooter>
           </form>

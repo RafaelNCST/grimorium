@@ -44,6 +44,7 @@
     "image_label": "Image",
     "upload_image": "Upload Image",
     "change_image": "Change Image",
+    "create_button": "Create Region",
     "save_button": "Save",
     "cancel_button": "Cancel",
     "creating": "Creating...",
