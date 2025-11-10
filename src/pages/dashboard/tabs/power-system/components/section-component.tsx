@@ -253,6 +253,14 @@ export function SectionComponent({
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+        // Cancel activation if dialog is open
+        tolerance: 5,
+      },
+      // Custom event filter to prevent drag when dialog is open
+      onActivation: () => {
+        if (document.body.hasAttribute('data-dialog-open')) {
+          return false;
+        }
       },
     })
   );

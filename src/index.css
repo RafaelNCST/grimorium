@@ -470,6 +470,16 @@
   [data-radix-select-trigger] {
     background: hsl(var(--background)) !important;
   }
+
+  /* Block interactions with content behind dialogs/modals */
+  body[data-dialog-open] #root > * {
+    pointer-events: none !important;
+  }
+
+  /* Ensure portal content (dialogs, selects, tooltips) can still be interacted with */
+  body[data-dialog-open] [data-radix-portal] {
+    pointer-events: auto !important;
+  }
 }
 
 /* CRITICAL: Force text selection - Must be outside @layer to have max precedence */

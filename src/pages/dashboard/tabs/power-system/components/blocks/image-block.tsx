@@ -363,34 +363,13 @@ export function ImageBlock({
         </div>
 
         {/* Crop Modal - Separado do container do bloco */}
-        <Dialog open={showCropModal} onOpenChange={setShowCropModal} modal>
-          <DialogContent
-            className="sm:max-w-3xl z-50"
-            onPointerDownOutside={(e) => e.preventDefault()}
-            onInteractOutside={(e) => e.preventDefault()}
-            onPointerDown={(e) => {
-              // Stop propagation to prevent drag events from reaching the sortable wrapper
-              e.stopPropagation();
-            }}
-            onMouseDown={(e) => {
-              // Stop propagation to prevent drag events from reaching the sortable wrapper
-              e.stopPropagation();
-            }}
-            onTouchStart={(e) => {
-              // Stop propagation to prevent drag events from reaching the sortable wrapper
-              e.stopPropagation();
-            }}
-          >
+        <Dialog open={showCropModal} onOpenChange={setShowCropModal}>
+          <DialogContent className="sm:max-w-3xl z-50">
             <DialogHeader>
               <DialogTitle>{t("blocks.image.crop_image_title")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div
-                className="relative w-full h-[400px] bg-black"
-                onPointerDown={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
-              >
+              <div className="relative w-full h-[400px] bg-black">
                 {cropImageSrc && (
                   <Cropper
                     image={cropImageSrc}
