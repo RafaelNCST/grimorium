@@ -23,15 +23,15 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
         {region.image ? (
-          <div className="relative w-full h-52">
+          <div className="relative w-full h-[28rem]">
             <img
               src={region.image}
               alt={region.name || "Region"}
-              className="w-full h-full object-cover rounded-t-lg"
+              className="w-full h-full object-fill rounded-t-lg"
             />
           </div>
         ) : (
-          <div className="relative w-full h-52 bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
+          <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
             <MapPin className="w-16 h-16 text-muted-foreground/30" />
           </div>
         )}

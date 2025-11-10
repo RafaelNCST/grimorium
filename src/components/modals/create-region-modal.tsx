@@ -159,7 +159,10 @@ export function CreateRegionModal({
               name="image"
               render={() => (
                 <FormItem>
-                  <FormLabel>{t("create_region.image_label")}</FormLabel>
+                  <FormLabel>
+                    {t("create_region.image_label")}
+                    <span className="text-xs text-muted-foreground ml-2">({t("create_region.image_recommended")})</span>
+                  </FormLabel>
                   <FormControl>
                     <div className="space-y-3">
                       <input
@@ -170,11 +173,11 @@ export function CreateRegionModal({
                         id="region-image-upload"
                       />
                       {imageSrc ? (
-                        <div className="relative w-full h-52 rounded-lg overflow-hidden border">
+                        <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
                           <img
                             src={imageSrc}
                             alt="Region preview"
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-fill"
                           />
                           <Button
                             type="button"
@@ -188,7 +191,7 @@ export function CreateRegionModal({
                         </div>
                       ) : (
                         <label htmlFor="region-image-upload" className="cursor-pointer block">
-                          <div className="w-full h-52 border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
+                          <div className="w-full h-[28rem] border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
                             <ImagePlus className="h-8 w-8 text-muted-foreground" />
                             <span className="text-sm text-muted-foreground">
                               {t("create_region.upload_image")}

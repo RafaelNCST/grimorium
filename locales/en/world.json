@@ -42,6 +42,7 @@
     "summary_label": "Summary",
     "summary_placeholder": "Briefly describe this region...",
     "image_label": "Image",
+    "image_recommended": "Recommended: 1200x448px",
     "upload_image": "Upload Image",
     "change_image": "Change Image",
     "create_button": "Create Region",
