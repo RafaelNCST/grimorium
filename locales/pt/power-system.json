@@ -257,7 +257,7 @@
       "name_placeholder": "ex: Sistema de Magia, Habilidades, Poderes",
       "icon_label": "Ícone do Sistema (opcional)",
       "icon_placeholder": "Enviar uma imagem de ícone",
-      "submit": "Criar",
+      "submit": "Criar Sistema",
       "cancel": "Cancelar",
       "templates_section": "Começar com um Template",
       "templates_section_description": "Escolha um template para aprender como usar o sistema de poder",

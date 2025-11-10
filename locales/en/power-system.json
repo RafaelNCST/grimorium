@@ -257,7 +257,7 @@
       "name_placeholder": "e.g., Magic System, Abilities, Powers",
       "icon_label": "System Icon (optional)",
       "icon_placeholder": "Upload an icon image",
-      "submit": "Create",
+      "submit": "Create System",
       "cancel": "Cancel",
       "templates_section": "Start with a Template",
       "templates_section_description": "Choose a template to learn how to use the power system",
