@@ -186,7 +186,10 @@ export function CreateSystemModal({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>{t("modals.create_system.title")}</DialogTitle>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              {t("modals.create_system.title")}
+            </DialogTitle>
           </DialogHeader>
 
         <div className="flex-1 overflow-hidden">

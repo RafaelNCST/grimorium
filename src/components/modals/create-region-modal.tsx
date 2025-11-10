@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import { IRegion, RegionScale } from "@/pages/dashboard/tabs/world/types/region-types";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Map } from "lucide-react";
 
 interface CreateRegionModalProps {
   open: boolean;
@@ -143,7 +143,8 @@ export function CreateRegionModal({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <Map className="w-5 h-5 text-primary" />
             {editRegion ? t("create_region.edit_title") : t("create_region.title")}
           </DialogTitle>
           <DialogDescription>
