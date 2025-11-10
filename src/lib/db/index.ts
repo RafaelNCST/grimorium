@@ -421,6 +421,21 @@ async function runMigrations(database: Database): Promise<void> {
       UNIQUE(character_id, section_id)
     );
 
+    -- REGIÕES (MUNDO)
+    CREATE TABLE IF NOT EXISTS regions (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      parent_id TEXT,
+      scale TEXT NOT NULL,
+      summary TEXT,
+      image TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -457,6 +472,8 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_power_links_character ON power_character_links(character_id);
     CREATE INDEX IF NOT EXISTS idx_power_links_page ON power_character_links(page_id);
     CREATE INDEX IF NOT EXISTS idx_power_links_section ON power_character_links(section_id);
+    CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
+    CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
   `;
 
     await database.execute(schema);

@@ -1,295 +1,198 @@
-import { Plus, Search, MapPin, Mountain, Globe } from "lucide-react";
-
-import { EmptyState } from "@/components/empty-state";
-import { CreateContinentModal } from "@/components/modals/create-continent-modal";
-import { CreateLocationModal } from "@/components/modals/create-location-modal";
-import { CreateWorldModal } from "@/components/modals/create-world-modal";
+import { useTranslation } from "react-i18next";
+import { Plus, Search, Network, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { EmptyState } from "@/components/empty-state";
+import { CreateRegionModal } from "@/components/modals/create-region-modal";
+import { HierarchyManagerModal } from "./components/hierarchy-manager-modal";
+import { RegionCard } from "./components/region-card";
+import { ScaleFilterBadges } from "./components/scale-filter-badges";
+import { IRegion, IRegionWithChildren, RegionScale } from "./types/region-types";
+import { RegionFormData } from "@/components/modals/create-region-modal";
 
-import { EntityCard } from "./components/entity-card";
-import { SectionHeader } from "./components/section-header";
-import { StatsInfo } from "./components/stats-info";
-import {
-  IWorldEntity,
-  IWorldEntityStats,
-  IWorld,
-  IContinent,
-} from "./types/world-types";
-
-interface PropsWorldView {
+interface WorldViewProps {
   bookId: string;
-  searchTerm: string;
-  worldEntities: IWorldEntity[];
-  showCreateWorldModal: boolean;
-  showCreateContinentModal: boolean;
-  showCreateLocationModal: boolean;
-  filteredWorlds: IWorldEntity[];
-  filteredContinents: IWorldEntity[];
-  filteredLocations: IWorldEntity[];
-  entityStats: IWorldEntityStats;
-  availableWorlds: IWorld[];
-  availableContinents: IContinent[];
-  onSetSearchTerm: (term: string) => void;
-  onSetShowCreateWorldModal: (show: boolean) => void;
-  onSetShowCreateContinentModal: (show: boolean) => void;
-  onSetShowCreateLocationModal: (show: boolean) => void;
-  onCreateWorld: () => void;
-  onCreateContinent: () => void;
-  onCreateLocation: () => void;
-  onWorldCreated: (world: IWorldEntity) => void;
-  onContinentCreated: (continent: IWorldEntity) => void;
-  onLocationCreated: (location: IWorldEntity) => void;
-  onEntityClick: (entity: IWorldEntity) => void;
-  onGetTypeColor: (type: string) => string;
-  onGetParentName: (parentId?: string) => string;
+  regions: IRegion[];
+  allRegions: IRegion[];
+  hierarchy: IRegionWithChildren[];
+  isLoading: boolean;
+  searchQuery: string;
+  selectedScales: RegionScale[];
+  scaleStats: {
+    local: number;
+    continental: number;
+    planetary: number;
+    galactic: number;
+    universal: number;
+    multiversal: number;
+  };
+  regionMap: Map<string, IRegion>;
+  showCreateModal: boolean;
+  showHierarchyModal: boolean;
+  onSearchChange: (query: string) => void;
+  onScaleToggle: (scale: RegionScale) => void;
+  onCreateRegion: (data: RegionFormData) => void;
+  onRegionClick: (regionId: string) => void;
+  onShowCreateModal: (show: boolean) => void;
+  onShowHierarchyModal: (show: boolean) => void;
+  onRefreshRegions: () => void;
 }
 
 export function WorldView({
   bookId,
-  searchTerm,
-  worldEntities,
-  showCreateWorldModal,
-  showCreateContinentModal,
-  showCreateLocationModal,
-  filteredWorlds,
-  filteredContinents,
-  filteredLocations,
-  entityStats,
-  availableWorlds,
-  availableContinents,
-  onSetSearchTerm,
-  onSetShowCreateWorldModal,
-  onSetShowCreateContinentModal,
-  onSetShowCreateLocationModal,
-  onCreateWorld,
-  onCreateContinent,
-  onCreateLocation,
-  onWorldCreated,
-  onContinentCreated,
-  onLocationCreated,
-  onEntityClick,
-  onGetTypeColor,
-  onGetParentName,
-}: PropsWorldView) {
-  if (worldEntities.length === 0) {
+  regions,
+  allRegions,
+  hierarchy,
+  isLoading,
+  searchQuery,
+  selectedScales,
+  scaleStats,
+  regionMap,
+  showCreateModal,
+  showHierarchyModal,
+  onSearchChange,
+  onScaleToggle,
+  onCreateRegion,
+  onRegionClick,
+  onShowCreateModal,
+  onShowHierarchyModal,
+  onRefreshRegions,
+}: WorldViewProps) {
+  const { t } = useTranslation("world");
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex-1 h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading regions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (allRegions.length === 0) {
     return (
       <div className="flex-1 h-full flex flex-col space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold">Mundo</h2>
-            <p className="text-muted-foreground">
-              Gerencie mundos, continentes e locais
-            </p>
+            <h2 className="text-2xl font-bold">{t("title")}</h2>
+            <p className="text-muted-foreground">{t("description")}</p>
           </div>
           <Button
             variant="magical"
             size="lg"
-            onClick={onCreateWorld}
+            onClick={() => onShowCreateModal(true)}
             className="animate-glow"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Nova Região
+            {t("new_region_button")}
           </Button>
         </div>
 
         <EmptyState
-          icon={Globe}
-          title="Nenhum mundo criado"
-          description="Comece criando o primeiro mundo da sua história para organizar continentes e locais."
+          icon={Network}
+          title={t("empty_state.title")}
+          description={t("empty_state.description")}
         />
 
-        <CreateWorldModal
-          open={showCreateWorldModal}
-          onClose={() => onSetShowCreateWorldModal(false)}
-          onWorldCreated={onWorldCreated}
-          bookId={bookId}
-        />
-
-        <CreateContinentModal
-          open={showCreateContinentModal}
-          onClose={() => onSetShowCreateContinentModal(false)}
-          onContinentCreated={onContinentCreated}
-          bookId={bookId}
-          availableWorlds={availableWorlds.map((w) => ({
-            id: w.id,
-            name: w.name,
-          }))}
-        />
-
-        <CreateLocationModal
-          open={showCreateLocationModal}
-          onClose={() => onSetShowCreateLocationModal(false)}
-          onLocationCreated={onLocationCreated}
-          bookId={bookId}
-          availableParents={[
-            ...availableWorlds.map((w) => ({
-              id: w.id,
-              name: w.name,
-              type: "World",
-            })),
-            ...availableContinents.map((c) => ({
-              id: c.id,
-              name: c.name,
-              type: "Continent",
-            })),
-          ]}
+        <CreateRegionModal
+          open={showCreateModal}
+          onOpenChange={onShowCreateModal}
+          onConfirm={onCreateRegion}
+          availableRegions={allRegions}
         />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Mundo</h2>
-          <p className="text-muted-foreground">
-            Gerencie mundos, continentes e locais da sua história
-          </p>
-          <div className="mt-2">
-            <StatsInfo stats={entityStats} />
-          </div>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("description")}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onShowHierarchyModal(true)}
+          >
+            <Network className="w-4 h-4 mr-2" />
+            {t("manage_hierarchy_button")}
+          </Button>
+          <Button
+            variant="magical"
+            onClick={() => onShowCreateModal(true)}
+            className="animate-glow"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {t("new_region_button")}
+          </Button>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar mundos, continentes ou locais..."
-            value={searchTerm}
-            onChange={(e) => onSetSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      {/* Search Bar */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder={t("search_placeholder")}
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Scale Filter Badges */}
+      <ScaleFilterBadges
+        totalRegions={allRegions.length}
+        scaleStats={scaleStats}
+        selectedScales={selectedScales}
+        onScaleToggle={onScaleToggle}
+      />
+
+      {/* Regions Grid */}
+      {regions.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {regions.map((region) => {
+            const parentRegion = region.parentId
+              ? regionMap.get(region.parentId)
+              : undefined;
+
+            return (
+              <RegionCard
+                key={region.id}
+                region={region}
+                onClick={onRegionClick}
+                parentRegion={parentRegion}
+              />
+            );
+          })}
         </div>
-      </div>
-
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Globe}
-          title="Mundos"
-          count={entityStats.totalWorlds}
-          entityName="mundo"
-          onCreateClick={onCreateWorld}
+      ) : (
+        <EmptyState
+          icon={Search}
+          title={t("not_found")}
+          description="Try adjusting your search or filters"
         />
+      )}
 
-        {filteredWorlds.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredWorlds.map((entity) => (
-              <EntityCard
-                key={entity.id}
-                entity={entity}
-                onEntityClick={onEntityClick}
-                getTypeColor={onGetTypeColor}
-                getParentName={onGetParentName}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Globe}
-            title="Nenhum mundo criado"
-            description="Crie o primeiro mundo da sua história para organizar continentes e locais."
-          />
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <SectionHeader
-          icon={Mountain}
-          title="Continentes"
-          count={entityStats.totalContinents}
-          entityName="continente"
-          onCreateClick={onCreateContinent}
-        />
-
-        {filteredContinents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredContinents.map((entity) => (
-              <EntityCard
-                key={entity.id}
-                entity={entity}
-                onEntityClick={onEntityClick}
-                getTypeColor={onGetTypeColor}
-                getParentName={onGetParentName}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Mountain}
-            title="Nenhum continente criado"
-            description="Crie continentes para organizar melhor os locais da sua história."
-          />
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <SectionHeader
-          icon={MapPin}
-          title="Locais"
-          count={entityStats.totalLocations}
-          entityName="local"
-          onCreateClick={onCreateLocation}
-        />
-
-        {filteredLocations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredLocations.map((entity) => (
-              <EntityCard
-                key={entity.id}
-                entity={entity}
-                onEntityClick={onEntityClick}
-                getTypeColor={onGetTypeColor}
-                getParentName={onGetParentName}
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={MapPin}
-            title="Nenhum local criado"
-            description="Crie locais específicos onde sua história acontece."
-          />
-        )}
-      </div>
-
-      <CreateWorldModal
-        open={showCreateWorldModal}
-        onClose={() => onSetShowCreateWorldModal(false)}
-        onWorldCreated={onWorldCreated}
-        bookId={bookId}
+      {/* Modals */}
+      <CreateRegionModal
+        open={showCreateModal}
+        onOpenChange={onShowCreateModal}
+        onConfirm={onCreateRegion}
+        availableRegions={allRegions}
       />
 
-      <CreateContinentModal
-        open={showCreateContinentModal}
-        onClose={() => onSetShowCreateContinentModal(false)}
-        onContinentCreated={onContinentCreated}
-        bookId={bookId}
-        availableWorlds={availableWorlds.map((w) => ({
-          id: w.id,
-          name: w.name,
-        }))}
-      />
-
-      <CreateLocationModal
-        open={showCreateLocationModal}
-        onClose={() => onSetShowCreateLocationModal(false)}
-        onLocationCreated={onLocationCreated}
-        bookId={bookId}
-        availableParents={[
-          ...availableWorlds.map((w) => ({
-            id: w.id,
-            name: w.name,
-            type: "World",
-          })),
-          ...availableContinents.map((c) => ({
-            id: c.id,
-            name: c.name,
-            type: "Continent",
-          })),
-        ]}
+      <HierarchyManagerModal
+        open={showHierarchyModal}
+        onOpenChange={onShowHierarchyModal}
+        regions={hierarchy}
+        onRefresh={onRefreshRegions}
       />
     </div>
   );

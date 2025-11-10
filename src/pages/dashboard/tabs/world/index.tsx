@@ -1,162 +1,188 @@
-import { useState, useCallback, useMemo } from "react";
-
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-
-import { IWorldEntity, IWorld, IContinent } from "./types/world-types";
-import { filterEntities } from "./utils/filter-entities";
-import { getParentName } from "./utils/get-parent-name";
-import { getTypeColor } from "./utils/get-type-color";
+import { useToast } from "@/hooks/use-toast";
+import { IRegion, IRegionWithChildren, RegionScale } from "./types/region-types";
+import {
+  getRegionsByBookId,
+  createRegion,
+  getRegionHierarchy,
+} from "@/lib/db/regions.service";
+import { RegionFormData } from "@/components/modals/create-region-modal";
 import { WorldView } from "./view";
 
-interface PropsWorldTab {
+interface WorldTabProps {
   bookId: string;
 }
 
-export function WorldTab({ bookId }: PropsWorldTab) {
+export function WorldTab({ bookId }: WorldTabProps) {
   const navigate = useNavigate();
-  const [worldEntities, setWorldEntities] = useState<IWorldEntity[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showCreateWorldModal, setShowCreateWorldModal] = useState(false);
-  const [showCreateContinentModal, setShowCreateContinentModal] =
-    useState(false);
-  const [showCreateLocationModal, setShowCreateLocationModal] = useState(false);
+  const { toast } = useToast();
 
-  const worlds = useMemo(
-    () => worldEntities.filter((e) => e.type === "World"),
-    [worldEntities]
-  );
+  const [regions, setRegions] = useState<IRegion[]>([]);
+  const [hierarchy, setHierarchy] = useState<IRegionWithChildren[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedScales, setSelectedScales] = useState<RegionScale[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showHierarchyModal, setShowHierarchyModal] = useState(false);
 
-  const continents = useMemo(
-    () => worldEntities.filter((e) => e.type === "Continent"),
-    [worldEntities]
-  );
-
-  const locations = useMemo(
-    () => worldEntities.filter((e) => e.type === "Location"),
-    [worldEntities]
-  );
-
-  const filteredWorlds = useMemo(
-    () => filterEntities(worldEntities, searchTerm, "World"),
-    [worldEntities, searchTerm]
-  );
-
-  const filteredContinents = useMemo(
-    () => filterEntities(worldEntities, searchTerm, "Continent"),
-    [worldEntities, searchTerm]
-  );
-
-  const filteredLocations = useMemo(
-    () => filterEntities(worldEntities, searchTerm, "Location"),
-    [worldEntities, searchTerm]
-  );
-
-  const entityStats = useMemo(
-    () => ({
-      totalWorlds: worlds.length,
-      totalContinents: continents.length,
-      totalLocations: locations.length,
-    }),
-    [worlds.length, continents.length, locations.length]
-  );
-
-  const availableWorlds = useMemo<IWorld[]>(
-    () => worlds.map((w) => ({ id: w.id, name: w.name })),
-    [worlds]
-  );
-
-  const availableContinents = useMemo<IContinent[]>(
-    () => continents.map((c) => ({ id: c.id, name: c.name })),
-    [continents]
-  );
-
-  const handleSetSearchTerm = useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
-
-  const handleSetShowCreateWorldModal = useCallback((show: boolean) => {
-    setShowCreateWorldModal(show);
-  }, []);
-
-  const handleSetShowCreateContinentModal = useCallback((show: boolean) => {
-    setShowCreateContinentModal(show);
-  }, []);
-
-  const handleSetShowCreateLocationModal = useCallback((show: boolean) => {
-    setShowCreateLocationModal(show);
-  }, []);
-
-  const handleCreateWorld = useCallback(() => {
-    setShowCreateWorldModal(true);
-  }, []);
-
-  const handleCreateContinent = useCallback(() => {
-    setShowCreateContinentModal(true);
-  }, []);
-
-  const handleCreateLocation = useCallback(() => {
-    setShowCreateLocationModal(true);
-  }, []);
-
-  const handleWorldCreated = useCallback((newWorld: IWorldEntity) => {
-    setWorldEntities((prev) => [...prev, newWorld]);
-  }, []);
-
-  const handleContinentCreated = useCallback((newContinent: IWorldEntity) => {
-    setWorldEntities((prev) => [...prev, newContinent]);
-  }, []);
-
-  const handleLocationCreated = useCallback((newLocation: IWorldEntity) => {
-    setWorldEntities((prev) => [...prev, newLocation]);
-  }, []);
-
-  const handleEntityClick = useCallback(
-    (entity: IWorldEntity) => {
-      navigate({
-        to: "/dashboard/$dashboardId/tabs/world/$worldId",
-        params: { dashboardId: bookId, worldId: entity.id },
+  // Load regions from database
+  const loadRegions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [regionsData, hierarchyData] = await Promise.all([
+        getRegionsByBookId(bookId),
+        getRegionHierarchy(bookId),
+      ]);
+      setRegions(regionsData);
+      setHierarchy(hierarchyData);
+    } catch (error) {
+      console.error("Failed to load regions:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load regions",
+        variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [bookId, toast]);
+
+  // Initial load
+  useEffect(() => {
+    loadRegions();
+  }, [loadRegions]);
+
+  // Filter regions by search and selected scales
+  const filteredRegions = useMemo(() => {
+    let filtered = regions;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (region) =>
+          region.name.toLowerCase().includes(query) ||
+          region.summary?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by selected scales
+    if (selectedScales.length > 0) {
+      filtered = filtered.filter((region) =>
+        selectedScales.includes(region.scale)
+      );
+    }
+
+    return filtered;
+  }, [regions, searchQuery, selectedScales]);
+
+  // Calculate scale statistics
+  const scaleStats = useMemo(() => {
+    const stats = {
+      local: 0,
+      continental: 0,
+      planetary: 0,
+      galactic: 0,
+      universal: 0,
+      multiversal: 0,
+    };
+
+    regions.forEach((region) => {
+      stats[region.scale]++;
+    });
+
+    return stats;
+  }, [regions]);
+
+  // Create region map for quick parent lookup
+  const regionMap = useMemo(() => {
+    const map = new Map<string, IRegion>();
+    regions.forEach((region) => map.set(region.id, region));
+    return map;
+  }, [regions]);
+
+  // Handle search query change
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  // Handle scale filter toggle
+  const handleScaleToggle = useCallback((scale: RegionScale) => {
+    setSelectedScales((prev) => {
+      if (prev.includes(scale)) {
+        return prev.filter((s) => s !== scale);
+      } else {
+        return [...prev, scale];
+      }
+    });
+  }, []);
+
+  // Handle create region
+  const handleCreateRegion = useCallback(
+    async (data: RegionFormData) => {
+      try {
+        await createRegion({
+          bookId,
+          name: data.name,
+          parentId: data.parentId,
+          scale: data.scale,
+          summary: data.summary,
+          image: data.image,
+        });
+
+        toast({
+          title: "Success",
+          description: "Region created successfully",
+        });
+
+        setShowCreateModal(false);
+        loadRegions();
+      } catch (error: any) {
+        console.error("Failed to create region:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create region",
+          variant: "destructive",
+        });
+      }
     },
-    [navigate, bookId]
+    [bookId, toast, loadRegions]
   );
 
-  const handleGetTypeColor = useCallback(
-    (type: string) => getTypeColor(type as "World" | "Continent" | "Location"),
-    []
-  );
-
-  const handleGetParentName = useCallback(
-    (parentId?: string) => getParentName(parentId, worldEntities),
-    [worldEntities]
+  // Handle region card click (future navigation)
+  const handleRegionClick = useCallback(
+    (regionId: string) => {
+      // TODO: Navigate to region detail page when implemented
+      console.log("Region clicked:", regionId);
+      // navigate({
+      //   to: "/dashboard/$dashboardId/tabs/world/$regionId",
+      //   params: { dashboardId: bookId, regionId },
+      // });
+    },
+    [bookId]
   );
 
   return (
     <WorldView
       bookId={bookId}
-      searchTerm={searchTerm}
-      worldEntities={worldEntities}
-      showCreateWorldModal={showCreateWorldModal}
-      showCreateContinentModal={showCreateContinentModal}
-      showCreateLocationModal={showCreateLocationModal}
-      filteredWorlds={filteredWorlds}
-      filteredContinents={filteredContinents}
-      filteredLocations={filteredLocations}
-      entityStats={entityStats}
-      availableWorlds={availableWorlds}
-      availableContinents={availableContinents}
-      onSetSearchTerm={handleSetSearchTerm}
-      onSetShowCreateWorldModal={handleSetShowCreateWorldModal}
-      onSetShowCreateContinentModal={handleSetShowCreateContinentModal}
-      onSetShowCreateLocationModal={handleSetShowCreateLocationModal}
-      onCreateWorld={handleCreateWorld}
-      onCreateContinent={handleCreateContinent}
-      onCreateLocation={handleCreateLocation}
-      onWorldCreated={handleWorldCreated}
-      onContinentCreated={handleContinentCreated}
-      onLocationCreated={handleLocationCreated}
-      onEntityClick={handleEntityClick}
-      onGetTypeColor={handleGetTypeColor}
-      onGetParentName={handleGetParentName}
+      regions={filteredRegions}
+      allRegions={regions}
+      hierarchy={hierarchy}
+      isLoading={isLoading}
+      searchQuery={searchQuery}
+      selectedScales={selectedScales}
+      scaleStats={scaleStats}
+      regionMap={regionMap}
+      showCreateModal={showCreateModal}
+      showHierarchyModal={showHierarchyModal}
+      onSearchChange={handleSearchChange}
+      onScaleToggle={handleScaleToggle}
+      onCreateRegion={handleCreateRegion}
+      onRegionClick={handleRegionClick}
+      onShowCreateModal={setShowCreateModal}
+      onShowHierarchyModal={setShowHierarchyModal}
+      onRefreshRegions={loadRegions}
     />
   );
 }

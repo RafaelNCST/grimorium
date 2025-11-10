@@ -1,0 +1,77 @@
+{
+  "title": "Mundo",
+  "description": "Gerencie as regiões e localizações do seu mundo",
+  "new_region_button": "Nova Região",
+  "manage_hierarchy_button": "Gerenciar Hierarquia",
+  "empty_state": {
+    "title": "Nenhuma região criada",
+    "description": "Comece criando sua primeira região para construir seu mundo"
+  },
+  "search_placeholder": "Buscar regiões...",
+  "not_found": "Nenhuma região encontrada",
+  "filters": {
+    "all": "Todas",
+    "scale": "Escala"
+  },
+  "scales": {
+    "local": "Local",
+    "continental": "Continental",
+    "planetary": "Planetária",
+    "galactic": "Galáctica",
+    "universal": "Universal",
+    "multiversal": "Multiversal"
+  },
+  "scale_descriptions": {
+    "local": "Cidades, vilas, florestas, montanhas, regiões menores",
+    "continental": "Continentes, grandes regiões, países, territórios extensos",
+    "planetary": "Planetas, mundos, dimensões planetárias",
+    "galactic": "Galáxias, sistemas estelares, setores espaciais",
+    "universal": "Universos, realidades, planos de existência",
+    "multiversal": "Multiversos, conjunto de realidades, metaversos"
+  },
+  "create_region": {
+    "title": "Criar Nova Região",
+    "edit_title": "Editar Região",
+    "name_label": "Nome da Região",
+    "name_placeholder": "Ex: Reino de Eldoria",
+    "parent_label": "Região Pai",
+    "parent_placeholder": "Selecione uma região pai (opcional)",
+    "parent_neutral": "Neutra (sem região pai)",
+    "scale_label": "Escala da Região",
+    "scale_placeholder": "Selecione a escala",
+    "summary_label": "Resumo",
+    "summary_placeholder": "Descreva brevemente esta região...",
+    "image_label": "Imagem",
+    "upload_image": "Carregar Imagem",
+    "change_image": "Alterar Imagem",
+    "save_button": "Salvar",
+    "cancel_button": "Cancelar",
+    "creating": "Criando...",
+    "updating": "Atualizando..."
+  },
+  "hierarchy_manager": {
+    "title": "Gerenciar Hierarquia de Regiões",
+    "description": "Reorganize as regiões arrastando e soltando. Você pode mover regiões entre diferentes pais ou torná-las neutras.",
+    "neutral_regions": "Regiões Neutras",
+    "neutral_description": "Regiões sem pai (nível raiz)",
+    "close_button": "Fechar",
+    "drag_hint": "Arraste para reorganizar",
+    "expand": "Expandir",
+    "collapse": "Recolher",
+    "delete_region": "Excluir região",
+    "no_regions": "Nenhuma região neste nível"
+  },
+  "delete_confirmation": {
+    "title": "Excluir Região",
+    "message": "Tem certeza que deseja excluir esta região?",
+    "warning": "Esta ação não pode ser desfeita. As sub-regiões terão seu pai removido.",
+    "type_to_confirm": "Digite o nome da região para confirmar:",
+    "delete_button": "Excluir",
+    "cancel_button": "Cancelar",
+    "deleting": "Excluindo..."
+  },
+  "region_card": {
+    "parent_badge": "Região Pai:",
+    "no_summary": "Sem descrição"
+  }
+}

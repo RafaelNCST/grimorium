@@ -107,7 +107,8 @@
       "Bash(Get-Process)",
       "Bash(Where-Object {$_rocessName -match \"node\"})",
       "Bash(Select-Object ProcessName,Id,CommandLine)",
-      "Bash(cmd.exe //c taskkill //PID 29836 //F)"
+      "Bash(cmd.exe //c taskkill //PID 29836 //F)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
