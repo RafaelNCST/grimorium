@@ -13,6 +13,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useBookStore, Book as BookType } from "@/stores/book-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
+import { deleteBook as deleteBookDB } from "@/lib/db/books.service";
 
 import { DEFAULT_TABS_CONSTANT } from "./constants/dashboard-constants";
 import { DashboardView } from "./view";
@@ -326,17 +327,37 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     setIsEditingHeader(false);
   }, [book, setIsEditingHeader]);
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback(async () => {
     if (book && deleteInput === book.title) {
-      deleteBook(bookId);
-      onBack();
-      setShowDeleteDialog(false);
+      try {
+        // Delete from database first
+        await deleteBookDB(bookId);
+        // Then update the store
+        deleteBook(bookId);
+        onBack();
+        setShowDeleteDialog(false);
+      } catch (error) {
+        console.error("Error deleting book:", error);
+        alert(
+          `Erro ao excluir livro: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
     }
   }, [book, deleteInput, deleteBook, bookId, onBack]);
 
-  const handleDeleteBook = useCallback(() => {
-    deleteBook(bookId);
-    onBack();
+  const handleDeleteBook = useCallback(async () => {
+    try {
+      // Delete from database first
+      await deleteBookDB(bookId);
+      // Then update the store
+      deleteBook(bookId);
+      onBack();
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      alert(
+        `Erro ao excluir livro: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }, [deleteBook, bookId, onBack]);
 
   const handleNavigateToChapters = useCallback(() => {
