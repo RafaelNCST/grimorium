@@ -89,7 +89,7 @@ export function WorldView({
             className="animate-glow"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Novo Mundo
+            Nova Região
           </Button>
         </div>
 
