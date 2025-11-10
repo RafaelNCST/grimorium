@@ -107,7 +107,7 @@ export function EditSystemModal({
           >
             <div className="space-y-2">
               <FormLabel>{t("modals.edit_system.name_label")}</FormLabel>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 p-1">
                 {/* Icon Section */}
                 <div className="flex-shrink-0">
                   <label htmlFor="icon-upload" className="cursor-pointer">
