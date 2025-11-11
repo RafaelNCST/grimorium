@@ -94,7 +94,10 @@ export function DeleteRegionConfirmationDialog({
   if (isVersionDeletion) {
     return (
       <AlertDialog open={isOpen} onOpenChange={handleCancel}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onOverlayClick={handleCancel}
+          onEscapeKeyDown={handleCancel}
+        >
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
@@ -125,7 +128,10 @@ export function DeleteRegionConfirmationDialog({
   // Region Deletion Flow (2 Steps)
   return (
     <AlertDialog open={isOpen} onOpenChange={handleCancel}>
-      <AlertDialogContent>
+      <AlertDialogContent
+        onOverlayClick={handleCancel}
+        onEscapeKeyDown={handleCancel}
+      >
         {step === 1 ? (
           <>
             <AlertDialogHeader>
