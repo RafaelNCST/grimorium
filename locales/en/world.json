@@ -61,16 +61,47 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "delete_region": "Delete region",
-    "no_regions": "No regions at this level"
+    "no_regions": "No regions at this level",
+    "move_success_title": "Success",
+    "move_success_message": "Region hierarchy updated successfully",
+    "move_error_title": "Error",
+    "move_error_message": "Failed to update hierarchy",
+    "reorder_success_title": "Success",
+    "reorder_success_message": "Regions reordered successfully",
+    "reorder_error_title": "Error",
+    "reorder_error_message": "Failed to reorder regions"
   },
   "delete_confirmation": {
-    "title": "Delete Region",
-    "message": "Are you sure you want to delete this region?",
-    "warning": "This action cannot be undone. Sub-regions will have their parent removed.",
-    "type_to_confirm": "Type the region name to confirm:",
-    "delete_button": "Delete",
-    "cancel_button": "Cancel",
-    "deleting": "Deleting..."
+    "success_title": "Success",
+    "success_message": "Region deleted successfully",
+    "error_title": "Error",
+    "error_message": "Failed to delete region"
+  },
+  "delete": {
+    "version": {
+      "title": "Delete Version",
+      "message": "Are you sure you want to delete the version '{{versionName}}'? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete Version"
+    },
+    "region": {
+      "title": "Delete Region",
+      "step1": {
+        "message": "This action will permanently delete the region '{{regionName}}' and all its versions.",
+        "input_label": "Type the full region name to confirm:",
+        "input_placeholder": "Type the region name",
+        "name_mismatch": "The entered name does not match the region name",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Final Confirmation",
+        "message": "You are about to permanently delete the region '{{regionName}}' and all its {{totalVersions}} versions. This action cannot be undone.",
+        "message_single": "You are about to permanently delete the region '{{regionName}}' and its version. This action cannot be undone.",
+        "cancel": "No, cancel",
+        "confirm": "Yes, permanently delete"
+      }
+    }
   },
   "region_card": {
     "parent_badge": "Parent Region:",

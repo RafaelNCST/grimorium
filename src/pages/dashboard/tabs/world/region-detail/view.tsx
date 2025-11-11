@@ -32,7 +32,7 @@ import { type IRegionVersion } from "@/lib/db/regions.service";
 import { SCALE_COLORS } from "@/pages/dashboard/tabs/world/constants/scale-colors";
 import { Badge } from "@/components/ui/badge";
 
-import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
+import { DeleteRegionConfirmationDialog } from "../components/delete-region-confirmation-dialog";
 import { VersionManager } from "./components/version-manager";
 
 interface RegionDetailViewProps {
@@ -410,7 +410,7 @@ export function RegionDetailView({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <DeleteConfirmationDialog
+      <DeleteRegionConfirmationDialog
         isOpen={showDeleteModal}
         onClose={onDeleteModalClose}
         regionName={region.name}

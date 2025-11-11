@@ -61,16 +61,47 @@
     "expand": "Expandir",
     "collapse": "Recolher",
     "delete_region": "Excluir região",
-    "no_regions": "Nenhuma região neste nível"
+    "no_regions": "Nenhuma região neste nível",
+    "move_success_title": "Sucesso",
+    "move_success_message": "Hierarquia de região atualizada com sucesso",
+    "move_error_title": "Erro",
+    "move_error_message": "Falha ao atualizar hierarquia",
+    "reorder_success_title": "Sucesso",
+    "reorder_success_message": "Regiões reordenadas com sucesso",
+    "reorder_error_title": "Erro",
+    "reorder_error_message": "Falha ao reordenar regiões"
   },
   "delete_confirmation": {
-    "title": "Excluir Região",
-    "message": "Tem certeza que deseja excluir esta região?",
-    "warning": "Esta ação não pode ser desfeita. As sub-regiões terão seu pai removido.",
-    "type_to_confirm": "Digite o nome da região para confirmar:",
-    "delete_button": "Excluir",
-    "cancel_button": "Cancelar",
-    "deleting": "Excluindo..."
+    "success_title": "Sucesso",
+    "success_message": "Região excluída com sucesso",
+    "error_title": "Erro",
+    "error_message": "Falha ao excluir região"
+  },
+  "delete": {
+    "version": {
+      "title": "Excluir Versão",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versão"
+    },
+    "region": {
+      "title": "Excluir Região",
+      "step1": {
+        "message": "Esta ação excluirá a região '{{regionName}}' e todas as suas versões permanentemente.",
+        "input_label": "Digite o nome completo da região para confirmar:",
+        "input_placeholder": "Digite o nome da região",
+        "name_mismatch": "O nome digitado não corresponde ao nome da região",
+        "cancel": "Cancelar",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Confirmação Final",
+        "message": "Você está prestes a excluir permanentemente a região '{{regionName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita.",
+        "message_single": "Você está prestes a excluir permanentemente a região '{{regionName}}' e sua versão. Esta ação não pode ser desfeita.",
+        "cancel": "Não, cancelar",
+        "confirm": "Sim, excluir permanentemente"
+      }
+    }
   },
   "region_card": {
     "parent_badge": "Região Pai:",

@@ -430,6 +430,7 @@ async function runMigrations(database: Database): Promise<void> {
       scale TEXT NOT NULL,
       summary TEXT,
       image TEXT,
+      order_index INTEGER NOT NULL DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
@@ -514,6 +515,17 @@ async function runMigrations(database: Database): Promise<void> {
     } catch (error) {
       // Column already exists or other error - safe to ignore
       console.log("[db] icon_image column already exists or error:", error);
+    }
+
+    // Add order_index column to regions if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE regions ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0"
+      );
+      console.log("[db] Added order_index column to regions table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log("[db] order_index column already exists or error:", error);
     }
 
     // Verify books table exists and log count

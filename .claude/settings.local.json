@@ -109,7 +109,9 @@
       "Bash(Select-Object ProcessName,Id,CommandLine)",
       "Bash(cmd.exe //c taskkill //PID 29836 //F)",
       "Bash(git log:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(cmd /c \"taskkill /PID 40648 /F\")",
+      "Bash(cmd /c \"for /f \"\"tokens=5\"\" %a in (''netstat -ano ^| findstr :8080 ^| findstr LISTENING'') do @taskkill /F /PID %a\" 2)"
     ],
     "deny": [],
     "ask": []

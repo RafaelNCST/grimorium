@@ -12,6 +12,7 @@ interface DBRegion {
   scale: RegionScale;
   summary: string | null;
   image: string | null;
+  order_index: number;
   created_at: number;
   updated_at: number;
 }
@@ -28,6 +29,7 @@ function regionToDBRegion(region: IRegion): DBRegion {
     scale: region.scale,
     summary: region.summary || null,
     image: region.image || null,
+    order_index: region.orderIndex,
     created_at: region.createdAt,
     updated_at: region.updatedAt,
   };
@@ -45,6 +47,7 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
     scale: dbRegion.scale,
     summary: dbRegion.summary || undefined,
     image: dbRegion.image || undefined,
+    orderIndex: dbRegion.order_index || 0,
     createdAt: dbRegion.created_at,
     updatedAt: dbRegion.updated_at,
   };
@@ -56,7 +59,7 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
 export async function getRegionsByBookId(bookId: string): Promise<IRegion[]> {
   const db = await getDB();
   const result = await db.select<DBRegion[]>(
-    "SELECT * FROM regions WHERE book_id = $1 ORDER BY created_at DESC",
+    "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index ASC, created_at DESC",
     [bookId]
   );
   return result.map(dbRegionToRegion);
@@ -78,15 +81,26 @@ export async function getRegionById(id: string): Promise<IRegion | null> {
  * Create a new region
  */
 export async function createRegion(
-  region: Omit<IRegion, 'id' | 'createdAt' | 'updatedAt'>
+  region: Omit<IRegion, 'id' | 'createdAt' | 'updatedAt' | 'orderIndex'>
 ): Promise<IRegion> {
   const db = await getDB();
   const now = Date.now();
   const id = crypto.randomUUID();
 
+  // Calculate the next order_index for regions with the same parent
+  const siblings = await db.select<DBRegion[]>(
+    "SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND " +
+    (region.parentId ? "parent_id = $2" : "parent_id IS NULL"),
+    region.parentId ? [region.bookId, region.parentId] : [region.bookId]
+  );
+
+  const maxOrder = (siblings[0] as any)?.max_order ?? -1;
+  const orderIndex = maxOrder + 1;
+
   const newRegion: IRegion = {
     ...region,
     id,
+    orderIndex,
     createdAt: now,
     updatedAt: now,
   };
@@ -95,9 +109,9 @@ export async function createRegion(
 
   await db.execute(
     `INSERT INTO regions (
-      id, book_id, name, parent_id, scale, summary, image, created_at, updated_at
+      id, book_id, name, parent_id, scale, summary, image, order_index, created_at, updated_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
     )`,
     [
       dbRegion.id,
@@ -107,6 +121,7 @@ export async function createRegion(
       dbRegion.scale,
       dbRegion.summary,
       dbRegion.image,
+      dbRegion.order_index,
       dbRegion.created_at,
       dbRegion.updated_at,
     ]
@@ -147,14 +162,16 @@ export async function updateRegion(
       scale = $3,
       summary = $4,
       image = $5,
-      updated_at = $6
-    WHERE id = $7`,
+      order_index = $6,
+      updated_at = $7
+    WHERE id = $8`,
     [
       dbRegion.name,
       dbRegion.parent_id,
       dbRegion.scale,
       dbRegion.summary,
       dbRegion.image,
+      dbRegion.order_index,
       dbRegion.updated_at,
       id,
     ]
@@ -263,6 +280,18 @@ export async function getRegionHierarchy(
     }
   });
 
+  // Sort children by orderIndex
+  const sortByOrderIndex = (regions: IRegionWithChildren[]) => {
+    regions.sort((a, b) => a.orderIndex - b.orderIndex);
+    regions.forEach((region) => {
+      if (region.children.length > 0) {
+        sortByOrderIndex(region.children);
+      }
+    });
+  };
+
+  sortByOrderIndex(rootRegions);
+
   return rootRegions;
 }
 
@@ -356,5 +385,69 @@ export async function updateRegionVersion(
   await db.execute(
     "UPDATE region_versions SET name = $1, description = $2 WHERE id = $3",
     [name, description, versionId]
+  );
+}
+
+/**
+ * Reorder regions within the same parent
+ * Similar to power system's reorderPages function
+ */
+export async function reorderRegions(
+  regionIds: string[],
+  parentId: string | null
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  // Update each region with its new order index
+  for (let i = 0; i < regionIds.length; i++) {
+    await db.execute(
+      "UPDATE regions SET order_index = $1, updated_at = $2 WHERE id = $3",
+      [i, now, regionIds[i]]
+    );
+  }
+}
+
+/**
+ * Move a region to a different parent and reorder
+ * Similar to power system's movePage function
+ */
+export async function moveRegion(
+  regionId: string,
+  newParentId: string | null,
+  newOrderIndex?: number
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  // Prevent circular hierarchy
+  if (newParentId) {
+    const isCircular = await checkCircularHierarchy(regionId, newParentId);
+    if (isCircular) {
+      throw new Error("Cannot move region: circular hierarchy detected");
+    }
+  }
+
+  // If no order index provided, calculate the next one
+  let orderIndex = newOrderIndex;
+  if (orderIndex === undefined) {
+    const region = await getRegionById(regionId);
+    if (!region) {
+      throw new Error("Region not found");
+    }
+
+    const siblings = await db.select<DBRegion[]>(
+      "SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND " +
+      (newParentId ? "parent_id = $2" : "parent_id IS NULL"),
+      newParentId ? [region.bookId, newParentId] : [region.bookId]
+    );
+
+    const maxOrder = (siblings[0] as any)?.max_order ?? -1;
+    orderIndex = maxOrder + 1;
+  }
+
+  await db.execute(
+    "UPDATE regions SET parent_id = $1, order_index = $2, updated_at = $3 WHERE id = $4",
+    [newParentId, orderIndex, now, regionId]
   );
 }

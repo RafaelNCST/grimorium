@@ -32,6 +32,8 @@ export interface IRegion {
   summary?: string;
   /** Image path for the region */
   image?: string;
+  /** Order index for sorting within same parent */
+  orderIndex: number;
   /** Creation timestamp */
   createdAt: number;
   /** Last update timestamp */
