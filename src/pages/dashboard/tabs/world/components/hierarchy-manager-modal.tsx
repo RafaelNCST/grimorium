@@ -128,15 +128,17 @@ export function HierarchyManagerModal({
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <DeleteRegionConfirmationDialog
-        isOpen={showDeleteModal}
-        onClose={handleDeleteModalClose}
-        regionName={regionToDelete?.name || ""}
-        currentVersion={{ isMain: true } as any}
-        totalVersions={1}
-        onConfirmDelete={confirmDelete}
-      />
+      {/* Delete Confirmation Dialog - Rendered independently to avoid z-index/size conflicts */}
+      {showDeleteModal && (
+        <DeleteRegionConfirmationDialog
+          isOpen={showDeleteModal}
+          onClose={handleDeleteModalClose}
+          regionName={regionToDelete?.name || ""}
+          currentVersion={{ isMain: true } as any}
+          totalVersions={1}
+          onConfirmDelete={confirmDelete}
+        />
+      )}
     </>
   );
 }
