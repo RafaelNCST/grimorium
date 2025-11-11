@@ -15,6 +15,11 @@ export type RegionScale =
   | 'multiversal';
 
 /**
+ * Season type for region environment
+ */
+export type RegionSeason = 'spring' | 'summer' | 'autumn' | 'winter' | 'custom';
+
+/**
  * Region Interface - represents a geographic/spatial region in the story world
  */
 export interface IRegion {
@@ -38,6 +43,46 @@ export interface IRegion {
   createdAt: number;
   /** Last update timestamp */
   updatedAt: number;
+
+  // Environment fields
+  /** Climate description */
+  climate?: string;
+  /** Current season */
+  currentSeason?: RegionSeason;
+  /** Custom season name (when currentSeason is 'custom') */
+  customSeasonName?: string;
+  /** General description of flora, fauna, and environment */
+  generalDescription?: string;
+  /** List of region anomalies (JSON string array) */
+  regionAnomalies?: string;
+
+  // Information fields
+  /** Resident faction IDs (JSON string array) */
+  residentFactions?: string;
+  /** Dominant faction IDs (JSON string array) */
+  dominantFactions?: string;
+  /** Important character IDs (JSON string array) */
+  importantCharacters?: string;
+  /** Race IDs found in this region (JSON string array) */
+  racesFound?: string;
+  /** Item IDs found in this region (JSON string array) */
+  itemsFound?: string;
+
+  // Narrative fields
+  /** Narrative purpose of this region */
+  narrativePurpose?: string;
+  /** Unique characteristics (sounds, smells, sensations) */
+  uniqueCharacteristics?: string;
+  /** Political importance */
+  politicalImportance?: string;
+  /** Religious importance */
+  religiousImportance?: string;
+  /** How the world perceives this region */
+  worldPerception?: string;
+  /** List of region mysteries (JSON string array) */
+  regionMysteries?: string;
+  /** List of inspirations (JSON string array) */
+  inspirations?: string;
 }
 
 /**
@@ -57,4 +102,27 @@ export interface IRegionFormData {
   scale: RegionScale;
   summary?: string;
   image?: string;
+
+  // Environment fields
+  climate?: string;
+  currentSeason?: RegionSeason;
+  customSeasonName?: string;
+  generalDescription?: string;
+  regionAnomalies?: string[];
+
+  // Information fields
+  residentFactions?: string[];
+  dominantFactions?: string[];
+  importantCharacters?: string[];
+  racesFound?: string[];
+  itemsFound?: string[];
+
+  // Narrative fields
+  narrativePurpose?: string;
+  uniqueCharacteristics?: string;
+  politicalImportance?: string;
+  religiousImportance?: string;
+  worldPerception?: string;
+  regionMysteries?: string[];
+  inspirations?: string[];
 }

@@ -13,6 +13,11 @@ import { useTranslation } from "react-i18next";
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import {
@@ -31,6 +37,10 @@ import {
 import { type IRegionVersion } from "@/lib/db/regions.service";
 import { SCALE_COLORS } from "@/pages/dashboard/tabs/world/constants/scale-colors";
 import { Badge } from "@/components/ui/badge";
+import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
+import { ListInput } from "@/components/modals/create-region-modal/components/list-input";
+import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
+import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 
 import { DeleteRegionConfirmationDialog } from "../components/delete-region-confirmation-dialog";
 import { VersionManager } from "./components/version-manager";
@@ -39,6 +49,7 @@ interface RegionDetailViewProps {
   region: IRegion;
   editData: IRegion;
   isEditing: boolean;
+  hasChanges: boolean;
   versions: IRegionVersion[];
   currentVersion: IRegionVersion | null;
   showDeleteModal: boolean;
@@ -46,6 +57,12 @@ interface RegionDetailViewProps {
   imagePreview: string;
   fileInputRef: React.RefObject<HTMLInputElement>;
   allRegions: IRegion[];
+  advancedSectionOpen: boolean;
+  // Related data for multi-selects
+  characters: Array<{ id: string; name: string; image?: string }>;
+  factions: Array<{ id: string; name: string; image?: string }>;
+  races: Array<{ id: string; name: string; image?: string }>;
+  items: Array<{ id: string; name: string; image?: string }>;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -70,12 +87,21 @@ interface RegionDetailViewProps {
   ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
+  onAdvancedSectionToggle: () => void;
 }
+
+// Helper component for empty state
+const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
+  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
+    <p>{t("region-detail:empty_states.no_data")}</p>
+  </div>
+);
 
 export function RegionDetailView({
   region,
   editData,
   isEditing,
+  hasChanges,
   versions,
   currentVersion,
   showDeleteModal,
@@ -83,6 +109,11 @@ export function RegionDetailView({
   imagePreview,
   fileInputRef,
   allRegions,
+  advancedSectionOpen,
+  characters,
+  factions,
+  races,
+  items,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -99,8 +130,20 @@ export function RegionDetailView({
   onVersionUpdate,
   onImageFileChange,
   onEditDataChange,
+  onAdvancedSectionToggle,
 }: RegionDetailViewProps) {
   const { t } = useTranslation(["region-detail", "world"]);
+
+  // Helper function to safely parse JSON arrays
+  const safeJsonParse = (value: string | undefined): string[] => {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
 
   // Get parent region for display
   const parentRegion = region.parentId
@@ -111,7 +154,7 @@ export function RegionDetailView({
   const availableParentRegions = allRegions.filter((r) => r.id !== region.id);
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       <RegionNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={onNavigationSidebarClose}
@@ -158,6 +201,7 @@ export function RegionDetailView({
                       variant="magical"
                       className="animate-glow"
                       onClick={onSave}
+                      disabled={!hasChanges}
                     >
                       {t("region-detail:header.save")}
                     </Button>
@@ -380,6 +424,848 @@ export function RegionDetailView({
                   )}
                 </CardContent>
               </Card>
+
+              {/* Advanced Section - Collapsible */}
+              <Collapsible
+                open={advancedSectionOpen}
+                onOpenChange={onAdvancedSectionToggle}
+              >
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CollapsibleTrigger asChild>
+                      <div className="flex items-center justify-between cursor-pointer">
+                        <CardTitle>
+                          {t("region-detail:sections.advanced_info")}
+                        </CardTitle>
+                        <Button variant="ghost" size="sm">
+                          {advancedSectionOpen
+                            ? t("region-detail:actions.close")
+                            : t("region-detail:actions.open")}
+                        </Button>
+                      </div>
+                    </CollapsibleTrigger>
+                  </CardHeader>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-6">
+                      {/* Environment Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("world:create_region.environment_section")}
+                        </h4>
+
+                        {/* Climate */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">{t("world:create_region.climate_label")}</Label>
+                          {isEditing ? (
+                            <>
+                              <Input
+                                value={editData.climate || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("climate", e.target.value)
+                                }
+                                placeholder={t(
+                                  "world:create_region.climate_placeholder"
+                                )}
+                                maxLength={200}
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.climate?.length || 0}/200</span>
+                              </div>
+                            </>
+                          ) : region.climate ? (
+                            <p className="text-sm">{region.climate}</p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Season Picker */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <SeasonPicker
+                              value={editData.currentSeason}
+                              customSeasonName={editData.customSeasonName}
+                              onSeasonChange={(season) =>
+                                onEditDataChange("currentSeason", season)
+                              }
+                              onCustomNameChange={(name) =>
+                                onEditDataChange("customSeasonName", name)
+                              }
+                            />
+                          ) : region.currentSeason ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.current_season_label")}
+                              </Label>
+                              {(() => {
+                                const selectedSeason = REGION_SEASONS.find(
+                                  (s) => s.value === region.currentSeason
+                                );
+                                if (!selectedSeason) return null;
+
+                                const Icon = selectedSeason.icon;
+                                const displayLabel =
+                                  region.currentSeason === "custom" &&
+                                  region.customSeasonName
+                                    ? region.customSeasonName
+                                    : t(`world:seasons.${region.currentSeason}`);
+
+                                // Extract RGB values from color classes
+                                const colorMap: Record<string, string> = {
+                                  "text-green-600 dark:text-green-400": "34, 197, 94",
+                                  "text-amber-600 dark:text-amber-400": "251, 191, 36",
+                                  "text-orange-600 dark:text-orange-400": "251, 146, 60",
+                                  "text-blue-600 dark:text-blue-400": "37, 99, 235",
+                                  "text-purple-600 dark:text-purple-400": "147, 51, 234",
+                                };
+                                const rgb = colorMap[selectedSeason.color] || "147, 51, 234";
+
+                                return (
+                                  <button
+                                    type="button"
+                                    disabled
+                                    className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all ${selectedSeason.bgColor} ${selectedSeason.borderColor}`}
+                                  >
+                                    <div className={`p-3 rounded-lg ${selectedSeason.bgColor}`}>
+                                      <Icon className={`w-6 h-6 ${selectedSeason.color}`} />
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                      <p className={`font-semibold text-base ${selectedSeason.color}`}>
+                                        {displayLabel}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        {selectedSeason.description}
+                                      </p>
+                                    </div>
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.current_season_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* General Description */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t("world:create_region.general_description_label")}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.generalDescription || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "generalDescription",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.general_description_placeholder"
+                                )}
+                                rows={5}
+                                maxLength={1000}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.generalDescription?.length || 0}/1000
+                                </span>
+                              </div>
+                            </>
+                          ) : region.generalDescription ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.generalDescription}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Region Anomalies */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <ListInput
+                              label={t("world:create_region.region_anomalies_label")}
+                              placeholder={t(
+                                "world:create_region.anomaly_placeholder"
+                              )}
+                              buttonText={t("world:create_region.add_anomaly")}
+                              value={
+                                editData.regionAnomalies
+                                  ? safeJsonParse(editData.regionAnomalies)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "regionAnomalies",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : safeJsonParse(region.regionAnomalies).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.region_anomalies_label")}
+                              </Label>
+                              <ul className="list-disc list-inside space-y-1">
+                                {safeJsonParse(region.regionAnomalies).map(
+                                  (anomaly: string, index: number) => (
+                                    <li key={index} className="text-sm">
+                                      {anomaly}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.region_anomalies_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Information Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("world:create_region.information_section")}
+                        </h4>
+
+                        {/* Resident Factions */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <MultiSelect
+                              label={t(
+                                "world:create_region.resident_factions_label"
+                              )}
+                              placeholder={t(
+                                "world:create_region.resident_factions_placeholder"
+                              )}
+                              emptyText={t(
+                                "world:create_region.no_factions_warning"
+                              )}
+                              noSelectionText={t(
+                                "world:create_region.no_factions_selected"
+                              )}
+                              searchPlaceholder={t(
+                                "world:create_region.search_faction"
+                              )}
+                              options={factions}
+                              value={
+                                editData.residentFactions
+                                  ? safeJsonParse(editData.residentFactions)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "residentFactions",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.residentFactions &&
+                            safeJsonParse(region.residentFactions).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.resident_factions_label"
+                                )}
+                              </Label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeJsonParse(region.residentFactions).map(
+                                  (factionId: string) => {
+                                    const faction = factions.find(
+                                      (f) => f.id === factionId
+                                    );
+                                    return faction ? (
+                                      <Badge key={factionId} variant="secondary">
+                                        {faction.name}
+                                      </Badge>
+                                    ) : null;
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.resident_factions_label"
+                                )}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Dominant Factions */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <MultiSelect
+                              label={t(
+                                "world:create_region.dominant_factions_label"
+                              )}
+                              placeholder={t(
+                                "world:create_region.dominant_factions_placeholder"
+                              )}
+                              emptyText={t(
+                                "world:create_region.no_factions_warning"
+                              )}
+                              noSelectionText={t(
+                                "world:create_region.no_factions_selected"
+                              )}
+                              searchPlaceholder={t(
+                                "world:create_region.search_faction"
+                              )}
+                              options={factions}
+                              value={
+                                editData.dominantFactions
+                                  ? safeJsonParse(editData.dominantFactions)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "dominantFactions",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.dominantFactions &&
+                            safeJsonParse(region.dominantFactions).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.dominant_factions_label"
+                                )}
+                              </Label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeJsonParse(region.dominantFactions).map(
+                                  (factionId: string) => {
+                                    const faction = factions.find(
+                                      (f) => f.id === factionId
+                                    );
+                                    return faction ? (
+                                      <Badge key={factionId} variant="secondary">
+                                        {faction.name}
+                                      </Badge>
+                                    ) : null;
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.dominant_factions_label"
+                                )}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Important Characters */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <MultiSelect
+                              label={t(
+                                "world:create_region.important_characters_label"
+                              )}
+                              placeholder={t(
+                                "world:create_region.important_characters_placeholder"
+                              )}
+                              emptyText={t(
+                                "world:create_region.no_characters_warning"
+                              )}
+                              noSelectionText={t(
+                                "world:create_region.no_characters_selected"
+                              )}
+                              searchPlaceholder={t(
+                                "world:create_region.search_character"
+                              )}
+                              options={characters}
+                              value={
+                                editData.importantCharacters
+                                  ? safeJsonParse(editData.importantCharacters)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "importantCharacters",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.importantCharacters &&
+                            safeJsonParse(region.importantCharacters).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.important_characters_label"
+                                )}
+                              </Label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeJsonParse(region.importantCharacters).map(
+                                  (characterId: string) => {
+                                    const character = characters.find(
+                                      (c) => c.id === characterId
+                                    );
+                                    return character ? (
+                                      <Badge
+                                        key={characterId}
+                                        variant="secondary"
+                                      >
+                                        {character.name}
+                                      </Badge>
+                                    ) : null;
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t(
+                                  "world:create_region.important_characters_label"
+                                )}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Races Found */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <MultiSelect
+                              label={t("world:create_region.races_found_label")}
+                              placeholder={t(
+                                "world:create_region.races_found_placeholder"
+                              )}
+                              emptyText={t(
+                                "world:create_region.no_races_warning"
+                              )}
+                              noSelectionText={t(
+                                "world:create_region.no_races_selected"
+                              )}
+                              searchPlaceholder={t(
+                                "world:create_region.search_race"
+                              )}
+                              options={races}
+                              value={
+                                editData.racesFound
+                                  ? safeJsonParse(editData.racesFound)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "racesFound",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.racesFound &&
+                            safeJsonParse(region.racesFound).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.races_found_label")}
+                              </Label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeJsonParse(region.racesFound).map(
+                                  (raceId: string) => {
+                                    const race = races.find(
+                                      (r) => r.id === raceId
+                                    );
+                                    return race ? (
+                                      <Badge key={raceId} variant="secondary">
+                                        {race.name}
+                                      </Badge>
+                                    ) : null;
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.races_found_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Items Found */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <MultiSelect
+                              label={t("world:create_region.items_found_label")}
+                              placeholder={t(
+                                "world:create_region.items_found_placeholder"
+                              )}
+                              emptyText={t(
+                                "world:create_region.no_items_warning"
+                              )}
+                              noSelectionText={t(
+                                "world:create_region.no_items_selected"
+                              )}
+                              searchPlaceholder={t(
+                                "world:create_region.search_item"
+                              )}
+                              options={items}
+                              value={
+                                editData.itemsFound
+                                  ? safeJsonParse(editData.itemsFound)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "itemsFound",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.itemsFound &&
+                            safeJsonParse(region.itemsFound).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.items_found_label")}
+                              </Label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeJsonParse(region.itemsFound).map(
+                                  (itemId: string) => {
+                                    const item = items.find(
+                                      (i) => i.id === itemId
+                                    );
+                                    return item ? (
+                                      <Badge key={itemId} variant="secondary">
+                                        {item.name}
+                                      </Badge>
+                                    ) : null;
+                                  }
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.items_found_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Narrative Section */}
+                      <div className="space-y-4">
+                        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                          {t("world:create_region.narrative_section")}
+                        </h4>
+
+                        {/* Narrative Purpose */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t("world:create_region.narrative_purpose_label")}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.narrativePurpose || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "narrativePurpose",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.narrative_purpose_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.narrativePurpose?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : region.narrativePurpose ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.narrativePurpose}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Unique Characteristics */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t(
+                              "world:create_region.unique_characteristics_label"
+                            )}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.uniqueCharacteristics || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "uniqueCharacteristics",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.unique_characteristics_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.uniqueCharacteristics?.length || 0}
+                                  /500
+                                </span>
+                              </div>
+                            </>
+                          ) : region.uniqueCharacteristics ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.uniqueCharacteristics}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Political Importance */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t("world:create_region.political_importance_label")}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.politicalImportance || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "politicalImportance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.political_importance_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.politicalImportance?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : region.politicalImportance ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.politicalImportance}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Religious Importance */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t("world:create_region.religious_importance_label")}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.religiousImportance || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "religiousImportance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.religious_importance_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.religiousImportance?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : region.religiousImportance ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.religiousImportance}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* World Perception */}
+                        <div className="space-y-2">
+                          <Label className="text-purple-600 dark:text-purple-400">
+                            {t("world:create_region.world_perception_label")}
+                          </Label>
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.worldPerception || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "worldPerception",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.world_perception_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.worldPerception?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : region.worldPerception ? (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {region.worldPerception}
+                            </p>
+                          ) : (
+                            <EmptyFieldState t={t} />
+                          )}
+                        </div>
+
+                        {/* Region Mysteries */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <ListInput
+                              label={t("world:create_region.region_mysteries_label")}
+                              placeholder={t(
+                                "world:create_region.mystery_placeholder"
+                              )}
+                              buttonText={t("world:create_region.add_mystery")}
+                              value={
+                                editData.regionMysteries
+                                  ? safeJsonParse(editData.regionMysteries)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "regionMysteries",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.regionMysteries &&
+                            safeJsonParse(region.regionMysteries).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.region_mysteries_label")}
+                              </Label>
+                              <ul className="list-disc list-inside space-y-1">
+                                {safeJsonParse(region.regionMysteries).map(
+                                  (mystery: string, index: number) => (
+                                    <li key={index} className="text-sm">
+                                      {mystery}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.region_mysteries_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Inspirations */}
+                        <div className="space-y-2">
+                          {isEditing ? (
+                            <ListInput
+                              label={t("world:create_region.inspirations_label")}
+                              placeholder={t(
+                                "world:create_region.inspiration_placeholder"
+                              )}
+                              buttonText={t(
+                                "world:create_region.add_inspiration"
+                              )}
+                              value={
+                                editData.inspirations
+                                  ? safeJsonParse(editData.inspirations)
+                                  : []
+                              }
+                              onChange={(value) =>
+                                onEditDataChange(
+                                  "inspirations",
+                                  JSON.stringify(value)
+                                )
+                              }
+                            />
+                          ) : region.inspirations &&
+                            safeJsonParse(region.inspirations).length > 0 ? (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.inspirations_label")}
+                              </Label>
+                              <ul className="list-disc list-inside space-y-1">
+                                {safeJsonParse(region.inspirations).map(
+                                  (inspiration: string, index: number) => (
+                                    <li key={index} className="text-sm">
+                                      {inspiration}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-purple-600 dark:text-purple-400">
+                                {t("world:create_region.inspirations_label")}
+                              </Label>
+                              <EmptyFieldState t={t} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             </div>
 
             {/* Sidebar - Versions - 1 column */}

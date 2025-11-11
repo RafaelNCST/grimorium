@@ -7,8 +7,7 @@ import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { HierarchyManagerModal } from "./components/hierarchy-manager-modal";
 import { RegionCard } from "./components/region-card";
 import { ScaleFilterBadges } from "./components/scale-filter-badges";
-import { IRegion, IRegionWithChildren, RegionScale } from "./types/region-types";
-import { RegionFormData } from "@/components/modals/create-region-modal";
+import { IRegion, IRegionWithChildren, RegionScale, IRegionFormData } from "./types/region-types";
 
 interface WorldViewProps {
   bookId: string;
@@ -29,9 +28,13 @@ interface WorldViewProps {
   regionMap: Map<string, IRegion>;
   showCreateModal: boolean;
   showHierarchyModal: boolean;
+  characters: Array<{ id: string; name: string }>;
+  factions: Array<{ id: string; name: string }>;
+  races: Array<{ id: string; name: string }>;
+  items: Array<{ id: string; name: string }>;
   onSearchChange: (query: string) => void;
   onScaleToggle: (scale: RegionScale) => void;
-  onCreateRegion: (data: RegionFormData) => void;
+  onCreateRegion: (data: IRegionFormData) => void;
   onRegionClick: (regionId: string) => void;
   onShowCreateModal: (show: boolean) => void;
   onShowHierarchyModal: (show: boolean) => void;
@@ -50,6 +53,10 @@ export function WorldView({
   regionMap,
   showCreateModal,
   showHierarchyModal,
+  characters,
+  factions,
+  races,
+  items,
   onSearchChange,
   onScaleToggle,
   onCreateRegion,
@@ -103,6 +110,10 @@ export function WorldView({
           onOpenChange={onShowCreateModal}
           onConfirm={onCreateRegion}
           availableRegions={allRegions}
+          characters={characters}
+          factions={factions}
+          races={races}
+          items={items}
         />
       </div>
     );
@@ -186,6 +197,10 @@ export function WorldView({
         onOpenChange={onShowCreateModal}
         onConfirm={onCreateRegion}
         availableRegions={allRegions}
+        characters={characters}
+        factions={factions}
+        races={races}
+        items={items}
       />
 
       <HierarchyManagerModal

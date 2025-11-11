@@ -112,7 +112,11 @@
       "Bash(git show:*)",
       "Bash(cmd /c \"taskkill /PID 40648 /F\")",
       "Bash(cmd /c \"for /f \"\"tokens=5\"\" %a in (''netstat -ano ^| findstr :8080 ^| findstr LISTENING'') do @taskkill /F /PID %a\" 2)",
-      "Bash(cmd /c \"taskkill /PID 31612 /F\")"
+      "Bash(cmd /c \"taskkill /PID 31612 /F\")",
+      "Bash(/tmp/pt_world_backup.json)",
+      "Bash(Select-String -Pattern \"region-detail\" -Context 2,2)",
+      "Bash(cmd /c \"taskkill /PID 44920 /F\")",
+      "Bash(cmd //c \"taskkill //PID 44920 //F\")"
     ],
     "deny": [],
     "ask": []

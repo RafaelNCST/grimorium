@@ -1,13 +1,16 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useToast } from "@/hooks/use-toast";
-import { IRegion, IRegionWithChildren, RegionScale } from "./types/region-types";
+import { IRegion, IRegionWithChildren, RegionScale, IRegionFormData } from "./types/region-types";
 import {
   getRegionsByBookId,
   createRegion,
   getRegionHierarchy,
 } from "@/lib/db/regions.service";
-import { RegionFormData } from "@/components/modals/create-region-modal";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
 import { WorldView } from "./view";
 
 interface WorldTabProps {
@@ -26,16 +29,30 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showHierarchyModal, setShowHierarchyModal] = useState(false);
 
-  // Load regions from database
+  // Data for multi-select dropdowns
+  const [characters, setCharacters] = useState<Array<{ id: string; name: string }>>([]);
+  const [factions, setFactions] = useState<Array<{ id: string; name: string }>>([]);
+  const [races, setRaces] = useState<Array<{ id: string; name: string }>>([]);
+  const [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Load regions and related data from database
   const loadRegions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [regionsData, hierarchyData] = await Promise.all([
+      const [regionsData, hierarchyData, charactersData, factionsData, racesData, itemsData] = await Promise.all([
         getRegionsByBookId(bookId),
         getRegionHierarchy(bookId),
+        getCharactersByBookId(bookId),
+        getFactionsByBookId(bookId),
+        getRacesByBookId(bookId),
+        getItemsByBookId(bookId),
       ]);
       setRegions(regionsData);
       setHierarchy(hierarchyData);
+      setCharacters(charactersData.map(c => ({ id: c.id, name: c.name })));
+      setFactions(factionsData.map(f => ({ id: f.id, name: f.name })));
+      setRaces(racesData.map(r => ({ id: r.id, name: r.name })));
+      setItems(itemsData.map(i => ({ id: i.id, name: i.name })));
     } catch (error) {
       console.error("Failed to load regions:", error);
       toast({
@@ -118,9 +135,15 @@ export function WorldTab({ bookId }: WorldTabProps) {
     });
   }, []);
 
+  // Helper to convert arrays to JSON strings
+  const arrayToJson = (arr: string[] | undefined): string | undefined => {
+    if (!arr || arr.length === 0) return undefined;
+    return JSON.stringify(arr);
+  };
+
   // Handle create region
   const handleCreateRegion = useCallback(
-    async (data: RegionFormData) => {
+    async (data: IRegionFormData) => {
       try {
         await createRegion({
           bookId,
@@ -129,6 +152,25 @@ export function WorldTab({ bookId }: WorldTabProps) {
           scale: data.scale,
           summary: data.summary,
           image: data.image,
+          // Environment fields
+          climate: data.climate,
+          currentSeason: data.currentSeason,
+          customSeasonName: data.customSeasonName,
+          generalDescription: data.generalDescription,
+          regionAnomalies: arrayToJson(data.regionAnomalies),
+          // Information fields
+          residentFactions: arrayToJson(data.residentFactions),
+          dominantFactions: arrayToJson(data.dominantFactions),
+          importantCharacters: arrayToJson(data.importantCharacters),
+          racesFound: arrayToJson(data.racesFound),
+          itemsFound: arrayToJson(data.itemsFound),
+          // Narrative fields
+          narrativePurpose: data.narrativePurpose,
+          uniqueCharacteristics: data.uniqueCharacteristics,
+          politicalImportance: data.politicalImportance,
+          religiousImportance: data.religiousImportance,
+          worldPerception: data.worldPerception,
+          inspirations: arrayToJson(data.inspirations),
         });
 
         toast({
@@ -174,6 +216,10 @@ export function WorldTab({ bookId }: WorldTabProps) {
       regionMap={regionMap}
       showCreateModal={showCreateModal}
       showHierarchyModal={showHierarchyModal}
+      characters={characters}
+      factions={factions}
+      races={races}
+      items={items}
       onSearchChange={handleSearchChange}
       onScaleToggle={handleScaleToggle}
       onCreateRegion={handleCreateRegion}

@@ -1,36 +1,30 @@
 # O que vamos fazer?
-> Vamos agora refatorar a tab Mundo, introduzindo uma forma dinâmica e visual de interagir e registrar o mundo da sua história.
+> Vamos adicionar campos avançados para cada região, ela seguirá o padrão de campos avançados vistos na tab `Personagens`, adicionando tanto ao modal quanto nos detalhes
 
-## Visão Geral
-> A ideia é o usuário lidar apena regiões e suas hierarquias apenas, onde o usuário define quem é o pai dessa região e o resto é feito pelo app
+## Novos campos
 
-## Design e lógica
+**Ambiente**
+- Clima: Input simples de uma linha com limite de 200 caracteres
+- Estação atual: Picker com icone e texto contendo as 4 estações em suas respectivas cores para hover e active mais uma quarta na proxima linha chamada "Outra" que permite adicionar uma estação personalizada
+- Descrição geral: Input grande com 1000 caracteres, permitindo descrever flora, flauna e qualquer coisa na região no geral
+- Anomálias da região: Input que ao escrever, permitie adicionar a uma lista cada inspiração, o input tem 2 linhas e não tem limite de caracteres, podendo o usuário escolher o quanto quer escrever e adicionar em cada parte da linha. Cada item da lista pode ser por exemplo, gravidade aumentada, rios que correm ao contrário, mana mais forte no local etc
 
-**Dados vazios**
-> Já está estalalecido atualmente, não deve mudar
+**Informações**
+> Todos serão Dropdown múltiplo que cria tags com foto e nome a cada opção escolhido
+- Facção(s) residente(s): seus dados são as fações cadastradas no app
+- Facçõe(s) dominante(s): seus dados são as fações cadastradas no app
+- Personagens importantes no local: seus dados são as fações cadastradas no app
+- Raças encontradas: seus dados são as raças cadastradas no app
+- Itens encontrados: seus dados são os itens cadastradas no app
 
-**Nova Região**
-> O botão já existe, mas ao clicar nele deve abrir um modal que tem os campos:
-- Imagem (Opcional): Quadrada, grande e que ocupe toda a width, ela será um mapa demonstrativo da região. Se não for definido imagem, terá uma imagem default
-- Nome da região: Input de uma linha com tamanho máximo de 200 caracteres
-- Região Pai (Opcional): Dropdown contendo todas as regiões, permitindo que o usuário escolher quem é a região acima dessa em hierarquia (Exemplo: estamos criando região cidade de Noix e ela fica no continente Montial, então a região pai é o continente Montial). Por padrão, toda região é considerada "Neutra" até que escolha um pai, se não escolher um pai ela continua a ser neutra.
-- Escala: Um picker de cores diferentes para cada item de cards que contém icone, descrição e titulo, com os dados sendo: Local (Imperios, cidades, florestas, vilas, montanhas, etc), Continental (Ilhas, continentes, paises, etc), Planetária (Planetas, satelites, cometas, etc), Galáctica (Estrelas, sistemas solares, Galaxias, sistemas, etc), Universal (Universos e Dimensões), Multiversal (Conjunto de universos, dimensões, reinos divinos etc). Note que os textos que dei são exemplos, ajeite tudo para ter a melhor apresentação
-- Resumo: Um input grande para colocar o resumo da região
-
-**Gerenciar Hierarquia**
-> Deve ter um botão ao lado de "Nova Região" chamado "Gerenciar hierarquia", esse botão abre um modal que nos mostrará:
-- Uma árvore de regiões mostrando todas as regiões e sua hierarquia que já existe no app, quem é filho e pai de quem, tudo em uma árvore visual. Em cada item da região, deve aparecer apenas nome e a sua escala, além de abaixo dele suas regiões filhas.
-- A árvore deve ter a capacidade de ajudar a reorganizar a ordem das regiÕes de forma fácil, com drag and drop permitindo escolher quem é pai ou filho de quem
-- A árvore deve permitir excluir INDIVIDUALMENTE cada região com modal de confirmação pedindo texto antes de excluir (Semelhante a modais de exclusão de detalhes de outras tabs)
-- Regiões neutras aparecem sempre isoladas e fora da arvore, já que não foi definido pai para elas
-
-**Card**
-> Ao criar com sucesso através do modal, um card será criado na lista de tabs, esse card terá as informações listadas anteriormente nele, e a lista será uma lista horizontal que quebra pra proxima linha ao chegar no limite da width
-- Deve haver filtro de busca de texto que busca por nome de região
-- Deve haver um filtro/contador para filtrar por escala. O design será igual a outros filtro/contador de outras tabs, inclusive a lógica de filtro
-- Todo card deve ter um hover semelhante ao card de outras tabs
-- O design do card deve seguir a mesma identidade visual de cada campo (Ou seja, se uma tag tem cor, siga a mesma cor, se a imagem é quadrada e grande, deixe quadrada e grande)
+**Narrativa**
+- Proposito narrativo: Input grande com 500 linhas máximas
+- Características únicas do local: Input grande com 500 linhas máximas (Sons, cheiros, sensações que ajudem o autor a escrever narrativas interessantes pra obra)
+- Importância política: Input grande com 500 linhas máximas
+- Importância religiosa: Input grande com 500 linhas máximas
+- Como é visto pelo resto do mundo: Input grande com 500 linhas máximas
+- Inspirações: Input que ao escrever, permitie adicionar a uma lista cada inspiração, o input tem 2 linhas e não tem limite de caracteres, podendo o usuário escolher o quanto quer escrever e adicionar em cada parte da linha
 
 ## Importante lembrar
 - Lembre-se de conferir se está usando i18n corretamente configurado para as linguagens do app, e se tudo está importado da maneira correta
-- Não faça nenhuma navegação pro card ainda, isso será em outro momento
+- Não fazer placeholders explicando, e sim faça um placeholder imaginando que está cadastrando uma região (Evite colocar "ex:" so coloque o exemplo direito)

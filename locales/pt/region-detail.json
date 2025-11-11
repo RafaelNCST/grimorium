@@ -10,6 +10,7 @@
   },
   "sections": {
     "basic_info": "Informações Básicas",
+    "advanced_info": "Informações Avançadas",
     "versions": "Versões"
   },
   "fields": {

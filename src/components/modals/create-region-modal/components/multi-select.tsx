@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { X, Search } from "lucide-react";
-import { useTranslation } from "react-i18next";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,47 +12,54 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface Character {
+interface MultiSelectOption {
   id: string;
   name: string;
   image?: string;
 }
 
-interface PropsCharacterSelector {
-  characters: Character[];
-  selectedIds: string[];
-  onChange: (selectedIds: string[]) => void;
+interface MultiSelectProps {
+  label: string;
+  placeholder: string;
+  emptyText: string;
+  noSelectionText: string;
+  searchPlaceholder: string;
+  options: MultiSelectOption[];
+  value: string[];
+  onChange: (value: string[]) => void;
+  disabled?: boolean;
 }
 
-export function CharacterSelector({
-  characters,
-  selectedIds,
+export function MultiSelect({
+  label,
+  placeholder,
+  emptyText,
+  noSelectionText,
+  searchPlaceholder,
+  options,
+  value,
   onChange,
-}: PropsCharacterSelector) {
-  const { t } = useTranslation("create-plot-arc");
+  disabled = false,
+}: MultiSelectProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const selectedCharacters = characters.filter((c) =>
-    selectedIds.includes(c.id)
-  );
-  const availableCharacters = characters.filter(
-    (c) => !selectedIds.includes(c.id)
+  const selectedOptions = options.filter((opt) => value.includes(opt.id));
+  const availableOptions = options.filter((opt) => !value.includes(opt.id));
+
+  // Filter available options by search query
+  const filteredOptions = availableOptions.filter((opt) =>
+    opt.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Filter available characters by search query
-  const filteredCharacters = availableCharacters.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleAdd = (characterId: string) => {
-    if (!selectedIds.includes(characterId)) {
-      onChange([...selectedIds, characterId]);
+  const handleAdd = (optionId: string) => {
+    if (!value.includes(optionId)) {
+      onChange([...value, optionId]);
       setSearchQuery(""); // Clear search after selection
     }
   };
 
-  const handleRemove = (characterId: string) => {
-    onChange(selectedIds.filter((id) => id !== characterId));
+  const handleRemove = (optionId: string) => {
+    onChange(value.filter((id) => id !== optionId));
   };
 
   const getInitials = (name: string) =>
@@ -67,30 +72,28 @@ export function CharacterSelector({
 
   return (
     <div className="space-y-3">
+      {/* Header with label and counter */}
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">
-          {t("modal.important_characters")}
-        </Label>
-        {selectedCharacters.length > 0 && (
+        <Label className="text-sm font-medium">{label}</Label>
+        {selectedOptions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedCharacters.length}{" "}
-            {selectedCharacters.length === 1
-              ? t("modal.selected_singular")
-              : t("modal.selected_plural")}
+            {selectedOptions.length} selecionado{selectedOptions.length !== 1 ? "s" : ""}
           </span>
         )}
       </div>
 
-      {characters.length === 0 ? (
+      {/* No options available */}
+      {options.length === 0 ? (
         <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
-          <p className="text-sm">{t("modal.no_characters_available")}</p>
+          <p className="text-sm">{emptyText}</p>
         </div>
       ) : (
         <>
-          {availableCharacters.length > 0 && (
-            <Select onValueChange={handleAdd}>
+          {/* Dropdown selector */}
+          {availableOptions.length > 0 && (
+            <Select onValueChange={handleAdd} disabled={disabled}>
               <SelectTrigger>
-                <SelectValue placeholder={t("modal.select_character")} />
+                <SelectValue placeholder={placeholder} />
               </SelectTrigger>
               <SelectContent>
                 {/* Search input inside dropdown */}
@@ -98,7 +101,7 @@ export function CharacterSelector({
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <Input
-                      placeholder={t("modal.search_character")}
+                      placeholder={searchPlaceholder}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9 h-9"
@@ -108,30 +111,27 @@ export function CharacterSelector({
                   </div>
                 </div>
 
-                {/* Characters list */}
+                {/* Options list */}
                 <div className="max-h-[300px] overflow-y-auto">
-                  {filteredCharacters.length === 0 ? (
+                  {filteredOptions.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">
                       Nenhum resultado encontrado
                     </div>
                   ) : (
-                    filteredCharacters.map((character) => (
+                    filteredOptions.map((option) => (
                       <SelectItem
-                        key={character.id}
-                        value={character.id}
+                        key={option.id}
+                        value={option.id}
                         className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage
-                              src={character.image}
-                              alt={character.name}
-                            />
-                            <AvatarFallback className="text-xs !text-foreground">
-                              {getInitials(character.name)}
+                          <Avatar className="w-8 h-8 rounded-md">
+                            <AvatarImage src={option.image} alt={option.name} />
+                            <AvatarFallback className="text-xs rounded-md !text-foreground">
+                              {getInitials(option.name)}
                             </AvatarFallback>
                           </Avatar>
-                          <span>{character.name}</span>
+                          <span>{option.name}</span>
                         </div>
                       </SelectItem>
                     ))
@@ -141,29 +141,28 @@ export function CharacterSelector({
             </Select>
           )}
 
-          {selectedCharacters.length > 0 && (
+          {/* Selected items display */}
+          {selectedOptions.length > 0 && (
             <div className="max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
               <div className="flex flex-wrap gap-3">
-                {selectedCharacters.map((character) => (
+                {selectedOptions.map((option) => (
                   <div
-                    key={character.id}
+                    key={option.id}
                     className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
                   >
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={character.image} alt={character.name} />
-                      <AvatarFallback className="text-xs">
-                        {getInitials(character.name)}
+                    <Avatar className="w-10 h-10 rounded-md">
+                      <AvatarImage src={option.image} alt={option.name} />
+                      <AvatarFallback className="text-xs rounded-md">
+                        {getInitials(option.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium">
-                      {character.name}
-                    </span>
+                    <span className="text-sm font-medium">{option.name}</span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       className="h-6 w-6 p-0 ml-1"
-                      onClick={() => handleRemove(character.id)}
+                      onClick={() => handleRemove(option.id)}
                     >
                       <X className="w-3 h-3" />
                     </Button>
@@ -173,9 +172,10 @@ export function CharacterSelector({
             </div>
           )}
 
-          {selectedCharacters.length === 0 && characters.length > 0 && (
+          {/* Empty state when no selection */}
+          {selectedOptions.length === 0 && options.length > 0 && (
             <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
-              <p className="text-sm">{t("modal.no_characters_selected")}</p>
+              <p className="text-sm">{noSelectionText}</p>
             </div>
           )}
         </>

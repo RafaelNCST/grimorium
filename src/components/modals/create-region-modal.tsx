@@ -29,35 +29,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
-import { IRegion, RegionScale } from "@/pages/dashboard/tabs/world/types/region-types";
+import { IRegion, RegionScale, RegionSeason, IRegionFormData } from "@/pages/dashboard/tabs/world/types/region-types";
 import { ImagePlus, X, Map } from "lucide-react";
+import { AdvancedSection } from "./create-region-modal/components/advanced-section";
+import { SeasonPicker } from "./create-region-modal/components/season-picker";
+import { ListInput } from "./create-region-modal/components/list-input";
+import { MultiSelect } from "./create-region-modal/components/multi-select";
 
 interface CreateRegionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (data: RegionFormData) => void;
+  onConfirm: (data: IRegionFormData) => void;
   availableRegions?: IRegion[];
   editRegion?: IRegion | null;
-}
-
-export interface RegionFormData {
-  name: string;
-  parentId: string | null;
-  scale: RegionScale;
-  summary?: string;
-  image?: string;
+  // For multi-select dropdowns
+  factions?: Array<{ id: string; name: string }>;
+  characters?: Array<{ id: string; name: string }>;
+  races?: Array<{ id: string; name: string }>;
+  items?: Array<{ id: string; name: string }>;
 }
 
 const regionFormSchema = z.object({
+  // Basic fields
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
   parentId: z.string().nullable(),
   scale: z.enum(["local", "continental", "planetary", "galactic", "universal", "multiversal"]),
   summary: z.string().max(500, "Summary is too long").optional(),
   image: z.string().optional(),
+
+  // Environment fields
+  climate: z.string().max(200).optional(),
+  currentSeason: z.enum(["spring", "summer", "autumn", "winter", "custom"]).optional(),
+  customSeasonName: z.string().max(50).optional(),
+  generalDescription: z.string().max(1000).optional(),
+  regionAnomalies: z.array(z.string()).optional(),
+
+  // Information fields
+  residentFactions: z.array(z.string()).optional(),
+  dominantFactions: z.array(z.string()).optional(),
+  importantCharacters: z.array(z.string()).optional(),
+  racesFound: z.array(z.string()).optional(),
+  itemsFound: z.array(z.string()).optional(),
+
+  // Narrative fields
+  narrativePurpose: z.string().max(500).optional(),
+  uniqueCharacteristics: z.string().max(500).optional(),
+  politicalImportance: z.string().max(500).optional(),
+  religiousImportance: z.string().max(500).optional(),
+  worldPerception: z.string().max(500).optional(),
+  regionMysteries: z.array(z.string()).optional(),
+  inspirations: z.array(z.string()).optional(),
 });
 
 type RegionFormValues = z.infer<typeof regionFormSchema>;
+
+// Helper to parse JSON array fields from IRegion
+function parseJsonArray(jsonString: string | undefined): string[] {
+  if (!jsonString) return [];
+  try {
+    return JSON.parse(jsonString);
+  } catch {
+    return [];
+  }
+}
 
 export function CreateRegionModal({
   open,
@@ -65,6 +101,10 @@ export function CreateRegionModal({
   onConfirm,
   availableRegions = [],
   editRegion = null,
+  factions = [],
+  characters = [],
+  races = [],
+  items = [],
 }: CreateRegionModalProps) {
   const { t } = useTranslation("world");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,6 +118,26 @@ export function CreateRegionModal({
       scale: editRegion?.scale || "local",
       summary: editRegion?.summary || "",
       image: editRegion?.image || "",
+      // Environment
+      climate: editRegion?.climate || "",
+      currentSeason: editRegion?.currentSeason || undefined,
+      customSeasonName: editRegion?.customSeasonName || "",
+      generalDescription: editRegion?.generalDescription || "",
+      regionAnomalies: parseJsonArray(editRegion?.regionAnomalies),
+      // Information
+      residentFactions: parseJsonArray(editRegion?.residentFactions),
+      dominantFactions: parseJsonArray(editRegion?.dominantFactions),
+      importantCharacters: parseJsonArray(editRegion?.importantCharacters),
+      racesFound: parseJsonArray(editRegion?.racesFound),
+      itemsFound: parseJsonArray(editRegion?.itemsFound),
+      // Narrative
+      narrativePurpose: editRegion?.narrativePurpose || "",
+      uniqueCharacteristics: editRegion?.uniqueCharacteristics || "",
+      politicalImportance: editRegion?.politicalImportance || "",
+      religiousImportance: editRegion?.religiousImportance || "",
+      worldPerception: editRegion?.worldPerception || "",
+      regionMysteries: parseJsonArray(editRegion?.regionMysteries),
+      inspirations: parseJsonArray(editRegion?.inspirations),
     },
   });
 
@@ -90,6 +150,26 @@ export function CreateRegionModal({
         scale: editRegion.scale,
         summary: editRegion.summary || "",
         image: editRegion.image || "",
+        // Environment
+        climate: editRegion.climate || "",
+        currentSeason: editRegion.currentSeason || undefined,
+        customSeasonName: editRegion.customSeasonName || "",
+        generalDescription: editRegion.generalDescription || "",
+        regionAnomalies: parseJsonArray(editRegion.regionAnomalies),
+        // Information
+        residentFactions: parseJsonArray(editRegion.residentFactions),
+        dominantFactions: parseJsonArray(editRegion.dominantFactions),
+        importantCharacters: parseJsonArray(editRegion.importantCharacters),
+        racesFound: parseJsonArray(editRegion.racesFound),
+        itemsFound: parseJsonArray(editRegion.itemsFound),
+        // Narrative
+        narrativePurpose: editRegion.narrativePurpose || "",
+        uniqueCharacteristics: editRegion.uniqueCharacteristics || "",
+        politicalImportance: editRegion.politicalImportance || "",
+        religiousImportance: editRegion.religiousImportance || "",
+        worldPerception: editRegion.worldPerception || "",
+        regionMysteries: parseJsonArray(editRegion.regionMysteries),
+        inspirations: parseJsonArray(editRegion.inspirations),
       });
       setImageSrc(editRegion.image);
     } else {
@@ -99,6 +179,23 @@ export function CreateRegionModal({
         scale: "local",
         summary: "",
         image: "",
+        climate: "",
+        currentSeason: undefined,
+        customSeasonName: "",
+        generalDescription: "",
+        regionAnomalies: [],
+        residentFactions: [],
+        dominantFactions: [],
+        importantCharacters: [],
+        racesFound: [],
+        itemsFound: [],
+        narrativePurpose: "",
+        uniqueCharacteristics: "",
+        politicalImportance: "",
+        religiousImportance: "",
+        worldPerception: "",
+        regionMysteries: [],
+        inspirations: [],
       });
       setImageSrc(undefined);
     }
@@ -125,7 +222,11 @@ export function CreateRegionModal({
   const handleSubmit = async (data: RegionFormValues) => {
     setIsSubmitting(true);
     try {
-      onConfirm(data as RegionFormData);
+      // Convert form data to IRegionFormData (arrays stay as arrays)
+      const formData: IRegionFormData = {
+        ...data,
+      };
+      onConfirm(formData);
       form.reset();
       setImageSrc(undefined);
     } finally {
@@ -154,157 +255,555 @@ export function CreateRegionModal({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Image Upload */}
-            <FormField
-              control={form.control}
-              name="image"
-              render={() => (
-                <FormItem>
-                  <FormLabel>
-                    {t("create_region.image_label")}
-                    <span className="text-xs text-muted-foreground ml-2">({t("create_region.image_recommended")})</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="space-y-3">
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                        onChange={handleImageSelect}
-                        className="hidden"
-                        id="region-image-upload"
-                      />
-                      {imageSrc ? (
-                        <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
-                          <img
-                            src={imageSrc}
-                            alt="Region preview"
-                            className="w-full h-full object-fill"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2"
-                            onClick={handleRemoveImage}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <label htmlFor="region-image-upload" className="cursor-pointer block">
-                          <div className="w-full h-[28rem] border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
-                            <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">
-                              {t("create_region.upload_image")}
-                            </span>
-                          </div>
-                        </label>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Basic Fields Section */}
+            <div className="space-y-6">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t("create_region.basic_fields")}
+              </h3>
 
-            {/* Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("create_region.name_label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("create_region.name_placeholder")}
-                      {...field}
-                      maxLength={200}
-                    />
-                  </FormControl>
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{field.value?.length || 0}/200</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Parent Region */}
-            <FormField
-              control={form.control}
-              name="parentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("create_region.parent_label")}</FormLabel>
-                  <Select
-                    value={field.value || "neutral"}
-                    onValueChange={(value) =>
-                      field.onChange(value === "neutral" ? null : value)
-                    }
-                  >
+              {/* Image Upload */}
+              <FormField
+                control={form.control}
+                name="image"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>
+                      {t("create_region.image_label")}
+                      <span className="text-xs text-muted-foreground ml-2">({t("create_region.image_recommended")})</span>
+                    </FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("create_region.parent_placeholder")} />
-                      </SelectTrigger>
+                      <div className="space-y-3">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                          onChange={handleImageSelect}
+                          className="hidden"
+                          id="region-image-upload"
+                        />
+                        {imageSrc ? (
+                          <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
+                            <img
+                              src={imageSrc}
+                              alt="Region preview"
+                              className="w-full h-full object-fill"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2"
+                              onClick={handleRemoveImage}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <label htmlFor="region-image-upload" className="cursor-pointer block">
+                            <div className="w-full h-[28rem] border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
+                              <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">
+                                {t("create_region.upload_image")}
+                              </span>
+                            </div>
+                          </label>
+                        )}
+                      </div>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="neutral">
-                        {t("create_region.parent_neutral")}
-                      </SelectItem>
-                      {availableRegions
-                        .filter((r) => r.id !== editRegion?.id) // Don't allow selecting self
-                        .map((region) => (
-                          <SelectItem key={region.id} value={region.id}>
-                            {region.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Scale Picker */}
-            <FormField
-              control={form.control}
-              name="scale"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <ScalePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Name */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("create_region.name_label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("create_region.name_placeholder")}
+                        {...field}
+                        maxLength={200}
+                      />
+                    </FormControl>
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{field.value?.length || 0}/200</span>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Summary */}
-            <FormField
-              control={form.control}
-              name="summary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("create_region.summary_label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("create_region.summary_placeholder")}
-                      {...field}
-                      rows={4}
-                      maxLength={500}
-                      className="resize-none"
-                    />
-                  </FormControl>
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{field.value?.length || 0}/500</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Parent Region */}
+              <FormField
+                control={form.control}
+                name="parentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("create_region.parent_label")}</FormLabel>
+                    <Select
+                      value={field.value || "neutral"}
+                      onValueChange={(value) =>
+                        field.onChange(value === "neutral" ? null : value)
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("create_region.parent_placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="neutral">
+                          {t("create_region.parent_neutral")}
+                        </SelectItem>
+                        {availableRegions
+                          .filter((r) => r.id !== editRegion?.id)
+                          .map((region) => (
+                            <SelectItem key={region.id} value={region.id}>
+                              {region.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Scale Picker */}
+              <FormField
+                control={form.control}
+                name="scale"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <ScalePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Summary */}
+              <FormField
+                control={form.control}
+                name="summary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("create_region.summary_label")}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder={t("create_region.summary_placeholder")}
+                        {...field}
+                        rows={4}
+                        maxLength={500}
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{field.value?.length || 0}/500</span>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Advanced Section */}
+            <AdvancedSection>
+              {/* Environment Section */}
+              <div className="space-y-4">
+                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                  {t("create_region.environment_section")}
+                </h4>
+
+                {/* Climate */}
+                <FormField
+                  control={form.control}
+                  name="climate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.climate_label")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t("create_region.climate_placeholder")}
+                          {...field}
+                          maxLength={200}
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/200</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Season Picker */}
+                <FormField
+                  control={form.control}
+                  name="currentSeason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SeasonPicker
+                          value={field.value}
+                          customSeasonName={form.watch("customSeasonName")}
+                          onSeasonChange={(season: RegionSeason) => field.onChange(season)}
+                          onCustomNameChange={(name) => form.setValue("customSeasonName", name)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* General Description */}
+                <FormField
+                  control={form.control}
+                  name="generalDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.general_description_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.general_description_placeholder")}
+                          {...field}
+                          rows={5}
+                          maxLength={1000}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/1000</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Region Anomalies */}
+                <FormField
+                  control={form.control}
+                  name="regionAnomalies"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ListInput
+                          label={t("create_region.region_anomalies_label")}
+                          placeholder={t("create_region.anomaly_placeholder")}
+                          buttonText={t("create_region.add_anomaly")}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                          maxLength={200}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Separator />
+
+              {/* Information Section */}
+              <div className="space-y-4">
+                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                  {t("create_region.information_section")}
+                </h4>
+
+                {/* Resident Factions */}
+                <FormField
+                  control={form.control}
+                  name="residentFactions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <MultiSelect
+                          label={t("create_region.resident_factions_label")}
+                          placeholder={t("create_region.resident_factions_placeholder")}
+                          emptyText={t("create_region.no_factions_warning")}
+                          noSelectionText={t("create_region.no_factions_selected")}
+                          searchPlaceholder={t("create_region.search_faction")}
+                          options={factions}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Dominant Factions */}
+                <FormField
+                  control={form.control}
+                  name="dominantFactions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <MultiSelect
+                          label={t("create_region.dominant_factions_label")}
+                          placeholder={t("create_region.dominant_factions_placeholder")}
+                          emptyText={t("create_region.no_factions_warning")}
+                          noSelectionText={t("create_region.no_factions_selected")}
+                          searchPlaceholder={t("create_region.search_faction")}
+                          options={factions}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Important Characters */}
+                <FormField
+                  control={form.control}
+                  name="importantCharacters"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <MultiSelect
+                          label={t("create_region.important_characters_label")}
+                          placeholder={t("create_region.important_characters_placeholder")}
+                          emptyText={t("create_region.no_characters_warning")}
+                          noSelectionText={t("create_region.no_characters_selected")}
+                          searchPlaceholder={t("create_region.search_character")}
+                          options={characters}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Races Found */}
+                <FormField
+                  control={form.control}
+                  name="racesFound"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <MultiSelect
+                          label={t("create_region.races_found_label")}
+                          placeholder={t("create_region.races_found_placeholder")}
+                          emptyText={t("create_region.no_races_warning")}
+                          noSelectionText={t("create_region.no_races_selected")}
+                          searchPlaceholder={t("create_region.search_race")}
+                          options={races}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Items Found */}
+                <FormField
+                  control={form.control}
+                  name="itemsFound"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <MultiSelect
+                          label={t("create_region.items_found_label")}
+                          placeholder={t("create_region.items_found_placeholder")}
+                          emptyText={t("create_region.no_items_warning")}
+                          noSelectionText={t("create_region.no_items_selected")}
+                          searchPlaceholder={t("create_region.search_item")}
+                          options={items}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Separator />
+
+              {/* Narrative Section */}
+              <div className="space-y-4">
+                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                  {t("create_region.narrative_section")}
+                </h4>
+
+                {/* Narrative Purpose */}
+                <FormField
+                  control={form.control}
+                  name="narrativePurpose"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.narrative_purpose_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.narrative_purpose_placeholder")}
+                          {...field}
+                          rows={3}
+                          maxLength={500}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/500</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Unique Characteristics */}
+                <FormField
+                  control={form.control}
+                  name="uniqueCharacteristics"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.unique_characteristics_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.unique_characteristics_placeholder")}
+                          {...field}
+                          rows={3}
+                          maxLength={500}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/500</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Political Importance */}
+                <FormField
+                  control={form.control}
+                  name="politicalImportance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.political_importance_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.political_importance_placeholder")}
+                          {...field}
+                          rows={3}
+                          maxLength={500}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/500</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Religious Importance */}
+                <FormField
+                  control={form.control}
+                  name="religiousImportance"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.religious_importance_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.religious_importance_placeholder")}
+                          {...field}
+                          rows={3}
+                          maxLength={500}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/500</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* World Perception */}
+                <FormField
+                  control={form.control}
+                  name="worldPerception"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("create_region.world_perception_label")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder={t("create_region.world_perception_placeholder")}
+                          {...field}
+                          rows={3}
+                          maxLength={500}
+                          className="resize-none"
+                        />
+                      </FormControl>
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{field.value?.length || 0}/500</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Region Mysteries */}
+                <FormField
+                  control={form.control}
+                  name="regionMysteries"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ListInput
+                          label={t("create_region.region_mysteries_label")}
+                          placeholder={t("create_region.mystery_placeholder")}
+                          buttonText={t("create_region.add_mystery")}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Inspirations */}
+                <FormField
+                  control={form.control}
+                  name="inspirations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ListInput
+                          label={t("create_region.inspirations_label")}
+                          placeholder={t("create_region.inspiration_placeholder")}
+                          buttonText={t("create_region.add_inspiration")}
+                          value={field.value || []}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </AdvancedSection>
 
             <DialogFooter>
               <Button

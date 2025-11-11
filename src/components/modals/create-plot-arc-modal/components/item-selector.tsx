@@ -1,9 +1,11 @@
-import { X } from "lucide-react";
+import { useState } from "react";
+import { X, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -30,13 +32,20 @@ export function ItemSelector({
   onChange,
 }: PropsItemSelector) {
   const { t } = useTranslation("create-plot-arc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const selectedItems = items.filter((i) => selectedIds.includes(i.id));
   const availableItems = items.filter((i) => !selectedIds.includes(i.id));
 
+  // Filter available items by search query
+  const filteredItems = availableItems.filter((i) =>
+    i.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleAdd = (itemId: string) => {
     if (!selectedIds.includes(itemId)) {
       onChange([...selectedIds, itemId]);
+      setSearchQuery(""); // Clear search after selection
     }
   };
 
@@ -80,23 +89,47 @@ export function ItemSelector({
                 <SelectValue placeholder={t("modal.select_item")} />
               </SelectTrigger>
               <SelectContent>
-                {availableItems.map((item) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id}
-                    className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-8 h-8 rounded-md">
-                        <AvatarImage src={item.image} alt={item.name} />
-                        <AvatarFallback className="text-xs rounded-md !text-foreground">
-                          {getInitials(item.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{item.name}</span>
+                {/* Search input inside dropdown */}
+                <div className="px-2 pb-2 pt-1 border-b sticky top-0 bg-popover z-10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      placeholder={t("modal.search_item")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 h-9"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+
+                {/* Items list */}
+                <div className="max-h-[300px] overflow-y-auto">
+                  {filteredItems.length === 0 ? (
+                    <div className="py-6 text-center text-sm text-muted-foreground">
+                      Nenhum resultado encontrado
                     </div>
-                  </SelectItem>
-                ))}
+                  ) : (
+                    filteredItems.map((item) => (
+                      <SelectItem
+                        key={item.id}
+                        value={item.id}
+                        className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-8 h-8 rounded-md">
+                            <AvatarImage src={item.image} alt={item.name} />
+                            <AvatarFallback className="text-xs rounded-md !text-foreground">
+                              {getInitials(item.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{item.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))
+                  )}
+                </div>
               </SelectContent>
             </Select>
           )}

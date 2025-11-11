@@ -528,66 +528,6 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] order_index column already exists or error:", error);
     }
 
-    // Add advanced fields to regions table
-    // Environment fields
-    const environmentFields = [
-      "climate TEXT",
-      "current_season TEXT",
-      "custom_season_name TEXT",
-      "general_description TEXT",
-      "region_anomalies TEXT"
-    ];
-
-    for (const field of environmentFields) {
-      try {
-        const [columnName] = field.split(' ');
-        await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
-      } catch (error) {
-        // Column already exists - safe to ignore
-      }
-    }
-
-    // Information fields
-    const informationFields = [
-      "resident_factions TEXT",
-      "dominant_factions TEXT",
-      "important_characters TEXT",
-      "races_found TEXT",
-      "items_found TEXT"
-    ];
-
-    for (const field of informationFields) {
-      try {
-        const [columnName] = field.split(' ');
-        await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
-      } catch (error) {
-        // Column already exists - safe to ignore
-      }
-    }
-
-    // Narrative fields
-    const narrativeFields = [
-      "narrative_purpose TEXT",
-      "unique_characteristics TEXT",
-      "political_importance TEXT",
-      "religious_importance TEXT",
-      "world_perception TEXT",
-      "region_mysteries TEXT",
-      "inspirations TEXT"
-    ];
-
-    for (const field of narrativeFields) {
-      try {
-        const [columnName] = field.split(' ');
-        await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
-      } catch (error) {
-        // Column already exists - safe to ignore
-      }
-    }
-
     // Verify books table exists and log count
     const result = await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"

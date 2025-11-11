@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,10 @@ import {
   updateRegionVersion,
   type IRegionVersion,
 } from "@/lib/db/regions.service";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   type IRegion,
   type IRegionFormData,
@@ -65,6 +69,105 @@ export function RegionDetail() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+
+  // Related data for multi-selects
+  const [characters, setCharacters] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [factions, setFactions] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+
+  // Check if there are changes between region and editData
+  const hasChanges = useMemo(() => {
+    if (!isEditing) return false;
+
+    // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
+    const arraysEqual = (a: unknown[] | undefined, b: unknown[] | undefined): boolean => {
+      if (!a && !b) return true;
+      if (!a || !b) return false;
+      if (a.length !== b.length) return false;
+
+      // For string arrays (like mysteries, anomalies), order matters
+      if (a.length > 0 && typeof a[0] === 'string') {
+        return a.every((item, index) => item === b[index]);
+      }
+
+      // For ID arrays, order doesn't matter
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((item, index) => item === sortedB[index]);
+    };
+
+    // Helper to parse JSON strings to arrays for comparison
+    const parseJsonArray = (value: string | undefined): string[] => {
+      if (!value) return [];
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [];
+      }
+    };
+
+    // Compare basic fields
+    if (region.name !== editData.name) return true;
+    if (region.parentId !== editData.parentId) return true;
+    if (region.scale !== editData.scale) return true;
+    if (region.summary !== editData.summary) return true;
+    if (region.image !== editData.image) return true;
+
+    // Compare advanced fields - Environment
+    if (region.climate !== editData.climate) return true;
+    if (region.currentSeason !== editData.currentSeason) return true;
+    if (region.customSeasonName !== editData.customSeasonName) return true;
+    if (region.generalDescription !== editData.generalDescription) return true;
+
+    const regionAnomalies = parseJsonArray(region.regionAnomalies);
+    const editAnomalies = parseJsonArray(editData.regionAnomalies);
+    if (!arraysEqual(regionAnomalies, editAnomalies)) return true;
+
+    // Compare advanced fields - Information
+    if (!arraysEqual(
+      parseJsonArray(region.residentFactions),
+      parseJsonArray(editData.residentFactions)
+    )) return true;
+
+    if (!arraysEqual(
+      parseJsonArray(region.dominantFactions),
+      parseJsonArray(editData.dominantFactions)
+    )) return true;
+
+    if (!arraysEqual(
+      parseJsonArray(region.importantCharacters),
+      parseJsonArray(editData.importantCharacters)
+    )) return true;
+
+    if (!arraysEqual(
+      parseJsonArray(region.racesFound),
+      parseJsonArray(editData.racesFound)
+    )) return true;
+
+    if (!arraysEqual(
+      parseJsonArray(region.itemsFound),
+      parseJsonArray(editData.itemsFound)
+    )) return true;
+
+    // Compare advanced fields - Narrative
+    if (region.narrativePurpose !== editData.narrativePurpose) return true;
+    if (region.uniqueCharacteristics !== editData.uniqueCharacteristics) return true;
+    if (region.politicalImportance !== editData.politicalImportance) return true;
+    if (region.religiousImportance !== editData.religiousImportance) return true;
+    if (region.worldPerception !== editData.worldPerception) return true;
+
+    const regionMysteries = parseJsonArray(region.regionMysteries);
+    const editMysteries = parseJsonArray(editData.regionMysteries);
+    if (!arraysEqual(regionMysteries, editMysteries)) return true;
+
+    const regionInspirations = parseJsonArray(region.inspirations);
+    const editInspirations = parseJsonArray(editData.inspirations);
+    if (!arraysEqual(regionInspirations, editInspirations)) return true;
+
+    return false;
+  }, [region, editData, isEditing]);
 
   // Load region from database
   useEffect(() => {
@@ -116,6 +219,38 @@ export function RegionDetail() {
           if (dashboardId) {
             const allRegionsFromBook = await getRegionsByBookId(dashboardId);
             setAllRegions(allRegionsFromBook);
+
+            // Load related data for multi-selects
+            const [charactersData, factionsData, racesData, itemsData] = await Promise.all([
+              getCharactersByBookId(dashboardId),
+              getFactionsByBookId(dashboardId),
+              getRacesByBookId(dashboardId),
+              getItemsByBookId(dashboardId)
+            ]);
+
+            setCharacters(charactersData.map(char => ({
+              id: char.id,
+              name: char.name,
+              image: char.image
+            })));
+
+            setFactions(factionsData.map(faction => ({
+              id: faction.id,
+              name: faction.name,
+              image: faction.image
+            })));
+
+            setRaces(racesData.map(race => ({
+              id: race.id,
+              name: race.name,
+              image: race.image
+            })));
+
+            setItems(itemsData.map(item => ({
+              id: item.id,
+              name: item.name,
+              image: item.image
+            })));
           }
         }
       } catch (error) {
@@ -372,11 +507,16 @@ export function RegionDetail() {
     setEditData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const handleAdvancedSectionToggle = useCallback(() => {
+    setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
   return (
     <RegionDetailView
       region={region}
       editData={editData}
       isEditing={isEditing}
+      hasChanges={hasChanges}
       versions={versions}
       currentVersion={currentVersion}
       showDeleteModal={showDeleteModal}
@@ -384,6 +524,11 @@ export function RegionDetail() {
       imagePreview={imagePreview}
       fileInputRef={fileInputRef}
       allRegions={allRegions}
+      advancedSectionOpen={advancedSectionOpen}
+      characters={characters}
+      factions={factions}
+      races={races}
+      items={items}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}
@@ -400,6 +545,7 @@ export function RegionDetail() {
       onVersionUpdate={handleVersionUpdate}
       onImageFileChange={handleImageFileChange}
       onEditDataChange={handleEditDataChange}
+      onAdvancedSectionToggle={handleAdvancedSectionToggle}
     />
   );
 }
