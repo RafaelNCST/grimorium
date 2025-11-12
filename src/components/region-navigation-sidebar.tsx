@@ -80,7 +80,7 @@ export function RegionNavigationSidebar({
       {currentRegion && (
         <div className="p-2 border-b border-border bg-card">
           <div className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30 cursor-default">
-            <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
+            <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
               {currentRegion.image ? (
                 <img
                   src={currentRegion.image}
@@ -88,7 +88,7 @@ export function RegionNavigationSidebar({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Map className="w-5 h-5 text-muted-foreground" />
+                <Map className="w-5 h-5 text-muted-foreground/50" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -122,7 +122,7 @@ export function RegionNavigationSidebar({
                   }}
                   className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-muted/50"
                 >
-                  <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-muted flex items-center justify-center">
+                  <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/10">
                     {region.image ? (
                       <img
                         src={region.image}
@@ -130,7 +130,7 @@ export function RegionNavigationSidebar({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Map className="w-5 h-5 text-muted-foreground" />
+                      <Map className="w-5 h-5 text-muted-foreground/50" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

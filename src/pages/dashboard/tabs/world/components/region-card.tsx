@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { IRegion } from "../types/region-types";
 import { SCALE_COLORS } from "../constants/scale-colors";
-import { MapPin } from "lucide-react";
+import { Map, MapPin } from "lucide-react";
 
 interface RegionCardProps {
   region: IRegion;
@@ -32,7 +32,7 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
           </div>
         ) : (
           <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
-            <MapPin className="w-16 h-16 text-muted-foreground/30" />
+            <Map className="w-16 h-16 text-muted-foreground/30" />
           </div>
         )}
 

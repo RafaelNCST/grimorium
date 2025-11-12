@@ -28,7 +28,6 @@ import { getItemsByBookId } from "@/lib/db/items.service";
 import { IRegion } from "../types/region-types";
 import { MapImageUploader } from "./components/map-image-uploader";
 import { MapCanvas } from "./components/map-canvas";
-import { MapModeSelector, MapMode } from "./components/map-mode-selector";
 import { RegionChildrenList } from "./components/region-children-list";
 import { MapMarkerDetails } from "./components/map-marker-details";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -45,7 +44,6 @@ export function RegionMapPage() {
   const [mapImagePath, setMapImagePath] = useState<string | null>(null);
   const [mapId, setMapId] = useState<string | null>(null);
   const [markers, setMarkers] = useState<IRegionMapMarker[]>([]);
-  const [mapMode, setMapMode] = useState<MapMode>("view");
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
   const [selectedChildForPlacement, setSelectedChildForPlacement] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,14 +51,6 @@ export function RegionMapPage() {
   const [factions, setFactions] = useState<Array<{ id: string; name: string; image?: string }>>([]);
   const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
   const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-
-  const handleModeChange = (mode: MapMode) => {
-    setMapMode(mode);
-    if (mode === "view") {
-      setSelectedMarkerId(null);
-      setSelectedChildForPlacement(null);
-    }
-  };
 
   const regionId = params.regionId as string;
 
@@ -84,7 +74,7 @@ export function RegionMapPage() {
       }
 
       // Delete key pressed with a marker selected
-      if ((event.key === "Delete" || event.key === "Del") && selectedMarkerId && mapMode === "edit") {
+      if ((event.key === "Delete" || event.key === "Del") && selectedMarkerId) {
         event.preventDefault();
 
         const marker = markers.find((m) => m.id === selectedMarkerId);
@@ -115,7 +105,7 @@ export function RegionMapPage() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedMarkerId, selectedChildForPlacement, mapMode, markers, toast]);
+  }, [selectedMarkerId, selectedChildForPlacement, markers, toast]);
 
   const loadData = async () => {
     try {
@@ -281,6 +271,10 @@ export function RegionMapPage() {
     }
   };
 
+  const handleMarkerClick = (marker: IRegionMapMarker) => {
+    setSelectedMarkerId(marker.id);
+  };
+
   const handleMarkerDragEnd = async (markerId: string, x: number, y: number) => {
     try {
       await updateMarkerPosition(markerId, x, y);
@@ -298,10 +292,6 @@ export function RegionMapPage() {
         variant: "destructive",
       });
     }
-  };
-
-  const handleMarkerClick = (marker: IRegionMapMarker) => {
-    setSelectedMarkerId(marker.id);
   };
 
   const handleRemoveMarker = async (marker: IRegionMapMarker) => {
@@ -424,26 +414,23 @@ export function RegionMapPage() {
         )}
       </div>
 
-      {/* Left Sidebar - Mode Selector and Children List - Fixed */}
+      {/* Left Sidebar - Children List - Fixed */}
       <div className="fixed top-28 left-4 z-30 flex flex-col gap-4">
         {mapImagePath && (
-          <>
-            <MapModeSelector mode={mapMode} onModeChange={handleModeChange} />
-            <RegionChildrenList
-              children={childrenRegions}
-              markers={markers}
-              selectedChildId={selectedChildForPlacement}
-              isEditMode={mapMode === "edit"}
-              onChildSelect={handleChildSelect}
-              onDeselectChild={handleDeselectChild}
-              onRemoveMarker={handleRemoveMarker}
-            />
-          </>
+          <RegionChildrenList
+            children={childrenRegions}
+            markers={markers}
+            selectedChildId={selectedChildForPlacement}
+            isEditMode={true}
+            onChildSelect={handleChildSelect}
+            onDeselectChild={handleDeselectChild}
+            onRemoveMarker={handleRemoveMarker}
+          />
         )}
       </div>
 
       {/* Right Sidebar - Marker Details - Fixed */}
-      {selectedRegion && selectedMarker && mapMode === "edit" && (
+      {selectedRegion && selectedMarker && (
         <div className="fixed top-12 right-4 z-30">
           <MapMarkerDetails
             region={selectedRegion}
@@ -453,6 +440,7 @@ export function RegionMapPage() {
             factions={factions}
             races={races}
             items={items}
+            isEditMode={true}
             onClose={() => setSelectedMarkerId(null)}
             onRemoveMarker={handleRemoveSelectedMarker}
             onColorChange={handleColorChange}
@@ -470,10 +458,9 @@ export function RegionMapPage() {
             markers={markers}
             selectedMarkerId={selectedMarkerId}
             selectedChildForPlacement={selectedChildForPlacement}
-            isEditMode={mapMode === "edit"}
             onMarkerClick={handleMarkerClick}
-            onMarkerDragEnd={handleMarkerDragEnd}
             onMapClick={handleMapClick}
+            onMarkerDragEnd={handleMarkerDragEnd}
           />
         ) : (
           <MapImageUploader regionId={regionId} versionId={versionId} onUploadComplete={handleUploadComplete} />

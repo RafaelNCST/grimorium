@@ -1,4 +1,4 @@
-import { X, ExternalLink, Trash2, Palette, Check, ChevronDown, ChevronRight } from "lucide-react";
+import { X, ExternalLink, Trash2, Palette, Check, ChevronDown, ChevronRight, Map } from "lucide-react";
 import { IRegion } from "../../types/region-types";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -27,6 +27,7 @@ interface MapMarkerDetailsProps {
   factions: Array<{ id: string; name: string; image?: string }>;
   races: Array<{ id: string; name: string; image?: string }>;
   items: Array<{ id: string; name: string; image?: string }>;
+  isEditMode?: boolean;
   onClose: () => void;
   onRemoveMarker?: () => void;
   onColorChange?: (color: string) => void;
@@ -56,6 +57,7 @@ export function MapMarkerDetails({
   factions,
   races,
   items,
+  isEditMode = true,
   onClose,
   onRemoveMarker,
   onColorChange,
@@ -143,97 +145,107 @@ export function MapMarkerDetails({
       {/* Content */}
       <ScrollArea className="flex-1 min-h-0 overflow-y-auto">
         <div className="p-4 space-y-4">
-          {/* Color Selector */}
-          <div>
-            <button
-              onClick={() => setShowColorPicker(!showColorPicker)}
-              className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Palette className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  {t("region_map.marker_color")}
-                </p>
-              </div>
-              <ChevronDown
-                className={cn(
-                  "w-4 h-4 text-muted-foreground transition-transform",
-                  showColorPicker && "rotate-180"
-                )}
-              />
-            </button>
-
-            {showColorPicker && (
-              <TooltipProvider delayDuration={300}>
-                <div className="grid grid-cols-6 gap-2 mt-2">
-                  {MARKER_COLORS.map((color) => (
-                    <Tooltip key={color.value}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => onColorChange?.(color.value)}
-                          className={cn(
-                            "w-full aspect-square rounded-lg border transition-all hover:opacity-60 flex items-center justify-center",
-                            markerColor === color.value
-                              ? "opacity-60 border-foreground"
-                              : "border-border"
-                          )}
-                          style={{ backgroundColor: color.value }}
-                        >
-                          {markerColor === color.value && (
-                            <Check
-                              className={cn(
-                                "w-4 h-4",
-                                color.value === '#ffffff' ? "text-black" : "text-white"
-                              )}
-                            />
-                          )}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{color.name}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                </div>
-              </TooltipProvider>
-            )}
-          </div>
-
-          {/* Label Toggle */}
-          <div>
-            <button
-              onClick={() => onLabelToggle?.(!showLabel)}
-              className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  {t("region_map.show_label")}
-                </span>
-              </div>
-              <div
-                className={cn(
-                  "w-10 h-6 rounded-full transition-colors relative",
-                  showLabel ? "bg-purple-600" : "bg-muted-foreground/20"
-                )}
+          {/* Color Selector - Only in Edit Mode */}
+          {isEditMode && (
+            <div>
+              <button
+                onClick={() => setShowColorPicker(!showColorPicker)}
+                className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors"
               >
-                <div
+                <div className="flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                    {t("region_map.marker_color")}
+                  </p>
+                </div>
+                <ChevronDown
                   className={cn(
-                    "absolute top-1 w-4 h-4 bg-white rounded-full transition-transform",
-                    showLabel ? "translate-x-5" : "translate-x-1"
+                    "w-4 h-4 text-muted-foreground transition-transform",
+                    showColorPicker && "rotate-180"
                   )}
                 />
-              </div>
-            </button>
-          </div>
+              </button>
+
+              {showColorPicker && (
+                <TooltipProvider delayDuration={300}>
+                  <div className="grid grid-cols-6 gap-2 mt-2">
+                    {MARKER_COLORS.map((color) => (
+                      <Tooltip key={color.value}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => onColorChange?.(color.value)}
+                            className={cn(
+                              "w-full aspect-square rounded-lg border transition-all hover:opacity-60 flex items-center justify-center",
+                              markerColor === color.value
+                                ? "opacity-60 border-foreground"
+                                : "border-border"
+                            )}
+                            style={{ backgroundColor: color.value }}
+                          >
+                            {markerColor === color.value && (
+                              <Check
+                                className={cn(
+                                  "w-4 h-4",
+                                  color.value === '#ffffff' ? "text-black" : "text-white"
+                                )}
+                              />
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{color.name}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </TooltipProvider>
+              )}
+            </div>
+          )}
+
+          {/* Label Toggle - Only in Edit Mode */}
+          {isEditMode && (
+            <div>
+              <button
+                onClick={() => onLabelToggle?.(!showLabel)}
+                className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                    {t("region_map.show_label")}
+                  </span>
+                </div>
+                <div
+                  className={cn(
+                    "w-10 h-6 rounded-full transition-colors relative",
+                    showLabel ? "bg-purple-600" : "bg-muted-foreground/20"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "absolute top-1 w-4 h-4 bg-white rounded-full transition-transform",
+                      showLabel ? "translate-x-5" : "translate-x-1"
+                    )}
+                  />
+                </div>
+              </button>
+            </div>
+          )}
 
           {/* Image */}
-          <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-            <img
-              src={region.image ? convertFileSrc(region.image) : "/placeholder.svg"}
-              alt={region.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {region.image ? (
+            <div className="aspect-video rounded-lg overflow-hidden bg-muted">
+              <img
+                src={convertFileSrc(region.image)}
+                alt={region.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+              <Map className="w-12 h-12 text-muted-foreground/30" />
+            </div>
+          )}
 
           {/* Scale */}
           <div>
@@ -558,7 +570,7 @@ export function MapMarkerDetails({
           {t("region_map.view_details")}
         </Button>
 
-        {onRemoveMarker && (
+        {onRemoveMarker && isEditMode && (
           <Button
             variant="outline"
             onClick={onRemoveMarker}

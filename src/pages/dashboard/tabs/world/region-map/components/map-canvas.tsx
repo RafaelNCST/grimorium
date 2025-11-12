@@ -14,10 +14,9 @@ interface MapCanvasProps {
   markers: IRegionMapMarker[];
   selectedMarkerId?: string | null;
   selectedChildForPlacement?: string | null;
-  isEditMode: boolean;
   onMarkerClick?: (marker: IRegionMapMarker) => void;
-  onMarkerDragEnd?: (markerId: string, x: number, y: number) => void;
   onMapClick?: (x: number, y: number) => void;
+  onMarkerDragEnd?: (markerId: string, x: number, y: number) => void;
 }
 
 export function MapCanvas({
@@ -26,20 +25,22 @@ export function MapCanvas({
   markers,
   selectedMarkerId,
   selectedChildForPlacement,
-  isEditMode,
   onMarkerClick,
-  onMarkerDragEnd,
   onMapClick,
+  onMarkerDragEnd,
 }: MapCanvasProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
-  const [draggingMarkerId, setDraggingMarkerId] = useState<string | null>(null);
-  const [tempMarkerPositions, setTempMarkerPositions] = useState<Record<string, { x: number; y: number }>>({});
-  const isDraggingRef = useRef(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [imageUrl, setImageUrl] = useState("");
+
+  // Drag and drop states
+  const [draggingMarkerId, setDraggingMarkerId] = useState<string | null>(null);
+  const [tempMarkerPositions, setTempMarkerPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const isDraggingRef = useRef(false);
+  const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -92,8 +93,114 @@ export function MapCanvas({
     };
   }, [imagePath]);
 
+  // Handle marker drag start
+  const handleMarkerMouseDown = (e: React.MouseEvent, markerId: string) => {
+    if (!imageRef.current) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const rect = imageRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    isDraggingRef.current = true;
+    dragStartPosRef.current = { x, y };
+    setDraggingMarkerId(markerId);
+  };
+
+  // Handle mouse move for dragging markers
+  useEffect(() => {
+    if (!draggingMarkerId || !imageRef.current) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!imageRef.current || !dragStartPosRef.current) return;
+
+      const rect = imageRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Check if mouse moved significantly (more than 3px) to differentiate click from drag
+      const dx = Math.abs(x - dragStartPosRef.current.x);
+      const dy = Math.abs(y - dragStartPosRef.current.y);
+      if (dx > 3 || dy > 3) {
+        isDraggingRef.current = true;
+      }
+
+      // Update temporary position
+      setTempMarkerPositions((prev) => ({
+        ...prev,
+        [draggingMarkerId]: { x, y },
+      }));
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (!imageRef.current || !dragStartPosRef.current) return;
+
+      const rect = imageRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Check if this was a drag or just a click
+      const dx = Math.abs(x - dragStartPosRef.current.x);
+      const dy = Math.abs(y - dragStartPosRef.current.y);
+      const wasDragged = dx > 3 || dy > 3;
+
+      if (wasDragged && onMarkerDragEnd) {
+        // Clamp position to image bounds
+        const clampedX = Math.max(0, Math.min(x, rect.width));
+        const clampedY = Math.max(0, Math.min(y, rect.height));
+        onMarkerDragEnd(draggingMarkerId, clampedX, clampedY);
+      } else {
+        // Was a click, trigger marker click
+        const marker = markers.find((m) => m.id === draggingMarkerId);
+        if (marker) {
+          onMarkerClick?.(marker);
+        }
+      }
+
+      // Reset drag state
+      isDraggingRef.current = false;
+      dragStartPosRef.current = null;
+      setDraggingMarkerId(null);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [draggingMarkerId, markers, onMarkerClick, onMarkerDragEnd]);
+
+  // Clear temporary positions only when the marker position in props is updated
+  useEffect(() => {
+    setTempMarkerPositions(prev => {
+      const newPositions = { ...prev };
+      let hasChanges = false;
+
+      // Remove temp positions that match the actual marker positions
+      Object.keys(newPositions).forEach(markerId => {
+        const marker = markers.find(m => m.id === markerId);
+        const tempPos = newPositions[markerId];
+
+        if (marker && tempPos) {
+          // If the marker position matches temp position (rounded), remove temp
+          if (Math.round(marker.positionX) === Math.round(tempPos.x) &&
+              Math.round(marker.positionY) === Math.round(tempPos.y)) {
+            delete newPositions[markerId];
+            hasChanges = true;
+          }
+        }
+      });
+
+      return hasChanges ? newPositions : prev;
+    });
+  }, [markers]);
+
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isEditMode || !imageRef.current) return;
+    if (!imageRef.current) return;
 
     // Don't trigger if clicking on a marker
     const target = e.target as HTMLElement;
@@ -125,97 +232,9 @@ export function MapCanvas({
     }
   };
 
-  const handleMarkerMouseDown = (e: React.MouseEvent, markerId: string) => {
-    if (!isEditMode || !imageRef.current) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    isDraggingRef.current = true;
-    setDraggingMarkerId(markerId);
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDraggingRef.current || !draggingMarkerId || !imageRef.current) return;
-
-      const rect = imageRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Update position in real-time
-      if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-        setTempMarkerPositions(prev => ({
-          ...prev,
-          [draggingMarkerId]: { x, y }
-        }));
-      }
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      if (!isDraggingRef.current || !draggingMarkerId || !imageRef.current) return;
-
-      const rect = imageRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Clean up dragging state immediately
-      isDraggingRef.current = false;
-      setDraggingMarkerId(null);
-
-      // Save final position if within bounds
-      // Keep temp position until parent updates (prevents flicker)
-      if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
-        onMarkerDragEnd?.(draggingMarkerId, x, y);
-      } else {
-        // If dropped outside bounds, remove temp position
-        setTempMarkerPositions(prev => {
-          const newPositions = { ...prev };
-          delete newPositions[draggingMarkerId];
-          return newPositions;
-        });
-      }
-    };
-
-    if (isDraggingRef.current) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [draggingMarkerId, onMarkerDragEnd]);
-
   const getRegionById = (regionId: string) => {
     return children.find((r) => r.id === regionId);
   };
-
-  // Clean up temp positions when markers update from parent
-  useEffect(() => {
-    setTempMarkerPositions(prev => {
-      const newPositions = { ...prev };
-      let hasChanges = false;
-
-      // Remove temp positions that match the actual marker positions
-      Object.keys(newPositions).forEach(markerId => {
-        const marker = markers.find(m => m.id === markerId);
-        const tempPos = newPositions[markerId];
-
-        if (marker && tempPos) {
-          // If the marker position matches temp position (rounded), remove temp
-          if (Math.round(marker.positionX) === Math.round(tempPos.x) &&
-              Math.round(marker.positionY) === Math.round(tempPos.y)) {
-            delete newPositions[markerId];
-            hasChanges = true;
-          }
-        }
-      });
-
-      return hasChanges ? newPositions : prev;
-    });
-  }, [markers]);
 
   return (
     <div
@@ -230,8 +249,8 @@ export function MapCanvas({
         maxScale={4}
         disabled={false}
         panning={{
-          disabled: false,
-          allowLeftClickPan: !isEditMode,
+          disabled: isDraggingRef.current || draggingMarkerId !== null,
+          allowLeftClickPan: true,
           allowMiddleClickPan: true,
           allowRightClickPan: false
         }}
@@ -273,9 +292,9 @@ export function MapCanvas({
               wrapperClass="w-full h-full select-none"
               contentClass={cn(
                 "flex items-center justify-center select-none",
-                !isEditMode && "cursor-grab active:cursor-grabbing",
-                isEditMode && !selectedChildForPlacement && "cursor-crosshair",
-                isEditMode && selectedChildForPlacement && "cursor-pointer"
+                !draggingMarkerId && !selectedChildForPlacement && "cursor-grab active:cursor-grabbing",
+                selectedChildForPlacement && "cursor-pointer",
+                draggingMarkerId && "cursor-grabbing"
               )}
             >
               <div
@@ -291,7 +310,6 @@ export function MapCanvas({
                   WebkitUserSelect: 'none',
                   MozUserSelect: 'none',
                   msUserSelect: 'none',
-                  cursor: draggingMarkerId ? 'grabbing' : undefined,
                 }}
               >
                 {/* Map Image */}
@@ -319,8 +337,6 @@ export function MapCanvas({
                     const region = getRegionById(marker.childRegionId);
                     if (!region) return null;
 
-                    // Use temporary position if available (during drag or right after),
-                    // otherwise use the stored position from props
                     const tempPos = tempMarkerPositions[marker.id];
                     const x = tempPos ? tempPos.x : marker.positionX;
                     const y = tempPos ? tempPos.y : marker.positionY;
@@ -335,12 +351,12 @@ export function MapCanvas({
                         color={marker.color}
                         showLabel={marker.showLabel}
                         isSelected={selectedMarkerId === marker.id}
-                        isDraggable={isEditMode}
-                        onClick={() => isEditMode && !isDragging && onMarkerClick?.(marker)}
+                        isDraggable={true}
+                        onClick={() => !isDragging && onMarkerClick?.(marker)}
                         onMouseDown={(e) => handleMarkerMouseDown(e, marker.id)}
                         style={{
-                          cursor: isDragging ? 'grabbing' : (isEditMode ? 'grab' : 'pointer'),
-                          pointerEvents: isDragging ? 'none' : 'auto'
+                          cursor: isDragging ? 'grabbing' : 'grab',
+                          pointerEvents: isDragging ? 'auto' : 'auto'
                         }}
                       />
                     );
