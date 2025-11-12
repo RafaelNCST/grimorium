@@ -170,5 +170,28 @@
   "region_card": {
     "parent_badge": "Parent Region:",
     "no_summary": "No description"
+  },
+  "region_map": {
+    "children_title": "Child Regions",
+    "no_children": "No child regions registered",
+    "click_to_select": "Click to select and then click on the map",
+    "toggle_edit_mode": "Switch to Edit mode to position",
+    "marker_color": "Marker Color",
+    "show_label": "Show Name",
+    "view_details": "View more details",
+    "remove_from_map": "Remove from Map",
+    "scale": "Scale",
+    "no_image": "No image",
+    "summary": "Summary",
+    "climate": "Climate",
+    "current_season": "Current Season",
+    "general_description": "General Description",
+    "narrative_purpose": "Narrative Purpose",
+    "unique_characteristics": "Unique Characteristics",
+    "resident_factions": "Resident Factions",
+    "dominant_factions": "Dominant Factions",
+    "important_characters": "Important Characters",
+    "races_found": "Races Found",
+    "items_found": "Items Found"
   }
 }

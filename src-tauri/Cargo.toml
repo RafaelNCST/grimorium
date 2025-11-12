@@ -23,3 +23,4 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "2.8.5", features = [] }
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2", features = ["sqlite"] }
 tauri-plugin-dialog = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
+tauri-plugin-fs = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }

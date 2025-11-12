@@ -69,6 +69,7 @@ interface RegionDetailViewProps {
   timeline: ITimelineEra[];
   onTimelineChange: (timeline: ITimelineEra[]) => void;
   onBack: () => void;
+  onViewMap: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
   onRegionSelect: (regionId: string) => void;
@@ -122,6 +123,7 @@ export function RegionDetailView({
   timeline,
   onTimelineChange,
   onBack,
+  onViewMap,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
   onRegionSelect,
@@ -215,6 +217,10 @@ export function RegionDetailView({
                   </>
                 ) : (
                   <>
+                    <Button variant="outline" onClick={onViewMap}>
+                      <Map className="w-4 h-4 mr-2" />
+                      Ver Mapa
+                    </Button>
                     <Button variant="outline" size="icon" onClick={onEdit}>
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -690,16 +696,34 @@ export function RegionDetailView({
                                   "world:create_region.resident_factions_label"
                                 )}
                               </Label>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-col gap-2">
                                 {safeJsonParse(region.residentFactions).map(
                                   (factionId: string) => {
                                     const faction = factions.find(
                                       (f) => f.id === factionId
                                     );
                                     return faction ? (
-                                      <Badge key={factionId} variant="secondary">
-                                        {faction.name}
-                                      </Badge>
+                                      <div
+                                        key={factionId}
+                                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                      >
+                                        {faction.image ? (
+                                          <img
+                                            src={convertFileSrc(faction.image)}
+                                            alt={faction.name}
+                                            className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground font-semibold">
+                                              {faction.name.charAt(0).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <span className="text-sm font-medium">
+                                          {faction.name}
+                                        </span>
+                                      </div>
                                     ) : null;
                                   }
                                 )}
@@ -757,16 +781,34 @@ export function RegionDetailView({
                                   "world:create_region.dominant_factions_label"
                                 )}
                               </Label>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-col gap-2">
                                 {safeJsonParse(region.dominantFactions).map(
                                   (factionId: string) => {
                                     const faction = factions.find(
                                       (f) => f.id === factionId
                                     );
                                     return faction ? (
-                                      <Badge key={factionId} variant="secondary">
-                                        {faction.name}
-                                      </Badge>
+                                      <div
+                                        key={factionId}
+                                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                      >
+                                        {faction.image ? (
+                                          <img
+                                            src={convertFileSrc(faction.image)}
+                                            alt={faction.name}
+                                            className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground font-semibold">
+                                              {faction.name.charAt(0).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <span className="text-sm font-medium">
+                                          {faction.name}
+                                        </span>
+                                      </div>
                                     ) : null;
                                   }
                                 )}
@@ -824,19 +866,34 @@ export function RegionDetailView({
                                   "world:create_region.important_characters_label"
                                 )}
                               </Label>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-col gap-2">
                                 {safeJsonParse(region.importantCharacters).map(
                                   (characterId: string) => {
                                     const character = characters.find(
                                       (c) => c.id === characterId
                                     );
                                     return character ? (
-                                      <Badge
+                                      <div
                                         key={characterId}
-                                        variant="secondary"
+                                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
                                       >
-                                        {character.name}
-                                      </Badge>
+                                        {character.image ? (
+                                          <img
+                                            src={convertFileSrc(character.image)}
+                                            alt={character.name}
+                                            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground font-semibold">
+                                              {character.name.charAt(0).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <span className="text-sm font-medium">
+                                          {character.name}
+                                        </span>
+                                      </div>
                                     ) : null;
                                   }
                                 )}
@@ -890,16 +947,34 @@ export function RegionDetailView({
                               <Label className="text-purple-600 dark:text-purple-400">
                                 {t("world:create_region.races_found_label")}
                               </Label>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-col gap-2">
                                 {safeJsonParse(region.racesFound).map(
                                   (raceId: string) => {
                                     const race = races.find(
                                       (r) => r.id === raceId
                                     );
                                     return race ? (
-                                      <Badge key={raceId} variant="secondary">
-                                        {race.name}
-                                      </Badge>
+                                      <div
+                                        key={raceId}
+                                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                      >
+                                        {race.image ? (
+                                          <img
+                                            src={convertFileSrc(race.image)}
+                                            alt={race.name}
+                                            className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground font-semibold">
+                                              {race.name.charAt(0).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <span className="text-sm font-medium">
+                                          {race.name}
+                                        </span>
+                                      </div>
                                     ) : null;
                                   }
                                 )}
@@ -951,16 +1026,34 @@ export function RegionDetailView({
                               <Label className="text-purple-600 dark:text-purple-400">
                                 {t("world:create_region.items_found_label")}
                               </Label>
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-col gap-2">
                                 {safeJsonParse(region.itemsFound).map(
                                   (itemId: string) => {
                                     const item = items.find(
                                       (i) => i.id === itemId
                                     );
                                     return item ? (
-                                      <Badge key={itemId} variant="secondary">
-                                        {item.name}
-                                      </Badge>
+                                      <div
+                                        key={itemId}
+                                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                      >
+                                        {item.image ? (
+                                          <img
+                                            src={convertFileSrc(item.image)}
+                                            alt={item.name}
+                                            className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                          />
+                                        ) : (
+                                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground font-semibold">
+                                              {item.name.charAt(0).toUpperCase()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <span className="text-sm font-medium">
+                                          {item.name}
+                                        </span>
+                                      </div>
                                     ) : null;
                                   }
                                 )}

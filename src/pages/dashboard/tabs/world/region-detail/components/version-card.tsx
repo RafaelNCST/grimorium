@@ -30,11 +30,11 @@ export function VersionCard({
 
   return (
     <Card
-      className={`cursor-pointer transition-all hover:shadow-md ${
+      className={`cursor-pointer transition-all ${
         isSelected
-          ? "border-primary bg-primary/10 shadow-sm"
-          : "border-muted hover:border-primary/50"
-      } ${version.isMain ? "ring-2 ring-primary/30" : ""}`}
+          ? "border-primary bg-primary/10 shadow-md"
+          : "border-muted hover:bg-muted/50"
+      }`}
       onClick={onClick}
     >
       <CardContent className="p-3 space-y-2">

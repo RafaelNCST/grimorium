@@ -516,6 +516,43 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
     CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id);
     CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id);
+
+    -- MAPAS DE REGIÕES
+    CREATE TABLE IF NOT EXISTS region_maps (
+      id TEXT PRIMARY KEY,
+      region_id TEXT NOT NULL,
+      version_id TEXT,
+      image_path TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
+      FOREIGN KEY (version_id) REFERENCES region_versions(id) ON DELETE CASCADE,
+      UNIQUE(region_id, version_id)
+    );
+
+    -- MARCADORES DE MAPAS DE REGIÕES
+    CREATE TABLE IF NOT EXISTS region_map_markers (
+      id TEXT PRIMARY KEY,
+      map_id TEXT NOT NULL,
+      parent_region_id TEXT NOT NULL,
+      child_region_id TEXT NOT NULL,
+      position_x INTEGER NOT NULL,
+      position_y INTEGER NOT NULL,
+      color TEXT DEFAULT '#8b5cf6',
+      show_label INTEGER DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (map_id) REFERENCES region_maps(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_region_id) REFERENCES regions(id) ON DELETE CASCADE,
+      FOREIGN KEY (child_region_id) REFERENCES regions(id) ON DELETE CASCADE,
+      UNIQUE(map_id, child_region_id)
+    );
+
+    -- ÍNDICES PARA MAPAS
+    CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id);
+    CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id);
+    CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id);
+    CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id);
   `;
 
     await database.execute(schema);
@@ -546,6 +583,28 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] icon_image column already exists or error:", error);
     }
 
+    // Add color column to region_map_markers if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE region_map_markers ADD COLUMN color TEXT DEFAULT '#8b5cf6'"
+      );
+      console.log("[db] Added color column to region_map_markers table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log("[db] color column already exists or error:", error);
+    }
+
+    // Add show_label column to region_map_markers if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE region_map_markers ADD COLUMN show_label INTEGER DEFAULT 1"
+      );
+      console.log("[db] Added show_label column to region_map_markers table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log("[db] show_label column already exists or error:", error);
+    }
+
     // Add order_index column to regions if it doesn't exist
     try {
       await database.execute(
@@ -555,6 +614,122 @@ async function runMigrations(database: Database): Promise<void> {
     } catch (error) {
       // Column already exists or other error - safe to ignore
       console.log("[db] order_index column already exists or error:", error);
+    }
+
+    // Add version_id column to region_maps if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE region_maps ADD COLUMN version_id TEXT"
+      );
+      console.log("[db] Added version_id column to region_maps table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log("[db] version_id column already exists or error:", error);
+    }
+
+    // Migrate region_maps table to support version_id with correct constraints
+    try {
+      // Check if we need to migrate by checking if the old constraint exists
+      const tableInfo = await database.select<Array<{ sql: string }>>(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_maps'"
+      );
+
+      if (tableInfo.length > 0 && tableInfo[0].sql.includes('region_id TEXT NOT NULL UNIQUE')) {
+        console.log("[db] Migrating region_maps table to support version_id...");
+
+        // Create new table with correct schema
+        await database.execute(`
+          CREATE TABLE region_maps_new (
+            id TEXT PRIMARY KEY,
+            region_id TEXT NOT NULL,
+            version_id TEXT,
+            image_path TEXT NOT NULL,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
+            FOREIGN KEY (version_id) REFERENCES region_versions(id) ON DELETE CASCADE,
+            UNIQUE(region_id, version_id)
+          )
+        `);
+
+        // Copy existing data (set version_id to NULL for existing maps)
+        await database.execute(`
+          INSERT INTO region_maps_new (id, region_id, version_id, image_path, created_at, updated_at)
+          SELECT id, region_id, NULL, image_path, created_at, updated_at
+          FROM region_maps
+        `);
+
+        // Drop old table
+        await database.execute("DROP TABLE region_maps");
+
+        // Rename new table
+        await database.execute("ALTER TABLE region_maps_new RENAME TO region_maps");
+
+        // Recreate index
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id)");
+
+        console.log("[db] Successfully migrated region_maps table");
+      } else {
+        console.log("[db] region_maps table already has correct schema");
+      }
+    } catch (error) {
+      console.log("[db] Migration error or already migrated:", error);
+    }
+
+    // Migrate region_map_markers to link to specific maps (version-specific)
+    try {
+      const markersTableInfo = await database.select<Array<{ sql: string }>>(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_map_markers'"
+      );
+
+      if (markersTableInfo.length > 0 && !markersTableInfo[0].sql.includes('map_id')) {
+        console.log("[db] Migrating region_map_markers to link to specific maps...");
+
+        // Create new table with map_id
+        await database.execute(`
+          CREATE TABLE region_map_markers_new (
+            id TEXT PRIMARY KEY,
+            map_id TEXT NOT NULL,
+            parent_region_id TEXT NOT NULL,
+            child_region_id TEXT NOT NULL,
+            position_x INTEGER NOT NULL,
+            position_y INTEGER NOT NULL,
+            color TEXT DEFAULT '#8b5cf6',
+            show_label INTEGER DEFAULT 1,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            FOREIGN KEY (map_id) REFERENCES region_maps(id) ON DELETE CASCADE,
+            FOREIGN KEY (parent_region_id) REFERENCES regions(id) ON DELETE CASCADE,
+            FOREIGN KEY (child_region_id) REFERENCES regions(id) ON DELETE CASCADE,
+            UNIQUE(map_id, child_region_id)
+          )
+        `);
+
+        // Copy existing markers, linking them to main version maps (version_id = NULL)
+        await database.execute(`
+          INSERT INTO region_map_markers_new (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, created_at, updated_at)
+          SELECT m.id, rm.id, m.parent_region_id, m.child_region_id, m.position_x, m.position_y, m.color, m.show_label, m.created_at, m.updated_at
+          FROM region_map_markers m
+          JOIN region_maps rm ON rm.region_id = m.parent_region_id AND rm.version_id IS NULL
+        `);
+
+        // Drop old table
+        await database.execute("DROP TABLE region_map_markers");
+
+        // Rename new table
+        await database.execute("ALTER TABLE region_map_markers_new RENAME TO region_map_markers");
+
+        // Recreate indexes
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id)");
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id)");
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id)");
+
+        console.log("[db] Successfully migrated region_map_markers table");
+      } else {
+        console.log("[db] region_map_markers table already has correct schema");
+      }
+    } catch (error) {
+      console.log("[db] Markers migration error or already migrated:", error);
     }
 
     // Add advanced fields to regions table

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -34,6 +34,8 @@ export function RegionDetail() {
   const { dashboardId, regionId } = useParams({
     from: "/dashboard/$dashboardId/tabs/world/$regionId/",
   });
+  const search = useSearch({ strict: false });
+  const versionIdFromUrl = (search as { versionId?: string })?.versionId;
   const navigate = useNavigate();
   const { t } = useTranslation("region-detail");
 
@@ -52,24 +54,13 @@ export function RegionDetail() {
   };
 
   const [isEditing, setIsEditing] = useState(false);
-  const [region, setRegion] = useState<IRegion>(emptyRegion);
+  const [region, setRegion] = useState<IRegion | null>(null);
   const [editData, setEditData] = useState<IRegion>(emptyRegion);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  const [versions, setVersions] = useState<IRegionVersion[]>([
-    {
-      id: "main-version",
-      name: "Versão Principal",
-      description: "Versão principal da região",
-      createdAt: new Date().toISOString(),
-      isMain: true,
-      regionData: emptyRegion,
-    },
-  ]);
-  const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(
-    versions[0]
-  );
+  const [versions, setVersions] = useState<IRegionVersion[]>([]);
+  const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
@@ -185,10 +176,6 @@ export function RegionDetail() {
       try {
         const regionFromDB = await getRegionById(regionId);
         if (regionFromDB) {
-          setRegion(regionFromDB);
-          setEditData(regionFromDB);
-          setImagePreview(regionFromDB.image || "");
-
           // Load versions from database
           const versionsFromDB = await getRegionVersions(regionId);
 
@@ -206,6 +193,11 @@ export function RegionDetail() {
             await createRegionVersion(regionId, mainVersion);
             setVersions([mainVersion]);
             setCurrentVersion(mainVersion);
+
+            // Set region data from main version
+            setRegion(regionFromDB);
+            setEditData(regionFromDB);
+            setImagePreview(regionFromDB.image || "");
           } else {
             // Update main version with loaded data
             const updatedVersions = versionsFromDB.map((v) =>
@@ -218,10 +210,24 @@ export function RegionDetail() {
             );
             setVersions(updatedVersions);
 
-            // Set main version as current
-            const mainVersion = updatedVersions.find((v) => v.isMain);
-            if (mainVersion) {
-              setCurrentVersion(mainVersion);
+            // Set current version based on URL parameter or default to main
+            let selectedVersion: IRegionVersion | undefined;
+
+            if (versionIdFromUrl) {
+              selectedVersion = updatedVersions.find((v) => v.id === versionIdFromUrl);
+              if (!selectedVersion) {
+                selectedVersion = updatedVersions.find((v) => v.isMain);
+              }
+            } else {
+              selectedVersion = updatedVersions.find((v) => v.isMain);
+            }
+
+            if (selectedVersion) {
+              setCurrentVersion(selectedVersion);
+              // Set region data from selected version to avoid visual flicker
+              setRegion(selectedVersion.regionData);
+              setEditData(selectedVersion.regionData);
+              setImagePreview(selectedVersion.regionData.image || "");
             }
           }
 
@@ -277,7 +283,7 @@ export function RegionDetail() {
     };
 
     loadRegion();
-  }, [regionId, dashboardId]);
+  }, [regionId, dashboardId, versionIdFromUrl]);
 
   const handleVersionChange = useCallback(
     (versionId: string | null) => {
@@ -407,13 +413,33 @@ export function RegionDetail() {
     }
 
     try {
-      // Update region in database
+      // Update region in database - pass ALL fields from updatedRegion
       await updateRegion(regionId, {
         name: updatedRegion.name,
         parentId: updatedRegion.parentId,
         scale: updatedRegion.scale,
         summary: updatedRegion.summary,
         image: updatedRegion.image,
+        // Environment fields
+        climate: updatedRegion.climate,
+        currentSeason: updatedRegion.currentSeason,
+        customSeasonName: updatedRegion.customSeasonName,
+        generalDescription: updatedRegion.generalDescription,
+        regionAnomalies: updatedRegion.regionAnomalies,
+        // Information fields
+        residentFactions: updatedRegion.residentFactions,
+        dominantFactions: updatedRegion.dominantFactions,
+        importantCharacters: updatedRegion.importantCharacters,
+        racesFound: updatedRegion.racesFound,
+        itemsFound: updatedRegion.itemsFound,
+        // Narrative fields
+        narrativePurpose: updatedRegion.narrativePurpose,
+        uniqueCharacteristics: updatedRegion.uniqueCharacteristics,
+        politicalImportance: updatedRegion.politicalImportance,
+        religiousImportance: updatedRegion.religiousImportance,
+        worldPerception: updatedRegion.worldPerception,
+        regionMysteries: updatedRegion.regionMysteries,
+        inspirations: updatedRegion.inspirations,
       });
 
       // Save timeline
@@ -500,6 +526,14 @@ export function RegionDetail() {
     navigateToWorldTab();
   }, [navigateToWorldTab]);
 
+  const handleViewMap = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/world/$regionId/map",
+      params: { dashboardId, regionId },
+      search: currentVersion?.id && currentVersion.id !== 'main-version' ? { versionId: currentVersion.id } : undefined,
+    });
+  }, [navigate, dashboardId, regionId, currentVersion]);
+
   const handleNavigationSidebarToggle = useCallback(() => {
     setIsNavigationSidebarOpen((prev) => !prev);
   }, []);
@@ -537,6 +571,18 @@ export function RegionDetail() {
     setTimeline(newTimeline);
   }, []);
 
+  // Don't render until we have the region data loaded
+  if (!region || !currentVersion) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground">Carregando região...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <RegionDetailView
       region={region}
@@ -558,6 +604,7 @@ export function RegionDetail() {
       timeline={timeline}
       onTimelineChange={handleTimelineChange}
       onBack={handleBack}
+      onViewMap={handleViewMap}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}
       onRegionSelect={handleRegionSelect}

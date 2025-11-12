@@ -170,5 +170,28 @@
   "region_card": {
     "parent_badge": "Região Pai:",
     "no_summary": "Sem descrição"
+  },
+  "region_map": {
+    "children_title": "Regiões Filhas",
+    "no_children": "Nenhuma região filha cadastrada",
+    "click_to_select": "Clique para selecionar e depois clique no mapa",
+    "toggle_edit_mode": "Alterne para modo Edição para posicionar",
+    "marker_color": "Cor do Marcador",
+    "show_label": "Mostrar Nome",
+    "view_details": "Ver mais detalhes",
+    "remove_from_map": "Remover do Mapa",
+    "scale": "Escala",
+    "no_image": "Sem imagem",
+    "summary": "Resumo",
+    "climate": "Clima",
+    "current_season": "Estação Atual",
+    "general_description": "Descrição Geral",
+    "narrative_purpose": "Propósito Narrativo",
+    "unique_characteristics": "Características Únicas",
+    "resident_factions": "Facções Residentes",
+    "dominant_factions": "Facções Dominantes",
+    "important_characters": "Personagens Importantes",
+    "races_found": "Raças Encontradas",
+    "items_found": "Itens Encontrados"
   }
 }
