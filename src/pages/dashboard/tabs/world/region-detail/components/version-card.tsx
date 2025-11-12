@@ -40,7 +40,7 @@ export function VersionCard({
       <CardContent className="p-3 space-y-2">
         {/* Header with Main Badge */}
         {version.isMain && (
-          <div className="flex items-center gap-1 mb-1">
+          <div className="flex items-center gap-1 mb-1 pointer-events-none">
             <Badge
               variant="default"
               className="text-xs bg-primary text-primary-foreground"
@@ -53,15 +53,15 @@ export function VersionCard({
 
         {/* Region Image */}
         <div className="flex items-center gap-3">
-          <Avatar className="w-12 h-12 border-2 border-border">
+          <Avatar className="w-12 h-12 border-2 border-border rounded-lg">
             {version.regionData?.image && (
               <AvatarImage
                 src={version.regionData.image}
                 alt={version.name}
-                className="object-cover"
+                className="object-cover rounded-lg"
               />
             )}
-            <AvatarFallback className="text-sm font-semibold">
+            <AvatarFallback className="text-sm font-semibold rounded-lg">
               {version.name
                 .split(" ")
                 .map((n) => n[0])
