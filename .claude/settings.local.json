@@ -116,7 +116,11 @@
       "Bash(/tmp/pt_world_backup.json)",
       "Bash(Select-String -Pattern \"region-detail\" -Context 2,2)",
       "Bash(cmd /c \"taskkill /PID 44920 /F\")",
-      "Bash(cmd //c \"taskkill //PID 44920 //F\")"
+      "Bash(cmd //c \"taskkill //PID 44920 //F\")",
+      "Bash(cmd /c \"taskkill /PID 24568 /F\")",
+      "Bash(cmd /c \"taskkill /PID 26600 /F\")",
+      "Bash(cmd //c \"taskkill //F //IM node.exe //T\")",
+      "Bash(cmd //c \"taskkill //F //IM app.exe //T\")"
     ],
     "deny": [],
     "ask": []

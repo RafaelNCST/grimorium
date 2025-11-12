@@ -6,13 +6,15 @@ import {
   Calendar,
   Users,
   Building,
-  Info,
   ChevronDown,
   Sparkles,
   Edit,
   Trash2,
+  Swords,
+  Package,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 
 import {
   Accordion,
@@ -38,30 +40,29 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Interfaces
-interface ITimelineEvent {
+export interface ITimelineEvent {
   id: string;
   name: string;
   description: string;
-  shortDescription: string;
   reason: string;
   outcome: string;
   startDate: string;
   endDate: string;
   charactersInvolved: string[];
-  organizationsInvolved: string[];
+  factionsInvolved: string[];
+  racesInvolved: string[];
+  itemsInvolved: string[];
 }
 
-interface TimelineEra {
+export interface ITimelineEra {
   id: string;
   name: string;
   description: string;
@@ -70,95 +71,28 @@ interface TimelineEra {
   events: ITimelineEvent[];
 }
 
-interface PropsWorldTimeline {
-  worldId: string;
-  worldType: "World" | "Continent";
+interface PropsRegionTimeline {
+  regionId: string;
   isEditing: boolean;
+  timeline: ITimelineEra[];
+  onTimelineChange: (timeline: ITimelineEra[]) => void;
+  // Real data from the app
+  characters: Array<{ id: string; name: string; image?: string }>;
+  factions: Array<{ id: string; name: string; image?: string }>;
+  races: Array<{ id: string; name: string; image?: string }>;
+  items: Array<{ id: string; name: string; image?: string }>;
 }
 
-// Mock data for select options
-const mockCharacters = [
-  { id: "1", name: "Aldara, a Guardiã" },
-  { id: "2", name: "Theron Sombraluna" },
-  { id: "3", name: "Lyria Ventolâmina" },
-  { id: "4", name: "Kael Forjacerta" },
-];
-
-const mockFactions = [
-  { id: "1", name: "Ordem dos Guardiões" },
-  { id: "2", name: "Culto das Sombras" },
-  { id: "3", name: "Reino de Aethermoor" },
-  { id: "4", name: "Academia Arcana" },
-];
-
-// Mock timeline data
-const mockTimeline: TimelineEra[] = [
-  {
-    id: "1",
-    name: "Era dos Primórdios",
-    description:
-      "Era inicial do mundo, quando a magia ainda era selvagem e as primeiras civilizações começaram a se formar.",
-    startDate: "0 EP (Era Primordial)",
-    endDate: "1000 EP",
-    events: [
-      {
-        id: "1",
-        name: "A Grande Convergência",
-        description:
-          "Um evento cataclísmico que uniu múltiplas dimensões mágicas em uma única realidade, criando o mundo como conhecemos hoje. As energias mágicas se estabilizaram e permitiram o desenvolvimento das primeiras formas de vida inteligente.",
-        shortDescription:
-          "Evento que uniu dimensões mágicas e criou o mundo atual",
-        reason: "Instabilidade dimensional causada por antigos rituais arcanos",
-        outcome:
-          "Estabilização da magia e surgimento das primeiras civilizações",
-        startDate: "50 EP",
-        endDate: "52 EP",
-        charactersInvolved: ["1"],
-        organizationsInvolved: ["1"],
-      },
-      {
-        id: "2",
-        name: "Nascimento dos Guardiões",
-        description:
-          "Formação da primeira ordem dedicada a proteger o equilíbrio mágico do mundo. Os primeiros Guardiões foram escolhidos pelos próprios elementos.",
-        shortDescription: "Criação da primeira ordem de guardiões mágicos",
-        reason: "Necessidade de proteger o mundo de ameaças mágicas",
-        outcome: "Estabelecimento da Ordem dos Guardiões",
-        startDate: "250 EP",
-        endDate: "260 EP",
-        charactersInvolved: ["1"],
-        organizationsInvolved: ["1"],
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Era das Trevas",
-    description:
-      "Período sombrio marcado por guerras e o surgimento de forças maléficas que ameaçaram destruir o mundo.",
-    startDate: "1001 EP",
-    endDate: "2500 EP",
-    events: [
-      {
-        id: "3",
-        name: "A Corrupção das Sombras",
-        description:
-          "Surgimento de uma força sombria que corrompeu várias regiões do mundo, transformando terras férteis em desertos amaldiçoados e criando criaturas aberrantes.",
-        shortDescription: "Surgimento de força sombria que corrompeu o mundo",
-        reason: "Experimentos proibidos com magia sombria",
-        outcome: "Criação do Culto das Sombras e corrupção de vastas áreas",
-        startDate: "1200 EP",
-        endDate: "1350 EP",
-        charactersInvolved: ["2"],
-        organizationsInvolved: ["2"],
-      },
-    ],
-  },
-];
-
-export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
-  const [timeline, setTimeline] = useState<TimelineEra[]>(mockTimeline);
-  const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(
+export function RegionTimeline({
+  isEditing,
+  timeline,
+  onTimelineChange,
+  characters,
+  factions,
+  races,
+  items,
+}: PropsRegionTimeline) {
+  const [selectedEvent, setSelectedEvent] = useState<ITimelineEvent | null>(
     null
   );
   const [showEventModal, setShowEventModal] = useState(false);
@@ -166,7 +100,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
   const [showEditEraModal, setShowEditEraModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [selectedEraId, setSelectedEraId] = useState<string>("");
-  const [editingEra, setEditingEra] = useState<TimelineEra | null>(null);
+  const [editingEra, setEditingEra] = useState<ITimelineEra | null>(null);
   const [editingEvent, setEditingEvent] = useState<boolean>(false);
 
   const [newEra, setNewEra] = useState({
@@ -179,13 +113,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
   const [newEvent, setNewEvent] = useState({
     name: "",
     description: "",
-    shortDescription: "",
     reason: "",
     outcome: "",
     startDate: "",
     endDate: "",
     charactersInvolved: [] as string[],
-    organizationsInvolved: [] as string[],
+    factionsInvolved: [] as string[],
+    racesInvolved: [] as string[],
+    itemsInvolved: [] as string[],
   });
 
   const [editEra, setEditEra] = useState({
@@ -201,13 +136,13 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
       return;
     }
 
-    const era: TimelineEra = {
+    const era: ITimelineEra = {
       id: Date.now().toString(),
       ...newEra,
       events: [],
     };
 
-    setTimeline([...timeline, era]);
+    onTimelineChange([...timeline, era]);
     setNewEra({ name: "", description: "", startDate: "", endDate: "" });
     setShowCreateEraModal(false);
     toast.success("Era criada com sucesso!");
@@ -219,13 +154,13 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
       return;
     }
 
-    const event: TimelineEvent = {
+    const event: ITimelineEvent = {
       id: Date.now().toString(),
       ...newEvent,
     };
 
-    setTimeline((prev) =>
-      prev.map((era) =>
+    onTimelineChange(
+      timeline.map((era) =>
         era.id === selectedEraId
           ? { ...era, events: [...era.events, event] }
           : era
@@ -235,39 +170,41 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
     setNewEvent({
       name: "",
       description: "",
-      shortDescription: "",
       reason: "",
       outcome: "",
       startDate: "",
       endDate: "",
       charactersInvolved: [],
-      organizationsInvolved: [],
+      factionsInvolved: [],
+      racesInvolved: [],
+      itemsInvolved: [],
     });
     setSelectedEraId("");
     setShowCreateEventModal(false);
     toast.success("Evento criado com sucesso!");
   };
 
-  const openEventDetails = (event: TimelineEvent, edit: boolean = false) => {
+  const openEventDetails = (event: ITimelineEvent, edit: boolean = false) => {
     setSelectedEvent(event);
     setEditingEvent(edit);
     if (edit) {
       setNewEvent({
         name: event.name,
         description: event.description,
-        shortDescription: event.shortDescription,
         reason: event.reason,
         outcome: event.outcome,
         startDate: event.startDate,
         endDate: event.endDate,
         charactersInvolved: [...event.charactersInvolved],
-        organizationsInvolved: [...event.organizationsInvolved],
+        factionsInvolved: [...event.factionsInvolved],
+        racesInvolved: [...event.racesInvolved],
+        itemsInvolved: [...event.itemsInvolved],
       });
     }
     setShowEventModal(true);
   };
 
-  const handleEditEra = (era: TimelineEra) => {
+  const handleEditEra = (era: ITimelineEra) => {
     setEditingEra(era);
     setEditEra({
       name: era.name,
@@ -284,8 +221,8 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
       return;
     }
 
-    setTimeline((prev) =>
-      prev.map((era) =>
+    onTimelineChange(
+      timeline.map((era) =>
         era.id === editingEra.id ? { ...era, ...editEra } : era
       )
     );
@@ -302,13 +239,13 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
       return;
     }
 
-    const updatedEvent: TimelineEvent = {
+    const updatedEvent: ITimelineEvent = {
       ...selectedEvent,
       ...newEvent,
     };
 
-    setTimeline((prev) =>
-      prev.map((era) => ({
+    onTimelineChange(
+      timeline.map((era) => ({
         ...era,
         events: era.events.map((event) =>
           event.id === selectedEvent.id ? updatedEvent : event
@@ -319,13 +256,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
     setNewEvent({
       name: "",
       description: "",
-      shortDescription: "",
       reason: "",
       outcome: "",
       startDate: "",
       endDate: "",
       charactersInvolved: [],
-      organizationsInvolved: [],
+      factionsInvolved: [],
+      racesInvolved: [],
+      itemsInvolved: [],
     });
     setSelectedEvent(null);
     setEditingEvent(false);
@@ -334,13 +272,13 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
   };
 
   const handleDeleteEra = (eraId: string) => {
-    setTimeline((prev) => prev.filter((era) => era.id !== eraId));
+    onTimelineChange(timeline.filter((era) => era.id !== eraId));
     toast.success("Era excluída com sucesso!");
   };
 
   const handleDeleteEvent = (eventId: string) => {
-    setTimeline((prev) =>
-      prev.map((era) => ({
+    onTimelineChange(
+      timeline.map((era) => ({
         ...era,
         events: era.events.filter((event) => event.id !== eventId),
       }))
@@ -352,65 +290,43 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
   };
 
   const getCharacterName = (id: string) =>
-    mockCharacters.find((c) => c.id === id)?.name ||
-    "Personagem não encontrado";
+    characters.find((c) => c.id === id)?.name || "Personagem não encontrado";
 
-  const getOrganizationName = (id: string) =>
-    mockFactions.find((o) => o.id === id)?.name || "Organização não encontrada";
+  const getFactionName = (id: string) =>
+    factions.find((f) => f.id === id)?.name || "Facção não encontrada";
 
-  if (timeline.length === 0) {
-    return (
-      <Card className="card-magical">
-        <CardContent className="flex flex-col items-center justify-center py-16">
+  const getRaceName = (id: string) =>
+    races.find((r) => r.id === id)?.name || "Raça não encontrada";
+
+  const getItemName = (id: string) =>
+    items.find((i) => i.id === id)?.name || "Item não encontrado";
+
+  return (
+    <>
+      {timeline.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16">
           <Clock className="w-16 h-16 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">
             Nenhuma Linha do Tempo Definida
           </h3>
           <p className="text-muted-foreground text-center mb-6 max-w-md">
-            Crie a primeira era para começar a documentar a história deste{" "}
-            {worldType === "World" ? "mundo" : "continente"}.
+            {isEditing
+              ? "Crie a primeira era para começar a documentar a história desta região."
+              : "Esta região ainda não possui linha do tempo histórica definida."}
           </p>
           {isEditing && (
             <Button
               onClick={() => setShowCreateEraModal(true)}
-              className="btn-magical"
+              variant="magical"
+              className="animate-glow"
             >
               <Plus className="w-4 h-4 mr-2" />
               Criar Primeira Era
             </Button>
           )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="card-magical">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              Linha do Tempo
-            </CardTitle>
-            <CardDescription>
-              História cronológica de{" "}
-              {worldType === "World" ? "mundo" : "continente"}
-            </CardDescription>
-          </div>
-          {isEditing && (
-            <Button
-              onClick={() => setShowCreateEraModal(true)}
-              size="sm"
-              className="btn-magical"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Era
-            </Button>
-          )}
         </div>
-      </CardHeader>
-      <CardContent>
+      ) : (
+        <div>
         <div className="relative">
           {/* Enhanced Timeline Line with Gradient and Glow */}
           <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
@@ -439,8 +355,8 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   <div className="ml-20 relative">
                     <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden">
                       <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
-                        <div className="flex items-center justify-between w-full">
-                          <div className="text-left">
+                        <div className="flex items-start justify-between w-full">
+                          <div className="text-left flex-1">
                             <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                               {era.name}
                             </h3>
@@ -451,32 +367,83 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                               <Clock className="w-3 h-3 mr-1" />
                               {era.startDate} - {era.endDate}
                             </Badge>
+                            {era.description && (
+                              <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+                                {era.description}
+                              </p>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 ml-4">
                             {isEditing && (
                               <>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditEra(era);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-primary/10"
-                                >
-                                  <Edit className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteEra(era.id);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedEraId(era.id);
+                                        // Reset form before opening
+                                        setNewEvent({
+                                          name: "",
+                                          description: "",
+                                          reason: "",
+                                          outcome: "",
+                                          startDate: "",
+                                          endDate: "",
+                                          charactersInvolved: [],
+                                          factionsInvolved: [],
+                                          racesInvolved: [],
+                                          itemsInvolved: [],
+                                        });
+                                        setShowCreateEventModal(true);
+                                      }}
+                                      className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600 dark:hover:text-green-400"
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    <p>Adicionar Evento</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditEra(era);
+                                      }}
+                                      className="h-8 w-8 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    <p>Editar Era</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteEra(era.id);
+                                      }}
+                                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    <p>Deletar Era</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </>
                             )}
                             {era.events.length > 0 && (
@@ -488,9 +455,6 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                             <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-                          {era.description}
-                        </p>
                       </div>
                     </AccordionTrigger>
 
@@ -507,7 +471,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
 
                                 {/* Event Card */}
                                 <Card
-                                  className="hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02] bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
+                                  className="hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
                                   onClick={() => openEventDetails(event)}
                                 >
                                   <CardContent className="p-5">
@@ -534,7 +498,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                                                 e.stopPropagation();
                                                 openEventDetails(event, true);
                                               }}
-                                              className="h-6 w-6 p-0 hover:bg-primary/10"
+                                              className="h-6 w-6 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
                                             >
                                               <Edit className="w-3 h-3" />
                                             </Button>
@@ -551,43 +515,60 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                                             </Button>
                                           </>
                                         )}
-                                        <Info className="w-4 h-4 text-muted-foreground/60" />
                                       </div>
                                     </div>
-                                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                                      {event.shortDescription}
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                      {event.description.length > 200
+                                        ? `${event.description.substring(0, 200)}...`
+                                        : event.description}
                                     </p>
                                     {(event.charactersInvolved.length > 0 ||
-                                      event.organizationsInvolved.length >
-                                        0) && (
-                                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
-                                        {event.charactersInvolved.length >
-                                          0 && (
+                                      event.factionsInvolved.length > 0 ||
+                                      event.racesInvolved.length > 0 ||
+                                      event.itemsInvolved.length > 0) && (
+                                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30 flex-wrap">
+                                        {event.charactersInvolved.length > 0 && (
                                           <div className="flex items-center gap-1">
                                             <Users className="w-3 h-3 text-muted-foreground" />
                                             <span className="text-xs text-muted-foreground">
                                               {event.charactersInvolved.length}{" "}
                                               personagem
-                                              {event.charactersInvolved
-                                                .length !== 1
+                                              {event.charactersInvolved.length !== 1
                                                 ? "s"
                                                 : ""}
                                             </span>
                                           </div>
                                         )}
-                                        {event.organizationsInvolved.length >
-                                          0 && (
+                                        {event.factionsInvolved.length > 0 && (
                                           <div className="flex items-center gap-1">
                                             <Building className="w-3 h-3 text-muted-foreground" />
                                             <span className="text-xs text-muted-foreground">
-                                              {
-                                                event.organizationsInvolved
-                                                  .length
-                                              }{" "}
-                                              organização
-                                              {event.organizationsInvolved
-                                                .length !== 1
+                                              {event.factionsInvolved.length}{" "}
+                                              facção
+                                              {event.factionsInvolved.length !== 1
                                                 ? "ões"
+                                                : ""}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {event.racesInvolved.length > 0 && (
+                                          <div className="flex items-center gap-1">
+                                            <Swords className="w-3 h-3 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">
+                                              {event.racesInvolved.length} raça
+                                              {event.racesInvolved.length !== 1
+                                                ? "s"
+                                                : ""}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {event.itemsInvolved.length > 0 && (
+                                          <div className="flex items-center gap-1">
+                                            <Package className="w-3 h-3 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">
+                                              {event.itemsInvolved.length} item
+                                              {event.itemsInvolved.length !== 1
+                                                ? "s"
                                                 : ""}
                                             </span>
                                           </div>
@@ -598,27 +579,6 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                                 </Card>
                               </div>
                             ))}
-
-                            {/* Add Event Button */}
-                            {isEditing && (
-                              <div className="relative">
-                                <div className="absolute -left-8 top-3">
-                                  <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20" />
-                                </div>
-                                <Button
-                                  onClick={() => {
-                                    setSelectedEraId(era.id);
-                                    setShowCreateEventModal(true);
-                                  }}
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-muted-foreground hover:text-primary hover:bg-primary/5 border border-dashed border-muted-foreground/30 hover:border-primary/30 w-full justify-start"
-                                >
-                                  <Plus className="w-4 h-4 mr-2" />
-                                  Adicionar Evento
-                                </Button>
-                              </div>
-                            )}
                           </>
                         ) : (
                           isEditing && (
@@ -638,7 +598,8 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                                       setShowCreateEventModal(true);
                                     }}
                                     size="sm"
-                                    className="btn-magical"
+                                    variant="magical"
+                                    className="animate-glow"
                                   >
                                     <Plus className="w-4 h-4 mr-2" />
                                     Criar Primeiro Evento
@@ -656,11 +617,26 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
             ))}
           </Accordion>
         </div>
-      </CardContent>
+
+        {isEditing && (
+          <div className="flex justify-end mt-6">
+            <Button
+              onClick={() => setShowCreateEraModal(true)}
+              size="sm"
+              variant="magical"
+              className="animate-glow"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Era
+            </Button>
+          </div>
+        )}
+      </div>
+      )}
 
       {/* Event Details/Edit Modal */}
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
@@ -675,7 +651,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
 
           {selectedEvent &&
             (editingEvent ? (
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-event-name">Nome do Evento *</Label>
                   <Input
@@ -684,30 +660,16 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                     onChange={(e) =>
                       setNewEvent((prev) => ({ ...prev, name: e.target.value }))
                     }
-                    placeholder="Ex: A Grande Convergência"
+                    placeholder="A Grande Convergência"
+                    maxLength={200}
                   />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEvent.name.length}/200</span>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-event-short-desc">
-                    Descrição Resumida *
-                  </Label>
-                  <Textarea
-                    id="edit-event-short-desc"
-                    value={newEvent.shortDescription}
-                    onChange={(e) =>
-                      setNewEvent((prev) => ({
-                        ...prev,
-                        shortDescription: e.target.value,
-                      }))
-                    }
-                    placeholder="Descrição breve que aparece no card da timeline"
-                    rows={2}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-event-desc">Descrição Completa</Label>
+                  <Label htmlFor="edit-event-desc">Descrição *</Label>
                   <Textarea
                     id="edit-event-desc"
                     value={newEvent.description}
@@ -717,9 +679,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                         description: e.target.value,
                       }))
                     }
-                    placeholder="Descrição detalhada que aparece no modal"
-                    rows={3}
+                    placeholder="Durante três noites, o céu ficou vermelho e as cinco luas do planeta se alinharam pela primeira vez em mil anos. Portais se abriram trazendo criaturas de outros planos"
+                    rows={4}
+                    maxLength={500}
+                    className="resize-none"
                   />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEvent.description.length}/500</span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -734,9 +701,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                           reason: e.target.value,
                         }))
                       }
-                      placeholder="Por que aconteceu?"
+                      placeholder="O ritual proibido realizado pelos magos do Conselho Cinzento rompeu o véu entre os planos"
                       rows={2}
+                      maxLength={500}
+                      className="resize-none"
                     />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{newEvent.reason.length}/500</span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="edit-event-outcome">Como Terminou</Label>
@@ -749,9 +721,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                           outcome: e.target.value,
                         }))
                       }
-                      placeholder="Qual foi o resultado?"
+                      placeholder="Os heróis conseguiram fechar os portais, mas não antes de metade da cidade ser destruída"
                       rows={2}
+                      maxLength={500}
+                      className="resize-none"
                     />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{newEvent.outcome.length}/500</span>
+                    </div>
                   </div>
                 </div>
 
@@ -767,8 +744,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                           startDate: e.target.value,
                         }))
                       }
-                      placeholder="Ex: 50 EP"
+                      placeholder="50 EP"
+                      maxLength={50}
                     />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{newEvent.startDate.length}/50</span>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="edit-event-end">Data Fim</Label>
@@ -781,116 +762,78 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                           endDate: e.target.value,
                         }))
                       }
-                      placeholder="Ex: 52 EP"
+                      placeholder="52 EP"
+                      maxLength={50}
                     />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{newEvent.endDate.length}/50</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="edit-event-characters">
-                    Personagens Envolvidos
-                  </Label>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (!newEvent.charactersInvolved.includes(value)) {
-                        setNewEvent((prev) => ({
-                          ...prev,
-                          charactersInvolved: [
-                            ...prev.charactersInvolved,
-                            value,
-                          ],
-                        }));
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar personagens" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockCharacters.map((char) => (
-                        <SelectItem key={char.id} value={char.id}>
-                          {char.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {newEvent.charactersInvolved.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {newEvent.charactersInvolved.map((id) => (
-                        <Badge
-                          key={id}
-                          variant="secondary"
-                          className="cursor-pointer"
-                          onClick={() =>
-                            setNewEvent((prev) => ({
-                              ...prev,
-                              charactersInvolved:
-                                prev.charactersInvolved.filter(
-                                  (cid) => cid !== id
-                                ),
-                            }))
-                          }
-                        >
-                          {getCharacterName(id)} ×
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <MultiSelect
+                  label="Personagens Envolvidos"
+                  placeholder="Selecionar personagens"
+                  emptyText="Nenhum personagem cadastrado"
+                  noSelectionText="Nenhum personagem selecionado"
+                  searchPlaceholder="Buscar personagem..."
+                  options={characters}
+                  value={newEvent.charactersInvolved}
+                  onChange={(value) =>
+                    setNewEvent((prev) => ({
+                      ...prev,
+                      charactersInvolved: value,
+                    }))
+                  }
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="edit-event-organizations">
-                    Organizações Envolvidas
-                  </Label>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (!newEvent.organizationsInvolved.includes(value)) {
-                        setNewEvent((prev) => ({
-                          ...prev,
-                          organizationsInvolved: [
-                            ...prev.organizationsInvolved,
-                            value,
-                          ],
-                        }));
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecionar organizações" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockFactions.map((org) => (
-                        <SelectItem key={org.id} value={org.id}>
-                          {org.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {newEvent.organizationsInvolved.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {newEvent.organizationsInvolved.map((id) => (
-                        <Badge
-                          key={id}
-                          variant="outline"
-                          className="cursor-pointer"
-                          onClick={() =>
-                            setNewEvent((prev) => ({
-                              ...prev,
-                              organizationsInvolved:
-                                prev.organizationsInvolved.filter(
-                                  (oid) => oid !== id
-                                ),
-                            }))
-                          }
-                        >
-                          {getOrganizationName(id)} ×
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <MultiSelect
+                  label="Facções Envolvidas"
+                  placeholder="Selecionar facções"
+                  emptyText="Nenhuma facção cadastrada"
+                  noSelectionText="Nenhuma facção selecionada"
+                  searchPlaceholder="Buscar facção..."
+                  options={factions}
+                  value={newEvent.factionsInvolved}
+                  onChange={(value) =>
+                    setNewEvent((prev) => ({
+                      ...prev,
+                      factionsInvolved: value,
+                    }))
+                  }
+                />
+
+                <MultiSelect
+                  label="Raças Envolvidas"
+                  placeholder="Selecionar raças"
+                  emptyText="Nenhuma raça cadastrada"
+                  noSelectionText="Nenhuma raça selecionada"
+                  searchPlaceholder="Buscar raça..."
+                  options={races}
+                  value={newEvent.racesInvolved}
+                  onChange={(value) =>
+                    setNewEvent((prev) => ({
+                      ...prev,
+                      racesInvolved: value,
+                    }))
+                  }
+                />
+
+                <MultiSelect
+                  label="Itens Envolvidos"
+                  placeholder="Selecionar itens"
+                  emptyText="Nenhum item cadastrado"
+                  noSelectionText="Nenhum item selecionado"
+                  searchPlaceholder="Buscar item..."
+                  options={items}
+                  value={newEvent.itemsInvolved}
+                  onChange={(value) =>
+                    setNewEvent((prev) => ({
+                      ...prev,
+                      itemsInvolved: value,
+                    }))
+                  }
+                />
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button
@@ -902,7 +845,8 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   >
                     Cancelar
                   </Button>
-                  <Button onClick={handleUpdateEvent} className="btn-magical">
+                  <Button onClick={handleUpdateEvent} variant="magical"
+              className="animate-glow">
                     Salvar Alterações
                   </Button>
                 </div>
@@ -947,16 +891,48 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   </div>
                 )}
 
-                {selectedEvent.organizationsInvolved.length > 0 && (
+                {selectedEvent.factionsInvolved.length > 0 && (
                   <div>
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                       <Building className="w-4 h-4" />
-                      Organizações Envolvidas
+                      Facções Envolvidas
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedEvent.organizationsInvolved.map((id) => (
-                        <Badge key={id} variant="outline">
-                          {getOrganizationName(id)}
+                      {selectedEvent.factionsInvolved.map((id) => (
+                        <Badge key={id} variant="secondary">
+                          {getFactionName(id)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEvent.racesInvolved.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Swords className="w-4 h-4" />
+                      Raças Envolvidas
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEvent.racesInvolved.map((id) => (
+                        <Badge key={id} variant="secondary">
+                          {getRaceName(id)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEvent.itemsInvolved.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Package className="w-4 h-4" />
+                      Itens Envolvidos
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEvent.itemsInvolved.map((id) => (
+                        <Badge key={id} variant="secondary">
+                          {getItemName(id)}
                         </Badge>
                       ))}
                     </div>
@@ -999,8 +975,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                 onChange={(e) =>
                   setNewEra((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="Ex: Era dos Primórdios"
+                placeholder="Era dos Primórdios"
+                maxLength={200}
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{newEra.name.length}/200</span>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -1014,9 +994,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                     description: e.target.value,
                   }))
                 }
-                placeholder="Breve descrição da era (máximo 2 linhas)"
+                placeholder="Um tempo de trevas e descobertas, onde as primeiras civilizações começaram a surgir das cinzas do caos"
                 rows={2}
+                maxLength={500}
+                className="resize-none"
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{newEra.description.length}/500</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1031,8 +1016,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       startDate: e.target.value,
                     }))
                   }
-                  placeholder="Ex: 0 EP"
+                  placeholder="0 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEra.startDate.length}/50</span>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="era-end">Fim</Label>
@@ -1042,8 +1031,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   onChange={(e) =>
                     setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
                   }
-                  placeholder="Ex: 1000 EP"
+                  placeholder="1000 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEra.endDate.length}/50</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1055,7 +1048,11 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
             >
               Cancelar
             </Button>
-            <Button onClick={handleCreateEra} className="btn-magical">
+            <Button
+              onClick={handleCreateEra}
+              variant="magical"
+              className="animate-glow"
+            >
               Criar Era
             </Button>
           </div>
@@ -1065,9 +1062,26 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
       {/* Create Event Modal */}
       <Dialog
         open={showCreateEventModal}
-        onOpenChange={setShowCreateEventModal}
+        onOpenChange={(open) => {
+          setShowCreateEventModal(open);
+          if (!open) {
+            // Reset form when closing
+            setNewEvent({
+              name: "",
+              description: "",
+              reason: "",
+              outcome: "",
+              startDate: "",
+              endDate: "",
+              charactersInvolved: [],
+              factionsInvolved: [],
+              racesInvolved: [],
+              itemsInvolved: [],
+            });
+          }
+        }}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Novo Evento</DialogTitle>
             <DialogDescription>
@@ -1075,7 +1089,7 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="event-name">Nome do Evento *</Label>
               <Input
@@ -1084,28 +1098,16 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                 onChange={(e) =>
                   setNewEvent((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="Ex: A Grande Convergência"
+                placeholder="A Grande Convergência"
+                maxLength={200}
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{newEvent.name.length}/200</span>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="event-short-desc">Descrição Resumida *</Label>
-              <Textarea
-                id="event-short-desc"
-                value={newEvent.shortDescription}
-                onChange={(e) =>
-                  setNewEvent((prev) => ({
-                    ...prev,
-                    shortDescription: e.target.value,
-                  }))
-                }
-                placeholder="Descrição breve que aparece no card da timeline"
-                rows={2}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="event-desc">Descrição Completa</Label>
+              <Label htmlFor="event-desc">Descrição *</Label>
               <Textarea
                 id="event-desc"
                 value={newEvent.description}
@@ -1115,9 +1117,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                     description: e.target.value,
                   }))
                 }
-                placeholder="Descrição detalhada que aparece no modal"
-                rows={3}
+                placeholder="Durante três noites, o céu ficou vermelho e as cinco luas do planeta se alinharam pela primeira vez em mil anos. Portais se abriram trazendo criaturas de outros planos"
+                rows={4}
+                maxLength={500}
+                className="resize-none"
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{newEvent.description.length}/500</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1129,9 +1136,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   onChange={(e) =>
                     setNewEvent((prev) => ({ ...prev, reason: e.target.value }))
                   }
-                  placeholder="Por que aconteceu?"
+                  placeholder="O ritual proibido realizado pelos magos do Conselho Cinzento rompeu o véu entre os planos"
                   rows={2}
+                  maxLength={500}
+                  className="resize-none"
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEvent.reason.length}/500</span>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="event-outcome">Como Terminou</Label>
@@ -1144,9 +1156,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       outcome: e.target.value,
                     }))
                   }
-                  placeholder="Qual foi o resultado?"
+                  placeholder="Os heróis conseguiram fechar os portais, mas não antes de metade da cidade ser destruída"
                   rows={2}
+                  maxLength={500}
+                  className="resize-none"
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEvent.outcome.length}/500</span>
+                </div>
               </div>
             </div>
 
@@ -1162,8 +1179,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       startDate: e.target.value,
                     }))
                   }
-                  placeholder="Ex: 50 EP"
+                  placeholder="50 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEvent.startDate.length}/50</span>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="event-end">Data Fim</Label>
@@ -1176,110 +1197,78 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       endDate: e.target.value,
                     }))
                   }
-                  placeholder="Ex: 52 EP"
+                  placeholder="52 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{newEvent.endDate.length}/50</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="event-characters">Personagens Envolvidos</Label>
-              <Select
-                value=""
-                onValueChange={(value) => {
-                  if (!newEvent.charactersInvolved.includes(value)) {
-                    setNewEvent((prev) => ({
-                      ...prev,
-                      charactersInvolved: [...prev.charactersInvolved, value],
-                    }));
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar personagens" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockCharacters.map((char) => (
-                    <SelectItem key={char.id} value={char.id}>
-                      {char.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {newEvent.charactersInvolved.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {newEvent.charactersInvolved.map((id) => (
-                    <Badge
-                      key={id}
-                      variant="secondary"
-                      className="cursor-pointer"
-                      onClick={() =>
-                        setNewEvent((prev) => ({
-                          ...prev,
-                          charactersInvolved: prev.charactersInvolved.filter(
-                            (cid) => cid !== id
-                          ),
-                        }))
-                      }
-                    >
-                      {getCharacterName(id)} ×
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
+            <MultiSelect
+              label="Personagens Envolvidos"
+              placeholder="Selecionar personagens"
+              emptyText="Nenhum personagem cadastrado"
+              noSelectionText="Nenhum personagem selecionado"
+              searchPlaceholder="Buscar personagem..."
+              options={characters}
+              value={newEvent.charactersInvolved}
+              onChange={(value) =>
+                setNewEvent((prev) => ({
+                  ...prev,
+                  charactersInvolved: value,
+                }))
+              }
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="event-organizations">
-                Organizações Envolvidas
-              </Label>
-              <Select
-                value=""
-                onValueChange={(value) => {
-                  if (!newEvent.organizationsInvolved.includes(value)) {
-                    setNewEvent((prev) => ({
-                      ...prev,
-                      organizationsInvolved: [
-                        ...prev.organizationsInvolved,
-                        value,
-                      ],
-                    }));
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar organizações" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockFactions.map((org) => (
-                    <SelectItem key={org.id} value={org.id}>
-                      {org.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {newEvent.organizationsInvolved.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {newEvent.organizationsInvolved.map((id) => (
-                    <Badge
-                      key={id}
-                      variant="outline"
-                      className="cursor-pointer"
-                      onClick={() =>
-                        setNewEvent((prev) => ({
-                          ...prev,
-                          organizationsInvolved:
-                            prev.organizationsInvolved.filter(
-                              (oid) => oid !== id
-                            ),
-                        }))
-                      }
-                    >
-                      {getOrganizationName(id)} ×
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
+            <MultiSelect
+              label="Facções Envolvidas"
+              placeholder="Selecionar facções"
+              emptyText="Nenhuma facção cadastrada"
+              noSelectionText="Nenhuma facção selecionada"
+              searchPlaceholder="Buscar facção..."
+              options={factions}
+              value={newEvent.factionsInvolved}
+              onChange={(value) =>
+                setNewEvent((prev) => ({
+                  ...prev,
+                  factionsInvolved: value,
+                }))
+              }
+            />
+
+            <MultiSelect
+              label="Raças Envolvidas"
+              placeholder="Selecionar raças"
+              emptyText="Nenhuma raça cadastrada"
+              noSelectionText="Nenhuma raça selecionada"
+              searchPlaceholder="Buscar raça..."
+              options={races}
+              value={newEvent.racesInvolved}
+              onChange={(value) =>
+                setNewEvent((prev) => ({
+                  ...prev,
+                  racesInvolved: value,
+                }))
+              }
+            />
+
+            <MultiSelect
+              label="Itens Envolvidos"
+              placeholder="Selecionar itens"
+              emptyText="Nenhum item cadastrado"
+              noSelectionText="Nenhum item selecionado"
+              searchPlaceholder="Buscar item..."
+              options={items}
+              value={newEvent.itemsInvolved}
+              onChange={(value) =>
+                setNewEvent((prev) => ({
+                  ...prev,
+                  itemsInvolved: value,
+                }))
+              }
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
@@ -1289,7 +1278,8 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
             >
               Cancelar
             </Button>
-            <Button onClick={handleCreateEvent} className="btn-magical">
+            <Button onClick={handleCreateEvent} variant="magical"
+              className="animate-glow">
               Criar Evento
             </Button>
           </div>
@@ -1315,8 +1305,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                 onChange={(e) =>
                   setEditEra((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="Ex: Era dos Primórdios"
+                placeholder="Era dos Primórdios"
+                maxLength={200}
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editEra.name.length}/200</span>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -1330,9 +1324,14 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                     description: e.target.value,
                   }))
                 }
-                placeholder="Breve descrição da era (máximo 2 linhas)"
+                placeholder="Um tempo de trevas e descobertas, onde as primeiras civilizações começaram a surgir das cinzas do caos"
                 rows={2}
+                maxLength={500}
+                className="resize-none"
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editEra.description.length}/500</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1347,8 +1346,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                       startDate: e.target.value,
                     }))
                   }
-                  placeholder="Ex: 0 EP"
+                  placeholder="0 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editEra.startDate.length}/50</span>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-era-end">Fim</Label>
@@ -1358,8 +1361,12 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
                   onChange={(e) =>
                     setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
                   }
-                  placeholder="Ex: 1000 EP"
+                  placeholder="1000 EP"
+                  maxLength={50}
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editEra.endDate.length}/50</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1371,12 +1378,13 @@ export function WorldTimeline({ worldType, isEditing }: PropsWorldTimeline) {
             >
               Cancelar
             </Button>
-            <Button onClick={handleUpdateEra} className="btn-magical">
+            <Button onClick={handleUpdateEra} variant="magical"
+              className="animate-glow">
               Salvar Alterações
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   );
 }

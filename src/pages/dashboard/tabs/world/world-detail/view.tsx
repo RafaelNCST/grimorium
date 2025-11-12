@@ -3,7 +3,7 @@ import { MapPin } from "lucide-react";
 import { LinkedNotesModal } from "@/components/annotations/linked-notes-modal";
 import { ConfirmDeleteModal } from "@/components/modals/confirm-delete-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WorldTimeline } from "@/components/world-timeline";
+// import { WorldTimeline } from "@/components/world-timeline"; // TODO: Implementar timeline para mundo/continente
 
 import { BasicInfoCard } from "./components/basic-info-card";
 import { EntityHeader } from "./components/entity-header";
@@ -151,7 +151,8 @@ export function WorldDetailView({
           </div>
         )}
 
-        <div className="mt-8">
+        {/* TODO: Implementar timeline para mundo/continente */}
+        {/* <div className="mt-8">
           <Card>
             <CardHeader>
               <CardTitle>Timeline de Eventos</CardTitle>
@@ -164,7 +165,7 @@ export function WorldDetailView({
               />
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
 
       <ConfirmDeleteModal

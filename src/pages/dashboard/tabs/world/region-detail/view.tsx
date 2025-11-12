@@ -44,6 +44,8 @@ import { REGION_SEASONS } from "@/components/modals/create-region-modal/constant
 
 import { DeleteRegionConfirmationDialog } from "../components/delete-region-confirmation-dialog";
 import { VersionManager } from "./components/version-manager";
+import { RegionTimeline } from "./components/region-timeline";
+import { type ITimelineEra } from "@/lib/db/regions.service";
 
 interface RegionDetailViewProps {
   region: IRegion;
@@ -63,6 +65,9 @@ interface RegionDetailViewProps {
   factions: Array<{ id: string; name: string; image?: string }>;
   races: Array<{ id: string; name: string; image?: string }>;
   items: Array<{ id: string; name: string; image?: string }>;
+  // Timeline
+  timeline: ITimelineEra[];
+  onTimelineChange: (timeline: ITimelineEra[]) => void;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -114,6 +119,8 @@ export function RegionDetailView({
   factions,
   races,
   items,
+  timeline,
+  onTimelineChange,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -1266,6 +1273,25 @@ export function RegionDetailView({
                   </CollapsibleContent>
                 </Card>
               </Collapsible>
+
+              {/* Timeline Section - Separate from Advanced */}
+              <Card className="card-magical">
+                <CardHeader>
+                  <CardTitle>Linha do Tempo da Região</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RegionTimeline
+                    regionId={region.id}
+                    isEditing={isEditing}
+                    timeline={timeline}
+                    onTimelineChange={onTimelineChange}
+                    characters={characters}
+                    factions={factions}
+                    races={races}
+                    items={items}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Sidebar - Versions - 1 column */}

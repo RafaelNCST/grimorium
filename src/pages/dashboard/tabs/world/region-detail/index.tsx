@@ -13,7 +13,10 @@ import {
   createRegionVersion,
   deleteRegionVersion,
   updateRegionVersion,
+  getRegionTimeline,
+  saveRegionTimeline,
   type IRegionVersion,
+  type ITimelineEra,
 } from "@/lib/db/regions.service";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
@@ -77,9 +80,16 @@ export function RegionDetail() {
   const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
   const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
 
+  // Timeline state
+  const [timeline, setTimeline] = useState<ITimelineEra[]>([]);
+  const [originalTimeline, setOriginalTimeline] = useState<ITimelineEra[]>([]);
+
   // Check if there are changes between region and editData
   const hasChanges = useMemo(() => {
     if (!isEditing) return false;
+
+    // Check if timeline has changed
+    if (JSON.stringify(timeline) !== JSON.stringify(originalTimeline)) return true;
 
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
     const arraysEqual = (a: unknown[] | undefined, b: unknown[] | undefined): boolean => {
@@ -167,7 +177,7 @@ export function RegionDetail() {
     if (!arraysEqual(regionInspirations, editInspirations)) return true;
 
     return false;
-  }, [region, editData, isEditing]);
+  }, [region, editData, isEditing, timeline, originalTimeline]);
 
   // Load region from database
   useEffect(() => {
@@ -251,6 +261,11 @@ export function RegionDetail() {
               name: item.name,
               image: item.image
             })));
+
+            // Load timeline
+            const timelineData = await getRegionTimeline(regionId);
+            setTimeline(timelineData);
+            setOriginalTimeline(timelineData);
           }
         }
       } catch (error) {
@@ -401,13 +416,19 @@ export function RegionDetail() {
         image: updatedRegion.image,
       });
 
+      // Save timeline
+      await saveRegionTimeline(regionId, timeline);
+
+      // Update original timeline after successful save
+      setOriginalTimeline(timeline);
+
       setIsEditing(false);
       toast.success("Região atualizada com sucesso!");
     } catch (error) {
       console.error("Error saving region:", error);
       toast.error("Erro ao salvar região");
     }
-  }, [editData, versions, currentVersion, regionId]);
+  }, [editData, versions, currentVersion, regionId, timeline]);
 
   const navigateToWorldTab = useCallback(() => {
     if (!dashboardId) return;
@@ -455,8 +476,9 @@ export function RegionDetail() {
 
   const handleCancel = useCallback(() => {
     setEditData(region);
+    setTimeline(originalTimeline);
     setIsEditing(false);
-  }, [region]);
+  }, [region, originalTimeline]);
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -511,6 +533,10 @@ export function RegionDetail() {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
 
+  const handleTimelineChange = useCallback((newTimeline: ITimelineEra[]) => {
+    setTimeline(newTimeline);
+  }, []);
+
   return (
     <RegionDetailView
       region={region}
@@ -529,6 +555,8 @@ export function RegionDetail() {
       factions={factions}
       races={races}
       items={items}
+      timeline={timeline}
+      onTimelineChange={handleTimelineChange}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}

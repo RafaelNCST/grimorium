@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Form,
   FormControl,
@@ -32,7 +33,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import { IRegion, RegionScale, RegionSeason, IRegionFormData } from "@/pages/dashboard/tabs/world/types/region-types";
-import { ImagePlus, X, Map } from "lucide-react";
+import { ImagePlus, X, Map, Info } from "lucide-react";
 import { AdvancedSection } from "./create-region-modal/components/advanced-section";
 import { SeasonPicker } from "./create-region-modal/components/season-picker";
 import { ListInput } from "./create-region-modal/components/list-input";
@@ -252,6 +253,14 @@ export function CreateRegionModal({
             {t("description")}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Important Note Alert */}
+        <Alert className="bg-primary/5 border-primary/20">
+          <Info className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-sm">
+            Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.
+          </AlertDescription>
+        </Alert>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">

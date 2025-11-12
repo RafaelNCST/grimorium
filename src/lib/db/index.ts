@@ -448,6 +448,33 @@ async function runMigrations(database: Database): Promise<void> {
       created_at TEXT NOT NULL
     );
 
+    -- LINHA DO TEMPO DE REGIÕES - ERAS
+    CREATE TABLE IF NOT EXISTS region_timeline_eras (
+      id TEXT PRIMARY KEY,
+      region_id TEXT NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL
+    );
+
+    -- LINHA DO TEMPO DE REGIÕES - EVENTOS
+    CREATE TABLE IF NOT EXISTS region_timeline_events (
+      id TEXT PRIMARY KEY,
+      era_id TEXT NOT NULL REFERENCES region_timeline_eras(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      short_description TEXT,
+      reason TEXT,
+      outcome TEXT,
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL,
+      characters_involved TEXT,
+      factions_involved TEXT,
+      races_involved TEXT,
+      items_involved TEXT
+    );
+
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
     CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
@@ -487,6 +514,8 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
     CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
     CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
+    CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id);
+    CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id);
   `;
 
     await database.execute(schema);

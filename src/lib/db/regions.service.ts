@@ -577,3 +577,156 @@ export async function moveRegion(
     [newParentId, orderIndex, now, regionId]
   );
 }
+
+/**
+ * Region Timeline Types
+ */
+export interface ITimelineEvent {
+  id: string;
+  name: string;
+  description: string;
+  reason: string;
+  outcome: string;
+  startDate: string;
+  endDate: string;
+  charactersInvolved: string[];
+  factionsInvolved: string[];
+  racesInvolved: string[];
+  itemsInvolved: string[];
+}
+
+export interface ITimelineEra {
+  id: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  events: ITimelineEvent[];
+}
+
+interface DBTimelineEvent {
+  id: string;
+  era_id: string;
+  name: string;
+  description: string;
+  reason: string;
+  outcome: string;
+  start_date: string;
+  end_date: string;
+  characters_involved: string;
+  factions_involved: string;
+  races_involved: string;
+  items_involved: string;
+}
+
+interface DBTimelineEra {
+  id: string;
+  region_id: string;
+  name: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+}
+
+/**
+ * Get timeline for a region
+ */
+export async function getRegionTimeline(
+  regionId: string
+): Promise<ITimelineEra[]> {
+  const db = await getDB();
+
+  // Get all eras for this region
+  const erasResult = await db.select<DBTimelineEra[]>(
+    "SELECT * FROM region_timeline_eras WHERE region_id = $1 ORDER BY start_date ASC",
+    [regionId]
+  );
+
+  // Get all events for all eras
+  const timeline: ITimelineEra[] = [];
+
+  for (const dbEra of erasResult) {
+    const eventsResult = await db.select<DBTimelineEvent[]>(
+      "SELECT * FROM region_timeline_events WHERE era_id = $1 ORDER BY start_date ASC",
+      [dbEra.id]
+    );
+
+    const events: ITimelineEvent[] = eventsResult.map((dbEvent) => ({
+      id: dbEvent.id,
+      name: dbEvent.name,
+      description: dbEvent.description,
+      reason: dbEvent.reason,
+      outcome: dbEvent.outcome,
+      startDate: dbEvent.start_date,
+      endDate: dbEvent.end_date,
+      charactersInvolved: JSON.parse(dbEvent.characters_involved || "[]"),
+      factionsInvolved: JSON.parse(dbEvent.factions_involved || "[]"),
+      racesInvolved: JSON.parse(dbEvent.races_involved || "[]"),
+      itemsInvolved: JSON.parse(dbEvent.items_involved || "[]"),
+    }));
+
+    timeline.push({
+      id: dbEra.id,
+      name: dbEra.name,
+      description: dbEra.description,
+      startDate: dbEra.start_date,
+      endDate: dbEra.end_date,
+      events,
+    });
+  }
+
+  return timeline;
+}
+
+/**
+ * Save complete timeline for a region (replaces existing timeline)
+ */
+export async function saveRegionTimeline(
+  regionId: string,
+  timeline: ITimelineEra[]
+): Promise<void> {
+  const db = await getDB();
+
+  // Delete existing timeline
+  await db.execute("DELETE FROM region_timeline_eras WHERE region_id = $1", [regionId]);
+  // Events will be cascade deleted
+
+  // Insert new eras and events
+  for (const era of timeline) {
+    await db.execute(
+      `INSERT INTO region_timeline_eras (
+        id, region_id, name, description, start_date, end_date
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6
+      )`,
+      [era.id, regionId, era.name, era.description, era.startDate, era.endDate]
+    );
+
+    // Insert events for this era
+    for (const event of era.events) {
+      await db.execute(
+        `INSERT INTO region_timeline_events (
+          id, era_id, name, description, reason, outcome,
+          start_date, end_date, characters_involved, factions_involved,
+          races_involved, items_involved
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+        )`,
+        [
+          event.id,
+          era.id,
+          event.name,
+          event.description,
+          event.reason,
+          event.outcome,
+          event.startDate,
+          event.endDate,
+          JSON.stringify(event.charactersInvolved),
+          JSON.stringify(event.factionsInvolved),
+          JSON.stringify(event.racesInvolved),
+          JSON.stringify(event.itemsInvolved),
+        ]
+      );
+    }
+  }
+}
