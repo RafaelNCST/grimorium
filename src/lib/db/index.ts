@@ -540,6 +540,7 @@ async function runMigrations(database: Database): Promise<void> {
       position_y INTEGER NOT NULL,
       color TEXT DEFAULT '#8b5cf6',
       show_label INTEGER DEFAULT 1,
+      scale REAL DEFAULT 1.0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       FOREIGN KEY (map_id) REFERENCES region_maps(id) ON DELETE CASCADE,
@@ -696,6 +697,7 @@ async function runMigrations(database: Database): Promise<void> {
             position_y INTEGER NOT NULL,
             color TEXT DEFAULT '#8b5cf6',
             show_label INTEGER DEFAULT 1,
+            scale REAL DEFAULT 1.0,
             created_at INTEGER NOT NULL,
             updated_at INTEGER NOT NULL,
             FOREIGN KEY (map_id) REFERENCES region_maps(id) ON DELETE CASCADE,
@@ -707,8 +709,8 @@ async function runMigrations(database: Database): Promise<void> {
 
         // Copy existing markers, linking them to main version maps (version_id = NULL)
         await database.execute(`
-          INSERT INTO region_map_markers_new (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, created_at, updated_at)
-          SELECT m.id, rm.id, m.parent_region_id, m.child_region_id, m.position_x, m.position_y, m.color, m.show_label, m.created_at, m.updated_at
+          INSERT INTO region_map_markers_new (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
+          SELECT m.id, rm.id, m.parent_region_id, m.child_region_id, m.position_x, m.position_y, m.color, m.show_label, 1.0, m.created_at, m.updated_at
           FROM region_map_markers m
           JOIN region_maps rm ON rm.region_id = m.parent_region_id AND rm.version_id IS NULL
         `);
@@ -730,6 +732,14 @@ async function runMigrations(database: Database): Promise<void> {
       }
     } catch (error) {
       console.log("[db] Markers migration error or already migrated:", error);
+    }
+
+    // Add scale column to region_map_markers table
+    try {
+      await database.execute("ALTER TABLE region_map_markers ADD COLUMN scale REAL DEFAULT 1.0");
+      console.log("[db] Added scale column to region_map_markers table");
+    } catch (error) {
+      // Column already exists - safe to ignore
     }
 
     // Add advanced fields to regions table

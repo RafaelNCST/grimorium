@@ -22,6 +22,7 @@ export interface IRegionMapMarker {
   positionY: number;
   color: string;
   showLabel: boolean;
+  scale: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -50,6 +51,7 @@ interface DBRegionMapMarker {
   position_y: number;
   color: string;
   show_label: number;
+  scale: number;
   created_at: number;
   updated_at: number;
 }
@@ -81,6 +83,7 @@ function dbMarkerToMarker(dbMarker: DBRegionMapMarker): IRegionMapMarker {
     positionY: dbMarker.position_y,
     color: dbMarker.color || '#8b5cf6',
     showLabel: dbMarker.show_label === 1,
+    scale: dbMarker.scale || 1.0,
     createdAt: dbMarker.created_at,
     updatedAt: dbMarker.updated_at,
   };
@@ -262,7 +265,8 @@ export async function addMarker(
   x: number,
   y: number,
   color: string = '#8b5cf6',
-  showLabel: boolean = true
+  showLabel: boolean = true,
+  scale: number = 1.0
 ): Promise<IRegionMapMarker> {
   const db = await getDB();
   const now = Date.now();
@@ -277,14 +281,15 @@ export async function addMarker(
     positionY: Math.round(y),
     color,
     showLabel,
+    scale,
     createdAt: now,
     updatedAt: now,
   };
 
   await db.execute(
-    `INSERT INTO region_map_markers (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-    [id, mapId, parentRegionId, childRegionId, Math.round(x), Math.round(y), color, showLabel ? 1 : 0, now, now]
+    `INSERT INTO region_map_markers (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    [id, mapId, parentRegionId, childRegionId, Math.round(x), Math.round(y), color, showLabel ? 1 : 0, scale, now, now]
   );
 
   return newMarker;
@@ -336,6 +341,22 @@ export async function updateMarkerLabelVisibility(
   await db.execute(
     `UPDATE region_map_markers SET show_label = $1, updated_at = $2 WHERE id = $3`,
     [showLabel ? 1 : 0, now, markerId]
+  );
+}
+
+/**
+ * Update marker scale
+ */
+export async function updateMarkerScale(
+  markerId: string,
+  scale: number
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+
+  await db.execute(
+    `UPDATE region_map_markers SET scale = $1, updated_at = $2 WHERE id = $3`,
+    [scale, now, markerId]
   );
 }
 

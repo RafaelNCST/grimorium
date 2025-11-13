@@ -17,6 +17,7 @@ import {
   updateMarkerPosition,
   updateMarkerColor,
   updateMarkerLabelVisibility,
+  updateMarkerScale,
   removeMarker,
   uploadMapImage,
   IRegionMapMarker,
@@ -360,6 +361,23 @@ export function RegionMapPage() {
     }
   };
 
+  const handleMarkerScaleChange = async (markerId: string, scale: number) => {
+    try {
+      await updateMarkerScale(markerId, scale);
+      setMarkers((prev) =>
+        prev.map((m) => (m.id === markerId ? { ...m, scale } : m))
+      );
+    } catch (error) {
+      console.error("Failed to update marker scale:", error);
+      toast({
+        title: "Erro ao redimensionar marcador",
+        description:
+          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const selectedMarker = markers.find((m) => m.id === selectedMarkerId);
   const selectedRegion = selectedMarker
     ? childrenRegions.find((r) => r.id === selectedMarker.childRegionId)
@@ -461,6 +479,7 @@ export function RegionMapPage() {
             onMarkerClick={handleMarkerClick}
             onMapClick={handleMapClick}
             onMarkerDragEnd={handleMarkerDragEnd}
+            onMarkerScaleChange={handleMarkerScaleChange}
           />
         ) : (
           <MapImageUploader regionId={regionId} versionId={versionId} onUploadComplete={handleUploadComplete} />

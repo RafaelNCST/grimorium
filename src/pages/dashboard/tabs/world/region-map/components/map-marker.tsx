@@ -14,8 +14,10 @@ interface MapMarkerProps {
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   onMouseDown?: (e: React.MouseEvent) => void;
-  scale?: number;
+  markerScale?: number; // Custom marker scale from database
+  zoomScale?: number; // Current zoom scale of the canvas
   style?: React.CSSProperties;
+  onResize?: (newScale: number) => void;
 }
 
 export function MapMarker({
@@ -30,17 +32,55 @@ export function MapMarker({
   onDragStart,
   onDragEnd,
   onMouseDown,
-  scale = 1,
+  markerScale = 1,
+  zoomScale = 1,
   style,
+  onResize,
 }: MapMarkerProps) {
-  const markerSize = 32 / scale; // Adjust size based on zoom
-  const pinSize = 20 / scale;
+  // Base marker size
+  const baseMarkerSize = 32;
+  const basePinSize = 20;
+  const baseFontSize = 12;
+
+  // Apply both custom scale and inverse zoom scale to maintain consistent visual size
+  const markerSize = (baseMarkerSize * markerScale) / zoomScale;
+  const pinSize = (basePinSize * markerScale) / zoomScale;
+  const fontSize = (baseFontSize * markerScale) / zoomScale;
+
+  // Calculate label dimensions for wrapper sizing
+  const labelPaddingX = 8 / zoomScale; // px-2 = 8px horizontal padding
+  const labelPaddingY = 4 / zoomScale; // py-1 = 4px vertical padding
+  const labelSpacing = showLabel ? 4 / zoomScale : 0; // mt-1 equivalent
+  const borderWidth = 1 / zoomScale; // border width
+  const borderRadius = 6 / zoomScale; // rounded-md equivalent
+
+  // Estimate label width based on text length and font size
+  // Average character width is approximately 0.7 of the font size for most fonts (increased for safety)
+  const estimatedLabelWidth = showLabel
+    ? (region.name.length * fontSize * 0.7) + (labelPaddingX * 2) + (borderWidth * 2)
+    : 0;
+
+  const labelHeight = showLabel
+    ? fontSize + (labelPaddingY * 2) + (borderWidth * 2) + (2 / zoomScale) // font size + padding + borders + extra space
+    : 0;
+
+  // Selection wrapper size (includes marker and label if shown)
+  // Increased padding from 12 to 16 for more breathing room, especially at high zoom
+  const wrapperPadding = 16 / zoomScale;
+  const wrapperWidth = Math.max(markerSize, estimatedLabelWidth) + (wrapperPadding * 2);
+  const wrapperHeight = markerSize + labelSpacing + labelHeight + (wrapperPadding * 2);
+
+  // Handle size for resize corners
+  const handleSize = 8 / zoomScale;
+
+  // Wrapper positioning to center it
+  const wrapperLeft = -(wrapperWidth / 2) + (markerSize / 2);
 
   return (
     <div
       data-marker="true"
       className={cn(
-        "absolute transition-transform hover:scale-110",
+        "absolute transition-none",
         isSelected && "z-50"
       )}
       style={{
@@ -55,12 +95,35 @@ export function MapMarker({
       onMouseDown={onMouseDown}
       draggable={false}
     >
+      {/* Expanded clickable area when selected - invisible but captures events */}
+      {isSelected && (
+        <div
+          className="absolute pointer-events-auto"
+          style={{
+            left: `${wrapperLeft}px`,
+            top: `${-wrapperPadding}px`,
+            width: `${wrapperWidth}px`,
+            height: `${wrapperHeight}px`,
+          }}
+        />
+      )}
+
+      {/* Selection wrapper - shown when selected */}
+      {isSelected && (
+        <div
+          className="absolute border-2 border-white pointer-events-none"
+          style={{
+            left: `${wrapperLeft}px`,
+            top: `${-wrapperPadding}px`,
+            width: `${wrapperWidth}px`,
+            height: `${wrapperHeight}px`,
+          }}
+        />
+      )}
+
       <div className="relative">
         <div
-          className={cn(
-            "rounded-full flex items-center justify-center shadow-lg transition-all",
-            isSelected && "shadow-[0_0_30px_rgba(255,255,255,1),0_0_15px_rgba(255,255,255,0.8)]"
-          )}
+          className="rounded-full flex items-center justify-center shadow-lg transition-colors"
           style={{
             width: `${markerSize}px`,
             height: `${markerSize}px`,
@@ -81,15 +144,76 @@ export function MapMarker({
         {/* Region name label */}
         {showLabel && (
           <div
-            className="absolute left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap bg-background/95 backdrop-blur-sm border rounded-md px-2 py-1 shadow-lg pointer-events-none"
+            className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap bg-background/95 backdrop-blur-sm shadow-lg pointer-events-none"
             style={{
-              fontSize: `${12 / scale}px`,
+              fontSize: `${fontSize}px`,
+              marginTop: `${labelSpacing}px`,
+              paddingLeft: `${labelPaddingX}px`,
+              paddingRight: `${labelPaddingX}px`,
+              paddingTop: `${labelPaddingY}px`,
+              paddingBottom: `${labelPaddingY}px`,
+              borderWidth: `${borderWidth}px`,
+              borderRadius: `${borderRadius}px`,
+              borderColor: 'hsl(var(--border))',
             }}
           >
-            <span className="text-xs font-medium">{region.name}</span>
+            <span className="font-medium">{region.name}</span>
           </div>
         )}
       </div>
+
+      {/* Resize handles - only shown when selected */}
+      {isSelected && onResize && (
+        <>
+          {/* Top-left handle */}
+          <div
+            className="absolute bg-blue-500 border border-white cursor-nwse-resize"
+            style={{
+              left: `${wrapperLeft - handleSize / 2}px`,
+              top: `${-wrapperPadding - handleSize / 2}px`,
+              width: `${handleSize}px`,
+              height: `${handleSize}px`,
+            }}
+            data-handle="nw"
+          />
+
+          {/* Top-right handle */}
+          <div
+            className="absolute bg-blue-500 border border-white cursor-nesw-resize"
+            style={{
+              left: `${wrapperLeft + wrapperWidth - handleSize / 2}px`,
+              top: `${-wrapperPadding - handleSize / 2}px`,
+              width: `${handleSize}px`,
+              height: `${handleSize}px`,
+            }}
+            data-handle="ne"
+          />
+
+          {/* Bottom-left handle */}
+          <div
+            className="absolute bg-blue-500 border border-white cursor-nesw-resize"
+            style={{
+              left: `${wrapperLeft - handleSize / 2}px`,
+              top: `${-wrapperPadding + wrapperHeight - handleSize / 2}px`,
+              width: `${handleSize}px`,
+              height: `${handleSize}px`,
+            }}
+            data-handle="sw"
+          />
+
+          {/* Bottom-right handle */}
+          <div
+            className="absolute bg-blue-500 border border-white cursor-nwse-resize"
+            style={{
+              left: `${wrapperLeft + wrapperWidth - handleSize / 2}px`,
+              top: `${-wrapperPadding + wrapperHeight - handleSize / 2}px`,
+              width: `${handleSize}px`,
+              height: `${handleSize}px`,
+            }}
+            data-handle="se"
+          />
+        </>
+      )}
     </div>
   );
 }
