@@ -195,6 +195,9 @@ export function RegionDetail() {
           // Load versions from database
           const versionsFromDB = await getRegionVersions(regionId);
 
+          // Prepare versions list
+          let updatedVersions: IRegionVersion[] = [];
+
           // If no versions exist, create main version
           if (versionsFromDB.length === 0) {
             const mainVersion: IRegionVersion = {
@@ -207,6 +210,7 @@ export function RegionDetail() {
             };
 
             await createRegionVersion(regionId, mainVersion);
+            updatedVersions = [mainVersion];
             setVersions([mainVersion]);
             setCurrentVersion(mainVersion);
 
@@ -216,7 +220,7 @@ export function RegionDetail() {
             setImagePreview(regionFromDB.image || "");
           } else {
             // Update main version with loaded data
-            const updatedVersions = versionsFromDB.map((v) =>
+            updatedVersions = versionsFromDB.map((v) =>
               v.isMain
                 ? {
                     ...v,
@@ -226,30 +230,6 @@ export function RegionDetail() {
             );
             setVersions(updatedVersions);
 
-            // Set current version based on URL parameter or default to main
-            let selectedVersion: IRegionVersion | undefined;
-
-            if (versionIdFromUrl) {
-              selectedVersion = updatedVersions.find((v) => v.id === versionIdFromUrl);
-              if (!selectedVersion) {
-                selectedVersion = updatedVersions.find((v) => v.isMain);
-              }
-            } else {
-              selectedVersion = updatedVersions.find((v) => v.isMain);
-            }
-
-            if (selectedVersion) {
-              setCurrentVersion(selectedVersion);
-              // Set region data from selected version to avoid visual flicker
-              setRegion(selectedVersion.regionData);
-              setEditData(selectedVersion.regionData);
-              setImagePreview(selectedVersion.regionData.image || "");
-
-              // Load timeline for this version
-              const timelineData = await getRegionVersionTimeline(selectedVersion.id);
-              setTimeline(timelineData);
-              setOriginalTimeline(timelineData);
-            }
           }
 
           // Load all regions from the same book
@@ -288,6 +268,127 @@ export function RegionDetail() {
               name: item.name,
               image: item.image
             })));
+
+            // Clean orphaned IDs from all versions BEFORE setting state
+            const characterIds = new Set(charactersData.map(c => c.id));
+            const factionIds = new Set(factionsData.map(f => f.id));
+            const raceIds = new Set(racesData.map(r => r.id));
+            const itemIds = new Set(itemsData.map(i => i.id));
+
+            let hasOrphanedIds = false;
+
+            const cleanedVersions = updatedVersions.map(version => {
+              const regionData = version.regionData;
+              let needsUpdate = false;
+
+              // Helper to safely parse JSON strings
+              const safeJsonParse = (value: any): string[] => {
+                // Already an array
+                if (Array.isArray(value)) return value;
+
+                // Null, undefined, or empty
+                if (!value) return [];
+
+                // Not a string
+                if (typeof value !== 'string') return [];
+
+                // Empty string
+                if (value.trim() === '') return [];
+
+                // Try to parse
+                try {
+                  return JSON.parse(value);
+                } catch (error) {
+                  console.warn('[RegionDetail] Failed to parse JSON:', value, error);
+                  return [];
+                }
+              };
+
+              // Parse and clean each field
+              const importantCharacters = safeJsonParse(regionData.importantCharacters);
+              const importantFactions = safeJsonParse(regionData.importantFactions);
+              const racesFound = safeJsonParse(regionData.racesFound);
+              const itemsFound = safeJsonParse(regionData.itemsFound);
+
+              // Filter out orphaned IDs
+              const cleanedCharacters = importantCharacters.filter((id: string) => characterIds.has(id));
+              const cleanedFactions = importantFactions.filter((id: string) => factionIds.has(id));
+              const cleanedRaces = racesFound.filter((id: string) => raceIds.has(id));
+              const cleanedItems = itemsFound.filter((id: string) => itemIds.has(id));
+
+              // Check if any IDs were removed
+              if (cleanedCharacters.length !== importantCharacters.length ||
+                  cleanedFactions.length !== importantFactions.length ||
+                  cleanedRaces.length !== racesFound.length ||
+                  cleanedItems.length !== itemsFound.length) {
+                needsUpdate = true;
+                hasOrphanedIds = true;
+              }
+
+              if (needsUpdate) {
+                return {
+                  ...version,
+                  regionData: {
+                    ...regionData,
+                    importantCharacters: JSON.stringify(cleanedCharacters),
+                    importantFactions: JSON.stringify(cleanedFactions),
+                    racesFound: JSON.stringify(cleanedRaces),
+                    itemsFound: JSON.stringify(cleanedItems),
+                  }
+                };
+              }
+
+              return version;
+            });
+
+            // Update database if orphaned IDs were found
+            if (hasOrphanedIds) {
+              console.log('[RegionDetail] Cleaning orphaned IDs from region fields');
+
+              for (const version of cleanedVersions) {
+                try {
+                  if (version.isMain) {
+                    // Update main region
+                    await updateRegion(regionId, version.regionData);
+                  } else {
+                    // Update version
+                    const { updateRegionVersionData } = await import("@/lib/db/regions.service");
+                    await updateRegionVersionData(version.id, version.regionData);
+                  }
+                } catch (error) {
+                  console.error(`[RegionDetail] Failed to clean orphaned IDs for version ${version.id}:`, error);
+                }
+              }
+            }
+
+            // Update state with cleaned versions (always use cleaned versions)
+            const finalVersions = hasOrphanedIds ? cleanedVersions : updatedVersions;
+            setVersions(finalVersions);
+
+            // Set current version based on URL parameter or default to main (using cleaned data)
+            let selectedVersion: IRegionVersion | undefined;
+
+            if (versionIdFromUrl) {
+              selectedVersion = finalVersions.find((v) => v.id === versionIdFromUrl);
+              if (!selectedVersion) {
+                selectedVersion = finalVersions.find((v) => v.isMain);
+              }
+            } else {
+              selectedVersion = finalVersions.find((v) => v.isMain);
+            }
+
+            if (selectedVersion) {
+              setCurrentVersion(selectedVersion);
+              // Set region data from selected version (already cleaned)
+              setRegion(selectedVersion.regionData);
+              setEditData(selectedVersion.regionData);
+              setImagePreview(selectedVersion.regionData.image || "");
+
+              // Load timeline for this version
+              const timelineData = await getRegionVersionTimeline(selectedVersion.id);
+              setTimeline(timelineData);
+              setOriginalTimeline(timelineData);
+            }
           }
         }
       } catch (error) {

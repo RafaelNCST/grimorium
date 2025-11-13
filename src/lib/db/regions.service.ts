@@ -533,6 +533,20 @@ export async function updateRegionVersion(
 }
 
 /**
+ * Update region data within a version (for cleaning orphaned IDs, etc.)
+ */
+export async function updateRegionVersionData(
+  versionId: string,
+  regionData: IRegionFormData
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE region_versions SET region_data = $1 WHERE id = $2",
+    [JSON.stringify(regionData), versionId]
+  );
+}
+
+/**
  * Reorder regions within the same parent
  * Similar to power system's reorderPages function
  */
