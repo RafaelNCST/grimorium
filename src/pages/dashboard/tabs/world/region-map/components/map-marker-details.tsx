@@ -133,7 +133,7 @@ export function MapMarkerDetails({
   const itemsFoundItems = getItems(parseJsonArray(region.itemsFound), items);
 
   return (
-    <div className="bg-background border rounded-lg shadow-lg w-80 flex flex-col max-h-[calc(100vh-80px)] overflow-hidden">
+    <div className="bg-background border rounded-lg shadow-lg w-80 flex flex-col h-[calc(100vh-96px)] overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
         <h3 className="font-semibold text-sm truncate flex-1">{region.name}</h3>

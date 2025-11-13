@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MapMarker } from "./map-marker";
@@ -41,6 +41,9 @@ export function MapCanvas({
   const [tempMarkerPositions, setTempMarkerPositions] = useState<Record<string, { x: number; y: number }>>({});
   const isDraggingRef = useRef(false);
   const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const [currentScale, setCurrentScale] = useState(1);
+  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -93,16 +96,51 @@ export function MapCanvas({
     };
   }, [imagePath]);
 
+  // Convert client coordinates to image coordinates considering zoom/pan
+  const clientToImageCoords = useCallback((clientX: number, clientY: number) => {
+    if (!imageRef.current) {
+      console.log('[MapCanvas] clientToImageCoords: missing imageRef');
+      return { x: 0, y: 0 };
+    }
+
+    const rect = imageRef.current.getBoundingClientRect();
+
+    // Get mouse position relative to the image's bounding box
+    const offsetX = clientX - rect.left;
+    const offsetY = clientY - rect.top;
+
+    // Convert to image coordinates by dividing by scale
+    const x = offsetX / currentScale;
+    const y = offsetY / currentScale;
+
+    console.log('[MapCanvas] clientToImageCoords:', {
+      clientX,
+      clientY,
+      rectLeft: rect.left,
+      rectTop: rect.top,
+      scale: currentScale,
+      offsetX,
+      offsetY,
+      x,
+      y
+    });
+
+    return { x, y };
+  }, [currentScale]);
+
   // Handle marker drag start
   const handleMarkerMouseDown = (e: React.MouseEvent, markerId: string) => {
-    if (!imageRef.current) return;
+    console.log('[MapCanvas] handleMarkerMouseDown called for marker:', markerId);
+    if (!imageRef.current) {
+      console.log('[MapCanvas] No imageRef, returning');
+      return;
+    }
 
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = imageRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = clientToImageCoords(e.clientX, e.clientY);
+    console.log('[MapCanvas] Start drag at image coords:', { x, y });
 
     isDraggingRef.current = true;
     dragStartPosRef.current = { x, y };
@@ -116,9 +154,7 @@ export function MapCanvas({
     const handleMouseMove = (e: MouseEvent) => {
       if (!imageRef.current || !dragStartPosRef.current) return;
 
-      const rect = imageRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { x, y } = clientToImageCoords(e.clientX, e.clientY);
 
       // Check if mouse moved significantly (more than 3px) to differentiate click from drag
       const dx = Math.abs(x - dragStartPosRef.current.x);
@@ -137,9 +173,7 @@ export function MapCanvas({
     const handleMouseUp = (e: MouseEvent) => {
       if (!imageRef.current || !dragStartPosRef.current) return;
 
-      const rect = imageRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { x, y } = clientToImageCoords(e.clientX, e.clientY);
 
       // Check if this was a drag or just a click
       const dx = Math.abs(x - dragStartPosRef.current.x);
@@ -147,9 +181,9 @@ export function MapCanvas({
       const wasDragged = dx > 3 || dy > 3;
 
       if (wasDragged && onMarkerDragEnd) {
-        // Clamp position to image bounds
-        const clampedX = Math.max(0, Math.min(x, rect.width));
-        const clampedY = Math.max(0, Math.min(y, rect.height));
+        // Clamp position to image bounds (in image coordinates)
+        const clampedX = Math.max(0, Math.min(x, imageDimensions.width));
+        const clampedY = Math.max(0, Math.min(y, imageDimensions.height));
         onMarkerDragEnd(draggingMarkerId, clampedX, clampedY);
       } else {
         // Was a click, trigger marker click
@@ -172,7 +206,7 @@ export function MapCanvas({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [draggingMarkerId, markers, onMarkerClick, onMarkerDragEnd]);
+  }, [draggingMarkerId, markers, onMarkerClick, onMarkerDragEnd, imageDimensions, clientToImageCoords]);
 
   // Clear temporary positions only when the marker position in props is updated
   useEffect(() => {
@@ -206,12 +240,10 @@ export function MapCanvas({
     const target = e.target as HTMLElement;
     if (target.closest('[data-marker]')) return;
 
-    const rect = imageRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = clientToImageCoords(e.clientX, e.clientY);
 
-    // Only trigger if within image bounds
-    if (x >= 0 && y >= 0 && x <= rect.width && y <= rect.height) {
+    // Only trigger if within image bounds (in image coordinates)
+    if (x >= 0 && y >= 0 && x <= imageDimensions.width && y <= imageDimensions.height) {
       onMapClick?.(x, y);
     }
   };
@@ -244,10 +276,15 @@ export function MapCanvas({
       style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}
     >
       <TransformWrapper
+        ref={(ref) => {
+          transformRef.current = ref;
+          console.log('[MapCanvas] TransformWrapper ref set:', ref !== null);
+        }}
         initialScale={1}
-        minScale={0.25}
+        minScale={0.5}
         maxScale={4}
         disabled={false}
+        limitToBounds={false}
         panning={{
           disabled: isDraggingRef.current || draggingMarkerId !== null,
           allowLeftClickPan: true,
@@ -255,10 +292,24 @@ export function MapCanvas({
           allowRightClickPan: false
         }}
         centerOnInit
-        wheel={{ step: 0.1 }}
+        wheel={{
+          step: 0.07,
+          smoothStep: 0.005,
+          disabled: false,
+          limitsOnWheel: true
+        }}
         doubleClick={{ disabled: true }}
+        smooth={false}
+        velocityAnimation={{
+          disabled: true
+        }}
+        onTransformed={(ref, state) => {
+          setCurrentScale(state.scale);
+          setCurrentPosition({ x: state.positionX, y: state.positionY });
+        }}
       >
-        {({ zoomIn, zoomOut, resetTransform }) => (
+        {({ zoomIn, zoomOut, resetTransform }) => {
+          return (
           <>
             {/* Zoom Controls - Fixed */}
             <div className="fixed bottom-4 right-4 z-30 flex flex-col gap-2">
@@ -364,7 +415,8 @@ export function MapCanvas({
               </div>
             </TransformComponent>
           </>
-        )}
+        );
+        }}
       </TransformWrapper>
 
       {/* Loading State */}

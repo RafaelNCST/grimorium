@@ -76,7 +76,7 @@ export function VersionManager({
 
       {/* Versions List with Scroll */}
       <ScrollArea className="flex-1">
-        <div className="space-y-3 w-full">
+        <div className="space-y-3 w-full pr-4">
           {/* Main Version */}
           {mainVersion && (
             <VersionCard

@@ -360,7 +360,9 @@ export function RegionDetail() {
 
   const handleVersionDelete = useCallback(
     async (versionId: string) => {
+      console.log("[handleVersionDelete] Starting deletion for versionId:", versionId);
       const versionToDelete = versions.find((v) => v.id === versionId);
+      console.log("[handleVersionDelete] Version to delete:", versionToDelete);
 
       // Don't allow deleting main version
       if (versionToDelete?.isMain) {
@@ -369,11 +371,14 @@ export function RegionDetail() {
       }
 
       try {
+        console.log("[handleVersionDelete] Calling deleteRegionVersion...");
         // Delete from database
         await deleteRegionVersion(versionId);
+        console.log("[handleVersionDelete] deleteRegionVersion completed successfully");
 
         // Update state only if delete is successful
         const updatedVersions = versions.filter((v) => v.id !== versionId);
+        console.log("[handleVersionDelete] Updated versions count:", updatedVersions.length);
 
         // If the deleted version was the current one, switch to main
         if (currentVersion?.id === versionId) {
@@ -389,7 +394,7 @@ export function RegionDetail() {
         setVersions(updatedVersions);
         toast.success("Versão excluída com sucesso!");
       } catch (error) {
-        console.error("Error deleting region version:", error);
+        console.error("[handleVersionDelete] Error deleting region version:", error);
         toast.error("Erro ao excluir versão");
       }
     },
@@ -499,21 +504,31 @@ export function RegionDetail() {
 
       if (!versionToDelete) return;
 
-      const updatedVersions = versions.filter(
-        (v) => v.id !== currentVersion.id
-      );
+      try {
+        console.log("[handleConfirmDelete] Deleting version from database:", currentVersion.id);
+        // Delete from database
+        await deleteRegionVersion(currentVersion.id);
+        console.log("[handleConfirmDelete] Version deleted from database successfully");
 
-      // Switch to main version after deleting
-      const mainVersion = updatedVersions.find((v) => v.isMain);
-      if (mainVersion) {
-        setCurrentVersion(mainVersion);
-        setRegion(mainVersion.regionData);
-        setEditData(mainVersion.regionData);
-        setImagePreview(mainVersion.regionData.image || "");
+        const updatedVersions = versions.filter(
+          (v) => v.id !== currentVersion.id
+        );
+
+        // Switch to main version after deleting
+        const mainVersion = updatedVersions.find((v) => v.isMain);
+        if (mainVersion) {
+          setCurrentVersion(mainVersion);
+          setRegion(mainVersion.regionData);
+          setEditData(mainVersion.regionData);
+          setImagePreview(mainVersion.regionData.image || "");
+        }
+
+        setVersions(updatedVersions);
+        toast.success(t("delete.version.success"));
+      } catch (error) {
+        console.error("[handleConfirmDelete] Error deleting version:", error);
+        toast.error("Erro ao excluir versão");
       }
-
-      setVersions(updatedVersions);
-      toast.success(t("delete.version.success"));
     } else {
       // Delete entire region (main version)
       try {
@@ -551,8 +566,8 @@ export function RegionDetail() {
   );
 
   const handleBack = useCallback(() => {
-    window.history.back();
-  }, []);
+    navigateToWorldTab();
+  }, [navigateToWorldTab]);
 
   const handleViewMap = useCallback(() => {
     navigate({

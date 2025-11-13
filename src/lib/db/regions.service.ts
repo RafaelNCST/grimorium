@@ -451,7 +451,7 @@ export async function getRegionVersions(
 ): Promise<IRegionVersion[]> {
   const db = await getDB();
   const result = await db.select<DBRegionVersion[]>(
-    "SELECT * FROM region_versions WHERE region_id = $1 ORDER BY created_at DESC",
+    "SELECT * FROM region_versions WHERE region_id = $1 ORDER BY is_main DESC, created_at ASC",
     [regionId]
   );
 
@@ -496,7 +496,25 @@ export async function createRegionVersion(
  */
 export async function deleteRegionVersion(versionId: string): Promise<void> {
   const db = await getDB();
-  await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
+  console.log(`[deleteRegionVersion] Deleting version with ID: ${versionId}`);
+
+  // First verify the version exists
+  const existing = await db.select<DBRegionVersion[]>(
+    "SELECT * FROM region_versions WHERE id = $1",
+    [versionId]
+  );
+  console.log(`[deleteRegionVersion] Version exists before delete:`, existing.length > 0);
+
+  // Delete the version
+  const result = await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
+  console.log(`[deleteRegionVersion] Delete result:`, result);
+
+  // Verify deletion
+  const afterDelete = await db.select<DBRegionVersion[]>(
+    "SELECT * FROM region_versions WHERE id = $1",
+    [versionId]
+  );
+  console.log(`[deleteRegionVersion] Version exists after delete:`, afterDelete.length > 0);
 }
 
 /**
