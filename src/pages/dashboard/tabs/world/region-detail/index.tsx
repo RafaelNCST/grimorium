@@ -532,7 +532,6 @@ export function RegionDetail() {
       try {
         if (!dashboardId) return;
         await deleteRegion(regionId);
-        toast.success(t("delete.region.success"));
         navigateToWorldTab();
       } catch (error) {
         console.error("Error deleting region:", error);

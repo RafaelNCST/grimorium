@@ -141,7 +141,33 @@ export function RegionMapPage() {
         // Load markers for this specific map
         const { getMarkersByMapId } = await import("@/lib/db/region-maps.service");
         const markersData = await getMarkersByMapId(map.id);
-        setMarkers(markersData);
+
+        // Clean orphaned markers (markers whose child regions no longer exist)
+        const validMarkers: IRegionMapMarker[] = [];
+        const orphanedMarkerIds: string[] = [];
+
+        for (const marker of markersData) {
+          const childRegion = await getRegionById(marker.childRegionId);
+          if (childRegion) {
+            validMarkers.push(marker);
+          } else {
+            orphanedMarkerIds.push(marker.id);
+          }
+        }
+
+        // Remove orphaned markers from database
+        if (orphanedMarkerIds.length > 0) {
+          console.log(`[RegionMap] Cleaning ${orphanedMarkerIds.length} orphaned markers`);
+          for (const markerId of orphanedMarkerIds) {
+            try {
+              await removeMarker(markerId);
+            } catch (error) {
+              console.error(`[RegionMap] Failed to remove orphaned marker ${markerId}:`, error);
+            }
+          }
+        }
+
+        setMarkers(validMarkers);
       } else {
         setMapImagePath(null);
         setMapId(null);
