@@ -9,6 +9,7 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  AlertCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -73,6 +74,11 @@ interface RegionDetailViewProps {
   // Timeline
   timeline: ITimelineEra[];
   onTimelineChange: (timeline: ITimelineEra[]) => void;
+  // Validation
+  errors: Record<string, string>;
+  validateField: (field: string, value: any) => void;
+  hasRequiredFieldsEmpty: boolean;
+  missingFields: string[];
   onBack: () => void;
   onViewMap: () => void;
   onNavigationSidebarToggle: () => void;
@@ -129,6 +135,10 @@ export function RegionDetailView({
   items,
   timeline,
   onTimelineChange,
+  errors,
+  validateField,
+  hasRequiredFieldsEmpty,
+  missingFields,
   onBack,
   onViewMap,
   onNavigationSidebarToggle,
@@ -244,23 +254,43 @@ export function RegionDetailView({
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col items-end gap-1">
                 {isEditing ? (
                   <>
-                    <Button variant="outline" onClick={onCancel}>
-                      {t("region-detail:header.cancel")}
-                    </Button>
-                    <Button
-                      variant="magical"
-                      className="animate-glow"
-                      onClick={onSave}
-                      disabled={!hasChanges}
-                    >
-                      {t("region-detail:header.save")}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={onCancel}>
+                        {t("region-detail:header.cancel")}
+                      </Button>
+                      <Button
+                        variant="magical"
+                        className="animate-glow"
+                        onClick={onSave}
+                        disabled={!hasChanges || hasRequiredFieldsEmpty}
+                      >
+                        {t("region-detail:header.save")}
+                      </Button>
+                    </div>
+                    {hasRequiredFieldsEmpty && (
+                      <p className="text-xs text-destructive">
+                        {missingFields.length > 0 ? (
+                          <>
+                            {t("region-detail:missing_fields")}:{" "}
+                            {missingFields.map((field) => {
+                              const fieldNames: Record<string, string> = {
+                                name: t("region-detail:fields.name"),
+                                scale: t("region-detail:fields.scale"),
+                              };
+                              return fieldNames[field] || field;
+                            }).join(", ")}
+                          </>
+                        ) : (
+                          t("region-detail:fill_required_fields")
+                        )}
+                      </p>
+                    )}
                   </>
                 ) : (
-                  <>
+                  <div className="flex gap-2">
                     <Button variant="outline" onClick={onViewMap}>
                       <Map className="w-4 h-4 mr-2" />
                       Ver Mapa
@@ -275,7 +305,7 @@ export function RegionDetailView({
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -350,16 +380,27 @@ export function RegionDetailView({
 
                       {/* Name */}
                       <div className="space-y-2">
-                        <Label>{t("region-detail:fields.name")} *</Label>
+                        <Label>
+                          {t("region-detail:fields.name")}
+                          <span className="text-destructive ml-1">*</span>
+                        </Label>
                         <Input
                           value={editData.name}
                           onChange={(e) =>
                             onEditDataChange("name", e.target.value)
                           }
+                          onBlur={() => validateField("name", editData.name)}
                           placeholder={t("world:create_region.name_placeholder")}
                           maxLength={200}
+                          className={errors.name ? "border-destructive" : ""}
                           required
                         />
+                        {errors.name && (
+                          <p className="text-sm text-destructive flex items-center gap-1">
+                            <AlertCircle className="h-4 w-4" />
+                            {errors.name}
+                          </p>
+                        )}
                         <div className="flex justify-end text-xs text-muted-foreground">
                           <span>{editData.name?.length || 0}/200</span>
                         </div>
@@ -408,7 +449,9 @@ export function RegionDetailView({
 
                       {/* Summary */}
                       <div className="space-y-2">
-                        <Label>{t("region-detail:fields.summary")}</Label>
+                        <Label>
+                          {t("region-detail:fields.summary")}
+                        </Label>
                         <Textarea
                           value={editData.summary || ""}
                           onChange={(e) =>
@@ -513,7 +556,9 @@ export function RegionDetailView({
                         {/* Climate */}
                         {isEditing ? (
                           <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">{t("world:create_region.climate_label")}</Label>
+                            <Label className="text-purple-600 dark:text-purple-400">
+                              {t("world:create_region.climate_label")}
+                            </Label>
                             <Input
                               value={editData.climate || ""}
                               onChange={(e) =>

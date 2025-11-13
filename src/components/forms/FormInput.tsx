@@ -1,0 +1,80 @@
+import * as React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+
+export interface FormInputProps extends React.ComponentProps<'input'> {
+  label?: string;
+  error?: string;
+  helperText?: string;
+  containerClassName?: string;
+  showOptionalLabel?: boolean;
+}
+
+/**
+ * FormInput - Generic input component with label and error handling
+ *
+ * @example
+ * ```tsx
+ * <FormInput
+ *   label="Nome da Região"
+ *   name="name"
+ *   placeholder="Digite o nome..."
+ *   required
+ *   error={errors.name?.message}
+ * />
+ * ```
+ */
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
+  (
+    {
+      label,
+      error,
+      helperText,
+      containerClassName,
+      className,
+      required,
+      showOptionalLabel = true,
+      id,
+      name,
+      ...props
+    },
+    ref
+  ) => {
+    const inputId = id || name;
+    const hasError = Boolean(error);
+
+    return (
+      <div className={cn('space-y-2', containerClassName)}>
+        {label && (
+          <Label htmlFor={inputId} className="flex items-center gap-1">
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {!required && showOptionalLabel && (
+              <span className="text-xs text-muted-foreground">(opcional)</span>
+            )}
+          </Label>
+        )}
+        <Input
+          id={inputId}
+          name={name}
+          ref={ref}
+          aria-invalid={hasError}
+          className={cn(hasError && 'border-destructive', className)}
+          required={required}
+          {...props}
+        />
+        {hasError && (
+          <p className="text-sm text-destructive" role="alert">
+            {error}
+          </p>
+        )}
+        {!hasError && helperText && (
+          <p className="text-sm text-muted-foreground">{helperText}</p>
+        )}
+      </div>
+    );
+  }
+);
+
+FormInput.displayName = 'FormInput';

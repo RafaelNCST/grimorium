@@ -2,7 +2,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { z } from "zod";
+import { RegionSchema } from "@/lib/validation/region-schema";
 
 import {
   getRegionById,
@@ -81,6 +82,59 @@ export function RegionDetail() {
   // Timeline state
   const [timeline, setTimeline] = useState<ITimelineEra[]>([]);
   const [originalTimeline, setOriginalTimeline] = useState<ITimelineEra[]>([]);
+
+  // Validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Função de validação de campo individual (onBlur)
+  const validateField = useCallback((field: string, value: any) => {
+    try {
+      // Validar apenas este campo
+      const fieldSchema = RegionSchema.pick({ [field]: true } as any);
+      fieldSchema.parse({ [field]: value });
+
+      // Se passou, remover erro
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setErrors(prev => ({
+          ...prev,
+          [field]: error.errors[0].message
+        }));
+        return false;
+      }
+    }
+  }, []);
+
+  // Verificar se tem campos obrigatórios vazios e quais são
+  const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
+    if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
+
+    try {
+      // Validar apenas campos obrigatórios
+      RegionSchema.pick({
+        name: true,
+        scale: true,
+      } as any).parse({
+        name: editData.name,
+        scale: editData.scale,
+      });
+      return { hasRequiredFieldsEmpty: false, missingFields: [] };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const missing = error.errors.map(e => e.path[0] as string);
+        console.log('Campos vazios:', missing);
+        return { hasRequiredFieldsEmpty: true, missingFields: missing };
+      }
+      return { hasRequiredFieldsEmpty: true, missingFields: [] };
+    }
+  }, [editData]);
 
   // Save section states to localStorage
   useEffect(() => {
@@ -393,7 +447,6 @@ export function RegionDetail() {
         }
       } catch (error) {
         console.error("Error loading region:", error);
-        toast.error("Erro ao carregar região");
       } finally {
         setIsLoading(false);
       }
@@ -421,7 +474,6 @@ export function RegionDetail() {
         setOriginalTimeline(timelineData);
       } catch (error) {
         console.error("Error loading version timeline:", error);
-        toast.error("Erro ao carregar timeline da versão");
       }
     },
     [versions]
@@ -448,10 +500,8 @@ export function RegionDetail() {
 
         // Update state only if save is successful
         setVersions((prev) => [...prev, newVersion]);
-        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
       } catch (error) {
         console.error("Error creating region version:", error);
-        toast.error("Erro ao criar versão");
       }
     },
     [regionId]
@@ -465,7 +515,6 @@ export function RegionDetail() {
 
       // Don't allow deleting main version
       if (versionToDelete?.isMain) {
-        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -491,10 +540,8 @@ export function RegionDetail() {
         }
 
         setVersions(updatedVersions);
-        toast.success("Versão excluída com sucesso!");
       } catch (error) {
         console.error("[handleVersionDelete] Error deleting region version:", error);
-        toast.error("Erro ao excluir versão");
       }
     },
     [versions, currentVersion]
@@ -517,32 +564,67 @@ export function RegionDetail() {
         }
       } catch (error) {
         console.error("Error updating region version:", error);
-        toast.error("Erro ao atualizar versão");
       }
     },
     [versions, currentVersion]
   );
 
   const handleSave = useCallback(async () => {
-    const updatedRegion = editData;
-    setRegion(updatedRegion);
-
-    // Update data in current version
-    const updatedVersions = versions.map((v) =>
-      v.id === currentVersion?.id
-        ? { ...v, regionData: updatedRegion }
-        : v
-    );
-    setVersions(updatedVersions);
-
-    const activeVersion = updatedVersions.find(
-      (v) => v.id === currentVersion?.id
-    );
-    if (activeVersion) {
-      setCurrentVersion(activeVersion);
-    }
+    if (!currentVersion || !editData) return;
 
     try {
+      // Validar TUDO com Zod
+      const validatedData = RegionSchema.parse({
+        name: editData.name,
+        scale: editData.scale,
+        summary: editData.summary,
+        climate: editData.climate,
+        parentId: editData.parentId,
+        image: editData.image,
+        currentSeason: editData.currentSeason,
+        customSeasonName: editData.customSeasonName,
+        generalDescription: editData.generalDescription,
+        regionAnomalies: editData.regionAnomalies,
+        residentFactions: editData.residentFactions,
+        dominantFactions: editData.dominantFactions,
+        importantCharacters: editData.importantCharacters,
+        racesFound: editData.racesFound,
+        itemsFound: editData.itemsFound,
+        narrativePurpose: editData.narrativePurpose,
+        uniqueCharacteristics: editData.uniqueCharacteristics,
+        politicalImportance: editData.politicalImportance,
+        religiousImportance: editData.religiousImportance,
+        worldPerception: editData.worldPerception,
+        regionMysteries: editData.regionMysteries,
+        inspirations: editData.inspirations,
+      });
+
+      // Atualizar state com dados validados
+      const updatedRegion = {
+        ...editData,
+        name: validatedData.name,
+        scale: validatedData.scale,
+        summary: validatedData.summary,
+        climate: validatedData.climate,
+      };
+
+      setRegion(updatedRegion);
+
+      // Update data in current version
+      const updatedVersions = versions.map((v) =>
+        v.id === currentVersion?.id
+          ? { ...v, regionData: updatedRegion }
+          : v
+      );
+      setVersions(updatedVersions);
+
+      const activeVersion = updatedVersions.find(
+        (v) => v.id === currentVersion?.id
+      );
+      if (activeVersion) {
+        setCurrentVersion(activeVersion);
+      }
+
       // Update region in database - pass ALL fields from updatedRegion
       await updateRegion(regionId, {
         name: updatedRegion.name,
@@ -580,13 +662,22 @@ export function RegionDetail() {
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
 
+      setErrors({}); // Limpar erros
       setIsEditing(false);
-      toast.success("Região atualizada com sucesso!");
     } catch (error) {
-      console.error("Error saving region:", error);
-      toast.error("Erro ao salvar região");
+      if (error instanceof z.ZodError) {
+        // Mapear erros para cada campo
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach(err => {
+          const field = err.path[0] as string;
+          newErrors[field] = err.message;
+        });
+        setErrors(newErrors);
+      } else {
+        console.error("Error saving region:", error);
+      }
     }
-  }, [editData, versions, currentVersion, regionId, timeline]);
+  }, [editData, versions, currentVersion, regionId, timeline, t]);
 
   const navigateToWorldTab = useCallback(() => {
     if (!dashboardId) return;
@@ -623,10 +714,8 @@ export function RegionDetail() {
         }
 
         setVersions(updatedVersions);
-        toast.success(t("delete.version.success"));
       } catch (error) {
         console.error("[handleConfirmDelete] Error deleting version:", error);
-        toast.error("Erro ao excluir versão");
       }
     } else {
       // Delete entire region (main version)
@@ -636,16 +725,21 @@ export function RegionDetail() {
         navigateToWorldTab();
       } catch (error) {
         console.error("Error deleting region:", error);
-        toast.error("Erro ao excluir região");
       }
     }
   }, [currentVersion, versions, navigateToWorldTab, regionId, dashboardId, t]);
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = useCallback(async () => {
+    if (hasChanges) {
+      const confirmCancel = window.confirm(t("unsaved_changes_warning"));
+      if (!confirmCancel) return;
+    }
+
     setEditData(region);
     setTimeline(originalTimeline);
+    setErrors({}); // Limpar erros ao cancelar
     setIsEditing(false);
-  }, [region, originalTimeline]);
+  }, [region, originalTimeline, hasChanges, t]);
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -752,6 +846,10 @@ export function RegionDetail() {
       races={races}
       items={items}
       timeline={timeline}
+      errors={errors}
+      validateField={validateField}
+      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+      missingFields={missingFields}
       onTimelineChange={handleTimelineChange}
       onBack={handleBack}
       onViewMap={handleViewMap}

@@ -8,6 +8,12 @@
     "save": "Save",
     "quick_navigation": "Quick Navigation"
   },
+  "fill_required_fields": "Fill all required fields to save",
+  "missing_fields": "Missing required fields",
+  "unsaved_changes_warning": "You have unsaved changes. Do you want to discard?",
+  "save_success": "Region updated successfully!",
+  "save_error": "Error saving region",
+  "validation_error": "Fix the following fields: {{fields}}",
   "sections": {
     "basic_info": "Basic Information",
     "advanced_info": "Advanced Information",

@@ -8,6 +8,12 @@
     "save": "Salvar",
     "quick_navigation": "Navegação Rápida"
   },
+  "fill_required_fields": "Preencha todos os campos obrigatórios para salvar",
+  "missing_fields": "Campos obrigatórios faltando",
+  "unsaved_changes_warning": "Você tem alterações não salvas. Deseja descartar?",
+  "save_success": "Região atualizada com sucesso!",
+  "save_error": "Erro ao salvar região",
+  "validation_error": "Corrija os seguintes campos: {{fields}}",
   "sections": {
     "basic_info": "Informações Básicas",
     "advanced_info": "Informações Avançadas",
