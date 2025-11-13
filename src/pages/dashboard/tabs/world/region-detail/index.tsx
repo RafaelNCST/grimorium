@@ -13,8 +13,8 @@ import {
   createRegionVersion,
   deleteRegionVersion,
   updateRegionVersion,
-  getRegionTimeline,
-  saveRegionTimeline,
+  getRegionVersionTimeline,
+  saveRegionVersionTimeline,
   type IRegionVersion,
   type ITimelineEra,
 } from "@/lib/db/regions.service";
@@ -63,7 +63,14 @@ export function RegionDetail() {
   const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem('regionDetailAdvancedSectionOpen');
+    return stored ? JSON.parse(stored) : false;
+  });
+  const [timelineSectionOpen, setTimelineSectionOpen] = useState(() => {
+    const stored = localStorage.getItem('regionDetailTimelineSectionOpen');
+    return stored ? JSON.parse(stored) : false;
+  });
 
   // Related data for multi-selects
   const [characters, setCharacters] = useState<Array<{ id: string; name: string; image?: string }>>([]);
@@ -74,6 +81,15 @@ export function RegionDetail() {
   // Timeline state
   const [timeline, setTimeline] = useState<ITimelineEra[]>([]);
   const [originalTimeline, setOriginalTimeline] = useState<ITimelineEra[]>([]);
+
+  // Save section states to localStorage
+  useEffect(() => {
+    localStorage.setItem('regionDetailAdvancedSectionOpen', JSON.stringify(advancedSectionOpen));
+  }, [advancedSectionOpen]);
+
+  useEffect(() => {
+    localStorage.setItem('regionDetailTimelineSectionOpen', JSON.stringify(timelineSectionOpen));
+  }, [timelineSectionOpen]);
 
   // Check if there are changes between region and editData
   const hasChanges = useMemo(() => {
@@ -228,6 +244,11 @@ export function RegionDetail() {
               setRegion(selectedVersion.regionData);
               setEditData(selectedVersion.regionData);
               setImagePreview(selectedVersion.regionData.image || "");
+
+              // Load timeline for this version
+              const timelineData = await getRegionVersionTimeline(selectedVersion.id);
+              setTimeline(timelineData);
+              setOriginalTimeline(timelineData);
             }
           }
 
@@ -267,11 +288,6 @@ export function RegionDetail() {
               name: item.name,
               image: item.image
             })));
-
-            // Load timeline
-            const timelineData = await getRegionTimeline(regionId);
-            setTimeline(timelineData);
-            setOriginalTimeline(timelineData);
           }
         }
       } catch (error) {
@@ -286,7 +302,7 @@ export function RegionDetail() {
   }, [regionId, dashboardId, versionIdFromUrl]);
 
   const handleVersionChange = useCallback(
-    (versionId: string | null) => {
+    async (versionId: string | null) => {
       if (!versionId) return;
 
       const version = versions.find((v) => v.id === versionId);
@@ -296,6 +312,16 @@ export function RegionDetail() {
       setRegion(version.regionData);
       setEditData(version.regionData);
       setImagePreview(version.regionData.image || "");
+
+      // Load timeline for this version
+      try {
+        const timelineData = await getRegionVersionTimeline(version.id);
+        setTimeline(timelineData);
+        setOriginalTimeline(timelineData);
+      } catch (error) {
+        console.error("Error loading version timeline:", error);
+        toast.error("Erro ao carregar timeline da versão");
+      }
 
       toast.success(`Versão "${version.name}" ativada`);
     },
@@ -442,8 +468,10 @@ export function RegionDetail() {
         inspirations: updatedRegion.inspirations,
       });
 
-      // Save timeline
-      await saveRegionTimeline(regionId, timeline);
+      // Save timeline for current version
+      if (currentVersion) {
+        await saveRegionVersionTimeline(currentVersion.id, timeline);
+      }
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
@@ -523,8 +551,8 @@ export function RegionDetail() {
   );
 
   const handleBack = useCallback(() => {
-    navigateToWorldTab();
-  }, [navigateToWorldTab]);
+    window.history.back();
+  }, []);
 
   const handleViewMap = useCallback(() => {
     navigate({
@@ -543,8 +571,12 @@ export function RegionDetail() {
   }, []);
 
   const handleRegionSelect = useCallback((regionId: string) => {
-    window.location.replace(`/dashboard/${dashboardId}/tabs/world/${regionId}`);
-  }, [dashboardId]);
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/world/$regionId",
+      params: { dashboardId, regionId },
+      replace: true,
+    });
+  }, [dashboardId, navigate]);
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
@@ -565,6 +597,10 @@ export function RegionDetail() {
 
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
+  const handleTimelineSectionToggle = useCallback(() => {
+    setTimelineSectionOpen((prev) => !prev);
   }, []);
 
   const handleTimelineChange = useCallback((newTimeline: ITimelineEra[]) => {
@@ -597,6 +633,7 @@ export function RegionDetail() {
       fileInputRef={fileInputRef}
       allRegions={allRegions}
       advancedSectionOpen={advancedSectionOpen}
+      timelineSectionOpen={timelineSectionOpen}
       characters={characters}
       factions={factions}
       races={races}
@@ -621,6 +658,7 @@ export function RegionDetail() {
       onImageFileChange={handleImageFileChange}
       onEditDataChange={handleEditDataChange}
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
+      onTimelineSectionToggle={handleTimelineSectionToggle}
     />
   );
 }

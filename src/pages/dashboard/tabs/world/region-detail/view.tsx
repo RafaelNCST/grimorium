@@ -64,6 +64,7 @@ interface RegionDetailViewProps {
   fileInputRef: React.RefObject<HTMLInputElement>;
   allRegions: IRegion[];
   advancedSectionOpen: boolean;
+  timelineSectionOpen: boolean;
   // Related data for multi-selects
   characters: Array<{ id: string; name: string; image?: string }>;
   factions: Array<{ id: string; name: string; image?: string }>;
@@ -98,6 +99,7 @@ interface RegionDetailViewProps {
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
   onAdvancedSectionToggle: () => void;
+  onTimelineSectionToggle: () => void;
 }
 
 // Helper component for empty state
@@ -120,6 +122,7 @@ export function RegionDetailView({
   fileInputRef,
   allRegions,
   advancedSectionOpen,
+  timelineSectionOpen,
   characters,
   factions,
   races,
@@ -144,6 +147,7 @@ export function RegionDetailView({
   onImageFileChange,
   onEditDataChange,
   onAdvancedSectionToggle,
+  onTimelineSectionToggle,
 }: RegionDetailViewProps) {
   const { t } = useTranslation(["region-detail", "world"]);
 
@@ -1456,24 +1460,40 @@ export function RegionDetailView({
                 </Card>
               </Collapsible>
 
-              {/* Timeline Section - Separate from Advanced */}
-              <Card className="card-magical">
-                <CardHeader>
-                  <CardTitle>Linha do Tempo da Região</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RegionTimeline
-                    regionId={region.id}
-                    isEditing={isEditing}
-                    timeline={timeline}
-                    onTimelineChange={onTimelineChange}
-                    characters={characters}
-                    factions={factions}
-                    races={races}
-                    items={items}
-                  />
-                </CardContent>
-              </Card>
+              {/* Timeline Section - Collapsible */}
+              <Collapsible
+                open={timelineSectionOpen}
+                onOpenChange={onTimelineSectionToggle}
+              >
+                <Card className="card-magical">
+                  <CardHeader>
+                    <CollapsibleTrigger asChild>
+                      <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+                        <CardTitle>Linha do Tempo da Região</CardTitle>
+                        {timelineSectionOpen ? (
+                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </button>
+                    </CollapsibleTrigger>
+                  </CardHeader>
+                  <CollapsibleContent>
+                    <CardContent>
+                      <RegionTimeline
+                        regionId={region.id}
+                        isEditing={isEditing}
+                        timeline={timeline}
+                        onTimelineChange={onTimelineChange}
+                        characters={characters}
+                        factions={factions}
+                        races={races}
+                        items={items}
+                      />
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
             </div>
 
             {/* Sidebar - Versions - 1 column */}
@@ -1485,7 +1505,7 @@ export function RegionDetailView({
                       {t("region-detail:sections.versions")}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[600px]">
+                  <CardContent className="h-[600px] p-6 pt-0">
                     <VersionManager
                       versions={versions}
                       currentVersion={currentVersion}

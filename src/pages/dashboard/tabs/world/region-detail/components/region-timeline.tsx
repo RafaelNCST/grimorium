@@ -374,78 +374,6 @@ export function RegionTimeline({
                             )}
                           </div>
                           <div className="flex items-center gap-2 ml-4">
-                            {isEditing && (
-                              <>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedEraId(era.id);
-                                        // Reset form before opening
-                                        setNewEvent({
-                                          name: "",
-                                          description: "",
-                                          reason: "",
-                                          outcome: "",
-                                          startDate: "",
-                                          endDate: "",
-                                          charactersInvolved: [],
-                                          factionsInvolved: [],
-                                          racesInvolved: [],
-                                          itemsInvolved: [],
-                                        });
-                                        setShowCreateEventModal(true);
-                                      }}
-                                      className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600 dark:hover:text-green-400"
-                                    >
-                                      <Plus className="w-3 h-3" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom">
-                                    <p>Adicionar Evento</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEditEra(era);
-                                      }}
-                                      className="h-8 w-8 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom">
-                                    <p>Editar Era</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteEra(era.id);
-                                      }}
-                                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom">
-                                    <p>Deletar Era</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </>
-                            )}
                             {era.events.length > 0 && (
                               <Badge variant="outline" className="text-xs">
                                 {era.events.length} evento
@@ -457,6 +385,79 @@ export function RegionTimeline({
                         </div>
                       </div>
                     </AccordionTrigger>
+
+                    {/* Action buttons positioned absolutely outside the trigger */}
+                    {isEditing && (
+                      <div className="absolute top-6 right-2 flex gap-1 z-10">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedEraId(era.id);
+                                setNewEvent({
+                                  name: "",
+                                  description: "",
+                                  reason: "",
+                                  outcome: "",
+                                  startDate: "",
+                                  endDate: "",
+                                  charactersInvolved: [],
+                                  factionsInvolved: [],
+                                  racesInvolved: [],
+                                  itemsInvolved: [],
+                                });
+                                setShowCreateEventModal(true);
+                              }}
+                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600 dark:hover:text-green-400"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <p>Adicionar Evento</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditEra(era);
+                              }}
+                              className="h-8 w-8 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <p>Editar Era</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteEra(era.id);
+                              }}
+                              className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <p>Deletar Era</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
 
                     <AccordionContent className="pt-4 pb-0">
                       <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
@@ -581,17 +582,17 @@ export function RegionTimeline({
                             ))}
                           </>
                         ) : (
-                          isEditing && (
-                            <div className="text-center py-8">
-                              <div className="relative">
-                                <div className="absolute -left-8 top-6">
-                                  <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20" />
-                                </div>
-                                <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
-                                  <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
-                                  <p className="text-sm text-muted-foreground mb-4">
-                                    Esta era ainda não possui eventos
-                                  </p>
+                          <div className="text-center py-8">
+                            <div className="relative">
+                              <div className="absolute -left-8 top-6">
+                                <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20" />
+                              </div>
+                              <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
+                                <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                                <p className="text-sm text-muted-foreground mb-4">
+                                  Esta era ainda não possui eventos
+                                </p>
+                                {isEditing && (
                                   <Button
                                     onClick={() => {
                                       setSelectedEraId(era.id);
@@ -604,10 +605,10 @@ export function RegionTimeline({
                                     <Plus className="w-4 h-4 mr-2" />
                                     Criar Primeiro Evento
                                   </Button>
-                                </div>
+                                )}
                               </div>
                             </div>
-                          )
+                          </div>
                         )}
                       </div>
                     </AccordionContent>

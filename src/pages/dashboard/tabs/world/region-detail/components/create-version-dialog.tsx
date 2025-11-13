@@ -44,8 +44,8 @@ export function CreateVersionDialog({
   const [versionDescription, setVersionDescription] = useState("");
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
 
-  const MAX_NAME_LENGTH = 150;
-  const MAX_DESCRIPTION_LENGTH = 150;
+  const MAX_NAME_LENGTH = 50;
+  const MAX_DESCRIPTION_LENGTH = 200;
 
   const nameCharsRemaining = MAX_NAME_LENGTH - versionName.length;
   const descriptionCharsRemaining =
@@ -101,7 +101,7 @@ export function CreateVersionDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <Alert className="bg-primary/5 border-primary/20">
+          <Alert className="bg-primary/10 border-primary/30">
             <Info className="h-4 w-4 text-primary" />
             <AlertDescription className="text-sm">
               {t("versions.create_dialog.info_message")}

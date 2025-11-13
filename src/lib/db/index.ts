@@ -451,7 +451,7 @@ async function runMigrations(database: Database): Promise<void> {
     -- LINHA DO TEMPO DE REGIÕES - ERAS
     CREATE TABLE IF NOT EXISTS region_timeline_eras (
       id TEXT PRIMARY KEY,
-      region_id TEXT NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
+      region_id TEXT NOT NULL REFERENCES region_versions(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       description TEXT,
       start_date TEXT NOT NULL,
@@ -790,6 +790,88 @@ async function runMigrations(database: Database): Promise<void> {
       } catch (error) {
         // Column already exists - safe to ignore
       }
+    }
+
+    // Migrate region_timeline_eras to reference region_versions instead of regions
+    try {
+      const timelineTableInfo = await database.select<Array<{ sql: string }>>(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_timeline_eras'"
+      );
+
+      if (timelineTableInfo.length > 0 && timelineTableInfo[0].sql.includes('REFERENCES regions(id)')) {
+        console.log("[db] Migrating region_timeline_eras to reference region_versions...");
+
+        // Create new table with correct foreign key
+        await database.execute(`
+          CREATE TABLE region_timeline_eras_new (
+            id TEXT PRIMARY KEY,
+            region_id TEXT NOT NULL REFERENCES region_versions(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            description TEXT,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL
+          )
+        `);
+
+        // Copy existing eras data - link to main version of each region
+        // We need to find the main version for each region_id in the old table
+        await database.execute(`
+          INSERT INTO region_timeline_eras_new (id, region_id, name, description, start_date, end_date)
+          SELECT e.id, v.id, e.name, e.description, e.start_date, e.end_date
+          FROM region_timeline_eras e
+          JOIN region_versions v ON v.region_id = e.region_id AND v.is_main = 1
+        `);
+
+        // Drop old table (events will be cascade deleted, so we need to handle them separately)
+        // First, backup events data
+        await database.execute(`
+          CREATE TABLE region_timeline_events_backup AS
+          SELECT * FROM region_timeline_events
+        `);
+
+        await database.execute("DROP TABLE region_timeline_eras");
+
+        // Rename new table
+        await database.execute("ALTER TABLE region_timeline_eras_new RENAME TO region_timeline_eras");
+
+        // Recreate events table (it was cascade deleted)
+        await database.execute(`
+          CREATE TABLE region_timeline_events (
+            id TEXT PRIMARY KEY,
+            era_id TEXT NOT NULL REFERENCES region_timeline_eras(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            description TEXT,
+            short_description TEXT,
+            reason TEXT,
+            outcome TEXT,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            characters_involved TEXT,
+            factions_involved TEXT,
+            races_involved TEXT,
+            items_involved TEXT
+          )
+        `);
+
+        // Restore events data
+        await database.execute(`
+          INSERT INTO region_timeline_events
+          SELECT * FROM region_timeline_events_backup
+        `);
+
+        // Drop backup table
+        await database.execute("DROP TABLE region_timeline_events_backup");
+
+        // Recreate indexes
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id)");
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id)");
+
+        console.log("[db] Successfully migrated region_timeline_eras table");
+      } else {
+        console.log("[db] region_timeline_eras table already has correct schema");
+      }
+    } catch (error) {
+      console.log("[db] Timeline migration error or already migrated:", error);
     }
 
     // Verify books table exists and log count

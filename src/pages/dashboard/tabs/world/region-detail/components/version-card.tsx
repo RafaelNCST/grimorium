@@ -35,9 +35,9 @@ export function VersionCard({
 
   return (
     <HoverCard openDelay={300}>
-      <HoverCardTrigger asChild>
+      <HoverCardTrigger asChild className="w-full block">
         <Card
-          className={`cursor-pointer transition-all ${
+          className={`w-full cursor-pointer transition-all ${
             isSelected
               ? "border-primary bg-primary/10 shadow-md"
               : "border-muted hover:bg-muted/50"

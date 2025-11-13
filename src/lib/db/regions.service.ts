@@ -629,17 +629,17 @@ interface DBTimelineEra {
 }
 
 /**
- * Get timeline for a region
+ * Get timeline for a region version
  */
-export async function getRegionTimeline(
-  regionId: string
+export async function getRegionVersionTimeline(
+  versionId: string
 ): Promise<ITimelineEra[]> {
   const db = await getDB();
 
-  // Get all eras for this region
+  // Get all eras for this version
   const erasResult = await db.select<DBTimelineEra[]>(
     "SELECT * FROM region_timeline_eras WHERE region_id = $1 ORDER BY start_date ASC",
-    [regionId]
+    [versionId]
   );
 
   // Get all events for all eras
@@ -679,16 +679,16 @@ export async function getRegionTimeline(
 }
 
 /**
- * Save complete timeline for a region (replaces existing timeline)
+ * Save complete timeline for a region version (replaces existing timeline)
  */
-export async function saveRegionTimeline(
-  regionId: string,
+export async function saveRegionVersionTimeline(
+  versionId: string,
   timeline: ITimelineEra[]
 ): Promise<void> {
   const db = await getDB();
 
-  // Delete existing timeline
-  await db.execute("DELETE FROM region_timeline_eras WHERE region_id = $1", [regionId]);
+  // Delete existing timeline for this version
+  await db.execute("DELETE FROM region_timeline_eras WHERE region_id = $1", [versionId]);
   // Events will be cascade deleted
 
   // Insert new eras and events
@@ -699,7 +699,7 @@ export async function saveRegionTimeline(
       ) VALUES (
         $1, $2, $3, $4, $5, $6
       )`,
-      [era.id, regionId, era.name, era.description, era.startDate, era.endDate]
+      [era.id, versionId, era.name, era.description, era.startDate, era.endDate]
     );
 
     // Insert events for this era
@@ -729,4 +729,33 @@ export async function saveRegionTimeline(
       );
     }
   }
+}
+
+/**
+ * @deprecated Use getRegionVersionTimeline instead
+ * Get timeline for a region (legacy - returns main version timeline)
+ */
+export async function getRegionTimeline(
+  regionId: string
+): Promise<ITimelineEra[]> {
+  // For backwards compatibility, get timeline from main version
+  const versions = await getRegionVersions(regionId);
+  const mainVersion = versions.find(v => v.isMain);
+  if (!mainVersion) return [];
+  return getRegionVersionTimeline(mainVersion.id);
+}
+
+/**
+ * @deprecated Use saveRegionVersionTimeline instead
+ * Save complete timeline for a region (legacy - saves to main version)
+ */
+export async function saveRegionTimeline(
+  regionId: string,
+  timeline: ITimelineEra[]
+): Promise<void> {
+  // For backwards compatibility, save timeline to main version
+  const versions = await getRegionVersions(regionId);
+  const mainVersion = versions.find(v => v.isMain);
+  if (!mainVersion) return;
+  await saveRegionVersionTimeline(mainVersion.id, timeline);
 }

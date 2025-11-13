@@ -58,7 +58,7 @@ export function VersionManager({
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col -mx-6 px-6">
       {/* Header with Add Button */}
       <div className="pb-3">
         <Button
@@ -75,8 +75,8 @@ export function VersionManager({
       <Separator className="mb-3" />
 
       {/* Versions List with Scroll */}
-      <ScrollArea className="flex-1 pr-3">
-        <div className="space-y-3">
+      <ScrollArea className="flex-1">
+        <div className="space-y-3 w-full">
           {/* Main Version */}
           {mainVersion && (
             <VersionCard
@@ -88,7 +88,7 @@ export function VersionManager({
 
           {/* Alternative Versions */}
           {alternativeVersions.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 w-full">
               {alternativeVersions.map((version) => (
                 <VersionCard
                   key={version.id}
@@ -102,7 +102,7 @@ export function VersionManager({
 
           {/* Empty State */}
           {alternativeVersions.length === 0 && (
-            <div className="text-center py-6 px-4 bg-muted/30 rounded-lg">
+            <div className="w-full text-center py-6 px-4 bg-muted/30 rounded-lg">
               <GitBranch className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm font-medium text-foreground mb-1">
                 {t("versions.empty_state.title")}
@@ -117,7 +117,7 @@ export function VersionManager({
 
       {/* Hint at the bottom */}
       <div className="pt-3 mt-3 border-t">
-        <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+        <div className="w-full text-xs text-muted-foreground bg-muted/30 p-2 rounded">
           <p className="mb-1">
             <strong>{t("versions.hint.title")}</strong>
           </p>
