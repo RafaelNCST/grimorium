@@ -125,7 +125,8 @@
       "WebFetch(domain:v2.tauri.app)",
       "Bash(cmd /c \"taskkill /F /PID 47728\")",
       "Bash(cmd /c \"taskkill /PID 18440 /F\")",
-      "Bash(cmd //c \"taskkill //F //PID 39028\")"
+      "Bash(cmd //c \"taskkill //F //PID 39028\")",
+      "Bash(/tmp/old_map_canvas.tsx)"
     ],
     "deny": [],
     "ask": []

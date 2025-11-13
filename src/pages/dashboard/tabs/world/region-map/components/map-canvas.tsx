@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MapMarker } from "./map-marker";
@@ -41,9 +41,7 @@ export function MapCanvas({
   const [tempMarkerPositions, setTempMarkerPositions] = useState<Record<string, { x: number; y: number }>>({});
   const isDraggingRef = useRef(false);
   const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
-  const transformRef = useRef<ReactZoomPanPinchRef | null>(null);
   const [currentScale, setCurrentScale] = useState(1);
-  const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -233,6 +231,7 @@ export function MapCanvas({
     });
   }, [markers]);
 
+
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
 
@@ -276,15 +275,11 @@ export function MapCanvas({
       style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}
     >
       <TransformWrapper
-        ref={(ref) => {
-          transformRef.current = ref;
-          console.log('[MapCanvas] TransformWrapper ref set:', ref !== null);
-        }}
         initialScale={1}
-        minScale={0.5}
+        minScale={0.25}
         maxScale={4}
         disabled={false}
-        limitToBounds={false}
+        disablePadding={true}
         panning={{
           disabled: isDraggingRef.current || draggingMarkerId !== null,
           allowLeftClickPan: true,
@@ -293,19 +288,14 @@ export function MapCanvas({
         }}
         centerOnInit
         wheel={{
-          step: 0.07,
-          smoothStep: 0.005,
-          disabled: false,
-          limitsOnWheel: true
+          step: 0.05,
+          smoothStep: 0.002,
+          limitsOnWheel: true,
+          disabled: false
         }}
         doubleClick={{ disabled: true }}
-        smooth={false}
-        velocityAnimation={{
-          disabled: true
-        }}
         onTransformed={(ref, state) => {
           setCurrentScale(state.scale);
-          setCurrentPosition({ x: state.positionX, y: state.positionY });
         }}
       >
         {({ zoomIn, zoomOut, resetTransform }) => {
