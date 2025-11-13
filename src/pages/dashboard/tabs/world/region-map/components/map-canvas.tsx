@@ -288,7 +288,7 @@ export function MapCanvas({
         }}
         centerOnInit
         wheel={{
-          step: 0.05,
+          step: 0.03,
           smoothStep: 0.002,
           limitsOnWheel: true,
           disabled: false

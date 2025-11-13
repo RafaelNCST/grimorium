@@ -385,13 +385,13 @@ export function RegionMapPage() {
       {/* Back Button - Fixed */}
       <button
         onClick={handleBack}
-        className="fixed top-12 left-4 z-40 p-3 bg-background border rounded-lg shadow-lg hover:bg-muted transition-colors"
+        className="fixed top-12 left-4 z-40 h-[52px] px-6 bg-background border rounded-lg shadow-lg hover:bg-muted transition-colors flex items-center justify-center"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <ArrowLeft className="w-6 h-6" />
       </button>
 
       {/* Region Name - Fixed */}
-      <div className="fixed top-12 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-background border rounded-lg shadow-lg flex items-center gap-2">
+      <div className="fixed top-12 left-24 z-40 h-[52px] px-6 bg-background border rounded-lg shadow-lg flex items-center gap-2">
         <h1 className="text-lg font-semibold">{region.name}</h1>
         {mapImagePath && (
           <TooltipProvider delayDuration={300}>
@@ -450,7 +450,7 @@ export function RegionMapPage() {
       )}
 
       {/* Main Canvas */}
-      <div className="fixed inset-0 w-full h-full">
+      <div className="fixed inset-x-0 bottom-0 top-8 w-full">
         {mapImagePath ? (
           <MapCanvas
             imagePath={mapImagePath}
