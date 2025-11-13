@@ -322,8 +322,6 @@ export function RegionDetail() {
         console.error("Error loading version timeline:", error);
         toast.error("Erro ao carregar timeline da versão");
       }
-
-      toast.success(`Versão "${version.name}" ativada`);
     },
     [versions]
   );
