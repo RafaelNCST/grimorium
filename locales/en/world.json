@@ -51,8 +51,8 @@
     "creating": "Creating...",
     "updating": "Updating...",
 
-    "advanced_items": "Advanced Items",
-    "basic_fields": "Basic Fields",
+    "advanced_items": "Advanced Information",
+    "basic_fields": "Basic Information",
 
     "environment_section": "Environment",
     "climate_label": "Climate",
@@ -169,7 +169,8 @@
   },
   "region_card": {
     "parent_badge": "Parent Region:",
-    "no_summary": "No description"
+    "no_summary": "No description",
+    "view_details": "View details"
   },
   "region_map": {
     "children_title": "Child Regions",

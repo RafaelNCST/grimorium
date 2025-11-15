@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 interface ScalePickerProps {
-  value: RegionScale | null;
+  value: RegionScale | null | undefined;
   onChange: (scale: RegionScale) => void;
 }
 
@@ -42,9 +42,7 @@ export function ScalePicker({ value, onChange }: ScalePickerProps) {
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        {t("create_region.scale_label")}
-      </label>
+      {/* Label removed - not needed (duplicate title) */}
       <div className="grid grid-cols-2 gap-3">
         {SCALES.map((scale) => {
           const Icon = SCALE_ICONS[scale];

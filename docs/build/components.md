@@ -1,482 +1,102 @@
-# Componentes Visuais Reutilizáveis
+# Components Documentation
 
-Este documento documenta todos os componentes visuais reutilizáveis criados para o Grimorium, organizados por categoria: Formulário, Layout, Listas e Modais.
-
----
+Documentação completa dos componentes reutilizáveis disponíveis no projeto Grimorium.
 
 ## Índice
 
-1. [Componentes de Formulário](#componentes-de-formulário)
-2. [Componentes de Layout](#componentes-de-layout)
-3. [Componentes de Listas](#componentes-de-listas)
-4. [Componentes de Modais/Dialogs](#componentes-de-modaisdialogs)
-5. [Sistema de Versões](#sistema-de-versões)
-
----
-
-## Componentes de Formulário
-
-Todos os componentes de formulário seguem o padrão shadcn/ui e são compatíveis com React Hook Form.
-
-### 1. FormInput
-
-**Localização:** `src/components/forms/FormInput.tsx`
-
-**Propósito:** Input de texto genérico com label, erro e estados visuais.
-
-**Props:**
-```typescript
-interface FormInputProps {
-  label: string;                    // Label do campo
-  name: string;                     // Nome (para React Hook Form)
-  value: string;                    // Valor atual
-  onChange: (e: ChangeEvent) => void; // Callback de mudança
-  onBlur?: () => void;              // Callback para validação (opcional)
-  placeholder?: string;             // Placeholder
-  type?: 'text' | 'email' | 'password' | 'number'; // Tipo do input
-  disabled?: boolean;               // Desabilita o campo
-  required?: boolean;               // Campo obrigatório (mostra asterisco vermelho)
-  error?: string;                   // Mensagem de erro (borda vermelha + mensagem)
-  helperText?: string;              // Texto de ajuda
-  showOptionalLabel?: boolean;      // Mostrar "(opcional)"
-  className?: string;               // Classes adicionais
-  maxLength?: number;               // Limite de caracteres
-}
-```
-
-**Exemplo de uso (campo básico obrigatório com validação):**
-```tsx
-<div className="space-y-2">
-  <Label>
-    {t("fields.name")}
-    <span className="text-destructive ml-1">*</span>
-  </Label>
-  <Input
-    value={editData.name || ""}
-    onChange={(e) => onEditDataChange("name", e.target.value)}
-    onBlur={() => validateField("name", editData.name)}
-    placeholder={t("placeholders.name")}
-    maxLength={200}
-    className={errors.name ? "border-destructive" : ""}
-    required
-  />
-  {errors.name && (
-    <p className="text-sm text-destructive flex items-center gap-1">
-      <AlertCircle className="h-4 w-4" />
-      {errors.name}
-    </p>
-  )}
-</div>
-```
-
-**Exemplo de uso (sem validação):**
-```tsx
-<FormInput
-  label="Nome da Região"
-  name="name"
-  value={editData.name}
-  onChange={(e) => updateField('name', e.target.value)}
-  placeholder="Digite o nome da região..."
-  disabled={!isEditing}
-/>
-```
-
-**Quando usar:**
-- Inputs de texto simples (nome, descrição curta, etc)
-- Emails, senhas, números
-
-**Quando NÃO usar:**
-- Textos longos → use `FormTextarea`
-- Seleção de opções → use `FormSelect`
-- Seleção de entidades → use `EntitySelect`
-
----
-
-### 2. FormTextarea
-
-**Localização:** `src/components/forms/FormTextarea.tsx`
-
-**Propósito:** Textarea para textos longos com contador de caracteres opcional.
-
-**Props:**
-```typescript
-interface FormTextareaProps {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: ChangeEvent) => void;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  helperText?: string;
-  maxLength?: number;               // Limite de caracteres
-  showCharCount?: boolean;          // Mostrar contador
-  rows?: number;                    // Número de linhas (padrão: 4)
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<FormTextarea
-  label="Descrição"
-  name="description"
-  value={editData.description}
-  onChange={(e) => updateField('description', e.target.value)}
-  placeholder="Descreva a região..."
-  maxLength={1000}
-  showCharCount
-  rows={6}
-  disabled={!isEditing}
-/>
-```
-
-**Features especiais:**
-- Contador de caracteres: "245 / 1000"
-- Auto-resize (opcional)
-
----
-
-### 3. FormSelect
-
-**Localização:** `src/components/forms/FormSelect.tsx`
-
-**Propósito:** Dropdown simples para seleção única de opções estáticas.
-
-**Props:**
-```typescript
-interface FormSelectProps {
-  label: string;
-  value: string;
-  onValueChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<FormSelect
-  label="Tipo de Região"
-  value={editData.regionType}
-  onValueChange={(value) => updateField('regionType', value)}
-  options={[
-    { value: 'forest', label: 'Floresta' },
-    { value: 'mountain', label: 'Montanha' },
-    { value: 'desert', label: 'Deserto' },
-  ]}
-  placeholder="Selecione o tipo..."
-  disabled={!isEditing}
-  required
-/>
-```
-
-**Quando usar:**
-- Opções fixas conhecidas (tipos, categorias, etc)
-- Lista pequena de opções (até ~20 itens)
-
-**Quando NÃO usar:**
-- Seleção de entidades do banco → use `EntitySelect`
-- Seleção múltipla → use `FormMultiSelect`
-
----
-
-### 4. FormMultiSelect
-
-**Localização:** `src/components/forms/FormMultiSelect.tsx`
-
-**Propósito:** Multi-select com badges para múltiplas opções estáticas.
-
-**Props:**
-```typescript
-interface FormMultiSelectProps {
-  label: string;
-  value: string[];                  // Array de valores selecionados
-  onChange: (value: string[]) => void;
-  options: Array<{ value: string; label: string }>;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  maxItems?: number;                // Limite de itens selecionáveis
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<FormMultiSelect
-  label="Climas"
-  value={safeJsonParse(editData.climates)}
-  onChange={(values) => updateField('climates', JSON.stringify(values))}
-  options={[
-    { value: 'tropical', label: 'Tropical' },
-    { value: 'temperate', label: 'Temperado' },
-    { value: 'cold', label: 'Frio' },
-  ]}
-  placeholder="Selecione os climas..."
-  maxItems={3}
-  disabled={!isEditing}
-/>
-```
-
-**Features especiais:**
-- Mostra badges dos itens selecionados
-- Botão "X" para remover cada badge
-- Limite de itens configurável
-- Busca inline (opcional)
-
----
-
-### 5. EntitySelect
-
-**Localização:** `src/components/forms/EntitySelect.tsx`
-
-**Propósito:** Dropdown que busca e seleciona uma entidade do banco de dados.
-
-**Props:**
-```typescript
-interface EntitySelectProps {
-  entity: 'character' | 'faction' | 'race' | 'item' | 'region';
-  value: string | null;             // ID da entidade selecionada
-  onValueChange: (value: string | null) => void;
-  label: string;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  filter?: (entity: T) => boolean;  // Filtro customizado
-  excludeIds?: string[];            // IDs para excluir da lista
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<EntitySelect
-  entity="character"
-  value={editData.founderId}
-  onValueChange={(id) => updateField('founderId', id)}
-  label="Fundador"
-  placeholder="Selecione o fundador..."
-  disabled={!isEditing}
-/>
-```
-
-**Features especiais:**
-- Busca automática no banco de dados
-- Mostra avatar/ícone da entidade
-- Loading state enquanto busca
-- Cache de resultados
-
-**Busca por tipo:**
-| Tipo | Service | Mostra |
-|------|---------|--------|
-| character | `getAllCharacters()` | Avatar + Nome |
-| faction | `getAllFactions()` | Cor + Nome |
-| race | `getAllRaces()` | Ícone + Nome |
-| item | `getAllItems()` | Ícone + Nome |
-| region | `getAllRegions()` | Nome + Tipo |
-
----
-
-### 6. EntityMultiSelect
-
-**Localização:** `src/components/forms/EntityMultiSelect.tsx`
-
-**Propósito:** Multi-select de entidades do banco com badges e avatares.
-
-**Props:**
-```typescript
-interface EntityMultiSelectProps {
-  entity: 'character' | 'faction' | 'race' | 'item' | 'region';
-  value: string[];                  // Array de IDs selecionados
-  onChange: (value: string[]) => void;
-  label: string;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  maxItems?: number;
-  filter?: (entity: T) => boolean;
-  excludeIds?: string[];
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<EntityMultiSelect
-  entity="faction"
-  value={safeJsonParse(editData.residentFactions)}
-  onChange={(ids) => updateField('residentFactions', JSON.stringify(ids))}
-  label="Facções Residentes"
-  placeholder="Selecione facções..."
-  maxItems={10}
-  disabled={!isEditing}
-/>
-```
-
-**Features especiais:**
-- Badges com avatar/ícone + nome
-- Botão "X" em cada badge
-- Limite de itens
-- Loading state
+- [Componentes de Layout](#componentes-de-layout)
+- [Componentes de Listagem](#componentes-de-listagem)
+- [Componentes de Cards](#componentes-de-cards)
+- [Componentes de Dialogs](#componentes-de-dialogs)
+- [Componentes de Navegação](#componentes-de-navegação)
+- [Componentes de Estado Vazio](#componentes-de-estado-vazio)
+- [Componentes de Versionamento](#componentes-de-versionamento)
+- [Componentes de Texto](#componentes-de-texto)
+- [Componentes de Alertas](#componentes-de-alertas)
+- [Padrões de Uso](#padrões-de-uso)
 
 ---
 
 ## Componentes de Layout
 
-Componentes estruturais para páginas de detalhes.
+Componentes para estruturar páginas de detalhes de entidades com padrão consistente.
 
-### 1. DetailPageLayout
-
+### DetailPageLayout
 **Localização:** `src/components/detail-page/DetailPageLayout.tsx`
 
-**Propósito:** Layout principal de páginas de detalhes com sidebar e conteúdo.
+Layout principal para páginas de detalhes com sidebar opcional.
 
-**Props:**
+**Quando usar:**
+- Base de todas as páginas de detalhes de entidades
+- Quando precisa de layout consistente com sidebar opcional
+- Páginas de detalhes de Character, Faction, Item, Race, Region
+
+**Props principais:**
 ```typescript
 interface DetailPageLayoutProps {
-  children: React.ReactNode;        // Conteúdo principal
-  sidebar: React.ReactNode;         // Sidebar (menu lateral)
+  children: React.ReactNode;
+  sidebar?: React.ReactNode;
   className?: string;
+  sidebarClassName?: string;
+  mainClassName?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
 <DetailPageLayout
-  sidebar={
-    <SideNavigation
-      items={navItems}
-      header={<VersionSelector ... />}
-      footer={<DeleteButton ... />}
-    />
-  }
+  sidebar={<SideNavigation items={navItems} />}
+  sidebarClassName="w-64"
 >
+  {/* Conteúdo principal */}
   <EditControls ... />
   <BasicInfoSection>...</BasicInfoSection>
-  <AdvancedInfoSection>...</AdvancedInfoSection>
 </DetailPageLayout>
 ```
 
-**Estrutura renderizada:**
-```
-┌──────────┬─────────────────────┐
-│          │                     │
-│ Sidebar  │  Main Content       │
-│ (w-64)   │  (flex-1)           │
-│          │                     │
-└──────────┴─────────────────────┘
-```
-
-**Responsividade:**
-- Desktop: Sidebar 256px + conteúdo flexível
-- Mobile: Sidebar colapsável (hamburger)
-
 ---
 
-### 2. SideNavigation
-
-**Localização:** `src/components/detail-page/SideNavigation.tsx`
-
-**Propósito:** Menu de navegação lateral para páginas de detalhes.
-
-**Props:**
-```typescript
-interface NavItem {
-  id: string;
-  label: string;
-  icon?: React.ReactNode;
-  onClick?: () => void;
-}
-
-interface SideNavigationProps {
-  items: NavItem[];
-  activeItem?: string;              // ID do item ativo
-  header?: React.ReactNode;         // Ex: VersionSelector
-  footer?: React.ReactNode;         // Ex: DeleteButton
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-const navItems = [
-  { id: 'info', label: t('information'), icon: <Info /> },
-  { id: 'timeline', label: t('timeline'), icon: <Clock /> },
-  { id: 'map', label: t('map'), icon: <Map /> },
-];
-
-<SideNavigation
-  items={navItems}
-  activeItem={activeSection}
-  header={<VersionSelector versions={versions} ... />}
-  footer={
-    <Button variant="destructive" onClick={openDeleteDialog}>
-      <Trash2 /> {t('delete')}
-    </Button>
-  }
-/>
-```
-
-**Features especiais:**
-- Item ativo destacado visualmente
-- Smooth scroll ao clicar
-- Header/footer opcionais
-
----
-
-### 3. BasicInfoSection
-
+### BasicInfoSection
 **Localização:** `src/components/detail-page/BasicInfoSection.tsx`
 
-**Propósito:** Container para informações básicas da entidade (sempre visível).
+Container para campos de informações básicas (não colapsável).
 
-**Props:**
+**Quando usar:**
+- Seções de informações básicas/essenciais
+- Campos que devem estar sempre visíveis
+- Primeira seção de páginas de detalhes
+
+**Props principais:**
 ```typescript
 interface BasicInfoSectionProps {
-  title?: string;                   // Título da seção (opcional)
+  title?: string;
   children: React.ReactNode;
   className?: string;
+  contentClassName?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
-<BasicInfoSection title={t('basic_information')}>
-  <FormInput label={t('name')} ... />
-  <FormTextarea label={t('description')} ... />
-  <FormSelect label={t('type')} ... />
+<BasicInfoSection title="Informações Básicas">
+  <FormInput label="Nome" value={name} onChange={setName} />
+  <FormTextarea label="Descrição" value={description} onChange={setDescription} />
 </BasicInfoSection>
 ```
 
-**Aparência:**
-```
-┌──────────────────────────────┐
-│ Informações Básicas          │ ← Título (opcional)
-├──────────────────────────────┤
-│ Nome: [____________]         │
-│ Descrição: [____________]    │
-│ Tipo: [Dropdown ▼]          │
-└──────────────────────────────┘
-```
-
 ---
 
-### 4. AdvancedInfoSection
-
+### AdvancedInfoSection
 **Localização:** `src/components/detail-page/AdvancedInfoSection.tsx`
 
-**Propósito:** Container colapsável para informações avançadas.
+Container colapsável para informações avançadas.
 
-**Props:**
+**Quando usar:**
+- Informações secundárias/opcionais
+- Campos avançados que podem ficar ocultos
+- Segunda seção de páginas de detalhes
+
+**Props principais:**
 ```typescript
 interface AdvancedInfoSectionProps {
   title: string;
@@ -484,106 +104,91 @@ interface AdvancedInfoSectionProps {
   onToggle: () => void;
   children: React.ReactNode;
   className?: string;
+  contentClassName?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
-const { openSections, toggleSection } = useCollapsibleSections('regionSections');
+const [isOpen, setIsOpen] = useState(false);
 
 <AdvancedInfoSection
-  title={t('advanced_information')}
-  isOpen={openSections.advanced}
-  onToggle={() => toggleSection('advanced')}
+  title="Informações Avançadas"
+  isOpen={isOpen}
+  onToggle={() => setIsOpen(!isOpen)}
 >
-  <FormInput label={t('founded_date')} ... />
-  <FormSelect label={t('government_type')} ... />
-  <EntitySelect entity="character" label={t('ruler')} ... />
+  <FormSelectGrid label="Tipo" ... />
+  <FormListInput label="Habilidades" ... />
 </AdvancedInfoSection>
 ```
 
-**Aparência (collapsed):**
-```
-┌──────────────────────────────┐
-│ ▶ Informações Avançadas      │ ← Clicável
-└──────────────────────────────┘
-```
-
-**Aparência (expanded):**
-```
-┌──────────────────────────────┐
-│ ▼ Informações Avançadas      │ ← Clicável
-├──────────────────────────────┤
-│ Data Fundação: [_________]   │
-│ Governo: [Dropdown ▼]        │
-│ Governante: [Dropdown ▼]     │
-└──────────────────────────────┘
-```
-
-**Features especiais:**
-- Animação suave de expand/collapse
-- Estado persistido em localStorage (via useCollapsibleSections)
-
 ---
 
-### 5. CollapsibleSection
-
+### CollapsibleSection
 **Localização:** `src/components/detail-page/CollapsibleSection.tsx`
 
-**Propósito:** Seção colapsável genérica para features especiais (timeline, mapa, etc).
+Seção genérica colapsável com ícone customizável.
 
-**Props:**
+**Quando usar:**
+- Seções genéricas (timeline, mapa, relacionamentos)
+- Quando precisa de ícone customizado na header
+- Seções com conteúdo complexo (não apenas formulários)
+
+**Props principais:**
 ```typescript
 interface CollapsibleSectionProps {
   title: string;
-  icon?: React.ReactNode;
+  icon?: LucideIcon;
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
-  defaultOpen?: boolean;
   className?: string;
+  contentClassName?: string;
+  headerClassName?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
 <CollapsibleSection
-  title={t('timeline')}
-  icon={<Clock />}
-  isOpen={openSections.timeline}
-  onToggle={() => toggleSection('timeline')}
+  title="Timeline"
+  icon={Clock}
+  isOpen={showTimeline}
+  onToggle={() => setShowTimeline(!showTimeline)}
 >
-  <RegionTimeline timeline={timeline} ... />
+  <Timeline events={events} />
 </CollapsibleSection>
 ```
 
-**Diferença de AdvancedInfoSection:**
-- `AdvancedInfoSection`: Para campos de formulário avançados
-- `CollapsibleSection`: Para features completas (timeline, mapa, etc)
-
 ---
 
-### 6. EditControls
-
+### EditControls
 **Localização:** `src/components/detail-page/EditControls.tsx`
 
-**Propósito:** Botões de controle de edição padronizados.
+Controles padronizados de editar/salvar/cancelar.
 
-**Props:**
+**Quando usar:**
+- Todas as páginas de detalhes com modo de edição
+- Quando precisa de controles de edição consistentes
+- Suporte a estados de loading e mudanças não salvas
+
+**Props principais:**
 ```typescript
 interface EditControlsProps {
   isEditing: boolean;
-  hasChanges: boolean;
-  isSaving: boolean;
+  hasChanges?: boolean;
+  isSaving?: boolean;
   onEdit: () => void;
-  onSave: () => Promise<void>;
+  onSave: () => void;
   onCancel: () => void;
-  onDelete?: () => void;            // Opcional
-  className?: string;
+  position?: 'top' | 'bottom' | 'sticky'; // default: 'sticky'
+  saveText?: string;
+  cancelText?: string;
+  editText?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
 <EditControls
   isEditing={isEditing}
@@ -592,715 +197,1940 @@ interface EditControlsProps {
   onEdit={() => setIsEditing(true)}
   onSave={handleSave}
   onCancel={handleCancel}
-  onDelete={openDeleteDialog}
+  position="sticky"
 />
 ```
 
-**Comportamento:**
-
-**Quando NÃO está editando:**
-```
-[Editar] [Deletar]
-```
-
-**Quando está editando:**
-```
-[Salvar] [Cancelar]
-```
-- Botão "Salvar" desabilitado se `!hasChanges`
-- Botão "Salvar" com loading se `isSaving`
-
-**Quando está salvando:**
-```
-[⟳ Salvando...] [Cancelar]
-```
+**Funcionalidades:**
+- Posição sticky por padrão (sempre visível no scroll)
+- Loading state no botão salvar
+- Desabilita botão salvar quando não há mudanças
+- Visual consistente com todas as páginas
 
 ---
 
-## Componentes de Listas
+### FieldWithVisibilityToggle
+**Localização:** `src/components/detail-page/FieldWithVisibilityToggle.tsx`
 
-### 1. CollapsibleEntityList
+⭐ **Componente recomendado** - Wrapper para campos opcionais que podem ser ocultados/mostrados.
 
-**Localização:** `src/components/entity-list/CollapsibleEntityList.tsx`
+**Quando usar:**
+- Campos OPCIONAIS da seção avançada (Advanced Info Section)
+- Campos que o usuário pode escolher esconder na visualização
+- Apenas para campos não obrigatórios
 
-**Propósito:** Lista colapsável de entidades relacionadas com renderização customizada.
+**⚠️ IMPORTANTE - Regras de Uso:**
+1. ✅ **APENAS campos OPCIONAIS** podem ser ocultados
+2. ❌ **Campos OBRIGATÓRIOS** (required) NÃO podem ser ocultados (use `isOptional={false}`)
+3. ✅ **Modo VIEW:** Campos ocultos são completamente removidos (return null)
+4. ✅ **Modo EDIT:** Campos ocultos são mostrados com opacidade reduzida e borda tracejada
+5. ✅ **Seções avançadas:** Se TODOS os campos forem ocultados, a seção inteira deve ser ocultada no modo VIEW
+6. ✅ **Seções especiais:** Seções como Timeline, Map podem ser ocultadas por inteiro (use `ISectionVisibility`)
 
-**Props:**
+**Props principais:**
 ```typescript
-interface CollapsibleEntityListProps<T> {
-  title: string;
-  entities: T[];                    // Array de entidades
-  isOpen: boolean;
-  onToggle: () => void;
-  renderCard: (entity: T) => React.ReactNode; // Função de render
-  emptyText: string;                // Texto quando vazio
-  isEditing?: boolean;              // Modo de edição
-  onRemove?: (entity: T) => void;   // Callback de remoção
-  className?: string;
+interface FieldWithVisibilityToggleProps {
+  fieldName: string;              // Nome único do campo (ex: "biography")
+  label: string;                  // Label do campo
+  children: React.ReactNode;      // Conteúdo do campo (input, textarea, etc.)
+  isOptional?: boolean;           // Se false, campo não pode ser ocultado (default: true)
+  fieldVisibility: { [key: string]: boolean };  // Objeto de visibilidade
+  isEditing: boolean;             // Se está em modo de edição
+  onFieldVisibilityToggle: (fieldName: string) => void;  // Handler de toggle
+  className?: string;             // Classes adicionais
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo básico:**
 ```tsx
-<CollapsibleEntityList
-  title={t('resident_factions')}
-  entities={residentFactionsData}
-  isOpen={openSections.residentFactions}
-  onToggle={() => toggleSection('residentFactions')}
-  renderCard={(faction) => <FactionCard faction={faction} />}
-  emptyText={t('no_resident_factions')}
+import { FieldWithVisibilityToggle } from '@/components/detail-page';
+
+<FieldWithVisibilityToggle
+  fieldName="biography"
+  label="Biografia"
+  isOptional={true}
+  fieldVisibility={fieldVisibility}
   isEditing={isEditing}
-  onRemove={handleRemoveFaction}
-/>
+  onFieldVisibilityToggle={handleFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <FormTextarea
+      value={editData.biography || ""}
+      onChange={(e) => onEditDataChange("biography", e.target.value)}
+      placeholder="Escreva a biografia..."
+    />
+  ) : (
+    region.biography ? (
+      <p className="text-sm">{region.biography}</p>
+    ) : (
+      <EmptyFieldState />
+    )
+  )}
+</FieldWithVisibilityToggle>
 ```
 
-**Aparência (collapsed):**
-```
-┌──────────────────────────────┐
-│ ▶ Facções Residentes (3)     │
-└──────────────────────────────┘
-```
-
-**Aparência (expanded - visualização):**
-```
-┌──────────────────────────────┐
-│ ▼ Facções Residentes (3)     │
-├──────────────────────────────┤
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Guarda Imperial  │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Mercadores       │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Ordem Mágica     │ │
-│ └──────────────────────────┘ │
-└──────────────────────────────┘
-```
-
-**Aparência (expanded - edição):**
-```
-┌──────────────────────────────┐
-│ ▼ Facções Residentes (3)     │
-├──────────────────────────────┤
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Guarda Imperial X│ │ ← Botão remover
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Mercadores      X│ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ [Ícone] Ordem Mágica    X│ │
-│ └──────────────────────────┘ │
-└──────────────────────────────┘
-```
-
-**Features especiais:**
-- Renderização totalmente customizável via `renderCard`
-- Contador de itens no título
-- Modo de edição com botões de remoção
-- Estado vazio customizável
-
-**Uso típico em RegionDetail:**
+**Exemplo com campo obrigatório (não pode ser ocultado):**
 ```tsx
-// Facções residentes
-<CollapsibleEntityList
-  entities={residentFactions}
-  renderCard={(faction) => <FactionCard faction={faction} />}
-  ...
-/>
+<FieldWithVisibilityToggle
+  fieldName="name"
+  label="Nome"
+  isOptional={false}  // Campo obrigatório - não mostra botão de ocultar
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={handleFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <FormInput value={editData.name} onChange={...} />
+  ) : (
+    <p>{entity.name}</p>
+  )}
+</FieldWithVisibilityToggle>
+```
 
-// Personagens importantes
-<CollapsibleEntityList
-  entities={importantCharacters}
-  renderCard={(char) => <CharacterCard character={char} />}
-  ...
-/>
+**Exemplo de ocultar seção inteira quando todos os campos estão ocultos:**
+```tsx
+import { hasVisibleFields } from '@/components/detail-page';
 
-// Raças
-<CollapsibleEntityList
-  entities={races}
-  renderCard={(race) => <RaceCard race={race} />}
-  ...
+// Lista de todos os campos da seção avançada
+const advancedFields = [
+  'biography', 'personality', 'goals', 'fears', 'motivations'
+];
+
+// Verifica se pelo menos um campo está visível
+const hasAnyVisibleField = hasVisibleFields(advancedFields, fieldVisibility);
+
+// Renderização condicional
+{(!isEditing && !hasAnyVisibleField) ? null : (
+  <AdvancedInfoSection title="Informações Avançadas">
+    <FieldWithVisibilityToggle fieldName="biography" {...props}>
+      {/* conteúdo */}
+    </FieldWithVisibilityToggle>
+
+    <FieldWithVisibilityToggle fieldName="personality" {...props}>
+      {/* conteúdo */}
+    </FieldWithVisibilityToggle>
+
+    {/* ... outros campos */}
+  </AdvancedInfoSection>
+)}
+```
+
+**Funcionalidades:**
+- **Toggle visual:** Botão de olho (Eye/EyeOff) aparece apenas em modo de edição para campos opcionais
+- **Indicador de obrigatório:** Asterisco vermelho (*) aparece ao lado do label de campos não opcionais
+- **Feedback visual no modo edit:**
+  - Campo visível: aparência normal
+  - Campo oculto: `opacity-50`, `bg-muted/30`, borda tracejada
+- **Comportamento no modo view:**
+  - Campo visível: renderiza normalmente
+  - Campo oculto: return null (não renderiza nada)
+- **Gerenciamento de label:** O componente já renderiza o label, portanto:
+  - ✅ Remova tags `<Label>` de dentro do children
+  - ✅ Para componentes que têm prop `label`, passe `label=""` (string vazia)
+
+**Helpers de Visibilidade:**
+```typescript
+import {
+  hasVisibleFields,
+  isSectionVisible,
+  toggleFieldVisibility,
+  toggleSectionVisibility,
+  getHiddenFields,
+  getHiddenSections,
+  resetFieldsVisibility,
+  resetSectionsVisibility,
+} from '@/components/detail-page';
+
+// Verificar se algum campo de uma lista está visível
+const isVisible = hasVisibleFields(['bio', 'personality'], fieldVisibility);
+
+// Verificar se seção especial está visível
+const timelineVisible = isSectionVisible('timeline', sectionVisibility);
+
+// Toggle de visibilidade
+const newVisibility = toggleFieldVisibility('biography', fieldVisibility);
+setFieldVisibility(newVisibility);
+
+// Obter lista de campos ocultos
+const hidden = getHiddenFields(fieldVisibility);  // ['bio', 'goals']
+
+// Reset para todos visíveis
+const resetFields = resetFieldsVisibility(['bio', 'personality', 'goals']);
+```
+
+**Estrutura no banco de dados:**
+```typescript
+// Type definition
+interface IEntity {
+  // ... outros campos
+  fieldVisibility?: string;      // JSON string de IFieldVisibility
+  sectionVisibility?: string;    // JSON string de ISectionVisibility
+}
+
+interface IFieldVisibility {
+  [fieldName: string]: boolean;  // false = oculto, true/undefined = visível
+}
+
+interface ISectionVisibility {
+  [sectionName: string]: boolean;  // false = oculto, true/undefined = visível
+}
+
+// Exemplo de valor salvo no banco
+{
+  fieldVisibility: '{"biography": false, "goals": false}',
+  sectionVisibility: '{"timeline": false}'
+}
+```
+
+**Padrão completo de implementação:**
+
+1. **Adicionar tipos no entity type:**
+```typescript
+import type { IFieldVisibility, ISectionVisibility } from '@/components/detail-page';
+
+interface IRegion {
+  // ... campos existentes
+  fieldVisibility?: string;
+  sectionVisibility?: string;
+}
+
+interface IRegionFormData {
+  // ... campos existentes
+  fieldVisibility?: IFieldVisibility;
+  sectionVisibility?: ISectionVisibility;
+}
+```
+
+2. **Controller - Gerenciar estado:**
+```typescript
+import {
+  type IFieldVisibility,
+  type ISectionVisibility,
+  toggleFieldVisibility,
+  toggleSectionVisibility,
+} from '@/components/detail-page';
+import { safeJsonParse } from '@/lib/utils/json-parse';
+
+// Estados
+const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+const [sectionVisibility, setSectionVisibility] = useState<ISectionVisibility>({});
+
+// Carregar do banco
+useEffect(() => {
+  const region = await getRegionById(id);
+  setFieldVisibility(safeJsonParse<IFieldVisibility>(region.fieldVisibility, {}));
+  setSectionVisibility(safeJsonParse<ISectionVisibility>(region.sectionVisibility, {}));
+}, [id]);
+
+// Handlers
+const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
+  setFieldVisibility((prev) => toggleFieldVisibility(fieldName, prev));
+}, []);
+
+const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
+  setSectionVisibility((prev) => toggleSectionVisibility(sectionName, prev));
+}, []);
+
+// Salvar no banco
+const handleSave = async () => {
+  await updateRegion(regionId, {
+    // ... outros campos
+    fieldVisibility: JSON.stringify(fieldVisibility),
+    sectionVisibility: JSON.stringify(sectionVisibility),
+  });
+};
+
+// Passar para view
+return (
+  <RegionDetailView
+    fieldVisibility={fieldVisibility}
+    sectionVisibility={sectionVisibility}
+    onFieldVisibilityToggle={handleFieldVisibilityToggle}
+    onSectionVisibilityToggle={handleSectionVisibilityToggle}
+    // ... outras props
+  />
+);
+```
+
+3. **View - Usar componente:**
+```tsx
+import {
+  FieldWithVisibilityToggle,
+  hasVisibleFields,
+  isSectionVisible,
+} from '@/components/detail-page';
+
+// Lista de campos da seção
+const advancedFields = ['climate', 'season', 'description', 'anomalies'];
+
+// Verificar se deve mostrar seção
+const hasVisibleAdvancedFields = hasVisibleFields(advancedFields, fieldVisibility);
+
+// Renderização
+{(!isEditing && !hasVisibleAdvancedFields) ? null : (
+  <AdvancedInfoSection title="Informações Avançadas">
+    <FieldWithVisibilityToggle
+      fieldName="climate"
+      label="Clima"
+      isOptional={true}
+      fieldVisibility={fieldVisibility}
+      isEditing={isEditing}
+      onFieldVisibilityToggle={onFieldVisibilityToggle}
+    >
+      {isEditing ? (
+        <FormTextarea value={editData.climate} onChange={...} />
+      ) : (
+        <p>{region.climate}</p>
+      )}
+    </FieldWithVisibilityToggle>
+
+    {/* Repetir para outros campos */}
+  </AdvancedInfoSection>
+)}
+
+{/* Seções especiais (ex: Timeline) */}
+{isSectionVisible('timeline', sectionVisibility) && (
+  <CollapsibleSection
+    title="Timeline"
+    isOpen={timelineSectionOpen}
+    onToggle={onTimelineSectionToggle}
+  >
+    <Timeline data={timeline} />
+  </CollapsibleSection>
+)}
+```
+
+**⚠️ Notas importantes:**
+- Apenas campos da **seção avançada** devem usar este componente
+- Campos da **seção básica** (Basic Info Section) NÃO devem ser ocultáveis
+- Se um campo é obrigatório (required), use `isOptional={false}` para remover o botão de toggle
+- Sempre salve o estado de visibilidade no banco de dados como JSON string
+- Use `safeJsonParse` para carregar com fallback para objeto vazio `{}`
+
+---
+
+### SideNavigation
+**Localização:** `src/components/detail-page/SideNavigation.tsx`
+
+Navegação lateral genérica para páginas de detalhes.
+
+**Quando usar:**
+- Navegação entre seções da página
+- Menu lateral customizado
+- Links de navegação com ícones
+
+**Props principais:**
+```typescript
+interface NavItem {
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+interface SideNavigationProps {
+  items: NavItem[];
+  activeItem?: string;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  className?: string;
+  headerClassName?: string;
+  footerClassName?: string;
+  navClassName?: string;
+}
+```
+
+**Exemplo:**
+```tsx
+<SideNavigation
+  items={[
+    { id: 'basic', label: 'Informações Básicas', icon: FileText },
+    { id: 'advanced', label: 'Avançado', icon: Settings },
+    { id: 'timeline', label: 'Timeline', icon: Clock },
+  ]}
+  activeItem={activeSection}
+  header={<h3>Navegação</h3>}
 />
 ```
 
 ---
 
-## Componentes de Modais/Dialogs
+## Componentes de Listagem
 
-### 1. DeleteConfirmationDialog
+Componentes padronizados para páginas de listagem de entidades.
 
+### EntityListHeader
+**Localização:** `src/components/entity-list/EntityListHeader.tsx`
+
+Header padronizado para páginas de listagem.
+
+**Quando usar:**
+- ✅ Todas as páginas de listagem (World, Characters, Factions, etc.)
+- ✅ Quando precisa de título, descrição e botões de ação
+- ✅ Suporte a filtros integrados via children
+
+**Props principais:**
+```typescript
+interface HeaderAction {
+  label: string;
+  onClick: () => void;
+  variant?: 'default' | 'outline' | 'ghost' | 'magical';
+  size?: 'sm' | 'default' | 'lg';
+  icon?: LucideIcon;
+  className?: string;
+}
+
+interface EntityListHeaderProps {
+  title: string;
+  description: string;
+  primaryAction: HeaderAction;
+  secondaryActions?: HeaderAction[];
+  children?: React.ReactNode; // Geralmente filter badges
+}
+```
+
+**Exemplo:**
+```tsx
+<EntityListHeader
+  title="Personagens"
+  description="Gerencie os personagens da sua história"
+  primaryAction={{
+    label: "Novo Personagem",
+    onClick: () => setShowCreateModal(true),
+    variant: "magical",
+    icon: Plus,
+  }}
+  secondaryActions={[
+    {
+      label: "Importar",
+      onClick: handleImport,
+      variant: "outline",
+      icon: Upload,
+    },
+  ]}
+>
+  <EntityFilterBadges ... />
+</EntityListHeader>
+```
+
+**Funcionalidades:**
+- Layout responsivo (stack em mobile)
+- Botão primário com destaque
+- Múltiplos botões secundários
+- Ícones integrados
+- Área para filtros (children)
+
+---
+
+### EntitySearchBar
+**Localização:** `src/components/entity-list/EntitySearchBar.tsx`
+
+Barra de busca padronizada com ícone de lupa.
+
+**Quando usar:**
+- ✅ Busca em páginas de listagem
+- ✅ Quando precisa de busca simples por texto
+- ✅ Todas as tabs de entidades
+
+**Props principais:**
+```typescript
+interface EntitySearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  maxWidth?: string; // default: 'max-w-md'
+}
+```
+
+**Exemplo:**
+```tsx
+<EntitySearchBar
+  value={searchQuery}
+  onChange={setSearchQuery}
+  placeholder="Buscar personagens..."
+  maxWidth="max-w-lg"
+/>
+```
+
+**Funcionalidades:**
+- Ícone de busca integrado
+- Largura máxima configurável
+- Placeholder customizável
+- Debounce recomendado no onChange
+
+---
+
+### EntityFilterBadges
+**Localização:** `src/components/entity-list/EntityFilterBadges.tsx`
+
+Sistema de badges de filtros genérico e flexível.
+
+**Quando usar:**
+- ✅ Filtros em páginas de listagem
+- ✅ Suporta múltiplas linhas de filtros
+- ✅ Filtros com cores customizadas
+- ✅ Contadores por filtro
+
+**Props principais:**
+```typescript
+interface BadgeColorConfig {
+  color: string;
+  activeClasses: string;
+  inactiveClasses: string;
+}
+
+interface FilterItem<T = string> {
+  value: T;
+  label: string;
+  count: number;
+  colorConfig: BadgeColorConfig;
+  icon?: LucideIcon;
+}
+
+interface FilterRow<T = string> {
+  id: string;
+  items: FilterItem<T>[];
+  label?: string;
+}
+
+interface EntityFilterBadgesProps<T = string> {
+  totalCount: number;
+  totalLabel: string;
+  selectedFilters: T[];
+  filterRows: FilterRow<T>[];
+  onFilterToggle: (value: T) => void;
+  onClearFilters: () => void;
+}
+```
+
+**Exemplo:**
+```tsx
+// Configuração de cores
+const STATUS_COLORS = {
+  active: {
+    color: 'green',
+    activeClasses: 'bg-green-500 text-white border-green-500',
+    inactiveClasses: 'bg-green-500/10 text-green-700 dark:text-green-300',
+  },
+  inactive: {
+    color: 'gray',
+    activeClasses: 'bg-gray-500 text-white border-gray-500',
+    inactiveClasses: 'bg-gray-500/10 text-gray-700 dark:text-gray-300',
+  },
+};
+
+// Criação de filter rows
+const filterRows: FilterRow<string>[] = [
+  {
+    id: 'status',
+    label: 'Status',
+    items: [
+      {
+        value: 'active',
+        label: 'Ativos',
+        count: 10,
+        colorConfig: STATUS_COLORS.active,
+        icon: Check,
+      },
+      {
+        value: 'inactive',
+        label: 'Inativos',
+        count: 5,
+        colorConfig: STATUS_COLORS.inactive,
+        icon: X,
+      },
+    ],
+  },
+];
+
+// Uso
+<EntityFilterBadges
+  totalCount={allCharacters.length}
+  totalLabel="Todos"
+  selectedFilters={selectedFilters}
+  filterRows={filterRows}
+  onFilterToggle={(filter) => toggleFilter(filter)}
+  onClearFilters={() => setSelectedFilters([])}
+/>
+```
+
+**Funcionalidades:**
+- Suporta múltiplas linhas de filtros
+- Cores customizadas por filtro
+- Ícones opcionais
+- Contador por filtro
+- Badge "Todos" com contador total
+- Botão "Limpar filtros" (aparece quando há filtros ativos)
+- Estados active/inactive com estilos diferentes
+
+---
+
+### CollapsibleEntityList
+**Localização:** `src/components/entity-list/CollapsibleEntityList.tsx`
+
+Lista colapsável genérica de entidades com cards customizáveis.
+
+**Quando usar:**
+- Listas de entidades relacionadas
+- Seções colapsáveis com múltiplos itens
+- Quando precisa renderizar cards customizados
+
+**Props principais:**
+```typescript
+interface CollapsibleEntityListProps<T> {
+  title: string;
+  entities: T[];
+  isOpen: boolean;
+  onToggle: () => void;
+  renderCard: (entity: T, index: number) => React.ReactNode;
+  emptyText: string;
+  isEditing?: boolean;
+  onRemove?: (entity: T, index: number) => void;
+}
+```
+
+**Exemplo:**
+```tsx
+<CollapsibleEntityList
+  title="Personagens Relacionados"
+  entities={relatedCharacters}
+  isOpen={showRelated}
+  onToggle={() => setShowRelated(!showRelated)}
+  renderCard={(character) => (
+    <CharacterCard key={character.id} character={character} />
+  )}
+  emptyText="Nenhum personagem relacionado"
+  isEditing={isEditing}
+  onRemove={(character) => handleRemove(character.id)}
+/>
+```
+
+---
+
+## Componentes de Cards
+
+Cards genéricos e reutilizáveis.
+
+### BookCard
+**Localização:** `src/components/common/book-card.tsx`
+
+Card de livro com capa e overlay de ações.
+
+**Quando usar:**
+- ✅ Tela Home - listagem de livros do projeto
+- Grid de livros
+
+**Props principais:**
+```typescript
+interface BookCardProps {
+  id: string;
+  title: string;
+  genre?: string[];
+  visualStyle?: string;
+  coverImage?: string;
+  chapters?: number;
+  lastModified?: number;
+  onClick?: (bookId: string) => void;
+  onEdit?: (bookId: string) => void;
+}
+```
+
+**Exemplo:**
+```tsx
+<BookCard
+  id={book.id}
+  title={book.title}
+  genre={['Fantasia', 'Aventura']}
+  coverImage={book.coverImage}
+  chapters={12}
+  lastModified={Date.now()}
+  onClick={handleBookClick}
+  onEdit={handleBookEdit}
+/>
+```
+
+**Funcionalidades:**
+- Aspect ratio 3:4 para capa
+- Overlay com botões (aparece no hover)
+- Badges de gênero (até 2 + contador)
+- Data de modificação formatada
+- Animação de hover
+
+---
+
+## Componentes de Dialogs
+
+Modais e dialogs para confirmações e ações.
+
+### DeleteConfirmationDialog
 **Localização:** `src/components/dialogs/DeleteConfirmationDialog.tsx`
 
-**Propósito:** Dialog de confirmação de exclusão padronizado.
+Dialog de confirmação de exclusão padronizado e moderno.
 
-**Props:**
+**Quando usar:**
+- ✅ Confirmação de exclusão de entidades
+- ✅ Quando não precisa de validação extra (digitação do nome)
+- ✅ **Este é o componente padrão para exclusão**
+
+**Props principais:**
 ```typescript
 interface DeleteConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  entityType: string;               // "region", "character", etc
-  entityName: string;               // Nome da entidade
+  entityType: string; // ex: "região", "personagem"
+  entityName: string;
   onConfirm: () => Promise<void>;
-  children?: React.ReactNode;       // Conteúdo customizado
-  requireNameConfirmation?: boolean; // Exigir digitar nome
-  translationNamespace?: string;    // Namespace de tradução
-  className?: string;
+  children?: React.ReactNode; // Info adicional
+  title?: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 ```
 
-**Exemplo de uso (básico):**
+**Exemplo:**
 ```tsx
 <DeleteConfirmationDialog
-  open={deleteDialogOpen}
-  onOpenChange={setDeleteDialogOpen}
-  entityType="region"
-  entityName={region.name}
-  onConfirm={handleDelete}
-  translationNamespace="world"
-/>
-```
-
-**Exemplo de uso (com conteúdo customizado):**
-```tsx
-<DeleteConfirmationDialog
-  open={deleteDialogOpen}
-  onOpenChange={setDeleteDialogOpen}
-  entityType="region"
-  entityName={region.name}
-  onConfirm={handleDelete}
-  requireNameConfirmation
+  open={showDeleteDialog}
+  onOpenChange={setShowDeleteDialog}
+  entityType="personagem"
+  entityName={character.name}
+  onConfirm={async () => {
+    await deleteCharacter(character.id);
+    toast.success('Personagem excluído com sucesso');
+  }}
 >
-  <p className="text-destructive font-semibold">
-    {t('delete_warning')}
+  {/* Informações adicionais (opcional) */}
+  <p className="text-sm text-muted-foreground">
+    Todas as versões e relacionamentos também serão excluídos.
   </p>
-  {hasVersions && (
-    <p className="text-muted-foreground">
-      {t('delete_versions_warning', { count: versions.length })}
-    </p>
-  )}
-  {hasSubRegions && (
-    <p className="text-destructive">
-      {t('cannot_delete_has_subregions')}
-    </p>
-  )}
 </DeleteConfirmationDialog>
 ```
 
-**Aparência (básica):**
-```
-┌──────────────────────────────┐
-│ Deletar Região?              │
-├──────────────────────────────┤
-│ Você tem certeza que deseja  │
-│ deletar "Floresta Élfica"?   │
-│ Esta ação não pode ser       │
-│ desfeita.                    │
-├──────────────────────────────┤
-│        [Cancelar] [Deletar]  │
-└──────────────────────────────┘
-```
-
-**Aparência (com confirmação de nome):**
-```
-┌──────────────────────────────┐
-│ Deletar Região?              │
-├──────────────────────────────┤
-│ Você tem certeza que deseja  │
-│ deletar "Floresta Élfica"?   │
-│                              │
-│ Digite o nome para confirmar:│
-│ [____________________]       │
-│                              │
-├──────────────────────────────┤
-│        [Cancelar] [Deletar]  │ ← Desabilitado
-└──────────────────────────────┘
-```
-
-**Features especiais:**
-- Confirmação por nome (opcional)
-- Conteúdo customizado via children
-- Loading state no botão
-- Tradução automática baseada em entityType
+**Funcionalidades:**
+- Ícone de alerta
+- Loading state automático durante exclusão
+- Área para informações adicionais (children)
+- Botão destrutivo com estado de loading
+- Textos customizáveis
+- Animação de diálogo
 
 ---
 
-## Sistema de Versões
+### ConfirmDeleteModal
+**Localização:** `src/components/modals/confirm-delete-modal.tsx`
 
-Componentes específicos para o sistema de versionamento.
+Modal de confirmação de exclusão com input de validação (versão antiga).
 
-### 1. VersionSelector
+**Quando usar:**
+- ⚠️ Use apenas quando precisa de validação extra
+- Exclusões críticas que requerem digitação do nome
+- Exclusões de dados importantes
 
-**Localização:** `src/components/version-system/VersionSelector.tsx`
-
-**Propósito:** Dropdown de seleção de versões (usado no header do menu lateral).
-
-**Props:**
+**Props principais:**
 ```typescript
-interface VersionSelectorProps {
-  versions: IVersion[];
-  currentVersionId: string | null;
-  onVersionChange: (versionId: string) => void;
-  disabled?: boolean;
-  className?: string;
+interface ConfirmDeleteModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  itemName?: string; // Nome que deve ser digitado para confirmar
+  itemType?: string;
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
-<VersionSelector
-  versions={versions}
-  currentVersionId={currentVersion?.id}
-  onVersionChange={handleVersionChange}
-  disabled={isEditing}
+<ConfirmDeleteModal
+  open={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onConfirm={handleDeleteVersion}
+  title="Excluir Versão"
+  description="Esta ação não pode ser desfeita."
+  itemName={version.name}
+  itemType="versão"
 />
 ```
 
-**Aparência:**
-```
-┌──────────────────────────┐
-│ Versão: [Era dos Dragões ▼]
-└──────────────────────────┘
-       │
-       ▼
-┌────────────────────────────┐
-│ ✓ Era dos Dragões (Principal) │
-│   Era da Paz              │
-│   Período Moderno         │
-├────────────────────────────┤
-│ + Criar Nova Versão       │
-└────────────────────────────┘
-```
+**Funcionalidades:**
+- Exige digitação do nome do item para confirmar (se `itemName` fornecido)
+- Ícone de alerta
+- Botão destrutivo com animação glow
+- Validação inline
 
-**Features especiais:**
-- Versão principal marcada com ✓ e label
-- Botão "Criar Nova Versão" no dropdown
-- Desabilitado se isEditing (previne perda de dados)
+**Recomendação:**
+- Use `DeleteConfirmationDialog` para casos comuns
+- Use `ConfirmDeleteModal` apenas para exclusões críticas
 
 ---
 
-### 2. VersionCard
+### WarningDialog
+**Localização:** `src/components/dialogs/WarningDialog.tsx`
 
-**Localização:** `src/components/version-system/VersionCard.tsx`
+Dialog genérico de aviso/confirmação para ações não destrutivas.
 
-**Propósito:** Card de uma versão individual com ações.
+**Quando usar:**
+- ✅ Avisos de ações que causam perda de dados temporários (ex: descartar alterações)
+- ✅ Confirmações de ações importantes mas não destrutivas (ex: trocar imagem do mapa)
+- ✅ **Este é o componente padrão para avisos/confirmações não destrutivas**
 
-**Props:**
+**Props principais:**
 ```typescript
-interface VersionCardProps {
-  version: IVersion;
-  isActive: boolean;                // É a versão atual?
-  onActivate?: () => void;          // Ativar como principal
-  onEdit?: () => void;              // Editar nome/descrição
-  onDelete?: () => void;            // Deletar versão
-  onClick?: () => void;             // Selecionar versão
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<VersionCard
-  version={version}
-  isActive={currentVersion?.id === version.id}
-  onActivate={() => handleActivateVersion(version.id)}
-  onEdit={() => openEditVersionDialog(version)}
-  onDelete={() => handleDeleteVersion(version.id)}
-  onClick={() => handleVersionChange(version.id)}
-/>
-```
-
-**Aparência (versão principal):**
-```
-┌────────────────────────────────┐
-│ ⭐ Era dos Dragões (Principal) │
-│ Região durante o período...    │
-│ Atualizado: 10/01/2025         │
-│                                │
-│ [Editar] [Trocar]             │
-└────────────────────────────────┘
-```
-
-**Aparência (versão secundária):**
-```
-┌────────────────────────────────┐
-│ Era da Paz                     │
-│ Região durante o período...    │
-│ Atualizado: 05/01/2025         │
-│                                │
-│ [Ativar] [Editar] [Deletar]   │
-└────────────────────────────────┘
-```
-
-**Aparência (versão ativa - sendo visualizada):**
-```
-┌────────────────────────────────┐
-│ ✓ Período Moderno              │ ← Border highlight
-│ Versão atual da história       │
-│ Atualizado: 12/01/2025         │
-│                                │
-│ [Editar] [Ativar] [Deletar]   │
-└────────────────────────────────┘
-```
-
----
-
-### 3. CreateVersionDialog
-
-**Localização:** `src/components/version-system/CreateVersionDialog.tsx`
-
-**Propósito:** Dialog para criar nova versão.
-
-**Props:**
-```typescript
-interface CreateVersionDialogProps {
+interface WarningDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (data: { name: string; description: string }) => Promise<void>;
-  translationNamespace?: string;
-  className?: string;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  cancelText?: string; // default: "Cancelar"
+  confirmText?: string; // default: "Confirmar"
+  children?: React.ReactNode; // Info adicional (opcional)
 }
 ```
 
-**Exemplo de uso:**
+**Exemplo:**
 ```tsx
-<CreateVersionDialog
-  open={createVersionDialogOpen}
-  onOpenChange={setCreateVersionDialogOpen}
-  onConfirm={handleCreateVersion}
-  translationNamespace="world"
+<WarningDialog
+  open={showWarning}
+  onOpenChange={setShowWarning}
+  title="Trocar imagem do mapa?"
+  description="Existem 5 elementos colocados neste mapa. Ao trocar a imagem, todos os elementos serão removidos e você precisará posicioná-los novamente."
+  cancelText="Cancelar"
+  confirmText="Continuar e escolher imagem"
+  onConfirm={handleContinue}
 />
-```
 
-**Aparência:**
-```
-┌──────────────────────────────┐
-│ Criar Nova Versão            │
-├──────────────────────────────┤
-│ Nome:                        │
-│ [_____________________]      │
-│                              │
-│ Descrição:                   │
-│ [_____________________]      │
-│ [_____________________]      │
-│ [_____________________]      │
-│                              │
-│ ℹ️ A versão será criada com │
-│ os dados atuais da região    │
-│                              │
-├──────────────────────────────┤
-│        [Cancelar] [Criar]    │
-└──────────────────────────────┘
-```
-
-**Validações:**
-- Nome obrigatório
-- Descrição opcional
-- Loading state no botão Criar
-
----
-
-### 4. VersionManager
-
-**Localização:** `src/components/version-system/VersionManager.tsx`
-
-**Propósito:** Componente completo de gerenciamento de versões (usado em modal ou página).
-
-**Props:**
-```typescript
-interface VersionManagerProps {
-  versions: IVersion[];
-  currentVersionId: string | null;
-  onVersionChange: (versionId: string) => void;
-  onVersionCreate: (data: CreateVersionData) => Promise<void>;
-  onVersionUpdate: (versionId: string, data: UpdateVersionData) => Promise<void>;
-  onVersionDelete: (versionId: string) => Promise<void>;
-  onVersionActivate: (versionId: string) => Promise<void>;
-  entityType: string;               // "region", "character", etc
-  translationNamespace?: string;
-  className?: string;
-}
-```
-
-**Exemplo de uso:**
-```tsx
-<VersionManager
-  versions={versions}
-  currentVersionId={currentVersion?.id}
-  onVersionChange={handleVersionChange}
-  onVersionCreate={handleVersionCreate}
-  onVersionUpdate={handleVersionUpdate}
-  onVersionDelete={handleVersionDelete}
-  onVersionActivate={handleVersionActivate}
-  entityType="region"
-  translationNamespace="world"
-/>
-```
-
-**Features especiais:**
-- Lista todas as versões como cards
-- Botão criar nova versão
-- Todas as ações em um só lugar
-- Validações automáticas
-
----
-
-## Padrão de Validação Visual
-
-Todas as páginas de detalhes DEVEM implementar validação usando Zod com feedback visual. **Não use toasts ou snackbars** - apenas feedback visual.
-
-### Elementos Visuais de Validação
-
-#### 1. Asterisco Vermelho em Campos Obrigatórios
-```tsx
-<Label>
-  {t("region-detail:fields.name")}
-  <span className="text-destructive ml-1">*</span>
-</Label>
-```
-
-#### 2. Borda Vermelha em Campos com Erro
-```tsx
-<Input
-  className={errors.name ? "border-destructive" : ""}
-  onBlur={() => validateField("name", editData.name)}
-  // ... other props
-/>
-```
-
-#### 3. Mensagem de Erro com Ícone (AlertCircle)
-```tsx
-{errors.name && (
-  <p className="text-sm text-destructive flex items-center gap-1">
-    <AlertCircle className="h-4 w-4" />
-    {errors.name}
-  </p>
-)}
-```
-
-#### 4. Botão Salvar Desabilitado
-```tsx
-<Button
-  variant="magical"
-  onClick={onSave}
-  disabled={!hasChanges || hasRequiredFieldsEmpty}
+// Exemplo com children (info adicional)
+<WarningDialog
+  open={showWarning}
+  onOpenChange={setShowWarning}
+  title="Descartar alterações?"
+  description="Você tem alterações não salvas. Se sair agora, todas as mudanças serão perdidas."
+  cancelText="Continuar Editando"
+  confirmText="Descartar Alterações"
+  onConfirm={handleDiscard}
 >
-  {t("region-detail:header.save")}
+  <p className="text-sm text-muted-foreground">
+    Esta ação não pode ser desfeita.
+  </p>
+</WarningDialog>
+```
+
+**Funcionalidades:**
+- Ícone de alerta amarelo em círculo (AlertTriangle)
+- Layout consistente com modal width de `sm:max-w-md`
+- Botões com largura completa e mesmo tamanho (`flex-1`)
+- Botão de confirmação destrutivo com animação `animate-glow-red`
+- Textos customizáveis para cancelar e confirmar
+- Área opcional para informações adicionais (children)
+- Animação de entrada/saída
+
+**Visual:**
+- Header: Ícone amarelo + Título lado a lado
+- Description: Espaçamento `pt-3`
+- Footer: Dois botões com mesma largura
+  - Cancelar: `AlertDialogCancel` com `h-11`
+  - Confirmar: `Button destructive` com `size="lg"` e `animate-glow-red`
+
+**Casos de Uso:**
+- Descartar alterações não salvas (UnsavedChangesDialog usa internamente)
+- Trocar imagem do mapa quando há marcadores posicionados
+- Sair de uma tela com trabalho em progresso
+- Resetar configurações importantes
+- Qualquer ação que cause perda de dados temporários
+
+**Componentes que usam internamente:**
+- `UnsavedChangesDialog` (`src/pages/dashboard/tabs/world/region-detail/components/unsaved-changes-dialog.tsx`)
+- Modal de troca de imagem em `region-map/index.tsx`
+
+**Diferenças do DeleteConfirmationDialog:**
+- **WarningDialog**: Avisos gerais, confirmações não destrutivas, perda de dados temporários
+- **DeleteConfirmationDialog**: Exclusões permanentes de entidades
+
+**Arquivo de exportação:**
+```tsx
+import { WarningDialog } from '@/components/dialogs';
+// ou
+import { WarningDialog } from '@/components/dialogs/WarningDialog';
+```
+
+---
+
+## Componentes de Navegação
+
+Sidebars de navegação entre entidades com busca e destaque da entidade atual.
+
+### Padrão dos Navigation Sidebars
+
+Todos os navigation sidebars seguem o mesmo padrão:
+
+**Estrutura:**
+```
+┌─────────────────────────┐
+│ [Ícone] Título    (42) │ ← Header com contador
+├─────────────────────────┤
+│ 🔍 Buscar...           │ ← Search bar
+├─────────────────────────┤
+│ ┌─────────────────────┐ │
+│ │ [IMG] Nome 1     ✓ │ │ ← Item atual (destacado)
+│ └─────────────────────┘ │
+│ ┌─────────────────────┐ │
+│ │ [IMG] Nome 2       │ │ ← Outros itens
+│ └─────────────────────┘ │
+│ ...                     │ ← Scroll área
+└─────────────────────────┘
+```
+
+**Características comuns:**
+- Fixed left com animação de slide
+- Header com ícone, título e contador
+- Search bar integrada
+- Lista scrollável
+- Destaque visual do item atual
+- Avatares/imagens com fallback
+- Fechamento ao clicar fora ou no X
+- Transição suave de entrada/saída
+
+---
+
+### CharacterNavigationSidebar
+**Localização:** `src/components/character-navigation-sidebar.tsx`
+
+Sidebar de navegação entre personagens.
+
+**Quando usar:**
+- ✅ Navegação rápida entre personagens
+- ✅ Páginas de detalhes de personagem
+- ✅ Qualquer tela que precise trocar entre personagens
+
+**Props principais:**
+```typescript
+interface CharacterNavigationSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  characters: Array<{ id: string; name: string; image?: string }>;
+  currentCharacterId?: string;
+  onCharacterSelect: (characterId: string) => void;
+}
+```
+
+**Exemplo:**
+```tsx
+const [showNav, setShowNav] = useState(false);
+
+// Botão para abrir
+<Button onClick={() => setShowNav(true)}>
+  <Menu className="w-4 h-4" />
 </Button>
+
+// Sidebar
+<CharacterNavigationSidebar
+  isOpen={showNav}
+  onClose={() => setShowNav(false)}
+  characters={allCharacters}
+  currentCharacterId={currentCharacter.id}
+  onCharacterSelect={(id) => {
+    navigate(`/characters/${id}`);
+    setShowNav(false);
+  }}
+/>
 ```
 
-#### 5. Texto de Campos Faltando (vermelho)
-```tsx
-{hasRequiredFieldsEmpty && (
-  <p className="text-xs text-destructive">
-    {missingFields.length > 0 ? (
-      <>
-        {t("missing_fields")}:{" "}
-        {missingFields.map((field) => {
-          // Mapeie os campos específicos da sua entidade
-          const fieldNames: Record<string, string> = {
-            name: t("fields.name"),
-            // Adicione outros campos básicos da sua entidade aqui
-          };
-          return fieldNames[field] || field;
-        }).join(", ")}
-      </>
-    ) : (
-      t("fill_required_fields")
-    )}
-  </p>
-)}
-```
+**Funcionalidades:**
+- Busca de personagens por nome
+- Destaque do personagem atual (background diferente)
+- Avatares circulares com fallback de iniciais
+- Scroll área para muitos personagens
+- Animação de slide da esquerda
+- Contador de personagens no header
+- Botão X para fechar
+- Overlay escuro ao fundo
 
-### Props de Validação Necessárias
+**Visual:**
+- Avatar circular (rounded-full)
+- Iniciais coloridas como fallback
+- Check mark (✓) no personagem atual
+- Hover effect em cada item
 
-Toda página de detalhes deve receber essas props:
+---
 
+### FactionNavigationSidebar
+**Localização:** `src/components/faction-navigation-sidebar.tsx`
+
+Sidebar de navegação entre facções.
+
+**Quando usar:**
+- ✅ Navegação rápida entre facções
+- ✅ Páginas de detalhes de facção
+- ✅ Qualquer tela que precise trocar entre facções
+
+**Props principais:**
 ```typescript
-interface DetailViewProps {
-  // ... other props
-  errors: Record<string, string>;           // Erros por campo
-  validateField: (field: string, value: any) => void;  // Validação individual
-  hasRequiredFieldsEmpty: boolean;          // Há campos obrigatórios vazios?
-  missingFields: string[];                  // Lista de campos faltando
+interface FactionNavigationSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  factions: Array<{ id: string; name: string; image?: string }>;
+  currentFactionId?: string;
+  onFactionSelect: (factionId: string) => void;
 }
 ```
 
-### Regras de Validação
+**Exemplo:**
+```tsx
+<FactionNavigationSidebar
+  isOpen={showFactionNav}
+  onClose={() => setShowFactionNav(false)}
+  factions={allFactions}
+  currentFactionId={currentFaction.id}
+  onFactionSelect={(id) => {
+    navigate(`/factions/${id}`);
+    setShowFactionNav(false);
+  }}
+/>
+```
 
-1. **Campos Básicos = Obrigatórios**: Todos os campos na seção "Informações Básicas" são obrigatórios
-2. **Campos Avançados = Opcionais**: Todos os campos na seção "Informações Avançadas" são opcionais
-3. **Validação em tempo real (onBlur)**: Valida o campo quando perde o foco
-4. **Validação completa (onSave)**: Valida todos os campos ao salvar
-5. **Bloqueio de botão**: Desabilita "Salvar" se houver campos obrigatórios vazios
-6. **Sem notificações**: Não usar `toast.success()` ou `toast.error()`
-7. **Feedback visual apenas**: Bordas vermelhas, mensagens de erro, botão desabilitado
+**Diferenças do CharacterNavigationSidebar:**
+- **Avatar quadrado** (rounded-lg) em vez de circular
+- Ícone **Shield** como fallback em vez de iniciais
+- Mesmas funcionalidades, apenas visual diferente
 
-### Exemplo Completo de Campo com Validação
+---
+
+### ItemNavigationSidebar
+**Localização:** `src/components/item-navigation-sidebar.tsx`
+
+Sidebar de navegação entre itens.
+
+**Quando usar:**
+- ✅ Navegação rápida entre itens
+- ✅ Páginas de detalhes de item
+- ✅ Qualquer tela que precise trocar entre itens
+
+**Props principais:**
+```typescript
+interface ItemNavigationSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  items: Array<{ id: string; name: string; image?: string }>;
+  currentItemId?: string;
+  onItemSelect: (itemId: string) => void;
+}
+```
+
+**Exemplo:**
+```tsx
+<ItemNavigationSidebar
+  isOpen={showItemNav}
+  onClose={() => setShowItemNav(false)}
+  items={allItems}
+  currentItemId={currentItem.id}
+  onItemSelect={(id) => {
+    navigate(`/items/${id}`);
+    setShowItemNav(false);
+  }}
+/>
+```
+
+**Visual:**
+- Avatar circular (rounded-full)
+- Ícone de Package como fallback
+- Check mark (✓) no item atual
+
+---
+
+### Padrão de Implementação
+
+Para adicionar navigation sidebar em uma página de detalhes:
 
 ```tsx
-import { AlertCircle } from "lucide-react";
+import { useState } from 'react';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CharacterNavigationSidebar } from '@/components/character-navigation-sidebar';
 
-// Exemplo: Campo básico (obrigatório) em BasicInfoSection
-<BasicInfoSection title={t("basic_information")}>
-  <div className="space-y-2">
-    {/* Label com asterisco vermelho (campo básico = obrigatório) */}
-    <Label>
-      {t("fields.name")}
-      <span className="text-destructive ml-1">*</span>
-    </Label>
+function CharacterDetailPage() {
+  const [showNav, setShowNav] = useState(false);
+  const { characterId } = useParams();
+  const navigate = useNavigate();
 
-    {/* Input com validação onBlur e borda vermelha se erro */}
-    <Input
-      value={editData.name || ""}
-      onChange={(e) => onEditDataChange("name", e.target.value)}
-      onBlur={() => validateField("name", editData.name)}
-      placeholder={t("placeholders.name")}
-      maxLength={200}
-      className={errors.name ? "border-destructive" : ""}
-      disabled={!isEditing}
-      required
-    />
+  // Carregar todos os personagens
+  const allCharacters = useCharacterStore((state) => state.characters);
 
-    {/* Mensagem de erro com ícone */}
-    {errors.name && (
-      <p className="text-sm text-destructive flex items-center gap-1">
-        <AlertCircle className="h-4 w-4" />
-        {errors.name}
-      </p>
-    )}
+  return (
+    <>
+      {/* Botão no header ou sidebar */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setShowNav(true)}
+      >
+        <Menu className="w-4 h-4" />
+      </Button>
 
-    {/* Contador de caracteres (opcional) */}
-    {maxLength && (
-      <div className="flex justify-end text-xs text-muted-foreground">
-        <span>{editData.name?.length || 0}/{maxLength}</span>
-      </div>
-    )}
-  </div>
-</BasicInfoSection>
+      {/* Sidebar de navegação */}
+      <CharacterNavigationSidebar
+        isOpen={showNav}
+        onClose={() => setShowNav(false)}
+        characters={allCharacters}
+        currentCharacterId={characterId}
+        onCharacterSelect={(id) => {
+          navigate(`/characters/${id}`);
+          setShowNav(false); // Fecha após selecionar
+        }}
+      />
 
-// Exemplo: Campo avançado (opcional) em AdvancedInfoSection
-<AdvancedInfoSection
-  title={t("advanced_information")}
-  isOpen={openSections.advanced}
-  onToggle={() => toggleSection("advanced")}
->
-  <div className="space-y-2">
-    {/* Label sem asterisco (campo avançado = opcional) */}
-    <Label>{t("fields.founded_date")}</Label>
-
-    <Input
-      value={editData.foundedDate || ""}
-      onChange={(e) => onEditDataChange("foundedDate", e.target.value)}
-      // SEM onBlur validation - campo opcional
-      disabled={!isEditing}
-    />
-    {/* SEM mensagem de erro - campo opcional */}
-  </div>
-</AdvancedInfoSection>
+      {/* Resto do conteúdo */}
+    </>
+  );
+}
 ```
 
 ---
 
-## Guia de Uso Rápido
+## Componentes de Estado Vazio
 
-### Criar Nova Página de Detalhes
+### EmptyState
+**Localização:** `src/components/empty-state.tsx`
 
-1. **Layout básico:**
+Componente de estado vazio padronizado.
+
+**Quando usar:**
+- ✅ Listagens vazias
+- ✅ Seções sem conteúdo
+- ✅ Estados iniciais
+- ✅ Resultados de busca vazios
+
+**Props principais:**
+```typescript
+interface EmptyStateProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}
+```
+
+**Exemplo:**
 ```tsx
-import { DetailPageLayout, SideNavigation, EditControls } from '@/components/detail-page';
+// Estado vazio inicial
+<EmptyState
+  icon={Users}
+  title="Nenhum personagem criado"
+  description="Crie seu primeiro personagem para começar"
+  actionLabel="Criar Personagem"
+  onAction={() => setShowCreateModal(true)}
+/>
 
-<DetailPageLayout
-  sidebar={
-    <SideNavigation
-      items={navItems}
-      activeItem={activeSection}
-    />
+// Busca vazia
+<EmptyState
+  icon={Search}
+  title="Nenhum resultado encontrado"
+  description="Tente ajustar sua busca ou filtros"
+/>
+```
+
+**Funcionalidades:**
+- Ícone centralizado
+- Título e descrição
+- Botão de ação opcional
+- Layout centralizado e responsivo
+
+**Uso atual:**
+- World tab (regiões vazias)
+- Power System tab (sistemas vazios)
+- Plot tab (tramas vazias)
+- Races tab (raças vazias)
+- Characters tab (personagens vazios)
+- Factions tab (facções vazias)
+- Items tab (itens vazios)
+
+---
+
+## Componentes de Versionamento
+
+### VersionCard
+**Localização:** `src/components/version-system/VersionCard.tsx`
+
+Card genérico para exibir uma versão de qualquer entidade.
+
+**Quando usar:**
+- ✅ **Componente padrão para exibir versões**
+- ✅ Listagem de versões de personagens, facções, itens, raças, regiões
+- ✅ Qualquer entidade que tenha sistema de versões
+
+**Props principais:**
+```typescript
+interface VersionCardVersion {
+  id: string;
+  name: string;
+  description?: string;
+  isMain: boolean;
+  createdAt: string | number;
+}
+
+interface VersionCardProps {
+  version: VersionCardVersion;
+  isActive?: boolean;
+  onSelect?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onActivate?: () => void;
+  className?: string;
+}
+```
+
+**Exemplo:**
+```tsx
+<VersionCard
+  version={{
+    id: '1',
+    name: 'Versão 1.0',
+    description: 'Versão inicial do personagem',
+    isMain: true,
+    createdAt: Date.now(),
+  }}
+  isActive={currentVersionId === '1'}
+  onSelect={() => handleVersionSelect('1')}
+  onEdit={() => handleVersionEdit('1')}
+  onDelete={() => handleVersionDelete('1')}
+  onActivate={() => handleVersionActivate('1')}
+/>
+```
+
+**Funcionalidades:**
+- Card clicável para selecionar versão
+- Badge "Principal" para versão ativa
+- Menu dropdown com ações (3 pontos)
+  - Editar
+  - Tornar Principal (se não for a principal)
+  - Excluir (apenas se não for a principal)
+- Data de criação formatada (relativa)
+- Descrição opcional
+- Ring visual quando versão está ativa
+- Hover effect
+- Previne exclusão/ativação da versão principal
+
+**Estados visuais:**
+- Normal: Border padrão
+- Hover: Background accent/50
+- Ativa: Ring-2 ring-primary (destacada)
+- Principal: Badge com ícone de estrela
+
+---
+
+### CharacterVersionManager
+**Localização:** `src/components/character-version-manager.tsx`
+
+Sistema completo de gerenciamento de versões de personagem (componente legado específico).
+
+**⚠️ Nota:** Este componente é específico para personagens. Para novos desenvolvimentos, use o **VersionCard** genérico acima.
+
+**Quando usar:**
+- ⚠️ Legado - já implementado em Character detail
+- Para novos casos, use VersionCard
+
+**Props principais:**
+```typescript
+interface CharacterVersionManagerProps {
+  versions: ICharacterVersion[];
+  currentVersion: ICharacterVersion;
+  onVersionChange: (versionId: string) => void;
+  onVersionSave: (name: string, description?: string) => void;
+  onVersionDelete: (versionId: string) => void;
+  onVersionUpdate: (versionId: string, name: string, description?: string) => void;
+}
+```
+
+**Exemplo:**
+```tsx
+<CharacterVersionManager
+  versions={characterVersions}
+  currentVersion={currentVersion}
+  onVersionChange={handleVersionChange}
+  onVersionSave={handleVersionSave}
+  onVersionDelete={handleVersionDelete}
+  onVersionUpdate={handleVersionUpdate}
+/>
+```
+
+**Funcionalidades:**
+- Modal principal de gerenciamento
+- Modal de criação de versão
+- Modal de edição de versão
+- Modal de confirmação de exclusão
+- Badge de versão ativa
+- Datas formatadas
+- Dicas de uso
+- Lista de versões scrollável
+
+---
+
+## Componentes de Texto
+
+### RichTextEditor
+**Localização:** `src/components/rich-text-editor.tsx`
+
+Editor de texto rico com toolbar.
+
+**Quando usar:**
+- Edição de descrições longas
+- Conteúdo formatado
+- Anotações e notas
+
+**Props principais:**
+```typescript
+interface RichTextEditorProps {
+  content: string;
+  onChange: (content: string) => void;
+  readOnly?: boolean; // default: false
+  placeholder?: string; // default: "Comece a escrever..."
+}
+```
+
+**Exemplo:**
+```tsx
+// Modo de edição
+<RichTextEditor
+  content={biography}
+  onChange={setBiography}
+  placeholder="Escreva a biografia do personagem..."
+/>
+
+// Modo de leitura
+<RichTextEditor
+  content={biography}
+  onChange={() => {}}
+  readOnly
+/>
+```
+
+**Funcionalidades:**
+- Toolbar com botões de formatação
+- Suporte a headings (H1, H2, H3)
+- Bold, Italic
+- Blockquote
+- Texto normal
+- Modo de leitura (sem toolbar)
+- Estilos customizados
+
+---
+
+## Componentes de Alertas
+
+### InfoAlert
+**Localização:** `src/components/ui/info-alert.tsx`
+
+Alerta de informação estilizado.
+
+**Quando usar:**
+- Avisos informativos
+- Dicas para o usuário
+- Alertas não-críticos
+
+**Props principais:**
+```typescript
+interface InfoAlertProps {
+  children: React.ReactNode;
+  className?: string;
+}
+```
+
+**Exemplo:**
+```tsx
+<InfoAlert>
+  Este personagem está relacionado a 3 regiões diferentes.
+</InfoAlert>
+
+<InfoAlert className="mt-4">
+  <p className="font-semibold">Dica:</p>
+  <p>Use versões para experimentar diferentes desenvolvimentos do personagem.</p>
+</InfoAlert>
+```
+
+**Funcionalidades:**
+- Ícone de Info integrado
+- Cores primárias (bg-primary/10, border-primary/30)
+- Layout flexível
+
+---
+
+### TitleBar
+**Localização:** `src/components/title-bar.tsx`
+
+Barra de título da aplicação (window controls).
+
+**Quando usar:**
+- Layout principal da aplicação
+- Barra de título global
+
+**Funcionalidades:**
+- Título da aplicação
+- Título da página atual (baseado em rota)
+- Botão de inbox com contador de não lidos
+- Controles de janela (minimize, maximize, close)
+- Detecção de modal aberto (desabilita inbox)
+- Drag region
+- Integração com Tauri
+
+**Uso:** Componente usado automaticamente no layout principal
+
+---
+
+## Padrões de Uso
+
+### 1. Padrão de Detail Page
+
+**⚠️ Importante sobre campos em Detail Pages:**
+
+Os componentes de layout (`DetailPageLayout`, `EditControls`, `BasicInfoSection`, etc.) são **estruturais** e **não definem o conteúdo** dos campos. O conteúdo varia por entidade e tem **dois modos de exibição**:
+
+#### **Modo de Visualização** (isEditing = false)
+- Mostra dados formatados para leitura
+- Usa componentes de UI simples (text, badges, avatares)
+- Seções podem ser colapsáveis (`Collapsible` do shadcn)
+- Exemplo: `<p className="text-sm">{character.name}</p>`
+
+#### **Modo de Edição** (isEditing = true)
+- Mostra campos editáveis
+- Usa componentes de formulário (ver `forms.md`)
+- Validação inline
+- Exemplo: `<FormInput value={editData.name} onChange={...} />`
+
+**Exemplo de campo que muda:**
+```tsx
+{/* Nome do Personagem */}
+{isEditing ? (
+  // MODO EDIÇÃO: Input editável
+  <FormInput
+    label="Nome"
+    value={editData.name}
+    onChange={(e) => onEditDataChange('name', e.target.value)}
+    required
+    maxLength={200}
+  />
+) : (
+  // MODO VISUALIZAÇÃO: Texto simples
+  <div>
+    <Label>Nome</Label>
+    <p className="text-lg font-semibold">{character.name}</p>
+  </div>
+)}
+```
+
+**Variação de campos por entidade:**
+
+| Entidade | Campos específicos | Componentes usados |
+|----------|-------------------|-------------------|
+| **Character** | Nome, Idade, Raça, Facções | FormInput, FormSelect, FormEntityMultiSelectAuto |
+| **Faction** | Nome, Tipo, Status, Líder | FormInput, FormSelectGrid, EntitySelect |
+| **Item** | Nome, Categoria, Raridade | FormInput, FormSelect, FormSelectGrid |
+| **Region** | Nome, Escala, Clima, Estações | FormInput, FormSelectGrid, FormListInput |
+
+Todos os componentes de formulário estão documentados em **`docs/build/forms.md`**.
+
+#### **Referência Rápida: Componentes por Tipo de Campo**
+
+| Tipo de Dado | Modo Visualização | Modo Edição | Notas |
+|--------------|-------------------|-------------|-------|
+| **Texto curto** | `<p>{value}</p>` | `<FormInput>` | Nome, título |
+| **Texto longo** | `<p className="whitespace-pre-wrap">{value}</p>` | `<FormTextarea>` | Descrição, biografia |
+| **Imagem** | `<img src={value} />` ou Avatar | `<FormImageUpload>` | Banner, avatar |
+| **Seleção única** | `<Badge>{value}</Badge>` | `<FormSelect>` ou `<FormSelectGrid>` | Tipo, status, escala |
+| **Multi-seleção** | `<Collapsible>` com Badges + Avatares | `<FormEntityMultiSelectAuto>` | Facções, personagens relacionados |
+| **Lista de strings** | `<div>` com Badges | `<FormListInput>` | Tags, habilidades, características |
+| **Data/Timestamp** | `<p>{formatDate(value)}</p>` | `<Input type="date">` | Criação, modificação |
+| **Booleano** | `<Badge>Sim/Não</Badge>` ou Ícone | `<Checkbox>` | Ativo/inativo |
+| **Número** | `<p>{value}</p>` | `<FormInput type="number">` | Idade, quantidade |
+| **Rich Text** | `<RichTextEditor readOnly>` | `<RichTextEditor>` | História, notas |
+
+#### **Padrão de Collapsible para Visualização**
+
+Quando há muitos itens relacionados (facções, personagens, etc.), use `Collapsible` no modo visualização:
+
+```tsx
+{/* MODO VISUALIZAÇÃO */}
+<Collapsible open={openSections.factions} onOpenChange={() => toggleSection('factions')}>
+  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted">
+    <p className="text-sm font-semibold text-primary">
+      Facções Relacionadas
+      {factions.length > 0 && (
+        <span className="ml-1 text-muted-foreground">({factions.length})</span>
+      )}
+    </p>
+    {openSections.factions ? <ChevronDown /> : <ChevronRight />}
+  </CollapsibleTrigger>
+  <CollapsibleContent className="pt-2">
+    <div className="flex flex-wrap gap-2">
+      {factions.map((faction) => (
+        <Badge key={faction.id} variant="outline" className="flex items-center gap-1">
+          <Avatar className="w-4 h-4">
+            <AvatarImage src={faction.image} />
+            <AvatarFallback>{faction.name[0]}</AvatarFallback>
+          </Avatar>
+          {faction.name}
+        </Badge>
+      ))}
+    </div>
+  </CollapsibleContent>
+</Collapsible>
+```
+
+---
+
+Todas as páginas de detalhes seguem a mesma estrutura:
+
+```tsx
+import {
+  DetailPageLayout,
+  EditControls,
+  BasicInfoSection,
+  AdvancedInfoSection,
+  CollapsibleSection,
+} from '@/components/detail-page';
+
+function EntityDetailView() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+
+  return (
+    <DetailPageLayout sidebar={<SideNavigation items={navItems} />}>
+      {/* Controles de edição (sticky) */}
+      <EditControls
+        isEditing={isEditing}
+        hasChanges={hasChanges}
+        isSaving={isSaving}
+        onEdit={() => setIsEditing(true)}
+        onSave={handleSave}
+        onCancel={handleCancel}
+      />
+
+      {/* Informações básicas (sempre visível) */}
+      <BasicInfoSection title="Informações Básicas">
+        {/* Nome */}
+        {isEditing ? (
+          <FormInput
+            label="Nome"
+            value={editData.name}
+            onChange={(e) => onEditDataChange('name', e.target.value)}
+            required
+            maxLength={200}
+          />
+        ) : (
+          <div>
+            <Label className="text-sm font-medium text-primary">Nome</Label>
+            <p className="text-base text-foreground mt-1">{entity.name}</p>
+          </div>
+        )}
+
+        {/* Descrição */}
+        {isEditing ? (
+          <FormTextarea
+            label="Descrição"
+            value={editData.description}
+            onChange={(e) => onEditDataChange('description', e.target.value)}
+            rows={4}
+            maxLength={500}
+          />
+        ) : (
+          <div>
+            <Label className="text-sm font-medium text-primary">Descrição</Label>
+            <p className="text-base text-foreground mt-1 whitespace-pre-wrap">
+              {entity.description || 'Sem descrição'}
+            </p>
+          </div>
+        )}
+      </BasicInfoSection>
+
+      {/* Informações avançadas (colapsável) */}
+      <AdvancedInfoSection
+        title="Informações Avançadas"
+        isOpen={showAdvanced}
+        onToggle={() => setShowAdvanced(!showAdvanced)}
+      >
+        {/* Tipo/Categoria - Grid Visual */}
+        {isEditing ? (
+          <FormSelectGrid
+            label="Tipo"
+            value={editData.type}
+            onChange={(value) => onEditDataChange('type', value)}
+            options={typeOptions}
+            columns={2}
+          />
+        ) : (
+          <div>
+            <Label className="text-sm font-medium text-primary">Tipo</Label>
+            <Badge variant="secondary" className="mt-1">
+              {entity.type}
+            </Badge>
+          </div>
+        )}
+
+        {/* Facções Relacionadas - Multi-Select */}
+        {isEditing ? (
+          <FormEntityMultiSelectAuto
+            key={`factions-${refreshKey}`}
+            entityType="faction"
+            bookId={bookId}
+            label="Facções Relacionadas"
+            value={editData.factionIds || []}
+            onChange={(value) => onEditDataChange('factionIds', value)}
+          />
+        ) : (
+          <Collapsible open={openSections.factions}>
+            <CollapsibleTrigger>
+              <Label>Facções Relacionadas ({factions.length})</Label>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="flex flex-wrap gap-2">
+                {factions.map((faction) => (
+                  <Badge key={faction.id} variant="outline">
+                    <Avatar className="w-4 h-4 mr-1">
+                      <AvatarImage src={faction.image} />
+                      <AvatarFallback>{faction.name[0]}</AvatarFallback>
+                    </Avatar>
+                    {faction.name}
+                  </Badge>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </AdvancedInfoSection>
+
+      {/* Seções customizadas (colapsável) */}
+      <CollapsibleSection
+        title="Timeline"
+        icon={Clock}
+        isOpen={showTimeline}
+        onToggle={() => setShowTimeline(!showTimeline)}
+      >
+        <Timeline events={events} />
+      </CollapsibleSection>
+    </DetailPageLayout>
+  );
+}
+```
+
+---
+
+### 2. Padrão de List Page
+
+Todas as páginas de listagem seguem a mesma estrutura:
+
+```tsx
+import {
+  EntityListHeader,
+  EntitySearchBar,
+  EntityFilterBadges,
+} from '@/components/entity-list';
+import { EmptyState } from '@/components/empty-state';
+
+function EntityListView() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Configuração de filtros
+  const filterRows = createFilterRows(stats, t);
+
+  // Lista vazia
+  if (allEntities.length === 0) {
+    return (
+      <>
+        <EntityListHeader
+          title={t('title')}
+          description={t('description')}
+          primaryAction={{
+            label: t('create_new'),
+            onClick: () => setShowCreateModal(true),
+            variant: 'magical',
+            icon: Plus,
+          }}
+        />
+        <EmptyState
+          icon={Users}
+          title={t('empty_state.title')}
+          description={t('empty_state.description')}
+        />
+      </>
+    );
   }
->
-  <EditControls ... />
-  {/* Conteúdo */}
-</DetailPageLayout>
-```
 
-2. **Adicionar campos:**
-```tsx
-import { FormInput, FormTextarea, FormSelect, EntitySelect } from '@/components/forms';
+  return (
+    <div className="space-y-6">
+      {/* Header com filtros integrados */}
+      <EntityListHeader
+        title={t('title')}
+        description={t('description')}
+        primaryAction={{
+          label: t('create_new'),
+          onClick: () => setShowCreateModal(true),
+          variant: 'magical',
+          icon: Plus,
+        }}
+        secondaryActions={[
+          {
+            label: t('manage'),
+            onClick: handleManage,
+            variant: 'outline',
+            icon: Settings,
+          },
+        ]}
+      >
+        <EntityFilterBadges
+          totalCount={allEntities.length}
+          totalLabel={t('filters.all')}
+          selectedFilters={selectedFilters}
+          filterRows={filterRows}
+          onFilterToggle={toggleFilter}
+          onClearFilters={() => setSelectedFilters([])}
+        />
+      </EntityListHeader>
 
-<BasicInfoSection>
-  <FormInput label="Nome" ... />
-  <FormTextarea label="Descrição" ... />
-  <FormSelect label="Tipo" options={typeOptions} ... />
-  <EntitySelect entity="character" label="Fundador" ... />
-</BasicInfoSection>
-```
+      {/* Barra de busca */}
+      <EntitySearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder={t('search_placeholder')}
+      />
 
-3. **Adicionar seções avançadas:**
-```tsx
-import { AdvancedInfoSection } from '@/components/detail-page';
-
-<AdvancedInfoSection
-  title="Informações Avançadas"
-  isOpen={openSections.advanced}
-  onToggle={() => toggleSection('advanced')}
->
-  {/* Campos avançados */}
-</AdvancedInfoSection>
-```
-
-4. **Adicionar listas de entidades:**
-```tsx
-import { CollapsibleEntityList } from '@/components/entity-list';
-
-<CollapsibleEntityList
-  title="Facções"
-  entities={factions}
-  renderCard={(faction) => <FactionCard faction={faction} />}
-  isOpen={openSections.factions}
-  onToggle={() => toggleSection('factions')}
-  emptyText="Nenhuma facção"
-/>
-```
-
-5. **Adicionar exclusão:**
-```tsx
-import { DeleteConfirmationDialog } from '@/components/dialogs';
-
-<DeleteConfirmationDialog
-  open={deleteDialogOpen}
-  onOpenChange={setDeleteDialogOpen}
-  entityType="myentity"
-  entityName={entity.name}
-  onConfirm={handleDelete}
-/>
+      {/* Grid de cards */}
+      {filteredEntities.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredEntities.map((entity) => (
+            <EntityCard key={entity.id} entity={entity} onClick={handleClick} />
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={Search}
+          title={t('not_found')}
+          description="Try adjusting your search or filters"
+        />
+      )}
+    </div>
+  );
+}
 ```
 
 ---
 
-## Checklist de Componentes por Página
+### 3. Padrão de Confirmação de Exclusão
 
-✅ **Obrigatório em toda página de detalhes:**
-- [ ] DetailPageLayout
-- [ ] SideNavigation
-- [ ] EditControls
-- [ ] BasicInfoSection
-- [ ] DeleteConfirmationDialog
+```tsx
+import { DeleteConfirmationDialog } from '@/components/dialogs/DeleteConfirmationDialog';
 
-✅ **Opcional mas comum:**
-- [ ] AdvancedInfoSection
-- [ ] CollapsibleSection (para features especiais)
-- [ ] CollapsibleEntityList (para relacionamentos)
-- [ ] VersionSelector/VersionManager (se tiver versionamento)
+function EntityDetail() {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-✅ **Campos de formulário (conforme necessidade):**
-- [ ] FormInput
-- [ ] FormTextarea
-- [ ] FormSelect
-- [ ] FormMultiSelect
-- [ ] EntitySelect
-- [ ] EntityMultiSelect
+  const handleDelete = async () => {
+    await deleteEntity(entityId);
+    toast.success('Entidade excluída com sucesso');
+    navigate('/entities');
+  };
+
+  return (
+    <>
+      {/* Botão de exclusão */}
+      <Button
+        variant="destructive"
+        onClick={() => setShowDeleteDialog(true)}
+      >
+        <Trash2 className="w-4 h-4 mr-2" />
+        Excluir
+      </Button>
+
+      {/* Dialog de confirmação */}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        entityType="personagem"
+        entityName={entity.name}
+        onConfirm={handleDelete}
+      >
+        {/* Informações adicionais (opcional) */}
+        <p className="text-sm text-muted-foreground">
+          Todas as versões e relacionamentos também serão excluídos.
+        </p>
+      </DeleteConfirmationDialog>
+    </>
+  );
+}
+```
 
 ---
 
-Fim do documento.
+## Mapa de Localização
+
+```
+src/components/
+├── detail-page/
+│   ├── DetailPageLayout.tsx          # Layout principal de detalhes
+│   ├── BasicInfoSection.tsx          # Seção de informações básicas
+│   ├── AdvancedInfoSection.tsx       # Seção de informações avançadas
+│   ├── CollapsibleSection.tsx        # Seção colapsável genérica
+│   ├── EditControls.tsx              # Controles de editar/salvar/cancelar
+│   └── SideNavigation.tsx            # Navegação lateral genérica
+│
+├── entity-list/
+│   ├── EntityListHeader.tsx          # Header de listagem
+│   ├── EntitySearchBar.tsx           # Barra de busca
+│   ├── EntityFilterBadges.tsx        # Sistema de filtros
+│   └── CollapsibleEntityList.tsx     # Lista colapsável genérica
+│
+├── dialogs/
+│   ├── DeleteConfirmationDialog.tsx  # Dialog de confirmação de exclusão
+│   ├── WarningDialog.tsx             # Dialog genérico de aviso/confirmação
+│   └── index.ts                      # Exportações centralizadas
+│
+├── common/
+│   ├── book-card.tsx                 # Card de livro
+│   └── stats-card.tsx                # Card de estatísticas
+│
+├── modals/
+│   └── confirm-delete-modal.tsx      # Modal de exclusão com validação
+│
+├── character-navigation-sidebar.tsx  # Sidebar de navegação de personagens
+├── faction-navigation-sidebar.tsx    # Sidebar de navegação de facções
+├── item-navigation-sidebar.tsx       # Sidebar de navegação de itens
+├── character-version-manager.tsx     # Gerenciador de versões
+├── empty-state.tsx                   # Estado vazio
+├── rich-text-editor.tsx              # Editor de texto rico
+├── title-bar.tsx                     # Barra de título da aplicação
+│
+└── ui/
+    └── info-alert.tsx                # Alerta informativo
+```
+
+---
+
+## Resumo por Categoria
+
+### Layout (Detail Page) - 6 componentes
+- **DetailPageLayout** - Layout base com sidebar opcional
+- **BasicInfoSection** - Seção não-colapsável para info básicas
+- **AdvancedInfoSection** - Seção colapsável para info avançadas
+- **CollapsibleSection** - Seção colapsável genérica com ícone
+- **EditControls** - Barra de controles de edição (sticky)
+- **SideNavigation** - Navegação lateral genérica
+
+### Listagem - 4 componentes
+- **EntityListHeader** - Header com título, descrição e ações
+- **EntitySearchBar** - Barra de busca padronizada
+- **EntityFilterBadges** - Sistema de filtros com badges
+- **CollapsibleEntityList** - Lista colapsável genérica
+
+### Cards - 1 componente
+- **BookCard** - Card de livro (capa + overlay) - usado na tela Home
+
+### Dialogs - 3 componentes
+- **DeleteConfirmationDialog** ⭐ - Dialog de exclusão (padrão)
+- **WarningDialog** ⭐ - Dialog de aviso/confirmação não destrutivo (padrão)
+- **ConfirmDeleteModal** - Modal com validação (casos críticos)
+
+### Navegação - 3 componentes
+- **CharacterNavigationSidebar** - Navegação entre personagens
+- **FactionNavigationSidebar** - Navegação entre facções
+- **ItemNavigationSidebar** - Navegação entre itens
+
+### Estado Vazio - 1 componente
+- **EmptyState** - Estado vazio padronizado
+
+### Versionamento - 2 componentes
+- **VersionCard** ⭐ - Card genérico de versão (componente padrão)
+- **CharacterVersionManager** - Sistema de versões completo (legado)
+
+### Texto - 1 componente
+- **RichTextEditor** - Editor de texto rico
+
+### Alertas - 2 componentes
+- **InfoAlert** - Alerta informativo
+- **TitleBar** - Barra de título da aplicação
+
+**TOTAL: 23 componentes reutilizáveis documentados**
+
+---
+
+## Componentes Recomendados
+
+### Para Páginas de Detalhes
+⭐ **DetailPageLayout** + **EditControls** + **BasicInfoSection** + **AdvancedInfoSection**
+
+### Para Páginas de Listagem
+⭐ **EntityListHeader** + **EntitySearchBar** + **EntityFilterBadges** + **EmptyState**
+
+### Para Confirmação de Exclusão
+⭐ **DeleteConfirmationDialog** (padrão para todos os casos de exclusão)
+
+### Para Avisos e Confirmações Não Destrutivas
+⭐ **WarningDialog** (padrão para descartar alterações, trocar imagens, resetar configs)
+
+### Para Listagem de Livros
+⭐ **BookCard** (tela Home)
+
+### Para Sistema de Versões
+⭐ **VersionCard** (componente genérico padrão para qualquer entidade)
+
+### Para Navegação Entre Entidades
+⭐ **CharacterNavigationSidebar** (personagens)
+⭐ **FactionNavigationSidebar** (facções)
+⭐ **ItemNavigationSidebar** (itens)
+
+---
+
+## Componentes Específicos de Tabs
+
+⚠️ **Importante:** Os componentes listados neste documento são **globais e reutilizáveis**. Cada tab tem seus próprios componentes específicos que **não devem** ser usados fora do contexto da tab.
+
+### Cards Específicos por Tab
+
+Estes cards estão nas pastas das próprias tabs e **não são globais**:
+
+- **World Tab:**
+  - `RegionCard` → `src/pages/dashboard/tabs/world/components/region-card.tsx`
+
+- **Factions Tab:**
+  - `FactionCard` → `src/pages/dashboard/tabs/factions/components/faction-card.tsx`
+
+- **Items Tab:**
+  - `ItemCard` → `src/pages/dashboard/tabs/items/components/item-card.tsx`
+
+- **Races Tab:**
+  - `RaceCard` → `src/pages/dashboard/tabs/races/components/race-card.tsx`
+  - `SpeciesCard` → `src/pages/dashboard/tabs/races/components/species-card.tsx`
+
+- **Characters Tab:**
+  - Cards de personagem estão em `src/pages/dashboard/tabs/characters/components/`
+
+- **Power System Tab:**
+  - `PowerLinkCard` → `src/pages/dashboard/tabs/power-system/components/power-link-card.tsx`
+  - Hover cards específicos em `src/pages/dashboard/tabs/power-system/components/entity-views/`
+
+### Version Cards Específicos
+
+Cada entidade tem seu próprio version card:
+
+- `src/pages/dashboard/tabs/characters/character-detail/components/version-card.tsx`
+- `src/pages/dashboard/tabs/factions/faction-detail/components/version-card.tsx`
+- `src/pages/dashboard/tabs/items/item-detail/components/version-card.tsx`
+- `src/pages/dashboard/tabs/races/race-detail/components/race-version-card.tsx`
+- `src/pages/dashboard/tabs/world/region-detail/components/version-card.tsx`
+
+**Componente Global de Versão:**
+- `VersionCard` → `src/components/version-system/VersionCard.tsx` (componentizado e reutilizável)
+
+---
+
+## Referências
+
+- **Componentes de layout:** `src/components/detail-page/`
+- **Componentes de listagem:** `src/components/entity-list/`
+- **Componentes de dialogs:** `src/components/dialogs/`
+- **UI primitivos:** `src/components/ui/`
+- **Forms:** Ver `docs/build/forms.md`
+- **Componentes específicos de tabs:** Ver seção "Componentes Específicos de Tabs" acima

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Upload, ImageIcon } from "lucide-react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { uploadMapImage } from "@/lib/db/region-maps.service";
-import { useToast } from "@/hooks/use-toast";
 
 interface MapImageUploaderProps {
   regionId: string;
@@ -17,7 +16,6 @@ export function MapImageUploader({
   onUploadComplete,
 }: MapImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
 
   const handleUpload = async () => {
     try {
@@ -40,20 +38,9 @@ export function MapImageUploader({
 
       const regionMap = await uploadMapImage(regionId, selected, versionId);
 
-      toast({
-        title: "Imagem carregada",
-        description: "O mapa da região foi carregado com sucesso.",
-      });
-
       onUploadComplete(regionMap.imagePath, regionMap.id);
     } catch (error) {
       console.error("Failed to upload map image:", error);
-      toast({
-        title: "Erro ao carregar imagem",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     } finally {
       setIsUploading(false);
     }

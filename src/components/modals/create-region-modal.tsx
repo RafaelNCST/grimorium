@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoAlert } from "@/components/ui/info-alert";
 import {
   Form,
   FormControl,
@@ -20,8 +20,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -31,13 +29,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import { IRegion, RegionScale, RegionSeason, IRegionFormData } from "@/pages/dashboard/tabs/world/types/region-types";
-import { ImagePlus, X, Map, Info } from "lucide-react";
+import { IFaction } from "@/types/faction-types";
+import { ICharacter } from "@/types/character-types";
+import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import { IItem } from "@/lib/db/items.service";
+import { ImagePlus, X, Map, Plus, Save, Loader2 } from "lucide-react";
 import { AdvancedSection } from "./create-region-modal/components/advanced-section";
 import { SeasonPicker } from "./create-region-modal/components/season-picker";
 import { ListInput } from "./create-region-modal/components/list-input";
-import { MultiSelect } from "./create-region-modal/components/multi-select";
 
 interface CreateRegionModalProps {
   open: boolean;
@@ -45,23 +49,24 @@ interface CreateRegionModalProps {
   onConfirm: (data: IRegionFormData) => void;
   availableRegions?: IRegion[];
   editRegion?: IRegion | null;
-  // For multi-select dropdowns
-  factions?: Array<{ id: string; name: string }>;
-  characters?: Array<{ id: string; name: string }>;
-  races?: Array<{ id: string; name: string }>;
-  items?: Array<{ id: string; name: string }>;
+  bookId: string;
+  // Legacy props - mantidos para compatibilidade mas não usados
+  factions?: IFaction[];
+  characters?: ICharacter[];
+  races?: IRace[];
+  items?: IItem[];
 }
 
 const regionFormSchema = z.object({
   // Basic fields
-  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+  name: z.string().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
   parentId: z.string().nullable(),
   scale: z.enum(["local", "continental", "planetary", "galactic", "universal", "multiversal"]),
-  summary: z.string().max(500, "Summary is too long").optional(),
+  summary: z.string().min(1, "Resumo é obrigatório").max(500, "Resumo muito longo"),
   image: z.string().optional(),
 
   // Environment fields
-  climate: z.string().max(200).optional(),
+  climate: z.string().max(500).optional(),
   currentSeason: z.enum(["spring", "summer", "autumn", "winter", "custom"]).optional(),
   customSeasonName: z.string().max(50).optional(),
   generalDescription: z.string().max(1000).optional(),
@@ -102,14 +107,23 @@ export function CreateRegionModal({
   onConfirm,
   availableRegions = [],
   editRegion = null,
-  factions = [],
-  characters = [],
-  races = [],
-  items = [],
+  bookId,
+  factions,
+  characters,
+  races,
+  items,
 }: CreateRegionModalProps) {
   const { t } = useTranslation("world");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | undefined>(editRegion?.image);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Force refresh of entity selects when modal opens
+  useEffect(() => {
+    if (open) {
+      setRefreshKey(prev => prev + 1);
+    }
+  }, [open]);
 
   const form = useForm<RegionFormValues>({
     resolver: zodResolver(regionFormSchema),
@@ -255,18 +269,15 @@ export function CreateRegionModal({
         </DialogHeader>
 
         {/* Important Note Alert */}
-        <Alert className="bg-primary/5 border-primary/20">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertDescription className="text-sm">
-            Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.
-          </AlertDescription>
-        </Alert>
+        <InfoAlert>
+          Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.
+        </InfoAlert>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* Basic Fields Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
                 {t("create_region.basic_fields")}
               </h3>
 
@@ -276,9 +287,9 @@ export function CreateRegionModal({
                 name="image"
                 render={() => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel className="text-primary">
                       {t("create_region.image_label")}
-                      <span className="text-xs text-muted-foreground ml-2">({t("create_region.image_recommended")})</span>
+                      <span className="text-xs text-muted-foreground ml-2">(opcional - {t("create_region.image_recommended")})</span>
                     </FormLabel>
                     <FormControl>
                       <div className="space-y-3">
@@ -298,9 +309,9 @@ export function CreateRegionModal({
                             />
                             <Button
                               type="button"
-                              variant="destructive"
+                              variant="ghost"
                               size="icon"
-                              className="absolute top-2 right-2"
+                              className="absolute top-2 right-2 hover:bg-destructive/10 hover:text-destructive"
                               onClick={handleRemoveImage}
                             >
                               <X className="h-4 w-4" />
@@ -327,19 +338,21 @@ export function CreateRegionModal({
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>{t("create_region.name_label")}</FormLabel>
+                    <FormLabel className="text-primary">
+                      {t("create_region.name_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={t("create_region.name_placeholder")}
+                      <FormInput
                         {...field}
+                        placeholder={t("create_region.name_placeholder")}
                         maxLength={200}
+                        error={fieldState.error?.message}
+                        showLabel={false}
                       />
                     </FormControl>
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{field.value?.length || 0}/200</span>
-                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -351,7 +364,10 @@ export function CreateRegionModal({
                 name="parentId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("create_region.parent_label")}</FormLabel>
+                    <FormLabel className="text-primary">
+                      {t("create_region.parent_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
                     <Select
                       value={field.value || "neutral"}
                       onValueChange={(value) =>
@@ -387,6 +403,10 @@ export function CreateRegionModal({
                 name="scale"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel className="text-primary">
+                      {t("create_region.scale_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
                     <FormControl>
                       <ScalePicker
                         value={field.value}
@@ -402,21 +422,24 @@ export function CreateRegionModal({
               <FormField
                 control={form.control}
                 name="summary"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>{t("create_region.summary_label")}</FormLabel>
+                    <FormLabel className="text-primary">
+                      {t("create_region.summary_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder={t("create_region.summary_placeholder")}
+                      <FormTextarea
                         {...field}
+                        placeholder={t("create_region.summary_placeholder")}
                         rows={4}
                         maxLength={500}
+                        showCharCount
+                        error={fieldState.error?.message}
                         className="resize-none"
+                        showLabel={false}
                       />
                     </FormControl>
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{field.value?.length || 0}/500</span>
-                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -429,7 +452,7 @@ export function CreateRegionModal({
             <AdvancedSection>
               {/* Environment Section */}
               <div className="space-y-4">
-                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
                   {t("create_region.environment_section")}
                 </h4>
 
@@ -437,20 +460,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="climate"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.climate_label")}</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder={t("create_region.climate_placeholder")}
+                        <FormTextarea
                           {...field}
-                          maxLength={200}
+                          label={t("create_region.climate_label")}
+                          placeholder={t("create_region.climate_placeholder")}
+                          rows={4}
+                          maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
+                          className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/200</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -478,22 +503,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="generalDescription"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.general_description_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.general_description_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.general_description_label")}
+                          placeholder={t("create_region.general_description_placeholder")}
                           rows={5}
                           maxLength={1000}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/1000</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -512,6 +537,7 @@ export function CreateRegionModal({
                           value={field.value || []}
                           onChange={field.onChange}
                           maxLength={200}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -524,7 +550,7 @@ export function CreateRegionModal({
 
               {/* Information Section */}
               <div className="space-y-4">
-                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
                   {t("create_region.information_section")}
                 </h4>
 
@@ -535,18 +561,20 @@ export function CreateRegionModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <MultiSelect
+                        <FormEntityMultiSelectAuto
+                          key={`resident-factions-${refreshKey}`}
+                          entityType="faction"
+                          bookId={bookId}
                           label={t("create_region.resident_factions_label")}
                           placeholder={t("create_region.resident_factions_placeholder")}
                           emptyText={t("create_region.no_factions_warning")}
                           noSelectionText={t("create_region.no_factions_selected")}
                           searchPlaceholder={t("create_region.search_faction")}
-                          options={factions}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -558,18 +586,20 @@ export function CreateRegionModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <MultiSelect
+                        <FormEntityMultiSelectAuto
+                          key={`dominant-factions-${refreshKey}`}
+                          entityType="faction"
+                          bookId={bookId}
                           label={t("create_region.dominant_factions_label")}
                           placeholder={t("create_region.dominant_factions_placeholder")}
                           emptyText={t("create_region.no_factions_warning")}
                           noSelectionText={t("create_region.no_factions_selected")}
                           searchPlaceholder={t("create_region.search_faction")}
-                          options={factions}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -581,18 +611,20 @@ export function CreateRegionModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <MultiSelect
+                        <FormEntityMultiSelectAuto
+                          key={`important-characters-${refreshKey}`}
+                          entityType="character"
+                          bookId={bookId}
                           label={t("create_region.important_characters_label")}
                           placeholder={t("create_region.important_characters_placeholder")}
                           emptyText={t("create_region.no_characters_warning")}
                           noSelectionText={t("create_region.no_characters_selected")}
                           searchPlaceholder={t("create_region.search_character")}
-                          options={characters}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -604,18 +636,20 @@ export function CreateRegionModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <MultiSelect
+                        <FormEntityMultiSelectAuto
+                          key={`races-found-${refreshKey}`}
+                          entityType="race"
+                          bookId={bookId}
                           label={t("create_region.races_found_label")}
                           placeholder={t("create_region.races_found_placeholder")}
                           emptyText={t("create_region.no_races_warning")}
                           noSelectionText={t("create_region.no_races_selected")}
                           searchPlaceholder={t("create_region.search_race")}
-                          options={races}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -627,18 +661,20 @@ export function CreateRegionModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <MultiSelect
+                        <FormEntityMultiSelectAuto
+                          key={`items-found-${refreshKey}`}
+                          entityType="item"
+                          bookId={bookId}
                           label={t("create_region.items_found_label")}
                           placeholder={t("create_region.items_found_placeholder")}
                           emptyText={t("create_region.no_items_warning")}
                           noSelectionText={t("create_region.no_items_selected")}
                           searchPlaceholder={t("create_region.search_item")}
-                          options={items}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -648,7 +684,7 @@ export function CreateRegionModal({
 
               {/* Narrative Section */}
               <div className="space-y-4">
-                <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
                   {t("create_region.narrative_section")}
                 </h4>
 
@@ -656,22 +692,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="narrativePurpose"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.narrative_purpose_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.narrative_purpose_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.narrative_purpose_label")}
+                          placeholder={t("create_region.narrative_purpose_placeholder")}
                           rows={3}
                           maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/500</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -680,22 +716,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="uniqueCharacteristics"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.unique_characteristics_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.unique_characteristics_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.unique_characteristics_label")}
+                          placeholder={t("create_region.unique_characteristics_placeholder")}
                           rows={3}
                           maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/500</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -704,22 +740,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="politicalImportance"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.political_importance_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.political_importance_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.political_importance_label")}
+                          placeholder={t("create_region.political_importance_placeholder")}
                           rows={3}
                           maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/500</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -728,22 +764,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="religiousImportance"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.religious_importance_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.religious_importance_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.religious_importance_label")}
+                          placeholder={t("create_region.religious_importance_placeholder")}
                           rows={3}
                           maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/500</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -752,22 +788,22 @@ export function CreateRegionModal({
                 <FormField
                   control={form.control}
                   name="worldPerception"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>{t("create_region.world_perception_label")}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={t("create_region.world_perception_placeholder")}
+                        <FormTextarea
                           {...field}
+                          label={t("create_region.world_perception_label")}
+                          placeholder={t("create_region.world_perception_placeholder")}
                           rows={3}
                           maxLength={500}
+                          showCharCount
+                          error={fieldState.error?.message}
                           className="resize-none"
+                          labelClassName="text-primary"
+                          showOptionalLabel={false}
                         />
                       </FormControl>
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{field.value?.length || 0}/500</span>
-                      </div>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -785,6 +821,7 @@ export function CreateRegionModal({
                           buttonText={t("create_region.add_mystery")}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -805,6 +842,7 @@ export function CreateRegionModal({
                           buttonText={t("create_region.add_inspiration")}
                           value={field.value || []}
                           onChange={field.onChange}
+                          labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -821,14 +859,22 @@ export function CreateRegionModal({
                 onClick={handleClose}
                 disabled={isSubmitting}
               >
+                <X className="w-4 h-4 mr-2" />
                 {t("create_region.cancel_button")}
               </Button>
               <Button
                 type="submit"
                 variant="magical"
                 className="animate-glow"
-                disabled={isSubmitting || !form.formState.isValid}
+                disabled={isSubmitting}
               >
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : editRegion ? (
+                  <Save className="w-4 h-4 mr-2" />
+                ) : (
+                  <Plus className="w-4 h-4 mr-2" />
+                )}
                 {isSubmitting
                   ? editRegion ? t("create_region.updating") : t("create_region.creating")
                   : editRegion ? t("create_region.save_button") : t("create_region.create_button")}

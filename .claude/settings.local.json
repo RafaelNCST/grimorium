@@ -127,7 +127,21 @@
       "Bash(cmd /c \"taskkill /PID 18440 /F\")",
       "Bash(cmd //c \"taskkill //F //PID 39028\")",
       "Bash(/tmp/old_map_canvas.tsx)",
-      "Bash(pnpm list:*)"
+      "Bash(pnpm list:*)",
+      "Bash(Remove-Item -Path \"C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\pages\\dashboard\\tabs\\world\\world-detail\" -Recurse -Force)",
+      "Bash(Remove-Item -Path \"C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\routes\\dashboard\\`$dashboardId\\tabs\\world\\`$worldId.tsx\" -Force)",
+      "Bash(cmd /c \"for /f \"tokens=5\" %a in (''netstat -ano ^| findstr :8080 ^| findstr LISTENING'') do @taskkill /F /PID %a\" 2)",
+      "Bash(Select-String -Pattern \"region-detail|unsaved-changes\" -Context 2,2)",
+      "Bash(Select-String -Pattern \"region-detail/index.tsx\" -Context 2,2)",
+      "Bash(cmd /c \"for /f \"tokens=5\" %a in (''''netstat -ano ^| findstr :8080 ^| findstr LISTENING'''') do @taskkill /F /PID %a\")",
+      "Bash(Select-String -Pattern \"SUCCESS|ERROR\" -CaseSensitive)",
+      "Bash(cmd /c \"for /f \"tokens=5\" %a in (''netstat -ano ^| findstr :8080 ^| findstr LISTENING'') do @taskkill /F /PID %a\")",
+      "Bash(cmd /c \"taskkill /PID 18848 /F\")",
+      "Bash(cmd //c \"taskkill //PID 18848 //F //T\")",
+      "Bash(cmd /c \"taskkill /F /PID 18848\")",
+      "Bash(cmd /c \"taskkill /F /IM node.exe /T\")",
+      "Bash(Select-String -Pattern \"ÊXITO|SUCCESS\" -CaseSensitive)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

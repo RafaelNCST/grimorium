@@ -38,6 +38,10 @@ interface DBRegion {
   world_perception: string | null;
   region_mysteries: string | null;
   inspirations: string | null;
+
+  // Visibility configuration
+  field_visibility: string | null;
+  section_visibility: string | null;
 }
 
 /**
@@ -78,6 +82,10 @@ function regionToDBRegion(region: IRegion): DBRegion {
     world_perception: region.worldPerception || null,
     region_mysteries: region.regionMysteries || null,
     inspirations: region.inspirations || null,
+
+    // Visibility configuration
+    field_visibility: region.fieldVisibility || null,
+    section_visibility: region.sectionVisibility || null,
   };
 }
 
@@ -119,6 +127,10 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
     worldPerception: dbRegion.world_perception || undefined,
     regionMysteries: dbRegion.region_mysteries || undefined,
     inspirations: dbRegion.inspirations || undefined,
+
+    // Visibility configuration
+    fieldVisibility: dbRegion.field_visibility || undefined,
+    sectionVisibility: dbRegion.section_visibility || undefined,
   };
 }
 
@@ -181,12 +193,14 @@ export async function createRegion(
       id, book_id, name, parent_id, scale, summary, image, order_index, created_at, updated_at,
       climate, current_season, custom_season_name, general_description, region_anomalies,
       resident_factions, dominant_factions, important_characters, races_found, items_found,
-      narrative_purpose, unique_characteristics, political_importance, religious_importance, world_perception, region_mysteries, inspirations
+      narrative_purpose, unique_characteristics, political_importance, religious_importance, world_perception, region_mysteries, inspirations,
+      field_visibility, section_visibility
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
       $11, $12, $13, $14, $15,
       $16, $17, $18, $19, $20,
-      $21, $22, $23, $24, $25, $26, $27
+      $21, $22, $23, $24, $25, $26, $27,
+      $28, $29
     )`,
     [
       dbRegion.id,
@@ -216,6 +230,8 @@ export async function createRegion(
       dbRegion.world_perception,
       dbRegion.region_mysteries,
       dbRegion.inspirations,
+      dbRegion.field_visibility,
+      dbRegion.section_visibility,
     ]
   );
 
@@ -272,8 +288,10 @@ export async function updateRegion(
       religious_importance = $21,
       world_perception = $22,
       region_mysteries = $23,
-      inspirations = $24
-    WHERE id = $25`,
+      inspirations = $24,
+      field_visibility = $25,
+      section_visibility = $26
+    WHERE id = $27`,
     [
       dbRegion.name,
       dbRegion.parent_id,
@@ -299,6 +317,8 @@ export async function updateRegion(
       dbRegion.world_perception,
       dbRegion.region_mysteries,
       dbRegion.inspirations,
+      dbRegion.field_visibility,
+      dbRegion.section_visibility,
       id,
     ]
   );
@@ -763,31 +783,3 @@ export async function saveRegionVersionTimeline(
   }
 }
 
-/**
- * @deprecated Use getRegionVersionTimeline instead
- * Get timeline for a region (legacy - returns main version timeline)
- */
-export async function getRegionTimeline(
-  regionId: string
-): Promise<ITimelineEra[]> {
-  // For backwards compatibility, get timeline from main version
-  const versions = await getRegionVersions(regionId);
-  const mainVersion = versions.find(v => v.isMain);
-  if (!mainVersion) return [];
-  return getRegionVersionTimeline(mainVersion.id);
-}
-
-/**
- * @deprecated Use saveRegionVersionTimeline instead
- * Save complete timeline for a region (legacy - saves to main version)
- */
-export async function saveRegionTimeline(
-  regionId: string,
-  timeline: ITimelineEra[]
-): Promise<void> {
-  // For backwards compatibility, save timeline to main version
-  const versions = await getRegionVersions(regionId);
-  const mainVersion = versions.find(v => v.isMain);
-  if (!mainVersion) return;
-  await saveRegionVersionTimeline(mainVersion.id, timeline);
-}

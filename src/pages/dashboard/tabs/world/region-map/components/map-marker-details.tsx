@@ -137,7 +137,7 @@ export function MapMarkerDetails({
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
         <h3 className="font-semibold text-sm truncate flex-1">{region.name}</h3>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
       </div>
@@ -565,16 +565,16 @@ export function MapMarkerDetails({
 
       {/* Actions */}
       <div className="p-4 border-t space-y-2 flex-shrink-0">
-        <Button onClick={handleViewDetails} variant="outline" className="w-full">
+        <Button onClick={handleViewDetails} variant="magical" className="w-full animate-glow">
           <ExternalLink className="w-4 h-4 mr-2" />
           {t("region_map.view_details")}
         </Button>
 
         {onRemoveMarker && isEditMode && (
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={onRemoveMarker}
-            className="w-full hover:bg-destructive/10 hover:border-destructive/10 hover:ring-0 hover:shadow-none"
+            className="w-full hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2 className="w-4 h-4 mr-2" />
             {t("region_map.remove_from_map")}

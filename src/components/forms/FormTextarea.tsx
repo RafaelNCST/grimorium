@@ -12,6 +12,7 @@ export interface FormTextareaProps
   showOptionalLabel?: boolean;
   showCharCount?: boolean;
   maxLength?: number;
+  labelClassName?: string;
 }
 
 /**
@@ -45,6 +46,7 @@ export const FormTextarea = React.forwardRef<
       showOptionalLabel = true,
       showCharCount = false,
       maxLength,
+      labelClassName,
       id,
       name,
       value,
@@ -61,7 +63,7 @@ export const FormTextarea = React.forwardRef<
       <div className={cn('space-y-2', containerClassName)}>
         {label && (
           <div className="flex items-center justify-between">
-            <Label htmlFor={inputId} className="flex items-center gap-1">
+            <Label htmlFor={inputId} className={cn("flex items-center gap-1", labelClassName)}>
               {label}
               {required && <span className="text-destructive">*</span>}
               {!required && showOptionalLabel && (

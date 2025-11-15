@@ -1,12 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { Plus, Search, Network, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/empty-state";
+import {
+  EntityListHeader,
+  EntitySearchBar,
+  EntityFilterBadges,
+} from "@/components/entity-list";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { HierarchyManagerModal } from "./components/hierarchy-manager-modal";
 import { RegionCard } from "./components/region-card";
-import { ScaleFilterBadges } from "./components/scale-filter-badges";
+import { createScaleFilterRows } from "./helpers/scale-filter-config";
 import { IRegion, IRegionWithChildren, RegionScale, IRegionFormData } from "./types/region-types";
 
 interface WorldViewProps {
@@ -83,21 +87,18 @@ export function WorldView({
   if (allRegions.length === 0) {
     return (
       <div className="flex-1 h-full flex flex-col space-y-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">{t("title")}</h2>
-            <p className="text-muted-foreground">{t("description")}</p>
-          </div>
-          <Button
-            variant="magical"
-            size="lg"
-            onClick={() => onShowCreateModal(true)}
-            className="animate-glow"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {t("new_region_button")}
-          </Button>
-        </div>
+        <EntityListHeader
+          title={t("title")}
+          description={t("description")}
+          primaryAction={{
+            label: t("new_region_button"),
+            onClick: () => onShowCreateModal(true),
+            variant: "magical",
+            size: "lg",
+            icon: Plus,
+            className: "animate-glow",
+          }}
+        />
 
         <EmptyState
           icon={Network}
@@ -119,50 +120,50 @@ export function WorldView({
     );
   }
 
+  // Configure filter rows
+  const filterRows = createScaleFilterRows(scaleStats, t);
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
-          <p className="text-muted-foreground">{t("description")}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onShowHierarchyModal(true)}
-          >
-            <Network className="w-4 h-4 mr-2" />
-            {t("manage_hierarchy_button")}
-          </Button>
-          <Button
-            variant="magical"
-            onClick={() => onShowCreateModal(true)}
-            className="animate-glow"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {t("new_region_button")}
-          </Button>
-        </div>
-      </div>
+      {/* Header with integrated filters */}
+      <EntityListHeader
+        title={t("title")}
+        description={t("description")}
+        primaryAction={{
+          label: t("new_region_button"),
+          onClick: () => onShowCreateModal(true),
+          variant: "magical",
+          icon: Plus,
+          className: "animate-glow",
+        }}
+        secondaryActions={[
+          {
+            label: t("manage_hierarchy_button"),
+            onClick: () => onShowHierarchyModal(true),
+            variant: "outline",
+            icon: Network,
+          },
+        ]}
+      >
+        {/* Scale Filter Badges */}
+        <EntityFilterBadges
+          totalCount={allRegions.length}
+          totalLabel={t("filters.all")}
+          selectedFilters={selectedScales}
+          filterRows={filterRows}
+          onFilterToggle={onScaleToggle}
+          onClearFilters={() => {
+            // Clear all selected scales
+            selectedScales.forEach((scale) => onScaleToggle(scale));
+          }}
+        />
+      </EntityListHeader>
 
       {/* Search Bar */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder={t("search_placeholder")}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Scale Filter Badges */}
-      <ScaleFilterBadges
-        totalRegions={allRegions.length}
-        scaleStats={scaleStats}
-        selectedScales={selectedScales}
-        onScaleToggle={onScaleToggle}
+      <EntitySearchBar
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder={t("search_placeholder")}
       />
 
       {/* Regions Grid */}
@@ -197,6 +198,7 @@ export function WorldView({
         onOpenChange={onShowCreateModal}
         onConfirm={onCreateRegion}
         availableRegions={allRegions}
+        bookId={bookId}
         characters={characters}
         factions={factions}
         races={races}

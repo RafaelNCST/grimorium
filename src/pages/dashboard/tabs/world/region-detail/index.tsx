@@ -4,6 +4,7 @@ import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { RegionSchema } from "@/lib/validation/region-schema";
+import { safeJsonParse } from "@/lib/utils/json-parse";
 
 import {
   getRegionById,
@@ -28,8 +29,15 @@ import {
   type IRegionFormData,
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
+import {
+  type IFieldVisibility,
+  type ISectionVisibility,
+  toggleFieldVisibility,
+  toggleSectionVisibility,
+} from "@/components/detail-page/visibility-helpers";
 
 import { RegionDetailView } from "./view";
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 
 export function RegionDetail() {
   const { dashboardId, regionId } = useParams({
@@ -58,30 +66,55 @@ export function RegionDetail() {
   const [region, setRegion] = useState<IRegion | null>(null);
   const [editData, setEditData] = useState<IRegion>(emptyRegion);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [versions, setVersions] = useState<IRegionVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(null);
+  const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
-    const stored = localStorage.getItem('regionDetailAdvancedSectionOpen');
+    const stored = localStorage.getItem("regionDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
   });
   const [timelineSectionOpen, setTimelineSectionOpen] = useState(() => {
-    const stored = localStorage.getItem('regionDetailTimelineSectionOpen');
+    const stored = localStorage.getItem("regionDetailTimelineSectionOpen");
     return stored ? JSON.parse(stored) : false;
   });
 
   // Related data for multi-selects
-  const [characters, setCharacters] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [factions, setFactions] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [characters, setCharacters] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [factions, setFactions] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [races, setRaces] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [items, setItems] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
 
   // Timeline state
   const [timeline, setTimeline] = useState<ITimelineEra[]>([]);
   const [originalTimeline, setOriginalTimeline] = useState<ITimelineEra[]>([]);
+
+  // Visibility state
+  const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [sectionVisibility, setSectionVisibility] =
+    useState<ISectionVisibility>({});
+  const [originalFieldVisibility, setOriginalFieldVisibility] =
+    useState<IFieldVisibility>({});
+  const [originalSectionVisibility, setOriginalSectionVisibility] =
+    useState<ISectionVisibility>({});
+
+  // Refs to always have the latest visibility values
+  const fieldVisibilityRef = useRef<IFieldVisibility>({});
+  const sectionVisibilityRef = useRef<ISectionVisibility>({});
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -94,7 +127,7 @@ export function RegionDetail() {
       fieldSchema.parse({ [field]: value });
 
       // Se passou, remover erro
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -103,9 +136,9 @@ export function RegionDetail() {
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          [field]: error.errors[0].message
+          [field]: error.errors[0].message,
         }));
         return false;
       }
@@ -121,15 +154,16 @@ export function RegionDetail() {
       RegionSchema.pick({
         name: true,
         scale: true,
+        summary: true,
       } as any).parse({
         name: editData.name,
         scale: editData.scale,
+        summary: editData.summary,
       });
       return { hasRequiredFieldsEmpty: false, missingFields: [] };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const missing = error.errors.map(e => e.path[0] as string);
-        console.log('Campos vazios:', missing);
+        const missing = error.errors.map((e) => e.path[0] as string);
         return { hasRequiredFieldsEmpty: true, missingFields: missing };
       }
       return { hasRequiredFieldsEmpty: true, missingFields: [] };
@@ -138,11 +172,17 @@ export function RegionDetail() {
 
   // Save section states to localStorage
   useEffect(() => {
-    localStorage.setItem('regionDetailAdvancedSectionOpen', JSON.stringify(advancedSectionOpen));
+    localStorage.setItem(
+      "regionDetailAdvancedSectionOpen",
+      JSON.stringify(advancedSectionOpen)
+    );
   }, [advancedSectionOpen]);
 
   useEffect(() => {
-    localStorage.setItem('regionDetailTimelineSectionOpen', JSON.stringify(timelineSectionOpen));
+    localStorage.setItem(
+      "regionDetailTimelineSectionOpen",
+      JSON.stringify(timelineSectionOpen)
+    );
   }, [timelineSectionOpen]);
 
   // Check if there are changes between region and editData
@@ -150,16 +190,32 @@ export function RegionDetail() {
     if (!isEditing) return false;
 
     // Check if timeline has changed
-    if (JSON.stringify(timeline) !== JSON.stringify(originalTimeline)) return true;
+    if (JSON.stringify(timeline) !== JSON.stringify(originalTimeline))
+      return true;
+
+    // Check if visibility has changed
+    if (
+      JSON.stringify(fieldVisibility) !==
+      JSON.stringify(originalFieldVisibility)
+    )
+      return true;
+    if (
+      JSON.stringify(sectionVisibility) !==
+      JSON.stringify(originalSectionVisibility)
+    )
+      return true;
 
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
-    const arraysEqual = (a: unknown[] | undefined, b: unknown[] | undefined): boolean => {
+    const arraysEqual = (
+      a: unknown[] | undefined,
+      b: unknown[] | undefined
+    ): boolean => {
       if (!a && !b) return true;
       if (!a || !b) return false;
       if (a.length !== b.length) return false;
 
       // For string arrays (like mysteries, anomalies), order matters
-      if (a.length > 0 && typeof a[0] === 'string') {
+      if (a.length > 0 && typeof a[0] === "string") {
         return a.every((item, index) => item === b[index]);
       }
 
@@ -171,12 +227,7 @@ export function RegionDetail() {
 
     // Helper to parse JSON strings to arrays for comparison
     const parseJsonArray = (value: string | undefined): string[] => {
-      if (!value) return [];
-      try {
-        return JSON.parse(value);
-      } catch {
-        return [];
-      }
+      return safeJsonParse<string[]>(value, []);
     };
 
     // Compare basic fields
@@ -197,36 +248,54 @@ export function RegionDetail() {
     if (!arraysEqual(regionAnomalies, editAnomalies)) return true;
 
     // Compare advanced fields - Information
-    if (!arraysEqual(
-      parseJsonArray(region.residentFactions),
-      parseJsonArray(editData.residentFactions)
-    )) return true;
+    if (
+      !arraysEqual(
+        parseJsonArray(region.residentFactions),
+        parseJsonArray(editData.residentFactions)
+      )
+    )
+      return true;
 
-    if (!arraysEqual(
-      parseJsonArray(region.dominantFactions),
-      parseJsonArray(editData.dominantFactions)
-    )) return true;
+    if (
+      !arraysEqual(
+        parseJsonArray(region.dominantFactions),
+        parseJsonArray(editData.dominantFactions)
+      )
+    )
+      return true;
 
-    if (!arraysEqual(
-      parseJsonArray(region.importantCharacters),
-      parseJsonArray(editData.importantCharacters)
-    )) return true;
+    if (
+      !arraysEqual(
+        parseJsonArray(region.importantCharacters),
+        parseJsonArray(editData.importantCharacters)
+      )
+    )
+      return true;
 
-    if (!arraysEqual(
-      parseJsonArray(region.racesFound),
-      parseJsonArray(editData.racesFound)
-    )) return true;
+    if (
+      !arraysEqual(
+        parseJsonArray(region.racesFound),
+        parseJsonArray(editData.racesFound)
+      )
+    )
+      return true;
 
-    if (!arraysEqual(
-      parseJsonArray(region.itemsFound),
-      parseJsonArray(editData.itemsFound)
-    )) return true;
+    if (
+      !arraysEqual(
+        parseJsonArray(region.itemsFound),
+        parseJsonArray(editData.itemsFound)
+      )
+    )
+      return true;
 
     // Compare advanced fields - Narrative
     if (region.narrativePurpose !== editData.narrativePurpose) return true;
-    if (region.uniqueCharacteristics !== editData.uniqueCharacteristics) return true;
-    if (region.politicalImportance !== editData.politicalImportance) return true;
-    if (region.religiousImportance !== editData.religiousImportance) return true;
+    if (region.uniqueCharacteristics !== editData.uniqueCharacteristics)
+      return true;
+    if (region.politicalImportance !== editData.politicalImportance)
+      return true;
+    if (region.religiousImportance !== editData.religiousImportance)
+      return true;
     if (region.worldPerception !== editData.worldPerception) return true;
 
     const regionMysteries = parseJsonArray(region.regionMysteries);
@@ -238,7 +307,17 @@ export function RegionDetail() {
     if (!arraysEqual(regionInspirations, editInspirations)) return true;
 
     return false;
-  }, [region, editData, isEditing, timeline, originalTimeline]);
+  }, [
+    region,
+    editData,
+    isEditing,
+    timeline,
+    originalTimeline,
+    fieldVisibility,
+    originalFieldVisibility,
+    sectionVisibility,
+    originalSectionVisibility,
+  ]);
 
   // Load region from database
   useEffect(() => {
@@ -272,6 +351,24 @@ export function RegionDetail() {
             setRegion(regionFromDB);
             setEditData(regionFromDB);
             setImagePreview(regionFromDB.image || "");
+
+            // Load visibility preferences from the region data
+            const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
+              regionFromDB.fieldVisibility,
+              {}
+            );
+            const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
+              regionFromDB.sectionVisibility,
+              {}
+            );
+
+            setFieldVisibility(loadedFieldVisibility);
+            setSectionVisibility(loadedSectionVisibility);
+            setOriginalFieldVisibility(loadedFieldVisibility);
+            setOriginalSectionVisibility(loadedSectionVisibility);
+            // Update refs
+            fieldVisibilityRef.current = loadedFieldVisibility;
+            sectionVisibilityRef.current = loadedSectionVisibility;
           } else {
             // Update main version with loaded data
             updatedVersions = versionsFromDB.map((v) =>
@@ -283,7 +380,6 @@ export function RegionDetail() {
                 : v
             );
             setVersions(updatedVersions);
-
           }
 
           // Load all regions from the same book
@@ -292,89 +388,97 @@ export function RegionDetail() {
             setAllRegions(allRegionsFromBook);
 
             // Load related data for multi-selects
-            const [charactersData, factionsData, racesData, itemsData] = await Promise.all([
-              getCharactersByBookId(dashboardId),
-              getFactionsByBookId(dashboardId),
-              getRacesByBookId(dashboardId),
-              getItemsByBookId(dashboardId)
-            ]);
+            const [charactersData, factionsData, racesData, itemsData] =
+              await Promise.all([
+                getCharactersByBookId(dashboardId),
+                getFactionsByBookId(dashboardId),
+                getRacesByBookId(dashboardId),
+                getItemsByBookId(dashboardId),
+              ]);
 
-            setCharacters(charactersData.map(char => ({
-              id: char.id,
-              name: char.name,
-              image: char.image
-            })));
+            setCharacters(
+              charactersData.map((char) => ({
+                id: char.id,
+                name: char.name,
+                image: char.image,
+              }))
+            );
 
-            setFactions(factionsData.map(faction => ({
-              id: faction.id,
-              name: faction.name,
-              image: faction.image
-            })));
+            setFactions(
+              factionsData.map((faction) => ({
+                id: faction.id,
+                name: faction.name,
+                image: faction.image,
+              }))
+            );
 
-            setRaces(racesData.map(race => ({
-              id: race.id,
-              name: race.name,
-              image: race.image
-            })));
+            setRaces(
+              racesData.map((race) => ({
+                id: race.id,
+                name: race.name,
+                image: race.image,
+              }))
+            );
 
-            setItems(itemsData.map(item => ({
-              id: item.id,
-              name: item.name,
-              image: item.image
-            })));
+            setItems(
+              itemsData.map((item) => ({
+                id: item.id,
+                name: item.name,
+                image: item.image,
+              }))
+            );
 
             // Clean orphaned IDs from all versions BEFORE setting state
-            const characterIds = new Set(charactersData.map(c => c.id));
-            const factionIds = new Set(factionsData.map(f => f.id));
-            const raceIds = new Set(racesData.map(r => r.id));
-            const itemIds = new Set(itemsData.map(i => i.id));
+            const characterIds = new Set(charactersData.map((c) => c.id));
+            const factionIds = new Set(factionsData.map((f) => f.id));
+            const raceIds = new Set(racesData.map((r) => r.id));
+            const itemIds = new Set(itemsData.map((i) => i.id));
 
             let hasOrphanedIds = false;
 
-            const cleanedVersions = updatedVersions.map(version => {
+            const cleanedVersions = updatedVersions.map((version) => {
               const regionData = version.regionData;
               let needsUpdate = false;
 
-              // Helper to safely parse JSON strings
-              const safeJsonParse = (value: any): string[] => {
-                // Already an array
-                if (Array.isArray(value)) return value;
-
-                // Null, undefined, or empty
-                if (!value) return [];
-
-                // Not a string
-                if (typeof value !== 'string') return [];
-
-                // Empty string
-                if (value.trim() === '') return [];
-
-                // Try to parse
-                try {
-                  return JSON.parse(value);
-                } catch (error) {
-                  console.warn('[RegionDetail] Failed to parse JSON:', value, error);
-                  return [];
-                }
-              };
-
               // Parse and clean each field
-              const importantCharacters = safeJsonParse(regionData.importantCharacters);
-              const importantFactions = safeJsonParse(regionData.importantFactions);
-              const racesFound = safeJsonParse(regionData.racesFound);
-              const itemsFound = safeJsonParse(regionData.itemsFound);
+              const importantCharacters = safeJsonParse<string[]>(
+                regionData.importantCharacters,
+                []
+              );
+              const importantFactions = safeJsonParse<string[]>(
+                regionData.importantFactions,
+                []
+              );
+              const racesFound = safeJsonParse<string[]>(
+                regionData.racesFound,
+                []
+              );
+              const itemsFound = safeJsonParse<string[]>(
+                regionData.itemsFound,
+                []
+              );
 
               // Filter out orphaned IDs
-              const cleanedCharacters = importantCharacters.filter((id: string) => characterIds.has(id));
-              const cleanedFactions = importantFactions.filter((id: string) => factionIds.has(id));
-              const cleanedRaces = racesFound.filter((id: string) => raceIds.has(id));
-              const cleanedItems = itemsFound.filter((id: string) => itemIds.has(id));
+              const cleanedCharacters = importantCharacters.filter(
+                (id: string) => characterIds.has(id)
+              );
+              const cleanedFactions = importantFactions.filter((id: string) =>
+                factionIds.has(id)
+              );
+              const cleanedRaces = racesFound.filter((id: string) =>
+                raceIds.has(id)
+              );
+              const cleanedItems = itemsFound.filter((id: string) =>
+                itemIds.has(id)
+              );
 
               // Check if any IDs were removed
-              if (cleanedCharacters.length !== importantCharacters.length ||
-                  cleanedFactions.length !== importantFactions.length ||
-                  cleanedRaces.length !== racesFound.length ||
-                  cleanedItems.length !== itemsFound.length) {
+              if (
+                cleanedCharacters.length !== importantCharacters.length ||
+                cleanedFactions.length !== importantFactions.length ||
+                cleanedRaces.length !== racesFound.length ||
+                cleanedItems.length !== itemsFound.length
+              ) {
                 needsUpdate = true;
                 hasOrphanedIds = true;
               }
@@ -388,7 +492,7 @@ export function RegionDetail() {
                     importantFactions: JSON.stringify(cleanedFactions),
                     racesFound: JSON.stringify(cleanedRaces),
                     itemsFound: JSON.stringify(cleanedItems),
-                  }
+                  },
                 };
               }
 
@@ -397,8 +501,6 @@ export function RegionDetail() {
 
             // Update database if orphaned IDs were found
             if (hasOrphanedIds) {
-              console.log('[RegionDetail] Cleaning orphaned IDs from region fields');
-
               for (const version of cleanedVersions) {
                 try {
                   if (version.isMain) {
@@ -406,24 +508,36 @@ export function RegionDetail() {
                     await updateRegion(regionId, version.regionData);
                   } else {
                     // Update version
-                    const { updateRegionVersionData } = await import("@/lib/db/regions.service");
-                    await updateRegionVersionData(version.id, version.regionData);
+                    const { updateRegionVersionData } = await import(
+                      "@/lib/db/regions.service"
+                    );
+                    await updateRegionVersionData(
+                      version.id,
+                      version.regionData
+                    );
                   }
                 } catch (error) {
-                  console.error(`[RegionDetail] Failed to clean orphaned IDs for version ${version.id}:`, error);
+                  console.error(
+                    `Failed to clean orphaned IDs for version ${version.id}:`,
+                    error
+                  );
                 }
               }
             }
 
             // Update state with cleaned versions (always use cleaned versions)
-            const finalVersions = hasOrphanedIds ? cleanedVersions : updatedVersions;
+            const finalVersions = hasOrphanedIds
+              ? cleanedVersions
+              : updatedVersions;
             setVersions(finalVersions);
 
             // Set current version based on URL parameter or default to main (using cleaned data)
             let selectedVersion: IRegionVersion | undefined;
 
             if (versionIdFromUrl) {
-              selectedVersion = finalVersions.find((v) => v.id === versionIdFromUrl);
+              selectedVersion = finalVersions.find(
+                (v) => v.id === versionIdFromUrl
+              );
               if (!selectedVersion) {
                 selectedVersion = finalVersions.find((v) => v.isMain);
               }
@@ -438,8 +552,28 @@ export function RegionDetail() {
               setEditData(selectedVersion.regionData);
               setImagePreview(selectedVersion.regionData.image || "");
 
+              // Load visibility preferences from the region data
+              const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
+                selectedVersion.regionData.fieldVisibility,
+                {}
+              );
+              const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
+                selectedVersion.regionData.sectionVisibility,
+                {}
+              );
+
+              setFieldVisibility(loadedFieldVisibility);
+              setSectionVisibility(loadedSectionVisibility);
+              setOriginalFieldVisibility(loadedFieldVisibility);
+              setOriginalSectionVisibility(loadedSectionVisibility);
+              // Update refs
+              fieldVisibilityRef.current = loadedFieldVisibility;
+              sectionVisibilityRef.current = loadedSectionVisibility;
+
               // Load timeline for this version
-              const timelineData = await getRegionVersionTimeline(selectedVersion.id);
+              const timelineData = await getRegionVersionTimeline(
+                selectedVersion.id
+              );
               setTimeline(timelineData);
               setOriginalTimeline(timelineData);
             }
@@ -466,6 +600,24 @@ export function RegionDetail() {
       setRegion(version.regionData);
       setEditData(version.regionData);
       setImagePreview(version.regionData.image || "");
+
+      // Load visibility preferences from the region data
+      const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
+        version.regionData.fieldVisibility,
+        {}
+      );
+      const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
+        version.regionData.sectionVisibility,
+        {}
+      );
+
+      setFieldVisibility(loadedFieldVisibility);
+      setSectionVisibility(loadedSectionVisibility);
+      setOriginalFieldVisibility(loadedFieldVisibility);
+      setOriginalSectionVisibility(loadedSectionVisibility);
+      // Update refs
+      fieldVisibilityRef.current = loadedFieldVisibility;
+      sectionVisibilityRef.current = loadedSectionVisibility;
 
       // Load timeline for this version
       try {
@@ -509,9 +661,7 @@ export function RegionDetail() {
 
   const handleVersionDelete = useCallback(
     async (versionId: string) => {
-      console.log("[handleVersionDelete] Starting deletion for versionId:", versionId);
       const versionToDelete = versions.find((v) => v.id === versionId);
-      console.log("[handleVersionDelete] Version to delete:", versionToDelete);
 
       // Don't allow deleting main version
       if (versionToDelete?.isMain) {
@@ -519,14 +669,11 @@ export function RegionDetail() {
       }
 
       try {
-        console.log("[handleVersionDelete] Calling deleteRegionVersion...");
         // Delete from database
         await deleteRegionVersion(versionId);
-        console.log("[handleVersionDelete] deleteRegionVersion completed successfully");
 
         // Update state only if delete is successful
         const updatedVersions = versions.filter((v) => v.id !== versionId);
-        console.log("[handleVersionDelete] Updated versions count:", updatedVersions.length);
 
         // If the deleted version was the current one, switch to main
         if (currentVersion?.id === versionId) {
@@ -541,7 +688,10 @@ export function RegionDetail() {
 
         setVersions(updatedVersions);
       } catch (error) {
-        console.error("[handleVersionDelete] Error deleting region version:", error);
+        console.error(
+          "[handleVersionDelete] Error deleting region version:",
+          error
+        );
       }
     },
     [versions, currentVersion]
@@ -612,9 +762,7 @@ export function RegionDetail() {
 
       // Update data in current version
       const updatedVersions = versions.map((v) =>
-        v.id === currentVersion?.id
-          ? { ...v, regionData: updatedRegion }
-          : v
+        v.id === currentVersion?.id ? { ...v, regionData: updatedRegion } : v
       );
       setVersions(updatedVersions);
 
@@ -625,7 +773,11 @@ export function RegionDetail() {
         setCurrentVersion(activeVersion);
       }
 
-      // Update region in database - pass ALL fields from updatedRegion
+      // Get current visibility state from refs
+      const currentFieldVisibility = fieldVisibilityRef.current;
+      const currentSectionVisibility = sectionVisibilityRef.current;
+
+      // Update region in database - pass ALL fields including visibility preferences
       await updateRegion(regionId, {
         name: updatedRegion.name,
         parentId: updatedRegion.parentId,
@@ -652,7 +804,14 @@ export function RegionDetail() {
         worldPerception: updatedRegion.worldPerception,
         regionMysteries: updatedRegion.regionMysteries,
         inspirations: updatedRegion.inspirations,
+        // Visibility preferences
+        fieldVisibility: JSON.stringify(currentFieldVisibility),
+        sectionVisibility: JSON.stringify(currentSectionVisibility),
       });
+
+      // Update original visibility to match saved state
+      setOriginalFieldVisibility(currentFieldVisibility);
+      setOriginalSectionVisibility(currentSectionVisibility);
 
       // Save timeline for current version
       if (currentVersion) {
@@ -668,7 +827,7 @@ export function RegionDetail() {
       if (error instanceof z.ZodError) {
         // Mapear erros para cada campo
         const newErrors: Record<string, string> = {};
-        error.errors.forEach(err => {
+        error.errors.forEach((err) => {
           const field = err.path[0] as string;
           newErrors[field] = err.message;
         });
@@ -695,10 +854,8 @@ export function RegionDetail() {
       if (!versionToDelete) return;
 
       try {
-        console.log("[handleConfirmDelete] Deleting version from database:", currentVersion.id);
         // Delete from database
         await deleteRegionVersion(currentVersion.id);
-        console.log("[handleConfirmDelete] Version deleted from database successfully");
 
         const updatedVersions = versions.filter(
           (v) => v.id !== currentVersion.id
@@ -729,17 +886,41 @@ export function RegionDetail() {
     }
   }, [currentVersion, versions, navigateToWorldTab, regionId, dashboardId, t]);
 
-  const handleCancel = useCallback(async () => {
+  const handleCancel = useCallback(() => {
     if (hasChanges) {
-      const confirmCancel = window.confirm(t("unsaved_changes_warning"));
-      if (!confirmCancel) return;
+      setShowUnsavedChangesDialog(true);
+      return;
     }
 
+    // If no changes, cancel immediately
     setEditData(region);
     setTimeline(originalTimeline);
-    setErrors({}); // Limpar erros ao cancelar
+    setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
+    setErrors({});
     setIsEditing(false);
-  }, [region, originalTimeline, hasChanges, t]);
+  }, [
+    region,
+    originalTimeline,
+    originalFieldVisibility,
+    originalSectionVisibility,
+    hasChanges,
+  ]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setEditData(region);
+    setTimeline(originalTimeline);
+    setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
+    setErrors({});
+    setIsEditing(false);
+    setShowUnsavedChangesDialog(false);
+  }, [
+    region,
+    originalTimeline,
+    originalFieldVisibility,
+    originalSectionVisibility,
+  ]);
 
   const handleImageFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -765,7 +946,10 @@ export function RegionDetail() {
     navigate({
       to: "/dashboard/$dashboardId/tabs/world/$regionId/map",
       params: { dashboardId, regionId },
-      search: currentVersion?.id && currentVersion.id !== 'main-version' ? { versionId: currentVersion.id } : undefined,
+      search:
+        currentVersion?.id && currentVersion.id !== "main-version"
+          ? { versionId: currentVersion.id }
+          : undefined,
     });
   }, [navigate, dashboardId, regionId, currentVersion]);
 
@@ -777,13 +961,16 @@ export function RegionDetail() {
     setIsNavigationSidebarOpen(false);
   }, []);
 
-  const handleRegionSelect = useCallback((regionId: string) => {
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/world/$regionId",
-      params: { dashboardId, regionId },
-      replace: true,
-    });
-  }, [dashboardId, navigate]);
+  const handleRegionSelect = useCallback(
+    (regionId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/world/$regionId",
+        params: { dashboardId, regionId },
+        replace: true,
+      });
+    },
+    [dashboardId, navigate]
+  );
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);
@@ -814,6 +1001,34 @@ export function RegionDetail() {
     setTimeline(newTimeline);
   }, []);
 
+  const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
+    setFieldVisibility((prev) => {
+      const newVisibility = toggleFieldVisibility(fieldName, prev);
+      fieldVisibilityRef.current = newVisibility;
+      console.log(
+        "[Visibility] Field toggled:",
+        fieldName,
+        "New state:",
+        newVisibility
+      );
+      return newVisibility;
+    });
+  }, []);
+
+  const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
+    setSectionVisibility((prev) => {
+      const newVisibility = toggleSectionVisibility(sectionName, prev);
+      sectionVisibilityRef.current = newVisibility;
+      console.log(
+        "[Visibility] Section toggled:",
+        sectionName,
+        "New state:",
+        newVisibility
+      );
+      return newVisibility;
+    });
+  }, []);
+
   // Don't render until we have the region data loaded
   if (!region || !currentVersion) {
     return (
@@ -827,49 +1042,62 @@ export function RegionDetail() {
   }
 
   return (
-    <RegionDetailView
-      region={region}
-      editData={editData}
-      isEditing={isEditing}
-      hasChanges={hasChanges}
-      versions={versions}
-      currentVersion={currentVersion}
-      showDeleteModal={showDeleteModal}
-      isNavigationSidebarOpen={isNavigationSidebarOpen}
-      imagePreview={imagePreview}
-      fileInputRef={fileInputRef}
-      allRegions={allRegions}
-      advancedSectionOpen={advancedSectionOpen}
-      timelineSectionOpen={timelineSectionOpen}
-      characters={characters}
-      factions={factions}
-      races={races}
-      items={items}
-      timeline={timeline}
-      errors={errors}
-      validateField={validateField}
-      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
-      missingFields={missingFields}
-      onTimelineChange={handleTimelineChange}
-      onBack={handleBack}
-      onViewMap={handleViewMap}
-      onNavigationSidebarToggle={handleNavigationSidebarToggle}
-      onNavigationSidebarClose={handleNavigationSidebarClose}
-      onRegionSelect={handleRegionSelect}
-      onEdit={handleEdit}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onDeleteModalOpen={handleDeleteModalOpen}
-      onDeleteModalClose={handleDeleteModalClose}
-      onConfirmDelete={handleConfirmDelete}
-      onVersionChange={handleVersionChange}
-      onVersionCreate={handleVersionCreate}
-      onVersionDelete={handleVersionDelete}
-      onVersionUpdate={handleVersionUpdate}
-      onImageFileChange={handleImageFileChange}
-      onEditDataChange={handleEditDataChange}
-      onAdvancedSectionToggle={handleAdvancedSectionToggle}
-      onTimelineSectionToggle={handleTimelineSectionToggle}
-    />
+    <>
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={setShowUnsavedChangesDialog}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <RegionDetailView
+        region={region}
+        editData={editData}
+        isEditing={isEditing}
+        hasChanges={hasChanges}
+        versions={versions}
+        currentVersion={currentVersion}
+        showDeleteModal={showDeleteModal}
+        isNavigationSidebarOpen={isNavigationSidebarOpen}
+        imagePreview={imagePreview}
+        fileInputRef={fileInputRef}
+        allRegions={allRegions}
+        advancedSectionOpen={advancedSectionOpen}
+        timelineSectionOpen={timelineSectionOpen}
+        bookId={dashboardId}
+        characters={characters}
+        factions={factions}
+        races={races}
+        items={items}
+        timeline={timeline}
+        errors={errors}
+        validateField={validateField}
+        hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+        missingFields={missingFields}
+        fieldVisibility={fieldVisibility}
+        sectionVisibility={sectionVisibility}
+        onTimelineChange={handleTimelineChange}
+        onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        onSectionVisibilityToggle={handleSectionVisibilityToggle}
+        onBack={handleBack}
+        onViewMap={handleViewMap}
+        onNavigationSidebarToggle={handleNavigationSidebarToggle}
+        onNavigationSidebarClose={handleNavigationSidebarClose}
+        onRegionSelect={handleRegionSelect}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDeleteModalOpen={handleDeleteModalOpen}
+        onDeleteModalClose={handleDeleteModalClose}
+        onConfirmDelete={handleConfirmDelete}
+        onVersionChange={handleVersionChange}
+        onVersionCreate={handleVersionCreate}
+        onVersionDelete={handleVersionDelete}
+        onVersionUpdate={handleVersionUpdate}
+        onImageFileChange={handleImageFileChange}
+        onEditDataChange={handleEditDataChange}
+        onAdvancedSectionToggle={handleAdvancedSectionToggle}
+        onTimelineSectionToggle={handleTimelineSectionToggle}
+      />
+    </>
   );
 }

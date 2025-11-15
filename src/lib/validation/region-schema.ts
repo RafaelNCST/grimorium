@@ -12,15 +12,16 @@ export const RegionSchema = z.object({
     .string()
     .min(1, 'Escala é obrigatória'),
 
+  summary: z
+    .string()
+    .min(1, 'Resumo é obrigatório')
+    .max(500, 'Resumo deve ter no máximo 500 caracteres')
+    .trim(),
+
   // Campos opcionais
   climate: z
     .string()
     .max(200, 'Clima deve ter no máximo 200 caracteres')
-    .trim()
-    .optional(),
-  summary: z
-    .string()
-    .max(500, 'Resumo deve ter no máximo 500 caracteres')
     .trim()
     .optional(),
   parentId: z

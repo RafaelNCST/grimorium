@@ -802,6 +802,21 @@ async function runMigrations(database: Database): Promise<void> {
       }
     }
 
+    // Add visibility configuration fields to regions table
+    try {
+      await database.execute("ALTER TABLE regions ADD COLUMN field_visibility TEXT");
+      console.log("[db] Added field_visibility column to regions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    try {
+      await database.execute("ALTER TABLE regions ADD COLUMN section_visibility TEXT");
+      console.log("[db] Added section_visibility column to regions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Migrate region_timeline_eras to reference region_versions instead of regions
     try {
       const timelineTableInfo = await database.select<Array<{ sql: string }>>(

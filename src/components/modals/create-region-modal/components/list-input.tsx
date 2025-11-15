@@ -26,6 +26,7 @@ interface ListInputProps {
   buttonText: string;
   value: string[];
   onChange: (value: string[]) => void;
+  labelClassName?: string;
 }
 
 interface ListItem {
@@ -91,6 +92,7 @@ export function ListInput({
   buttonText,
   value,
   onChange,
+  labelClassName,
 }: ListInputProps) {
   const [newItem, setNewItem] = useState("");
 
@@ -147,7 +149,7 @@ export function ListInput({
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium">{label}</Label>
+      <Label className={labelClassName || "text-sm font-medium"}>{label}</Label>
 
       <div className="flex items-start gap-2">
         <Textarea

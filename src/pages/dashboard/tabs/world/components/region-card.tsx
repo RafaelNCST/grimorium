@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,13 +13,16 @@ interface RegionCardProps {
 }
 
 export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
+  const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation("world");
 
   return (
     <Card
       data-region-id={region.id}
-      className="cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
+      className="cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
       onClick={() => onClick?.(region.id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
@@ -29,10 +33,30 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
               alt={region.name || "Region"}
               className="w-full h-full object-fill rounded-t-lg"
             />
+            {/* Overlay with text */}
+            <div
+              className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-t-lg ${
+                isHovered ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <span className="text-white text-lg font-semibold">
+                {t("region_card.view_details")}
+              </span>
+            </div>
           </div>
         ) : (
           <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
             <Map className="w-16 h-16 text-muted-foreground/30" />
+            {/* Overlay with text */}
+            <div
+              className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-t-lg ${
+                isHovered ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <span className="text-white text-lg font-semibold">
+                {t("region_card.view_details")}
+              </span>
+            </div>
           </div>
         )}
 

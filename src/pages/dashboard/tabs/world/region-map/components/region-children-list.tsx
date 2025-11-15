@@ -79,7 +79,9 @@ export function RegionChildrenList({
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border transition-all",
                   isEditMode
-                    ? "cursor-pointer hover:bg-muted"
+                    ? isSelected
+                      ? "cursor-pointer"
+                      : "cursor-pointer hover:bg-muted"
                     : "cursor-default",
                   hasMarker && "bg-muted/50",
                   isSelected && "bg-primary/10 border-primary ring-2 ring-primary/20"

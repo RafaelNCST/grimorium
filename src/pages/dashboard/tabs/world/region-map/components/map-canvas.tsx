@@ -60,20 +60,14 @@ export function MapCanvas({
 
     const loadImage = async () => {
       try {
-        console.log('[MapCanvas] Loading image from:', imagePath);
-
         // Read file as binary using Tauri plugin-fs
         const fileData = await readFile(imagePath, {
           baseDir: BaseDirectory.AppData,
         });
 
-        console.log('[MapCanvas] File read successfully, size:', fileData.length);
-
         // Create blob from file data
         const blob = new Blob([fileData]);
         objectUrl = URL.createObjectURL(blob);
-
-        console.log('[MapCanvas] Blob URL created:', objectUrl);
 
         setImageUrl(objectUrl);
 
@@ -82,17 +76,13 @@ export function MapCanvas({
         img.onload = () => {
           setImageDimensions({ width: img.width, height: img.height });
           setImageLoaded(true);
-          console.log('[MapCanvas] Image loaded successfully:', {
-            width: img.width,
-            height: img.height,
-          });
         };
         img.onerror = (e) => {
-          console.error('[MapCanvas] Failed to load image from blob:', e);
+          console.error('Failed to load image from blob:', e);
         };
         img.src = objectUrl;
       } catch (error) {
-        console.error('[MapCanvas] Failed to read file:', error);
+        console.error('Failed to read file:', error);
       }
     };
 
@@ -109,7 +99,6 @@ export function MapCanvas({
   // Convert client coordinates to image coordinates considering zoom/pan
   const clientToImageCoords = useCallback((clientX: number, clientY: number) => {
     if (!imageRef.current) {
-      console.log('[MapCanvas] clientToImageCoords: missing imageRef');
       return { x: 0, y: 0 };
     }
 
@@ -123,25 +112,11 @@ export function MapCanvas({
     const x = offsetX / currentScale;
     const y = offsetY / currentScale;
 
-    console.log('[MapCanvas] clientToImageCoords:', {
-      clientX,
-      clientY,
-      rectLeft: rect.left,
-      rectTop: rect.top,
-      scale: currentScale,
-      offsetX,
-      offsetY,
-      x,
-      y
-    });
-
     return { x, y };
   }, [currentScale]);
 
   // Handle marker drag start
   const handleMarkerMouseDown = (e: React.MouseEvent, markerId: string) => {
-    console.log('[MapCanvas] handleMarkerMouseDown called for marker:', markerId);
-
     // Check if clicking on a resize handle
     const target = e.target as HTMLElement;
     if (target.hasAttribute('data-handle')) {
@@ -150,7 +125,6 @@ export function MapCanvas({
     }
 
     if (!imageRef.current) {
-      console.log('[MapCanvas] No imageRef, returning');
       return;
     }
 
@@ -162,13 +136,10 @@ export function MapCanvas({
     if (!marker) return;
 
     const { x: clickX, y: clickY } = clientToImageCoords(e.clientX, e.clientY);
-    console.log('[MapCanvas] Click at image coords:', { clickX, clickY });
-    console.log('[MapCanvas] Marker position:', { x: marker.positionX, y: marker.positionY });
 
     // Calculate offset between marker position and click position
     const offsetX = marker.positionX - clickX;
     const offsetY = marker.positionY - clickY;
-    console.log('[MapCanvas] Drag offset:', { offsetX, offsetY });
 
     isDraggingRef.current = true;
     dragStartPosRef.current = { x: clickX, y: clickY };
@@ -178,8 +149,6 @@ export function MapCanvas({
 
   // Handle resize start
   const handleResizeStart = (e: React.MouseEvent, markerId: string) => {
-    console.log('[MapCanvas] handleResizeStart called for marker:', markerId);
-
     e.preventDefault();
     e.stopPropagation();
 

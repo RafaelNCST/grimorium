@@ -57,7 +57,7 @@ export function RegionNavigationSidebar({
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="h-8 w-8 hover:bg-muted"
+          className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
         >
           <X className="w-4 h-4" />
         </Button>

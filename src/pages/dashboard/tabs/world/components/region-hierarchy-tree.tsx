@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 
 import {
   DndContext,
@@ -57,7 +57,7 @@ interface DropIndicator {
 }
 
 // Component for the visual region item (used in tree and overlay)
-function RegionItem({
+const RegionItem = memo(function RegionItem({
   region,
   level = 0,
   isOverlay = false,
@@ -155,7 +155,7 @@ function RegionItem({
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 p-0 text-destructive hover:bg-red-500/20 hover:text-red-600 shrink-0 transition-colors"
+          className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onDelete(region);
@@ -166,7 +166,7 @@ function RegionItem({
       )}
     </div>
   );
-}
+});
 
 interface RegionNodeProps {
   region: IRegionWithChildren;
@@ -358,20 +358,22 @@ export function RegionHierarchyTree({
   };
 
   // Flatten regions for sortable context
-  const flattenRegions = (
-    regions: IRegionWithChildren[]
-  ): IRegionWithChildren[] => {
-    const result: IRegionWithChildren[] = [];
-    regions.forEach((region) => {
-      result.push(region);
-      if (region.children.length > 0) {
-        result.push(...flattenRegions(region.children));
-      }
-    });
-    return result;
-  };
+  const allRegions = useMemo(() => {
+    const flattenRegions = (
+      regions: IRegionWithChildren[]
+    ): IRegionWithChildren[] => {
+      const result: IRegionWithChildren[] = [];
+      regions.forEach((region) => {
+        result.push(region);
+        if (region.children.length > 0) {
+          result.push(...flattenRegions(region.children));
+        }
+      });
+      return result;
+    };
 
-  const allRegions = flattenRegions(localRegions);
+    return flattenRegions(localRegions);
+  }, [localRegions]);
 
   // Helper: Deep clone regions tree
   const cloneRegionsTree = (

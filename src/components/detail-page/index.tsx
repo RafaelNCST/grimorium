@@ -12,3 +12,8 @@ export type { CollapsibleSectionProps } from './CollapsibleSection';
 
 export { EditControls } from './EditControls';
 export type { EditControlsProps } from './EditControls';
+
+export { FieldWithVisibilityToggle } from './FieldWithVisibilityToggle';
+export type { FieldWithVisibilityToggleProps } from './FieldWithVisibilityToggle';
+
+export * from './visibility-helpers';

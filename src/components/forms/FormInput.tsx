@@ -9,6 +9,7 @@ export interface FormInputProps extends React.ComponentProps<'input'> {
   helperText?: string;
   containerClassName?: string;
   showOptionalLabel?: boolean;
+  labelClassName?: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
       className,
       required,
       showOptionalLabel = true,
+      labelClassName,
       id,
       name,
       ...props
@@ -47,7 +49,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
     return (
       <div className={cn('space-y-2', containerClassName)}>
         {label && (
-          <Label htmlFor={inputId} className="flex items-center gap-1">
+          <Label htmlFor={inputId} className={cn("flex items-center gap-1", labelClassName)}>
             {label}
             {required && <span className="text-destructive">*</span>}
             {!required && showOptionalLabel && (

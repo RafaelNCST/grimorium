@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
 
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoAlert } from "@/components/ui/info-alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -101,12 +101,9 @@ export function CreateVersionDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <Alert className="bg-primary/10 border-primary/30">
-            <Info className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-sm">
-              {t("versions.create_dialog.info_message")}
-            </AlertDescription>
-          </Alert>
+          <InfoAlert>
+            {t("versions.create_dialog.info_message")}
+          </InfoAlert>
 
           <div className="space-y-4 pt-2">
             {/* Version Name */}
@@ -206,13 +203,13 @@ export function CreateVersionDialog({
               onClick={handleClose}
               className="flex-1"
             >
+              <X className="w-4 h-4 mr-2" />
               {t("versions.create_dialog.cancel")}
             </Button>
             <Button
               type="button"
               disabled={!canProceedToStep2}
               variant="magical"
-              size="lg"
               onClick={handleStep1Continue}
               className="flex-1 animate-glow"
             >

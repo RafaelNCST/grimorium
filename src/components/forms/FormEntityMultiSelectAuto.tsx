@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,38 +12,192 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface MultiSelectOption {
+/**
+ * Entity type for auto-loading from database
+ */
+export type EntityType = 'character' | 'faction' | 'race' | 'item' | 'region';
+
+/**
+ * Option interface for entity multi-select
+ */
+export interface EntityOption {
   id: string;
   name: string;
   image?: string;
 }
 
-interface MultiSelectProps {
+interface FormEntityMultiSelectAutoProps {
+  /**
+   * Entity type to load from database
+   */
+  entityType: EntityType;
+  /**
+   * Book ID to load entities for
+   */
+  bookId: string;
+  /**
+   * Label for the field
+   */
   label: string;
+  /**
+   * Placeholder text for the select
+   */
   placeholder: string;
+  /**
+   * Text shown when no options are available
+   */
   emptyText: string;
+  /**
+   * Text shown when no items are selected
+   */
   noSelectionText: string;
+  /**
+   * Placeholder for search input
+   */
   searchPlaceholder: string;
-  options: MultiSelectOption[];
+  /**
+   * Text for "no results found"
+   */
+  noResultsText?: string;
+  /**
+   * Text for counter (e.g., "selected")
+   */
+  counterText?: string;
+  /**
+   * Selected entity IDs
+   */
   value: string[];
+  /**
+   * Callback when selection changes
+   */
   onChange: (value: string[]) => void;
+  /**
+   * Whether the field is disabled
+   */
   disabled?: boolean;
+  /**
+   * Whether the field is required
+   */
+  required?: boolean;
+  /**
+   * Custom className for label
+   */
   labelClassName?: string;
+  /**
+   * Optional error message
+   */
+  error?: string;
+  /**
+   * Optional filter function to exclude certain entities
+   */
+  filter?: (entity: EntityOption) => boolean;
 }
 
-export function MultiSelect({
+// Import services dynamically based on entity type
+const loadEntities = async (entityType: EntityType, bookId: string): Promise<EntityOption[]> => {
+  try {
+    let data: any[] = [];
+
+    switch (entityType) {
+      case 'character': {
+        const { getCharactersByBookId } = await import('@/lib/db/characters.service');
+        data = await getCharactersByBookId(bookId);
+        break;
+      }
+      case 'faction': {
+        const { getFactionsByBookId } = await import('@/lib/db/factions.service');
+        data = await getFactionsByBookId(bookId);
+        break;
+      }
+      case 'race': {
+        const { getRacesByBookId } = await import('@/lib/db/races.service');
+        data = await getRacesByBookId(bookId);
+        break;
+      }
+      case 'item': {
+        const { getItemsByBookId } = await import('@/lib/db/items.service');
+        data = await getItemsByBookId(bookId);
+        break;
+      }
+      case 'region': {
+        const { getRegionsByBookId } = await import('@/lib/db/regions.service');
+        data = await getRegionsByBookId(bookId);
+        break;
+      }
+    }
+
+    // Map to EntityOption interface
+    return data.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      image: item.image,
+    }));
+  } catch (error) {
+    console.error(`Error loading ${entityType} entities:`, error);
+    return [];
+  }
+};
+
+/**
+ * FormEntityMultiSelectAuto - Auto-loading entity multi-selection component
+ *
+ * Automatically loads entities from database based on entityType and bookId.
+ * Updates when bookId or entityType changes.
+ *
+ * @example
+ * ```tsx
+ * <FormEntityMultiSelectAuto
+ *   entityType="character"
+ *   bookId={bookId}
+ *   label="Resident Characters"
+ *   placeholder="Select characters..."
+ *   emptyText="No characters available"
+ *   noSelectionText="No characters selected"
+ *   searchPlaceholder="Search characters..."
+ *   value={selectedCharacterIds}
+ *   onChange={setSelectedCharacterIds}
+ * />
+ * ```
+ */
+export function FormEntityMultiSelectAuto({
+  entityType,
+  bookId,
   label,
   placeholder,
   emptyText,
   noSelectionText,
   searchPlaceholder,
-  options,
+  noResultsText = "No results found",
+  counterText = "selected",
   value,
   onChange,
   disabled = false,
-  labelClassName,
-}: MultiSelectProps) {
+  required = false,
+  labelClassName = "text-sm font-medium text-primary",
+  error,
+  filter,
+}: FormEntityMultiSelectAutoProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [options, setOptions] = useState<EntityOption[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load entities from database
+  useEffect(() => {
+    const fetchEntities = async () => {
+      if (!bookId) return;
+
+      setIsLoading(true);
+      const entities = await loadEntities(entityType, bookId);
+
+      // Apply filter if provided
+      const filteredEntities = filter ? entities.filter(filter) : entities;
+
+      setOptions(filteredEntities);
+      setIsLoading(false);
+    };
+
+    fetchEntities();
+  }, [entityType, bookId, filter]);
 
   const selectedOptions = options.filter((opt) => value.includes(opt.id));
   const availableOptions = options.filter((opt) => !value.includes(opt.id));
@@ -72,14 +226,31 @@ export function MultiSelect({
       .toUpperCase()
       .slice(0, 2);
 
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Label className={labelClassName}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+        <div className="text-center py-6 text-muted-foreground border border-border rounded-lg">
+          <p className="text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {/* Header with label and counter */}
       <div className="flex items-center justify-between">
-        <Label className={labelClassName || "text-sm font-medium"}>{label}</Label>
+        <Label className={labelClassName}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
         {selectedOptions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedOptions.length} selecionado{selectedOptions.length !== 1 ? "s" : ""}
+            {selectedOptions.length} {counterText}
           </span>
         )}
       </div>
@@ -93,7 +264,7 @@ export function MultiSelect({
         <>
           {/* Dropdown selector */}
           {availableOptions.length > 0 && (
-            <Select onValueChange={handleAdd} disabled={disabled} value="">
+            <Select onValueChange={handleAdd} disabled={disabled}>
               <SelectTrigger>
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
@@ -117,7 +288,7 @@ export function MultiSelect({
                 <div className="max-h-[300px] overflow-y-auto">
                   {filteredOptions.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">
-                      Nenhum resultado encontrado
+                      {noResultsText}
                     </div>
                   ) : (
                     filteredOptions.map((option) => (
@@ -181,6 +352,10 @@ export function MultiSelect({
             </div>
           )}
         </>
+      )}
+
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
       )}
     </div>
   );

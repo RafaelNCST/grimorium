@@ -12,6 +12,8 @@ import {
   Trash2,
   Swords,
   Package,
+  X,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
@@ -380,7 +382,6 @@ export function RegionTimeline({
                                 {era.events.length !== 1 ? "s" : ""}
                               </Badge>
                             )}
-                            <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
                           </div>
                         </div>
                       </div>
@@ -388,7 +389,7 @@ export function RegionTimeline({
 
                     {/* Action buttons positioned absolutely outside the trigger */}
                     {isEditing && (
-                      <div className="absolute top-6 right-2 flex gap-1 z-10">
+                      <div className="absolute top-6 right-12 flex gap-0.5 z-10">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -411,7 +412,7 @@ export function RegionTimeline({
                                 });
                                 setShowCreateEventModal(true);
                               }}
-                              className="h-8 w-8 p-0 hover:bg-green-500/10 hover:text-green-600 dark:hover:text-green-400"
+                              className="h-8 w-8 p-0"
                             >
                               <Plus className="w-3 h-3" />
                             </Button>
@@ -429,7 +430,7 @@ export function RegionTimeline({
                                 e.stopPropagation();
                                 handleEditEra(era);
                               }}
-                              className="h-8 w-8 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
+                              className="h-8 w-8 p-0"
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
@@ -458,6 +459,11 @@ export function RegionTimeline({
                         </Tooltip>
                       </div>
                     )}
+
+                    {/* ChevronDown positioned at the end (rightmost) */}
+                    <div className="absolute top-6 right-4 z-10">
+                      <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
+                    </div>
 
                     <AccordionContent className="pt-4 pb-0">
                       <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
@@ -499,7 +505,7 @@ export function RegionTimeline({
                                                 e.stopPropagation();
                                                 openEventDetails(event, true);
                                               }}
-                                              className="h-6 w-6 p-0 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400"
+                                              className="h-6 w-6 p-0"
                                             >
                                               <Edit className="w-3 h-3" />
                                             </Button>
@@ -844,10 +850,12 @@ export function RegionTimeline({
                       setShowEventModal(false);
                     }}
                   >
+                    <X className="w-4 h-4 mr-2" />
                     Cancelar
                   </Button>
                   <Button onClick={handleUpdateEvent} variant="magical"
               className="animate-glow">
+                    <Save className="w-4 h-4 mr-2" />
                     Salvar Alterações
                   </Button>
                 </div>
@@ -1047,6 +1055,7 @@ export function RegionTimeline({
               variant="outline"
               onClick={() => setShowCreateEraModal(false)}
             >
+              <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
             <Button
@@ -1054,6 +1063,7 @@ export function RegionTimeline({
               variant="magical"
               className="animate-glow"
             >
+              <Plus className="w-4 h-4 mr-2" />
               Criar Era
             </Button>
           </div>
@@ -1277,10 +1287,12 @@ export function RegionTimeline({
               variant="outline"
               onClick={() => setShowCreateEventModal(false)}
             >
+              <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
             <Button onClick={handleCreateEvent} variant="magical"
               className="animate-glow">
+              <Plus className="w-4 h-4 mr-2" />
               Criar Evento
             </Button>
           </div>
@@ -1377,10 +1389,12 @@ export function RegionTimeline({
               variant="outline"
               onClick={() => setShowEditEraModal(false)}
             >
+              <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
             <Button onClick={handleUpdateEra} variant="magical"
               className="animate-glow">
+              <Save className="w-4 h-4 mr-2" />
               Salvar Alterações
             </Button>
           </div>

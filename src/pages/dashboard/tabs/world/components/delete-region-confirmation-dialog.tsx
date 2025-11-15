@@ -56,11 +56,6 @@ export function DeleteRegionConfirmationDialog({
   const isNameValid = nameInput.trim() === regionName;
 
   const handleConfirm = () => {
-    console.log("handleConfirm called", {
-      isVersionDeletion,
-      step,
-      isNameValid,
-    });
     if (isVersionDeletion) {
       // Simple version deletion
       onConfirmDelete();
@@ -69,15 +64,12 @@ export function DeleteRegionConfirmationDialog({
       // Region deletion - check step
       if (step === 1) {
         if (!isNameValid) {
-          console.log("Name validation failed", { nameInput, regionName });
           return;
         }
         // Move to step 2
-        console.log("Moving to step 2");
         setStep(2);
       } else {
         // Final confirmation - delete region
-        console.log("Deleting region");
         onConfirmDelete();
         onClose();
       }

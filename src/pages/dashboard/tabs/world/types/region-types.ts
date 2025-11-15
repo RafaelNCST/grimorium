@@ -3,6 +3,11 @@
  * Defines the types for the hierarchical region management system
  */
 
+import type {
+  IFieldVisibility,
+  ISectionVisibility,
+} from '@/components/detail-page/visibility-helpers';
+
 /**
  * Region Scale - represents the scope/size of a region
  */
@@ -83,6 +88,12 @@ export interface IRegion {
   regionMysteries?: string;
   /** List of inspirations (JSON string array) */
   inspirations?: string;
+
+  // Visibility configuration
+  /** Field visibility configuration for advanced fields */
+  fieldVisibility?: string;
+  /** Section visibility configuration for special sections (timeline, map, etc.) */
+  sectionVisibility?: string;
 }
 
 /**
@@ -125,4 +136,8 @@ export interface IRegionFormData {
   worldPerception?: string;
   regionMysteries?: string[];
   inspirations?: string[];
+
+  // Visibility configuration
+  fieldVisibility?: IFieldVisibility;
+  sectionVisibility?: ISectionVisibility;
 }

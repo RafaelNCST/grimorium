@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowLeft, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { WarningDialog } from "@/components/dialogs/WarningDialog";
 import { getRegionById } from "@/lib/db/regions.service";
 import {
   getMapByRegionId,
@@ -38,7 +38,6 @@ export function RegionMapPage() {
   const search = useSearch({ strict: false });
   const versionId = (search as { versionId?: string })?.versionId || null;
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [region, setRegion] = useState<IRegion | null>(null);
   const [childrenRegions, setChildrenRegions] = useState<IRegion[]>([]);
@@ -52,6 +51,7 @@ export function RegionMapPage() {
   const [factions, setFactions] = useState<Array<{ id: string; name: string; image?: string }>>([]);
   const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
   const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [showChangeImageWarning, setShowChangeImageWarning] = useState(false);
 
   const regionId = params.regionId as string;
 
@@ -84,18 +84,8 @@ export function RegionMapPage() {
             await removeMarker(marker.id);
             setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
             setSelectedMarkerId(null);
-            toast({
-              title: "Marcador removido",
-              description: "O marcador foi removido do mapa com sucesso.",
-            });
           } catch (error) {
             console.error("Failed to remove marker:", error);
-            toast({
-              title: "Erro ao remover marcador",
-              description:
-                error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-              variant: "destructive",
-            });
           }
         }
       }
@@ -106,7 +96,7 @@ export function RegionMapPage() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedMarkerId, selectedChildForPlacement, markers, toast]);
+  }, [selectedMarkerId, selectedChildForPlacement, markers]);
 
   const loadData = async () => {
     try {
@@ -115,11 +105,6 @@ export function RegionMapPage() {
       // Load region
       const regionData = await getRegionById(regionId);
       if (!regionData) {
-        toast({
-          title: "Erro",
-          description: "Região não encontrada.",
-          variant: "destructive",
-        });
         navigate({ to: "/dashboard/$dashboardId/tabs/world", params: { dashboardId: params.dashboardId as string } });
         return;
       }
@@ -157,12 +142,11 @@ export function RegionMapPage() {
 
         // Remove orphaned markers from database
         if (orphanedMarkerIds.length > 0) {
-          console.log(`[RegionMap] Cleaning ${orphanedMarkerIds.length} orphaned markers`);
           for (const markerId of orphanedMarkerIds) {
             try {
               await removeMarker(markerId);
             } catch (error) {
-              console.error(`[RegionMap] Failed to remove orphaned marker ${markerId}:`, error);
+              console.error(`Failed to remove orphaned marker ${markerId}:`, error);
             }
           }
         }
@@ -188,12 +172,6 @@ export function RegionMapPage() {
       setItems(itemsData.map(i => ({ id: i.id, name: i.name, image: i.image })));
     } catch (error) {
       console.error("Failed to load region map data:", error);
-      toast({
-        title: "Erro ao carregar mapa",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -213,8 +191,19 @@ export function RegionMapPage() {
     setMarkers([]); // Clear markers when new map is uploaded
   };
 
-  const handleChangeImage = async () => {
+  const handleChangeImage = () => {
+    // Check if there are markers placed on the map
+    if (markers.length > 0) {
+      setShowChangeImageWarning(true);
+    } else {
+      proceedWithImageChange();
+    }
+  };
+
+  const proceedWithImageChange = async () => {
     try {
+      setShowChangeImageWarning(false);
+
       const selected = await open({
         multiple: false,
         filters: [
@@ -233,19 +222,8 @@ export function RegionMapPage() {
       setMapImagePath(regionMap.imagePath);
       setMapId(regionMap.id);
       setMarkers([]); // Clear markers when changing image
-
-      toast({
-        title: "Imagem atualizada",
-        description: "O mapa da região foi atualizado com sucesso.",
-      });
     } catch (error) {
       console.error("Failed to update map image:", error);
-      toast({
-        title: "Erro ao atualizar imagem",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -289,12 +267,6 @@ export function RegionMapPage() {
       setSelectedChildForPlacement(null);
     } catch (error) {
       console.error("Failed to add/update marker:", error);
-      toast({
-        title: "Erro ao posicionar marcador",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -312,12 +284,6 @@ export function RegionMapPage() {
       );
     } catch (error) {
       console.error("Failed to update marker position:", error);
-      toast({
-        title: "Erro ao mover marcador",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -331,12 +297,6 @@ export function RegionMapPage() {
       }
     } catch (error) {
       console.error("Failed to remove marker:", error);
-      toast({
-        title: "Erro ao remover marcador",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -359,12 +319,6 @@ export function RegionMapPage() {
       );
     } catch (error) {
       console.error("Failed to update marker color:", error);
-      toast({
-        title: "Erro ao alterar cor",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -378,12 +332,6 @@ export function RegionMapPage() {
       );
     } catch (error) {
       console.error("Failed to update marker label visibility:", error);
-      toast({
-        title: "Erro ao alterar visibilidade do nome",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -395,12 +343,6 @@ export function RegionMapPage() {
       );
     } catch (error) {
       console.error("Failed to update marker scale:", error);
-      toast({
-        title: "Erro ao redimensionar marcador",
-        description:
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -426,16 +368,16 @@ export function RegionMapPage() {
 
   return (
     <div className="fixed inset-0 bg-background overflow-hidden">
-      {/* Back Button - Fixed */}
-      <button
-        onClick={handleBack}
-        className="fixed top-12 left-4 z-40 h-[52px] px-6 bg-background border rounded-lg shadow-lg hover:bg-muted transition-colors flex items-center justify-center"
-      >
-        <ArrowLeft className="w-6 h-6" />
-      </button>
-
-      {/* Region Name - Fixed */}
-      <div className="fixed top-12 left-24 z-40 h-[52px] px-6 bg-background border rounded-lg shadow-lg flex items-center gap-2">
+      {/* Region Name with Back Button - Fixed */}
+      <div className="fixed top-12 left-4 z-40 h-[52px] px-3 bg-background border rounded-lg shadow-lg flex items-center gap-2">
+        <Button
+          onClick={handleBack}
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
         <h1 className="text-lg font-semibold">{region.name}</h1>
         {mapImagePath && (
           <TooltipProvider delayDuration={300}>
@@ -511,6 +453,17 @@ export function RegionMapPage() {
           <MapImageUploader regionId={regionId} versionId={versionId} onUploadComplete={handleUploadComplete} />
         )}
       </div>
+
+      {/* Change Image Warning Dialog */}
+      <WarningDialog
+        open={showChangeImageWarning}
+        onOpenChange={setShowChangeImageWarning}
+        title="Trocar imagem do mapa?"
+        description={`Existem ${markers.length} ${markers.length === 1 ? 'elemento colocado' : 'elementos colocados'} neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.`}
+        cancelText="Cancelar"
+        confirmText="Continuar e escolher imagem"
+        onConfirm={proceedWithImageChange}
+      />
     </div>
   );
 }

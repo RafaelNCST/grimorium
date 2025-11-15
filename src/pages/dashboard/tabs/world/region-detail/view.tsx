@@ -10,12 +10,20 @@ import {
   ChevronDown,
   ChevronRight,
   AlertCircle,
+  Eye,
+  EyeOff,
+  Save,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import {
   Collapsible,
@@ -43,14 +51,22 @@ import { SCALE_COLORS } from "@/pages/dashboard/tabs/world/constants/scale-color
 import { Badge } from "@/components/ui/badge";
 import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
 import { ListInput } from "@/components/modals/create-region-modal/components/list-input";
-import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
+import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/constants/season-colors";
 
 import { DeleteRegionConfirmationDialog } from "../components/delete-region-confirmation-dialog";
 import { VersionManager } from "./components/version-manager";
 import { RegionTimeline } from "./components/region-timeline";
 import { type ITimelineEra } from "@/lib/db/regions.service";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import {
+  type IFieldVisibility,
+  type ISectionVisibility,
+  FieldWithVisibilityToggle,
+  hasVisibleFields,
+  isSectionVisible,
+} from "@/components/detail-page";
 
 interface RegionDetailViewProps {
   region: IRegion;
@@ -66,11 +82,12 @@ interface RegionDetailViewProps {
   allRegions: IRegion[];
   advancedSectionOpen: boolean;
   timelineSectionOpen: boolean;
-  // Related data for multi-selects
-  characters: Array<{ id: string; name: string; image?: string }>;
-  factions: Array<{ id: string; name: string; image?: string }>;
-  races: Array<{ id: string; name: string; image?: string }>;
-  items: Array<{ id: string; name: string; image?: string }>;
+  bookId: string;
+  // Related data for multi-selects (legacy - não mais usados)
+  characters?: Array<{ id: string; name: string; image?: string }>;
+  factions?: Array<{ id: string; name: string; image?: string }>;
+  races?: Array<{ id: string; name: string; image?: string }>;
+  items?: Array<{ id: string; name: string; image?: string }>;
   // Timeline
   timeline: ITimelineEra[];
   onTimelineChange: (timeline: ITimelineEra[]) => void;
@@ -79,6 +96,11 @@ interface RegionDetailViewProps {
   validateField: (field: string, value: any) => void;
   hasRequiredFieldsEmpty: boolean;
   missingFields: string[];
+  // Visibility
+  fieldVisibility: IFieldVisibility;
+  sectionVisibility: ISectionVisibility;
+  onFieldVisibilityToggle: (fieldName: string) => void;
+  onSectionVisibilityToggle: (sectionName: string) => void;
   onBack: () => void;
   onViewMap: () => void;
   onNavigationSidebarToggle: () => void;
@@ -129,6 +151,7 @@ export function RegionDetailView({
   allRegions,
   advancedSectionOpen,
   timelineSectionOpen,
+  bookId,
   characters,
   factions,
   races,
@@ -139,6 +162,10 @@ export function RegionDetailView({
   validateField,
   hasRequiredFieldsEmpty,
   missingFields,
+  fieldVisibility,
+  sectionVisibility,
+  onFieldVisibilityToggle,
+  onSectionVisibilityToggle,
   onBack,
   onViewMap,
   onNavigationSidebarToggle,
@@ -160,6 +187,14 @@ export function RegionDetailView({
   onTimelineSectionToggle,
 }: RegionDetailViewProps) {
   const { t } = useTranslation(["region-detail", "world"]);
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  // Force refresh of entity selects when entering edit mode
+  React.useEffect(() => {
+    if (isEditing) {
+      setRefreshKey(prev => prev + 1);
+    }
+  }, [isEditing]);
 
   // Load initial state from localStorage or use defaults
   const getInitialSectionState = () => {
@@ -246,7 +281,6 @@ export function RegionDetailView({
                       variant="ghost"
                       size="icon"
                       onClick={onNavigationSidebarToggle}
-                      className="hover:bg-muted"
                     >
                       <Menu className="w-5 h-5" />
                     </Button>
@@ -259,6 +293,7 @@ export function RegionDetailView({
                   <>
                     <div className="flex gap-2">
                       <Button variant="outline" onClick={onCancel}>
+                        <X className="w-4 h-4 mr-2" />
                         {t("region-detail:header.cancel")}
                       </Button>
                       <Button
@@ -267,6 +302,7 @@ export function RegionDetailView({
                         onClick={onSave}
                         disabled={!hasChanges || hasRequiredFieldsEmpty}
                       >
+                        <Save className="w-4 h-4 mr-2" />
                         {t("region-detail:header.save")}
                       </Button>
                     </div>
@@ -279,6 +315,7 @@ export function RegionDetailView({
                               const fieldNames: Record<string, string> = {
                                 name: t("region-detail:fields.name"),
                                 scale: t("region-detail:fields.scale"),
+                                summary: t("region-detail:fields.summary"),
                               };
                               return fieldNames[field] || field;
                             }).join(", ")}
@@ -291,17 +328,17 @@ export function RegionDetailView({
                   </>
                 ) : (
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={onViewMap}>
-                      <Map className="w-4 h-4 mr-2" />
-                      Ver Mapa
+                    <Button variant="ghost" size="icon" onClick={onViewMap}>
+                      <Map className="w-4 h-4" />
                     </Button>
-                    <Button variant="outline" size="icon" onClick={onEdit}>
+                    <Button variant="ghost" size="icon" onClick={onEdit}>
                       <Edit2 className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       size="icon"
                       onClick={onDeleteModalOpen}
+                      className="hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -328,10 +365,10 @@ export function RegionDetailView({
                     <div className="space-y-6">
                       {/* Image Upload */}
                       <div className="space-y-2">
-                        <Label>
+                        <Label className="text-primary">
                           {t("region-detail:fields.image")}
                           <span className="text-xs text-muted-foreground ml-2">
-                            ({t("world:create_region.image_recommended")})
+                            (opcional - {t("world:create_region.image_recommended")})
                           </span>
                         </Label>
                         <div className="space-y-3">
@@ -352,9 +389,9 @@ export function RegionDetailView({
                               />
                               <Button
                                 type="button"
-                                variant="destructive"
+                                variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2"
+                                className="absolute top-2 right-2 hover:bg-destructive/10 hover:text-destructive"
                                 onClick={() => {
                                   onEditDataChange("image", "");
                                 }}
@@ -380,7 +417,7 @@ export function RegionDetailView({
 
                       {/* Name */}
                       <div className="space-y-2">
-                        <Label>
+                        <Label className="text-primary">
                           {t("region-detail:fields.name")}
                           <span className="text-destructive ml-1">*</span>
                         </Label>
@@ -408,7 +445,10 @@ export function RegionDetailView({
 
                       {/* Parent Region */}
                       <div className="space-y-2">
-                        <Label>{t("region-detail:fields.parent")}</Label>
+                        <Label className="text-primary">
+                          {t("region-detail:fields.parent")}
+                          <span className="text-destructive ml-1">*</span>
+                        </Label>
                         <Select
                           value={editData.parentId || "neutral"}
                           onValueChange={(value) =>
@@ -440,7 +480,10 @@ export function RegionDetailView({
 
                       {/* Scale Picker */}
                       <div className="space-y-2">
-                        <Label>{t("region-detail:fields.scale")} *</Label>
+                        <Label className="text-primary">
+                          {t("region-detail:fields.scale")}
+                          <span className="text-destructive ml-1">*</span>
+                        </Label>
                         <ScalePicker
                           value={editData.scale}
                           onChange={(value) => onEditDataChange("scale", value)}
@@ -449,21 +492,26 @@ export function RegionDetailView({
 
                       {/* Summary */}
                       <div className="space-y-2">
-                        <Label>
+                        <Label className="text-primary">
                           {t("region-detail:fields.summary")}
+                          <span className="text-destructive ml-1">*</span>
                         </Label>
                         <Textarea
                           value={editData.summary || ""}
                           onChange={(e) =>
                             onEditDataChange("summary", e.target.value)
                           }
+                          onBlur={() => validateField("summary", editData.summary)}
                           placeholder={t(
                             "world:create_region.summary_placeholder"
                           )}
                           rows={4}
                           maxLength={500}
-                          className="resize-none"
+                          className={errors.summary ? "resize-none border-destructive" : "resize-none"}
                         />
+                        {errors.summary && (
+                          <p className="text-xs text-destructive">{errors.summary}</p>
+                        )}
                         <div className="flex justify-end text-xs text-muted-foreground">
                           <span>{editData.summary?.length || 0}/500</span>
                         </div>
@@ -509,16 +557,19 @@ export function RegionDetailView({
                           </div>
                         )}
 
-                        {region.summary && (
-                          <div className="space-y-2">
-                            <Label className="text-base text-purple-600 dark:text-purple-400">
-                              {t("region-detail:fields.summary")}
-                            </Label>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                              {region.summary}
-                            </p>
-                          </div>
-                        )}
+                        <div className="space-y-2">
+                          <Label className="text-base text-primary">
+                            {t("region-detail:fields.summary")}
+                            <span className="text-destructive ml-1">*</span>
+                          </Label>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                            {region.summary || (
+                              <span className="italic text-muted-foreground/60">
+                                Não especificado
+                              </span>
+                            )}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -526,69 +577,100 @@ export function RegionDetailView({
               </Card>
 
               {/* Advanced Section - Collapsible */}
-              <Collapsible
-                open={advancedSectionOpen}
-                onOpenChange={onAdvancedSectionToggle}
-              >
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CollapsibleTrigger asChild>
-                      <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
-                        <CardTitle>
-                          {t("region-detail:sections.advanced_info")}
-                        </CardTitle>
-                        {advancedSectionOpen ? (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                        )}
-                      </button>
-                    </CollapsibleTrigger>
-                  </CardHeader>
-                  <CollapsibleContent>
-                    <CardContent className="space-y-6">
+              {/* Hide entire section in view mode if no fields are visible */}
+              {(isEditing || hasVisibleFields([
+                'climate',
+                'currentSeason',
+                'generalDescription',
+                'regionAnomalies',
+                'residentFactions',
+                'dominantFactions',
+                'importantCharacters',
+                'racesFound',
+                'itemsFound',
+                'narrativePurpose',
+                'uniqueCharacteristics',
+                'politicalImportance',
+                'religiousImportance',
+                'worldPerception',
+                'regionMysteries',
+                'inspirations',
+              ], fieldVisibility)) && (
+                <Collapsible
+                  open={advancedSectionOpen}
+                  onOpenChange={onAdvancedSectionToggle}
+                >
+                  <Card className="card-magical">
+                    <CardHeader>
+                      <CollapsibleTrigger asChild>
+                        <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+                          <CardTitle>
+                            {t("region-detail:sections.advanced_info")}
+                          </CardTitle>
+                          {advancedSectionOpen ? (
+                            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          )}
+                        </button>
+                      </CollapsibleTrigger>
+                    </CardHeader>
+                    <CollapsibleContent>
+                      <CardContent className="space-y-6">
                       {/* Environment Section */}
-                      <div className="space-y-4">
-                        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                          {t("world:create_region.environment_section")}
-                        </h4>
+                      {(isEditing || hasVisibleFields(['climate', 'currentSeason', 'generalDescription', 'regionAnomalies'], fieldVisibility)) && (
+                        <>
+                          <div className="space-y-4">
+                            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+                              {t("world:create_region.environment_section")}
+                            </h4>
 
-                        {/* Climate */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.climate_label")}
-                            </Label>
-                            <Input
-                              value={editData.climate || ""}
-                              onChange={(e) =>
-                                onEditDataChange("climate", e.target.value)
-                              }
-                              placeholder={t(
-                                "world:create_region.climate_placeholder"
-                              )}
-                              maxLength={200}
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>{editData.climate?.length || 0}/200</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.climate_label")}
-                            </Label>
-                            {region.climate ? (
+                            {/* Climate */}
+                            <FieldWithVisibilityToggle
+                          fieldName="climate"
+                          label={t("world:create_region.climate_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.climate || ""}
+                                onChange={(e) =>
+                                  onEditDataChange("climate", e.target.value)
+                                }
+                                placeholder={t(
+                                  "world:create_region.climate_placeholder"
+                                )}
+                                maxLength={500}
+                                rows={4}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>{editData.climate?.length || 0}/500</span>
+                              </div>
+                            </>
+                          ) : (
+                            region.climate ? (
                               <p className="text-sm">{region.climate}</p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Season Picker */}
-                        {isEditing ? (
-                          <div className="space-y-2">
+                        <FieldWithVisibilityToggle
+                          fieldName="currentSeason"
+                          label=""
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
                             <SeasonPicker
                               value={editData.currentSeason}
                               customSeasonName={editData.customSeasonName}
@@ -599,13 +681,8 @@ export function RegionDetailView({
                                 onEditDataChange("customSeasonName", name)
                               }
                             />
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.current_season_label")}
-                            </Label>
-                            {region.currentSeason ? (
+                          ) : (
+                            region.currentSeason ? (
                               (() => {
                                 const selectedSeason = REGION_SEASONS.find(
                                   (s) => s.value === region.currentSeason
@@ -619,89 +696,86 @@ export function RegionDetailView({
                                     ? region.customSeasonName
                                     : t(`world:seasons.${region.currentSeason}`);
 
-                                // Extract RGB values from color classes
-                                const colorMap: Record<string, string> = {
-                                  "text-green-600 dark:text-green-400": "34, 197, 94",
-                                  "text-amber-600 dark:text-amber-400": "251, 191, 36",
-                                  "text-orange-600 dark:text-orange-400": "251, 146, 60",
-                                  "text-blue-600 dark:text-blue-400": "37, 99, 235",
-                                  "text-purple-600 dark:text-purple-400": "147, 51, 234",
-                                };
-                                const rgb = colorMap[selectedSeason.color] || "147, 51, 234";
-
                                 return (
-                                  <button
-                                    type="button"
-                                    disabled
-                                    className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all ${selectedSeason.bgColor} ${selectedSeason.borderColor}`}
-                                  >
-                                    <div className={`p-3 rounded-lg ${selectedSeason.bgColor}`}>
-                                      <Icon className={`w-6 h-6 ${selectedSeason.color}`} />
+                                  <div className={`
+                                    relative p-4 rounded-lg border-2 text-left
+                                    ${SEASON_ACTIVE_COLOR[region.currentSeason]} text-foreground
+                                  `}>
+                                    <div className="flex items-start gap-3">
+                                      <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-sm">
+                                          {displayLabel}
+                                        </p>
+                                        <p className="text-xs mt-1 opacity-80">
+                                          {selectedSeason.description}
+                                        </p>
+                                      </div>
                                     </div>
-                                    <div className="flex-1 text-left">
-                                      <p className={`font-semibold text-base ${selectedSeason.color}`}>
-                                        {displayLabel}
-                                      </p>
-                                      <p className="text-xs text-muted-foreground mt-1">
-                                        {selectedSeason.description}
-                                      </p>
-                                    </div>
-                                  </button>
+                                  </div>
                                 );
                               })()
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* General Description */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.general_description_label")}
-                            </Label>
-                            <Textarea
-                              value={editData.generalDescription || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "generalDescription",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.general_description_placeholder"
-                              )}
-                              rows={5}
-                              maxLength={1000}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.generalDescription?.length || 0}/1000
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.general_description_label")}
-                            </Label>
-                            {region.generalDescription ? (
+                        <FieldWithVisibilityToggle
+                          fieldName="generalDescription"
+                          label={t("world:create_region.general_description_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.generalDescription || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "generalDescription",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.general_description_placeholder"
+                                )}
+                                rows={5}
+                                maxLength={1000}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.generalDescription?.length || 0}/1000
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.generalDescription ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.generalDescription}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Region Anomalies */}
-                        {isEditing ? (
-                          <div className="space-y-2">
+                        <FieldWithVisibilityToggle
+                          fieldName="regionAnomalies"
+                          label={t("world:create_region.region_anomalies_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
                             <ListInput
-                              label={t("world:create_region.region_anomalies_label")}
+                              label=""
                               placeholder={t(
                                 "world:create_region.anomaly_placeholder"
                               )}
@@ -717,14 +791,10 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.region_anomalies_label")}
-                            </Label>
-                            {safeJsonParse(region.regionAnomalies).length > 0 ? (
+                          ) : (
+                            safeJsonParse(region.regionAnomalies).length > 0 ? (
                               <ul className="list-disc list-inside space-y-1">
                                 {safeJsonParse(region.regionAnomalies).map(
                                   (anomaly: string, index: number) => (
@@ -736,26 +806,41 @@ export function RegionDetailView({
                               </ul>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
                           </div>
-                        )}
-                      </div>
 
-                      <Separator />
+                          {/* Separator - only show if Information section will be visible */}
+                          {(isEditing || hasVisibleFields(['residentFactions', 'dominantFactions', 'importantCharacters', 'racesFound', 'itemsFound'], fieldVisibility)) && (
+                            <Separator />
+                          )}
+                        </>
+                      )}
 
                       {/* Information Section */}
-                      <div className="space-y-4">
-                        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                          {t("world:create_region.information_section")}
-                        </h4>
+                      {(isEditing || hasVisibleFields(['residentFactions', 'dominantFactions', 'importantCharacters', 'racesFound', 'itemsFound'], fieldVisibility)) && (
+                        <>
+                          <div className="space-y-4">
+                            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+                              {t("world:create_region.information_section")}
+                            </h4>
 
-                        {/* Resident Factions */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <MultiSelect
-                              label={t(
-                                "world:create_region.resident_factions_label"
-                              )}
+                            {/* Resident Factions */}
+                            <FieldWithVisibilityToggle
+                          fieldName="residentFactions"
+                          label={t("world:create_region.resident_factions_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <FormEntityMultiSelectAuto
+                              key={`resident-factions-${refreshKey}`}
+                              entityType="faction"
+                              bookId={bookId}
+                              label=""
                               placeholder={t(
                                 "world:create_region.resident_factions_placeholder"
                               )}
@@ -768,7 +853,6 @@ export function RegionDetailView({
                               searchPlaceholder={t(
                                 "world:create_region.search_faction"
                               )}
-                              options={factions}
                               value={
                                 editData.residentFactions
                                   ? safeJsonParse(editData.residentFactions)
@@ -780,71 +864,79 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <Collapsible open={openSections.residentFactions} onOpenChange={() => toggleSection('residentFactions')}>
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                {t("world:create_region.resident_factions_label")}
-                                {safeJsonParse(region.residentFactions).length > 0 && (
-                                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.residentFactions).length})</span>
-                                )}
-                              </p>
-                              {openSections.residentFactions ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2">
-                              {safeJsonParse(region.residentFactions).length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                  {safeJsonParse(region.residentFactions).map(
-                                    (factionId: string) => {
-                                      const faction = factions.find(
-                                        (f) => f.id === factionId
-                                      );
-                                      return faction ? (
-                                        <div
-                                          key={factionId}
-                                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                                        >
-                                          {faction.image ? (
-                                            <img
-                                              src={convertFileSrc(faction.image)}
-                                              alt={faction.name}
-                                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                              <span className="text-xs text-muted-foreground font-semibold">
-                                                {faction.name.charAt(0).toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <span className="text-sm font-medium">
-                                            {faction.name}
-                                          </span>
-                                        </div>
-                                      ) : null;
-                                    }
+                          ) : (
+                            <Collapsible open={openSections.residentFactions} onOpenChange={() => toggleSection('residentFactions')}>
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                                <p className="text-sm font-semibold text-primary">
+                                  {safeJsonParse(region.residentFactions).length > 0 && (
+                                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.residentFactions).length})</span>
                                   )}
-                                </div>
-                              ) : (
-                                <EmptyFieldState t={t} />
-                              )}
-                            </CollapsibleContent>
-                          </Collapsible>
-                        )}
+                                </p>
+                                {openSections.residentFactions ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="mt-2">
+                                {safeJsonParse(region.residentFactions).length > 0 ? (
+                                  <div className="flex flex-col gap-2">
+                                    {safeJsonParse(region.residentFactions).map(
+                                      (factionId: string) => {
+                                        const faction = factions.find(
+                                          (f) => f.id === factionId
+                                        );
+                                        return faction ? (
+                                          <div
+                                            key={factionId}
+                                            className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                          >
+                                            {faction.image ? (
+                                              <img
+                                                src={convertFileSrc(faction.image)}
+                                                alt={faction.name}
+                                                className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                              />
+                                            ) : (
+                                              <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-xs text-muted-foreground font-semibold">
+                                                  {faction.name.charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
+                                            <span className="text-sm font-medium">
+                                              {faction.name}
+                                            </span>
+                                          </div>
+                                        ) : null;
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <EmptyFieldState t={t} />
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Dominant Factions */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <MultiSelect
-                              label={t(
-                                "world:create_region.dominant_factions_label"
-                              )}
+                        <FieldWithVisibilityToggle
+                          fieldName="dominantFactions"
+                          label={t("world:create_region.dominant_factions_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <FormEntityMultiSelectAuto
+                              key={`dominant-factions-${refreshKey}`}
+                              entityType="faction"
+                              bookId={bookId}
+                              label=""
                               placeholder={t(
                                 "world:create_region.dominant_factions_placeholder"
                               )}
@@ -857,7 +949,6 @@ export function RegionDetailView({
                               searchPlaceholder={t(
                                 "world:create_region.search_faction"
                               )}
-                              options={factions}
                               value={
                                 editData.dominantFactions
                                   ? safeJsonParse(editData.dominantFactions)
@@ -869,71 +960,79 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <Collapsible open={openSections.dominantFactions} onOpenChange={() => toggleSection('dominantFactions')}>
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                {t("world:create_region.dominant_factions_label")}
-                                {safeJsonParse(region.dominantFactions).length > 0 && (
-                                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.dominantFactions).length})</span>
-                                )}
-                              </p>
-                              {openSections.dominantFactions ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2">
-                              {safeJsonParse(region.dominantFactions).length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                  {safeJsonParse(region.dominantFactions).map(
-                                    (factionId: string) => {
-                                      const faction = factions.find(
-                                        (f) => f.id === factionId
-                                      );
-                                      return faction ? (
-                                        <div
-                                          key={factionId}
-                                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                                        >
-                                          {faction.image ? (
-                                            <img
-                                              src={convertFileSrc(faction.image)}
-                                              alt={faction.name}
-                                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                              <span className="text-xs text-muted-foreground font-semibold">
-                                                {faction.name.charAt(0).toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <span className="text-sm font-medium">
-                                            {faction.name}
-                                          </span>
-                                        </div>
-                                      ) : null;
-                                    }
+                          ) : (
+                            <Collapsible open={openSections.dominantFactions} onOpenChange={() => toggleSection('dominantFactions')}>
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                                <p className="text-sm font-semibold text-primary">
+                                  {safeJsonParse(region.dominantFactions).length > 0 && (
+                                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.dominantFactions).length})</span>
                                   )}
-                                </div>
-                              ) : (
-                                <EmptyFieldState t={t} />
-                              )}
-                            </CollapsibleContent>
-                          </Collapsible>
-                        )}
+                                </p>
+                                {openSections.dominantFactions ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="mt-2">
+                                {safeJsonParse(region.dominantFactions).length > 0 ? (
+                                  <div className="flex flex-col gap-2">
+                                    {safeJsonParse(region.dominantFactions).map(
+                                      (factionId: string) => {
+                                        const faction = factions.find(
+                                          (f) => f.id === factionId
+                                        );
+                                        return faction ? (
+                                          <div
+                                            key={factionId}
+                                            className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                          >
+                                            {faction.image ? (
+                                              <img
+                                                src={convertFileSrc(faction.image)}
+                                                alt={faction.name}
+                                                className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                              />
+                                            ) : (
+                                              <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-xs text-muted-foreground font-semibold">
+                                                  {faction.name.charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
+                                            <span className="text-sm font-medium">
+                                              {faction.name}
+                                            </span>
+                                          </div>
+                                        ) : null;
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <EmptyFieldState t={t} />
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Important Characters */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <MultiSelect
-                              label={t(
-                                "world:create_region.important_characters_label"
-                              )}
+                        <FieldWithVisibilityToggle
+                          fieldName="importantCharacters"
+                          label={t("world:create_region.important_characters_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <FormEntityMultiSelectAuto
+                              key={`important-characters-${refreshKey}`}
+                              entityType="character"
+                              bookId={bookId}
+                              label=""
                               placeholder={t(
                                 "world:create_region.important_characters_placeholder"
                               )}
@@ -946,7 +1045,6 @@ export function RegionDetailView({
                               searchPlaceholder={t(
                                 "world:create_region.search_character"
                               )}
-                              options={characters}
                               value={
                                 editData.importantCharacters
                                   ? safeJsonParse(editData.importantCharacters)
@@ -958,69 +1056,79 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <Collapsible open={openSections.importantCharacters} onOpenChange={() => toggleSection('importantCharacters')}>
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                {t("world:create_region.important_characters_label")}
-                                {safeJsonParse(region.importantCharacters).length > 0 && (
-                                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.importantCharacters).length})</span>
-                                )}
-                              </p>
-                              {openSections.importantCharacters ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2">
-                              {safeJsonParse(region.importantCharacters).length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                  {safeJsonParse(region.importantCharacters).map(
-                                    (characterId: string) => {
-                                      const character = characters.find(
-                                        (c) => c.id === characterId
-                                      );
-                                      return character ? (
-                                        <div
-                                          key={characterId}
-                                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                                        >
-                                          {character.image ? (
-                                            <img
-                                              src={convertFileSrc(character.image)}
-                                              alt={character.name}
-                                              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                              <span className="text-xs text-muted-foreground font-semibold">
-                                                {character.name.charAt(0).toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <span className="text-sm font-medium">
-                                            {character.name}
-                                          </span>
-                                        </div>
-                                      ) : null;
-                                    }
+                          ) : (
+                            <Collapsible open={openSections.importantCharacters} onOpenChange={() => toggleSection('importantCharacters')}>
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                                <p className="text-sm font-semibold text-primary">
+                                  {safeJsonParse(region.importantCharacters).length > 0 && (
+                                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.importantCharacters).length})</span>
                                   )}
-                                </div>
-                              ) : (
-                                <EmptyFieldState t={t} />
-                              )}
-                            </CollapsibleContent>
-                          </Collapsible>
-                        )}
+                                </p>
+                                {openSections.importantCharacters ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="mt-2">
+                                {safeJsonParse(region.importantCharacters).length > 0 ? (
+                                  <div className="flex flex-col gap-2">
+                                    {safeJsonParse(region.importantCharacters).map(
+                                      (characterId: string) => {
+                                        const character = characters.find(
+                                          (c) => c.id === characterId
+                                        );
+                                        return character ? (
+                                          <div
+                                            key={characterId}
+                                            className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                          >
+                                            {character.image ? (
+                                              <img
+                                                src={convertFileSrc(character.image)}
+                                                alt={character.name}
+                                                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                              />
+                                            ) : (
+                                              <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-xs text-muted-foreground font-semibold">
+                                                  {character.name.charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
+                                            <span className="text-sm font-medium">
+                                              {character.name}
+                                            </span>
+                                          </div>
+                                        ) : null;
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <EmptyFieldState t={t} />
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Races Found */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <MultiSelect
-                              label={t("world:create_region.races_found_label")}
+                        <FieldWithVisibilityToggle
+                          fieldName="racesFound"
+                          label={t("world:create_region.races_found_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <FormEntityMultiSelectAuto
+                              key={`races-found-${refreshKey}`}
+                              entityType="race"
+                              bookId={bookId}
+                              label=""
                               placeholder={t(
                                 "world:create_region.races_found_placeholder"
                               )}
@@ -1033,7 +1141,6 @@ export function RegionDetailView({
                               searchPlaceholder={t(
                                 "world:create_region.search_race"
                               )}
-                              options={races}
                               value={
                                 editData.racesFound
                                   ? safeJsonParse(editData.racesFound)
@@ -1045,69 +1152,79 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <Collapsible open={openSections.racesFound} onOpenChange={() => toggleSection('racesFound')}>
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                {t("world:create_region.races_found_label")}
-                                {safeJsonParse(region.racesFound).length > 0 && (
-                                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.racesFound).length})</span>
-                                )}
-                              </p>
-                              {openSections.racesFound ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2">
-                              {safeJsonParse(region.racesFound).length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                  {safeJsonParse(region.racesFound).map(
-                                    (raceId: string) => {
-                                      const race = races.find(
-                                        (r) => r.id === raceId
-                                      );
-                                      return race ? (
-                                        <div
-                                          key={raceId}
-                                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                                        >
-                                          {race.image ? (
-                                            <img
-                                              src={convertFileSrc(race.image)}
-                                              alt={race.name}
-                                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                              <span className="text-xs text-muted-foreground font-semibold">
-                                                {race.name.charAt(0).toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <span className="text-sm font-medium">
-                                            {race.name}
-                                          </span>
-                                        </div>
-                                      ) : null;
-                                    }
+                          ) : (
+                            <Collapsible open={openSections.racesFound} onOpenChange={() => toggleSection('racesFound')}>
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                                <p className="text-sm font-semibold text-primary">
+                                  {safeJsonParse(region.racesFound).length > 0 && (
+                                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.racesFound).length})</span>
                                   )}
-                                </div>
-                              ) : (
-                                <EmptyFieldState t={t} />
-                              )}
-                            </CollapsibleContent>
-                          </Collapsible>
-                        )}
+                                </p>
+                                {openSections.racesFound ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="mt-2">
+                                {safeJsonParse(region.racesFound).length > 0 ? (
+                                  <div className="flex flex-col gap-2">
+                                    {safeJsonParse(region.racesFound).map(
+                                      (raceId: string) => {
+                                        const race = races.find(
+                                          (r) => r.id === raceId
+                                        );
+                                        return race ? (
+                                          <div
+                                            key={raceId}
+                                            className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                          >
+                                            {race.image ? (
+                                              <img
+                                                src={convertFileSrc(race.image)}
+                                                alt={race.name}
+                                                className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                              />
+                                            ) : (
+                                              <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-xs text-muted-foreground font-semibold">
+                                                  {race.name.charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
+                                            <span className="text-sm font-medium">
+                                              {race.name}
+                                            </span>
+                                          </div>
+                                        ) : null;
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <EmptyFieldState t={t} />
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Items Found */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <MultiSelect
-                              label={t("world:create_region.items_found_label")}
+                        <FieldWithVisibilityToggle
+                          fieldName="itemsFound"
+                          label={t("world:create_region.items_found_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <FormEntityMultiSelectAuto
+                              key={`items-found-${refreshKey}`}
+                              entityType="item"
+                              bookId={bookId}
+                              label=""
                               placeholder={t(
                                 "world:create_region.items_found_placeholder"
                               )}
@@ -1120,7 +1237,6 @@ export function RegionDetailView({
                               searchPlaceholder={t(
                                 "world:create_region.search_item"
                               )}
-                              options={items}
                               value={
                                 editData.itemsFound
                                   ? safeJsonParse(editData.itemsFound)
@@ -1132,291 +1248,307 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <Collapsible open={openSections.itemsFound} onOpenChange={() => toggleSection('itemsFound')}>
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                                {t("world:create_region.items_found_label")}
-                                {safeJsonParse(region.itemsFound).length > 0 && (
-                                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.itemsFound).length})</span>
-                                )}
-                              </p>
-                              {openSections.itemsFound ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-2">
-                              {safeJsonParse(region.itemsFound).length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                  {safeJsonParse(region.itemsFound).map(
-                                    (itemId: string) => {
-                                      const item = items.find(
-                                        (i) => i.id === itemId
-                                      );
-                                      return item ? (
-                                        <div
-                                          key={itemId}
-                                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                                        >
-                                          {item.image ? (
-                                            <img
-                                              src={convertFileSrc(item.image)}
-                                              alt={item.name}
-                                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                            />
-                                          ) : (
-                                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                              <span className="text-xs text-muted-foreground font-semibold">
-                                                {item.name.charAt(0).toUpperCase()}
-                                              </span>
-                                            </div>
-                                          )}
-                                          <span className="text-sm font-medium">
-                                            {item.name}
-                                          </span>
-                                        </div>
-                                      ) : null;
-                                    }
+                          ) : (
+                            <Collapsible open={openSections.itemsFound} onOpenChange={() => toggleSection('itemsFound')}>
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                                <p className="text-sm font-semibold text-primary">
+                                  {safeJsonParse(region.itemsFound).length > 0 && (
+                                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({safeJsonParse(region.itemsFound).length})</span>
                                   )}
-                                </div>
-                              ) : (
-                                <EmptyFieldState t={t} />
-                              )}
-                            </CollapsibleContent>
-                          </Collapsible>
-                        )}
-                      </div>
+                                </p>
+                                {openSections.itemsFound ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="mt-2">
+                                {safeJsonParse(region.itemsFound).length > 0 ? (
+                                  <div className="flex flex-col gap-2">
+                                    {safeJsonParse(region.itemsFound).map(
+                                      (itemId: string) => {
+                                        const item = items.find(
+                                          (i) => i.id === itemId
+                                        );
+                                        return item ? (
+                                          <div
+                                            key={itemId}
+                                            className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                                          >
+                                            {item.image ? (
+                                              <img
+                                                src={convertFileSrc(item.image)}
+                                                alt={item.name}
+                                                className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                              />
+                                            ) : (
+                                              <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-xs text-muted-foreground font-semibold">
+                                                  {item.name.charAt(0).toUpperCase()}
+                                                </span>
+                                              </div>
+                                            )}
+                                            <span className="text-sm font-medium">
+                                              {item.name}
+                                            </span>
+                                          </div>
+                                        ) : null;
+                                      }
+                                    )}
+                                  </div>
+                                ) : (
+                                  <EmptyFieldState t={t} />
+                                )}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )}
+                        </FieldWithVisibilityToggle>
+                          </div>
 
-                      <Separator />
+                          {/* Separator - only show if Narrative section will be visible */}
+                          {(isEditing || hasVisibleFields(['narrativePurpose', 'uniqueCharacteristics', 'politicalImportance', 'religiousImportance', 'worldPerception', 'regionMysteries', 'inspirations'], fieldVisibility)) && (
+                            <Separator />
+                          )}
+                        </>
+                      )}
 
                       {/* Narrative Section */}
-                      <div className="space-y-4">
-                        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                          {t("world:create_region.narrative_section")}
-                        </h4>
+                      {(isEditing || hasVisibleFields(['narrativePurpose', 'uniqueCharacteristics', 'politicalImportance', 'religiousImportance', 'worldPerception', 'regionMysteries', 'inspirations'], fieldVisibility)) && (
+                        <div className="space-y-4">
+                          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+                            {t("world:create_region.narrative_section")}
+                          </h4>
 
-                        {/* Narrative Purpose */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.narrative_purpose_label")}
-                            </Label>
-                            <Textarea
-                              value={editData.narrativePurpose || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "narrativePurpose",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.narrative_purpose_placeholder"
-                              )}
-                              rows={3}
-                              maxLength={500}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.narrativePurpose?.length || 0}/500
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.narrative_purpose_label")}
-                            </Label>
-                            {region.narrativePurpose ? (
+                          {/* Narrative Purpose */}
+                          <FieldWithVisibilityToggle
+                          fieldName="narrativePurpose"
+                          label={t("world:create_region.narrative_purpose_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.narrativePurpose || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "narrativePurpose",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.narrative_purpose_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.narrativePurpose?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.narrativePurpose ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.narrativePurpose}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Unique Characteristics */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t(
-                                "world:create_region.unique_characteristics_label"
-                              )}
-                            </Label>
-                            <Textarea
-                              value={editData.uniqueCharacteristics || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "uniqueCharacteristics",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.unique_characteristics_placeholder"
-                              )}
-                              rows={3}
-                              maxLength={500}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.uniqueCharacteristics?.length || 0}
-                                /500
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.unique_characteristics_label")}
-                            </Label>
-                            {region.uniqueCharacteristics ? (
+                        <FieldWithVisibilityToggle
+                          fieldName="uniqueCharacteristics"
+                          label={t("world:create_region.unique_characteristics_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.uniqueCharacteristics || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "uniqueCharacteristics",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.unique_characteristics_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.uniqueCharacteristics?.length || 0}
+                                  /500
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.uniqueCharacteristics ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.uniqueCharacteristics}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Political Importance */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.political_importance_label")}
-                            </Label>
-                            <Textarea
-                              value={editData.politicalImportance || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "politicalImportance",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.political_importance_placeholder"
-                              )}
-                              rows={3}
-                              maxLength={500}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.politicalImportance?.length || 0}/500
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.political_importance_label")}
-                            </Label>
-                            {region.politicalImportance ? (
+                        <FieldWithVisibilityToggle
+                          fieldName="politicalImportance"
+                          label={t("world:create_region.political_importance_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.politicalImportance || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "politicalImportance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.political_importance_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.politicalImportance?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.politicalImportance ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.politicalImportance}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Religious Importance */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.religious_importance_label")}
-                            </Label>
-                            <Textarea
-                              value={editData.religiousImportance || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "religiousImportance",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.religious_importance_placeholder"
-                              )}
-                              rows={3}
-                              maxLength={500}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.religiousImportance?.length || 0}/500
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.religious_importance_label")}
-                            </Label>
-                            {region.religiousImportance ? (
+                        <FieldWithVisibilityToggle
+                          fieldName="religiousImportance"
+                          label={t("world:create_region.religious_importance_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.religiousImportance || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "religiousImportance",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.religious_importance_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.religiousImportance?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.religiousImportance ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.religiousImportance}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* World Perception */}
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.world_perception_label")}
-                            </Label>
-                            <Textarea
-                              value={editData.worldPerception || ""}
-                              onChange={(e) =>
-                                onEditDataChange(
-                                  "worldPerception",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={t(
-                                "world:create_region.world_perception_placeholder"
-                              )}
-                              rows={3}
-                              maxLength={500}
-                              className="resize-none"
-                            />
-                            <div className="flex justify-end text-xs text-muted-foreground">
-                              <span>
-                                {editData.worldPerception?.length || 0}/500
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.world_perception_label")}
-                            </Label>
-                            {region.worldPerception ? (
+                        <FieldWithVisibilityToggle
+                          fieldName="worldPerception"
+                          label={t("world:create_region.world_perception_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
+                            <>
+                              <Textarea
+                                value={editData.worldPerception || ""}
+                                onChange={(e) =>
+                                  onEditDataChange(
+                                    "worldPerception",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={t(
+                                  "world:create_region.world_perception_placeholder"
+                                )}
+                                rows={3}
+                                maxLength={500}
+                                className="resize-none"
+                              />
+                              <div className="flex justify-end text-xs text-muted-foreground">
+                                <span>
+                                  {editData.worldPerception?.length || 0}/500
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            region.worldPerception ? (
                               <p className="text-sm whitespace-pre-wrap">
                                 {region.worldPerception}
                               </p>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Region Mysteries */}
-                        {isEditing ? (
-                          <div className="space-y-2">
+                        <FieldWithVisibilityToggle
+                          fieldName="regionMysteries"
+                          label={t("world:create_region.region_mysteries_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
                             <ListInput
-                              label={t("world:create_region.region_mysteries_label")}
+                              label=""
                               placeholder={t(
                                 "world:create_region.mystery_placeholder"
                               )}
@@ -1432,14 +1564,10 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.region_mysteries_label")}
-                            </Label>
-                            {safeJsonParse(region.regionMysteries).length > 0 ? (
+                          ) : (
+                            safeJsonParse(region.regionMysteries).length > 0 ? (
                               <ul className="list-disc list-inside space-y-1">
                                 {safeJsonParse(region.regionMysteries).map(
                                   (mystery: string, index: number) => (
@@ -1451,15 +1579,22 @@ export function RegionDetailView({
                               </ul>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
 
                         {/* Inspirations */}
-                        {isEditing ? (
-                          <div className="space-y-2">
+                        <FieldWithVisibilityToggle
+                          fieldName="inspirations"
+                          label={t("world:create_region.inspirations_label")}
+                          isOptional={true}
+                          fieldVisibility={fieldVisibility}
+                          isEditing={isEditing}
+                          onFieldVisibilityToggle={onFieldVisibilityToggle}
+                        >
+                          {isEditing ? (
                             <ListInput
-                              label={t("world:create_region.inspirations_label")}
+                              label=""
                               placeholder={t(
                                 "world:create_region.inspiration_placeholder"
                               )}
@@ -1477,14 +1612,10 @@ export function RegionDetailView({
                                   JSON.stringify(value)
                                 )
                               }
+                              labelClassName="text-sm font-medium text-primary"
                             />
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Label className="text-purple-600 dark:text-purple-400">
-                              {t("world:create_region.inspirations_label")}
-                            </Label>
-                            {safeJsonParse(region.inspirations).length > 0 ? (
+                          ) : (
+                            safeJsonParse(region.inspirations).length > 0 ? (
                               <ul className="list-disc list-inside space-y-1">
                                 {safeJsonParse(region.inspirations).map(
                                   (inspiration: string, index: number) => (
@@ -1496,49 +1627,85 @@ export function RegionDetailView({
                               </ul>
                             ) : (
                               <EmptyFieldState t={t} />
-                            )}
-                          </div>
-                        )}
-                      </div>
+                            )
+                          )}
+                        </FieldWithVisibilityToggle>
+                        </div>
+                      )}
                     </CardContent>
                   </CollapsibleContent>
                 </Card>
               </Collapsible>
+              )}
 
               {/* Timeline Section - Collapsible */}
-              <Collapsible
-                open={timelineSectionOpen}
-                onOpenChange={onTimelineSectionToggle}
-              >
-                <Card className="card-magical">
-                  <CardHeader>
-                    <CollapsibleTrigger asChild>
-                      <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
-                        <CardTitle>Linha do Tempo da Região</CardTitle>
-                        {timelineSectionOpen ? (
-                          <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                        )}
-                      </button>
-                    </CollapsibleTrigger>
-                  </CardHeader>
-                  <CollapsibleContent>
-                    <CardContent>
-                      <RegionTimeline
-                        regionId={region.id}
-                        isEditing={isEditing}
-                        timeline={timeline}
-                        onTimelineChange={onTimelineChange}
-                        characters={characters}
-                        factions={factions}
-                        races={races}
-                        items={items}
-                      />
-                    </CardContent>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
+              {/* Hide in view mode if section is hidden, but show with visual feedback in edit mode */}
+              {(isEditing || isSectionVisible('timeline', sectionVisibility)) && (
+                <Collapsible
+                  open={timelineSectionOpen}
+                  onOpenChange={onTimelineSectionToggle}
+                >
+                  <Card className={`card-magical transition-all duration-200 ${
+                    !isSectionVisible('timeline', sectionVisibility) && isEditing
+                      ? 'opacity-50 bg-muted/30 border-dashed border-muted-foreground/30'
+                      : ''
+                  }`}>
+                    <CardHeader>
+                      <CollapsibleTrigger asChild>
+                        <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+                          <CardTitle>Linha do Tempo da Região</CardTitle>
+                          <div className="flex items-center gap-2">
+                            {isEditing && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onSectionVisibilityToggle('timeline');
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    {isSectionVisible('timeline', sectionVisibility) ? (
+                                      <Eye className="w-3 h-3" />
+                                    ) : (
+                                      <EyeOff className="w-3 h-3" />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{isSectionVisible('timeline', sectionVisibility) ? 'Ocultar seção' : 'Mostrar seção'}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            {timelineSectionOpen ? (
+                              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                            ) : (
+                              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                            )}
+                          </div>
+                        </button>
+                      </CollapsibleTrigger>
+                    </CardHeader>
+                    <CollapsibleContent>
+                      <CardContent>
+                        <RegionTimeline
+                          regionId={region.id}
+                          isEditing={isEditing}
+                          timeline={timeline}
+                          onTimelineChange={onTimelineChange}
+                          characters={characters}
+                          factions={factions}
+                          races={races}
+                          items={items}
+                        />
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
+              )}
             </div>
 
             {/* Sidebar - Versions - 1 column */}
