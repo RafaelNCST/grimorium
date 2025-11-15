@@ -72,13 +72,13 @@ function SortableItem({
       />
       <Button
         data-no-drag="true"
-        variant="ghost"
+        variant="ghost-destructive"
         size="icon"
         onClick={(e) => {
           e.stopPropagation();
           onDelete();
         }}
-        className="h-8 w-8 text-destructive hover:bg-red-500/20 hover:text-red-600 transition-opacity cursor-pointer"
+        className="h-8 w-8 transition-opacity cursor-pointer"
       >
         <X className="h-4 w-4" />
       </Button>
@@ -165,8 +165,8 @@ export function ListInput({
           data-no-drag="true"
           onClick={handleAddItem}
           size="icon"
-          variant="outline"
-          className="cursor-pointer mt-1"
+          variant="secondary"
+          className="cursor-pointer"
           disabled={!newItem.trim()}
         >
           <Plus className="h-4 w-4" />

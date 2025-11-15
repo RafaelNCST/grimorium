@@ -1,286 +1,84 @@
-# Form Components Documentation
+# Componentes de Formulário
 
-Documentação completa dos componentes de formulário disponíveis em `src/components/forms`.
+Classificação dos componentes base reutilizáveis de formulário utilizados no projeto.
 
-## Índice
-
-- [Componentes Básicos](#componentes-básicos)
-- [Componentes de Seleção](#componentes-de-seleção)
-- [Componentes Avançados](#componentes-avançados)
-- [Guia de Uso](#guia-de-uso)
-- [Exemplos Práticos](#exemplos-práticos)
+**Localização:** `src/components/` (ui, forms)
 
 ---
 
-## Componentes Básicos
+## 1. Input (Texto Simples)
+**Componente:** `Input` (`src/components/ui/input.tsx`)
+**Uso:** Campos de texto curto (Nome, datas, valores únicos)
+**Descrição:** Input padrão para textos de uma linha
 
-### FormInput
-**Localização:** `src/components/forms/FormInput.tsx`
+---
 
-Input de texto simples com suporte a validação, contador de caracteres e labels customizáveis.
+## 2. Textarea (Texto Longo)
+**Componente:** `Textarea` (`src/components/ui/textarea.tsx`)
+**Uso:** Campos de texto longo (Resumo, descrições, notas)
+**Descrição:** Textarea com suporte a múltiplas linhas e `resize-none`
 
-**Quando usar:**
-- Campos de texto curto (nome, título, etc.)
-- Inputs com limite de caracteres
-- Campos que precisam de validação inline
+---
 
-**Props principais:**
-```typescript
-interface FormInputProps {
-  label?: string;
-  placeholder?: string;
-  maxLength?: number;
-  showCharCount?: boolean;
-  required?: boolean;
-  error?: string;
-  showLabel?: boolean;
-  showOptionalLabel?: boolean;
-  labelClassName?: string;
-}
-```
+## 3. Select (Seleção Única)
+**Componente:** `Select` + `SelectTrigger` + `SelectContent` + `SelectItem` (`src/components/ui/select.tsx`)
+**Uso:** Seleção única de opções em dropdown
+**Descrição:** Dropdown estilizado para selecionar uma opção
 
-**Exemplo:**
+**Exemplo de uso:**
 ```tsx
-<FormInput
-  label="Nome da Região"
-  placeholder="Digite o nome..."
-  maxLength={200}
-  showCharCount
-  required
-/>
+<Select value={value} onValueChange={onChange}>
+  <SelectTrigger>
+    <SelectValue placeholder="Selecione..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="option1">Opção 1</SelectItem>
+    <SelectItem value="option2">Opção 2</SelectItem>
+  </SelectContent>
+</Select>
 ```
 
 ---
 
-### FormTextarea
-**Localização:** `src/components/forms/FormTextarea.tsx`
-
-Área de texto multilinha com contador de caracteres e redimensionamento opcional.
-
-**Quando usar:**
-- Descrições longas
-- Resumos, biografias
-- Notas e observações
-
-**Props principais:**
-```typescript
-interface FormTextareaProps {
-  label?: string;
-  placeholder?: string;
-  rows?: number;
-  maxLength?: number;
-  showCharCount?: boolean;
-  required?: boolean;
-  error?: string;
-  className?: string;
-  showLabel?: boolean;
-  labelClassName?: string;
-}
-```
-
-**Exemplo:**
-```tsx
-<FormTextarea
-  label="Resumo"
-  placeholder="Descreva a região..."
-  rows={4}
-  maxLength={500}
-  showCharCount
-  className="resize-none"
-/>
-```
+## 4. Button (Botão)
+**Componente:** `Button` (`src/components/ui/button.tsx`)
+**Uso:** Botões de ação (Ver documentação em `buttons.md`)
+**Descrição:** Botão base com múltiplas variantes (magical, destructive, secondary, ghost, etc.)
 
 ---
 
-## Componentes de Seleção
-
-### FormSelect
-**Localização:** `src/components/forms/FormSelect.tsx`
-
-Select simples para escolha única entre opções.
-
-**Quando usar:**
-- Seleção única de valores
-- Listas com poucas opções
-- Campos obrigatórios com valor padrão
-
-**Props principais:**
-```typescript
-interface FormSelectProps {
-  label?: string;
-  placeholder?: string;
-  options: SelectOption[];
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  error?: string;
-}
-
-interface SelectOption {
-  value: string;
-  label: string;
-}
-```
-
-**Exemplo:**
-```tsx
-<FormSelect
-  label="Região Pai"
-  placeholder="Selecione uma região..."
-  options={regions.map(r => ({ value: r.id, label: r.name }))}
-  value={parentId}
-  onChange={setParentId}
-/>
-```
+## 5. Label (Rótulo)
+**Componente:** `Label` (`src/components/ui/label.tsx`)
+**Uso:** Rótulos para campos de formulário
+**Descrição:** Label padrão associado a inputs
 
 ---
 
-### FormMultiSelect
-**Localização:** `src/components/forms/FormMultiSelect.tsx`
-
-Multi-seleção simples sem avatares ou imagens.
-
-**Quando usar:**
-- Seleção múltipla de valores simples
-- Tags, categorias
-- Opções sem contexto visual
-
-**Props principais:**
-```typescript
-interface FormMultiSelectProps {
-  label?: string;
-  placeholder?: string;
-  options: MultiSelectOption[];
-  value: string[];
-  onChange: (value: string[]) => void;
-  required?: boolean;
-}
-
-interface MultiSelectOption {
-  value: string;
-  label: string;
-}
-```
+## 6. Badge (Distintivo)
+**Componente:** `Badge` (`src/components/ui/badge.tsx`)
+**Uso:** Tags e distintivos visuais
+**Descrição:** Badge com variantes (default, secondary, outline, destructive)
 
 ---
 
-### EntitySelect
-**Localização:** `src/components/forms/EntitySelect.tsx`
-
-Select com avatar/imagem para entidades.
-
-**Quando usar:**
-- Seleção única de entidade (personagem, facção, etc.)
-- Quando o contexto visual (avatar) é importante
-
-**Props principais:**
-```typescript
-interface EntitySelectProps {
-  label?: string;
-  entities: Entity[];
-  value: string;
-  onChange: (value: string) => void;
-  entityType: EntityType; // 'character', 'faction', 'race', 'item'
-}
-
-interface Entity {
-  id: string;
-  name: string;
-  image?: string;
-}
-```
+## 7. Card (Cartão)
+**Componente:** `Card` + `CardHeader` + `CardTitle` + `CardContent` (`src/components/ui/card.tsx`)
+**Uso:** Containers para agrupar conteúdo
+**Descrição:** Container estilizado com header e conteúdo
 
 ---
 
-## Componentes Avançados
+## 8. FormSelectGrid (Grid de Seleção)
+**Componente:** `FormSelectGrid` (`src/components/forms/FormSelectGrid.tsx`)
+**Uso:** Seleção visual em grid com ícones (Escala, Estação, Tipos)
+**Descrição:** Grid de botões com ícones, descrições e cores customizáveis. Suporta conteúdo expandido (ex: input customizado)
 
-### FormImageUpload
-**Localização:** `src/components/forms/FormImageUpload.tsx`
-
-Upload de imagem com preview e remoção.
-
-**Quando usar:**
-- Upload de imagens para entidades
-- Campos que precisam de preview visual
-- Imagens de banner, avatar, capa
-
-**Props principais:**
-```typescript
-interface FormImageUploadProps {
-  value?: string;
-  onChange: (value: string) => void;
-  label: string;
-  helperText?: string;
-  required?: boolean;
-  height?: string; // default: 'h-[28rem]'
-  accept?: string;
-  error?: string;
-  id?: string;
-}
-```
-
-**Exemplo:**
-```tsx
-<FormImageUpload
-  value={image}
-  onChange={setImage}
-  label="Imagem da Região"
-  helperText="Recomendado: 1200x448px"
-  height="h-[28rem]"
-  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-/>
-```
-
-**Características:**
-- Preview automático da imagem selecionada
-- Botão de remoção no canto superior direito
-- Área de drop visual com ícone
-- Suporta conversão para base64
-- Altura customizável
-
----
-
-### FormSelectGrid
-**Localização:** `src/components/forms/FormSelectGrid.tsx`
-
-Grid visual de seleção com ícones e descrições.
-
-**Quando usar:**
-- Seleção de escalas, níveis, categorias
-- Opções que se beneficiam de contexto visual
-- Quando ícones ajudam na identificação
-- Choices com descrições detalhadas
-
-**Props principais:**
-```typescript
-interface FormSelectGridProps<T = string> {
-  value: T | null | undefined;
-  onChange: (value: T) => void;
-  options: GridSelectOption<T>[];
-  label: string;
-  required?: boolean;
-  error?: string;
-  columns?: number; // default: 2
-  className?: string;
-}
-
-interface GridSelectOption<T = string> {
-  value: T;
-  label: string;
-  description?: string;
-  icon?: LucideIcon;
-  baseColorClass?: string;
-  hoverColorClass?: string;
-  activeColorClass?: string;
-}
-```
-
-**Exemplo (Escala de Região):**
+**Exemplo de uso:**
 ```tsx
 <FormSelectGrid
   value={scale}
   onChange={setScale}
-  label="Escala"
+  label="Escala da Região"
   required
   columns={2}
   options={[
@@ -289,598 +87,108 @@ interface GridSelectOption<T = string> {
       label: "Local",
       description: "Cidades, vilas, florestas",
       icon: MapPin,
-      activeColorClass: "bg-emerald-500 text-white border-emerald-500",
-      hoverColorClass: "hover:bg-emerald-500 hover:text-white"
-    },
-    {
-      value: "continental",
-      label: "Continental",
-      description: "Continentes, nações",
-      icon: Globe,
-      activeColorClass: "bg-blue-500 text-white border-blue-500",
-      hoverColorClass: "hover:bg-blue-500 hover:text-white"
+      baseColorClass: "bg-background",
+      hoverColorClass: "hover:bg-emerald-500",
+      activeColorClass: "bg-emerald-500 text-white",
     },
     // ... mais opções
   ]}
+  // Opcional: conteúdo expandido
+  expandedContent={<Input placeholder="Nome customizado" />}
+  showExpandedContent={value === "custom"}
 />
 ```
 
-**Características:**
-- Grid responsivo (1-3 colunas)
-- Ícones opcionais com Lucide React
-- Descrições para contexto
-- Cores customizáveis por opção
-- Estados: normal, hover, active
-- Texto alinhado à esquerda
-
-**Casos de Uso:**
-- ScalePicker (escalas de região)
-- SeasonPicker (estações do ano)
-- Seleção de tipos/categorias visuais
-- Qualquer escolha que se beneficia de ícones
+**Propriedades principais:**
+- `columns`: Número de colunas (2, 3 ou 4)
+- `colSpan`: Opção pode ocupar múltiplas colunas
+- `expandedContent`: Conteúdo adicional (ex: input)
+- `showExpandedContent`: Controla visibilidade do conteúdo expandido
 
 ---
 
-### FormListInput
-**Localização:** `src/components/forms/FormListInput.tsx`
+## 9. FormEntityMultiSelectAuto (Multi-Select de Entidades com Auto-Load)
+**Componente:** `FormEntityMultiSelectAuto` (`src/components/forms/FormEntityMultiSelectAuto.tsx`)
+**Uso:** Seleção múltipla de entidades relacionadas (Facções, Personagens, Raças, Itens, Regiões)
+**Descrição:** Multi-select especializado que carrega automaticamente entidades do banco de dados. Possui busca integrada, avatares e exibição visual das seleções. Ideal para campos de relacionamento entre entidades. 
 
-Input para criar listas de strings (adicionar/remover itens).
-
-**Quando usar:**
-- Listas de características, anomalias
-- Tags customizadas
-- Itens que o usuário adiciona manualmente
-- Arrays de strings simples
-
-**Props principais:**
-```typescript
-interface FormListInputProps {
-  value: string[];
-  onChange: (value: string[]) => void;
-  label: string;
-  placeholder?: string;
-  addButtonText?: string;
-  required?: boolean;
-  maxLength?: number;
-  error?: string;
-  labelClassName?: string;
-}
-```
-
-**Exemplo:**
-```tsx
-<FormListInput
-  value={anomalies}
-  onChange={setAnomalies}
-  label="Anomalias da Região"
-  placeholder="Rios que fluem para cima..."
-  addButtonText="Adicionar Anomalia"
-  maxLength={200}
-/>
-```
-
-**Características:**
-- Input com botão de adicionar (+)
-- Enter para adicionar
-- Badges para itens adicionados
-- Botão X para remover cada item
-- Limite de caracteres por item
-- Wrap automático dos badges
-
-**Casos de Uso:**
-- Anomalias, peculiaridades
-- Lista de recursos naturais
-- Tags, características
-- Qualquer array de strings
-
----
-
-### FormEntityMultiSelectAuto
-**Localização:** `src/components/forms/FormEntityMultiSelectAuto.tsx`
-
-Multi-seleção de entidades com busca, avatares e **carregamento automático do banco de dados**.
-
-**Quando usar:**
-- ✅ **Em modais** - Dados sempre atualizados ao abrir
-- ✅ **Páginas de edição** - Dados atualizados ao entrar em modo edição
-- ✅ Seleção múltipla de personagens, facções, raças, itens do DB
-- ✅ Quando quer menos código no componente pai
-- ✅ **Este é o componente padrão para multi-seleção de entidades!**
-
-**Props principais:**
-```typescript
-interface FormEntityMultiSelectAutoProps {
-  entityType: 'character' | 'faction' | 'race' | 'item' | 'region';
-  bookId: string;
-  label: string;
-  placeholder?: string;
-  emptyText?: string;
-  noSelectionText?: string;
-  searchPlaceholder?: string;
-  noResultsText?: string;
-  counterText?: string; // default: "selected"
-  value: string[]; // IDs selecionados
-  onChange: (value: string[]) => void;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  labelClassName?: string;
-  filter?: (entity: EntityOption) => boolean; // Filtro customizado
-}
-
-interface EntityOption {
-  id: string;
-  name: string;
-  image?: string;
-}
-```
-
-**Exemplo:**
+**Exemplo de uso:**
 ```tsx
 <FormEntityMultiSelectAuto
-  entityType="character"
+  entityType="faction"
   bookId={bookId}
-  label="Personagens Residentes"
-  placeholder="Selecione personagens..."
-  emptyText="Nenhum personagem disponível"
-  noSelectionText="Nenhum personagem selecionado"
-  searchPlaceholder="Buscar personagens..."
-  noResultsText="Nenhum resultado encontrado"
-  counterText="selecionado(s)"
-  value={residentCharacterIds}
-  onChange={setResidentCharacterIds}
+  label="Facções Dominantes"
+  placeholder="Selecione as facções..."
+  emptyText="Nenhuma facção disponível"
+  noSelectionText="Nenhuma facção selecionada"
+  searchPlaceholder="Buscar facção..."
+  value={dominantFactions}
+  onChange={setDominantFactions}
+  labelClassName="text-sm font-medium text-primary"
 />
 ```
 
-**Características:**
-- **Carregamento automático do DB** baseado em `entityType` e `bookId`
-- Dropdown com busca integrada
-- Avatares quadrados (rounded-md)
-- Iniciais como fallback
-- Contador de selecionados
-- Cards dos selecionados com avatar
-- Botão X para remover
-- Estados vazios customizáveis
-- Scroll quando muitos itens
-- Filtro customizado opcional
+**Propriedades principais:**
+- `entityType`: Tipo de entidade ('character' | 'faction' | 'race' | 'item' | 'region')
+- `bookId`: ID do livro para carregar as entidades
+- `label`: Texto do label
+- `placeholder`: Texto do placeholder no dropdown
+- `emptyText`: Mensagem quando não há opções disponíveis
+- `noSelectionText`: Mensagem quando nenhuma entidade foi selecionada
+- `searchPlaceholder`: Placeholder do campo de busca
+- `value`: Array de IDs selecionados (string[])
+- `onChange`: Callback quando a seleção muda
+- `filter`: (Opcional) Função para filtrar entidades
+- `required`: (Opcional) Se o campo é obrigatório
+- `disabled`: (Opcional) Se o campo está desabilitado
 
-**Estados:**
-1. **Carregando:** Mostra "Loading..."
-2. **Sem opções:** Mostra `emptyText`
-3. **Sem seleção:** Mostra `noSelectionText`
-4. **Com seleção:** Mostra cards com avatares
-5. **Busca vazia:** Mostra `noResultsText`
+**Funcionalidades:**
+- ✅ Carregamento automático de entidades do banco de dados
+- ✅ Busca integrada no dropdown
+- ✅ Exibição com avatares (imagem ou iniciais)
+- ✅ Contador de seleções
+- ✅ Remoção individual de itens selecionados
+- ✅ Estados vazios informativos
+- ✅ Scroll automático para listas longas
+- ✅ Suporte a filtros customizados
 
-**Como funciona o carregamento automático:**
+**Casos de uso no projeto:**
+- **Facções Residentes/Dominantes:** Selecionar facções que habitam ou dominam uma região
+- **Personagens Importantes:** Escolher personagens relevantes para uma região
+- **Raças Encontradas:** Indicar quais raças são encontradas em uma região
+- **Itens Encontrados:** Listar itens que podem ser encontrados em uma região
+
+---
+
+## 10. ListInput (Lista Dinâmica com Drag & Drop)
+**Componente:** `ListInput` (`src/components/modals/create-region-modal/components/list-input.tsx`)
+**Uso:** Listas dinâmicas de itens com adição, edição, remoção e reordenação
+**Descrição:** Componente de lista editável que permite adicionar múltiplos itens de texto. Possui funcionalidade de drag-and-drop para reordenar itens, edição inline e remoção individual. Ideal para listas abertas onde a ordem importa.
+
+**Exemplo de uso:**
 ```tsx
-// O componente automaticamente busca do DB baseado no entityType
-useEffect(() => {
-  const loadEntities = async () => {
-    switch (entityType) {
-      case 'character':
-        const chars = await getCharactersByBookId(bookId);
-        break;
-      case 'faction':
-        const facs = await getFactionsByBookId(bookId);
-        break;
-      // ... outros tipos
-    }
-  };
-  loadEntities();
-}, [entityType, bookId, filter]);
-```
-
-**Refresh automático em modais/edição:**
-Para garantir que os dados sejam atualizados quando o modal abre ou quando entra em modo de edição, use o padrão `refreshKey`:
-
-```tsx
-// No componente pai (modal ou página de detalhes)
-const [refreshKey, setRefreshKey] = useState(0);
-
-useEffect(() => {
-  if (open) { // Para modais
-    setRefreshKey(prev => prev + 1);
-  }
-}, [open]);
-
-// Ou para modo de edição
-useEffect(() => {
-  if (isEditing) { // Para páginas de detalhes
-    setRefreshKey(prev => prev + 1);
-  }
-}, [isEditing]);
-
-// No FormEntityMultiSelectAuto
-<FormEntityMultiSelectAuto
-  key={`resident-characters-${refreshKey}`} // ⚠️ Key única força re-mount
-  entityType="character"
-  bookId={bookId}
-  label="Personagens Residentes"
-  value={residentCharacterIds}
-  onChange={setResidentCharacterIds}
+<ListInput
+  label="Mistérios da Região"
+  placeholder="Descreva um mistério..."
+  buttonText="Adicionar Mistério"
+  value={regionMysteries}
+  onChange={setRegionMysteries}
+  labelClassName="text-sm font-medium text-primary"
 />
 ```
 
----
+**Propriedades principais:**
+- `label`: Texto do label do campo
+- `placeholder`: Placeholder para o campo de entrada
+- `buttonText`: Texto do botão de adicionar (não é usado visualmente, mas mantido para compatibilidade)
+- `value`: Array de strings com os itens da lista
+- `onChange`: Callback quando a lista é modificada (adicionar, editar, remover ou reordenar)
+- `labelClassName`: (Opcional) Classe customizada para o label
 
-## Guia de Uso
-
-### Importação
-
-```tsx
-import {
-  FormInput,
-  FormTextarea,
-  FormSelect,
-  FormMultiSelect,
-  EntitySelect,
-  FormImageUpload,
-  FormSelectGrid,
-  FormListInput,
-  FormEntityMultiSelectAuto,
-  type GridSelectOption,
-  type EntityOption,
-  type FormEntityType,
-} from "@/components/forms";
-```
-
----
-
-### Padrões de Implementação
-
-#### 1. Campo Obrigatório
-```tsx
-<FormInput
-  label="Nome"
-  required // Adiciona asterisco vermelho *
-  placeholder="Digite o nome..."
-/>
-```
-
-#### 2. Campo Opcional
-```tsx
-<FormTextarea
-  label="Resumo"
-  helperText="(opcional)" // Texto em cinza
-  placeholder="Descrição opcional..."
-/>
-```
-
-#### 3. Campo com Validação
-```tsx
-<FormInput
-  label="Nome"
-  value={name}
-  onChange={setName}
-  error={errors.name} // Mensagem de erro em vermelho
-  required
-/>
-```
-
-#### 4. Integração com React Hook Form
-```tsx
-<FormField
-  control={form.control}
-  name="name"
-  render={({ field, fieldState }) => (
-    <FormItem>
-      <FormLabel className="text-primary">
-        Nome
-        <span className="text-destructive ml-1">*</span>
-      </FormLabel>
-      <FormControl>
-        <FormInput
-          {...field}
-          placeholder="Digite o nome..."
-          maxLength={200}
-          error={fieldState.error?.message}
-          showLabel={false} // Label já está acima
-        />
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-```
-
----
-
-## Exemplos Práticos
-
-### Exemplo 1: Modal de Criar Região (Campos Básicos)
-
-```tsx
-import {
-  FormImageUpload,
-  FormInput,
-  FormSelect,
-  FormSelectGrid,
-  FormTextarea,
-  FormEntityMultiSelectAuto,
-  type GridSelectOption,
-} from "@/components/forms";
-
-// Configuração de escalas
-const scaleOptions: GridSelectOption[] = [
-  {
-    value: "local",
-    label: "Local",
-    description: "Cidades, vilas, florestas",
-    icon: MapPin,
-    activeColorClass: "bg-emerald-500 text-white border-emerald-500",
-    hoverColorClass: "hover:bg-emerald-500 hover:text-white",
-  },
-  // ... mais escalas
-];
-
-function CreateRegionModal() {
-  return (
-    <div className="space-y-6">
-      {/* Imagem */}
-      <FormImageUpload
-        value={image}
-        onChange={setImage}
-        label="Imagem"
-        helperText="opcional - Recomendado: 1200x448px"
-        height="h-[28rem]"
-      />
-
-      {/* Nome */}
-      <FormInput
-        value={name}
-        onChange={setName}
-        label="Nome"
-        placeholder="Digite o nome da região..."
-        maxLength={200}
-        required
-      />
-
-      {/* Região Pai */}
-      <FormSelect
-        label="Região Pai"
-        placeholder="Selecione..."
-        value={parentId}
-        onChange={setParentId}
-        options={[
-          { value: "neutral", label: "Neutra" },
-          ...regions.map(r => ({ value: r.id, label: r.name })),
-        ]}
-        required
-      />
-
-      {/* Escala */}
-      <FormSelectGrid
-        value={scale}
-        onChange={setScale}
-        label="Escala"
-        options={scaleOptions}
-        columns={2}
-        required
-      />
-
-      {/* Resumo */}
-      <FormTextarea
-        value={summary}
-        onChange={setSummary}
-        label="Resumo"
-        placeholder="Descreva a região..."
-        rows={4}
-        maxLength={500}
-        showCharCount
-      />
-    </div>
-  );
-}
-```
-
----
-
-### Exemplo 2: Campos Avançados com FormEntityMultiSelectAuto
-
-```tsx
-import {
-  FormSelectGrid,
-  FormListInput,
-  FormEntityMultiSelectAuto,
-  type GridSelectOption,
-} from "@/components/forms";
-
-// Estações
-const seasonOptions: GridSelectOption[] = [
-  {
-    value: "spring",
-    label: "Primavera",
-    icon: Flower,
-    activeColorClass: "bg-green-500 text-white",
-  },
-  {
-    value: "summer",
-    label: "Verão",
-    icon: Sun,
-    activeColorClass: "bg-yellow-500 text-black",
-  },
-  // ...
-];
-
-function AdvancedFields({ bookId }: { bookId: string }) {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  // Refresh quando o modal abre
-  useEffect(() => {
-    setRefreshKey(prev => prev + 1);
-  }, []);
-
-  return (
-    <div className="space-y-6">
-      {/* Clima */}
-      <FormInput
-        label="Clima"
-        value={climate}
-        onChange={setClimate}
-        placeholder="Tropical, Temperado..."
-        maxLength={100}
-      />
-
-      {/* Estação Predominante */}
-      <FormSelectGrid
-        value={season}
-        onChange={setSeason}
-        label="Estação Predominante"
-        options={seasonOptions}
-        columns={2}
-      />
-
-      {/* Recursos Naturais */}
-      <FormListInput
-        value={naturalResources}
-        onChange={setNaturalResources}
-        label="Recursos Naturais"
-        placeholder="Minério de ferro, madeira..."
-        addButtonText="Adicionar Recurso"
-        maxLength={100}
-      />
-
-      {/* Personagens Residentes */}
-      <FormEntityMultiSelectAuto
-        key={`resident-characters-${refreshKey}`}
-        entityType="character"
-        bookId={bookId}
-        label="Personagens Residentes"
-        placeholder="Selecione personagens..."
-        emptyText="Crie personagens primeiro"
-        noSelectionText="Nenhum personagem selecionado"
-        searchPlaceholder="Buscar personagens..."
-        value={residentCharacterIds}
-        onChange={setResidentCharacterIds}
-      />
-
-      {/* Facções Ativas */}
-      <FormEntityMultiSelectAuto
-        key={`active-factions-${refreshKey}`}
-        entityType="faction"
-        bookId={bookId}
-        label="Facções Ativas"
-        placeholder="Selecione facções..."
-        emptyText="Crie facções primeiro"
-        noSelectionText="Nenhuma facção selecionada"
-        searchPlaceholder="Buscar facções..."
-        value={activeFactionIds}
-        onChange={setActiveFactionIds}
-      />
-    </div>
-  );
-}
-```
-
----
-
-## Resumo de Componentes por Categoria
-
-### Texto
-- **FormInput** - Campo de texto curto com contador
-- **FormTextarea** - Campo de texto longo com contador
-
-### Seleção Simples
-- **FormSelect** - Select dropdown tradicional
-- **EntitySelect** - Select com avatares (seleção única)
-
-### Seleção Múltipla
-- **FormMultiSelect** - Multi-select simples (strings, sem avatares)
-- **FormEntityMultiSelectAuto** ⭐ - Multi-select de entidades com avatares e **carregamento automático do DB**
-
-### Seleção Visual
-- **FormSelectGrid** - Grid de opções com ícones e descrições
-
-### Especializados
-- **FormImageUpload** - Upload de imagem com preview e remoção
-- **FormListInput** - Input para criar/remover listas de strings
-
-### Componente Recomendado
-⭐ **FormEntityMultiSelectAuto** é o componente padrão para seleção múltipla de entidades do banco de dados (personagens, facções, raças, itens, regiões). Use este componente em vez de criar props para passar entidades manualmente.
-
----
-
-## Mapa de Localização
-
-```
-src/components/forms/
-├── FormInput.tsx                      # Campo de texto básico
-├── FormTextarea.tsx                   # Área de texto
-├── FormSelect.tsx                     # Select simples
-├── FormMultiSelect.tsx                # Multi-select simples
-├── EntitySelect.tsx                   # Select com avatar
-├── FormImageUpload.tsx                # ✨ Upload de imagem
-├── FormSelectGrid.tsx                 # ✨ Grid de seleção visual
-├── FormListInput.tsx                  # ✨ Input de lista
-├── FormEntityMultiSelectAuto.tsx      # ✨ Multi-select com carregamento automático
-└── index.tsx                          # Exportações
-```
-
-**Componentes criados (✨):**
-- **FormImageUpload** - Upload de imagem com preview
-- **FormSelectGrid** - Grid visual para seleção (substitui ScalePicker, SeasonPicker)
-- **FormListInput** - Input para listas de strings
-- **FormEntityMultiSelectAuto** - Multi-select de entidades com carregamento automático do DB
-
----
-
-## Decisões de Design
-
-### Por que FormSelectGrid?
-- **Antes:** ScalePicker, SeasonPicker (componentes específicos)
-- **Agora:** FormSelectGrid genérico
-- **Benefício:** Reutilização para qualquer tipo de seleção visual
-
-### Por que FormEntityMultiSelectAuto?
-- **Antes:** MultiSelect no modal com código duplicado + prop drilling de entidades
-- **Agora:** FormEntityMultiSelectAuto que carrega automaticamente do DB
-- **Benefício:**
-  - Menos código no componente pai
-  - Dados sempre atualizados quando o modal abre ou entra em modo edição
-  - Não precisa passar arrays de entidades via props
-  - Componentização real com responsabilidade única
-
-### Por que FormListInput?
-- **Antes:** ListInput específico no modal
-- **Agora:** Componente genérico
-- **Benefício:** Listas de tags, características, etc.
-
-### Por que FormImageUpload?
-- **Antes:** Código inline no modal
-- **Agora:** Componente reutilizável
-- **Benefício:** Upload de imagens em qualquer formulário
-
----
-
-## Status de Implementação
-
-1. ✅ Componentes criados e documentados
-2. ✅ Modal de criar região migrado para FormEntityMultiSelectAuto
-3. ✅ Region Detail (modo de edição) migrado para FormEntityMultiSelectAuto
-4. ✅ Sistema de refresh automático implementado (refreshKey pattern)
-5. ⏳ Aplicar em outros modais (personagens, facções, raças, itens, etc.)
-6. ⏳ Criar variações conforme necessário
-
-## Onde está sendo usado:
-
-### FormEntityMultiSelectAuto
-- ✅ `src/components/modals/create-region-modal.tsx` (5 instâncias)
-  - Resident Factions
-  - Dominant Factions
-  - Important Characters
-  - Races Found
-  - Items Found
-- ✅ `src/pages/dashboard/tabs/world/region-detail/view.tsx` (5 instâncias)
-  - Resident Factions (edit mode)
-  - Dominant Factions (edit mode)
-  - Important Characters (edit mode)
-  - Races Found (edit mode)
-  - Items Found (edit mode)
-
----
-
-## Referências
-
-- **Modal de referência:** `src/components/modals/create-region-modal.tsx`
-- **Componentes base:** `src/components/forms/`
-- **UI primitivos:** `src/components/ui/`
+**Funcionalidades:**
+- ✅ Adicionar novos itens à lista (Enter ou botão +)
+- ✅ Editar itens existentes inline
+- ✅ Remover itens individuais
+- ✅ Drag & Drop para reordenar itens
+- ✅ Validação: botão desabilitado quando campo vazio
+- ✅ Atalho de teclado: Enter adiciona item, Shift+Enter quebra linha

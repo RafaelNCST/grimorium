@@ -121,7 +121,7 @@ export function HierarchyManagerModal({
           </ScrollArea>
 
           <div className="flex justify-end pt-4 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="secondary" onClick={() => onOpenChange(false)}>
               {t("hierarchy_manager.close_button")}
             </Button>
           </div>

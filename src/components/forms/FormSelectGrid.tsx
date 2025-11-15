@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 /**
  * Option configuration for grid selection
@@ -34,6 +35,10 @@ export interface GridSelectOption<T = string> {
    * Active/selected color class
    */
   activeColorClass?: string;
+  /**
+   * Number of columns this option should span (e.g., 2 for full width in a 2-column grid)
+   */
+  colSpan?: number;
 }
 
 interface FormSelectGridProps<T = string> {
@@ -69,6 +74,14 @@ interface FormSelectGridProps<T = string> {
    * Optional custom className for grid container
    */
   className?: string;
+  /**
+   * Optional expanded content to show after grid (e.g., custom input field)
+   */
+  expandedContent?: ReactNode;
+  /**
+   * Whether to show the expanded content
+   */
+  showExpandedContent?: boolean;
 }
 
 /**
@@ -118,7 +131,14 @@ export function FormSelectGrid<T extends string = string>({
   error,
   columns = 2,
   className,
+  expandedContent,
+  showExpandedContent = false,
 }: FormSelectGridProps<T>) {
+  const getColSpanClass = (colSpan?: number) => {
+    if (!colSpan) return "";
+    return `col-span-${colSpan}`;
+  };
+
   return (
     <div className="space-y-2">
       <Label className="text-primary">
@@ -138,6 +158,7 @@ export function FormSelectGrid<T extends string = string>({
               onClick={() => onChange(option.value)}
               className={cn(
                 "relative p-4 rounded-lg border-2 transition-all text-left",
+                option.colSpan ? getColSpanClass(option.colSpan) : "",
                 isSelected
                   ? option.activeColorClass || "bg-primary text-white border-primary"
                   : cn(
@@ -165,6 +186,10 @@ export function FormSelectGrid<T extends string = string>({
           );
         })}
       </div>
+
+      {showExpandedContent && expandedContent && (
+        <div className="mt-4">{expandedContent}</div>
+      )}
 
       {error && (
         <p className="text-sm text-destructive">{error}</p>

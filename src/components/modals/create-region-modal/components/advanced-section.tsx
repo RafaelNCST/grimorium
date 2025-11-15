@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AdvancedSectionProps {
   children: ReactNode;
@@ -17,22 +17,28 @@ export function AdvancedSection({ children }: AdvancedSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
-      <CollapsibleTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full flex items-center justify-between"
-        >
-          <span className="font-semibold">{t("create_region.advanced_items")}</span>
-          {isOpen ? (
-            <ChevronUp className="w-4 h-4 ml-2" />
-          ) : (
-            <ChevronDown className="w-4 h-4 ml-2" />
-          )}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-6">{children}</CollapsibleContent>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Card className="card-magical">
+        <CardHeader>
+          <CollapsibleTrigger asChild>
+            <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+              <CardTitle>
+                {t("create_region.advanced_items")}
+              </CardTitle>
+              {isOpen ? (
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              )}
+            </button>
+          </CollapsibleTrigger>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent className="space-y-6">
+            {children}
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
     </Collapsible>
   );
 }

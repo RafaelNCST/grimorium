@@ -384,7 +384,7 @@ export function MapCanvas({
             {/* Zoom Controls - Fixed */}
             <div className="fixed bottom-4 right-4 z-30 flex flex-col gap-2">
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="icon"
                 onClick={() => zoomIn()}
                 className="shadow-lg"
@@ -392,7 +392,7 @@ export function MapCanvas({
                 <ZoomIn className="w-4 h-4" />
               </Button>
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="icon"
                 onClick={() => zoomOut()}
                 className="shadow-lg"
@@ -400,7 +400,7 @@ export function MapCanvas({
                 <ZoomOut className="w-4 h-4" />
               </Button>
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="icon"
                 onClick={() => resetTransform()}
                 className="shadow-lg"

@@ -153,9 +153,9 @@ const RegionItem = memo(function RegionItem({
       {/* Delete Button */}
       {showDelete && onDelete && !isOverlay && (
         <Button
-          variant="ghost"
+          variant="ghost-destructive"
           size="icon"
-          className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0 transition-colors"
+          className="h-7 w-7 p-0 shrink-0 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onDelete(region);

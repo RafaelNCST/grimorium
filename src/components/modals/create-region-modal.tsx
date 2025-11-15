@@ -277,7 +277,7 @@ export function CreateRegionModal({
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* Basic Fields Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">
                 {t("create_region.basic_fields")}
               </h3>
 
@@ -445,8 +445,6 @@ export function CreateRegionModal({
                 )}
               />
             </div>
-
-            <Separator />
 
             {/* Advanced Section */}
             <AdvancedSection>
@@ -855,7 +853,7 @@ export function CreateRegionModal({
             <DialogFooter>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={handleClose}
                 disabled={isSubmitting}
               >

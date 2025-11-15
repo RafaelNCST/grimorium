@@ -13,6 +13,7 @@ import {
   Infinity,
   Layers
 } from "lucide-react";
+import { FormSelectGrid, GridSelectOption } from "@/components/forms/FormSelectGrid";
 
 interface ScalePickerProps {
   value: RegionScale | null | undefined;
@@ -40,40 +41,23 @@ const SCALES: RegionScale[] = [
 export function ScalePicker({ value, onChange }: ScalePickerProps) {
   const { t } = useTranslation("world");
 
-  return (
-    <div className="space-y-3">
-      {/* Label removed - not needed (duplicate title) */}
-      <div className="grid grid-cols-2 gap-3">
-        {SCALES.map((scale) => {
-          const Icon = SCALE_ICONS[scale];
-          const isSelected = value === scale;
+  const scaleOptions: GridSelectOption<RegionScale>[] = SCALES.map((scale) => ({
+    value: scale,
+    label: t(`scales.${scale}`),
+    description: t(`scale_descriptions.${scale}`),
+    icon: SCALE_ICONS[scale],
+    baseColorClass: SCALE_BASE_COLOR,
+    hoverColorClass: SCALE_HOVER_COLOR[scale],
+    activeColorClass: `${SCALE_ACTIVE_COLOR[scale]} text-white`,
+  }));
 
-          return (
-            <button
-              key={scale}
-              type="button"
-              onClick={() => onChange(scale)}
-              className={`
-                relative p-4 rounded-lg border-2 transition-all text-left
-                ${isSelected ? `${SCALE_ACTIVE_COLOR[scale]} text-white` : SCALE_BASE_COLOR}
-                ${!isSelected ? `${SCALE_HOVER_COLOR[scale]} hover:text-white` : ""}
-              `}
-            >
-              <div className="flex items-start gap-3">
-                <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">
-                    {t(`scales.${scale}`)}
-                  </p>
-                  <p className="text-xs mt-1 opacity-80">
-                    {t(`scale_descriptions.${scale}`)}
-                  </p>
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+  return (
+    <FormSelectGrid
+      value={value}
+      onChange={onChange}
+      options={scaleOptions}
+      label="" // Label is handled by parent component
+      columns={2}
+    />
   );
 }

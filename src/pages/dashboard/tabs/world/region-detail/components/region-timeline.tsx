@@ -443,12 +443,12 @@ export function RegionTimeline({
                           <TooltipTrigger asChild>
                             <Button
                               size="sm"
-                              variant="ghost"
+                              variant="ghost-destructive"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteEra(era.id);
                               }}
-                              className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                              className="h-8 w-8 p-0"
                             >
                               <Trash2 className="w-3 h-3" />
                             </Button>
@@ -511,12 +511,12 @@ export function RegionTimeline({
                                             </Button>
                                             <Button
                                               size="sm"
-                                              variant="ghost"
+                                              variant="ghost-destructive"
                                               onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleDeleteEvent(event.id);
                                               }}
-                                              className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                                              className="h-6 w-6 p-0"
                                             >
                                               <Trash2 className="w-3 h-3" />
                                             </Button>
@@ -844,7 +844,7 @@ export function RegionTimeline({
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => {
                       setEditingEvent(false);
                       setShowEventModal(false);
@@ -951,7 +951,7 @@ export function RegionTimeline({
                 {isEditing && (
                   <div className="flex justify-end gap-2 pt-4 border-t">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       onClick={() => openEventDetails(selectedEvent, true)}
                       className="flex items-center gap-2"
                     >
@@ -993,7 +993,7 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="era-description">Descrição</Label>
+              <Label htmlFor="era-description">Descrição *</Label>
               <Textarea
                 id="era-description"
                 value={newEra.description}
@@ -1015,7 +1015,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start">Início</Label>
+                <Label htmlFor="era-start">Início *</Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1033,7 +1033,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end">Fim</Label>
+                <Label htmlFor="era-end">Fim *</Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1052,7 +1052,7 @@ export function RegionTimeline({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowCreateEraModal(false)}
             >
               <X className="w-4 h-4 mr-2" />
@@ -1062,6 +1062,12 @@ export function RegionTimeline({
               onClick={handleCreateEra}
               variant="magical"
               className="animate-glow"
+              disabled={
+                !newEra.name.trim() ||
+                !newEra.description.trim() ||
+                !newEra.startDate.trim() ||
+                !newEra.endDate.trim()
+              }
             >
               <Plus className="w-4 h-4 mr-2" />
               Criar Era
@@ -1140,7 +1146,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-reason">Motivo</Label>
+                <Label htmlFor="event-reason">Motivo *</Label>
                 <Textarea
                   id="event-reason"
                   value={newEvent.reason}
@@ -1157,7 +1163,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-outcome">Como Terminou</Label>
+                <Label htmlFor="event-outcome">Como Terminou *</Label>
                 <Textarea
                   id="event-outcome"
                   value={newEvent.outcome}
@@ -1180,7 +1186,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-start">Data Início</Label>
+                <Label htmlFor="event-start">Data Início *</Label>
                 <Input
                   id="event-start"
                   value={newEvent.startDate}
@@ -1198,7 +1204,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-end">Data Fim</Label>
+                <Label htmlFor="event-end">Data Fim *</Label>
                 <Input
                   id="event-end"
                   value={newEvent.endDate}
@@ -1284,14 +1290,25 @@ export function RegionTimeline({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowCreateEventModal(false)}
             >
               <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
-            <Button onClick={handleCreateEvent} variant="magical"
-              className="animate-glow">
+            <Button
+              onClick={handleCreateEvent}
+              variant="magical"
+              className="animate-glow"
+              disabled={
+                !newEvent.name.trim() ||
+                !newEvent.description.trim() ||
+                !newEvent.reason.trim() ||
+                !newEvent.outcome.trim() ||
+                !newEvent.startDate.trim() ||
+                !newEvent.endDate.trim()
+              }
+            >
               <Plus className="w-4 h-4 mr-2" />
               Criar Evento
             </Button>
@@ -1386,7 +1403,7 @@ export function RegionTimeline({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setShowEditEraModal(false)}
             >
               <X className="w-4 h-4 mr-2" />

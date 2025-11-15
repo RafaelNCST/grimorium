@@ -16,12 +16,12 @@ const buttonVariants = cva(
           "relative overflow-visible bg-gradient-primary text-primary-foreground transition-all duration-300 hover:shadow-magical-glow hover:brightness-125 hover:saturate-150",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-red-500 hover:brightness-125 transition-colors duration-200",
-        outline:
-          "border border-border bg-card text-card-foreground hover:bg-primary-glow hover:text-white hover:border-primary-glow hover:shadow-glow transition-all duration-300",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors duration-200",
+          "border border-border bg-card text-card-foreground hover:bg-primary-glow hover:text-white hover:border-primary-glow hover:shadow-glow transition-all duration-300",
         ghost:
           "hover:bg-accent hover:text-accent-foreground transition-colors duration-200",
+        "ghost-destructive":
+          "hover:bg-destructive/10 hover:text-destructive transition-colors duration-200",
         link: "text-primary underline-offset-4 hover:underline",
         accent:
           "bg-gradient-accent text-accent-foreground hover:shadow-accent-glow hover:-translate-y-0.5 font-semibold transition-all duration-300",

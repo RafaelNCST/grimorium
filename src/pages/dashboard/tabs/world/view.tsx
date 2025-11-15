@@ -140,7 +140,7 @@ export function WorldView({
           {
             label: t("manage_hierarchy_button"),
             onClick: () => onShowHierarchyModal(true),
-            variant: "outline",
+            variant: "secondary",
             icon: Network,
           },
         ]}

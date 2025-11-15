@@ -292,7 +292,7 @@ export function RegionDetailView({
                 {isEditing ? (
                   <>
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={onCancel}>
+                      <Button variant="secondary" onClick={onCancel}>
                         <X className="w-4 h-4 mr-2" />
                         {t("region-detail:header.cancel")}
                       </Button>
@@ -335,10 +335,9 @@ export function RegionDetailView({
                       <Edit2 className="w-4 h-4" />
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="ghost-destructive"
                       size="icon"
                       onClick={onDeleteModalOpen}
-                      className="hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -389,9 +388,9 @@ export function RegionDetailView({
                               />
                               <Button
                                 type="button"
-                                variant="ghost"
+                                variant="ghost-destructive"
                                 size="icon"
-                                className="absolute top-2 right-2 hover:bg-destructive/10 hover:text-destructive"
+                                className="absolute top-2 right-2"
                                 onClick={() => {
                                   onEditDataChange("image", "");
                                 }}
