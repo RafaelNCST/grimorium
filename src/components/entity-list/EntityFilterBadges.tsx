@@ -172,6 +172,7 @@ export function EntityFilterBadges<T extends string = string>({
       {/* Total Badge - Always shown first */}
       <div className="flex items-center gap-2 flex-wrap">
         <Badge
+          variant={undefined}
           className={`cursor-pointer border transition-colors ${
             !hasActiveFilters
               ? "!bg-primary !text-white !border-primary"
@@ -202,6 +203,7 @@ export function EntityFilterBadges<T extends string = string>({
               return (
                 <Badge
                   key={item.value}
+                  variant={undefined}
                   className={`cursor-pointer border transition-colors ${
                     isActive
                       ? item.colorConfig.activeClasses

@@ -141,7 +141,8 @@
       "Bash(cmd /c \"taskkill /F /PID 18848\")",
       "Bash(cmd /c \"taskkill /F /IM node.exe /T\")",
       "Bash(Select-String -Pattern \"ÊXITO|SUCCESS\" -CaseSensitive)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(cmd /c \"taskkill /PID 25808 /F\")"
     ],
     "deny": [],
     "ask": []

@@ -20,8 +20,5 @@ export type {
 } from "./EntityFilterBadges";
 
 // Helpers
-export {
-  createBadgeColorConfig,
-  BADGE_COLORS,
-} from "./helpers/badge-color-builder";
+export { BADGE_COLORS } from "./helpers/badge-color-builder";
 export type { TailwindColor } from "./helpers/badge-color-builder";
