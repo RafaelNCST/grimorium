@@ -17,7 +17,7 @@ import {
   reorderRegions,
 } from "@/lib/db/regions.service";
 import { useToast } from "@/hooks/use-toast";
-import { DeleteRegionConfirmationDialog } from "./delete-region-confirmation-dialog";
+import { DeleteEntityModal, type IEntityVersion } from "@/components/modals/delete-entity-modal";
 
 interface HierarchyManagerModalProps {
   open: boolean;
@@ -130,13 +130,15 @@ export function HierarchyManagerModal({
 
       {/* Delete Confirmation Dialog - Rendered independently to avoid z-index/size conflicts */}
       {showDeleteModal && (
-        <DeleteRegionConfirmationDialog
+        <DeleteEntityModal<IEntityVersion>
           isOpen={showDeleteModal}
           onClose={handleDeleteModalClose}
-          regionName={regionToDelete?.name || ""}
-          currentVersion={{ isMain: true } as any}
+          entityName={regionToDelete?.name || ""}
+          entityType="region"
+          currentVersion={{ isMain: true }}
           totalVersions={1}
           onConfirmDelete={confirmDelete}
+          i18nNamespace="world"
         />
       )}
     </>

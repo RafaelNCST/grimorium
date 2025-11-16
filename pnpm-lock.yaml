@@ -267,9 +267,6 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
-      lovable-tagger:
-        specifier: ^1.1.9
-        version: 1.1.10(vite@5.4.20(@types/node@22.18.8))
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -2631,9 +2628,6 @@ packages:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
 
-  estree-walker@3.0.3:
-    resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
-
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
@@ -3064,11 +3058,6 @@ packages:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
 
-  lovable-tagger@1.1.10:
-    resolution: {integrity: sha512-LbYaxi6vgrqg7Sq93/cRbIM78EP+X+GUU7spx804yqB2bxfiOej8UvcZHeE4WqMjAFI2dHGhXpy8r6SnvmrzGg==}
-    peerDependencies:
-      vite: '>=5.0.0 <8.0.0'
-
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
@@ -3079,9 +3068,6 @@ packages:
     resolution: {integrity: sha512-NTL7EbAao9IFtuSivSZgrAh4fZd09Lr+6MTkqIxuHaH2nnYiYIzXPo06cOxHg9wKLdj6LL8TByG4qpePqwgx/g==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0-rc
-
-  magic-string@0.30.19:
-    resolution: {integrity: sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw==}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -6417,10 +6403,6 @@ snapshots:
 
   estraverse@5.3.0: {}
 
-  estree-walker@3.0.3:
-    dependencies:
-      '@types/estree': 1.0.8
-
   esutils@2.0.3: {}
 
   eventemitter3@4.0.7: {}
@@ -6830,18 +6812,6 @@ snapshots:
     dependencies:
       js-tokens: 4.0.0
 
-  lovable-tagger@1.1.10(vite@5.4.20(@types/node@22.18.8)):
-    dependencies:
-      '@babel/parser': 7.28.4
-      '@babel/types': 7.28.4
-      esbuild: 0.25.10
-      estree-walker: 3.0.3
-      magic-string: 0.30.19
-      tailwindcss: 3.4.17
-      vite: 5.4.20(@types/node@22.18.8)
-    transitivePeerDependencies:
-      - ts-node
-
   lru-cache@10.4.3: {}
 
   lru-cache@5.1.1:
@@ -6851,10 +6821,6 @@ snapshots:
   lucide-react@0.462.0(react@18.3.1):
     dependencies:
       react: 18.3.1
-
-  magic-string@0.30.19:
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
 
   math-intrinsics@1.1.0: {}
 

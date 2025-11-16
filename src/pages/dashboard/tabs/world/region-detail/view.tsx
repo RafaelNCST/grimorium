@@ -47,7 +47,7 @@ import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/con
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 
-import { DeleteRegionConfirmationDialog } from "../components/delete-region-confirmation-dialog";
+import { DeleteEntityModal, type IEntityVersion } from "@/components/modals/delete-entity-modal";
 import { VersionManager } from "./components/version-manager";
 import { RegionTimeline } from "./components/region-timeline";
 import { type ITimelineEra } from "@/lib/db/regions.service";
@@ -1664,14 +1664,16 @@ export function RegionDetailView({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <DeleteRegionConfirmationDialog
+      <DeleteEntityModal<IRegionVersion>
         isOpen={showDeleteModal}
         onClose={onDeleteModalClose}
-        regionName={region.name}
+        entityName={region.name}
+        entityType="region"
         currentVersion={currentVersion}
         versionName={currentVersion?.name}
         totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
+        i18nNamespace="world"
       />
     </div>
   );
