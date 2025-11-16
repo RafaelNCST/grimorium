@@ -32,7 +32,6 @@ import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import {
   IRegion,
-  RegionScale,
   RegionSeason,
   IRegionFormData,
 } from "@/pages/dashboard/tabs/world/types/region-types";
@@ -54,6 +53,7 @@ interface CreateRegionModalProps {
   characters?: ICharacter[];
   races?: IRace[];
   items?: IItem[];
+  _unused?: never; // Marker to indicate legacy props are intentionally unused
 }
 
 const regionFormSchema = z.object({
@@ -119,10 +119,6 @@ export function CreateRegionModal({
   availableRegions = [],
   editRegion = null,
   bookId,
-  factions,
-  characters,
-  races,
-  items,
 }: CreateRegionModalProps) {
   const { t } = useTranslation("world");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -245,163 +241,160 @@ export function CreateRegionModal({
   };
 
   return (
-    <EntityModal
-      open={open}
-      onOpenChange={handleClose}
-      header={{
-        title: editRegion
-          ? t("create_region.edit_title")
-          : t("create_region.title"),
-        icon: Map,
-        description: t("description"),
-        warning:
-          "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.",
-      }}
-      basicFieldsTitle={t("create_region.basic_fields")}
-      basicFields={
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
-          >
-            {/* Image Upload */}
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <FormImageUpload
-                      value={field.value}
-                      onChange={field.onChange}
-                      label={t("create_region.image_label")}
-                      helperText={`opcional - ${t("create_region.image_recommended")}`}
-                      height="h-[28rem]"
-                      shape="rounded"
-                      placeholderIcon={Map}
-                      placeholderText={t("create_region.upload_image")}
-                      id="region-image-upload"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className="text-primary">
-                    {t("create_region.name_label")}
-                    <span className="text-destructive ml-1">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <FormInput
-                      {...field}
-                      placeholder={t("create_region.name_placeholder")}
-                      maxLength={200}
-                      error={fieldState.error?.message}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Parent Region */}
-            <FormField
-              control={form.control}
-              name="parentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary">
-                    {t("create_region.parent_label")}
-                    <span className="text-destructive ml-1">*</span>
-                  </FormLabel>
-                  <Select
-                    value={field.value || "neutral"}
-                    onValueChange={(value) =>
-                      field.onChange(value === "neutral" ? null : value)
-                    }
-                  >
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <EntityModal
+          open={open}
+          onOpenChange={handleClose}
+          header={{
+            title: editRegion
+              ? t("create_region.edit_title")
+              : t("create_region.title"),
+            icon: Map,
+            description: t("description"),
+            warning:
+              "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.",
+          }}
+          basicFieldsTitle={t("create_region.basic_fields")}
+          basicFields={
+            <div className="space-y-6">
+              {/* Image Upload */}
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("create_region.parent_placeholder")}
-                        />
-                      </SelectTrigger>
+                      <FormImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("create_region.image_label")}
+                        helperText={`opcional - ${t("create_region.image_recommended")}`}
+                        height="h-[28rem]"
+                        shape="rounded"
+                        placeholderIcon={Map}
+                        placeholderText={t("create_region.upload_image")}
+                        id="region-image-upload"
+                      />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="neutral">
-                        {t("create_region.parent_neutral")}
-                      </SelectItem>
-                      {availableRegions
-                        .filter((r) => r.id !== editRegion?.id)
-                        .map((region) => (
-                          <SelectItem key={region.id} value={region.id}>
-                            {region.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Scale Picker */}
-            <FormField
-              control={form.control}
-              name="scale"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-primary">
-                    {t("create_region.scale_label")}
-                    <span className="text-destructive ml-1">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <ScalePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Name */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="text-primary">
+                      {t("create_region.name_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <FormInput
+                        {...field}
+                        placeholder={t("create_region.name_placeholder")}
+                        maxLength={200}
+                        error={fieldState.error?.message}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Summary */}
-            <FormField
-              control={form.control}
-              name="summary"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className="text-primary">
-                    {t("create_region.summary_label")}
-                    <span className="text-destructive ml-1">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <FormTextarea
-                      {...field}
-                      placeholder={t("create_region.summary_placeholder")}
-                      rows={4}
-                      maxLength={500}
-                      showCharCount
-                      error={fieldState.error?.message}
-                      className="resize-none"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-      }
-      advancedFields={
+              {/* Parent Region */}
+              <FormField
+                control={form.control}
+                name="parentId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-primary">
+                      {t("create_region.parent_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
+                    <Select
+                      value={field.value || "neutral"}
+                      onValueChange={(value) =>
+                        field.onChange(value === "neutral" ? null : value)
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={t("create_region.parent_placeholder")}
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="neutral">
+                          {t("create_region.parent_neutral")}
+                        </SelectItem>
+                        {availableRegions
+                          .filter((r) => r.id !== editRegion?.id)
+                          .map((region) => (
+                            <SelectItem key={region.id} value={region.id}>
+                              {region.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Scale Picker */}
+              <FormField
+                control={form.control}
+                name="scale"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-primary">
+                      {t("create_region.scale_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <ScalePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Summary */}
+              <FormField
+                control={form.control}
+                name="summary"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="text-primary">
+                      {t("create_region.summary_label")}
+                      <span className="text-destructive ml-1">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <FormTextarea
+                        {...field}
+                        placeholder={t("create_region.summary_placeholder")}
+                        rows={4}
+                        maxLength={500}
+                        showCharCount
+                        error={fieldState.error?.message}
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          }
+          advancedFields={
         <>
           {/* Environment Section */}
           <div className="space-y-4">
@@ -828,22 +821,24 @@ export function CreateRegionModal({
             />
           </div>
         </>
-      }
-      footer={{
-        isSubmitting,
-        isValid: form.formState.isValid,
-        onSubmit: form.handleSubmit(handleSubmit),
-        onCancel: handleClose,
-        editMode: !!editRegion,
-        submitLabel: isSubmitting
-          ? editRegion
-            ? t("create_region.updating")
-            : t("create_region.creating")
-          : editRegion
-            ? t("create_region.save_button")
-            : t("create_region.create_button"),
-        cancelLabel: t("create_region.cancel_button"),
-      }}
-    />
+          }
+          footer={{
+            isSubmitting,
+            isValid: form.formState.isValid,
+            onSubmit: form.handleSubmit(handleSubmit),
+            onCancel: handleClose,
+            editMode: !!editRegion,
+            submitLabel: isSubmitting
+              ? editRegion
+                ? t("create_region.updating")
+                : t("create_region.creating")
+              : editRegion
+                ? t("create_region.save_button")
+                : t("create_region.create_button"),
+            cancelLabel: t("create_region.cancel_button"),
+          }}
+        />
+      </form>
+    </Form>
   );
 }
