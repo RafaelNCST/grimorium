@@ -17,7 +17,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
@@ -277,7 +276,6 @@ export function CreateRegionModal({
                         id="region-image-upload"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -286,7 +284,7 @@ export function CreateRegionModal({
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-primary">
                       {t("create_region.name_label")}
@@ -297,10 +295,8 @@ export function CreateRegionModal({
                         {...field}
                         placeholder={t("create_region.name_placeholder")}
                         maxLength={200}
-                        error={fieldState.error?.message}
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -341,7 +337,6 @@ export function CreateRegionModal({
                           ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -362,7 +357,6 @@ export function CreateRegionModal({
                         onChange={field.onChange}
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -371,7 +365,7 @@ export function CreateRegionModal({
               <FormField
                 control={form.control}
                 name="summary"
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-primary">
                       {t("create_region.summary_label")}
@@ -384,11 +378,9 @@ export function CreateRegionModal({
                         rows={4}
                         maxLength={500}
                         showCharCount
-                        error={fieldState.error?.message}
                         className="resize-none"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -406,7 +398,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="climate"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -416,7 +408,6 @@ export function CreateRegionModal({
                       rows={4}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -444,7 +435,6 @@ export function CreateRegionModal({
                       }
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -453,7 +443,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="generalDescription"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -465,7 +455,6 @@ export function CreateRegionModal({
                       rows={5}
                       maxLength={1000}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -492,7 +481,6 @@ export function CreateRegionModal({
                       labelClassName="text-sm font-medium text-primary"
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -652,7 +640,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="narrativePurpose"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -664,7 +652,6 @@ export function CreateRegionModal({
                       rows={3}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -678,7 +665,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="uniqueCharacteristics"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -690,7 +677,6 @@ export function CreateRegionModal({
                       rows={3}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -704,7 +690,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="politicalImportance"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -716,7 +702,6 @@ export function CreateRegionModal({
                       rows={3}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -730,7 +715,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="religiousImportance"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -742,7 +727,6 @@ export function CreateRegionModal({
                       rows={3}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -756,7 +740,7 @@ export function CreateRegionModal({
             <FormField
               control={form.control}
               name="worldPerception"
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <FormTextarea
@@ -768,7 +752,6 @@ export function CreateRegionModal({
                       rows={3}
                       maxLength={500}
                       showCharCount
-                      error={fieldState.error?.message}
                       className="resize-none"
                       labelClassName="text-primary"
                       showOptionalLabel={false}
@@ -794,7 +777,6 @@ export function CreateRegionModal({
                       labelClassName="text-sm font-medium text-primary"
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -815,7 +797,6 @@ export function CreateRegionModal({
                       labelClassName="text-sm font-medium text-primary"
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
