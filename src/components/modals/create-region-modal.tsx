@@ -278,7 +278,6 @@ export function CreateRegionModal({
                       placeholder={t("create_region.name_placeholder")}
                       maxLength={200}
                       error={fieldState.error?.message}
-                      showLabel={false}
                     />
                   </FormControl>
                   <FormMessage />
@@ -365,7 +364,6 @@ export function CreateRegionModal({
                       showCharCount
                       error={fieldState.error?.message}
                       className="resize-none"
-                      showLabel={false}
                     />
                   </FormControl>
                   <FormMessage />

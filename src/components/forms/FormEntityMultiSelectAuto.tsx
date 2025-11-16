@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -168,7 +169,7 @@ export function FormEntityMultiSelectAuto({
   noSelectionText,
   searchPlaceholder,
   noResultsText = "No results found",
-  counterText = "selected",
+  counterText,
   value,
   onChange,
   disabled = false,
@@ -177,9 +178,13 @@ export function FormEntityMultiSelectAuto({
   error,
   filter,
 }: FormEntityMultiSelectAutoProps) {
+  const { t } = useTranslation("common");
   const [searchQuery, setSearchQuery] = useState("");
   const [options, setOptions] = useState<EntityOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Use translated text if counterText not provided
+  const displayCounterText = counterText || t("form.selected");
 
   // Load entities from database
   useEffect(() => {
@@ -250,7 +255,7 @@ export function FormEntityMultiSelectAuto({
         </Label>
         {selectedOptions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedOptions.length} {counterText}
+            {selectedOptions.length} {displayCounterText}
           </span>
         )}
       </div>

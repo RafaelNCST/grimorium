@@ -37,14 +37,14 @@ export const RegionSchema = z.object({
   currentSeason: z.string().optional(),
   customSeasonName: z.string().optional(),
   generalDescription: z.string().optional(),
-  regionAnomalies: z.string().optional(),
+  regionAnomalies: z.array(z.string()).optional(),
 
-  // Arrays de IDs (JSON strings) - Information fields
-  residentFactions: z.string().optional(),
-  dominantFactions: z.string().optional(),
-  importantCharacters: z.string().optional(),
-  racesFound: z.string().optional(),
-  itemsFound: z.string().optional(),
+  // Arrays de IDs - Information fields
+  residentFactions: z.array(z.string()).optional(),
+  dominantFactions: z.array(z.string()).optional(),
+  importantCharacters: z.array(z.string()).optional(),
+  racesFound: z.array(z.string()).optional(),
+  itemsFound: z.array(z.string()).optional(),
 
   // Narrative fields
   narrativePurpose: z.string().optional(),
@@ -52,8 +52,8 @@ export const RegionSchema = z.object({
   politicalImportance: z.string().optional(),
   religiousImportance: z.string().optional(),
   worldPerception: z.string().optional(),
-  regionMysteries: z.string().optional(),
-  inspirations: z.string().optional(),
+  regionMysteries: z.array(z.string()).optional(),
+  inspirations: z.array(z.string()).optional(),
 });
 
 export type RegionFormData = z.infer<typeof RegionSchema>;

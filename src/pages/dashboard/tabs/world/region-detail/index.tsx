@@ -15,6 +15,7 @@ import {
   createRegionVersion,
   deleteRegionVersion,
   updateRegionVersion,
+  updateRegionVersionData,
   getRegionVersionTimeline,
   saveRegionVersionTimeline,
   type IRegionVersion,
@@ -720,10 +721,31 @@ export function RegionDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    if (!currentVersion || !editData) return;
+    console.log('[handleSave] Starting save...', { currentVersion, editData });
+    if (!currentVersion || !editData) {
+      console.log('[handleSave] Early return - missing currentVersion or editData');
+      return;
+    }
 
     try {
-      // Validar TUDO com Zod
+      console.log('[handleSave] Validating data...');
+
+      // Helper function to safely parse JSON strings to arrays
+      const parseArrayField = (field: any): string[] | undefined => {
+        if (!field) return undefined;
+        if (Array.isArray(field)) return field;
+        if (typeof field === 'string') {
+          try {
+            const parsed = JSON.parse(field);
+            return Array.isArray(parsed) ? parsed : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      };
+
+      // Validar TUDO com Zod (convertendo strings JSON para arrays)
       const validatedData = RegionSchema.parse({
         name: editData.name,
         scale: editData.scale,
@@ -734,19 +756,19 @@ export function RegionDetail() {
         currentSeason: editData.currentSeason,
         customSeasonName: editData.customSeasonName,
         generalDescription: editData.generalDescription,
-        regionAnomalies: editData.regionAnomalies,
-        residentFactions: editData.residentFactions,
-        dominantFactions: editData.dominantFactions,
-        importantCharacters: editData.importantCharacters,
-        racesFound: editData.racesFound,
-        itemsFound: editData.itemsFound,
+        regionAnomalies: parseArrayField(editData.regionAnomalies),
+        residentFactions: parseArrayField(editData.residentFactions),
+        dominantFactions: parseArrayField(editData.dominantFactions),
+        importantCharacters: parseArrayField(editData.importantCharacters),
+        racesFound: parseArrayField(editData.racesFound),
+        itemsFound: parseArrayField(editData.itemsFound),
         narrativePurpose: editData.narrativePurpose,
         uniqueCharacteristics: editData.uniqueCharacteristics,
         politicalImportance: editData.politicalImportance,
         religiousImportance: editData.religiousImportance,
         worldPerception: editData.worldPerception,
-        regionMysteries: editData.regionMysteries,
-        inspirations: editData.inspirations,
+        regionMysteries: parseArrayField(editData.regionMysteries),
+        inspirations: parseArrayField(editData.inspirations),
       });
 
       // Atualizar state com dados validados
@@ -777,8 +799,15 @@ export function RegionDetail() {
       const currentFieldVisibility = fieldVisibilityRef.current;
       const currentSectionVisibility = sectionVisibilityRef.current;
 
-      // Update region in database - pass ALL fields including visibility preferences
-      await updateRegion(regionId, {
+      // Helper function to ensure array fields are JSON strings for database
+      const ensureJsonString = (field: any): string | undefined => {
+        if (!field) return undefined;
+        if (typeof field === 'string') return field;
+        if (Array.isArray(field)) return JSON.stringify(field);
+        return undefined;
+      };
+
+      const dataToSave = {
         name: updatedRegion.name,
         parentId: updatedRegion.parentId,
         scale: updatedRegion.scale,
@@ -789,25 +818,41 @@ export function RegionDetail() {
         currentSeason: updatedRegion.currentSeason,
         customSeasonName: updatedRegion.customSeasonName,
         generalDescription: updatedRegion.generalDescription,
-        regionAnomalies: updatedRegion.regionAnomalies,
+        regionAnomalies: ensureJsonString(updatedRegion.regionAnomalies),
         // Information fields
-        residentFactions: updatedRegion.residentFactions,
-        dominantFactions: updatedRegion.dominantFactions,
-        importantCharacters: updatedRegion.importantCharacters,
-        racesFound: updatedRegion.racesFound,
-        itemsFound: updatedRegion.itemsFound,
+        residentFactions: ensureJsonString(updatedRegion.residentFactions),
+        dominantFactions: ensureJsonString(updatedRegion.dominantFactions),
+        importantCharacters: ensureJsonString(updatedRegion.importantCharacters),
+        racesFound: ensureJsonString(updatedRegion.racesFound),
+        itemsFound: ensureJsonString(updatedRegion.itemsFound),
         // Narrative fields
         narrativePurpose: updatedRegion.narrativePurpose,
         uniqueCharacteristics: updatedRegion.uniqueCharacteristics,
         politicalImportance: updatedRegion.politicalImportance,
         religiousImportance: updatedRegion.religiousImportance,
         worldPerception: updatedRegion.worldPerception,
-        regionMysteries: updatedRegion.regionMysteries,
-        inspirations: updatedRegion.inspirations,
+        regionMysteries: ensureJsonString(updatedRegion.regionMysteries),
+        inspirations: ensureJsonString(updatedRegion.inspirations),
         // Visibility preferences
         fieldVisibility: JSON.stringify(currentFieldVisibility),
         sectionVisibility: JSON.stringify(currentSectionVisibility),
-      });
+      };
+
+      // Check if we're editing the main version or an alternate version
+      const isMainVersion = currentVersion?.isMain ?? true;
+      console.log('[handleSave] isMainVersion:', isMainVersion);
+
+      if (isMainVersion) {
+        // Update the main region in database
+        console.log('[handleSave] Updating main region...');
+        await updateRegion(regionId, dataToSave);
+        console.log('[handleSave] Main region updated successfully');
+      } else {
+        // Update the alternate version's data in database
+        console.log('[handleSave] Updating alternate version...', currentVersion.id);
+        await updateRegionVersionData(currentVersion.id, updatedRegion);
+        console.log('[handleSave] Alternate version updated successfully');
+      }
 
       // Update original visibility to match saved state
       setOriginalFieldVisibility(currentFieldVisibility);
@@ -815,16 +860,22 @@ export function RegionDetail() {
 
       // Save timeline for current version
       if (currentVersion) {
+        console.log('[handleSave] Saving timeline...');
         await saveRegionVersionTimeline(currentVersion.id, timeline);
+        console.log('[handleSave] Timeline saved');
       }
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
 
       setErrors({}); // Limpar erros
+      console.log('[handleSave] Exiting edit mode...');
       setIsEditing(false);
+      console.log('[handleSave] Save completed successfully!');
     } catch (error) {
+      console.error('[handleSave] Error caught:', error);
       if (error instanceof z.ZodError) {
+        console.error('[handleSave] Zod validation errors:', error.errors);
         // Mapear erros para cada campo
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {

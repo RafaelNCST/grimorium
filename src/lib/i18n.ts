@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enCommon from "../../locales/en/common.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
 import enCreateBook from "../../locales/en/create-book.json";
@@ -22,6 +23,7 @@ import enRaceDetail from "../../locales/en/race-detail.json";
 import enRaces from "../../locales/en/races.json";
 import enRegionDetail from "../../locales/en/region-detail.json";
 import enWorld from "../../locales/en/world.json";
+import ptCommon from "../../locales/pt/common.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
@@ -46,6 +48,7 @@ import ptWorld from "../../locales/pt/world.json";
 
 const resources = {
   en: {
+    common: enCommon,
     home: enHome,
     inbox: enInbox,
     characters: enCharacters,
@@ -69,6 +72,7 @@ const resources = {
     world: enWorld,
   },
   pt: {
+    common: ptCommon,
     home: ptHome,
     inbox: ptInbox,
     characters: ptCharacters,
