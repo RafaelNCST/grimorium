@@ -75,6 +75,10 @@ export interface SearchConfig {
    * Placeholder text
    */
   placeholder: string;
+  /**
+   * Optional max width for the search bar (default: max-w-md)
+   */
+  maxWidth?: string;
 }
 
 /**
@@ -324,6 +328,7 @@ export function EntityListLayout<T extends string = string>({
           value={search.value}
           onChange={search.onChange}
           placeholder={search.placeholder}
+          maxWidth={search.maxWidth}
         />
       )}
 

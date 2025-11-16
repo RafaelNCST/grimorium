@@ -1,19 +1,14 @@
-import { memo, useState } from "react";
+import { useState } from "react";
 
-import { Calendar, Filter, Plus, Search, SearchX, Users } from "lucide-react";
+import { Plus, Users, Filter, Search as SearchIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyState } from "@/components/empty-state";
+import { EntityListLayout, EntityCardList } from "@/components/layouts";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
-import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
-import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useCharactersStore } from "@/stores/characters-store";
 import { ICharacter, ICharacterFormData } from "@/types/character-types";
+
+import { CharacterCard } from "./components/character-card";
+import { createRoleFilterRows } from "./helpers/role-filter-config";
 
 interface IRoleStats {
   total: number;
@@ -38,7 +33,7 @@ interface CharactersViewProps {
   onCharacterClick: (characterId: string) => void;
 }
 
-const CharactersViewComponent = function CharactersView({
+export function CharactersView({
   bookId,
   characters,
   filteredCharacters,
@@ -51,8 +46,7 @@ const CharactersViewComponent = function CharactersView({
   onCharacterCreated,
   onCharacterClick,
 }: CharactersViewProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { t } = useTranslation(["characters", "create-character"] as any);
+  const { t } = useTranslation(["characters", "create-character"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreateCharacter = (formData: ICharacterFormData) => {
@@ -67,235 +61,84 @@ const CharactersViewComponent = function CharactersView({
     setIsModalOpen(false);
   };
 
+  // Configure filter rows
+  const filterRows = createRoleFilterRows(roleStats, t);
+
+  // Determine which empty state to show
+  const hasNoResults = filteredCharacters.length === 0 && characters.length > 0;
+  const hasSearch = searchTerm.trim().length > 0;
+  const hasFilters = selectedRoles.length > 0;
+
   return (
-    <div className="flex-1 h-full flex flex-col space-y-6">
-      {/* Header with compact role stats */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">{t("characters:page.title")}</h2>
-          <p className="text-muted-foreground">
-            {t("characters:page.description")}
-          </p>
-          {characters.length > 0 && (
-            <div className="flex items-center gap-4 mt-2">
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.length === 0
-                    ? "!bg-primary !text-white !border-primary"
-                    : "bg-background text-foreground border-border hover:!bg-primary hover:!text-white hover:!border-primary"
-                }`}
-                onClick={onClearFilters}
-              >
-                {roleStats.total} {t("characters:page.total_badge")}
-              </Badge>
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.includes("protagonist")
-                    ? "!bg-yellow-500 !text-black !border-yellow-500"
-                    : "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400"
-                }`}
-                onClick={() => onRoleFilterChange("protagonist")}
-              >
-                {roleStats.protagonist} {t("characters:page.protagonist_badge")}
-              </Badge>
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.includes("antagonist")
-                    ? "!bg-orange-500 !text-black !border-orange-500"
-                    : "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500"
-                }`}
-                onClick={() => onRoleFilterChange("antagonist")}
-              >
-                {roleStats.antagonist} {t("characters:page.antagonist_badge")}
-              </Badge>
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.includes("villain")
-                    ? "!bg-red-500 !text-black !border-red-500"
-                    : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500"
-                }`}
-                onClick={() => onRoleFilterChange("villain")}
-              >
-                {roleStats.villain} {t("characters:page.villain_badge")}
-              </Badge>
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.includes("secondary")
-                    ? "!bg-blue-500 !text-black !border-blue-500"
-                    : "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500"
-                }`}
-                onClick={() => onRoleFilterChange("secondary")}
-              >
-                {roleStats.secondary} {t("characters:page.secondary_badge")}
-              </Badge>
-              <Badge
-                className={`cursor-pointer border transition-colors ${
-                  selectedRoles.includes("extra")
-                    ? "!bg-gray-500 !text-black !border-gray-500"
-                    : "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500"
-                }`}
-                onClick={() => onRoleFilterChange("extra")}
-              >
-                {roleStats.extra} {t("characters:page.extra_badge")}
-              </Badge>
-            </div>
+    <>
+      <EntityListLayout
+        isLoading={false}
+        isEmpty={characters.length === 0}
+        emptyState={{
+          icon: Users,
+          title: t("characters:empty_state.no_characters"),
+          description: t("characters:empty_state.no_characters_description"),
+        }}
+        header={{
+          title: t("characters:page.title"),
+          description: t("characters:page.description"),
+          primaryAction: {
+            label: t("characters:page.new_character"),
+            onClick: () => setIsModalOpen(true),
+            variant: "magical",
+            icon: Plus,
+            className: "animate-glow",
+          },
+        }}
+        filters={{
+          totalCount: roleStats.total,
+          totalLabel: t("characters:page.total_badge"),
+          selectedFilters: selectedRoles,
+          filterRows: filterRows,
+          onFilterToggle: onRoleFilterChange,
+          onClearFilters: onClearFilters,
+        }}
+        search={{
+          value: searchTerm,
+          onChange: onSearchTermChange,
+          placeholder: t("characters:page.search_placeholder"),
+          maxWidth: "max-w-[50%]",
+        }}
+        showNoResultsState={hasNoResults}
+        noResultsState={{
+          icon: hasFilters ? Filter : SearchIcon,
+          title: hasFilters
+            ? t("characters:empty_state.no_role_characters", {
+                role: selectedRoles
+                  .map((role) => t(`create-character:role.${role}`) as string)
+                  .join(", ")
+                  .toLowerCase(),
+              })
+            : t("characters:empty_state.no_results"),
+          description: hasFilters
+            ? t("characters:empty_state.no_role_characters_description")
+            : t("characters:empty_state.no_results_description"),
+        }}
+      >
+        <EntityCardList
+          items={filteredCharacters}
+          renderCard={(character) => (
+            <CharacterCard
+              key={character.id}
+              character={character}
+              onClick={onCharacterClick}
+            />
           )}
-        </div>
-        <Button
-          variant="magical"
-          size="lg"
-          data-testid="create-character-trigger"
-          className="animate-glow"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          {t("characters:page.new_character")}
-        </Button>
-      </div>
+          gridCols={{ sm: 1, md: 2, lg: 3, xl: 4, "2xl": 5 }}
+        />
+      </EntityListLayout>
 
       <CreateCharacterModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleCreateCharacter}
+        bookId={bookId}
       />
-
-      {/* Search Filter */}
-      {characters.length > 0 && (
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("characters:page.search_placeholder")}
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      )}
-
-      {/* Characters List */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] max-[2500px]:grid-cols-5 gap-4">
-        {filteredCharacters.map((character) => {
-          // Find role data
-          const roleData = CHARACTER_ROLES_CONSTANT.find(
-            (r) => r.value === character.role
-          );
-          const RoleIcon = roleData?.icon;
-
-          // Find gender data
-          const genderData = GENDERS_CONSTANT.find(
-            (g) => g.value === character.gender
-          );
-          const GenderIcon = genderData?.icon;
-
-          return (
-            <Card
-              key={character.id}
-              className="card-magical cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
-              onClick={() => onCharacterClick(character.id)}
-            >
-              <CardContent className="p-5 space-y-4">
-                {/* Top Section: Image + Name/Age/Gender/Role */}
-                <div className="flex gap-4">
-                  {/* Character Image - Circular */}
-                  <Avatar className="w-20 h-20 flex-shrink-0">
-                    <AvatarImage
-                      src={character.image}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                      {character.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  {/* Name, Age, Gender, and Role */}
-                  <div className="flex-1 min-w-0 space-y-2">
-                    <CardTitle className="text-base font-bold line-clamp-2">
-                      {character.name}
-                    </CardTitle>
-
-                    <div className="flex flex-wrap gap-x-3 gap-y-1">
-                      {character.age && (
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-sm font-medium text-muted-foreground">
-                            {character.age}
-                          </span>
-                        </div>
-                      )}
-                      {character.gender && GenderIcon && (
-                        <div className="flex items-center gap-1.5">
-                          <GenderIcon className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-sm font-medium text-muted-foreground capitalize">
-                            {t(`create-character:gender.${character.gender}`)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Role Badge */}
-                    <div className="flex">
-                      <Badge
-                        className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
-                      >
-                        {RoleIcon && (
-                          <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
-                        )}
-                        <span className="text-xs font-medium">
-                          {t(`create-character:role.${character.role}`)}
-                        </span>
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                  {character.description}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {filteredCharacters.length === 0 && (
-        <EmptyState
-          icon={
-            characters.length === 0
-              ? Users
-              : selectedRoles.length > 0
-                ? Filter
-                : SearchX
-          }
-          title={
-            characters.length === 0
-              ? t("characters:empty_state.no_characters")
-              : selectedRoles.length > 0
-                ? t("characters:empty_state.no_role_characters", {
-                    role: selectedRoles
-                      .map(
-                        (role) => t(`create-character:role.${role}`) as string
-                      )
-                      .join(", ")
-                      .toLowerCase(),
-                  })
-                : t("characters:empty_state.no_results")
-          }
-          description={
-            characters.length === 0
-              ? t("characters:empty_state.no_characters_description")
-              : selectedRoles.length > 0
-                ? t("characters:empty_state.no_role_characters_description")
-                : t("characters:empty_state.no_results_description")
-          }
-        />
-      )}
-    </div>
+    </>
   );
-};
-
-export const CharactersView = memo(CharactersViewComponent);
+}

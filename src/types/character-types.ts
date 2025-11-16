@@ -49,7 +49,7 @@ export interface ICharacter {
   eyes?: string;
   face?: string;
   distinguishingFeatures?: string;
-  speciesAndRace?: string;
+  speciesAndRace?: string[];
 
   // Behavior and Tastes
   archetype?: string;
@@ -64,7 +64,7 @@ export interface ICharacter {
   alignment?: string;
 
   // Locations and Organizations
-  birthPlace?: string;
+  birthPlace?: string[];
   affiliatedPlace?: string;
   organization?: string;
 
@@ -105,7 +105,7 @@ export interface ICharacterFormData {
   eyes: string;
   face: string;
   distinguishingFeatures: string;
-  speciesAndRace: string;
+  speciesAndRace: string[];
 
   // Behavior and Tastes (Advanced)
   archetype: string;
@@ -120,7 +120,7 @@ export interface ICharacterFormData {
   alignment: string;
 
   // Locations and Organizations (Advanced)
-  birthPlace: string;
+  birthPlace: string[];
   affiliatedPlace: string;
   organization: string;
 }

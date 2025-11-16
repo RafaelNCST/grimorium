@@ -60,6 +60,10 @@ interface FormImageUploadProps {
    */
   placeholderText?: string;
   /**
+   * Size of placeholder text (default: text-sm)
+   */
+  placeholderTextSize?: string;
+  /**
    * Accepted file types
    */
   accept?: string;
@@ -137,6 +141,7 @@ export function FormImageUpload({
   imageFit = "fill",
   placeholderIcon: PlaceholderIcon = ImagePlus,
   placeholderText = "Click to upload image",
+  placeholderTextSize = "text-sm",
   accept = "image/png,image/jpeg,image/jpg,image/webp,image/gif",
   error,
   id = "image-upload",
@@ -233,7 +238,7 @@ export function FormImageUpload({
               className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}
             >
               <PlaceholderIcon className="h-8 w-8 text-muted-foreground/60" />
-              <span className="text-sm text-muted-foreground">
+              <span className={`${placeholderTextSize} text-muted-foreground`}>
                 {placeholderText}
               </span>
             </div>

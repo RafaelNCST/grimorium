@@ -9,6 +9,7 @@ interface PropsCreateCharacterModal {
   open: boolean;
   onClose: () => void;
   onConfirm: (characterData: ICharacterFormData) => void;
+  bookId: string;
   species?: Array<{ id: string; name: string }>;
   locations?: Array<{ id: string; name: string }>;
   organizations?: Array<{ id: string; name: string }>;
@@ -18,6 +19,7 @@ export function CreateCharacterModal({
   open,
   onClose,
   onConfirm,
+  bookId,
   species = [],
   locations = [],
   organizations = [],
@@ -76,6 +78,7 @@ export function CreateCharacterModal({
       onClose={handleClose}
       onSubmit={onSubmit}
       isValid={isValid}
+      bookId={bookId}
       hasSpecies={hasSpecies}
       hasLocations={hasLocations}
       hasOrganizations={hasOrganizations}

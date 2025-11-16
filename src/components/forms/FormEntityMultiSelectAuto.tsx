@@ -94,6 +94,11 @@ interface FormEntityMultiSelectAutoProps {
    * Optional filter function to exclude certain entities
    */
   filter?: (entity: EntityOption) => boolean;
+  /**
+   * Maximum number of selections allowed (optional)
+   * When set, prevents selecting more than this number of items
+   */
+  maxSelections?: number;
 }
 
 // Import services dynamically based on entity type
@@ -186,6 +191,7 @@ export function FormEntityMultiSelectAuto({
   labelClassName = "text-sm font-medium text-primary",
   error,
   filter,
+  maxSelections,
 }: FormEntityMultiSelectAutoProps) {
   const { t } = useTranslation("common");
   const [searchQuery, setSearchQuery] = useState("");
@@ -216,12 +222,20 @@ export function FormEntityMultiSelectAuto({
   const selectedOptions = options.filter((opt) => value.includes(opt.id));
   const availableOptions = options.filter((opt) => !value.includes(opt.id));
 
+  // Check if max selections is reached
+  const isMaxReached = maxSelections !== undefined && value.length >= maxSelections;
+
   // Filter available options by search query
   const filteredOptions = availableOptions.filter((opt) =>
     opt.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleAdd = (optionId: string) => {
+    // Check if max selections is reached
+    if (maxSelections !== undefined && value.length >= maxSelections) {
+      return;
+    }
+
     if (!value.includes(optionId)) {
       onChange([...value, optionId]);
       setSearchQuery(""); // Clear search after selection
@@ -264,7 +278,8 @@ export function FormEntityMultiSelectAuto({
         </Label>
         {selectedOptions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedOptions.length} {displayCounterText}
+            {selectedOptions.length}
+            {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
           </span>
         )}
       </div>
@@ -276,8 +291,17 @@ export function FormEntityMultiSelectAuto({
         </div>
       ) : (
         <>
+          {/* Max selections reached message */}
+          {isMaxReached && (
+            <div className="text-center py-3 text-xs text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
+              <p>
+                {t("form.max_selections_reached", { max: maxSelections })}
+              </p>
+            </div>
+          )}
+
           {/* Dropdown selector */}
-          {availableOptions.length > 0 && (
+          {availableOptions.length > 0 && !isMaxReached && (
             <Select onValueChange={handleAdd} disabled={disabled}>
               <SelectTrigger>
                 <SelectValue placeholder={placeholder} />

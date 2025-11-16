@@ -120,6 +120,7 @@ export function WorldView({
           value: searchQuery,
           onChange: onSearchChange,
           placeholder: t("search_placeholder"),
+          maxWidth: "max-w-[50%]",
         }}
         showNoResultsState={regions.length === 0}
         noResultsState={{

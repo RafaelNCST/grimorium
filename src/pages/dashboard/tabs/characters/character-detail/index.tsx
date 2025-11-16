@@ -75,6 +75,7 @@ export function CharacterDetail() {
     gender: "",
     description: "",
     alignment: "",
+    birthPlace: [],
     qualities: [],
     relationships: [],
     family: {
@@ -802,6 +803,7 @@ export function CharacterDetail() {
       character={character}
       editData={editData}
       isEditing={isEditing}
+      bookId={dashboardId}
       versions={versions}
       currentVersion={currentVersion}
       showDeleteModal={showDeleteModal}

@@ -1,6 +1,7 @@
 {
   "form": {
     "selected": "selected",
-    "selected_plural": "selected"
+    "selected_plural": "selected",
+    "max_selections_reached": "Maximum of {{max}} selection(s) reached"
   }
 }

@@ -22,7 +22,7 @@ const DEFAULT_FORM_VALUES: CharacterFormSchema = {
   eyes: "",
   face: "",
   distinguishingFeatures: "",
-  speciesAndRace: "",
+  speciesAndRace: [],
   archetype: "",
   personality: "",
   hobbies: "",
@@ -31,7 +31,7 @@ const DEFAULT_FORM_VALUES: CharacterFormSchema = {
   favoriteFood: "",
   favoriteMusic: "",
   alignment: "",
-  birthPlace: "",
+  birthPlace: [],
   affiliatedPlace: "",
   organization: "",
 };

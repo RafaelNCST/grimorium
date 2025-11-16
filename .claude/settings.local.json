@@ -144,7 +144,15 @@
       "Bash(git checkout:*)",
       "Bash(cmd /c \"taskkill /PID 25808 /F\")",
       "Bash(cmd /c \"taskkill /F /PID 24876\")",
-      "Bash(Select-String -Pattern \"error TS|CreateVersion|version-manager|region-detail\" -Context 1,1)"
+      "Bash(Select-String -Pattern \"error TS|CreateVersion|version-manager|region-detail\" -Context 1,1)",
+      "Bash(Select-String -Pattern \"error TS|character\" -Context 0,1)",
+      "Bash(Select-Object -First 30)",
+      "Bash(Select-String -Pattern \"role-filter-config|EntityFilterBadges|error TS\" -Context 1,1)",
+      "Bash(cmd /c \"for /f \"\"tokens=5\"\" %a in (''netstat -ano ^| findstr :8080 ^| findstr LISTENING'') do @taskkill /F /PID %a\")",
+      "Bash(Select-String -Pattern \"filterRows|hoverClass|colorConfig\" -Context 3,3)",
+      "Bash(/tmp/old_characters_view.tsx)",
+      "Bash(cmd /c \"taskkill /F /PID 38708\")",
+      "Bash(cmd //c \"taskkill //F //PID 38708\")"
     ],
     "deny": [],
     "ask": []

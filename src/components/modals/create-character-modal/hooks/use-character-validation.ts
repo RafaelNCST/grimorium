@@ -25,7 +25,7 @@ export const characterFormSchema = z.object({
   eyes: z.string().optional(),
   face: z.string().optional(),
   distinguishingFeatures: z.string().optional(),
-  speciesAndRace: z.string().optional(),
+  speciesAndRace: z.array(z.string()).optional(),
 
   // Behavior and Tastes (Advanced - all optional)
   archetype: z.string().optional(),
@@ -49,7 +49,7 @@ export const characterFormSchema = z.object({
   alignment: z.string().optional(),
 
   // Locations and Organizations (Advanced - all optional)
-  birthPlace: z.string().optional(),
+  birthPlace: z.array(z.string()).optional(),
   affiliatedPlace: z.string().optional(),
   organization: z.string().optional(),
 });

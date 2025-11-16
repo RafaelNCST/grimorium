@@ -118,7 +118,8 @@ export function [Entidade]View({ entities, isLoading, ... }: Props) {
         search={{
           value: searchQuery,
           onChange: onSearchChange,
-          placeholder: "Buscar..."
+          placeholder: "Buscar...",
+          maxWidth: "max-w-[50%]", // Opcional: define largura máxima (padrão: max-w-md)
         }}
       >
         <EntityCardList
@@ -139,63 +140,164 @@ export function [Entidade]View({ entities, isLoading, ... }: Props) {
 
 ### 1.3 Card da Entidade
 
-**IMPORTANTE:** Cada card é **específico** para sua tab. Não há componente reutilizável de card - apenas o comportamento de hover é padrão.
+**IMPORTANTE:** Cada card é **específico** para sua tab. Não há componente reutilizável de card - apenas o **comportamento de hover é padrão**.
 
 **Componentes base:** `@/components/ui/card` (Card, CardContent, CardHeader, CardFooter)
 
-**Padrões comuns:**
-- ✅ `cursor-pointer` - Clicável
-- ✅ `hover:border-primary/50` - Borda animada no hover
-- ✅ `transition-all duration-300` - Transições suaves
-- ✅ Overlay com "Ver detalhes" no hover da imagem
+---
 
-**Exemplo (RegionCard):**
+#### Hover Padrão (SEMPRE aplicar)
+
+**1. No Card principal:**
+```tsx
+className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
+```
+**⚠️ IMPORTANTE:** Adicionar `relative` para que o overlay funcione corretamente.
+
+**2. Overlay "Ver detalhes" cobrindo o card inteiro:**
+- O overlay cobre **todo o card**, não apenas a imagem
+- Sempre usar `rounded-lg` (borda do card) e texto `text-lg`
+
+**Pattern completo:**
+```tsx
+const [isHovered, setIsHovered] = useState(false);
+
+<Card
+  className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
+  onClick={() => onClick?.(id)}
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+>
+  <CardContent>
+    {/* Conteúdo do card (imagem, textos, badges, etc) */}
+  </CardContent>
+
+  {/* Overlay cobrindo todo o card */}
+  <div
+    className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg ${
+      isHovered ? "opacity-100" : "opacity-0"
+    }`}
+  >
+    <span className="text-white text-lg font-semibold">
+      Ver detalhes
+    </span>
+  </div>
+</Card>
+```
+
+**⚠️ IMPORTANTE:**
+- O overlay deve estar **fora** do `CardContent`, mas **dentro** do `Card`
+- Sempre adicionar `z-10` no overlay
+- Sempre adicionar `relative` no Card
+
+---
+
+#### Exemplo 1: Card com Imagem Grande (RegionCard)
+
 ```tsx
 export function RegionCard({ region, onClick, parentRegion }: Props) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Card
-      className="cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
+      className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
       onClick={() => onClick?.(region.id)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-0">
-        {/* Imagem com overlay no hover */}
-        <div className="relative w-full h-[28rem]">
+        {/* Imagem grande */}
+        <div className="w-full h-[28rem]">
           <img src={region.image} className="w-full h-full object-fill rounded-t-lg" />
-          <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-t-lg ${isHovered ? "opacity-100" : "opacity-0"}`}>
-            <span className="text-white text-lg font-semibold">Ver detalhes</span>
-          </div>
         </div>
 
         {/* Conteúdo único da região */}
         <div className="p-4 space-y-3">
           <h3 className="font-semibold text-lg">{region.name}</h3>
-
-          {/* Badges específicos (escala, região pai) */}
           <div className="flex gap-1.5">
             <Badge>{region.scale}</Badge>
             {parentRegion && <Badge>{parentRegion.name}</Badge>}
           </div>
-
-          {/* Resumo */}
           <p className="text-sm text-muted-foreground line-clamp-3">
             {region.summary}
           </p>
         </div>
       </CardContent>
+
+      {/* Overlay cobrindo todo o card */}
+      <div
+        className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="text-white text-lg font-semibold">Ver detalhes</span>
+      </div>
     </Card>
   );
 }
 ```
 
+---
+
+#### Exemplo 2: Card com Avatar Pequeno (CharacterCard)
+
+```tsx
+export function CharacterCard({ character, onClick }: Props) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Card
+      className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
+      onClick={() => onClick?.(character.id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <CardContent className="p-5 space-y-4">
+        <div className="flex gap-4">
+          {/* Avatar pequeno */}
+          <Avatar className="w-20 h-20 flex-shrink-0">
+            <AvatarImage src={character.image} className="object-cover" />
+            <AvatarFallback>...</AvatarFallback>
+          </Avatar>
+
+          {/* Conteúdo único do personagem */}
+          <div className="flex-1 min-w-0 space-y-2">
+            <CardTitle className="text-base font-bold">{character.name}</CardTitle>
+            <Badge className={roleData?.bgColorClass}>
+              {character.role}
+            </Badge>
+          </div>
+        </div>
+
+        <p className="text-sm text-muted-foreground line-clamp-3">
+          {character.description}
+        </p>
+      </CardContent>
+
+      {/* Overlay cobrindo todo o card */}
+      <div
+        className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="text-white text-lg font-semibold">
+          Ver detalhes
+        </span>
+      </div>
+    </Card>
+  );
+}
+```
+
+---
+
 **Customize conforme sua entidade:**
 - Estrutura do conteúdo (cabeçalho, corpo, rodapé)
 - Badges e tags
 - Informações exibidas
-- Tamanho e proporção da imagem
+- Tamanho e proporção da imagem/avatar
+- Border-radius do overlay (rounded-t-lg, rounded-full, etc.)
+- Tamanho do texto do overlay (text-lg, text-xs, etc.)
 - Ícone placeholder quando sem imagem
 
 ### 1.4 Modal de Criação
@@ -405,7 +507,181 @@ export interface IEntityFormData extends Omit<IEntity, 'id' | 'createdAt' | 'upd
 
 ---
 
-## Passo 4: Validação com Zod
+## Passo 4: Configuração de Filtros
+
+**Arquivo:** `helpers/filter-config.ts`
+
+Se a sua tab tiver filtros (badges clicáveis para filtrar entidades), você deve criar uma função helper que retorna a configuração dos filtros.
+
+### 4.1 Estrutura do Filter Config
+
+```tsx
+import { FilterRow } from "@/components/entity-list";
+
+export interface [Tipo]Stats {
+  total: number;
+  // ... stats para cada tipo de filtro
+}
+
+/**
+ * Creates filter rows configuration for [entidade]
+ */
+export function create[Tipo]FilterRows(
+  stats: [Tipo]Stats,
+  t: (key: string) => string
+): FilterRow<string>[] {
+  return [
+    {
+      id: "[tipo]-filters",
+      items: [
+        {
+          value: "filter1",
+          label: t("namespace:key"),
+          count: stats.filter1,
+          colorConfig: {
+            color: "colorName",
+            inactiveClasses: "...",
+            activeClasses: "...",
+          },
+        },
+        // ... mais filtros
+      ],
+    },
+  ];
+}
+```
+
+### 4.2 Color Config (IMPORTANTE)
+
+O `colorConfig` controla as cores do badge em dois estados:
+
+**`inactiveClasses`** - Badge não selecionado:
+- Background translúcido (`bg-[color]-500/10`)
+- Border colorido (`border-[color]-500/30`)
+- Texto colorido (`text-[color]-600 dark:text-[color]-400`)
+- **⚠️ IMPORTANTE: Classes de hover (`hover:!bg-[color]-500 hover:!text-black hover:!border-[color]-500`)**
+
+**`activeClasses`** - Badge selecionado:
+- Background sólido (`!bg-[color]-500`)
+- Texto preto (`!text-black`)
+- Border sólido (`!border-[color]-500`)
+
+**⚠️ ATENÇÃO:** As classes de `hover:` devem estar **incluídas nas `inactiveClasses`**, não em uma propriedade separada. Se você esquecer as classes de hover, todos os filtros terão hover roxo (padrão do Badge).
+
+### 4.3 Exemplo Completo
+
+```tsx
+import { FilterRow } from "@/components/entity-list";
+
+export interface RoleStats {
+  total: number;
+  protagonist: number;
+  antagonist: number;
+  villain: number;
+  secondary: number;
+  extra: number;
+}
+
+export function createRoleFilterRows(
+  stats: RoleStats,
+  t: (key: string) => string
+): FilterRow<string>[] {
+  return [
+    {
+      id: "character-roles",
+      items: [
+        {
+          value: "protagonist",
+          label: t("characters:page.protagonist_badge"),
+          count: stats.protagonist,
+          colorConfig: {
+            color: "yellow",
+            // ⚠️ Note as classes de hover no final das inactiveClasses:
+            inactiveClasses: "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400",
+            activeClasses: "!bg-yellow-500 !text-black !border-yellow-500",
+          },
+        },
+        {
+          value: "antagonist",
+          label: t("characters:page.antagonist_badge"),
+          count: stats.antagonist,
+          colorConfig: {
+            color: "orange",
+            inactiveClasses: "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500",
+            activeClasses: "!bg-orange-500 !text-black !border-orange-500",
+          },
+        },
+        {
+          value: "villain",
+          label: t("characters:page.villain_badge"),
+          count: stats.villain,
+          colorConfig: {
+            color: "red",
+            inactiveClasses: "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500",
+            activeClasses: "!bg-red-500 !text-black !border-red-500",
+          },
+        },
+        {
+          value: "secondary",
+          label: t("characters:page.secondary_badge"),
+          count: stats.secondary,
+          colorConfig: {
+            color: "blue",
+            inactiveClasses: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
+            activeClasses: "!bg-blue-500 !text-black !border-blue-500",
+          },
+        },
+        {
+          value: "extra",
+          label: t("characters:page.extra_badge"),
+          count: stats.extra,
+          colorConfig: {
+            color: "gray",
+            inactiveClasses: "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500",
+            activeClasses: "!bg-gray-500 !text-black !border-gray-500",
+          },
+        },
+      ],
+    },
+  ];
+}
+```
+
+### 4.4 Uso no Container
+
+```tsx
+// No index.tsx (container)
+import { createRoleFilterRows } from "./helpers/role-filter-config";
+
+export function CharactersTab() {
+  const { t } = useTranslation();
+
+  // Calcular stats
+  const roleStats = useMemo(() => ({
+    total: characters.length,
+    protagonist: characters.filter(c => c.role === "protagonist").length,
+    antagonist: characters.filter(c => c.role === "antagonist").length,
+    // ... outros
+  }), [characters]);
+
+  // Criar filter rows
+  const filterRows = useMemo(
+    () => createRoleFilterRows(roleStats, t),
+    [roleStats, t]
+  );
+
+  return (
+    <CharactersView
+      filterRows={filterRows}
+      // ...
+    />
+  );
+}
+```
+
+---
+
+## Passo 5: Validação com Zod
 
 **Arquivo:** `lib/validation/[entidade]-schema.ts`
 
@@ -474,7 +750,8 @@ export const EntitySchema = z.object({
 - [ ] Criar `[entidade]-card.tsx` para renderizar cada item
 - [ ] Criar `types/[entidade]-types.ts` com interfaces
 - [ ] Criar modal de criação usando `EntityModal`
-- [ ] Implementar filtros e busca
+- [ ] Criar `helpers/filter-config.ts` com colorConfig incluindo classes de hover
+- [ ] Implementar filtros e busca no container
 - [ ] Configurar navegação para detalhes
 
 ### Detalhes

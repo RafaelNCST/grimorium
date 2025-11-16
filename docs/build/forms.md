@@ -68,10 +68,24 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 
 ---
 
-## 8. FormSelectGrid (Grid de Seleção)
+## 8. FormSelectGrid (Grid de Seleção com Descrição)
 **Componente:** `FormSelectGrid` (`src/components/forms/FormSelectGrid.tsx`)
-**Uso:** Seleção visual em grid com ícones (Escala, Estação, Tipos)
-**Descrição:** Grid de botões com ícones, descrições e cores customizáveis. Suporta conteúdo expandido (ex: input customizado)
+**Uso:** Seleção visual em grid com ícones e descrições (Escala, Estação, Arquétipos, Alinhamento D&D)
+**Descrição:** Grid de botões com ícones à esquerda, label e descrição à direita. Cores customizáveis seguindo o padrão visual do projeto.
+
+**⚠️ IMPORTANTE - Classes de Cor Obrigatórias:**
+Para manter a consistência visual com o resto do projeto, você **DEVE** passar as classes de cor manualmente para cada opção:
+
+- **`baseColorClass`**: Estado neutro/não selecionado
+  - Padrão: `"bg-card text-muted-foreground border-border"`
+
+- **`hoverColorClass`**: Estado hover (fundo transparente colorido + borda colorida fraca)
+  - Padrão: `"hover:bg-{cor}-500/10 hover:border-{cor}-500/20"`
+  - Exemplo: `"hover:bg-emerald-500/10 hover:border-emerald-500/20"`
+
+- **`activeColorClass`**: Estado selecionado (fundo transparente colorido mais forte + borda colorida + ring)
+  - Padrão: `"bg-{cor}-500/20 border-{cor}-500/30 ring-2 ring-{cor}-500/50 text-white"`
+  - Exemplo: `"bg-emerald-500/20 border-emerald-500/30 ring-2 ring-emerald-500/50 text-white"`
 
 **Exemplo de uso:**
 ```tsx
@@ -87,9 +101,9 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
       label: "Local",
       description: "Cidades, vilas, florestas",
       icon: MapPin,
-      baseColorClass: "bg-background",
-      hoverColorClass: "hover:bg-emerald-500",
-      activeColorClass: "bg-emerald-500 text-white",
+      baseColorClass: "bg-card text-muted-foreground border-border",
+      hoverColorClass: "hover:bg-emerald-500/10 hover:border-emerald-500/20",
+      activeColorClass: "bg-emerald-500/20 border-emerald-500/30 ring-2 ring-emerald-500/50 text-white",
     },
     // ... mais opções
   ]}
@@ -104,15 +118,90 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 - `colSpan`: Opção pode ocupar múltiplas colunas
 - `expandedContent`: Conteúdo adicional (ex: input)
 - `showExpandedContent`: Controla visibilidade do conteúdo expandido
+- **`baseColorClass`**: Classes CSS para estado neutro (OBRIGATÓRIO)
+- **`hoverColorClass`**: Classes CSS para hover (OBRIGATÓRIO)
+- **`activeColorClass`**: Classes CSS para selecionado (OBRIGATÓRIO)
 
 ---
 
-## 9. FormEntityMultiSelectAuto (Multi-Select de Entidades com Auto-Load)
+## 9. FormSimpleGrid (Grid de Seleção Simples - Ícone em Cima)
+**Componente:** `FormSimpleGrid` (`src/components/forms/FormSimpleGrid.tsx`)
+**Uso:** Seleção única em grid com ícone no topo e label abaixo (Roles de Personagem, Status, Categorias)
+**Descrição:** Grid de botões com layout vertical: ícone no topo e label abaixo. **Diferente do FormSelectGrid** que tem layout horizontal (ícone à esquerda, label à direita). Não possui campo de descrição. Ideal para seleções visuais simples onde o ícone é o elemento principal.
+
+**⚠️ IMPORTANTE - Classes de Cor Obrigatórias:**
+Assim como o FormSelectGrid, você **DEVE** passar as classes de cor manualmente para cada opção para manter a consistência visual:
+
+- **`baseColorClass`**: Estado neutro/não selecionado
+  - Padrão: `"bg-card text-muted-foreground border-border"`
+
+- **`hoverColorClass`**: Estado hover (fundo transparente colorido + borda colorida fraca)
+  - Padrão: `"hover:bg-{cor}-500/10 hover:border-{cor}-500/20"`
+  - Exemplo: `"hover:bg-yellow-500/10 hover:border-yellow-500/20"`
+
+- **`activeColorClass`**: Estado selecionado (fundo transparente colorido mais forte + borda colorida + ring)
+  - Padrão: `"bg-{cor}-500/20 border-{cor}-500/30 ring-2 ring-{cor}-500/50"`
+  - Exemplo: `"bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50"`
+
+**Exemplo de uso:**
+```tsx
+<FormSimpleGrid
+  value={role}
+  onChange={setRole}
+  label="Role do Personagem"
+  required
+  columns={5}
+  options={[
+    {
+      value: "protagonist",
+      label: "Protagonista",
+      icon: Star,
+      baseColorClass: "bg-card text-muted-foreground border-border",
+      hoverColorClass: "hover:bg-yellow-500/10 hover:border-yellow-500/20",
+      activeColorClass: "bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50",
+    },
+    {
+      value: "antagonist",
+      label: "Antagonista",
+      icon: Swords,
+      baseColorClass: "bg-card text-muted-foreground border-border",
+      hoverColorClass: "hover:bg-orange-500/10 hover:border-orange-500/20",
+      activeColorClass: "bg-orange-500/20 border-orange-500/30 ring-2 ring-orange-500/50",
+    },
+    // ... mais opções
+  ]}
+/>
+```
+
+**Propriedades principais:**
+- `columns`: Número de colunas (2, 3, 4, 5 ou 6)
+- `label`: Texto do label do campo
+- `required`: Se o campo é obrigatório
+- `error`: Mensagem de erro opcional
+- `className`: Classe CSS customizada para o grid
+- **`baseColorClass`**: Classes CSS para estado neutro (OBRIGATÓRIO)
+- **`hoverColorClass`**: Classes CSS para hover (OBRIGATÓRIO)
+- **`activeColorClass`**: Classes CSS para selecionado (OBRIGATÓRIO)
+
+**Diferenças do FormSelectGrid:**
+- ✅ **Layout Vertical**: Ícone no topo, label abaixo
+- ✅ **Sem Descrição**: Apenas ícone e label (mais compacto)
+- ✅ **Mais Colunas**: Suporta até 6 colunas (FormSelectGrid limita a 4)
+- ✅ **Uso**: Ideal para seleções simples e visuais (roles, status, categorias)
+
+**Casos de uso no projeto:**
+- **Roles de Personagem:** Protagonista, Antagonista, Vilão, Secundário, Extra
+- **Status de Projeto:** Planejamento, Em Andamento, Revisão, Concluído
+- **Categorias Simples:** Qualquer seleção que não precise de descrição detalhada
+
+---
+
+## 10. FormEntityMultiSelectAuto (Multi-Select de Entidades com Auto-Load)
 **Componente:** `FormEntityMultiSelectAuto` (`src/components/forms/FormEntityMultiSelectAuto.tsx`)
 **Uso:** Seleção múltipla de entidades relacionadas (Facções, Personagens, Raças, Itens, Regiões)
 **Descrição:** Multi-select especializado que carrega automaticamente entidades do banco de dados. Possui busca integrada, avatares e exibição visual das seleções. Ideal para campos de relacionamento entre entidades. 
 
-**Exemplo de uso:**
+**Exemplo de uso básico (múltiplas seleções):**
 ```tsx
 <FormEntityMultiSelectAuto
   entityType="faction"
@@ -124,6 +213,23 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
   searchPlaceholder="Buscar facção..."
   value={dominantFactions}
   onChange={setDominantFactions}
+  labelClassName="text-sm font-medium text-primary"
+/>
+```
+
+**Exemplo com limite de seleção (seleção única):**
+```tsx
+<FormEntityMultiSelectAuto
+  entityType="region"
+  bookId={bookId}
+  label="Local de Nascimento"
+  placeholder="Selecione um local..."
+  emptyText="Nenhum local disponível"
+  noSelectionText="Nenhum local selecionado"
+  searchPlaceholder="Buscar local..."
+  value={birthPlace}
+  onChange={setBirthPlace}
+  maxSelections={1}
   labelClassName="text-sm font-medium text-primary"
 />
 ```
@@ -141,26 +247,29 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 - `filter`: (Opcional) Função para filtrar entidades
 - `required`: (Opcional) Se o campo é obrigatório
 - `disabled`: (Opcional) Se o campo está desabilitado
+- **`maxSelections`**: (Opcional) Número máximo de seleções permitidas. Quando definido, o dropdown é desabilitado ao atingir o limite e mostra uma mensagem informativa
 
 **Funcionalidades:**
 - ✅ Carregamento automático de entidades do banco de dados
 - ✅ Busca integrada no dropdown
 - ✅ Exibição com avatares (imagem ou iniciais)
-- ✅ Contador de seleções
+- ✅ Contador de seleções (com exibição de limite quando definido)
 - ✅ Remoção individual de itens selecionados
 - ✅ Estados vazios informativos
 - ✅ Scroll automático para listas longas
 - ✅ Suporte a filtros customizados
+- ✅ **Limite de seleções configurável** (maxSelections) - desabilita dropdown ao atingir limite
 
 **Casos de uso no projeto:**
-- **Facções Residentes/Dominantes:** Selecionar facções que habitam ou dominam uma região
-- **Personagens Importantes:** Escolher personagens relevantes para uma região
-- **Raças Encontradas:** Indicar quais raças são encontradas em uma região
-- **Itens Encontrados:** Listar itens que podem ser encontrados em uma região
+- **Facções Residentes/Dominantes:** Selecionar facções que habitam ou dominam uma região (múltiplas seleções)
+- **Personagens Importantes:** Escolher personagens relevantes para uma região (múltiplas seleções)
+- **Raças Encontradas:** Indicar quais raças são encontradas em uma região (múltiplas seleções)
+- **Itens Encontrados:** Listar itens que podem ser encontrados em uma região (múltiplas seleções)
+- **Local de Nascimento:** Escolher o local onde um personagem nasceu (seleção única com `maxSelections={1}`)
 
 ---
 
-## 10. ListInput (Lista Dinâmica com Drag & Drop)
+## 11. ListInput (Lista Dinâmica com Drag & Drop)
 **Componente:** `ListInput` (`src/components/modals/create-region-modal/components/list-input.tsx`)
 **Uso:** Listas dinâmicas de itens com adição, edição, remoção e reordenação
 **Descrição:** Componente de lista editável que permite adicionar múltiplos itens de texto. Possui funcionalidade de drag-and-drop para reordenar itens, edição inline e remoção individual. Ideal para listas abertas onde a ordem importa.
@@ -195,7 +304,7 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 
 ---
 
-## 11. FormImageUpload (Upload de Imagem)
+## 12. FormImageUpload (Upload de Imagem)
 **Componente:** `FormImageUpload` (`src/components/forms/FormImageUpload.tsx`)
 **Uso:** Upload de imagens com preview e customização de forma
 **Descrição:** Componente de upload de imagem altamente customizável. Permite diferentes formas (quadrado, arredondado, circular), ajuste de como a imagem se encaixa no container, e ícone/texto customizável no placeholder. O placeholder possui fundo roxo escuro.
