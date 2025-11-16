@@ -6,23 +6,23 @@
 import type {
   IFieldVisibility,
   ISectionVisibility,
-} from '@/components/detail-page/visibility-helpers';
+} from "@/components/detail-page/visibility-helpers";
 
 /**
  * Region Scale - represents the scope/size of a region
  */
 export type RegionScale =
-  | 'local'
-  | 'continental'
-  | 'planetary'
-  | 'galactic'
-  | 'universal'
-  | 'multiversal';
+  | "local"
+  | "continental"
+  | "planetary"
+  | "galactic"
+  | "universal"
+  | "multiversal";
 
 /**
  * Season type for region environment
  */
-export type RegionSeason = 'spring' | 'summer' | 'autumn' | 'winter' | 'custom';
+export type RegionSeason = "spring" | "summer" | "autumn" | "winter" | "custom";
 
 /**
  * Region Interface - represents a geographic/spatial region in the story world

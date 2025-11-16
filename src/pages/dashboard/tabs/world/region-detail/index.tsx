@@ -1,11 +1,20 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { RegionSchema } from "@/lib/validation/region-schema";
-import { safeJsonParse } from "@/lib/utils/json-parse";
 
+import {
+  type IFieldVisibility,
+  type ISectionVisibility,
+  toggleFieldVisibility,
+  toggleSectionVisibility,
+} from "@/components/detail-page/visibility-helpers";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
 import {
   getRegionById,
   getRegionsByBookId,
@@ -21,24 +30,16 @@ import {
   type IRegionVersion,
   type ITimelineEra,
 } from "@/lib/db/regions.service";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
+import { safeJsonParse } from "@/lib/utils/json-parse";
+import { RegionSchema } from "@/lib/validation/region-schema";
 import {
   type IRegion,
   type IRegionFormData,
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
-import {
-  type IFieldVisibility,
-  type ISectionVisibility,
-  toggleFieldVisibility,
-  toggleSectionVisibility,
-} from "@/components/detail-page/visibility-helpers";
 
-import { RegionDetailView } from "./view";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
+import { RegionDetailView } from "./view";
 
 export function RegionDetail() {
   const { dashboardId, regionId } = useParams({
@@ -227,9 +228,8 @@ export function RegionDetail() {
     };
 
     // Helper to parse JSON strings to arrays for comparison
-    const parseJsonArray = (value: string | undefined): string[] => {
-      return safeJsonParse<string[]>(value, []);
-    };
+    const parseJsonArray = (value: string | undefined): string[] =>
+      safeJsonParse<string[]>(value, []);
 
     // Compare basic fields
     if (region.name !== editData.name) return true;
@@ -438,7 +438,7 @@ export function RegionDetail() {
             let hasOrphanedIds = false;
 
             const cleanedVersions = updatedVersions.map((version) => {
-              const regionData = version.regionData;
+              const { regionData } = version;
 
               // Skip cleaning if regionData is null
               if (!regionData) {
@@ -652,10 +652,15 @@ export function RegionDetail() {
     }) => {
       try {
         console.log("[handleVersionCreate] Received versionData:", versionData);
-        console.log("[handleVersionCreate] entityData:", versionData.entityData);
+        console.log(
+          "[handleVersionCreate] entityData:",
+          versionData.entityData
+        );
 
         if (!versionData.entityData) {
-          console.error("[handleVersionCreate] ERROR: entityData is null/undefined!");
+          console.error(
+            "[handleVersionCreate] ERROR: entityData is null/undefined!"
+          );
           return;
         }
 
@@ -668,17 +673,25 @@ export function RegionDetail() {
           regionData: versionData.entityData as unknown as IRegion,
         };
 
-        console.log("[handleVersionCreate] Created newVersion object:", newVersion);
+        console.log(
+          "[handleVersionCreate] Created newVersion object:",
+          newVersion
+        );
 
         // Save to database
         await createRegionVersion(regionId, newVersion);
 
-        console.log("[handleVersionCreate] Version saved to database successfully");
+        console.log(
+          "[handleVersionCreate] Version saved to database successfully"
+        );
 
         // Update state only if save is successful
         setVersions((prev) => [...prev, newVersion]);
       } catch (error) {
-        console.error("[handleVersionCreate] Error creating region version:", error);
+        console.error(
+          "[handleVersionCreate] Error creating region version:",
+          error
+        );
       }
     },
     [regionId]
@@ -745,20 +758,22 @@ export function RegionDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    console.log('[handleSave] Starting save...', { currentVersion, editData });
+    console.log("[handleSave] Starting save...", { currentVersion, editData });
     if (!currentVersion || !editData) {
-      console.log('[handleSave] Early return - missing currentVersion or editData');
+      console.log(
+        "[handleSave] Early return - missing currentVersion or editData"
+      );
       return;
     }
 
     try {
-      console.log('[handleSave] Validating data...');
+      console.log("[handleSave] Validating data...");
 
       // Helper function to safely parse JSON strings to arrays
       const parseArrayField = (field: any): string[] | undefined => {
         if (!field) return undefined;
         if (Array.isArray(field)) return field;
-        if (typeof field === 'string') {
+        if (typeof field === "string") {
           try {
             const parsed = JSON.parse(field);
             return Array.isArray(parsed) ? parsed : undefined;
@@ -826,7 +841,7 @@ export function RegionDetail() {
       // Helper function to ensure array fields are JSON strings for database
       const ensureJsonString = (field: any): string | undefined => {
         if (!field) return undefined;
-        if (typeof field === 'string') return field;
+        if (typeof field === "string") return field;
         if (Array.isArray(field)) return JSON.stringify(field);
         return undefined;
       };
@@ -846,7 +861,9 @@ export function RegionDetail() {
         // Information fields
         residentFactions: ensureJsonString(updatedRegion.residentFactions),
         dominantFactions: ensureJsonString(updatedRegion.dominantFactions),
-        importantCharacters: ensureJsonString(updatedRegion.importantCharacters),
+        importantCharacters: ensureJsonString(
+          updatedRegion.importantCharacters
+        ),
         racesFound: ensureJsonString(updatedRegion.racesFound),
         itemsFound: ensureJsonString(updatedRegion.itemsFound),
         // Narrative fields
@@ -864,18 +881,21 @@ export function RegionDetail() {
 
       // Check if we're editing the main version or an alternate version
       const isMainVersion = currentVersion?.isMain ?? true;
-      console.log('[handleSave] isMainVersion:', isMainVersion);
+      console.log("[handleSave] isMainVersion:", isMainVersion);
 
       if (isMainVersion) {
         // Update the main region in database
-        console.log('[handleSave] Updating main region...');
+        console.log("[handleSave] Updating main region...");
         await updateRegion(regionId, dataToSave);
-        console.log('[handleSave] Main region updated successfully');
+        console.log("[handleSave] Main region updated successfully");
       } else {
         // Update the alternate version's data in database
-        console.log('[handleSave] Updating alternate version...', currentVersion.id);
+        console.log(
+          "[handleSave] Updating alternate version...",
+          currentVersion.id
+        );
         await updateRegionVersionData(currentVersion.id, updatedRegion);
-        console.log('[handleSave] Alternate version updated successfully');
+        console.log("[handleSave] Alternate version updated successfully");
       }
 
       // Update original visibility to match saved state
@@ -884,22 +904,22 @@ export function RegionDetail() {
 
       // Save timeline for current version
       if (currentVersion) {
-        console.log('[handleSave] Saving timeline...');
+        console.log("[handleSave] Saving timeline...");
         await saveRegionVersionTimeline(currentVersion.id, timeline);
-        console.log('[handleSave] Timeline saved');
+        console.log("[handleSave] Timeline saved");
       }
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
 
       setErrors({}); // Limpar erros
-      console.log('[handleSave] Exiting edit mode...');
+      console.log("[handleSave] Exiting edit mode...");
       setIsEditing(false);
-      console.log('[handleSave] Save completed successfully!');
+      console.log("[handleSave] Save completed successfully!");
     } catch (error) {
-      console.error('[handleSave] Error caught:', error);
+      console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
-        console.error('[handleSave] Zod validation errors:', error.errors);
+        console.error("[handleSave] Zod validation errors:", error.errors);
         // Mapear erros para cada campo
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {

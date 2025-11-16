@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { LucideIcon, Plus } from "lucide-react";
 import { ReactNode } from "react";
+
+import { LucideIcon, Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 /**
  * Action button configuration

@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 export interface FormTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -57,13 +58,16 @@ export const FormTextarea = React.forwardRef<
     const inputId = id || name;
     const hasError = Boolean(error);
     const charCount =
-      showCharCount && typeof value === 'string' ? value.length : 0;
+      showCharCount && typeof value === "string" ? value.length : 0;
 
     return (
-      <div className={cn('space-y-2', containerClassName)}>
+      <div className={cn("space-y-2", containerClassName)}>
         {label && (
           <div className="flex items-center justify-between">
-            <Label htmlFor={inputId} className={cn("flex items-center gap-1", labelClassName)}>
+            <Label
+              htmlFor={inputId}
+              className={cn("flex items-center gap-1", labelClassName)}
+            >
               {label}
               {required && <span className="text-destructive">*</span>}
               {!required && showOptionalLabel && (
@@ -86,7 +90,7 @@ export const FormTextarea = React.forwardRef<
           value={value}
           maxLength={maxLength}
           aria-invalid={hasError}
-          className={cn(hasError && 'border-destructive', className)}
+          className={cn(hasError && "border-destructive", className)}
           required={required}
           {...props}
         />
@@ -103,4 +107,4 @@ export const FormTextarea = React.forwardRef<
   }
 );
 
-FormTextarea.displayName = 'FormTextarea';
+FormTextarea.displayName = "FormTextarea";

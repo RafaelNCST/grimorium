@@ -1,9 +1,11 @@
 import { useState } from "react";
+
 import { X, Search } from "lucide-react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -76,10 +78,13 @@ export function MultiSelect({
     <div className="space-y-3">
       {/* Header with label and counter */}
       <div className="flex items-center justify-between">
-        <Label className={labelClassName || "text-sm font-medium"}>{label}</Label>
+        <Label className={labelClassName || "text-sm font-medium"}>
+          {label}
+        </Label>
         {selectedOptions.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {selectedOptions.length} selecionado{selectedOptions.length !== 1 ? "s" : ""}
+            {selectedOptions.length} selecionado
+            {selectedOptions.length !== 1 ? "s" : ""}
           </span>
         )}
       </div>

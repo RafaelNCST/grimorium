@@ -1,7 +1,9 @@
-import * as React from 'react';
-import { Edit, Save, X, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+
+import { Edit, Save, X, Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export interface EditControlsProps {
   isEditing: boolean;
@@ -11,7 +13,7 @@ export interface EditControlsProps {
   onSave: () => Promise<void> | void;
   onCancel: () => void;
   className?: string;
-  position?: 'top' | 'bottom' | 'sticky';
+  position?: "top" | "bottom" | "sticky";
   saveText?: string;
   cancelText?: string;
   editText?: string;
@@ -40,21 +42,21 @@ export function EditControls({
   onSave,
   onCancel,
   className,
-  position = 'sticky',
-  saveText = 'Salvar',
-  cancelText = 'Cancelar',
-  editText = 'Editar',
+  position = "sticky",
+  saveText = "Salvar",
+  cancelText = "Cancelar",
+  editText = "Editar",
 }: EditControlsProps) {
   const positionClasses = {
-    top: 'sticky top-0 z-10',
-    bottom: 'sticky bottom-0 z-10',
-    sticky: 'sticky top-0 z-10',
+    top: "sticky top-0 z-10",
+    bottom: "sticky bottom-0 z-10",
+    sticky: "sticky top-0 z-10",
   };
 
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-4 bg-card p-4 border-b border-border',
+        "flex items-center justify-between gap-4 bg-card p-4 border-b border-border",
         positionClasses[position],
         className
       )}
@@ -75,11 +77,7 @@ export function EditControls({
           </Button>
         ) : (
           <>
-            <Button
-              onClick={onCancel}
-              variant="outline"
-              disabled={isSaving}
-            >
+            <Button onClick={onCancel} variant="outline" disabled={isSaving}>
               <X className="h-4 w-4" />
               {cancelText}
             </Button>
@@ -93,7 +91,7 @@ export function EditControls({
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isSaving ? 'Salvando...' : saveText}
+              {isSaving ? "Salvando..." : saveText}
             </Button>
           </>
         )}

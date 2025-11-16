@@ -1,23 +1,36 @@
-import { X, ExternalLink, Trash2, Palette, Check, ChevronDown, ChevronRight, Map } from "lucide-react";
-import { IRegion } from "../../types/region-types";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useState, useEffect } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import {
+  X,
+  ExternalLink,
+  Trash2,
+  Palette,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Map,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
+
+import { IRegion } from "../../types/region-types";
+
 
 interface MapMarkerDetailsProps {
   region: IRegion;
@@ -35,18 +48,18 @@ interface MapMarkerDetailsProps {
 }
 
 const MARKER_COLORS = [
-  { name: 'Roxo', value: '#8b5cf6' },
-  { name: 'Azul', value: '#3b82f6' },
-  { name: 'Verde', value: '#10b981' },
-  { name: 'Vermelho', value: '#ef4444' },
-  { name: 'Amarelo', value: '#f59e0b' },
-  { name: 'Rosa', value: '#ec4899' },
-  { name: 'Laranja', value: '#f97316' },
-  { name: 'Ciano', value: '#06b6d4' },
-  { name: 'Índigo', value: '#6366f1' },
-  { name: 'Lima', value: '#84cc16' },
-  { name: 'Branco', value: '#ffffff' },
-  { name: 'Preto', value: '#000000' },
+  { name: "Roxo", value: "#8b5cf6" },
+  { name: "Azul", value: "#3b82f6" },
+  { name: "Verde", value: "#10b981" },
+  { name: "Vermelho", value: "#ef4444" },
+  { name: "Amarelo", value: "#f59e0b" },
+  { name: "Rosa", value: "#ec4899" },
+  { name: "Laranja", value: "#f97316" },
+  { name: "Ciano", value: "#06b6d4" },
+  { name: "Índigo", value: "#6366f1" },
+  { name: "Lima", value: "#84cc16" },
+  { name: "Branco", value: "#ffffff" },
+  { name: "Preto", value: "#000000" },
 ];
 
 export function MapMarkerDetails({
@@ -69,7 +82,7 @@ export function MapMarkerDetails({
 
   // Load initial state from localStorage or use defaults
   const getInitialSectionState = () => {
-    const stored = localStorage.getItem('mapMarkerDetailsSections');
+    const stored = localStorage.getItem("mapMarkerDetailsSections");
     if (stored) {
       try {
         return JSON.parse(stored);
@@ -96,11 +109,14 @@ export function MapMarkerDetails({
 
   // Save to localStorage whenever sections state changes
   useEffect(() => {
-    localStorage.setItem('mapMarkerDetailsSections', JSON.stringify(openSections));
+    localStorage.setItem(
+      "mapMarkerDetailsSections",
+      JSON.stringify(openSections)
+    );
   }, [openSections]);
 
   const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   const handleViewDetails = () => {
@@ -120,15 +136,28 @@ export function MapMarkerDetails({
     }
   };
 
-  const getItems = (ids: string[], list: Array<{ id: string; name: string; image?: string }>) => {
-    return ids
-      .map(id => list.find(item => item.id === id))
-      .filter((item): item is { id: string; name: string; image?: string } => !!item);
-  };
+  const getItems = (
+    ids: string[],
+    list: Array<{ id: string; name: string; image?: string }>
+  ) =>
+    ids
+      .map((id) => list.find((item) => item.id === id))
+      .filter(
+        (item): item is { id: string; name: string; image?: string } => !!item
+      );
 
-  const residentFactionsItems = getItems(parseJsonArray(region.residentFactions), factions);
-  const dominantFactionsItems = getItems(parseJsonArray(region.dominantFactions), factions);
-  const importantCharactersItems = getItems(parseJsonArray(region.importantCharacters), characters);
+  const residentFactionsItems = getItems(
+    parseJsonArray(region.residentFactions),
+    factions
+  );
+  const dominantFactionsItems = getItems(
+    parseJsonArray(region.dominantFactions),
+    factions
+  );
+  const importantCharactersItems = getItems(
+    parseJsonArray(region.importantCharacters),
+    characters
+  );
   const racesFoundItems = getItems(parseJsonArray(region.racesFound), races);
   const itemsFoundItems = getItems(parseJsonArray(region.itemsFound), items);
 
@@ -137,7 +166,12 @@ export function MapMarkerDetails({
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
         <h3 className="font-semibold text-sm truncate flex-1">{region.name}</h3>
-        <Button variant="ghost-destructive" size="icon" className="h-8 w-8" onClick={onClose}>
+        <Button
+          variant="ghost-destructive"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onClose}
+        >
           <X className="w-4 h-4" />
         </Button>
       </div>
@@ -186,7 +220,9 @@ export function MapMarkerDetails({
                               <Check
                                 className={cn(
                                   "w-4 h-4",
-                                  color.value === '#ffffff' ? "text-black" : "text-white"
+                                  color.value === "#ffffff"
+                                    ? "text-black"
+                                    : "text-white"
                                 )}
                               />
                             )}
@@ -249,7 +285,9 @@ export function MapMarkerDetails({
 
           {/* Scale */}
           <div>
-            <p className="text-base font-semibold text-purple-600 dark:text-purple-400 mb-1">{t("region_map.scale")}</p>
+            <p className="text-base font-semibold text-purple-600 dark:text-purple-400 mb-1">
+              {t("region_map.scale")}
+            </p>
             <p className="text-sm">{t(`scales.${region.scale}`)}</p>
           </div>
 
@@ -268,7 +306,9 @@ export function MapMarkerDetails({
           {/* Climate */}
           {region.climate && (
             <div>
-              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">{t("region_map.climate")}</p>
+              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">
+                {t("region_map.climate")}
+              </p>
               <p className="text-sm">{region.climate}</p>
             </div>
           )}
@@ -322,12 +362,17 @@ export function MapMarkerDetails({
           )}
 
           {/* Resident Factions */}
-          <Collapsible open={openSections.residentFactions} onOpenChange={() => toggleSection('residentFactions')}>
+          <Collapsible
+            open={openSections.residentFactions}
+            onOpenChange={() => toggleSection("residentFactions")}
+          >
             <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
               <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                 {t("region_map.resident_factions")}
                 {residentFactionsItems.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({residentFactionsItems.length})</span>
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({residentFactionsItems.length})
+                  </span>
                 )}
               </p>
               {openSections.residentFactions ? (
@@ -357,7 +402,9 @@ export function MapMarkerDetails({
                           </span>
                         </div>
                       )}
-                      <span className="text-xs font-medium truncate">{item.name}</span>
+                      <span className="text-xs font-medium truncate">
+                        {item.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -370,12 +417,17 @@ export function MapMarkerDetails({
           </Collapsible>
 
           {/* Dominant Factions */}
-          <Collapsible open={openSections.dominantFactions} onOpenChange={() => toggleSection('dominantFactions')}>
+          <Collapsible
+            open={openSections.dominantFactions}
+            onOpenChange={() => toggleSection("dominantFactions")}
+          >
             <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
               <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                 {t("region_map.dominant_factions")}
                 {dominantFactionsItems.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({dominantFactionsItems.length})</span>
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({dominantFactionsItems.length})
+                  </span>
                 )}
               </p>
               {openSections.dominantFactions ? (
@@ -405,7 +457,9 @@ export function MapMarkerDetails({
                           </span>
                         </div>
                       )}
-                      <span className="text-xs font-medium truncate">{item.name}</span>
+                      <span className="text-xs font-medium truncate">
+                        {item.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -418,12 +472,17 @@ export function MapMarkerDetails({
           </Collapsible>
 
           {/* Important Characters */}
-          <Collapsible open={openSections.importantCharacters} onOpenChange={() => toggleSection('importantCharacters')}>
+          <Collapsible
+            open={openSections.importantCharacters}
+            onOpenChange={() => toggleSection("importantCharacters")}
+          >
             <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
               <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                 {t("region_map.important_characters")}
                 {importantCharactersItems.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({importantCharactersItems.length})</span>
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({importantCharactersItems.length})
+                  </span>
                 )}
               </p>
               {openSections.importantCharacters ? (
@@ -453,7 +512,9 @@ export function MapMarkerDetails({
                           </span>
                         </div>
                       )}
-                      <span className="text-xs font-medium truncate">{item.name}</span>
+                      <span className="text-xs font-medium truncate">
+                        {item.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -466,12 +527,17 @@ export function MapMarkerDetails({
           </Collapsible>
 
           {/* Races Found */}
-          <Collapsible open={openSections.racesFound} onOpenChange={() => toggleSection('racesFound')}>
+          <Collapsible
+            open={openSections.racesFound}
+            onOpenChange={() => toggleSection("racesFound")}
+          >
             <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
               <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                 {t("region_map.races_found")}
                 {racesFoundItems.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({racesFoundItems.length})</span>
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({racesFoundItems.length})
+                  </span>
                 )}
               </p>
               {openSections.racesFound ? (
@@ -501,7 +567,9 @@ export function MapMarkerDetails({
                           </span>
                         </div>
                       )}
-                      <span className="text-xs font-medium truncate">{item.name}</span>
+                      <span className="text-xs font-medium truncate">
+                        {item.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -514,12 +582,17 @@ export function MapMarkerDetails({
           </Collapsible>
 
           {/* Items Found */}
-          <Collapsible open={openSections.itemsFound} onOpenChange={() => toggleSection('itemsFound')}>
+          <Collapsible
+            open={openSections.itemsFound}
+            onOpenChange={() => toggleSection("itemsFound")}
+          >
             <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
               <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                 {t("region_map.items_found")}
                 {itemsFoundItems.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">({itemsFoundItems.length})</span>
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({itemsFoundItems.length})
+                  </span>
                 )}
               </p>
               {openSections.itemsFound ? (
@@ -549,7 +622,9 @@ export function MapMarkerDetails({
                           </span>
                         </div>
                       )}
-                      <span className="text-xs font-medium truncate">{item.name}</span>
+                      <span className="text-xs font-medium truncate">
+                        {item.name}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -565,7 +640,11 @@ export function MapMarkerDetails({
 
       {/* Actions */}
       <div className="p-4 border-t space-y-2 flex-shrink-0">
-        <Button onClick={handleViewDetails} variant="magical" className="w-full animate-glow">
+        <Button
+          onClick={handleViewDetails}
+          variant="magical"
+          className="w-full animate-glow"
+        >
           <ExternalLink className="w-4 h-4 mr-2" />
           {t("region_map.view_details")}
         </Button>

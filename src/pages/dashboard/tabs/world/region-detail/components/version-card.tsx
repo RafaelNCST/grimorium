@@ -79,7 +79,9 @@ export function VersionCard({
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-sm truncate">{version.name}</h4>
+                <h4 className="font-semibold text-sm truncate">
+                  {version.name}
+                </h4>
                 {version.description && (
                   <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                     {version.description}

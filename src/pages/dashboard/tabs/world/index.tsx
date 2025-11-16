@@ -1,16 +1,24 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
+
 import { useToast } from "@/hooks/use-toast";
-import { IRegion, IRegionWithChildren, RegionScale, IRegionFormData } from "./types/region-types";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
 import {
   getRegionsByBookId,
   createRegion,
   getRegionHierarchy,
 } from "@/lib/db/regions.service";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
+
+import {
+  IRegion,
+  IRegionWithChildren,
+  RegionScale,
+  IRegionFormData,
+} from "./types/region-types";
 import { WorldView } from "./view";
 
 interface WorldTabProps {
@@ -30,8 +38,12 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [showHierarchyModal, setShowHierarchyModal] = useState(false);
 
   // Data for multi-select dropdowns
-  const [characters, setCharacters] = useState<Array<{ id: string; name: string }>>([]);
-  const [factions, setFactions] = useState<Array<{ id: string; name: string }>>([]);
+  const [characters, setCharacters] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  const [factions, setFactions] = useState<Array<{ id: string; name: string }>>(
+    []
+  );
   const [races, setRaces] = useState<Array<{ id: string; name: string }>>([]);
   const [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
 
@@ -39,7 +51,14 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const loadRegions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [regionsData, hierarchyData, charactersData, factionsData, racesData, itemsData] = await Promise.all([
+      const [
+        regionsData,
+        hierarchyData,
+        charactersData,
+        factionsData,
+        racesData,
+        itemsData,
+      ] = await Promise.all([
         getRegionsByBookId(bookId),
         getRegionHierarchy(bookId),
         getCharactersByBookId(bookId),
@@ -49,10 +68,10 @@ export function WorldTab({ bookId }: WorldTabProps) {
       ]);
       setRegions(regionsData);
       setHierarchy(hierarchyData);
-      setCharacters(charactersData.map(c => ({ id: c.id, name: c.name })));
-      setFactions(factionsData.map(f => ({ id: f.id, name: f.name })));
-      setRaces(racesData.map(r => ({ id: r.id, name: r.name })));
-      setItems(itemsData.map(i => ({ id: i.id, name: i.name })));
+      setCharacters(charactersData.map((c) => ({ id: c.id, name: c.name })));
+      setFactions(factionsData.map((f) => ({ id: f.id, name: f.name })));
+      setRaces(racesData.map((r) => ({ id: r.id, name: r.name })));
+      setItems(itemsData.map((i) => ({ id: i.id, name: i.name })));
     } catch (error) {
       console.error("Failed to load regions:", error);
       toast({

@@ -19,12 +19,12 @@ export function safeJsonParse<T = string[]>(
   }
 
   // If value is not a string, return fallback
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     return fallback;
   }
 
   // If value is an empty string, return fallback
-  if (value.trim() === '') {
+  if (value.trim() === "") {
     return fallback;
   }
 
@@ -33,7 +33,7 @@ export function safeJsonParse<T = string[]>(
     const parsed = JSON.parse(value);
     return parsed as T;
   } catch (error) {
-    console.warn('[safeJsonParse] Failed to parse JSON:', value, error);
+    console.warn("[safeJsonParse] Failed to parse JSON:", value, error);
     return fallback;
   }
 }

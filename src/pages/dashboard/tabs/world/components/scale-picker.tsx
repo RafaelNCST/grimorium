@@ -1,26 +1,34 @@
-import { useTranslation } from "react-i18next";
-import { RegionScale } from "../types/region-types";
-import {
-  SCALE_BASE_COLOR,
-  SCALE_HOVER_COLOR,
-  SCALE_ACTIVE_COLOR,
-} from "../constants/scale-colors";
 import {
   MapPin,
   Mountain,
   Globe,
   Sparkles,
   Infinity,
-  Layers
+  Layers,
 } from "lucide-react";
-import { FormSelectGrid, GridSelectOption } from "@/components/forms/FormSelectGrid";
+import { useTranslation } from "react-i18next";
+
+import {
+  FormSelectGrid,
+  GridSelectOption,
+} from "@/components/forms/FormSelectGrid";
+
+import {
+  SCALE_BASE_COLOR,
+  SCALE_HOVER_COLOR,
+  SCALE_ACTIVE_COLOR,
+} from "../constants/scale-colors";
+import { RegionScale } from "../types/region-types";
 
 interface ScalePickerProps {
   value: RegionScale | null | undefined;
   onChange: (scale: RegionScale) => void;
 }
 
-const SCALE_ICONS: Record<RegionScale, React.ComponentType<{ className?: string }>> = {
+const SCALE_ICONS: Record<
+  RegionScale,
+  React.ComponentType<{ className?: string }>
+> = {
   local: MapPin,
   continental: Mountain,
   planetary: Globe,

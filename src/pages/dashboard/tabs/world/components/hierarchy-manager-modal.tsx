@@ -1,5 +1,12 @@
 import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
+
+import {
+  DeleteEntityModal,
+  type IEntityVersion,
+} from "@/components/modals/delete-entity-modal";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,17 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { IRegionWithChildren } from "../types/region-types";
-import { RegionHierarchyTree } from "./region-hierarchy-tree";
+import { useToast } from "@/hooks/use-toast";
 import {
   deleteRegion as deleteRegionFromDB,
   moveRegion,
   reorderRegions,
 } from "@/lib/db/regions.service";
-import { useToast } from "@/hooks/use-toast";
-import { DeleteEntityModal, type IEntityVersion } from "@/components/modals/delete-entity-modal";
+
+import { IRegionWithChildren } from "../types/region-types";
+
+import { RegionHierarchyTree } from "./region-hierarchy-tree";
 
 interface HierarchyManagerModalProps {
   open: boolean;
@@ -34,7 +41,8 @@ export function HierarchyManagerModal({
 }: HierarchyManagerModalProps) {
   const { t } = useTranslation("world");
   const { toast } = useToast();
-  const [regionToDelete, setRegionToDelete] = useState<IRegionWithChildren | null>(null);
+  const [regionToDelete, setRegionToDelete] =
+    useState<IRegionWithChildren | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleDelete = (region: IRegionWithChildren) => {
@@ -69,7 +77,10 @@ export function HierarchyManagerModal({
     }
   };
 
-  const handleMoveRegion = async (regionId: string, newParentId: string | null) => {
+  const handleMoveRegion = async (
+    regionId: string,
+    newParentId: string | null
+  ) => {
     try {
       await moveRegion(regionId, newParentId);
       // Don't call onRefresh() - rely on optimistic updates for smooth UX
@@ -84,13 +95,17 @@ export function HierarchyManagerModal({
     }
   };
 
-  const handleReorderRegions = async (regionIds: string[], parentId: string | null) => {
+  const handleReorderRegions = async (
+    regionIds: string[],
+    parentId: string | null
+  ) => {
     try {
       await reorderRegions(regionIds, parentId);
     } catch (error: any) {
       toast({
         title: t("hierarchy_manager.reorder_error_title"),
-        description: error.message || t("hierarchy_manager.reorder_error_message"),
+        description:
+          error.message || t("hierarchy_manager.reorder_error_message"),
         variant: "destructive",
       });
     }

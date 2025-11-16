@@ -1,5 +1,9 @@
-import * as React from 'react';
-import { Check, X } from 'lucide-react';
+import * as React from "react";
+
+import { Check, X } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -7,16 +11,14 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export interface MultiSelectOption {
   value: string;
@@ -69,9 +71,9 @@ export const FormMultiSelect = React.forwardRef<
       value = [],
       onChange,
       options,
-      placeholder = 'Selecione itens...',
-      searchPlaceholder = 'Buscar...',
-      emptyText = 'Nenhum item encontrado',
+      placeholder = "Selecione itens...",
+      searchPlaceholder = "Buscar...",
+      emptyText = "Nenhum item encontrado",
       error,
       helperText,
       containerClassName,
@@ -104,12 +106,10 @@ export const FormMultiSelect = React.forwardRef<
       onChange(value.filter((v) => v !== optionValue));
     };
 
-    const selectedOptions = options.filter((opt) =>
-      value.includes(opt.value)
-    );
+    const selectedOptions = options.filter((opt) => value.includes(opt.value));
 
     return (
-      <div className={cn('space-y-2', containerClassName)}>
+      <div className={cn("space-y-2", containerClassName)}>
         {label && (
           <Label htmlFor={name} className="flex items-center gap-1">
             {label}
@@ -133,14 +133,14 @@ export const FormMultiSelect = React.forwardRef<
               role="combobox"
               aria-expanded={open}
               className={cn(
-                'w-full justify-between',
-                hasError && 'border-destructive',
-                !selectedCount && 'text-muted-foreground'
+                "w-full justify-between",
+                hasError && "border-destructive",
+                !selectedCount && "text-muted-foreground"
               )}
               disabled={disabled}
             >
               {selectedCount > 0
-                ? `${selectedCount} ${selectedCount === 1 ? 'item selecionado' : 'itens selecionados'}`
+                ? `${selectedCount} ${selectedCount === 1 ? "item selecionado" : "itens selecionados"}`
                 : placeholder}
               <Check className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -165,8 +165,8 @@ export const FormMultiSelect = React.forwardRef<
                       >
                         <Check
                           className={cn(
-                            'mr-2 h-4 w-4',
-                            isSelected ? 'opacity-100' : 'opacity-0'
+                            "mr-2 h-4 w-4",
+                            isSelected ? "opacity-100" : "opacity-0"
                           )}
                         />
                         {option.label}
@@ -215,4 +215,4 @@ export const FormMultiSelect = React.forwardRef<
   }
 );
 
-FormMultiSelect.displayName = 'FormMultiSelect';
+FormMultiSelect.displayName = "FormMultiSelect";

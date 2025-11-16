@@ -1,12 +1,14 @@
-import * as React from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import * as React from "react";
+
+import { Eye, EyeOff } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
 export interface FieldWithVisibilityToggleProps {
   fieldName: string;
@@ -47,7 +49,7 @@ export interface FieldWithVisibilityToggleProps {
  * ```
  */
 export const FieldWithVisibilityToggle = React.memo(
-  function FieldWithVisibilityToggle({
+  ({
     fieldName,
     label,
     children,
@@ -55,8 +57,8 @@ export const FieldWithVisibilityToggle = React.memo(
     fieldVisibility,
     isEditing,
     onFieldVisibilityToggle,
-    className = '',
-  }: FieldWithVisibilityToggleProps) {
+    className = "",
+  }: FieldWithVisibilityToggleProps) => {
     const isVisible = fieldVisibility[fieldName] !== false;
 
     // Hidden in view mode
@@ -68,8 +70,8 @@ export const FieldWithVisibilityToggle = React.memo(
       <div
         className={`space-y-2 transition-all duration-200 ${
           !isVisible && isEditing
-            ? 'opacity-50 bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30'
-            : ''
+            ? "opacity-50 bg-muted/30 p-3 rounded-lg border border-dashed border-muted-foreground/30"
+            : ""
         } ${className}`}
       >
         <div className="flex items-center justify-between">
@@ -95,7 +97,7 @@ export const FieldWithVisibilityToggle = React.memo(
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{isVisible ? 'Ocultar campo' : 'Mostrar campo'}</p>
+                <p>{isVisible ? "Ocultar campo" : "Mostrar campo"}</p>
               </TooltipContent>
             </Tooltip>
           )}

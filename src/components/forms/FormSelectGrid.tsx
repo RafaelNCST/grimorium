@@ -1,7 +1,9 @@
-import { Label } from "@/components/ui/label";
-import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+
+import { LucideIcon } from "lucide-react";
+
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 /**
  * Option configuration for grid selection
@@ -160,21 +162,20 @@ export function FormSelectGrid<T extends string = string>({
                 "relative p-4 rounded-lg border-2 transition-all text-left",
                 option.colSpan ? getColSpanClass(option.colSpan) : "",
                 isSelected
-                  ? option.activeColorClass || "bg-primary text-white border-primary"
+                  ? option.activeColorClass ||
+                      "bg-primary text-white border-primary"
                   : cn(
-                      option.baseColorClass || "bg-background text-foreground border-border",
-                      option.hoverColorClass || "hover:bg-primary hover:text-white hover:border-primary"
+                      option.baseColorClass ||
+                        "bg-background text-foreground border-border",
+                      option.hoverColorClass ||
+                        "hover:bg-primary hover:text-white hover:border-primary"
                     )
               )}
             >
               <div className="flex items-start gap-3">
-                {Icon && (
-                  <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                )}
+                {Icon && <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">
-                    {option.label}
-                  </p>
+                  <p className="font-medium text-sm">{option.label}</p>
                   {option.description && (
                     <p className="text-xs mt-1 opacity-80">
                       {option.description}
@@ -191,9 +192,7 @@ export function FormSelectGrid<T extends string = string>({
         <div className="mt-4">{expandedContent}</div>
       )}
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

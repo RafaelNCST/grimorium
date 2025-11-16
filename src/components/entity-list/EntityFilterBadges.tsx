@@ -1,5 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 
 /**
  * Configuration for badge color states

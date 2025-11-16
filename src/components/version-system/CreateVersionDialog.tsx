@@ -1,5 +1,10 @@
-import * as React from 'react';
-import { Loader2 } from 'lucide-react';
+import * as React from "react";
+
+import { Loader2 } from "lucide-react";
+
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,10 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { FormInput } from '@/components/forms/FormInput';
-import { FormTextarea } from '@/components/forms/FormTextarea';
+} from "@/components/ui/dialog";
 
 export interface CreateVersionData {
   name: string;
@@ -33,12 +35,12 @@ export function CreateVersionDialog({
   open,
   onOpenChange,
   onSubmit,
-  title = 'Criar Nova Versão',
-  description = 'Crie uma nova versão para esta entidade.',
-  entityType = 'entidade',
+  title = "Criar Nova Versão",
+  description = "Crie uma nova versão para esta entidade.",
+  entityType = "entidade",
 }: CreateVersionDialogProps) {
-  const [name, setName] = React.useState('');
-  const [versionDescription, setVersionDescription] = React.useState('');
+  const [name, setName] = React.useState("");
+  const [versionDescription, setVersionDescription] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,11 +56,11 @@ export function CreateVersionDialog({
       });
 
       // Reset form
-      setName('');
-      setVersionDescription('');
+      setName("");
+      setVersionDescription("");
       onOpenChange(false);
     } catch (error) {
-      console.error('Error creating version:', error);
+      console.error("Error creating version:", error);
     } finally {
       setIsSubmitting(false);
     }

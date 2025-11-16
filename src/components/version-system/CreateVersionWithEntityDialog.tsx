@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo, ReactNode } from "react";
+
 import { ArrowRight, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { InfoAlert } from "@/components/ui/info-alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { InfoAlert } from "@/components/ui/info-alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,7 +86,8 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
   const [isEntityModalOpen, setIsEntityModalOpen] = useState(false);
 
   const nameCharsRemaining = maxNameLength - versionName.length;
-  const descriptionCharsRemaining = maxDescriptionLength - versionDescription.length;
+  const descriptionCharsRemaining =
+    maxDescriptionLength - versionDescription.length;
 
   const canProceedToStep2 = useMemo(
     () => versionName.trim().length > 0 && versionDescription.trim().length > 0,
@@ -118,8 +120,14 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
     (entityData: TEntityData) => {
       console.log("[CreateVersionWithEntityDialog] handleEntityCreate called");
       console.log("[CreateVersionWithEntityDialog] versionName:", versionName);
-      console.log("[CreateVersionWithEntityDialog] versionDescription:", versionDescription);
-      console.log("[CreateVersionWithEntityDialog] entityData received:", entityData);
+      console.log(
+        "[CreateVersionWithEntityDialog] versionDescription:",
+        versionDescription
+      );
+      console.log(
+        "[CreateVersionWithEntityDialog] entityData received:",
+        entityData
+      );
 
       const dataToConfirm = {
         name: versionName.trim(),
@@ -127,7 +135,10 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
         entityData,
       };
 
-      console.log("[CreateVersionWithEntityDialog] Calling onConfirm with:", dataToConfirm);
+      console.log(
+        "[CreateVersionWithEntityDialog] Calling onConfirm with:",
+        dataToConfirm
+      );
 
       onConfirm(dataToConfirm);
       handleClose();
@@ -147,9 +158,7 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
             </DialogTitle>
           </DialogHeader>
 
-          <InfoAlert>
-            {t("versions.create_dialog.info_message")}
-          </InfoAlert>
+          <InfoAlert>{t("versions.create_dialog.info_message")}</InfoAlert>
 
           <div className="space-y-4 pt-2">
             {/* Version Name */}
@@ -208,7 +217,9 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
                     setVersionDescription(e.target.value);
                   }
                 }}
-                placeholder={t("versions.create_dialog.description_placeholder")}
+                placeholder={t(
+                  "versions.create_dialog.description_placeholder"
+                )}
                 maxLength={maxDescriptionLength}
                 rows={4}
                 className={`resize-none ${
@@ -265,13 +276,14 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
       </Dialog>
 
       {/* Step 2: Entity Creation Modal */}
-      {step === 2 && renderEntityModal({
-        open: isEntityModalOpen,
-        onOpenChange: (open) => {
-          if (!open) handleEntityModalClose();
-        },
-        onConfirm: handleEntityCreate,
-      })}
+      {step === 2 &&
+        renderEntityModal({
+          open: isEntityModalOpen,
+          onOpenChange: (open) => {
+            if (!open) handleEntityModalClose();
+          },
+          onConfirm: handleEntityCreate,
+        })}
     </>
   );
 }

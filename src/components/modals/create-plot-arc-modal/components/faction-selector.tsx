@@ -1,11 +1,12 @@
 import { useState } from "react";
+
 import { X, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -119,7 +120,10 @@ export function FactionSelector({
                       >
                         <div className="flex items-center gap-3">
                           <Avatar className="w-8 h-8 rounded-md">
-                            <AvatarImage src={faction.emblem} alt={faction.name} />
+                            <AvatarImage
+                              src={faction.emblem}
+                              alt={faction.name}
+                            />
                             <AvatarFallback className="text-xs rounded-md !text-foreground">
                               {getInitials(faction.name)}
                             </AvatarFallback>

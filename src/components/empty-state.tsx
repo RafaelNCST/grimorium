@@ -118,9 +118,11 @@ export function EmptyState({
   secondaryButton,
 }: PropsEmptyState) {
   // Support legacy API - convert to primaryButton if provided
-  const primary = primaryButton || (actionLabel && onAction
-    ? { label: actionLabel, onClick: onAction, variant: "magical" as const }
-    : undefined);
+  const primary =
+    primaryButton ||
+    (actionLabel && onAction
+      ? { label: actionLabel, onClick: onAction, variant: "magical" as const }
+      : undefined);
 
   const hasButtons = primary || secondaryButton;
 

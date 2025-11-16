@@ -1,10 +1,12 @@
 import { MapPin, Check, X } from "lucide-react";
-import { IRegion } from "../../types/region-types";
+import { useTranslation } from "react-i18next";
+
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { IRegionMapMarker } from "@/lib/db/region-maps.service";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+
+import { IRegion } from "../../types/region-types";
 
 interface RegionChildrenListProps {
   children: IRegion[];
@@ -27,9 +29,8 @@ export function RegionChildrenList({
 }: RegionChildrenListProps) {
   const { t } = useTranslation("world");
 
-  const getMarkerForRegion = (regionId: string) => {
-    return markers.find((m) => m.childRegionId === regionId);
-  };
+  const getMarkerForRegion = (regionId: string) =>
+    markers.find((m) => m.childRegionId === regionId);
 
   const handleChildClick = (regionId: string) => {
     if (!isEditMode) return;
@@ -57,7 +58,9 @@ export function RegionChildrenList({
   return (
     <div className="bg-background border rounded-lg shadow-lg w-64 flex flex-col max-h-[calc(100vh-140px)]">
       <div className="p-4 border-b">
-        <h3 className="font-semibold text-sm">{t("region_map.children_title")}</h3>
+        <h3 className="font-semibold text-sm">
+          {t("region_map.children_title")}
+        </h3>
         <p className="text-xs text-muted-foreground mt-1">
           {isEditMode
             ? t("region_map.click_to_select")
@@ -84,7 +87,8 @@ export function RegionChildrenList({
                       : "cursor-pointer hover:bg-muted"
                     : "cursor-default",
                   hasMarker && "bg-muted/50",
-                  isSelected && "bg-primary/10 border-primary ring-2 ring-primary/20"
+                  isSelected &&
+                    "bg-primary/10 border-primary ring-2 ring-primary/20"
                 )}
               >
                 <div

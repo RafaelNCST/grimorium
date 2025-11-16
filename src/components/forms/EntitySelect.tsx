@@ -1,5 +1,9 @@
-import * as React from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import * as React from "react";
+
+import { useParams } from "@tanstack/react-router";
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -7,19 +11,17 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { useParams } from '@tanstack/react-router';
+} from "@/components/ui/select";
 
 // Service imports
-import { getCharactersByBookId } from '@/lib/db/characters.service';
-import { getFactionsByBookId } from '@/lib/db/factions.service';
-import { getRacesByBookId } from '@/lib/db/races.service';
-import { getItemsByBookId } from '@/lib/db/items.service';
-import { getRegionsByBookId } from '@/lib/db/regions.service';
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import { getRegionsByBookId } from "@/lib/db/regions.service";
+import { cn } from "@/lib/utils";
 
-export type EntityType = 'character' | 'faction' | 'race' | 'item' | 'region';
+export type EntityType = "character" | "faction" | "race" | "item" | "region";
 
 export interface Entity {
   id: string;
@@ -74,7 +76,7 @@ export const EntitySelect = React.forwardRef<
       value,
       onValueChange,
       label,
-      placeholder = 'Selecione...',
+      placeholder = "Selecione...",
       error,
       helperText,
       containerClassName,
@@ -129,7 +131,7 @@ export const EntitySelect = React.forwardRef<
     const selectedEntity = entities.find((e) => e.id === value);
 
     return (
-      <div className={cn('space-y-2', containerClassName)}>
+      <div className={cn("space-y-2", containerClassName)}>
         {label && (
           <Label className="flex items-center gap-1">
             {label}
@@ -143,13 +145,13 @@ export const EntitySelect = React.forwardRef<
         <Select
           value={value ?? undefined}
           onValueChange={(newValue) =>
-            onValueChange?.(newValue === '__none__' ? null : newValue)
+            onValueChange?.(newValue === "__none__" ? null : newValue)
           }
           disabled={disabled || isLoading}
         >
           <SelectTrigger
             ref={ref}
-            className={cn(hasError && 'border-destructive')}
+            className={cn(hasError && "border-destructive")}
             aria-invalid={hasError}
           >
             {selectedEntity ? (
@@ -169,7 +171,7 @@ export const EntitySelect = React.forwardRef<
               </div>
             ) : (
               <SelectValue
-                placeholder={isLoading ? 'Carregando...' : placeholder}
+                placeholder={isLoading ? "Carregando..." : placeholder}
               />
             )}
           </SelectTrigger>
@@ -217,4 +219,4 @@ export const EntitySelect = React.forwardRef<
   }
 );
 
-EntitySelect.displayName = 'EntitySelect';
+EntitySelect.displayName = "EntitySelect";

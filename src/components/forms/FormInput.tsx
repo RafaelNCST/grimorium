@@ -1,9 +1,10 @@
-import * as React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import * as React from "react";
 
-export interface FormInputProps extends React.ComponentProps<'input'> {
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+export interface FormInputProps extends React.ComponentProps<"input"> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -47,9 +48,12 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
     const hasError = Boolean(error);
 
     return (
-      <div className={cn('space-y-2', containerClassName)}>
+      <div className={cn("space-y-2", containerClassName)}>
         {label && (
-          <Label htmlFor={inputId} className={cn("flex items-center gap-1", labelClassName)}>
+          <Label
+            htmlFor={inputId}
+            className={cn("flex items-center gap-1", labelClassName)}
+          >
             {label}
             {required && <span className="text-destructive">*</span>}
             {!required && showOptionalLabel && (
@@ -62,7 +66,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           name={name}
           ref={ref}
           aria-invalid={hasError}
-          className={cn(hasError && 'border-destructive', className)}
+          className={cn(hasError && "border-destructive", className)}
           required={required}
           {...props}
         />
@@ -79,4 +83,4 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
   }
 );
 
-FormInput.displayName = 'FormInput';
+FormInput.displayName = "FormInput";

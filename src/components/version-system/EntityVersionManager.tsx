@@ -1,4 +1,5 @@
 import { useState, ReactNode } from "react";
+
 import { Plus, GitBranch } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +15,11 @@ export interface BaseVersion {
   createdAt?: string | number;
 }
 
-export interface EntityVersionManagerProps<TVersion extends BaseVersion, TEntity, TEntityData> {
+export interface EntityVersionManagerProps<
+  TVersion extends BaseVersion,
+  TEntity,
+  TEntityData,
+> {
   /** Array of versions */
   versions: TVersion[];
   /** Currently selected version */
@@ -41,7 +46,11 @@ export interface EntityVersionManagerProps<TVersion extends BaseVersion, TEntity
   renderCreateDialog: (props: {
     open: boolean;
     onClose: () => void;
-    onConfirm: (data: { name: string; description: string; entityData: TEntityData }) => void;
+    onConfirm: (data: {
+      name: string;
+      description: string;
+      entityData: TEntityData;
+    }) => void;
     baseEntity: TEntity;
   }) => ReactNode;
 }
@@ -88,7 +97,7 @@ export interface EntityVersionManagerProps<TVersion extends BaseVersion, TEntity
 export function EntityVersionManager<
   TVersion extends BaseVersion,
   TEntity,
-  TEntityData
+  TEntityData,
 >({
   versions,
   currentVersion,
@@ -141,11 +150,12 @@ export function EntityVersionManager<
       <ScrollArea className="h-[520px] flex-shrink-0">
         <div className="space-y-3 w-full pr-4 pb-3">
           {/* Main Version */}
-          {mainVersion && renderVersionCard({
-            version: mainVersion,
-            isSelected: currentVersion?.id === mainVersion.id,
-            onClick: () => handleVersionClick(mainVersion),
-          })}
+          {mainVersion &&
+            renderVersionCard({
+              version: mainVersion,
+              isSelected: currentVersion?.id === mainVersion.id,
+              onClick: () => handleVersionClick(mainVersion),
+            })}
 
           {/* Alternative Versions */}
           {alternativeVersions.length > 0 && (

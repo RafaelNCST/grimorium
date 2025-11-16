@@ -19,9 +19,9 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => {
   React.useEffect(() => {
     // Add a class to body when dialog opens to block interactions behind it
-    document.body.setAttribute('data-dialog-open', 'true');
+    document.body.setAttribute("data-dialog-open", "true");
     return () => {
-      document.body.removeAttribute('data-dialog-open');
+      document.body.removeAttribute("data-dialog-open");
     };
   }, []);
 

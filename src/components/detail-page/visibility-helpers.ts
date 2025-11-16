@@ -106,9 +106,7 @@ export function toggleSectionVisibility(
  * @param fieldVisibility - Field visibility object
  * @returns Array of field names that are hidden
  */
-export function getHiddenFields(
-  fieldVisibility: IFieldVisibility
-): string[] {
+export function getHiddenFields(fieldVisibility: IFieldVisibility): string[] {
   return Object.entries(fieldVisibility)
     .filter(([_, isVisible]) => isVisible === false)
     .map(([fieldName]) => fieldName);
@@ -134,9 +132,7 @@ export function getHiddenSections(
  * @param fieldNames - Array of field names
  * @returns Field visibility object with all fields visible
  */
-export function resetFieldsVisibility(
-  fieldNames: string[]
-): IFieldVisibility {
+export function resetFieldsVisibility(fieldNames: string[]): IFieldVisibility {
   return fieldNames.reduce((acc, fieldName) => {
     acc[fieldName] = true;
     return acc;

@@ -1,10 +1,13 @@
 import { useState } from "react";
+
+import { Map, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { IRegion } from "../types/region-types";
+
 import { SCALE_COLORS } from "../constants/scale-colors";
-import { Map, MapPin } from "lucide-react";
+import { IRegion } from "../types/region-types";
 
 interface RegionCardProps {
   region: IRegion;
@@ -86,9 +89,7 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
                 className="flex items-center gap-1 px-2 py-0.5 pointer-events-none"
               >
                 <MapPin className="w-3 h-3" />
-                <span className="text-xs font-medium">
-                  {parentRegion.name}
-                </span>
+                <span className="text-xs font-medium">{parentRegion.name}</span>
               </Badge>
             )}
           </div>

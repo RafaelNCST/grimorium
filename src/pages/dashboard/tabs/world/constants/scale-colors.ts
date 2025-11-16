@@ -4,11 +4,15 @@ import { RegionScale } from "../types/region-types";
  * Color classes for region scales (for cards and general use)
  */
 export const SCALE_COLORS: Record<RegionScale, string> = {
-  local: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+  local:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
   continental: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  planetary: "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200",
-  galactic: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  universal: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+  planetary:
+    "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200",
+  galactic:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+  universal:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
   multiversal: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
 };
 
@@ -16,12 +20,18 @@ export const SCALE_COLORS: Record<RegionScale, string> = {
  * Badge color classes for region scale filters
  */
 export const SCALE_BADGE_COLORS: Record<RegionScale, string> = {
-  local: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400",
-  continental: "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
-  planetary: "bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400",
-  galactic: "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
-  universal: "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400",
-  multiversal: "bg-pink-500/10 text-pink-600 border-pink-500/20 dark:text-pink-400",
+  local:
+    "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400",
+  continental:
+    "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
+  planetary:
+    "bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400",
+  galactic:
+    "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
+  universal:
+    "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400",
+  multiversal:
+    "bg-pink-500/10 text-pink-600 border-pink-500/20 dark:text-pink-400",
 };
 
 /**

@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import * as React from "react";
+
+import { AlertTriangle, Loader2 } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 export interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -51,8 +53,8 @@ export function DeleteConfirmationDialog({
   children,
   title,
   description,
-  confirmText = 'Excluir',
-  cancelText = 'Cancelar',
+  confirmText = "Excluir",
+  cancelText = "Cancelar",
 }: DeleteConfirmationDialogProps) {
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -62,7 +64,7 @@ export function DeleteConfirmationDialog({
       await onConfirm();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error deleting entity:', error);
+      console.error("Error deleting entity:", error);
     } finally {
       setIsDeleting(false);
     }
@@ -102,7 +104,7 @@ export function DeleteConfirmationDialog({
             className="bg-destructive hover:bg-destructive/90"
           >
             {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isDeleting ? 'Excluindo...' : confirmText}
+            {isDeleting ? "Excluindo..." : confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

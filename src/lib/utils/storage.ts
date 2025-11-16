@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * Custom hook for localStorage with debounce
@@ -21,7 +21,10 @@ export function useLocalStorageState<T>(
       }
       return JSON.parse(item) as T;
     } catch (error) {
-      console.warn(`[useLocalStorageState] Failed to load ${key} from localStorage:`, error);
+      console.warn(
+        `[useLocalStorageState] Failed to load ${key} from localStorage:`,
+        error
+      );
       return defaultValue;
     }
   });
@@ -32,7 +35,10 @@ export function useLocalStorageState<T>(
       try {
         localStorage.setItem(key, JSON.stringify(state));
       } catch (error) {
-        console.error(`[useLocalStorageState] Failed to save ${key} to localStorage:`, error);
+        console.error(
+          `[useLocalStorageState] Failed to save ${key} to localStorage:`,
+          error
+        );
       }
     }, debounceMs);
 
@@ -56,7 +62,10 @@ export function getLocalStorageItem<T>(key: string, defaultValue: T): T {
     }
     return JSON.parse(item) as T;
   } catch (error) {
-    console.warn(`[getLocalStorageItem] Failed to load ${key} from localStorage:`, error);
+    console.warn(
+      `[getLocalStorageItem] Failed to load ${key} from localStorage:`,
+      error
+    );
     return defaultValue;
   }
 }
@@ -70,7 +79,10 @@ export function setLocalStorageItem<T>(key: string, value: T): void {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`[setLocalStorageItem] Failed to save ${key} to localStorage:`, error);
+    console.error(
+      `[setLocalStorageItem] Failed to save ${key} to localStorage:`,
+      error
+    );
   }
 }
 
@@ -82,6 +94,9 @@ export function removeLocalStorageItem(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error(`[removeLocalStorageItem] Failed to remove ${key} from localStorage:`, error);
+    console.error(
+      `[removeLocalStorageItem] Failed to remove ${key} from localStorage:`,
+      error
+    );
   }
 }

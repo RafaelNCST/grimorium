@@ -1,4 +1,5 @@
 import { FilterRow, BADGE_COLORS } from "@/components/entity-list";
+
 import { RegionScale } from "../types/region-types";
 
 /**

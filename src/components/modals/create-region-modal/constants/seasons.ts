@@ -1,6 +1,11 @@
 import { Leaf, Sun, Wind, Snowflake, Sparkles, LucideIcon } from "lucide-react";
 
-export type RegionSeasonValue = "spring" | "summer" | "autumn" | "winter" | "custom";
+export type RegionSeasonValue =
+  | "spring"
+  | "summer"
+  | "autumn"
+  | "winter"
+  | "custom";
 
 export interface SeasonOption {
   value: RegionSeasonValue;

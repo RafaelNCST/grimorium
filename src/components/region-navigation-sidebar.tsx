@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { X, Search, Map } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -134,7 +135,9 @@ export function RegionNavigationSidebar({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{region.name}</p>
+                    <p className="font-medium text-sm truncate">
+                      {region.name}
+                    </p>
                   </div>
                 </button>
               ))}

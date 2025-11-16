@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Upload, ImageIcon } from "lucide-react";
+
 import { open } from "@tauri-apps/plugin-dialog";
+import { Upload, ImageIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { uploadMapImage } from "@/lib/db/region-maps.service";
 
 interface MapImageUploaderProps {
@@ -56,8 +58,8 @@ export function MapImageUploader({
         <div className="text-center space-y-2">
           <h3 className="text-lg font-semibold">Nenhum mapa cadastrado</h3>
           <p className="text-sm text-muted-foreground max-w-md">
-            Faça upload de uma imagem para representar o mapa desta região. Formatos
-            suportados: PNG, JPEG, SVG.
+            Faça upload de uma imagem para representar o mapa desta região.
+            Formatos suportados: PNG, JPEG, SVG.
           </p>
         </div>
 

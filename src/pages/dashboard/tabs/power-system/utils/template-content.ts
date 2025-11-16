@@ -62,7 +62,12 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
             {
               type: "tag-list",
               content: {
-                tags: ["Energia Mística", "Invisível", "Onipresente", "Poderosa"],
+                tags: [
+                  "Energia Mística",
+                  "Invisível",
+                  "Onipresente",
+                  "Poderosa",
+                ],
               },
             },
           ],
@@ -184,12 +189,14 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                   {
                     id: crypto.randomUUID(),
                     title: "Fontes Místicas",
-                    description: "Nascentes de água imbuídas com energia mágica",
+                    description:
+                      "Nascentes de água imbuídas com energia mágica",
                   },
                   {
                     id: crypto.randomUUID(),
                     title: "Ruínas Arcanas",
-                    description: "Locais onde poderosos feitiços foram lançados",
+                    description:
+                      "Locais onde poderosos feitiços foram lançados",
                   },
                   {
                     id: crypto.randomUUID(),
@@ -610,7 +617,12 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
             {
               type: "tag-list",
               content: {
-                tags: ["Mystical Energy", "Invisible", "Omnipresent", "Powerful"],
+                tags: [
+                  "Mystical Energy",
+                  "Invisible",
+                  "Omnipresent",
+                  "Powerful",
+                ],
               },
             },
           ],
@@ -1030,7 +1042,12 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                   {
                     type: "tag-list",
                     content: {
-                      tags: ["Destructive", "Fast", "Intense", "High Consumption"],
+                      tags: [
+                        "Destructive",
+                        "Fast",
+                        "Intense",
+                        "High Consumption",
+                      ],
                     },
                   },
                   {
@@ -1280,8 +1297,7 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                   {
                     id: crypto.randomUUID(),
                     title: "Montanhas Altas",
-                    description:
-                      "O ar rarefeito fortalece a respiração e o Ki",
+                    description: "O ar rarefeito fortalece a respiração e o Ki",
                   },
                   {
                     id: crypto.randomUUID(),
@@ -1642,7 +1658,12 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                   {
                     type: "tag-list",
                     content: {
-                      tags: ["Defensivo", "Resistente", "Paciente", "Calculado"],
+                      tags: [
+                        "Defensivo",
+                        "Resistente",
+                        "Paciente",
+                        "Calculado",
+                      ],
                     },
                   },
                   {
@@ -1670,7 +1691,12 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                   {
                     type: "tag-list",
                     content: {
-                      tags: ["Equilibrado", "Gracioso", "Imprevisível", "Elegante"],
+                      tags: [
+                        "Equilibrado",
+                        "Gracioso",
+                        "Imprevisível",
+                        "Elegante",
+                      ],
                     },
                   },
                   {
@@ -1834,12 +1860,14 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                   {
                     id: crypto.randomUUID(),
                     title: "Waterfalls",
-                    description: "The constant flow symbolizes and reinforces Ki",
+                    description:
+                      "The constant flow symbolizes and reinforces Ki",
                   },
                   {
                     id: crypto.randomUUID(),
                     title: "Ancient Temples",
-                    description: "Places of meditation accumulate spiritual energy",
+                    description:
+                      "Places of meditation accumulate spiritual energy",
                   },
                   {
                     id: crypto.randomUUID(),
@@ -2217,7 +2245,12 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                   {
                     type: "tag-list",
                     content: {
-                      tags: ["Balanced", "Graceful", "Unpredictable", "Elegant"],
+                      tags: [
+                        "Balanced",
+                        "Graceful",
+                        "Unpredictable",
+                        "Elegant",
+                      ],
                     },
                   },
                   {

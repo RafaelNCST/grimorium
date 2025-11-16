@@ -1,4 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
+
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -6,9 +8,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export interface SelectOption {
   value: string;
@@ -59,7 +60,7 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
       value,
       onValueChange,
       options,
-      placeholder = 'Selecione...',
+      placeholder = "Selecione...",
       error,
       helperText,
       containerClassName,
@@ -72,7 +73,7 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
     const hasError = Boolean(error);
 
     return (
-      <div className={cn('space-y-2', containerClassName)}>
+      <div className={cn("space-y-2", containerClassName)}>
         {label && (
           <Label htmlFor={name} className="flex items-center gap-1">
             {label}
@@ -90,7 +91,7 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
         >
           <SelectTrigger
             ref={ref}
-            className={cn(hasError && 'border-destructive')}
+            className={cn(hasError && "border-destructive")}
             aria-invalid={hasError}
           >
             <SelectValue placeholder={placeholder} />
@@ -122,4 +123,4 @@ export const FormSelect = React.forwardRef<HTMLButtonElement, FormSelectProps>(
   }
 );
 
-FormSelect.displayName = 'FormSelect';
+FormSelect.displayName = "FormSelect";

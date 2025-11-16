@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
+
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
+import { open } from "@tauri-apps/plugin-dialog";
 import { ArrowLeft, Upload } from "lucide-react";
+
+import { WarningDialog } from "@/components/dialogs/WarningDialog";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -8,8 +12,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { WarningDialog } from "@/components/dialogs/WarningDialog";
-import { getRegionById } from "@/lib/db/regions.service";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
 import {
   getMapByRegionId,
   getMarkersByRegion,
@@ -22,16 +28,14 @@ import {
   uploadMapImage,
   IRegionMapMarker,
 } from "@/lib/db/region-maps.service";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
+import { getRegionById } from "@/lib/db/regions.service";
+
 import { IRegion } from "../types/region-types";
-import { MapImageUploader } from "./components/map-image-uploader";
+
 import { MapCanvas } from "./components/map-canvas";
-import { RegionChildrenList } from "./components/region-children-list";
+import { MapImageUploader } from "./components/map-image-uploader";
 import { MapMarkerDetails } from "./components/map-marker-details";
-import { open } from "@tauri-apps/plugin-dialog";
+import { RegionChildrenList } from "./components/region-children-list";
 
 export function RegionMapPage() {
   const params = useParams({ strict: false });
@@ -45,12 +49,22 @@ export function RegionMapPage() {
   const [mapId, setMapId] = useState<string | null>(null);
   const [markers, setMarkers] = useState<IRegionMapMarker[]>([]);
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
-  const [selectedChildForPlacement, setSelectedChildForPlacement] = useState<string | null>(null);
+  const [selectedChildForPlacement, setSelectedChildForPlacement] = useState<
+    string | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [characters, setCharacters] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [factions, setFactions] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [races, setRaces] = useState<Array<{ id: string; name: string; image?: string }>>([]);
-  const [items, setItems] = useState<Array<{ id: string; name: string; image?: string }>>([]);
+  const [characters, setCharacters] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [factions, setFactions] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [races, setRaces] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
+  const [items, setItems] = useState<
+    Array<{ id: string; name: string; image?: string }>
+  >([]);
   const [showChangeImageWarning, setShowChangeImageWarning] = useState(false);
 
   const regionId = params.regionId as string;
@@ -105,7 +119,10 @@ export function RegionMapPage() {
       // Load region
       const regionData = await getRegionById(regionId);
       if (!regionData) {
-        navigate({ to: "/dashboard/$dashboardId/tabs/world", params: { dashboardId: params.dashboardId as string } });
+        navigate({
+          to: "/dashboard/$dashboardId/tabs/world",
+          params: { dashboardId: params.dashboardId as string },
+        });
         return;
       }
       setRegion(regionData);
@@ -124,7 +141,9 @@ export function RegionMapPage() {
         setMapId(map.id);
 
         // Load markers for this specific map
-        const { getMarkersByMapId } = await import("@/lib/db/region-maps.service");
+        const { getMarkersByMapId } = await import(
+          "@/lib/db/region-maps.service"
+        );
         const markersData = await getMarkersByMapId(map.id);
 
         // Clean orphaned markers (markers whose child regions no longer exist)
@@ -146,7 +165,10 @@ export function RegionMapPage() {
             try {
               await removeMarker(markerId);
             } catch (error) {
-              console.error(`Failed to remove orphaned marker ${markerId}:`, error);
+              console.error(
+                `Failed to remove orphaned marker ${markerId}:`,
+                error
+              );
             }
           }
         }
@@ -159,17 +181,26 @@ export function RegionMapPage() {
       }
 
       // Load related entities
-      const [charactersData, factionsData, racesData, itemsData] = await Promise.all([
-        getCharactersByBookId(regionData.bookId),
-        getFactionsByBookId(regionData.bookId),
-        getRacesByBookId(regionData.bookId),
-        getItemsByBookId(regionData.bookId),
-      ]);
+      const [charactersData, factionsData, racesData, itemsData] =
+        await Promise.all([
+          getCharactersByBookId(regionData.bookId),
+          getFactionsByBookId(regionData.bookId),
+          getRacesByBookId(regionData.bookId),
+          getItemsByBookId(regionData.bookId),
+        ]);
 
-      setCharacters(charactersData.map(c => ({ id: c.id, name: c.name, image: c.image })));
-      setFactions(factionsData.map(f => ({ id: f.id, name: f.name, image: f.image })));
-      setRaces(racesData.map(r => ({ id: r.id, name: r.name, image: r.image })));
-      setItems(itemsData.map(i => ({ id: i.id, name: i.name, image: i.image })));
+      setCharacters(
+        charactersData.map((c) => ({ id: c.id, name: c.name, image: c.image }))
+      );
+      setFactions(
+        factionsData.map((f) => ({ id: f.id, name: f.name, image: f.image }))
+      );
+      setRaces(
+        racesData.map((r) => ({ id: r.id, name: r.name, image: r.image }))
+      );
+      setItems(
+        itemsData.map((i) => ({ id: i.id, name: i.name, image: i.image }))
+      );
     } catch (error) {
       console.error("Failed to load region map data:", error);
     } finally {
@@ -245,7 +276,9 @@ export function RegionMapPage() {
 
     try {
       // Check if marker already exists
-      const existingMarker = markers.find((m) => m.childRegionId === selectedChildForPlacement);
+      const existingMarker = markers.find(
+        (m) => m.childRegionId === selectedChildForPlacement
+      );
 
       if (existingMarker) {
         // Update existing marker position
@@ -259,7 +292,13 @@ export function RegionMapPage() {
         );
       } else {
         // Create new marker
-        const newMarker = await addMarker(mapId, regionId, selectedChildForPlacement, x, y);
+        const newMarker = await addMarker(
+          mapId,
+          regionId,
+          selectedChildForPlacement,
+          x,
+          y
+        );
         setMarkers((prev) => [...prev, newMarker]);
       }
 
@@ -274,12 +313,18 @@ export function RegionMapPage() {
     setSelectedMarkerId(marker.id);
   };
 
-  const handleMarkerDragEnd = async (markerId: string, x: number, y: number) => {
+  const handleMarkerDragEnd = async (
+    markerId: string,
+    x: number,
+    y: number
+  ) => {
     try {
       await updateMarkerPosition(markerId, x, y);
       setMarkers((prev) =>
         prev.map((m) =>
-          m.id === markerId ? { ...m, positionX: Math.round(x), positionY: Math.round(y) } : m
+          m.id === markerId
+            ? { ...m, positionX: Math.round(x), positionY: Math.round(y) }
+            : m
         )
       );
     } catch (error) {
@@ -407,7 +452,7 @@ export function RegionMapPage() {
             children={childrenRegions}
             markers={markers}
             selectedChildId={selectedChildForPlacement}
-            isEditMode={true}
+            isEditMode
             onChildSelect={handleChildSelect}
             onDeselectChild={handleDeselectChild}
             onRemoveMarker={handleRemoveMarker}
@@ -426,7 +471,7 @@ export function RegionMapPage() {
             factions={factions}
             races={races}
             items={items}
-            isEditMode={true}
+            isEditMode
             onClose={() => setSelectedMarkerId(null)}
             onRemoveMarker={handleRemoveSelectedMarker}
             onColorChange={handleColorChange}
@@ -450,7 +495,11 @@ export function RegionMapPage() {
             onMarkerScaleChange={handleMarkerScaleChange}
           />
         ) : (
-          <MapImageUploader regionId={regionId} versionId={versionId} onUploadComplete={handleUploadComplete} />
+          <MapImageUploader
+            regionId={regionId}
+            versionId={versionId}
+            onUploadComplete={handleUploadComplete}
+          />
         )}
       </div>
 
@@ -459,7 +508,7 @@ export function RegionMapPage() {
         open={showChangeImageWarning}
         onOpenChange={setShowChangeImageWarning}
         title="Trocar imagem do mapa?"
-        description={`Existem ${markers.length} ${markers.length === 1 ? 'elemento colocado' : 'elementos colocados'} neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.`}
+        description={`Existem ${markers.length} ${markers.length === 1 ? "elemento colocado" : "elementos colocados"} neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.`}
         cancelText="Cancelar"
         confirmText="Continuar e escolher imagem"
         onConfirm={proceedWithImageChange}

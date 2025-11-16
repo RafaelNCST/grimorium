@@ -1,4 +1,12 @@
-import { ArrowLeft, Pencil, PanelLeft, Trash2, Zap, Undo2, Redo2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Pencil,
+  PanelLeft,
+  Trash2,
+  Zap,
+  Undo2,
+  Redo2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -604,9 +612,7 @@ export function PowerSystemDetailView({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-sm font-medium">
-                      Undo (Ctrl+Z)
-                    </p>
+                    <p className="text-sm font-medium">Undo (Ctrl+Z)</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -623,9 +629,7 @@ export function PowerSystemDetailView({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-sm font-medium">
-                      Redo (Ctrl+Y)
-                    </p>
+                    <p className="text-sm font-medium">Redo (Ctrl+Y)</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

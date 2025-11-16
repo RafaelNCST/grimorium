@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Map } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
+
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { EntityModal } from "@/components/modals/entity-modal";
 import {
   Form,
   FormControl,
@@ -19,20 +27,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { FormInput } from "@/components/forms/FormInput";
-import { FormTextarea } from "@/components/forms/FormTextarea";
-import { FormImageUpload } from "@/components/forms/FormImageUpload";
-import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
-import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
-import { IRegion, RegionScale, RegionSeason, IRegionFormData } from "@/pages/dashboard/tabs/world/types/region-types";
-import { IFaction } from "@/types/faction-types";
-import { ICharacter } from "@/types/character-types";
-import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { IItem } from "@/lib/db/items.service";
-import { Map } from "lucide-react";
-import { EntityModal } from "@/components/modals/entity-modal";
-import { SeasonPicker } from "./create-region-modal/components/season-picker";
+import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
+import {
+  IRegion,
+  RegionScale,
+  RegionSeason,
+  IRegionFormData,
+} from "@/pages/dashboard/tabs/world/types/region-types";
+import { ICharacter } from "@/types/character-types";
+import { IFaction } from "@/types/faction-types";
+
 import { ListInput } from "./create-region-modal/components/list-input";
+import { SeasonPicker } from "./create-region-modal/components/season-picker";
 
 interface CreateRegionModalProps {
   open: boolean;
@@ -52,13 +60,25 @@ const regionFormSchema = z.object({
   // Basic fields
   name: z.string().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
   parentId: z.string().nullable(),
-  scale: z.enum(["local", "continental", "planetary", "galactic", "universal", "multiversal"]),
-  summary: z.string().min(1, "Resumo é obrigatório").max(500, "Resumo muito longo"),
+  scale: z.enum([
+    "local",
+    "continental",
+    "planetary",
+    "galactic",
+    "universal",
+    "multiversal",
+  ]),
+  summary: z
+    .string()
+    .min(1, "Resumo é obrigatório")
+    .max(500, "Resumo muito longo"),
   image: z.string().optional(),
 
   // Environment fields
   climate: z.string().max(500).optional(),
-  currentSeason: z.enum(["spring", "summer", "autumn", "winter", "custom"]).optional(),
+  currentSeason: z
+    .enum(["spring", "summer", "autumn", "winter", "custom"])
+    .optional(),
   customSeasonName: z.string().max(50).optional(),
   generalDescription: z.string().max(1000).optional(),
   regionAnomalies: z.array(z.string()).optional(),
@@ -111,7 +131,7 @@ export function CreateRegionModal({
   // Force refresh of entity selects when modal opens
   useEffect(() => {
     if (open) {
-      setRefreshKey(prev => prev + 1);
+      setRefreshKey((prev) => prev + 1);
     }
   }, [open]);
 
@@ -229,15 +249,21 @@ export function CreateRegionModal({
       open={open}
       onOpenChange={handleClose}
       header={{
-        title: editRegion ? t("create_region.edit_title") : t("create_region.title"),
+        title: editRegion
+          ? t("create_region.edit_title")
+          : t("create_region.title"),
         icon: Map,
         description: t("description"),
-        warning: "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região."
+        warning:
+          "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.",
       }}
       basicFieldsTitle={t("create_region.basic_fields")}
       basicFields={
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             {/* Image Upload */}
             <FormField
               control={form.control}
@@ -303,7 +329,9 @@ export function CreateRegionModal({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("create_region.parent_placeholder")} />
+                        <SelectValue
+                          placeholder={t("create_region.parent_placeholder")}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -375,417 +403,445 @@ export function CreateRegionModal({
       }
       advancedFields={
         <>
-              {/* Environment Section */}
-              <div className="space-y-4">
-                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                  {t("create_region.environment_section")}
-                </h4>
+          {/* Environment Section */}
+          <div className="space-y-4">
+            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+              {t("create_region.environment_section")}
+            </h4>
 
-                {/* Climate */}
-                <FormField
-                  control={form.control}
-                  name="climate"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.climate_label")}
-                          placeholder={t("create_region.climate_placeholder")}
-                          rows={4}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Climate */}
+            <FormField
+              control={form.control}
+              name="climate"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.climate_label")}
+                      placeholder={t("create_region.climate_placeholder")}
+                      rows={4}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Season Picker */}
-                <FormField
-                  control={form.control}
-                  name="currentSeason"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SeasonPicker
-                          value={field.value}
-                          customSeasonName={form.watch("customSeasonName")}
-                          onSeasonChange={(season: RegionSeason) => field.onChange(season)}
-                          onCustomNameChange={(name) => form.setValue("customSeasonName", name)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Season Picker */}
+            <FormField
+              control={form.control}
+              name="currentSeason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <SeasonPicker
+                      value={field.value}
+                      customSeasonName={form.watch("customSeasonName")}
+                      onSeasonChange={(season: RegionSeason) =>
+                        field.onChange(season)
+                      }
+                      onCustomNameChange={(name) =>
+                        form.setValue("customSeasonName", name)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                {/* General Description */}
-                <FormField
-                  control={form.control}
-                  name="generalDescription"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.general_description_label")}
-                          placeholder={t("create_region.general_description_placeholder")}
-                          rows={5}
-                          maxLength={1000}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* General Description */}
+            <FormField
+              control={form.control}
+              name="generalDescription"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.general_description_label")}
+                      placeholder={t(
+                        "create_region.general_description_placeholder"
+                      )}
+                      rows={5}
+                      maxLength={1000}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Region Anomalies */}
-                <FormField
-                  control={form.control}
-                  name="regionAnomalies"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <ListInput
-                          label={t("create_region.region_anomalies_label")}
-                          placeholder={t("create_region.anomaly_placeholder")}
-                          buttonText={t("create_region.add_anomaly")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          maxLength={200}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            {/* Region Anomalies */}
+            <FormField
+              control={form.control}
+              name="regionAnomalies"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <ListInput
+                      label={t("create_region.region_anomalies_label")}
+                      placeholder={t("create_region.anomaly_placeholder")}
+                      buttonText={t("create_region.add_anomaly")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      maxLength={200}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-              <Separator />
+          <Separator />
 
-              {/* Information Section */}
-              <div className="space-y-4">
-                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                  {t("create_region.information_section")}
-                </h4>
+          {/* Information Section */}
+          <div className="space-y-4">
+            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+              {t("create_region.information_section")}
+            </h4>
 
-                {/* Resident Factions */}
-                <FormField
-                  control={form.control}
-                  name="residentFactions"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormEntityMultiSelectAuto
-                          key={`resident-factions-${refreshKey}`}
-                          entityType="faction"
-                          bookId={bookId}
-                          label={t("create_region.resident_factions_label")}
-                          placeholder={t("create_region.resident_factions_placeholder")}
-                          emptyText={t("create_region.no_factions_warning")}
-                          noSelectionText={t("create_region.no_factions_selected")}
-                          searchPlaceholder={t("create_region.search_faction")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Resident Factions */}
+            <FormField
+              control={form.control}
+              name="residentFactions"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormEntityMultiSelectAuto
+                      key={`resident-factions-${refreshKey}`}
+                      entityType="faction"
+                      bookId={bookId}
+                      label={t("create_region.resident_factions_label")}
+                      placeholder={t(
+                        "create_region.resident_factions_placeholder"
+                      )}
+                      emptyText={t("create_region.no_factions_warning")}
+                      noSelectionText={t("create_region.no_factions_selected")}
+                      searchPlaceholder={t("create_region.search_faction")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Dominant Factions */}
-                <FormField
-                  control={form.control}
-                  name="dominantFactions"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormEntityMultiSelectAuto
-                          key={`dominant-factions-${refreshKey}`}
-                          entityType="faction"
-                          bookId={bookId}
-                          label={t("create_region.dominant_factions_label")}
-                          placeholder={t("create_region.dominant_factions_placeholder")}
-                          emptyText={t("create_region.no_factions_warning")}
-                          noSelectionText={t("create_region.no_factions_selected")}
-                          searchPlaceholder={t("create_region.search_faction")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Dominant Factions */}
+            <FormField
+              control={form.control}
+              name="dominantFactions"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormEntityMultiSelectAuto
+                      key={`dominant-factions-${refreshKey}`}
+                      entityType="faction"
+                      bookId={bookId}
+                      label={t("create_region.dominant_factions_label")}
+                      placeholder={t(
+                        "create_region.dominant_factions_placeholder"
+                      )}
+                      emptyText={t("create_region.no_factions_warning")}
+                      noSelectionText={t("create_region.no_factions_selected")}
+                      searchPlaceholder={t("create_region.search_faction")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Important Characters */}
-                <FormField
-                  control={form.control}
-                  name="importantCharacters"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormEntityMultiSelectAuto
-                          key={`important-characters-${refreshKey}`}
-                          entityType="character"
-                          bookId={bookId}
-                          label={t("create_region.important_characters_label")}
-                          placeholder={t("create_region.important_characters_placeholder")}
-                          emptyText={t("create_region.no_characters_warning")}
-                          noSelectionText={t("create_region.no_characters_selected")}
-                          searchPlaceholder={t("create_region.search_character")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Important Characters */}
+            <FormField
+              control={form.control}
+              name="importantCharacters"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormEntityMultiSelectAuto
+                      key={`important-characters-${refreshKey}`}
+                      entityType="character"
+                      bookId={bookId}
+                      label={t("create_region.important_characters_label")}
+                      placeholder={t(
+                        "create_region.important_characters_placeholder"
+                      )}
+                      emptyText={t("create_region.no_characters_warning")}
+                      noSelectionText={t(
+                        "create_region.no_characters_selected"
+                      )}
+                      searchPlaceholder={t("create_region.search_character")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Races Found */}
-                <FormField
-                  control={form.control}
-                  name="racesFound"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormEntityMultiSelectAuto
-                          key={`races-found-${refreshKey}`}
-                          entityType="race"
-                          bookId={bookId}
-                          label={t("create_region.races_found_label")}
-                          placeholder={t("create_region.races_found_placeholder")}
-                          emptyText={t("create_region.no_races_warning")}
-                          noSelectionText={t("create_region.no_races_selected")}
-                          searchPlaceholder={t("create_region.search_race")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Races Found */}
+            <FormField
+              control={form.control}
+              name="racesFound"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormEntityMultiSelectAuto
+                      key={`races-found-${refreshKey}`}
+                      entityType="race"
+                      bookId={bookId}
+                      label={t("create_region.races_found_label")}
+                      placeholder={t("create_region.races_found_placeholder")}
+                      emptyText={t("create_region.no_races_warning")}
+                      noSelectionText={t("create_region.no_races_selected")}
+                      searchPlaceholder={t("create_region.search_race")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Items Found */}
-                <FormField
-                  control={form.control}
-                  name="itemsFound"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormEntityMultiSelectAuto
-                          key={`items-found-${refreshKey}`}
-                          entityType="item"
-                          bookId={bookId}
-                          label={t("create_region.items_found_label")}
-                          placeholder={t("create_region.items_found_placeholder")}
-                          emptyText={t("create_region.no_items_warning")}
-                          noSelectionText={t("create_region.no_items_selected")}
-                          searchPlaceholder={t("create_region.search_item")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+            {/* Items Found */}
+            <FormField
+              control={form.control}
+              name="itemsFound"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormEntityMultiSelectAuto
+                      key={`items-found-${refreshKey}`}
+                      entityType="item"
+                      bookId={bookId}
+                      label={t("create_region.items_found_label")}
+                      placeholder={t("create_region.items_found_placeholder")}
+                      emptyText={t("create_region.no_items_warning")}
+                      noSelectionText={t("create_region.no_items_selected")}
+                      searchPlaceholder={t("create_region.search_item")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
 
-              <Separator />
+          <Separator />
 
-              {/* Narrative Section */}
-              <div className="space-y-4">
-                <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-                  {t("create_region.narrative_section")}
-                </h4>
+          {/* Narrative Section */}
+          <div className="space-y-4">
+            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+              {t("create_region.narrative_section")}
+            </h4>
 
-                {/* Narrative Purpose */}
-                <FormField
-                  control={form.control}
-                  name="narrativePurpose"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.narrative_purpose_label")}
-                          placeholder={t("create_region.narrative_purpose_placeholder")}
-                          rows={3}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Narrative Purpose */}
+            <FormField
+              control={form.control}
+              name="narrativePurpose"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.narrative_purpose_label")}
+                      placeholder={t(
+                        "create_region.narrative_purpose_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Unique Characteristics */}
-                <FormField
-                  control={form.control}
-                  name="uniqueCharacteristics"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.unique_characteristics_label")}
-                          placeholder={t("create_region.unique_characteristics_placeholder")}
-                          rows={3}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Unique Characteristics */}
+            <FormField
+              control={form.control}
+              name="uniqueCharacteristics"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.unique_characteristics_label")}
+                      placeholder={t(
+                        "create_region.unique_characteristics_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Political Importance */}
-                <FormField
-                  control={form.control}
-                  name="politicalImportance"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.political_importance_label")}
-                          placeholder={t("create_region.political_importance_placeholder")}
-                          rows={3}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Political Importance */}
+            <FormField
+              control={form.control}
+              name="politicalImportance"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.political_importance_label")}
+                      placeholder={t(
+                        "create_region.political_importance_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Religious Importance */}
-                <FormField
-                  control={form.control}
-                  name="religiousImportance"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.religious_importance_label")}
-                          placeholder={t("create_region.religious_importance_placeholder")}
-                          rows={3}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* Religious Importance */}
+            <FormField
+              control={form.control}
+              name="religiousImportance"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.religious_importance_label")}
+                      placeholder={t(
+                        "create_region.religious_importance_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* World Perception */}
-                <FormField
-                  control={form.control}
-                  name="worldPerception"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <FormTextarea
-                          {...field}
-                          label={t("create_region.world_perception_label")}
-                          placeholder={t("create_region.world_perception_placeholder")}
-                          rows={3}
-                          maxLength={500}
-                          showCharCount
-                          error={fieldState.error?.message}
-                          className="resize-none"
-                          labelClassName="text-primary"
-                          showOptionalLabel={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+            {/* World Perception */}
+            <FormField
+              control={form.control}
+              name="worldPerception"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <FormTextarea
+                      {...field}
+                      label={t("create_region.world_perception_label")}
+                      placeholder={t(
+                        "create_region.world_perception_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      showCharCount
+                      error={fieldState.error?.message}
+                      className="resize-none"
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-                {/* Region Mysteries */}
-                <FormField
-                  control={form.control}
-                  name="regionMysteries"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <ListInput
-                          label={t("create_region.region_mysteries_label")}
-                          placeholder={t("create_region.mystery_placeholder")}
-                          buttonText={t("create_region.add_mystery")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Region Mysteries */}
+            <FormField
+              control={form.control}
+              name="regionMysteries"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <ListInput
+                      label={t("create_region.region_mysteries_label")}
+                      placeholder={t("create_region.mystery_placeholder")}
+                      buttonText={t("create_region.add_mystery")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                {/* Inspirations */}
-                <FormField
-                  control={form.control}
-                  name="inspirations"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <ListInput
-                          label={t("create_region.inspirations_label")}
-                          placeholder={t("create_region.inspiration_placeholder")}
-                          buttonText={t("create_region.add_inspiration")}
-                          value={field.value || []}
-                          onChange={field.onChange}
-                          labelClassName="text-sm font-medium text-primary"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </>
+            {/* Inspirations */}
+            <FormField
+              control={form.control}
+              name="inspirations"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <ListInput
+                      label={t("create_region.inspirations_label")}
+                      placeholder={t("create_region.inspiration_placeholder")}
+                      buttonText={t("create_region.add_inspiration")}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      labelClassName="text-sm font-medium text-primary"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </>
       }
       footer={{
-        isSubmitting: isSubmitting,
+        isSubmitting,
         isValid: form.formState.isValid,
         onSubmit: form.handleSubmit(handleSubmit),
         onCancel: handleClose,
         editMode: !!editRegion,
         submitLabel: isSubmitting
-          ? editRegion ? t("create_region.updating") : t("create_region.creating")
-          : editRegion ? t("create_region.save_button") : t("create_region.create_button"),
+          ? editRegion
+            ? t("create_region.updating")
+            : t("create_region.creating")
+          : editRegion
+            ? t("create_region.save_button")
+            : t("create_region.create_button"),
         cancelLabel: t("create_region.cancel_button"),
       }}
     />

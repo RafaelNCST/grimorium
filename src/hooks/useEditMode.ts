@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from "react";
 
 export interface UseEditModeOptions<T> {
   initialData: T | null;
@@ -49,7 +49,7 @@ export function useEditMode<T>({
     try {
       return JSON.stringify(initialData) !== JSON.stringify(editData);
     } catch (error) {
-      console.warn('[useEditMode] Failed to compare data:', error);
+      console.warn("[useEditMode] Failed to compare data:", error);
       return false;
     }
   }, [initialData, editData, isEditing, compareFunction]);
@@ -70,7 +70,7 @@ export function useEditMode<T>({
   // Save changes
   const saveChanges = useCallback(async () => {
     if (!onSave) {
-      console.warn('[useEditMode] No onSave function provided');
+      console.warn("[useEditMode] No onSave function provided");
       return;
     }
 
@@ -79,7 +79,7 @@ export function useEditMode<T>({
       await onSave(editData);
       setIsEditing(false);
     } catch (error) {
-      console.error('[useEditMode] Failed to save changes:', error);
+      console.error("[useEditMode] Failed to save changes:", error);
       throw error;
     } finally {
       setIsSaving(false);
@@ -99,12 +99,15 @@ export function useEditMode<T>({
   }, [initialData, onCancel]);
 
   // Update a specific field in edit data
-  const updateField = useCallback(<K extends keyof T>(field: K, value: T[K]) => {
-    setEditData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }, []);
+  const updateField = useCallback(
+    <K extends keyof T>(field: K, value: T[K]) => {
+      setEditData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    },
+    []
+  );
 
   // Update edit data with a new object or updater function
   const updateEditData = useCallback((data: T | ((prev: T) => T)) => {

@@ -1,6 +1,8 @@
 import * as React from "react";
 import { type ReactNode } from "react";
+
 import { Plus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -102,7 +104,10 @@ export function EntityDetailVersionPanel({
               {/* Main Version */}
               {mainVersion && (
                 <div>
-                  {renderVersionCard(mainVersion, currentVersionId === mainVersion.id)}
+                  {renderVersionCard(
+                    mainVersion,
+                    currentVersionId === mainVersion.id
+                  )}
                 </div>
               )}
 
@@ -111,7 +116,10 @@ export function EntityDetailVersionPanel({
                 <div className="space-y-3 w-full">
                   {alternativeVersions.map((version) => (
                     <div key={version.id}>
-                      {renderVersionCard(version, currentVersionId === version.id)}
+                      {renderVersionCard(
+                        version,
+                        currentVersionId === version.id
+                      )}
                     </div>
                   ))}
                 </div>

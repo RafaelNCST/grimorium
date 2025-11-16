@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
+
 import { ImagePlus, X, LucideIcon } from "lucide-react";
-import { Label } from "@/components/ui/label";
+
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 type ImageShape = "square" | "rounded" | "circle";
 type ImageFit = "fill" | "cover" | "contain";
@@ -207,7 +209,9 @@ export function FormImageUpload({
         />
 
         {preview ? (
-          <div className={`relative ${width} ${height} ${shapeClass} overflow-hidden border`}>
+          <div
+            className={`relative ${width} ${height} ${shapeClass} overflow-hidden border`}
+          >
             <img
               src={preview}
               alt="Preview"
@@ -225,7 +229,9 @@ export function FormImageUpload({
           </div>
         ) : (
           <label htmlFor={id} className="cursor-pointer block">
-            <div className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}>
+            <div
+              className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}
+            >
               <PlaceholderIcon className="h-8 w-8 text-muted-foreground/60" />
               <span className="text-sm text-muted-foreground">
                 {placeholderText}
@@ -235,9 +241,7 @@ export function FormImageUpload({
         )}
       </div>
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

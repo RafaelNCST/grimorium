@@ -258,7 +258,7 @@ export function SectionComponent({
       },
       // Custom event filter to prevent drag when dialog is open
       onActivation: () => {
-        if (document.body.hasAttribute('data-dialog-open')) {
+        if (document.body.hasAttribute("data-dialog-open")) {
           return false;
         }
       },

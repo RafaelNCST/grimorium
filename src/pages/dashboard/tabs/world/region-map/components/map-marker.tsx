@@ -1,6 +1,8 @@
 import { MapPin } from "lucide-react";
-import { IRegion } from "../../types/region-types";
+
 import { cn } from "@/lib/utils";
+
+import { IRegion } from "../../types/region-types";
 
 interface MapMarkerProps {
   region: IRegion;
@@ -24,7 +26,7 @@ export function MapMarker({
   region,
   x,
   y,
-  color = '#8b5cf6',
+  color = "#8b5cf6",
   showLabel = true,
   isSelected = false,
   isDraggable = false,
@@ -57,32 +59,31 @@ export function MapMarker({
   // Estimate label width based on text length and font size
   // Average character width is approximately 0.7 of the font size for most fonts (increased for safety)
   const estimatedLabelWidth = showLabel
-    ? (region.name.length * fontSize * 0.7) + (labelPaddingX * 2) + (borderWidth * 2)
+    ? region.name.length * fontSize * 0.7 + labelPaddingX * 2 + borderWidth * 2
     : 0;
 
   const labelHeight = showLabel
-    ? fontSize + (labelPaddingY * 2) + (borderWidth * 2) + (2 / zoomScale) // font size + padding + borders + extra space
+    ? fontSize + labelPaddingY * 2 + borderWidth * 2 + 2 / zoomScale // font size + padding + borders + extra space
     : 0;
 
   // Selection wrapper size (includes marker and label if shown)
   // Increased padding from 12 to 16 for more breathing room, especially at high zoom
   const wrapperPadding = 16 / zoomScale;
-  const wrapperWidth = Math.max(markerSize, estimatedLabelWidth) + (wrapperPadding * 2);
-  const wrapperHeight = markerSize + labelSpacing + labelHeight + (wrapperPadding * 2);
+  const wrapperWidth =
+    Math.max(markerSize, estimatedLabelWidth) + wrapperPadding * 2;
+  const wrapperHeight =
+    markerSize + labelSpacing + labelHeight + wrapperPadding * 2;
 
   // Handle size for resize corners
   const handleSize = 8 / zoomScale;
 
   // Wrapper positioning to center it
-  const wrapperLeft = -(wrapperWidth / 2) + (markerSize / 2);
+  const wrapperLeft = -(wrapperWidth / 2) + markerSize / 2;
 
   return (
     <div
       data-marker="true"
-      className={cn(
-        "absolute transition-none",
-        isSelected && "z-50"
-      )}
+      className={cn("absolute transition-none", isSelected && "z-50")}
       style={{
         left: `${x}px`,
         top: `${y}px`,
@@ -131,9 +132,7 @@ export function MapMarker({
           }}
         >
           <MapPin
-            className={cn(
-              color === '#ffffff' ? "text-black" : "text-white"
-            )}
+            className={cn(color === "#ffffff" ? "text-black" : "text-white")}
             style={{
               width: `${pinSize}px`,
               height: `${pinSize}px`,
@@ -154,7 +153,7 @@ export function MapMarker({
               paddingBottom: `${labelPaddingY}px`,
               borderWidth: `${borderWidth}px`,
               borderRadius: `${borderRadius}px`,
-              borderColor: 'hsl(var(--border))',
+              borderColor: "hsl(var(--border))",
             }}
           >
             <span className="font-medium">{region.name}</span>

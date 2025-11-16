@@ -635,8 +635,13 @@ async function runMigrations(database: Database): Promise<void> {
         "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_maps'"
       );
 
-      if (tableInfo.length > 0 && tableInfo[0].sql.includes('region_id TEXT NOT NULL UNIQUE')) {
-        console.log("[db] Migrating region_maps table to support version_id...");
+      if (
+        tableInfo.length > 0 &&
+        tableInfo[0].sql.includes("region_id TEXT NOT NULL UNIQUE")
+      ) {
+        console.log(
+          "[db] Migrating region_maps table to support version_id..."
+        );
 
         // Create new table with correct schema
         await database.execute(`
@@ -664,10 +669,14 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute("DROP TABLE region_maps");
 
         // Rename new table
-        await database.execute("ALTER TABLE region_maps_new RENAME TO region_maps");
+        await database.execute(
+          "ALTER TABLE region_maps_new RENAME TO region_maps"
+        );
 
         // Recreate index
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id)");
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id)"
+        );
 
         console.log("[db] Successfully migrated region_maps table");
       } else {
@@ -683,8 +692,13 @@ async function runMigrations(database: Database): Promise<void> {
         "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_map_markers'"
       );
 
-      if (markersTableInfo.length > 0 && !markersTableInfo[0].sql.includes('map_id')) {
-        console.log("[db] Migrating region_map_markers to link to specific maps...");
+      if (
+        markersTableInfo.length > 0 &&
+        !markersTableInfo[0].sql.includes("map_id")
+      ) {
+        console.log(
+          "[db] Migrating region_map_markers to link to specific maps..."
+        );
 
         // Create new table with map_id
         await database.execute(`
@@ -719,12 +733,20 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute("DROP TABLE region_map_markers");
 
         // Rename new table
-        await database.execute("ALTER TABLE region_map_markers_new RENAME TO region_map_markers");
+        await database.execute(
+          "ALTER TABLE region_map_markers_new RENAME TO region_map_markers"
+        );
 
         // Recreate indexes
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id)");
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id)");
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id)");
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id)"
+        );
 
         console.log("[db] Successfully migrated region_map_markers table");
       } else {
@@ -736,7 +758,9 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add scale column to region_map_markers table
     try {
-      await database.execute("ALTER TABLE region_map_markers ADD COLUMN scale REAL DEFAULT 1.0");
+      await database.execute(
+        "ALTER TABLE region_map_markers ADD COLUMN scale REAL DEFAULT 1.0"
+      );
       console.log("[db] Added scale column to region_map_markers table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -749,12 +773,12 @@ async function runMigrations(database: Database): Promise<void> {
       "current_season TEXT",
       "custom_season_name TEXT",
       "general_description TEXT",
-      "region_anomalies TEXT"
+      "region_anomalies TEXT",
     ];
 
     for (const field of environmentFields) {
       try {
-        const [columnName] = field.split(' ');
+        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
         console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
@@ -768,12 +792,12 @@ async function runMigrations(database: Database): Promise<void> {
       "dominant_factions TEXT",
       "important_characters TEXT",
       "races_found TEXT",
-      "items_found TEXT"
+      "items_found TEXT",
     ];
 
     for (const field of informationFields) {
       try {
-        const [columnName] = field.split(' ');
+        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
         console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
@@ -789,12 +813,12 @@ async function runMigrations(database: Database): Promise<void> {
       "religious_importance TEXT",
       "world_perception TEXT",
       "region_mysteries TEXT",
-      "inspirations TEXT"
+      "inspirations TEXT",
     ];
 
     for (const field of narrativeFields) {
       try {
-        const [columnName] = field.split(' ');
+        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
         console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
@@ -804,14 +828,18 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add visibility configuration fields to regions table
     try {
-      await database.execute("ALTER TABLE regions ADD COLUMN field_visibility TEXT");
+      await database.execute(
+        "ALTER TABLE regions ADD COLUMN field_visibility TEXT"
+      );
       console.log("[db] Added field_visibility column to regions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
 
     try {
-      await database.execute("ALTER TABLE regions ADD COLUMN section_visibility TEXT");
+      await database.execute(
+        "ALTER TABLE regions ADD COLUMN section_visibility TEXT"
+      );
       console.log("[db] Added section_visibility column to regions table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -823,8 +851,13 @@ async function runMigrations(database: Database): Promise<void> {
         "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_timeline_eras'"
       );
 
-      if (timelineTableInfo.length > 0 && timelineTableInfo[0].sql.includes('REFERENCES regions(id)')) {
-        console.log("[db] Migrating region_timeline_eras to reference region_versions...");
+      if (
+        timelineTableInfo.length > 0 &&
+        timelineTableInfo[0].sql.includes("REFERENCES regions(id)")
+      ) {
+        console.log(
+          "[db] Migrating region_timeline_eras to reference region_versions..."
+        );
 
         // Create new table with correct foreign key
         await database.execute(`
@@ -857,7 +890,9 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute("DROP TABLE region_timeline_eras");
 
         // Rename new table
-        await database.execute("ALTER TABLE region_timeline_eras_new RENAME TO region_timeline_eras");
+        await database.execute(
+          "ALTER TABLE region_timeline_eras_new RENAME TO region_timeline_eras"
+        );
 
         // Recreate events table (it was cascade deleted)
         await database.execute(`
@@ -888,12 +923,18 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute("DROP TABLE region_timeline_events_backup");
 
         // Recreate indexes
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id)");
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id)");
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id)"
+        );
 
         console.log("[db] Successfully migrated region_timeline_eras table");
       } else {
-        console.log("[db] region_timeline_eras table already has correct schema");
+        console.log(
+          "[db] region_timeline_eras table already has correct schema"
+        );
       }
     } catch (error) {
       console.log("[db] Timeline migration error or already migrated:", error);

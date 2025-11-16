@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
-import { toast } from 'sonner';
+import { useState, useCallback, useEffect } from "react";
+
+import { toast } from "sonner";
 
 export interface IVersion<T> {
   id: string;
@@ -26,8 +27,14 @@ export interface UseVersionManagementOptions<T> {
   versions: IVersion<T>[];
   currentVersionId?: string | null;
   onVersionChange?: (versionId: string, version: IVersion<T>) => Promise<void>;
-  onVersionCreate?: (versionData: CreateVersionData, currentEntityData: T) => Promise<IVersion<T>>;
-  onVersionUpdate?: (versionId: string, updateData: UpdateVersionData) => Promise<void>;
+  onVersionCreate?: (
+    versionData: CreateVersionData,
+    currentEntityData: T
+  ) => Promise<IVersion<T>>;
+  onVersionUpdate?: (
+    versionId: string,
+    updateData: UpdateVersionData
+  ) => Promise<void>;
   onVersionDelete?: (versionId: string) => Promise<void>;
   onVersionActivate?: (versionId: string) => Promise<void>;
   hasUnsavedChanges?: boolean;
@@ -38,8 +45,14 @@ export interface UseVersionManagementReturn<T> {
   currentVersion: IVersion<T> | null;
   isChangingVersion: boolean;
   handleVersionChange: (versionId: string) => Promise<void>;
-  handleVersionCreate: (data: CreateVersionData, currentEntityData: T) => Promise<void>;
-  handleVersionUpdate: (versionId: string, data: UpdateVersionData) => Promise<void>;
+  handleVersionCreate: (
+    data: CreateVersionData,
+    currentEntityData: T
+  ) => Promise<void>;
+  handleVersionUpdate: (
+    versionId: string,
+    data: UpdateVersionData
+  ) => Promise<void>;
   handleVersionDelete: (versionId: string) => Promise<void>;
   handleVersionActivate: (versionId: string) => Promise<void>;
 }
@@ -59,9 +72,11 @@ export function useVersionManagement<T>({
   onVersionDelete,
   onVersionActivate,
   hasUnsavedChanges = false,
-  entityType = 'entity',
+  entityType = "entity",
 }: UseVersionManagementOptions<T>): UseVersionManagementReturn<T> {
-  const [currentVersion, setCurrentVersion] = useState<IVersion<T> | null>(null);
+  const [currentVersion, setCurrentVersion] = useState<IVersion<T> | null>(
+    null
+  );
   const [isChangingVersion, setIsChangingVersion] = useState(false);
 
   // Initialize current version based on currentVersionId or main version
@@ -78,8 +93,10 @@ export function useVersionManagement<T>({
 
       // If version from URL doesn't exist, warn user and fall back to main
       if (!selectedVersion) {
-        console.warn(`[useVersionManagement] Version ${currentVersionId} not found, falling back to main version`);
-        toast.warning('Versão não encontrada, exibindo versão principal');
+        console.warn(
+          `[useVersionManagement] Version ${currentVersionId} not found, falling back to main version`
+        );
+        toast.warning("Versão não encontrada, exibindo versão principal");
         selectedVersion = versions.find((v) => v.isMain);
       }
     } else {
@@ -95,21 +112,23 @@ export function useVersionManagement<T>({
   const handleVersionChange = useCallback(
     async (versionId: string) => {
       if (!onVersionChange) {
-        console.warn('[useVersionManagement] No onVersionChange handler provided');
+        console.warn(
+          "[useVersionManagement] No onVersionChange handler provided"
+        );
         return;
       }
 
       const version = versions.find((v) => v.id === versionId);
       if (!version) {
         console.error(`[useVersionManagement] Version ${versionId} not found`);
-        toast.error('Versão não encontrada');
+        toast.error("Versão não encontrada");
         return;
       }
 
       // Check for unsaved changes
       if (hasUnsavedChanges) {
         const confirmed = window.confirm(
-          'Você tem alterações não salvas. Deseja descartá-las e trocar de versão?'
+          "Você tem alterações não salvas. Deseja descartá-las e trocar de versão?"
         );
         if (!confirmed) {
           return;
@@ -121,8 +140,8 @@ export function useVersionManagement<T>({
         await onVersionChange(versionId, version);
         setCurrentVersion(version);
       } catch (error) {
-        console.error('[useVersionManagement] Error changing version:', error);
-        toast.error('Erro ao trocar de versão');
+        console.error("[useVersionManagement] Error changing version:", error);
+        toast.error("Erro ao trocar de versão");
 
         // Rollback to previous version
         if (currentVersion) {
@@ -139,7 +158,9 @@ export function useVersionManagement<T>({
   const handleVersionCreate = useCallback(
     async (data: CreateVersionData, currentEntityData: T) => {
       if (!onVersionCreate) {
-        console.warn('[useVersionManagement] No onVersionCreate handler provided');
+        console.warn(
+          "[useVersionManagement] No onVersionCreate handler provided"
+        );
         return;
       }
 
@@ -148,8 +169,8 @@ export function useVersionManagement<T>({
         setCurrentVersion(newVersion);
         toast.success(`Versão "${data.name}" criada com sucesso!`);
       } catch (error) {
-        console.error('[useVersionManagement] Error creating version:', error);
-        toast.error('Erro ao criar versão');
+        console.error("[useVersionManagement] Error creating version:", error);
+        toast.error("Erro ao criar versão");
       }
     },
     [onVersionCreate]
@@ -159,7 +180,9 @@ export function useVersionManagement<T>({
   const handleVersionUpdate = useCallback(
     async (versionId: string, data: UpdateVersionData) => {
       if (!onVersionUpdate) {
-        console.warn('[useVersionManagement] No onVersionUpdate handler provided');
+        console.warn(
+          "[useVersionManagement] No onVersionUpdate handler provided"
+        );
         return;
       }
 
@@ -175,10 +198,10 @@ export function useVersionManagement<T>({
           });
         }
 
-        toast.success('Versão atualizada com sucesso!');
+        toast.success("Versão atualizada com sucesso!");
       } catch (error) {
-        console.error('[useVersionManagement] Error updating version:', error);
-        toast.error('Erro ao atualizar versão');
+        console.error("[useVersionManagement] Error updating version:", error);
+        toast.error("Erro ao atualizar versão");
       }
     },
     [onVersionUpdate, currentVersion]
@@ -188,7 +211,9 @@ export function useVersionManagement<T>({
   const handleVersionDelete = useCallback(
     async (versionId: string) => {
       if (!onVersionDelete) {
-        console.warn('[useVersionManagement] No onVersionDelete handler provided');
+        console.warn(
+          "[useVersionManagement] No onVersionDelete handler provided"
+        );
         return;
       }
 
@@ -196,7 +221,7 @@ export function useVersionManagement<T>({
 
       // Don't allow deleting main version
       if (versionToDelete?.isMain) {
-        toast.error('Não é possível excluir a versão principal');
+        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -211,10 +236,10 @@ export function useVersionManagement<T>({
           }
         }
 
-        toast.success('Versão excluída com sucesso!');
+        toast.success("Versão excluída com sucesso!");
       } catch (error) {
-        console.error('[useVersionManagement] Error deleting version:', error);
-        toast.error('Erro ao excluir versão');
+        console.error("[useVersionManagement] Error deleting version:", error);
+        toast.error("Erro ao excluir versão");
       }
     },
     [versions, onVersionDelete, currentVersion]
@@ -224,16 +249,21 @@ export function useVersionManagement<T>({
   const handleVersionActivate = useCallback(
     async (versionId: string) => {
       if (!onVersionActivate) {
-        console.warn('[useVersionManagement] No onVersionActivate handler provided');
+        console.warn(
+          "[useVersionManagement] No onVersionActivate handler provided"
+        );
         return;
       }
 
       try {
         await onVersionActivate(versionId);
-        toast.success('Versão ativada como principal!');
+        toast.success("Versão ativada como principal!");
       } catch (error) {
-        console.error('[useVersionManagement] Error activating version:', error);
-        toast.error('Erro ao ativar versão');
+        console.error(
+          "[useVersionManagement] Error activating version:",
+          error
+        );
+        toast.error("Erro ao ativar versão");
       }
     },
     [onVersionActivate]

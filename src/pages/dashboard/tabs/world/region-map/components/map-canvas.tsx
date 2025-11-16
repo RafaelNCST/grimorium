@@ -1,12 +1,16 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { MapMarker } from "./map-marker";
-import { IRegion } from "../../types/region-types";
-import { IRegionMapMarker } from "@/lib/db/region-maps.service";
+
 import { readFile, BaseDirectory } from "@tauri-apps/plugin-fs";
+import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+import { Button } from "@/components/ui/button";
+import { IRegionMapMarker } from "@/lib/db/region-maps.service";
 import { cn } from "@/lib/utils";
+
+import { IRegion } from "../../types/region-types";
+
+import { MapMarker } from "./map-marker";
 
 interface MapCanvasProps {
   imagePath: string;
@@ -32,7 +36,10 @@ export function MapCanvas({
   onMarkerScaleChange,
 }: MapCanvasProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +47,9 @@ export function MapCanvas({
 
   // Drag and drop states
   const [draggingMarkerId, setDraggingMarkerId] = useState<string | null>(null);
-  const [tempMarkerPositions, setTempMarkerPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [tempMarkerPositions, setTempMarkerPositions] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
   const isDraggingRef = useRef(false);
   const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
   const dragOffsetRef = useRef<{ x: number; y: number } | null>(null);
@@ -78,11 +87,11 @@ export function MapCanvas({
           setImageLoaded(true);
         };
         img.onerror = (e) => {
-          console.error('Failed to load image from blob:', e);
+          console.error("Failed to load image from blob:", e);
         };
         img.src = objectUrl;
       } catch (error) {
-        console.error('Failed to read file:', error);
+        console.error("Failed to read file:", error);
       }
     };
 
@@ -97,29 +106,32 @@ export function MapCanvas({
   }, [imagePath]);
 
   // Convert client coordinates to image coordinates considering zoom/pan
-  const clientToImageCoords = useCallback((clientX: number, clientY: number) => {
-    if (!imageRef.current) {
-      return { x: 0, y: 0 };
-    }
+  const clientToImageCoords = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!imageRef.current) {
+        return { x: 0, y: 0 };
+      }
 
-    const rect = imageRef.current.getBoundingClientRect();
+      const rect = imageRef.current.getBoundingClientRect();
 
-    // Get mouse position relative to the image's bounding box
-    const offsetX = clientX - rect.left;
-    const offsetY = clientY - rect.top;
+      // Get mouse position relative to the image's bounding box
+      const offsetX = clientX - rect.left;
+      const offsetY = clientY - rect.top;
 
-    // Convert to image coordinates by dividing by scale
-    const x = offsetX / currentScale;
-    const y = offsetY / currentScale;
+      // Convert to image coordinates by dividing by scale
+      const x = offsetX / currentScale;
+      const y = offsetY / currentScale;
 
-    return { x, y };
-  }, [currentScale]);
+      return { x, y };
+    },
+    [currentScale]
+  );
 
   // Handle marker drag start
   const handleMarkerMouseDown = (e: React.MouseEvent, markerId: string) => {
     // Check if clicking on a resize handle
     const target = e.target as HTMLElement;
-    if (target.hasAttribute('data-handle')) {
+    if (target.hasAttribute("data-handle")) {
       handleResizeStart(e, markerId);
       return;
     }
@@ -132,7 +144,7 @@ export function MapCanvas({
     e.stopPropagation();
 
     // Get the marker's current position
-    const marker = markers.find(m => m.id === markerId);
+    const marker = markers.find((m) => m.id === markerId);
     if (!marker) return;
 
     const { x: clickX, y: clickY } = clientToImageCoords(e.clientX, e.clientY);
@@ -152,7 +164,7 @@ export function MapCanvas({
     e.preventDefault();
     e.stopPropagation();
 
-    const marker = markers.find(m => m.id === markerId);
+    const marker = markers.find((m) => m.id === markerId);
     if (!marker) return;
 
     // Store initial scale and mouse position
@@ -164,7 +176,9 @@ export function MapCanvas({
     const markerX = marker.positionX;
     const markerY = marker.positionY;
     const { x: mouseX, y: mouseY } = clientToImageCoords(e.clientX, e.clientY);
-    const distance = Math.sqrt(Math.pow(mouseX - markerX, 2) + Math.pow(mouseY - markerY, 2));
+    const distance = Math.sqrt(
+      Math.pow(mouseX - markerX, 2) + Math.pow(mouseY - markerY, 2)
+    );
     setResizeStartDistance(distance);
   };
 
@@ -173,9 +187,17 @@ export function MapCanvas({
     if (!draggingMarkerId || !imageRef.current) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!imageRef.current || !dragStartPosRef.current || !dragOffsetRef.current) return;
+      if (
+        !imageRef.current ||
+        !dragStartPosRef.current ||
+        !dragOffsetRef.current
+      )
+        return;
 
-      const { x: cursorX, y: cursorY } = clientToImageCoords(e.clientX, e.clientY);
+      const { x: cursorX, y: cursorY } = clientToImageCoords(
+        e.clientX,
+        e.clientY
+      );
 
       // Check if mouse moved significantly (more than 3px) to differentiate click from drag
       const dx = Math.abs(cursorX - dragStartPosRef.current.x);
@@ -196,9 +218,17 @@ export function MapCanvas({
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (!imageRef.current || !dragStartPosRef.current || !dragOffsetRef.current) return;
+      if (
+        !imageRef.current ||
+        !dragStartPosRef.current ||
+        !dragOffsetRef.current
+      )
+        return;
 
-      const { x: cursorX, y: cursorY } = clientToImageCoords(e.clientX, e.clientY);
+      const { x: cursorX, y: cursorY } = clientToImageCoords(
+        e.clientX,
+        e.clientY
+      );
 
       // Check if this was a drag or just a click
       const dx = Math.abs(cursorX - dragStartPosRef.current.x);
@@ -211,8 +241,14 @@ export function MapCanvas({
         const finalMarkerY = cursorY + dragOffsetRef.current.y;
 
         // Clamp position to image bounds (in image coordinates)
-        const clampedX = Math.max(0, Math.min(finalMarkerX, imageDimensions.width));
-        const clampedY = Math.max(0, Math.min(finalMarkerY, imageDimensions.height));
+        const clampedX = Math.max(
+          0,
+          Math.min(finalMarkerX, imageDimensions.width)
+        );
+        const clampedY = Math.max(
+          0,
+          Math.min(finalMarkerY, imageDimensions.height)
+        );
         onMarkerDragEnd(draggingMarkerId, clampedX, clampedY);
       } else {
         // Was a click, trigger marker click
@@ -236,7 +272,14 @@ export function MapCanvas({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [draggingMarkerId, markers, onMarkerClick, onMarkerDragEnd, imageDimensions, clientToImageCoords]);
+  }, [
+    draggingMarkerId,
+    markers,
+    onMarkerClick,
+    onMarkerDragEnd,
+    imageDimensions,
+    clientToImageCoords,
+  ]);
 
   // Handle mouse move for resizing markers
   useEffect(() => {
@@ -245,14 +288,19 @@ export function MapCanvas({
     const handleMouseMove = (e: MouseEvent) => {
       if (!imageRef.current) return;
 
-      const marker = markers.find(m => m.id === resizingMarkerId);
+      const marker = markers.find((m) => m.id === resizingMarkerId);
       if (!marker) return;
 
       // Calculate current distance from marker center
       const markerX = marker.positionX;
       const markerY = marker.positionY;
-      const { x: mouseX, y: mouseY } = clientToImageCoords(e.clientX, e.clientY);
-      const currentDistance = Math.sqrt(Math.pow(mouseX - markerX, 2) + Math.pow(mouseY - markerY, 2));
+      const { x: mouseX, y: mouseY } = clientToImageCoords(
+        e.clientX,
+        e.clientY
+      );
+      const currentDistance = Math.sqrt(
+        Math.pow(mouseX - markerX, 2) + Math.pow(mouseY - markerY, 2)
+      );
 
       // Calculate scale factor based on distance change
       if (resizeStartDistance > 0) {
@@ -282,23 +330,32 @@ export function MapCanvas({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [resizingMarkerId, markers, resizeStartScale, resizeStartDistance, onMarkerScaleChange, clientToImageCoords]);
+  }, [
+    resizingMarkerId,
+    markers,
+    resizeStartScale,
+    resizeStartDistance,
+    onMarkerScaleChange,
+    clientToImageCoords,
+  ]);
 
   // Clear temporary positions only when the marker position in props is updated
   useEffect(() => {
-    setTempMarkerPositions(prev => {
+    setTempMarkerPositions((prev) => {
       const newPositions = { ...prev };
       let hasChanges = false;
 
       // Remove temp positions that match the actual marker positions
-      Object.keys(newPositions).forEach(markerId => {
-        const marker = markers.find(m => m.id === markerId);
+      Object.keys(newPositions).forEach((markerId) => {
+        const marker = markers.find((m) => m.id === markerId);
         const tempPos = newPositions[markerId];
 
         if (marker && tempPos) {
           // If the marker position matches temp position (rounded), remove temp
-          if (Math.round(marker.positionX) === Math.round(tempPos.x) &&
-              Math.round(marker.positionY) === Math.round(tempPos.y)) {
+          if (
+            Math.round(marker.positionX) === Math.round(tempPos.x) &&
+            Math.round(marker.positionY) === Math.round(tempPos.y)
+          ) {
             delete newPositions[markerId];
             hasChanges = true;
           }
@@ -309,18 +366,22 @@ export function MapCanvas({
     });
   }, [markers]);
 
-
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
 
     // Don't trigger if clicking on a marker
     const target = e.target as HTMLElement;
-    if (target.closest('[data-marker]')) return;
+    if (target.closest("[data-marker]")) return;
 
     const { x, y } = clientToImageCoords(e.clientX, e.clientY);
 
     // Only trigger if within image bounds (in image coordinates)
-    if (x >= 0 && y >= 0 && x <= imageDimensions.width && y <= imageDimensions.height) {
+    if (
+      x >= 0 &&
+      y >= 0 &&
+      x <= imageDimensions.width &&
+      y <= imageDimensions.height
+    ) {
       onMapClick?.(x, y);
     }
   };
@@ -341,35 +402,43 @@ export function MapCanvas({
     }
   };
 
-  const getRegionById = (regionId: string) => {
-    return children.find((r) => r.id === regionId);
-  };
+  const getRegionById = (regionId: string) =>
+    children.find((r) => r.id === regionId);
 
   return (
     <div
       className="relative w-full h-full bg-background select-none"
       ref={containerRef}
       onSelectStart={handleSelectStart}
-      style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}
+      style={{
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        MozUserSelect: "none",
+        msUserSelect: "none",
+      }}
     >
       <TransformWrapper
         initialScale={1}
         minScale={0.25}
         maxScale={4}
         disabled={false}
-        disablePadding={true}
+        disablePadding
         panning={{
-          disabled: isDraggingRef.current || draggingMarkerId !== null || resizingRef.current || resizingMarkerId !== null,
+          disabled:
+            isDraggingRef.current ||
+            draggingMarkerId !== null ||
+            resizingRef.current ||
+            resizingMarkerId !== null,
           allowLeftClickPan: true,
           allowMiddleClickPan: true,
-          allowRightClickPan: false
+          allowRightClickPan: false,
         }}
         centerOnInit
         wheel={{
           step: 0.03,
           smoothStep: 0.002,
           limitsOnWheel: true,
-          disabled: false
+          disabled: false,
         }}
         doubleClick={{ disabled: true }}
         onTransformed={(ref, state) => {
@@ -378,8 +447,7 @@ export function MapCanvas({
         onPanningStart={() => setIsPanning(true)}
         onPanningStop={() => setIsPanning(false)}
       >
-        {({ zoomIn, zoomOut, resetTransform }) => {
-          return (
+        {({ zoomIn, zoomOut, resetTransform }) => (
           <>
             {/* Zoom Controls - Fixed */}
             <div className="fixed bottom-4 right-4 z-30 flex flex-col gap-2">
@@ -427,10 +495,10 @@ export function MapCanvas({
                 style={{
                   width: imageLoaded ? `${imageDimensions.width}px` : "100%",
                   height: imageLoaded ? `${imageDimensions.height}px` : "100%",
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  MozUserSelect: 'none',
-                  msUserSelect: 'none',
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  msUserSelect: "none",
                 }}
               >
                 {/* Map Image */}
@@ -443,12 +511,12 @@ export function MapCanvas({
                   onLoad={() => setImageLoaded(true)}
                   onContextMenu={(e) => e.preventDefault()}
                   style={{
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    MozUserSelect: 'none',
-                    msUserSelect: 'none',
-                    WebkitUserDrag: 'none',
-                    userDrag: 'none'
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    WebkitUserDrag: "none",
+                    userDrag: "none",
                   }}
                 />
 
@@ -474,14 +542,21 @@ export function MapCanvas({
                         color={marker.color}
                         showLabel={marker.showLabel}
                         isSelected={isSelected}
-                        isDraggable={true}
+                        isDraggable
                         markerScale={marker.scale || 1.0}
                         zoomScale={currentScale}
-                        onClick={() => !isDragging && !isResizing && onMarkerClick?.(marker)}
+                        onClick={() =>
+                          !isDragging && !isResizing && onMarkerClick?.(marker)
+                        }
                         onMouseDown={(e) => handleMarkerMouseDown(e, marker.id)}
                         style={{
-                          cursor: isDragging ? 'grabbing' : (isResizing ? 'nwse-resize' : 'default'),
-                          pointerEvents: isDragging || isResizing ? 'auto' : 'auto'
+                          cursor: isDragging
+                            ? "grabbing"
+                            : isResizing
+                              ? "nwse-resize"
+                              : "default",
+                          pointerEvents:
+                            isDragging || isResizing ? "auto" : "auto",
                         }}
                       />
                     );
@@ -489,8 +564,7 @@ export function MapCanvas({
               </div>
             </TransformComponent>
           </>
-        );
-        }}
+        )}
       </TransformWrapper>
 
       {/* Loading State */}

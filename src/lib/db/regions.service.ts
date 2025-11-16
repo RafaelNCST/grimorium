@@ -1,4 +1,10 @@
-import { IRegion, IRegionWithChildren, RegionScale, RegionSeason } from "@/pages/dashboard/tabs/world/types/region-types";
+import {
+  IRegion,
+  IRegionWithChildren,
+  RegionScale,
+  RegionSeason,
+} from "@/pages/dashboard/tabs/world/types/region-types";
+
 import { getDB } from "./index";
 
 /**
@@ -162,7 +168,7 @@ export async function getRegionById(id: string): Promise<IRegion | null> {
  * Create a new region
  */
 export async function createRegion(
-  region: Omit<IRegion, 'id' | 'createdAt' | 'updatedAt' | 'orderIndex'>
+  region: Omit<IRegion, "id" | "createdAt" | "updatedAt" | "orderIndex">
 ): Promise<IRegion> {
   const db = await getDB();
   const now = Date.now();
@@ -170,8 +176,9 @@ export async function createRegion(
 
   // Calculate the next order_index for regions with the same parent
   const siblings = await db.select<DBRegion[]>(
-    "SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND " +
-    (region.parentId ? "parent_id = $2" : "parent_id IS NULL"),
+    `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
+      region.parentId ? "parent_id = $2" : "parent_id IS NULL"
+    }`,
     region.parentId ? [region.bookId, region.parentId] : [region.bookId]
   );
 
@@ -243,7 +250,7 @@ export async function createRegion(
  */
 export async function updateRegion(
   id: string,
-  updates: Partial<Omit<IRegion, 'id' | 'bookId' | 'createdAt'>>
+  updates: Partial<Omit<IRegion, "id" | "bookId" | "createdAt">>
 ): Promise<void> {
   const db = await getDB();
   const now = Date.now();
@@ -523,10 +530,15 @@ export async function deleteRegionVersion(versionId: string): Promise<void> {
     "SELECT * FROM region_versions WHERE id = $1",
     [versionId]
   );
-  console.log(`[deleteRegionVersion] Version exists before delete:`, existing.length > 0);
+  console.log(
+    `[deleteRegionVersion] Version exists before delete:`,
+    existing.length > 0
+  );
 
   // Delete the version
-  const result = await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
+  const result = await db.execute("DELETE FROM region_versions WHERE id = $1", [
+    versionId,
+  ]);
   console.log(`[deleteRegionVersion] Delete result:`, result);
 
   // Verify deletion
@@ -534,7 +546,10 @@ export async function deleteRegionVersion(versionId: string): Promise<void> {
     "SELECT * FROM region_versions WHERE id = $1",
     [versionId]
   );
-  console.log(`[deleteRegionVersion] Version exists after delete:`, afterDelete.length > 0);
+  console.log(
+    `[deleteRegionVersion] Version exists after delete:`,
+    afterDelete.length > 0
+  );
 }
 
 /**
@@ -615,8 +630,9 @@ export async function moveRegion(
     }
 
     const siblings = await db.select<DBRegion[]>(
-      "SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND " +
-      (newParentId ? "parent_id = $2" : "parent_id IS NULL"),
+      `SELECT MAX(order_index) as max_order FROM regions WHERE book_id = $1 AND ${
+        newParentId ? "parent_id = $2" : "parent_id IS NULL"
+      }`,
       newParentId ? [region.bookId, newParentId] : [region.bookId]
     );
 
@@ -740,7 +756,9 @@ export async function saveRegionVersionTimeline(
   const db = await getDB();
 
   // Delete existing timeline for this version
-  await db.execute("DELETE FROM region_timeline_eras WHERE region_id = $1", [versionId]);
+  await db.execute("DELETE FROM region_timeline_eras WHERE region_id = $1", [
+    versionId,
+  ]);
   // Events will be cascade deleted
 
   // Insert new eras and events
@@ -782,4 +800,3 @@ export async function saveRegionVersionTimeline(
     }
   }
 }
-

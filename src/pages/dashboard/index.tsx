@@ -11,9 +11,9 @@ import {
 } from "@dnd-kit/core";
 import { useNavigate } from "@tanstack/react-router";
 
+import { deleteBook as deleteBookDB } from "@/lib/db/books.service";
 import { useBookStore, Book as BookType } from "@/stores/book-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
-import { deleteBook as deleteBookDB } from "@/lib/db/books.service";
 
 import { DEFAULT_TABS_CONSTANT } from "./constants/dashboard-constants";
 import { DashboardView } from "./view";

@@ -1,5 +1,8 @@
 import { ReactNode } from "react";
+
 import { LucideIcon, Loader2 } from "lucide-react";
+
+import { EmptyState, EmptyStateButton } from "@/components/empty-state";
 import {
   EntityListHeader,
   EntitySearchBar,
@@ -7,7 +10,6 @@ import {
   HeaderAction,
   FilterRow,
 } from "@/components/entity-list";
-import { EmptyState, EmptyStateButton } from "@/components/empty-state";
 
 /**
  * Empty state configuration

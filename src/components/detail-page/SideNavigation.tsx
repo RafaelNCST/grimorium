@@ -1,7 +1,8 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import * as React from "react";
+
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export interface NavItem {
   id: string;
@@ -49,14 +50,14 @@ export function SideNavigation({
   navClassName,
 }: SideNavigationProps) {
   return (
-    <div className={cn('flex h-full flex-col', className)}>
+    <div className={cn("flex h-full flex-col", className)}>
       {header && (
-        <div className={cn('border-b border-border p-4', headerClassName)}>
+        <div className={cn("border-b border-border p-4", headerClassName)}>
           {header}
         </div>
       )}
 
-      <ScrollArea className={cn('flex-1', navClassName)}>
+      <ScrollArea className={cn("flex-1", navClassName)}>
         <nav className="flex flex-col gap-1 p-2">
           {items.map((item) => {
             const isActive = item.id === activeItem;
@@ -64,11 +65,8 @@ export function SideNavigation({
             return (
               <Button
                 key={item.id}
-                variant={isActive ? 'secondary' : 'ghost'}
-                className={cn(
-                  'justify-start gap-2',
-                  isActive && 'bg-accent'
-                )}
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn("justify-start gap-2", isActive && "bg-accent")}
                 onClick={item.onClick}
                 disabled={item.disabled}
               >
@@ -82,7 +80,7 @@ export function SideNavigation({
 
       {footer && (
         <div
-          className={cn('border-t border-border p-4 mt-auto', footerClassName)}
+          className={cn("border-t border-border p-4 mt-auto", footerClassName)}
         >
           {footer}
         </div>

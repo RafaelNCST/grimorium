@@ -192,210 +192,215 @@ export function CreateSystemModal({
             </DialogTitle>
           </DialogHeader>
 
-        <div className="flex-1 overflow-hidden">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(handleSubmit)}
-              className="h-full flex flex-col space-y-4"
-            >
-              {/* System Name and Icon */}
-              <div className="space-y-2">
-                <FormLabel>{t("modals.create_system.name_label")}</FormLabel>
-                <div className="flex items-center gap-3 p-1">
-                  {/* Icon Section */}
-                  <div className="flex-shrink-0">
-                    <label
-                      htmlFor="icon-upload-create"
-                      className="cursor-pointer"
-                    >
-                      {iconImage ? (
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-primary hover:border-primary/80 transition-colors">
-                          <img
-                            src={iconImage}
-                            alt="System icon"
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Upload className="h-5 w-5 text-white" />
+          <div className="flex-1 overflow-hidden">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="h-full flex flex-col space-y-4"
+              >
+                {/* System Name and Icon */}
+                <div className="space-y-2">
+                  <FormLabel>{t("modals.create_system.name_label")}</FormLabel>
+                  <div className="flex items-center gap-3 p-1">
+                    {/* Icon Section */}
+                    <div className="flex-shrink-0">
+                      <label
+                        htmlFor="icon-upload-create"
+                        className="cursor-pointer"
+                      >
+                        {iconImage ? (
+                          <div className="relative w-16 h-16 rounded-lg overflow-hidden border-2 border-primary hover:border-primary/80 transition-colors">
+                            <img
+                              src={iconImage}
+                              alt="System icon"
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <Upload className="h-5 w-5 text-white" />
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="w-16 h-16 rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex items-center justify-center">
-                          <Upload className="h-6 w-6 text-muted-foreground" />
-                        </div>
+                        ) : (
+                          <div className="w-16 h-16 rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 transition-colors flex items-center justify-center">
+                            <Upload className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </label>
+                      <input
+                        id="icon-upload-create"
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </div>
+
+                    {/* Name Input */}
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              placeholder={t(
+                                "modals.create_system.name_placeholder"
+                              )}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </label>
-                    <input
-                      id="icon-upload-create"
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                      onChange={handleFileChange}
-                      className="hidden"
                     />
                   </div>
-
-                  {/* Name Input */}
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input
-                            placeholder={t(
-                              "modals.create_system.name_placeholder"
-                            )}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Templates Section */}
-              <div className="flex-1 min-h-0 flex flex-col space-y-3">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-purple-500" />
-                  <div>
-                    <h3 className="text-sm font-semibold">
-                      {t("modals.create_system.templates_section")}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {t("modals.create_system.templates_section_description")}
-                    </p>
-                  </div>
                 </div>
 
-                <ScrollArea className="flex-1 pr-4">
-                  <div className="space-y-4 pb-2">
-                    {/* No Template Option */}
-                    <Card
-                      className={cn(
-                        "cursor-pointer transition-all",
-                        selectedTemplate === null
-                          ? "bg-green-500/20 border-green-500/40"
-                          : "hover:bg-white/5"
-                      )}
-                      onClick={() => setSelectedTemplate(null)}
-                    >
-                      <CardHeader className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <FileText className="h-5 w-5 text-green-500" />
-                            </div>
-                            <div>
-                              <CardTitle className="text-base flex items-center gap-2">
-                                {t("modals.create_system.no_template")}
-                              </CardTitle>
-                              <CardDescription className="text-xs mt-1">
-                                {t(
-                                  "modals.create_system.no_template_description"
-                                )}
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                    </Card>
-
-                    {/* Templates */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {TEMPLATES.map((template) => {
-                        const Icon = template.icon;
-                        return (
-                          <Card
-                            key={template.id}
-                            className={cn(
-                              "cursor-pointer transition-all",
-                              selectedTemplate === template.id
-                                ? "bg-blue-500/20 border-blue-500/40"
-                                : "hover:bg-white/5"
-                            )}
-                            onClick={() => setSelectedTemplate(template.id)}
-                          >
-                            <CardHeader className="p-4">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-start gap-3 min-w-0">
-                                  <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                                    <Icon className="h-5 w-5 text-blue-500" />
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <CardTitle className="text-sm">
-                                      {t(template.nameKey)}
-                                    </CardTitle>
-                                    <CardDescription className="text-xs mt-1 line-clamp-2">
-                                      {t(template.descriptionKey)}
-                                    </CardDescription>
-                                  </div>
-                                </div>
-                              </div>
-                            </CardHeader>
-                          </Card>
-                        );
-                      })}
+                {/* Templates Section */}
+                <div className="flex-1 min-h-0 flex flex-col space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-purple-500" />
+                    <div>
+                      <h3 className="text-sm font-semibold">
+                        {t("modals.create_system.templates_section")}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {t(
+                          "modals.create_system.templates_section_description"
+                        )}
+                      </p>
                     </div>
                   </div>
-                </ScrollArea>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="flex-1 cursor-pointer"
-                >
-                  {t("modals.create_system.cancel")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="magical"
-                  size="lg"
-                  className="flex-1 animate-glow cursor-pointer"
-                  disabled={!systemName || systemName.trim().length === 0}
-                >
-                  {t("modals.create_system.submit")}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
-      </DialogContent>
-    </Dialog>
+                  <ScrollArea className="flex-1 pr-4">
+                    <div className="space-y-4 pb-2">
+                      {/* No Template Option */}
+                      <Card
+                        className={cn(
+                          "cursor-pointer transition-all",
+                          selectedTemplate === null
+                            ? "bg-green-500/20 border-green-500/40"
+                            : "hover:bg-white/5"
+                        )}
+                        onClick={() => setSelectedTemplate(null)}
+                      >
+                        <CardHeader className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                                <FileText className="h-5 w-5 text-green-500" />
+                              </div>
+                              <div>
+                                <CardTitle className="text-base flex items-center gap-2">
+                                  {t("modals.create_system.no_template")}
+                                </CardTitle>
+                                <CardDescription className="text-xs mt-1">
+                                  {t(
+                                    "modals.create_system.no_template_description"
+                                  )}
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
 
-    {/* Duplicate Name Warning Dialog */}
-    <AlertDialog open={showDuplicateWarning} onOpenChange={setShowDuplicateWarning}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t("modals.create_system.duplicate_warning.title")}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {t("modals.create_system.duplicate_warning.description", {
-              name: pendingData?.name.trim() || "",
-            })}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancelDuplicate}>
-            {t("modals.create_system.duplicate_warning.cancel")}
-          </AlertDialogCancel>
-          <Button
-            variant="magical"
-            size="lg"
-            className="animate-glow"
-            onClick={handleConfirmDuplicate}
-          >
-            {t("modals.create_system.duplicate_warning.confirm")}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+                      {/* Templates */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {TEMPLATES.map((template) => {
+                          const Icon = template.icon;
+                          return (
+                            <Card
+                              key={template.id}
+                              className={cn(
+                                "cursor-pointer transition-all",
+                                selectedTemplate === template.id
+                                  ? "bg-blue-500/20 border-blue-500/40"
+                                  : "hover:bg-white/5"
+                              )}
+                              onClick={() => setSelectedTemplate(template.id)}
+                            >
+                              <CardHeader className="p-4">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-start gap-3 min-w-0">
+                                    <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                      <Icon className="h-5 w-5 text-blue-500" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <CardTitle className="text-sm">
+                                        {t(template.nameKey)}
+                                      </CardTitle>
+                                      <CardDescription className="text-xs mt-1 line-clamp-2">
+                                        {t(template.descriptionKey)}
+                                      </CardDescription>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="flex-1 cursor-pointer"
+                  >
+                    {t("modals.create_system.cancel")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="magical"
+                    size="lg"
+                    className="flex-1 animate-glow cursor-pointer"
+                    disabled={!systemName || systemName.trim().length === 0}
+                  >
+                    {t("modals.create_system.submit")}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Duplicate Name Warning Dialog */}
+      <AlertDialog
+        open={showDuplicateWarning}
+        onOpenChange={setShowDuplicateWarning}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("modals.create_system.duplicate_warning.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("modals.create_system.duplicate_warning.description", {
+                name: pendingData?.name.trim() || "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDuplicate}>
+              {t("modals.create_system.duplicate_warning.cancel")}
+            </AlertDialogCancel>
+            <Button
+              variant="magical"
+              size="lg"
+              className="animate-glow"
+              onClick={handleConfirmDuplicate}
+            >
+              {t("modals.create_system.duplicate_warning.confirm")}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

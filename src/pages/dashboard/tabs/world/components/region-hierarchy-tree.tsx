@@ -57,116 +57,122 @@ interface DropIndicator {
 }
 
 // Component for the visual region item (used in tree and overlay)
-const RegionItem = memo(function RegionItem({
-  region,
-  level = 0,
-  isOverlay = false,
-  showDelete = false,
-  onDelete,
-  isExpanded,
-  onToggle,
-  dragHandleProps,
-}: {
-  region: IRegionWithChildren;
-  level?: number;
-  isOverlay?: boolean;
-  showDelete?: boolean;
-  onDelete?: (region: IRegionWithChildren) => void;
-  isExpanded?: boolean;
-  onToggle?: () => void;
-  dragHandleProps?: Record<string, unknown>;
-}) {
-  const { t } = useTranslation("world");
-  const hasChildren = region.children.length > 0;
+const RegionItem = memo(
+  ({
+    region,
+    level = 0,
+    isOverlay = false,
+    showDelete = false,
+    onDelete,
+    isExpanded,
+    onToggle,
+    dragHandleProps,
+  }: {
+    region: IRegionWithChildren;
+    level?: number;
+    isOverlay?: boolean;
+    showDelete?: boolean;
+    onDelete?: (region: IRegionWithChildren) => void;
+    isExpanded?: boolean;
+    onToggle?: () => void;
+    dragHandleProps?: Record<string, unknown>;
+  }) => {
+    const { t } = useTranslation("world");
+    const hasChildren = region.children.length > 0;
 
-  return (
-    <div
-      onClick={() => {
-        if (hasChildren && !isOverlay) {
-          onToggle?.();
-        }
-      }}
-      onKeyDown={(e) => {
-        if (hasChildren && !isOverlay && (e.key === "Enter" || e.key === " ")) {
-          e.preventDefault();
-          onToggle?.();
-        }
-      }}
-      role={hasChildren && !isOverlay ? "button" : undefined}
-      tabIndex={hasChildren && !isOverlay ? 0 : undefined}
-      {...dragHandleProps}
-      className={cn(
-        "flex items-center gap-2 rounded-md p-2 transition-all duration-200 min-h-[40px]",
-        !isOverlay && "hover:bg-white/5",
-        !isOverlay && hasChildren && "cursor-pointer",
-        !isOverlay && "active:cursor-grabbing",
-        isOverlay &&
-          "bg-background/95 border-2 border-primary shadow-2xl cursor-grabbing backdrop-blur-sm"
-      )}
-      style={{
-        paddingLeft: isOverlay ? "0.5rem" : `${level * 1.5 + 0.5}rem`,
-        ...(isOverlay
-          ? {
-              boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)",
-            }
-          : {}),
-      }}
-    >
-      {/* Expand/Collapse Button */}
-      <div className="h-6 w-6 p-0 shrink-0 flex items-center justify-center">
-        {hasChildren ? (
-          isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+    return (
+      <div
+        onClick={() => {
+          if (hasChildren && !isOverlay) {
+            onToggle?.();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (
+            hasChildren &&
+            !isOverlay &&
+            (e.key === "Enter" || e.key === " ")
+          ) {
+            e.preventDefault();
+            onToggle?.();
+          }
+        }}
+        role={hasChildren && !isOverlay ? "button" : undefined}
+        tabIndex={hasChildren && !isOverlay ? 0 : undefined}
+        {...dragHandleProps}
+        className={cn(
+          "flex items-center gap-2 rounded-md p-2 transition-all duration-200 min-h-[40px]",
+          !isOverlay && "hover:bg-white/5",
+          !isOverlay && hasChildren && "cursor-pointer",
+          !isOverlay && "active:cursor-grabbing",
+          isOverlay &&
+            "bg-background/95 border-2 border-primary shadow-2xl cursor-grabbing backdrop-blur-sm"
+        )}
+        style={{
+          paddingLeft: isOverlay ? "0.5rem" : `${level * 1.5 + 0.5}rem`,
+          ...(isOverlay
+            ? {
+                boxShadow:
+                  "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)",
+              }
+            : {}),
+        }}
+      >
+        {/* Expand/Collapse Button */}
+        <div className="h-6 w-6 p-0 shrink-0 flex items-center justify-center">
+          {hasChildren ? (
+            isExpanded ? (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )
           ) : (
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          )
-        ) : (
-          <div className="h-4 w-4" />
+            <div className="h-4 w-4" />
+          )}
+        </div>
+
+        {/* Region Icon */}
+        <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+
+        {/* Region Name and Scale Badge */}
+        <div className={cn("flex items-center gap-2 flex-1 min-w-0")}>
+          <span className="text-sm font-medium truncate">{region.name}</span>
+          <Badge
+            variant="secondary"
+            className={cn(
+              SCALE_COLORS[region.scale],
+              "text-xs px-2 py-0 shrink-0"
+            )}
+          >
+            {t(`scales.${region.scale}`)}
+          </Badge>
+        </div>
+
+        {/* Children Count */}
+        {hasChildren && (
+          <Badge variant="outline" className="text-xs px-2 py-0 shrink-0">
+            {region.children.length}
+          </Badge>
+        )}
+
+        {/* Delete Button */}
+        {showDelete && onDelete && !isOverlay && (
+          <Button
+            variant="ghost-destructive"
+            size="icon"
+            className="h-7 w-7 p-0 shrink-0 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(region);
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         )}
       </div>
-
-      {/* Region Icon */}
-      <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-
-      {/* Region Name and Scale Badge */}
-      <div className={cn("flex items-center gap-2 flex-1 min-w-0")}>
-        <span className="text-sm font-medium truncate">{region.name}</span>
-        <Badge
-          variant="secondary"
-          className={cn(
-            SCALE_COLORS[region.scale],
-            "text-xs px-2 py-0 shrink-0"
-          )}
-        >
-          {t(`scales.${region.scale}`)}
-        </Badge>
-      </div>
-
-      {/* Children Count */}
-      {hasChildren && (
-        <Badge variant="outline" className="text-xs px-2 py-0 shrink-0">
-          {region.children.length}
-        </Badge>
-      )}
-
-      {/* Delete Button */}
-      {showDelete && onDelete && !isOverlay && (
-        <Button
-          variant="ghost-destructive"
-          size="icon"
-          className="h-7 w-7 p-0 shrink-0 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(region);
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      )}
-    </div>
-  );
-});
+    );
+  }
+);
 
 interface RegionNodeProps {
   region: IRegionWithChildren;

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { type ReactNode } from "react";
+
 import {
   type LucideIcon,
   ArrowLeft,
@@ -9,13 +10,6 @@ import {
   X,
   Menu,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   ChevronDown,
   ChevronRight,
@@ -23,6 +17,14 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Tooltip,
   TooltipContent,
@@ -341,10 +343,7 @@ export function EntityDetailLayout({
               }
 
               return (
-                <Collapsible
-                  key={section.id}
-                  defaultOpen={section.defaultOpen}
-                >
+                <Collapsible key={section.id} defaultOpen={section.defaultOpen}>
                   <Card
                     className={cn(
                       "card-magical transition-all duration-200",

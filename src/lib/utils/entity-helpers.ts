@@ -76,7 +76,10 @@ export async function cleanOrphanedEntityIds<T extends Record<string, any>>(
           hasOrphanedIds = true;
         }
       } catch (error) {
-        console.error(`Failed to check existence for ${rule.field} ID ${id}:`, error);
+        console.error(
+          `Failed to check existence for ${rule.field} ID ${id}:`,
+          error
+        );
         // On error, keep the ID to avoid data loss
         validIds.push(id);
       }

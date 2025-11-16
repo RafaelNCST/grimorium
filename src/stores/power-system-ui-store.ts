@@ -32,7 +32,10 @@ interface PowerSystemUIStoreState {
   getCurrentPageId: (systemId: string) => string | null;
   getEditMode: (systemId: string) => boolean;
   getSidebarOpen: (systemId: string) => boolean;
-  getSelectedItem: (systemId: string) => { id: string | null; type: "page" | "group" | null };
+  getSelectedItem: (systemId: string) => {
+    id: string | null;
+    type: "page" | "group" | null;
+  };
 
   // Setters
   setExpandedGroups: (systemId: string, groups: Set<string>) => void;
@@ -40,7 +43,11 @@ interface PowerSystemUIStoreState {
   setCurrentPageId: (systemId: string, pageId: string | null) => void;
   setEditMode: (systemId: string, isEdit: boolean) => void;
   setSidebarOpen: (systemId: string, isOpen: boolean) => void;
-  setSelectedItem: (systemId: string, itemId: string | null, itemType: "page" | "group" | null) => void;
+  setSelectedItem: (
+    systemId: string,
+    itemId: string | null,
+    itemType: "page" | "group" | null
+  ) => void;
 
   // Utilities
   clearSystemState: (systemId: string) => void;
@@ -185,7 +192,11 @@ export const usePowerSystemUIStore = create<PowerSystemUIStoreState>()(
         }));
       },
 
-      setSelectedItem: (systemId: string, itemId: string | null, itemType: "page" | "group" | null) => {
+      setSelectedItem: (
+        systemId: string,
+        itemId: string | null,
+        itemType: "page" | "group" | null
+      ) => {
         set((state) => ({
           cache: {
             ...state.cache,

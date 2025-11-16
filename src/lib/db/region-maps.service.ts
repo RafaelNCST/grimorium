@@ -1,5 +1,12 @@
+import {
+  mkdir,
+  copyFile,
+  exists,
+  remove,
+  BaseDirectory,
+} from "@tauri-apps/plugin-fs";
+
 import { getDB } from "./index";
-import { mkdir, copyFile, exists, remove, BaseDirectory } from "@tauri-apps/plugin-fs";
 
 /**
  * Region Map Types
@@ -81,7 +88,7 @@ function dbMarkerToMarker(dbMarker: DBRegionMapMarker): IRegionMapMarker {
     childRegionId: dbMarker.child_region_id,
     positionX: dbMarker.position_x,
     positionY: dbMarker.position_y,
-    color: dbMarker.color || '#8b5cf6',
+    color: dbMarker.color || "#8b5cf6",
     showLabel: dbMarker.show_label === 1,
     scale: dbMarker.scale || 1.0,
     createdAt: dbMarker.created_at,
@@ -104,12 +111,12 @@ async function ensureMapsDirectory(): Promise<void> {
  */
 function sanitizeFileName(fileName: string): string {
   // Extract extension
-  const lastDot = fileName.lastIndexOf('.');
+  const lastDot = fileName.lastIndexOf(".");
   const name = lastDot > 0 ? fileName.substring(0, lastDot) : fileName;
-  const ext = lastDot > 0 ? fileName.substring(lastDot) : '';
+  const ext = lastDot > 0 ? fileName.substring(lastDot) : "";
 
   // Replace spaces and special characters with underscore
-  const sanitizedName = name.replace(/[^a-zA-Z0-9-_]/g, '_');
+  const sanitizedName = name.replace(/[^a-zA-Z0-9-_]/g, "_");
 
   return `${sanitizedName}${ext}`;
 }
@@ -126,45 +133,55 @@ export async function uploadMapImage(
   const db = await getDB();
   const now = Date.now();
 
-  console.log('[region-maps] Upload started:', { regionId, versionId, sourceFilePath });
+  console.log("[region-maps] Upload started:", {
+    regionId,
+    versionId,
+    sourceFilePath,
+  });
 
   // Ensure maps directory exists
   await ensureMapsDirectory();
 
   // Extract extension from source file
-  const originalFileName = sourceFilePath.split(/[\\/]/).pop() || `map_${regionId}_${now}`;
-  const lastDot = originalFileName.lastIndexOf('.');
-  const ext = lastDot > 0 ? originalFileName.substring(lastDot) : '.jpg';
+  const originalFileName =
+    sourceFilePath.split(/[\\/]/).pop() || `map_${regionId}_${now}`;
+  const lastDot = originalFileName.lastIndexOf(".");
+  const ext = lastDot > 0 ? originalFileName.substring(lastDot) : ".jpg";
 
   // Create unique filename with UUID to avoid conflicts between versions
   const uniqueId = crypto.randomUUID();
-  const fileName = `map_${regionId}_${versionId || 'main'}_${uniqueId}${ext}`;
+  const fileName = `map_${regionId}_${versionId || "main"}_${uniqueId}${ext}`;
   const relativePath = `maps/${fileName}`;
 
-  console.log('[region-maps] Generated unique filename:', { originalFileName, fileName, relativePath });
+  console.log("[region-maps] Generated unique filename:", {
+    originalFileName,
+    fileName,
+    relativePath,
+  });
 
   // Copy file to maps directory
   await copyFile(sourceFilePath, relativePath, {
     toPathBaseDir: BaseDirectory.AppData,
   });
 
-  console.log('[region-maps] File copied successfully');
+  console.log("[region-maps] File copied successfully");
 
   // Check if map already exists for this region and version
   const existingMap = await getMapByRegionId(regionId, versionId);
 
   if (existingMap) {
     // Delete all markers for this map before updating
-    console.log('[region-maps] Deleting all markers for map:', existingMap.id);
-    await db.execute(
-      "DELETE FROM region_map_markers WHERE map_id = $1",
-      [existingMap.id]
-    );
+    console.log("[region-maps] Deleting all markers for map:", existingMap.id);
+    await db.execute("DELETE FROM region_map_markers WHERE map_id = $1", [
+      existingMap.id,
+    ]);
 
     // Update existing map
     await db.execute(
-      `UPDATE region_maps SET image_path = $1, updated_at = $2 WHERE region_id = $3 AND ${versionId ? 'version_id = $4' : 'version_id IS NULL'}`,
-      versionId ? [relativePath, now, regionId, versionId] : [relativePath, now, regionId]
+      `UPDATE region_maps SET image_path = $1, updated_at = $2 WHERE region_id = $3 AND ${versionId ? "version_id = $4" : "version_id IS NULL"}`,
+      versionId
+        ? [relativePath, now, regionId, versionId]
+        : [relativePath, now, regionId]
     );
 
     // Delete old image file if it's different
@@ -174,14 +191,16 @@ export async function uploadMapImage(
           baseDir: BaseDirectory.AppData,
         });
         if (oldFileExists) {
-          await remove(existingMap.imagePath, { baseDir: BaseDirectory.AppData });
+          await remove(existingMap.imagePath, {
+            baseDir: BaseDirectory.AppData,
+          });
         }
       } catch (error) {
         console.error("[region-maps] Failed to delete old image:", error);
       }
     }
 
-    console.log('[region-maps] Map updated and markers cleared');
+    console.log("[region-maps] Map updated and markers cleared");
 
     return {
       ...existingMap,
@@ -251,7 +270,9 @@ export async function deleteMap(regionId: string): Promise<void> {
     }
 
     // Delete from database
-    await db.execute("DELETE FROM region_maps WHERE region_id = $1", [regionId]);
+    await db.execute("DELETE FROM region_maps WHERE region_id = $1", [
+      regionId,
+    ]);
   }
 }
 
@@ -264,7 +285,7 @@ export async function addMarker(
   childRegionId: string,
   x: number,
   y: number,
-  color: string = '#8b5cf6',
+  color: string = "#8b5cf6",
   showLabel: boolean = true,
   scale: number = 1.0
 ): Promise<IRegionMapMarker> {
@@ -289,7 +310,19 @@ export async function addMarker(
   await db.execute(
     `INSERT INTO region_map_markers (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-    [id, mapId, parentRegionId, childRegionId, Math.round(x), Math.round(y), color, showLabel ? 1 : 0, scale, now, now]
+    [
+      id,
+      mapId,
+      parentRegionId,
+      childRegionId,
+      Math.round(x),
+      Math.round(y),
+      color,
+      showLabel ? 1 : 0,
+      scale,
+      now,
+      now,
+    ]
   );
 
   return newMarker;

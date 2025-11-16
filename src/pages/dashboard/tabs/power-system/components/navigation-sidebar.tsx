@@ -659,14 +659,14 @@ function GroupItem({
   // Listen for rename/delete events
   useEffect(() => {
     const handleRenameEvent = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
+      const { detail } = e as CustomEvent;
       if (detail.id === group.id && detail.type === "group") {
         setIsEditing(true);
       }
     };
 
     const handleDeleteEvent = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
+      const { detail } = e as CustomEvent;
       if (detail.id === group.id && detail.type === "group") {
         onDelete(group.id);
       }
@@ -712,10 +712,14 @@ function GroupItem({
         isOver && "bg-primary/10 ring-2 ring-primary/30"
       )}
       {...(dragHandleProps && !isEditing ? dragHandleProps : {})}
-      onClick={!isEditing ? () => {
-        onToggle();
-        onSelect?.();
-      } : undefined}
+      onClick={
+        !isEditing
+          ? () => {
+              onToggle();
+              onSelect?.();
+            }
+          : undefined
+      }
     >
       {isEditing ? (
         <div className="flex items-center gap-2 px-2 w-full">
@@ -944,14 +948,14 @@ function PageItem({
   // Listen for rename/delete events
   useEffect(() => {
     const handleRenameEvent = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
+      const { detail } = e as CustomEvent;
       if (detail.id === page.id && detail.type === "page") {
         setIsEditing(true);
       }
     };
 
     const handleDeleteEvent = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
+      const { detail } = e as CustomEvent;
       if (detail.id === page.id && detail.type === "page") {
         onDelete(page.id);
       }

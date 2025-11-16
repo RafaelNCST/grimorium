@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+
 import {
   updatePowerSection,
   updatePowerBlock,
@@ -9,10 +10,8 @@ import {
   reorderPowerSections,
   reorderPowerBlocks,
 } from "@/lib/db/power-system.service";
-import type {
-  IPowerSection,
-  IPowerBlock,
-} from "../types/power-system-types";
+
+import type { IPowerSection, IPowerBlock } from "../types/power-system-types";
 
 /**
  * Snapshot represents the complete state of sections and blocks for a specific page
@@ -117,9 +116,10 @@ export function useUndoRedo(options: UseUndoRedoOptions) {
 
         // === STEP 1: Delete all existing sections and blocks for this page ===
         // This ensures a clean slate before applying the snapshot
-        await db.execute("DELETE FROM power_blocks WHERE section_id IN (SELECT id FROM power_sections WHERE page_id = $1)", [
-          snapshot.pageId,
-        ]);
+        await db.execute(
+          "DELETE FROM power_blocks WHERE section_id IN (SELECT id FROM power_sections WHERE page_id = $1)",
+          [snapshot.pageId]
+        );
         await db.execute("DELETE FROM power_sections WHERE page_id = $1", [
           snapshot.pageId,
         ]);
@@ -244,15 +244,16 @@ export function useUndoRedo(options: UseUndoRedoOptions) {
   /**
    * Get debug info about the current history state
    */
-  const getHistoryInfo = useCallback(() => {
-    return {
+  const getHistoryInfo = useCallback(
+    () => ({
       undoStackSize: undoStack.length,
       redoStackSize: redoStack.length,
       canUndo,
       canRedo,
       currentPageId: pageId,
-    };
-  }, [undoStack.length, redoStack.length, canUndo, canRedo, pageId]);
+    }),
+    [undoStack.length, redoStack.length, canUndo, canRedo, pageId]
+  );
 
   return {
     pushSnapshot,

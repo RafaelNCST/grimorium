@@ -16,8 +16,8 @@ import {
   Save,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 
+import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 import {
   Accordion,
   AccordionContent,
@@ -329,316 +329,327 @@ export function RegionTimeline({
         </div>
       ) : (
         <div>
-        <div className="relative">
-          {/* Enhanced Timeline Line with Gradient and Glow */}
-          <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
-            <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
-          </div>
+          <div className="relative">
+            {/* Enhanced Timeline Line with Gradient and Glow */}
+            <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
+              <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
+            </div>
 
-          <Accordion type="multiple" className="space-y-6">
-            {timeline.map((era) => (
-              <AccordionItem
-                key={era.id}
-                value={era.id}
-                className="border-none"
-              >
-                <div className="relative">
-                  {/* Era Marker with Enhanced Design */}
-                  <div className="absolute left-8 top-6 z-20">
-                    <div className="relative">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 border-4 border-background shadow-xl flex items-center justify-center">
-                        <Sparkles className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                      <div className="absolute inset-0 w-8 h-8 rounded-full bg-primary/20 animate-pulse" />
-                    </div>
-                  </div>
-
-                  {/* Era Card with Enhanced Styling */}
-                  <div className="ml-20 relative">
-                    <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden">
-                      <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
-                        <div className="flex items-start justify-between w-full">
-                          <div className="text-left flex-1">
-                            <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                              {era.name}
-                            </h3>
-                            <Badge
-                              variant="secondary"
-                              className="mt-2 bg-primary/10 text-primary border-primary/20"
-                            >
-                              <Clock className="w-3 h-3 mr-1" />
-                              {era.startDate} - {era.endDate}
-                            </Badge>
-                            {era.description && (
-                              <p className="text-sm text-muted-foreground leading-relaxed mt-3">
-                                {era.description}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 ml-4">
-                            {era.events.length > 0 && (
-                              <Badge variant="outline" className="text-xs">
-                                {era.events.length} evento
-                                {era.events.length !== 1 ? "s" : ""}
-                              </Badge>
-                            )}
-                          </div>
+            <Accordion type="multiple" className="space-y-6">
+              {timeline.map((era) => (
+                <AccordionItem
+                  key={era.id}
+                  value={era.id}
+                  className="border-none"
+                >
+                  <div className="relative">
+                    {/* Era Marker with Enhanced Design */}
+                    <div className="absolute left-8 top-6 z-20">
+                      <div className="relative">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 border-4 border-background shadow-xl flex items-center justify-center">
+                          <Sparkles className="w-3 h-3 text-primary-foreground" />
                         </div>
+                        <div className="absolute inset-0 w-8 h-8 rounded-full bg-primary/20 animate-pulse" />
                       </div>
-                    </AccordionTrigger>
-
-                    {/* Action buttons positioned absolutely outside the trigger */}
-                    {isEditing && (
-                      <div className="absolute top-6 right-12 flex gap-0.5 z-10">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedEraId(era.id);
-                                setNewEvent({
-                                  name: "",
-                                  description: "",
-                                  reason: "",
-                                  outcome: "",
-                                  startDate: "",
-                                  endDate: "",
-                                  charactersInvolved: [],
-                                  factionsInvolved: [],
-                                  racesInvolved: [],
-                                  itemsInvolved: [],
-                                });
-                                setShowCreateEventModal(true);
-                              }}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            <p>Adicionar Evento</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditEra(era);
-                              }}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            <p>Editar Era</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="ghost-destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteEra(era.id);
-                              }}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            <p>Deletar Era</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    )}
-
-                    {/* ChevronDown positioned at the end (rightmost) */}
-                    <div className="absolute top-6 right-4 z-10">
-                      <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
                     </div>
 
-                    <AccordionContent className="pt-4 pb-0">
-                      <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
-                        {era.events.length > 0 ? (
-                          <>
-                            {era.events.map((event) => (
-                              <div key={event.id} className="relative">
-                                {/* Event Marker */}
-                                <div className="absolute -left-8 top-3">
-                                  <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary/60 to-primary/40 border-2 border-background shadow-md" />
-                                </div>
-
-                                {/* Event Card */}
-                                <Card
-                                  className="hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
-                                  onClick={() => openEventDetails(event)}
-                                >
-                                  <CardContent className="p-5">
-                                    <div className="flex items-start justify-between mb-3">
-                                      <div className="flex-1">
-                                        <h4 className="font-semibold text-foreground/90 mb-1">
-                                          {event.name}
-                                        </h4>
-                                        <Badge
-                                          variant="outline"
-                                          className="text-xs bg-muted/50"
-                                        >
-                                          <Calendar className="w-3 h-3 mr-1" />
-                                          {event.startDate} - {event.endDate}
-                                        </Badge>
-                                      </div>
-                                      <div className="flex items-center gap-1">
-                                        {isEditing && (
-                                          <>
-                                            <Button
-                                              size="sm"
-                                              variant="ghost"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                openEventDetails(event, true);
-                                              }}
-                                              className="h-6 w-6 p-0"
-                                            >
-                                              <Edit className="w-3 h-3" />
-                                            </Button>
-                                            <Button
-                                              size="sm"
-                                              variant="ghost-destructive"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteEvent(event.id);
-                                              }}
-                                              className="h-6 w-6 p-0"
-                                            >
-                                              <Trash2 className="w-3 h-3" />
-                                            </Button>
-                                          </>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                      {event.description.length > 200
-                                        ? `${event.description.substring(0, 200)}...`
-                                        : event.description}
-                                    </p>
-                                    {(event.charactersInvolved.length > 0 ||
-                                      event.factionsInvolved.length > 0 ||
-                                      event.racesInvolved.length > 0 ||
-                                      event.itemsInvolved.length > 0) && (
-                                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30 flex-wrap">
-                                        {event.charactersInvolved.length > 0 && (
-                                          <div className="flex items-center gap-1">
-                                            <Users className="w-3 h-3 text-muted-foreground" />
-                                            <span className="text-xs text-muted-foreground">
-                                              {event.charactersInvolved.length}{" "}
-                                              personagem
-                                              {event.charactersInvolved.length !== 1
-                                                ? "s"
-                                                : ""}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {event.factionsInvolved.length > 0 && (
-                                          <div className="flex items-center gap-1">
-                                            <Building className="w-3 h-3 text-muted-foreground" />
-                                            <span className="text-xs text-muted-foreground">
-                                              {event.factionsInvolved.length}{" "}
-                                              facção
-                                              {event.factionsInvolved.length !== 1
-                                                ? "ões"
-                                                : ""}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {event.racesInvolved.length > 0 && (
-                                          <div className="flex items-center gap-1">
-                                            <Swords className="w-3 h-3 text-muted-foreground" />
-                                            <span className="text-xs text-muted-foreground">
-                                              {event.racesInvolved.length} raça
-                                              {event.racesInvolved.length !== 1
-                                                ? "s"
-                                                : ""}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {event.itemsInvolved.length > 0 && (
-                                          <div className="flex items-center gap-1">
-                                            <Package className="w-3 h-3 text-muted-foreground" />
-                                            <span className="text-xs text-muted-foreground">
-                                              {event.itemsInvolved.length} item
-                                              {event.itemsInvolved.length !== 1
-                                                ? "s"
-                                                : ""}
-                                            </span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                  </CardContent>
-                                </Card>
-                              </div>
-                            ))}
-                          </>
-                        ) : (
-                          <div className="text-center py-8">
-                            <div className="relative">
-                              <div className="absolute -left-8 top-6">
-                                <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20" />
-                              </div>
-                              <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
-                                <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
-                                <p className="text-sm text-muted-foreground mb-4">
-                                  Esta era ainda não possui eventos
+                    {/* Era Card with Enhanced Styling */}
+                    <div className="ml-20 relative">
+                      <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden">
+                        <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
+                          <div className="flex items-start justify-between w-full">
+                            <div className="text-left flex-1">
+                              <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                                {era.name}
+                              </h3>
+                              <Badge
+                                variant="secondary"
+                                className="mt-2 bg-primary/10 text-primary border-primary/20"
+                              >
+                                <Clock className="w-3 h-3 mr-1" />
+                                {era.startDate} - {era.endDate}
+                              </Badge>
+                              {era.description && (
+                                <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+                                  {era.description}
                                 </p>
-                                {isEditing && (
-                                  <Button
-                                    onClick={() => {
-                                      setSelectedEraId(era.id);
-                                      setShowCreateEventModal(true);
-                                    }}
-                                    size="sm"
-                                    variant="magical"
-                                    className="animate-glow"
-                                  >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Criar Primeiro Evento
-                                  </Button>
-                                )}
-                              </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 ml-4">
+                              {era.events.length > 0 && (
+                                <Badge variant="outline" className="text-xs">
+                                  {era.events.length} evento
+                                  {era.events.length !== 1 ? "s" : ""}
+                                </Badge>
+                              )}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    </AccordionContent>
-                  </div>
-                </div>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
+                        </div>
+                      </AccordionTrigger>
 
-        {isEditing && (
-          <div className="flex justify-end mt-6">
-            <Button
-              onClick={() => setShowCreateEraModal(true)}
-              size="sm"
-              variant="magical"
-              className="animate-glow"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Era
-            </Button>
+                      {/* Action buttons positioned absolutely outside the trigger */}
+                      {isEditing && (
+                        <div className="absolute top-6 right-12 flex gap-0.5 z-10">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedEraId(era.id);
+                                  setNewEvent({
+                                    name: "",
+                                    description: "",
+                                    reason: "",
+                                    outcome: "",
+                                    startDate: "",
+                                    endDate: "",
+                                    charactersInvolved: [],
+                                    factionsInvolved: [],
+                                    racesInvolved: [],
+                                    itemsInvolved: [],
+                                  });
+                                  setShowCreateEventModal(true);
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p>Adicionar Evento</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditEra(era);
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p>Editar Era</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteEra(era.id);
+                                }}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p>Deletar Era</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      )}
+
+                      {/* ChevronDown positioned at the end (rightmost) */}
+                      <div className="absolute top-6 right-4 z-10">
+                        <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
+                      </div>
+
+                      <AccordionContent className="pt-4 pb-0">
+                        <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
+                          {era.events.length > 0 ? (
+                            <>
+                              {era.events.map((event) => (
+                                <div key={event.id} className="relative">
+                                  {/* Event Marker */}
+                                  <div className="absolute -left-8 top-3">
+                                    <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary/60 to-primary/40 border-2 border-background shadow-md" />
+                                  </div>
+
+                                  {/* Event Card */}
+                                  <Card
+                                    className="hover:shadow-lg transition-all duration-300 cursor-pointer bg-gradient-to-r from-card to-card/80 border-border/50 hover:border-primary/30"
+                                    onClick={() => openEventDetails(event)}
+                                  >
+                                    <CardContent className="p-5">
+                                      <div className="flex items-start justify-between mb-3">
+                                        <div className="flex-1">
+                                          <h4 className="font-semibold text-foreground/90 mb-1">
+                                            {event.name}
+                                          </h4>
+                                          <Badge
+                                            variant="outline"
+                                            className="text-xs bg-muted/50"
+                                          >
+                                            <Calendar className="w-3 h-3 mr-1" />
+                                            {event.startDate} - {event.endDate}
+                                          </Badge>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          {isEditing && (
+                                            <>
+                                              <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  openEventDetails(event, true);
+                                                }}
+                                                className="h-6 w-6 p-0"
+                                              >
+                                                <Edit className="w-3 h-3" />
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                variant="ghost-destructive"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleDeleteEvent(event.id);
+                                                }}
+                                                className="h-6 w-6 p-0"
+                                              >
+                                                <Trash2 className="w-3 h-3" />
+                                              </Button>
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {event.description.length > 200
+                                          ? `${event.description.substring(0, 200)}...`
+                                          : event.description}
+                                      </p>
+                                      {(event.charactersInvolved.length > 0 ||
+                                        event.factionsInvolved.length > 0 ||
+                                        event.racesInvolved.length > 0 ||
+                                        event.itemsInvolved.length > 0) && (
+                                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30 flex-wrap">
+                                          {event.charactersInvolved.length >
+                                            0 && (
+                                            <div className="flex items-center gap-1">
+                                              <Users className="w-3 h-3 text-muted-foreground" />
+                                              <span className="text-xs text-muted-foreground">
+                                                {
+                                                  event.charactersInvolved
+                                                    .length
+                                                }{" "}
+                                                personagem
+                                                {event.charactersInvolved
+                                                  .length !== 1
+                                                  ? "s"
+                                                  : ""}
+                                              </span>
+                                            </div>
+                                          )}
+                                          {event.factionsInvolved.length >
+                                            0 && (
+                                            <div className="flex items-center gap-1">
+                                              <Building className="w-3 h-3 text-muted-foreground" />
+                                              <span className="text-xs text-muted-foreground">
+                                                {event.factionsInvolved.length}{" "}
+                                                facção
+                                                {event.factionsInvolved
+                                                  .length !== 1
+                                                  ? "ões"
+                                                  : ""}
+                                              </span>
+                                            </div>
+                                          )}
+                                          {event.racesInvolved.length > 0 && (
+                                            <div className="flex items-center gap-1">
+                                              <Swords className="w-3 h-3 text-muted-foreground" />
+                                              <span className="text-xs text-muted-foreground">
+                                                {event.racesInvolved.length}{" "}
+                                                raça
+                                                {event.racesInvolved.length !==
+                                                1
+                                                  ? "s"
+                                                  : ""}
+                                              </span>
+                                            </div>
+                                          )}
+                                          {event.itemsInvolved.length > 0 && (
+                                            <div className="flex items-center gap-1">
+                                              <Package className="w-3 h-3 text-muted-foreground" />
+                                              <span className="text-xs text-muted-foreground">
+                                                {event.itemsInvolved.length}{" "}
+                                                item
+                                                {event.itemsInvolved.length !==
+                                                1
+                                                  ? "s"
+                                                  : ""}
+                                              </span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <div className="text-center py-8">
+                              <div className="relative">
+                                <div className="absolute -left-8 top-6">
+                                  <div className="w-3 h-3 rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted/20" />
+                                </div>
+                                <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
+                                  <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                                  <p className="text-sm text-muted-foreground mb-4">
+                                    Esta era ainda não possui eventos
+                                  </p>
+                                  {isEditing && (
+                                    <Button
+                                      onClick={() => {
+                                        setSelectedEraId(era.id);
+                                        setShowCreateEventModal(true);
+                                      }}
+                                      size="sm"
+                                      variant="magical"
+                                      className="animate-glow"
+                                    >
+                                      <Plus className="w-4 h-4 mr-2" />
+                                      Criar Primeiro Evento
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </div>
+                  </div>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
-        )}
-      </div>
+
+          {isEditing && (
+            <div className="flex justify-end mt-6">
+              <Button
+                onClick={() => setShowCreateEraModal(true)}
+                size="sm"
+                variant="magical"
+                className="animate-glow"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Era
+              </Button>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Event Details/Edit Modal */}
@@ -853,8 +864,11 @@ export function RegionTimeline({
                     <X className="w-4 h-4 mr-2" />
                     Cancelar
                   </Button>
-                  <Button onClick={handleUpdateEvent} variant="magical"
-              className="animate-glow">
+                  <Button
+                    onClick={handleUpdateEvent}
+                    variant="magical"
+                    className="animate-glow"
+                  >
                     <Save className="w-4 h-4 mr-2" />
                     Salvar Alterações
                   </Button>
@@ -1409,8 +1423,11 @@ export function RegionTimeline({
               <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
-            <Button onClick={handleUpdateEra} variant="magical"
-              className="animate-glow">
+            <Button
+              onClick={handleUpdateEra}
+              variant="magical"
+              className="animate-glow"
+            >
               <Save className="w-4 h-4 mr-2" />
               Salvar Alterações
             </Button>

@@ -30,8 +30,8 @@ import { usePowerSystemStore } from "@/stores/power-system-store";
 import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 
 import { ManageLinksModal } from "../components/manage-links-modal";
-import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
 
 import { PowerSystemDetailView } from "./view";
 
@@ -282,7 +282,14 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       timestamp: Date.now(),
     };
     pushSnapshot(snapshot);
-  }, [currentPage, sections, blocks, isEditMode, isApplyingSnapshot, pushSnapshot]);
+  }, [
+    currentPage,
+    sections,
+    blocks,
+    isEditMode,
+    isApplyingSnapshot,
+    pushSnapshot,
+  ]);
 
   /**
    * Handle undo action
@@ -324,7 +331,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   useEffect(() => {
     if (!isEditMode) {
       clearHistory();
-    } else if (isEditMode && currentPage && sections.length > 0 && !isApplyingSnapshot) {
+    } else if (
+      isEditMode &&
+      currentPage &&
+      sections.length > 0 &&
+      !isApplyingSnapshot
+    ) {
       // Save initial snapshot when entering edit mode with existing data
       const snapshot: Snapshot = {
         pageId: currentPage.id,

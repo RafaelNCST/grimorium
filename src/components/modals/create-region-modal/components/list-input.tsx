@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   DndContext,
   closestCenter,
@@ -15,10 +16,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Plus, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ListInputProps {
   label: string;
@@ -41,12 +43,7 @@ interface SortableItemProps {
   onDelete: () => void;
 }
 
-function SortableItem({
-  id,
-  text,
-  onTextChange,
-  onDelete,
-}: SortableItemProps) {
+function SortableItem({ id, text, onTextChange, onDelete }: SortableItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 

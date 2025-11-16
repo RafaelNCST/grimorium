@@ -1,5 +1,6 @@
-import * as React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+
+import { cn } from "@/lib/utils";
 
 export interface DetailPageLayoutProps {
   children: React.ReactNode;
@@ -30,11 +31,11 @@ export function DetailPageLayout({
   mainClassName,
 }: DetailPageLayoutProps) {
   return (
-    <div className={cn('flex h-full w-full', className)}>
+    <div className={cn("flex h-full w-full", className)}>
       {sidebar && (
         <aside
           className={cn(
-            'w-64 shrink-0 border-r border-border bg-card',
+            "w-64 shrink-0 border-r border-border bg-card",
             sidebarClassName
           )}
         >
@@ -42,12 +43,7 @@ export function DetailPageLayout({
         </aside>
       )}
 
-      <main
-        className={cn(
-          'flex-1 overflow-auto',
-          mainClassName
-        )}
-      >
+      <main className={cn("flex-1 overflow-auto", mainClassName)}>
         {children}
       </main>
     </div>

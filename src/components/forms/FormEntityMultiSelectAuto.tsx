@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+
 import { X, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -16,7 +18,7 @@ import {
 /**
  * Entity type for auto-loading from database
  */
-export type EntityType = 'character' | 'faction' | 'race' | 'item' | 'region';
+export type EntityType = "character" | "faction" | "race" | "item" | "region";
 
 /**
  * Option interface for entity multi-select
@@ -95,33 +97,40 @@ interface FormEntityMultiSelectAutoProps {
 }
 
 // Import services dynamically based on entity type
-const loadEntities = async (entityType: EntityType, bookId: string): Promise<EntityOption[]> => {
+const loadEntities = async (
+  entityType: EntityType,
+  bookId: string
+): Promise<EntityOption[]> => {
   try {
     let data: any[] = [];
 
     switch (entityType) {
-      case 'character': {
-        const { getCharactersByBookId } = await import('@/lib/db/characters.service');
+      case "character": {
+        const { getCharactersByBookId } = await import(
+          "@/lib/db/characters.service"
+        );
         data = await getCharactersByBookId(bookId);
         break;
       }
-      case 'faction': {
-        const { getFactionsByBookId } = await import('@/lib/db/factions.service');
+      case "faction": {
+        const { getFactionsByBookId } = await import(
+          "@/lib/db/factions.service"
+        );
         data = await getFactionsByBookId(bookId);
         break;
       }
-      case 'race': {
-        const { getRacesByBookId } = await import('@/lib/db/races.service');
+      case "race": {
+        const { getRacesByBookId } = await import("@/lib/db/races.service");
         data = await getRacesByBookId(bookId);
         break;
       }
-      case 'item': {
-        const { getItemsByBookId } = await import('@/lib/db/items.service');
+      case "item": {
+        const { getItemsByBookId } = await import("@/lib/db/items.service");
         data = await getItemsByBookId(bookId);
         break;
       }
-      case 'region': {
-        const { getRegionsByBookId } = await import('@/lib/db/regions.service');
+      case "region": {
+        const { getRegionsByBookId } = await import("@/lib/db/regions.service");
         data = await getRegionsByBookId(bookId);
         break;
       }
@@ -359,9 +368,7 @@ export function FormEntityMultiSelectAuto({
         </>
       )}
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

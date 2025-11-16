@@ -1,4 +1,7 @@
-import * as React from 'react';
+import * as React from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -6,10 +9,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export interface Version {
   id: string;
@@ -46,15 +47,15 @@ export function VersionSelector({
   versions,
   currentVersionId,
   onVersionChange,
-  label = 'Versão',
-  placeholder = 'Selecione uma versão',
+  label = "Versão",
+  placeholder = "Selecione uma versão",
   disabled,
   className,
 }: VersionSelectorProps) {
   const currentVersion = versions.find((v) => v.id === currentVersionId);
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       {label && <Label>{label}</Label>}
       <Select
         value={currentVersionId ?? undefined}

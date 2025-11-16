@@ -101,7 +101,9 @@ export function CreateSectionModal({
                 variant="magical"
                 size="lg"
                 className="flex-1 animate-glow"
-                disabled={!form.formState.isValid || form.formState.isSubmitting}
+                disabled={
+                  !form.formState.isValid || form.formState.isSubmitting
+                }
               >
                 {t("modals.create_section.submit")}
               </Button>

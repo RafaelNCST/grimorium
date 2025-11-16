@@ -221,7 +221,9 @@ export function DeleteEntityModal<T extends IEntityVersion>({
                     type="text"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    placeholder={t(`delete.${entityType}.step1.input_placeholder`)}
+                    placeholder={t(
+                      `delete.${entityType}.step1.input_placeholder`
+                    )}
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"

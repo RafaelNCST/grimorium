@@ -1,9 +1,9 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-import enCommon from "../../locales/en/common.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
+import enCommon from "../../locales/en/common.json";
 import enCreateBook from "../../locales/en/create-book.json";
 import enCreateCharacter from "../../locales/en/create-character.json";
 import enCreateFaction from "../../locales/en/create-faction.json";
@@ -23,9 +23,9 @@ import enRaceDetail from "../../locales/en/race-detail.json";
 import enRaces from "../../locales/en/races.json";
 import enRegionDetail from "../../locales/en/region-detail.json";
 import enWorld from "../../locales/en/world.json";
-import ptCommon from "../../locales/pt/common.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
+import ptCommon from "../../locales/pt/common.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateCharacter from "../../locales/pt/create-character.json";
 import ptCreateFaction from "../../locales/pt/create-faction.json";

@@ -1,11 +1,18 @@
-import { useTranslation } from "react-i18next";
 import { Plus, Search, Network } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { EntityListLayout, EntityCardList } from "@/components/layouts";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
+
 import { HierarchyManagerModal } from "./components/hierarchy-manager-modal";
 import { RegionCard } from "./components/region-card";
 import { createScaleFilterRows } from "./helpers/scale-filter-config";
-import { IRegion, IRegionWithChildren, RegionScale, IRegionFormData } from "./types/region-types";
+import {
+  IRegion,
+  IRegionWithChildren,
+  RegionScale,
+  IRegionFormData,
+} from "./types/region-types";
 
 interface WorldViewProps {
   bookId: string;
@@ -102,7 +109,7 @@ export function WorldView({
           totalCount: allRegions.length,
           totalLabel: t("filters.all"),
           selectedFilters: selectedScales,
-          filterRows: filterRows,
+          filterRows,
           onFilterToggle: onScaleToggle,
           onClearFilters: () => {
             // Clear all selected scales

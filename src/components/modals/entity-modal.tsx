@@ -1,5 +1,9 @@
 import { type ReactNode } from "react";
+
 import { type LucideIcon, Plus, Save, Loader2, X } from "lucide-react";
+
+import { AdvancedSection } from "@/components/modals/create-region-modal/components/advanced-section";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InfoAlert } from "@/components/ui/info-alert";
-import { Button } from "@/components/ui/button";
-import { AdvancedSection } from "@/components/modals/create-region-modal/components/advanced-section";
 
 interface EntityModalHeader {
   title: string;
@@ -60,17 +62,11 @@ export function EntityModal({
             <Icon className="w-5 h-5 text-primary" />
             {header.title}
           </DialogTitle>
-          <DialogDescription>
-            {header.description}
-          </DialogDescription>
+          <DialogDescription>{header.description}</DialogDescription>
         </DialogHeader>
 
         {/* Important Note Alert */}
-        {header.warning && (
-          <InfoAlert>
-            {header.warning}
-          </InfoAlert>
-        )}
+        {header.warning && <InfoAlert>{header.warning}</InfoAlert>}
 
         {/* Basic Fields Section */}
         <div className="space-y-6">
@@ -81,11 +77,7 @@ export function EntityModal({
         </div>
 
         {/* Advanced Section */}
-        {advancedFields && (
-          <AdvancedSection>
-            {advancedFields}
-          </AdvancedSection>
-        )}
+        {advancedFields && <AdvancedSection>{advancedFields}</AdvancedSection>}
 
         <DialogFooter>
           <Button
@@ -112,7 +104,9 @@ export function EntityModal({
               <Plus className="w-4 h-4 mr-2" />
             )}
             {footer.isSubmitting
-              ? footer.editMode ? "Salvando..." : "Criando..."
+              ? footer.editMode
+                ? "Salvando..."
+                : "Criando..."
               : footer.submitLabel || (footer.editMode ? "Salvar" : "Criar")}
           </Button>
         </DialogFooter>
