@@ -1,10 +1,8 @@
-import { useState, useCallback, useMemo } from "react";
-
+import { useState, useCallback, useMemo, ReactNode } from "react";
 import { ArrowRight, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,40 +14,78 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  type IRegion,
-  type IRegionFormData,
-} from "@/pages/dashboard/tabs/world/types/region-types";
 
-interface CreateVersionDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: (data: {
-    name: string;
-    description: string;
-    regionData: IRegionFormData;
-  }) => void;
-  baseRegion: IRegion;
+export interface CreateVersionWithEntityData<TEntityData> {
+  name: string;
+  description: string;
+  entityData: TEntityData;
 }
 
-export function CreateVersionDialog({
+export interface CreateVersionWithEntityDialogProps<TEntity, TEntityData> {
+  /** Controls modal visibility */
+  open: boolean;
+  /** Callback when modal should close */
+  onClose: () => void;
+  /** Callback when version is created with entity data */
+  onConfirm: (data: CreateVersionWithEntityData<TEntityData>) => void;
+  /** Base entity to create version from */
+  baseEntity: TEntity;
+  /** i18n namespace to use for translations */
+  i18nNamespace: string;
+  /** Render prop for the entity creation modal (step 2) */
+  renderEntityModal: (props: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onConfirm: (entityData: TEntityData) => void;
+  }) => ReactNode;
+  /** Optional max length for version name (default: 50) */
+  maxNameLength?: number;
+  /** Optional max length for version description (default: 200) */
+  maxDescriptionLength?: number;
+}
+
+/**
+ * CreateVersionWithEntityDialog - Generic two-step dialog for creating versions
+ *
+ * Step 1: Collect version metadata (name + description)
+ * Step 2: Open entity-specific modal to collect entity data
+ *
+ * @example
+ * ```tsx
+ * <CreateVersionWithEntityDialog
+ *   open={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   onConfirm={handleVersionCreate}
+ *   baseEntity={region}
+ *   i18nNamespace="world"
+ *   renderEntityModal={({ open, onOpenChange, onConfirm }) => (
+ *     <CreateRegionModal
+ *       open={open}
+ *       onOpenChange={onOpenChange}
+ *       onConfirm={onConfirm}
+ *       availableRegions={[]}
+ *     />
+ *   )}
+ * />
+ * ```
+ */
+export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
   open,
   onClose,
   onConfirm,
-  baseRegion,
-}: CreateVersionDialogProps) {
-  const { t } = useTranslation("region-detail");
+  i18nNamespace,
+  renderEntityModal,
+  maxNameLength = 50,
+  maxDescriptionLength = 200,
+}: CreateVersionWithEntityDialogProps<TEntity, TEntityData>) {
+  const { t } = useTranslation(i18nNamespace);
   const [step, setStep] = useState<1 | 2>(1);
   const [versionName, setVersionName] = useState("");
   const [versionDescription, setVersionDescription] = useState("");
-  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [isEntityModalOpen, setIsEntityModalOpen] = useState(false);
 
-  const MAX_NAME_LENGTH = 50;
-  const MAX_DESCRIPTION_LENGTH = 200;
-
-  const nameCharsRemaining = MAX_NAME_LENGTH - versionName.length;
-  const descriptionCharsRemaining =
-    MAX_DESCRIPTION_LENGTH - versionDescription.length;
+  const nameCharsRemaining = maxNameLength - versionName.length;
+  const descriptionCharsRemaining = maxDescriptionLength - versionDescription.length;
 
   const canProceedToStep2 = useMemo(
     () => versionName.trim().length > 0 && versionDescription.trim().length > 0,
@@ -60,7 +96,7 @@ export function CreateVersionDialog({
     setStep(1);
     setVersionName("");
     setVersionDescription("");
-    setIsRegionModalOpen(false);
+    setIsEntityModalOpen(false);
     onClose();
   }, [onClose]);
 
@@ -70,21 +106,30 @@ export function CreateVersionDialog({
       return;
     }
     setStep(2);
-    setIsRegionModalOpen(true);
+    setIsEntityModalOpen(true);
   }, [canProceedToStep2, t]);
 
-  const handleRegionModalClose = useCallback(() => {
-    setIsRegionModalOpen(false);
+  const handleEntityModalClose = useCallback(() => {
+    setIsEntityModalOpen(false);
     setStep(1);
   }, []);
 
-  const handleRegionCreate = useCallback(
-    (regionData: IRegionFormData) => {
-      onConfirm({
+  const handleEntityCreate = useCallback(
+    (entityData: TEntityData) => {
+      console.log("[CreateVersionWithEntityDialog] handleEntityCreate called");
+      console.log("[CreateVersionWithEntityDialog] versionName:", versionName);
+      console.log("[CreateVersionWithEntityDialog] versionDescription:", versionDescription);
+      console.log("[CreateVersionWithEntityDialog] entityData received:", entityData);
+
+      const dataToConfirm = {
         name: versionName.trim(),
         description: versionDescription.trim(),
-        regionData: regionData as unknown as IRegionFormData,
-      });
+        entityData,
+      };
+
+      console.log("[CreateVersionWithEntityDialog] Calling onConfirm with:", dataToConfirm);
+
+      onConfirm(dataToConfirm);
       handleClose();
       toast.success(t("versions.create_dialog.success"));
     },
@@ -93,6 +138,7 @@ export function CreateVersionDialog({
 
   return (
     <>
+      {/* Step 1: Version Metadata */}
       <Dialog open={open && step === 1} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -115,12 +161,12 @@ export function CreateVersionDialog({
                 id="version-name"
                 value={versionName}
                 onChange={(e) => {
-                  if (e.target.value.length <= MAX_NAME_LENGTH) {
+                  if (e.target.value.length <= maxNameLength) {
                     setVersionName(e.target.value);
                   }
                 }}
                 placeholder={t("versions.create_dialog.name_placeholder")}
-                maxLength={MAX_NAME_LENGTH}
+                maxLength={maxNameLength}
                 className={
                   versionName.trim().length === 0 && versionName.length > 0
                     ? "border-destructive"
@@ -158,14 +204,12 @@ export function CreateVersionDialog({
                 id="version-description"
                 value={versionDescription}
                 onChange={(e) => {
-                  if (e.target.value.length <= MAX_DESCRIPTION_LENGTH) {
+                  if (e.target.value.length <= maxDescriptionLength) {
                     setVersionDescription(e.target.value);
                   }
                 }}
-                placeholder={t(
-                  "versions.create_dialog.description_placeholder"
-                )}
-                maxLength={MAX_DESCRIPTION_LENGTH}
+                placeholder={t("versions.create_dialog.description_placeholder")}
+                maxLength={maxDescriptionLength}
                 rows={4}
                 className={`resize-none ${
                   versionDescription.trim().length === 0 &&
@@ -220,17 +264,14 @@ export function CreateVersionDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Step 2: Region Creation Modal */}
-      {step === 2 && (
-        <CreateRegionModal
-          open={isRegionModalOpen}
-          onOpenChange={(open) => {
-            if (!open) handleRegionModalClose();
-          }}
-          onConfirm={handleRegionCreate}
-          availableRegions={[]}
-        />
-      )}
+      {/* Step 2: Entity Creation Modal */}
+      {step === 2 && renderEntityModal({
+        open: isEntityModalOpen,
+        onOpenChange: (open) => {
+          if (!open) handleEntityModalClose();
+        },
+        onConfirm: handleEntityCreate,
+      })}
     </>
   );
 }

@@ -14,6 +14,8 @@
   "save_success": "Região atualizada com sucesso!",
   "save_error": "Erro ao salvar região",
   "validation_error": "Corrija os seguintes campos: {{fields}}",
+  "error": "Erro",
+  "version_data_corrupted": "Esta versão possui dados corrompidos e não pode ser carregada. Considere excluí-la.",
   "sections": {
     "basic_info": "Informações Básicas",
     "advanced_info": "Informações Avançadas",

@@ -294,8 +294,8 @@ export function EntityDetailLayout({
         {/* Central content */}
         <main
           className={cn(
-            "flex-1 overflow-y-auto",
-            isEditMode ? "w-full" : versionsPanel ? "lg:w-3/4" : "w-full"
+            "flex-1 min-w-0 overflow-y-auto",
+            isEditMode ? "w-full" : versionsPanel ? "lg:flex-[3]" : "w-full"
           )}
         >
           <div className="space-y-6 max-w-7xl mx-auto px-4">
@@ -413,7 +413,9 @@ export function EntityDetailLayout({
 
         {/* Versions sidebar - Only show in view mode */}
         {!isEditMode && versionsPanel && (
-          <aside className="lg:w-1/4 h-full">{versionsPanel}</aside>
+          <aside className="hidden lg:flex lg:flex-[1] lg:min-w-[280px] lg:max-w-[400px] h-full overflow-y-auto">
+            {versionsPanel}
+          </aside>
         )}
       </div>
     </div>

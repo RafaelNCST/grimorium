@@ -45,10 +45,12 @@ import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSel
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/constants/season-colors";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Trash2 } from "lucide-react";
 
 import { DeleteEntityModal, type IEntityVersion } from "@/components/modals/delete-entity-modal";
-import { VersionManager } from "./components/version-manager";
+import { EntityVersionManager, CreateVersionWithEntityDialog } from "@/components/version-system";
+import { VersionCard } from "./components/version-card";
+import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { RegionTimeline } from "./components/region-timeline";
 import { type ITimelineEra } from "@/lib/db/regions.service";
 import { convertFileSrc } from "@tauri-apps/api/core";
@@ -1640,21 +1642,72 @@ export function RegionDetailView({
 
             // Versions panel
             versionsPanel={
-              <Card className="card-magical sticky top-24">
-                <CardHeader>
+              <Card className="card-magical sticky top-24 flex flex-col max-h-[calc(100vh-8rem)]">
+                <CardHeader className="flex-shrink-0">
                   <CardTitle className="text-base">
                     {t("region-detail:sections.versions")}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-[600px] p-6 pt-0">
-                  <VersionManager
+                <CardContent className="flex-1 min-h-0 p-6 pt-0 overflow-hidden">
+                  <EntityVersionManager<IRegionVersion, IRegion, IRegionFormData>
                     versions={versions}
                     currentVersion={currentVersion}
                     onVersionChange={onVersionChange}
                     onVersionCreate={onVersionCreate}
-                    onVersionDelete={onVersionDelete}
-                    isEditMode={isEditing}
-                    mainRegionData={region}
+                    baseEntity={region}
+                    i18nNamespace="region-detail"
+                    renderVersionCard={({ version, isSelected, onClick }) => {
+                      // Check if version has valid data
+                      const hasValidData = !!version.regionData;
+
+                      return (
+                        <div className="relative">
+                          <div className={!hasValidData ? "opacity-50 cursor-not-allowed" : ""}>
+                            <VersionCard
+                              version={version}
+                              isSelected={isSelected}
+                              onClick={hasValidData ? onClick : () => {}}
+                            />
+                          </div>
+                          {!hasValidData && !version.isMain && (
+                            <div className="flex items-center justify-between mt-1 px-2">
+                              <div className="text-xs text-destructive">
+                                ⚠️ Dados corrompidos
+                              </div>
+                              <Button
+                                variant="ghost-destructive"
+                                size="sm"
+                                className="h-6 text-xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onVersionDelete(version.id);
+                                }}
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Excluir
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }}
+                    renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
+                      <CreateVersionWithEntityDialog<IRegion, IRegionFormData>
+                        open={open}
+                        onClose={onClose}
+                        onConfirm={onConfirm}
+                        baseEntity={baseEntity}
+                        i18nNamespace="region-detail"
+                        renderEntityModal={({ open, onOpenChange, onConfirm }) => (
+                          <CreateRegionModal
+                            open={open}
+                            onOpenChange={onOpenChange}
+                            onConfirm={onConfirm}
+                            availableRegions={[]}
+                          />
+                        )}
+                      />
+                    )}
                   />
                 </CardContent>
               </Card>

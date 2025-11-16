@@ -143,7 +143,8 @@
       "Bash(Select-String -Pattern \"ÊXITO|SUCCESS\" -CaseSensitive)",
       "Bash(git checkout:*)",
       "Bash(cmd /c \"taskkill /PID 25808 /F\")",
-      "Bash(cmd /c \"taskkill /F /PID 24876\")"
+      "Bash(cmd /c \"taskkill /F /PID 24876\")",
+      "Bash(Select-String -Pattern \"error TS|CreateVersion|version-manager|region-detail\" -Context 1,1)"
     ],
     "deny": [],
     "ask": []

@@ -439,6 +439,12 @@ export function RegionDetail() {
 
             const cleanedVersions = updatedVersions.map((version) => {
               const regionData = version.regionData;
+
+              // Skip cleaning if regionData is null
+              if (!regionData) {
+                return version;
+              }
+
               let needsUpdate = false;
 
               // Parse and clean each field
@@ -597,6 +603,12 @@ export function RegionDetail() {
       const version = versions.find((v) => v.id === versionId);
       if (!version) return;
 
+      // If regionData is null, log error and return
+      if (!version.regionData) {
+        console.error("Version has null regionData:", version);
+        return;
+      }
+
       setCurrentVersion(version);
       setRegion(version.regionData);
       setEditData(version.regionData);
@@ -636,25 +648,37 @@ export function RegionDetail() {
     async (versionData: {
       name: string;
       description: string;
-      regionData: IRegionFormData;
+      entityData: IRegionFormData;
     }) => {
       try {
+        console.log("[handleVersionCreate] Received versionData:", versionData);
+        console.log("[handleVersionCreate] entityData:", versionData.entityData);
+
+        if (!versionData.entityData) {
+          console.error("[handleVersionCreate] ERROR: entityData is null/undefined!");
+          return;
+        }
+
         const newVersion: IRegionVersion = {
           id: `version-${Date.now()}`,
           name: versionData.name,
           description: versionData.description,
           createdAt: new Date().toISOString(),
           isMain: false,
-          regionData: versionData.regionData as unknown as IRegion,
+          regionData: versionData.entityData as unknown as IRegion,
         };
+
+        console.log("[handleVersionCreate] Created newVersion object:", newVersion);
 
         // Save to database
         await createRegionVersion(regionId, newVersion);
 
+        console.log("[handleVersionCreate] Version saved to database successfully");
+
         // Update state only if save is successful
         setVersions((prev) => [...prev, newVersion]);
       } catch (error) {
-        console.error("Error creating region version:", error);
+        console.error("[handleVersionCreate] Error creating region version:", error);
       }
     },
     [regionId]
