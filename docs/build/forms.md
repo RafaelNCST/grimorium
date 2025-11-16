@@ -192,3 +192,84 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 - ✅ Drag & Drop para reordenar itens
 - ✅ Validação: botão desabilitado quando campo vazio
 - ✅ Atalho de teclado: Enter adiciona item, Shift+Enter quebra linha
+
+---
+
+## 11. FormImageUpload (Upload de Imagem)
+**Componente:** `FormImageUpload` (`src/components/forms/FormImageUpload.tsx`)
+**Uso:** Upload de imagens com preview e customização de forma
+**Descrição:** Componente de upload de imagem altamente customizável. Permite diferentes formas (quadrado, arredondado, circular), ajuste de como a imagem se encaixa no container, e ícone/texto customizável no placeholder. O placeholder possui fundo roxo escuro.
+
+**Exemplo de uso básico:**
+```tsx
+<FormImageUpload
+  value={imageSrc}
+  onChange={(value) => form.setValue("image", value)}
+  label="Imagem da Região"
+  helperText="Recomendado: 1200x448px"
+  height="h-[28rem]"
+/>
+```
+
+**Exemplo avatar circular:**
+```tsx
+<FormImageUpload
+  value={avatar}
+  onChange={setAvatar}
+  label="Avatar do Personagem"
+  shape="circle"
+  height="h-40"
+  width="w-40"
+  imageFit="cover"
+  placeholderIcon={User}
+/>
+```
+
+**Exemplo com ícone customizado:**
+```tsx
+<FormImageUpload
+  value={factionImage}
+  onChange={setFactionImage}
+  label="Emblema da Facção"
+  shape="rounded"
+  height="h-64"
+  width="w-64"
+  placeholderIcon={Shield}
+  placeholderText="Adicionar emblema"
+/>
+```
+
+**Propriedades principais:**
+- `value`: Imagem atual (base64 ou URL)
+- `onChange`: Callback quando imagem muda
+- `label`: Texto do label
+- `helperText`: (Opcional) Texto auxiliar/recomendações
+- `required`: (Opcional) Se o campo é obrigatório
+- `height`: (Opcional) Altura do container (default: "h-[28rem]")
+- `width`: (Opcional) Largura do container (default: "w-full")
+- `shape`: (Opcional) Forma do container
+  - `"square"`: Bordas retas
+  - `"rounded"`: Bordas arredondadas (default)
+  - `"circle"`: Circular (requer width/height iguais)
+- `imageFit`: (Opcional) Como a imagem se encaixa
+  - `"fill"`: Preenche todo espaço (pode distorcer) - default
+  - `"cover"`: Cobre todo espaço (pode cortar)
+  - `"contain"`: Mantém proporção (pode ter espaços vazios)
+- `placeholderIcon`: (Opcional) Ícone Lucide para o placeholder (default: ImagePlus)
+- `placeholderText`: (Opcional) Texto do placeholder (default: "Click to upload image")
+- `accept`: (Opcional) Tipos de arquivo aceitos
+- `error`: (Opcional) Mensagem de erro
+- `id`: (Opcional) ID do input
+- `showLabel`: (Opcional) Mostrar label (default: true)
+- `labelClassName`: (Opcional) Classes CSS para label
+
+**Funcionalidades:**
+- ✅ Upload via clique
+- ✅ Preview da imagem
+- ✅ Botão de remover imagem
+- ✅ Placeholder com fundo roxo escuro (bg-purple-950/40)
+- ✅ Ícone customizável no placeholder
+- ✅ Três formas: quadrado, arredondado, circular
+- ✅ Três modos de fit: fill, cover, contain
+- ✅ Validação e mensagens de erro
+- ✅ Helper text para recomendações de tamanho

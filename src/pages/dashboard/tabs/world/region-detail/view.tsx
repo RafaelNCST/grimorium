@@ -4,7 +4,6 @@ import {
   Edit2,
   Trash2,
   Menu,
-  Upload,
   Map,
   X,
   ChevronDown,
@@ -51,6 +50,7 @@ import { SCALE_COLORS } from "@/pages/dashboard/tabs/world/constants/scale-color
 import { Badge } from "@/components/ui/badge";
 import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
 import { ListInput } from "@/components/modals/create-region-modal/components/list-input";
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/constants/season-colors";
@@ -363,54 +363,19 @@ export function RegionDetailView({
                   {isEditing ? (
                     <div className="space-y-6">
                       {/* Image Upload */}
-                      <div className="space-y-2">
-                        <Label className="text-primary">
-                          {t("region-detail:fields.image")}
-                          <span className="text-xs text-muted-foreground ml-2">
-                            (opcional - {t("world:create_region.image_recommended")})
-                          </span>
-                        </Label>
-                        <div className="space-y-3">
-                          <input
-                            type="file"
-                            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                            onChange={onImageFileChange}
-                            className="hidden"
-                            ref={fileInputRef}
+                      <div className="flex justify-center -mx-6">
+                        <div className="w-full max-w-[587px] px-6">
+                          <FormImageUpload
+                            value={imagePreview}
+                            onChange={(value) => onEditDataChange("image", value)}
+                            label={t("region-detail:fields.image")}
+                            helperText={`opcional - ${t("world:create_region.image_recommended")}`}
+                            height="h-[28rem]"
+                            shape="rounded"
+                            placeholderIcon={Map}
+                            placeholderText={t("world:create_region.upload_image")}
                             id="region-image-upload"
                           />
-                          {imagePreview ? (
-                            <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
-                              <img
-                                src={imagePreview}
-                                alt="Region preview"
-                                className="w-full h-full object-fill"
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost-destructive"
-                                size="icon"
-                                className="absolute top-2 right-2"
-                                onClick={() => {
-                                  onEditDataChange("image", "");
-                                }}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ) : (
-                            <label
-                              htmlFor="region-image-upload"
-                              className="cursor-pointer block"
-                            >
-                              <div className="w-full h-[28rem] border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
-                                <Upload className="h-8 w-8 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">
-                                  {t("world:create_region.upload_image")}
-                                </span>
-                              </div>
-                            </label>
-                          )}
                         </div>
                       </div>
 
@@ -519,19 +484,23 @@ export function RegionDetailView({
                   ) : (
                     <div className="space-y-6">
                       {/* Image Display */}
-                      {region.image ? (
-                        <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
-                          <img
-                            src={region.image}
-                            alt={region.name}
-                            className="w-full h-full object-fill"
-                          />
+                      <div className="flex justify-center -mx-6">
+                        <div className="w-full max-w-[587px] px-6">
+                          {region.image ? (
+                            <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
+                              <img
+                                src={region.image}
+                                alt={region.name}
+                                className="w-full h-full object-fill"
+                              />
+                            </div>
+                          ) : (
+                            <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+                              <Map className="w-16 h-16 text-muted-foreground/30" />
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
-                          <Map className="w-16 h-16 text-muted-foreground/30" />
-                        </div>
-                      )}
+                      </div>
 
                       {/* Region Info */}
                       <div className="space-y-4">

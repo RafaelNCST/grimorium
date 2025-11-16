@@ -31,6 +31,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import { IRegion, RegionScale, RegionSeason, IRegionFormData } from "@/pages/dashboard/tabs/world/types/region-types";
@@ -38,7 +39,7 @@ import { IFaction } from "@/types/faction-types";
 import { ICharacter } from "@/types/character-types";
 import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { IItem } from "@/lib/db/items.service";
-import { ImagePlus, X, Map, Plus, Save, Loader2 } from "lucide-react";
+import { Map, Plus, Save, Loader2, X } from "lucide-react";
 import { AdvancedSection } from "./create-region-modal/components/advanced-section";
 import { SeasonPicker } from "./create-region-modal/components/season-picker";
 import { ListInput } from "./create-region-modal/components/list-input";
@@ -115,7 +116,6 @@ export function CreateRegionModal({
 }: CreateRegionModalProps) {
   const { t } = useTranslation("world");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | undefined>(editRegion?.image);
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Force refresh of entity selects when modal opens
@@ -127,6 +127,7 @@ export function CreateRegionModal({
 
   const form = useForm<RegionFormValues>({
     resolver: zodResolver(regionFormSchema),
+    mode: "onChange",
     defaultValues: {
       name: editRegion?.name || "",
       parentId: editRegion?.parentId || null,
@@ -186,7 +187,6 @@ export function CreateRegionModal({
         regionMysteries: parseJsonArray(editRegion.regionMysteries),
         inspirations: parseJsonArray(editRegion.inspirations),
       });
-      setImageSrc(editRegion.image);
     } else {
       form.reset({
         name: "",
@@ -212,27 +212,8 @@ export function CreateRegionModal({
         regionMysteries: [],
         inspirations: [],
       });
-      setImageSrc(undefined);
     }
   }, [editRegion, form]);
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        form.setValue("image", result);
-        setImageSrc(result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    form.setValue("image", "");
-    setImageSrc(undefined);
-  };
 
   const handleSubmit = async (data: RegionFormValues) => {
     setIsSubmitting(true);
@@ -243,7 +224,6 @@ export function CreateRegionModal({
       };
       onConfirm(formData);
       form.reset();
-      setImageSrc(undefined);
     } finally {
       setIsSubmitting(false);
     }
@@ -251,7 +231,6 @@ export function CreateRegionModal({
 
   const handleClose = () => {
     form.reset();
-    setImageSrc(undefined);
     onOpenChange(false);
   };
 
@@ -285,49 +264,20 @@ export function CreateRegionModal({
               <FormField
                 control={form.control}
                 name="image"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary">
-                      {t("create_region.image_label")}
-                      <span className="text-xs text-muted-foreground ml-2">(opcional - {t("create_region.image_recommended")})</span>
-                    </FormLabel>
                     <FormControl>
-                      <div className="space-y-3">
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                          onChange={handleImageSelect}
-                          className="hidden"
-                          id="region-image-upload"
-                        />
-                        {imageSrc ? (
-                          <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
-                            <img
-                              src={imageSrc}
-                              alt="Region preview"
-                              className="w-full h-full object-fill"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-2 right-2 hover:bg-destructive/10 hover:text-destructive"
-                              onClick={handleRemoveImage}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <label htmlFor="region-image-upload" className="cursor-pointer block">
-                            <div className="w-full h-[28rem] border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2">
-                              <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">
-                                {t("create_region.upload_image")}
-                              </span>
-                            </div>
-                          </label>
-                        )}
-                      </div>
+                      <FormImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        label={t("create_region.image_label")}
+                        helperText={`opcional - ${t("create_region.image_recommended")}`}
+                        height="h-[28rem]"
+                        shape="rounded"
+                        placeholderIcon={Map}
+                        placeholderText={t("create_region.upload_image")}
+                        id="region-image-upload"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -864,7 +814,7 @@ export function CreateRegionModal({
                 type="submit"
                 variant="magical"
                 className="animate-glow"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !form.formState.isValid}
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />

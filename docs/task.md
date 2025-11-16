@@ -1,10 +1,14 @@
-# Criar Documentação 
+# O que vamos fazer:
+> Padronizar a tab `personagens` e seu design, focando em: 
+- Reusar os componentes componentizados globalmente
+- Manter o design padronizado entre tabs
+- Manter componentes reusaveis
 
-# Onde?
-> Na pasta @docs/build
+# O que usaremos como base para padronizar?
+> As documentações em `C:\Users\rafae\Desktop\dev\grimorium\docs\build`
 
-# Como?
-> Iremos ter primeiro 3 tipo de documentações gerais para páginas, nele daremos nomes faceis de entender e explicar para cada componente e diremos onde ele está
-- data.md: Aqui colocaremos os components que manuseiam dados explicados com seus caminhos (Exemplo: Dropdown: caminho do dropdown básico)
-- detail.md: Aqui são components reusaveis dos detalhes de algum elemento, temos seus nomes e caminhos  (Ex: AdvanceInfo: caminho do advance info)
-- list.md: Aqui são components reusaveis dos detalhes de algum elemento, temos seus nomes e caminhos  (Ex: AdvanceInfo: caminho do advance info)
+# Pontos a se seguir
+- Siga a risco a documentação
+- Se você achar algo que não se enquadre na documentação como um campo novo ou um componente novo, não mexa nele e deixe como está, mas no final de tudo liste todos os que foram deixados
+- Certifique-se de garantir de usar i18n para as linguagens pt e en do app
+- Não crie e modifique nenhuma documentação, foque em padronizar a tab

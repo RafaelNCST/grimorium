@@ -1,12 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Network, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/empty-state";
-import {
-  EntityListHeader,
-  EntitySearchBar,
-  EntityFilterBadges,
-} from "@/components/entity-list";
+import { Plus, Search, Network } from "lucide-react";
+import { EntityListLayout, EntityCardList } from "@/components/layouts";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { HierarchyManagerModal } from "./components/hierarchy-manager-modal";
 import { RegionCard } from "./components/region-card";
@@ -71,105 +65,65 @@ export function WorldView({
 }: WorldViewProps) {
   const { t } = useTranslation("world");
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex-1 h-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading regions...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (allRegions.length === 0) {
-    return (
-      <div className="flex-1 h-full flex flex-col space-y-6">
-        <EntityListHeader
-          title={t("title")}
-          description={t("description")}
-          primaryAction={{
-            label: t("new_region_button"),
-            onClick: () => onShowCreateModal(true),
-            variant: "magical",
-            size: "lg",
-            icon: Plus,
-            className: "animate-glow",
-          }}
-        />
-
-        <EmptyState
-          icon={Network}
-          title={t("empty_state.title")}
-          description={t("empty_state.description")}
-        />
-
-        <CreateRegionModal
-          open={showCreateModal}
-          onOpenChange={onShowCreateModal}
-          onConfirm={onCreateRegion}
-          availableRegions={allRegions}
-          characters={characters}
-          factions={factions}
-          races={races}
-          items={items}
-        />
-      </div>
-    );
-  }
-
   // Configure filter rows
   const filterRows = createScaleFilterRows(scaleStats, t);
 
   return (
-    <div className="space-y-6">
-      {/* Header with integrated filters */}
-      <EntityListHeader
-        title={t("title")}
-        description={t("description")}
-        primaryAction={{
-          label: t("new_region_button"),
-          onClick: () => onShowCreateModal(true),
-          variant: "magical",
-          icon: Plus,
-          className: "animate-glow",
+    <>
+      <EntityListLayout
+        isLoading={isLoading}
+        loadingText="Loading regions..."
+        isEmpty={allRegions.length === 0}
+        emptyState={{
+          icon: Network,
+          title: t("empty_state.title"),
+          description: t("empty_state.description"),
         }}
-        secondaryActions={[
-          {
-            label: t("manage_hierarchy_button"),
-            onClick: () => onShowHierarchyModal(true),
-            variant: "secondary",
-            icon: Network,
+        header={{
+          title: t("title"),
+          description: t("description"),
+          primaryAction: {
+            label: t("new_region_button"),
+            onClick: () => onShowCreateModal(true),
+            variant: "magical",
+            icon: Plus,
+            className: "animate-glow",
           },
-        ]}
-      >
-        {/* Scale Filter Badges */}
-        <EntityFilterBadges
-          totalCount={allRegions.length}
-          totalLabel={t("filters.all")}
-          selectedFilters={selectedScales}
-          filterRows={filterRows}
-          onFilterToggle={onScaleToggle}
-          onClearFilters={() => {
+          secondaryActions: [
+            {
+              label: t("manage_hierarchy_button"),
+              onClick: () => onShowHierarchyModal(true),
+              variant: "secondary",
+              icon: Network,
+            },
+          ],
+        }}
+        filters={{
+          totalCount: allRegions.length,
+          totalLabel: t("filters.all"),
+          selectedFilters: selectedScales,
+          filterRows: filterRows,
+          onFilterToggle: onScaleToggle,
+          onClearFilters: () => {
             // Clear all selected scales
             selectedScales.forEach((scale) => onScaleToggle(scale));
-          }}
-        />
-      </EntityListHeader>
-
-      {/* Search Bar */}
-      <EntitySearchBar
-        value={searchQuery}
-        onChange={onSearchChange}
-        placeholder={t("search_placeholder")}
-      />
-
-      {/* Regions Grid */}
-      {regions.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {regions.map((region) => {
+          },
+        }}
+        search={{
+          value: searchQuery,
+          onChange: onSearchChange,
+          placeholder: t("search_placeholder"),
+        }}
+        showNoResultsState={regions.length === 0}
+        noResultsState={{
+          icon: Search,
+          title: t("not_found"),
+          description: "Try adjusting your search or filters",
+        }}
+      >
+        <EntityCardList
+          items={regions}
+          renderCard={(region) => {
             const parentRegion = region.parentId
               ? regionMap.get(region.parentId)
               : undefined;
@@ -182,15 +136,11 @@ export function WorldView({
                 parentRegion={parentRegion}
               />
             );
-          })}
-        </div>
-      ) : (
-        <EmptyState
-          icon={Search}
-          title={t("not_found")}
-          description="Try adjusting your search or filters"
+          }}
+          gridCols={{ sm: 1, md: 2, lg: 3, xl: 4 }}
+          gap={4}
         />
-      )}
+      </EntityListLayout>
 
       {/* Modals */}
       <CreateRegionModal
@@ -211,6 +161,6 @@ export function WorldView({
         regions={hierarchy}
         onRefresh={onRefreshRegions}
       />
-    </div>
+    </>
   );
 }

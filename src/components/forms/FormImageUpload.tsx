@@ -1,7 +1,10 @@
 import { useState, useRef } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, LucideIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+
+type ImageShape = "square" | "rounded" | "circle";
+type ImageFit = "fill" | "cover" | "contain";
 
 interface FormImageUploadProps {
   /**
@@ -29,6 +32,32 @@ interface FormImageUploadProps {
    */
   height?: string;
   /**
+   * Width of the upload area (default: w-full)
+   */
+  width?: string;
+  /**
+   * Shape of the image container
+   * - square: Bordas retas (default)
+   * - rounded: Bordas arredondadas (rounded-lg)
+   * - circle: Circular (rounded-full, requer width/height iguais)
+   */
+  shape?: ImageShape;
+  /**
+   * How the image should fit in the container
+   * - fill: Preenche todo o espaço (pode distorcer)
+   * - cover: Cobre todo o espaço (pode cortar)
+   * - contain: Mantém proporção (pode ter espaços vazios)
+   */
+  imageFit?: ImageFit;
+  /**
+   * Icon component to show in placeholder (default: ImagePlus)
+   */
+  placeholderIcon?: LucideIcon;
+  /**
+   * Text to show in placeholder (default: "Click to upload image")
+   */
+  placeholderText?: string;
+  /**
    * Accepted file types
    */
   accept?: string;
@@ -40,21 +69,57 @@ interface FormImageUploadProps {
    * Custom ID for the input
    */
   id?: string;
+  /**
+   * Show label (default: true)
+   */
+  showLabel?: boolean;
+  /**
+   * Custom className for label
+   */
+  labelClassName?: string;
 }
 
 /**
  * FormImageUpload - Reusable image upload component
  *
- * Provides image upload with preview, remove functionality, and drag-drop area.
+ * Provides image upload with preview, remove functionality, and customizable shapes.
  *
- * @example
+ * @example Basic usage
  * ```tsx
  * <FormImageUpload
  *   value={imageSrc}
  *   onChange={(value) => form.setValue("image", value)}
- *   label="Image"
- *   helperText="Recommended: 1200x448px"
+ *   label="Imagem da Região"
+ *   helperText="Recomendado: 1200x448px"
  *   height="h-[28rem]"
+ * />
+ * ```
+ *
+ * @example Circular avatar
+ * ```tsx
+ * <FormImageUpload
+ *   value={avatar}
+ *   onChange={setAvatar}
+ *   label="Avatar do Personagem"
+ *   shape="circle"
+ *   height="h-40"
+ *   width="w-40"
+ *   imageFit="cover"
+ *   placeholderIcon={User}
+ * />
+ * ```
+ *
+ * @example Custom placeholder
+ * ```tsx
+ * <FormImageUpload
+ *   value={factionImage}
+ *   onChange={setFactionImage}
+ *   label="Emblema da Facção"
+ *   shape="rounded"
+ *   height="h-64"
+ *   width="w-64"
+ *   placeholderIcon={Shield}
+ *   placeholderText="Adicionar emblema"
  * />
  * ```
  */
@@ -65,9 +130,16 @@ export function FormImageUpload({
   helperText,
   required = false,
   height = "h-[28rem]",
+  width = "w-full",
+  shape = "rounded",
+  imageFit = "fill",
+  placeholderIcon: PlaceholderIcon = ImagePlus,
+  placeholderText = "Click to upload image",
   accept = "image/png,image/jpeg,image/jpg,image/webp,image/gif",
   error,
   id = "image-upload",
+  showLabel = true,
+  labelClassName = "text-primary",
 }: FormImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(value);
@@ -93,17 +165,36 @@ export function FormImageUpload({
     }
   };
 
+  // Shape classes
+  const shapeClasses = {
+    square: "",
+    rounded: "rounded-lg",
+    circle: "rounded-full",
+  };
+
+  // Image fit classes
+  const fitClasses = {
+    fill: "object-fill",
+    cover: "object-cover",
+    contain: "object-contain",
+  };
+
+  const shapeClass = shapeClasses[shape];
+  const fitClass = fitClasses[imageFit];
+
   return (
     <div className="space-y-2">
-      <Label className="text-primary">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-        {helperText && (
-          <span className="text-xs text-muted-foreground ml-2">
-            ({helperText})
-          </span>
-        )}
-      </Label>
+      {showLabel && (
+        <Label className={labelClassName}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+          {helperText && (
+            <span className="text-xs text-muted-foreground ml-2">
+              ({helperText})
+            </span>
+          )}
+        </Label>
+      )}
 
       <div className="space-y-3">
         <input
@@ -116,15 +207,15 @@ export function FormImageUpload({
         />
 
         {preview ? (
-          <div className={`relative w-full ${height} rounded-lg overflow-hidden border`}>
+          <div className={`relative ${width} ${height} ${shapeClass} overflow-hidden border`}>
             <img
               src={preview}
               alt="Preview"
-              className="w-full h-full object-fill"
+              className={`w-full h-full ${fitClass}`}
             />
             <Button
               type="button"
-              variant="destructive"
+              variant="ghost-destructive"
               size="icon"
               className="absolute top-2 right-2"
               onClick={handleRemoveImage}
@@ -134,10 +225,10 @@ export function FormImageUpload({
           </div>
         ) : (
           <label htmlFor={id} className="cursor-pointer block">
-            <div className={`w-full ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors rounded-lg flex flex-col items-center justify-center gap-2`}>
-              <ImagePlus className="h-8 w-8 text-muted-foreground" />
+            <div className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}>
+              <PlaceholderIcon className="h-8 w-8 text-muted-foreground/60" />
               <span className="text-sm text-muted-foreground">
-                Click to upload image
+                {placeholderText}
               </span>
             </div>
           </label>
