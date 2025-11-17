@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  AlertCircle,
   Calendar,
   ChevronDown,
   ChevronRight,
@@ -136,6 +137,7 @@ interface CharacterDetailViewProps {
   character: ICharacter;
   editData: ICharacter;
   isEditing: boolean;
+  hasChanges: boolean;
   bookId: string;
   versions: ICharacterVersion[];
   currentVersion: ICharacterVersion | null;
@@ -161,6 +163,10 @@ interface CharacterDetailViewProps {
   openSections: Record<string, boolean>;
   toggleSection: (sectionName: string) => void;
   powerLinks: IPowerCharacterLink[];
+  errors: Record<string, string>;
+  validateField: (field: string, value: any) => void;
+  hasRequiredFieldsEmpty: boolean;
+  missingFields: string[];
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -211,6 +217,7 @@ export function CharacterDetailView({
   character,
   editData,
   isEditing,
+  hasChanges,
   bookId,
   versions,
   currentVersion,
@@ -229,6 +236,10 @@ export function CharacterDetailView({
   openSections,
   toggleSection,
   powerLinks,
+  errors,
+  validateField,
+  hasRequiredFieldsEmpty,
+  missingFields,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -322,15 +333,24 @@ export function CharacterDetailView({
               {/* Name */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-primary">
-                  {t("character-detail:fields.name")} *
+                  {t("character-detail:fields.name")}
+                  <span className="text-destructive ml-1">*</span>
                 </Label>
                 <Input
                   value={editData.name}
                   onChange={(e) => onEditDataChange("name", e.target.value)}
+                  onBlur={() => validateField("name", editData.name)}
                   placeholder={t("create-character:modal.name_placeholder")}
                   maxLength={100}
+                  className={errors.name ? "border-destructive" : ""}
                   required
                 />
+                {errors.name && (
+                  <p className="text-sm text-destructive flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.name}
+                  </p>
+                )}
                 <div className="flex justify-end text-xs text-muted-foreground">
                   <span>{editData.name?.length || 0}/100</span>
                 </div>
@@ -341,16 +361,22 @@ export function CharacterDetailView({
                 {/* Age */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-primary">
-                    {t("character-detail:fields.age")} *
+                    {t("character-detail:fields.age")}
+                    <span className="text-destructive ml-1">*</span>
                   </Label>
                   <Input
                     type="text"
                     value={editData.age}
                     onChange={(e) => onEditDataChange("age", e.target.value)}
+                    onBlur={() => validateField("age", editData.age)}
                     placeholder={t("create-character:modal.age_placeholder")}
                     maxLength={50}
+                    className={errors.age ? "border-destructive" : ""}
                     required
                   />
+                  {errors.age && (
+                    <p className="text-xs text-destructive">{errors.age}</p>
+                  )}
                   <div className="flex justify-end text-xs text-muted-foreground">
                     <span>{editData.age?.length || 0}/50</span>
                   </div>
@@ -359,7 +385,8 @@ export function CharacterDetailView({
                 {/* Gender */}
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-primary">
-                    {t("character-detail:fields.gender")} *
+                    {t("character-detail:fields.gender")}
+                    <span className="text-destructive ml-1">*</span>
                   </Label>
                   <Select
                     value={editData.gender || ""}
@@ -420,17 +447,26 @@ export function CharacterDetailView({
           {/* Description */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.description")} *
+              {t("character-detail:fields.description")}
+              <span className="text-destructive ml-1">*</span>
             </Label>
             <Textarea
               value={editData.description}
               onChange={(e) => onEditDataChange("description", e.target.value)}
+              onBlur={() => validateField("description", editData.description)}
               placeholder={t("create-character:modal.description_placeholder")}
               rows={4}
               maxLength={500}
-              className="resize-none"
+              className={
+                errors.description
+                  ? "resize-none border-destructive"
+                  : "resize-none"
+              }
               required
             />
+            {errors.description && (
+              <p className="text-xs text-destructive">{errors.description}</p>
+            )}
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{editData.description?.length || 0}/500</span>
             </div>
@@ -1190,7 +1226,33 @@ export function CharacterDetailView({
             deleteLabel={t("character-detail:header.delete")}
             saveLabel={t("character-detail:header.save")}
             cancelLabel={t("character-detail:header.cancel")}
-            hasChanges
+            hasChanges={hasChanges}
+            hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+            validationMessage={
+              hasRequiredFieldsEmpty ? (
+                <p className="text-xs text-destructive">
+                  {missingFields.length > 0 ? (
+                    <>
+                      {t("character-detail:validation.missing_fields")}:{" "}
+                      {missingFields
+                        .map((field) => {
+                          const fieldNames: Record<string, string> = {
+                            name: t("character-detail:fields.name"),
+                            age: t("character-detail:fields.age"),
+                            role: t("character-detail:fields.role"),
+                            gender: t("character-detail:fields.gender"),
+                            description: t("character-detail:fields.description"),
+                          };
+                          return fieldNames[field] || field;
+                        })
+                        .join(", ")}
+                    </>
+                  ) : (
+                    t("character-detail:validation.fill_required_fields")
+                  )}
+                </p>
+              ) : undefined
+            }
             basicFields={basicFields}
             advancedFields={advancedFields}
             advancedSectionTitle={t("character-detail:sections.advanced_info")}

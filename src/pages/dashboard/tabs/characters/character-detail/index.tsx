@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { GENDERS_CONSTANT as GENDERS_CONSTANT_MODAL } from "@/components/modals/create-character-modal/constants/genders";
@@ -42,6 +43,8 @@ import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-cons
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
+import { CharacterSchema } from "@/lib/validation/character-schema";
 
 // Extended type to include page/section titles
 interface IPowerLinkWithTitles extends IPowerCharacterLink {
@@ -100,6 +103,7 @@ export function CharacterDetail() {
     relationships: [],
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [newQuality, setNewQuality] = useState("");
   const [_imageFile, _setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -139,6 +143,13 @@ export function CharacterDetail() {
   const [selectedLinkForEdit, setSelectedLinkForEdit] =
     useState<IPowerCharacterLink | null>(null);
 
+  // Validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Original states for comparison
+  const [originalFieldVisibility, setOriginalFieldVisibility] =
+    useState<IFieldVisibility>({});
+
   // Save advanced section state to localStorage
   useEffect(() => {
     localStorage.setItem(
@@ -146,6 +157,153 @@ export function CharacterDetail() {
       JSON.stringify(advancedSectionOpen)
     );
   }, [advancedSectionOpen]);
+
+  // Função de validação de campo individual (onBlur)
+  const validateField = useCallback((field: string, value: any) => {
+    try {
+      // Validar apenas este campo
+      const fieldSchema = CharacterSchema.pick({ [field]: true } as any);
+      fieldSchema.parse({ [field]: value });
+
+      // Se passou, remover erro
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Traduzir a mensagem de erro
+        const errorMessage = error.errors[0].message;
+        const translatedMessage = errorMessage.startsWith("character-detail:")
+          ? t(errorMessage)
+          : errorMessage;
+
+        setErrors((prev) => ({
+          ...prev,
+          [field]: translatedMessage,
+        }));
+        return false;
+      }
+    }
+  }, [t]);
+
+  // Verificar se tem campos obrigatórios vazios e quais são
+  const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
+    if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
+
+    try {
+      // Validar apenas campos obrigatórios
+      CharacterSchema.pick({
+        name: true,
+        age: true,
+        role: true,
+        gender: true,
+        description: true,
+      } as any).parse({
+        name: editData.name,
+        age: editData.age,
+        role: editData.role,
+        gender: editData.gender,
+        description: editData.description,
+      });
+      return { hasRequiredFieldsEmpty: false, missingFields: [] };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const missing = error.errors.map((e) => e.path[0] as string);
+        return { hasRequiredFieldsEmpty: true, missingFields: missing };
+      }
+      return { hasRequiredFieldsEmpty: true, missingFields: [] };
+    }
+  }, [editData]);
+
+  // Check if there are changes between character and editData
+  const hasChanges = useMemo(() => {
+    if (!isEditing) return false;
+
+    // Check if visibility has changed
+    if (
+      JSON.stringify(fieldVisibility) !==
+      JSON.stringify(originalFieldVisibility)
+    )
+      return true;
+
+    // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
+    const arraysEqual = (
+      a: unknown[] | undefined,
+      b: unknown[] | undefined
+    ): boolean => {
+      if (!a && !b) return true;
+      if (!a || !b) return false;
+      if (a.length !== b.length) return false;
+
+      // For string arrays, order matters
+      if (a.length > 0 && typeof a[0] === "string") {
+        return a.every((item, index) => item === b[index]);
+      }
+
+      // For ID arrays, order doesn't matter
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((item, index) => item === sortedB[index]);
+    };
+
+    // Compare basic fields
+    if (character.name !== editData.name) return true;
+    if (character.age !== editData.age) return true;
+    if (character.role !== editData.role) return true;
+    if (character.gender !== editData.gender) return true;
+    if (character.description !== editData.description) return true;
+    if (character.image !== editData.image) return true;
+    if (character.alignment !== editData.alignment) return true;
+
+    // Compare appearance fields
+    if (character.height !== editData.height) return true;
+    if (character.weight !== editData.weight) return true;
+    if (character.skinTone !== editData.skinTone) return true;
+    if (character.physicalType !== editData.physicalType) return true;
+    if (character.hair !== editData.hair) return true;
+    if (character.eyes !== editData.eyes) return true;
+    if (character.face !== editData.face) return true;
+    if (character.distinguishingFeatures !== editData.distinguishingFeatures)
+      return true;
+
+    if (!arraysEqual(character.speciesAndRace, editData.speciesAndRace))
+      return true;
+
+    // Compare behavior fields
+    if (character.archetype !== editData.archetype) return true;
+    if (character.personality !== editData.personality) return true;
+    if (character.hobbies !== editData.hobbies) return true;
+    if (character.dreamsAndGoals !== editData.dreamsAndGoals) return true;
+    if (character.fearsAndTraumas !== editData.fearsAndTraumas) return true;
+    if (character.favoriteFood !== editData.favoriteFood) return true;
+    if (character.favoriteMusic !== editData.favoriteMusic) return true;
+
+    // Compare locations
+    if (!arraysEqual(character.birthPlace, editData.birthPlace)) return true;
+
+    // Compare relationships
+    if (
+      JSON.stringify(character.relationships) !==
+      JSON.stringify(editData.relationships)
+    )
+      return true;
+
+    // Compare family
+    if (JSON.stringify(character.family) !== JSON.stringify(editData.family))
+      return true;
+
+    return false;
+  }, [
+    character,
+    editData,
+    isEditing,
+    fieldVisibility,
+    originalFieldVisibility,
+  ]);
 
   // Load character from database
   useEffect(() => {
@@ -157,6 +315,7 @@ export function CharacterDetail() {
           setEditData(characterFromDB);
           setImagePreview(characterFromDB.image || "");
           setFieldVisibility(characterFromDB.fieldVisibility || {});
+          setOriginalFieldVisibility(characterFromDB.fieldVisibility || {});
 
           // Load relationships
           const relationships = await getCharacterRelationships(characterId);
@@ -398,25 +557,61 @@ export function CharacterDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    const updatedCharacter = { ...editData, fieldVisibility };
-    setCharacter(updatedCharacter);
-
-    // Atualizar dados na versão atual
-    const updatedVersions = versions.map((v) =>
-      v.id === currentVersion?.id
-        ? { ...v, characterData: updatedCharacter as ICharacter }
-        : v
-    );
-    setVersions(updatedVersions);
-
-    const activeVersion = updatedVersions.find(
-      (v) => v.id === currentVersion?.id
-    );
-    if (activeVersion) {
-      setCurrentVersion(activeVersion);
-    }
-
     try {
+      console.log("[handleSave] Starting save...", { currentVersion, editData });
+
+      // Validar TUDO com Zod
+      const validatedData = CharacterSchema.parse({
+        name: editData.name,
+        age: editData.age,
+        role: editData.role,
+        gender: editData.gender,
+        description: editData.description,
+        image: editData.image,
+        alignment: editData.alignment,
+        // Appearance
+        height: editData.height,
+        weight: editData.weight,
+        skinTone: editData.skinTone,
+        physicalType: editData.physicalType,
+        hair: editData.hair,
+        eyes: editData.eyes,
+        face: editData.face,
+        distinguishingFeatures: editData.distinguishingFeatures,
+        speciesAndRace: editData.speciesAndRace,
+        // Behavior
+        archetype: editData.archetype,
+        personality: editData.personality,
+        hobbies: editData.hobbies,
+        dreamsAndGoals: editData.dreamsAndGoals,
+        fearsAndTraumas: editData.fearsAndTraumas,
+        favoriteFood: editData.favoriteFood,
+        favoriteMusic: editData.favoriteMusic,
+        // Locations
+        birthPlace: editData.birthPlace,
+        // Relations
+        family: editData.family,
+        relationships: editData.relationships,
+      });
+
+      const updatedCharacter = { ...editData, fieldVisibility };
+      setCharacter(updatedCharacter);
+
+      // Atualizar dados na versão atual
+      const updatedVersions = versions.map((v) =>
+        v.id === currentVersion?.id
+          ? { ...v, characterData: updatedCharacter as ICharacter }
+          : v
+      );
+      setVersions(updatedVersions);
+
+      const activeVersion = updatedVersions.find(
+        (v) => v.id === currentVersion?.id
+      );
+      if (activeVersion) {
+        setCurrentVersion(activeVersion);
+      }
+
       // Save relationships
       if (updatedCharacter.relationships) {
         await saveCharacterRelationships(
@@ -433,11 +628,32 @@ export function CharacterDetail() {
       // Atualizar no store (que também salva no DB)
       await updateCharacterInStore(characterId, updatedCharacter);
 
+      // Update original visibility to match saved state
+      setOriginalFieldVisibility(fieldVisibility);
+
+      setErrors({}); // Limpar erros
       setIsEditing(false);
       toast.success("Personagem atualizado com sucesso!");
     } catch (error) {
-      console.error("Error saving character:", error);
-      toast.error("Erro ao salvar personagem");
+      console.error("[handleSave] Error caught:", error);
+      if (error instanceof z.ZodError) {
+        console.error("[handleSave] Zod validation errors:", error.errors);
+        // Mapear erros para cada campo e traduzir
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const field = err.path[0] as string;
+          // Traduzir a mensagem de erro
+          const errorMessage = err.message;
+          const translatedMessage = errorMessage.startsWith("character-detail:")
+            ? t(errorMessage)
+            : errorMessage;
+          newErrors[field] = translatedMessage;
+        });
+        setErrors(newErrors);
+      } else {
+        console.error("Error saving character:", error);
+        toast.error("Erro ao salvar personagem");
+      }
     }
   }, [
     editData,
@@ -511,9 +727,25 @@ export function CharacterDetail() {
   ]);
 
   const handleCancel = useCallback(() => {
+    if (hasChanges) {
+      setShowUnsavedChangesDialog(true);
+      return;
+    }
+
+    // If no changes, cancel immediately
     setEditData({ ...character, relationships: character.relationships || [] });
+    setFieldVisibility(originalFieldVisibility);
+    setErrors({});
     setIsEditing(false);
-  }, [character]);
+  }, [character, originalFieldVisibility, hasChanges]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setEditData({ ...character, relationships: character.relationships || [] });
+    setFieldVisibility(originalFieldVisibility);
+    setErrors({});
+    setIsEditing(false);
+    setShowUnsavedChangesDialog(false);
+  }, [character, originalFieldVisibility]);
 
   const handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
@@ -818,70 +1050,83 @@ export function CharacterDetail() {
   );
 
   return (
-    <CharacterDetailView
-      character={character}
-      editData={editData}
-      isEditing={isEditing}
-      bookId={dashboardId}
-      versions={versions}
-      currentVersion={currentVersion}
-      showDeleteModal={showDeleteModal}
-      isNavigationSidebarOpen={isNavigationSidebarOpen}
-      newQuality={newQuality}
-      imagePreview={imagePreview}
-      selectedRelationshipCharacter={selectedRelationshipCharacter}
-      selectedRelationshipType={selectedRelationshipType}
-      relationshipIntensity={relationshipIntensity}
-      fileInputRef={fileInputRef}
-      mockCharacters={allCharacters}
-      mockLocations={mockLocations}
-      mockFactions={mockFactions}
-      roles={CHARACTER_ROLES_CONSTANT}
-      alignments={ALIGNMENTS_CONSTANT}
-      genders={GENDERS_CONSTANT_MODAL}
-      relationshipTypes={RELATIONSHIP_TYPES_CONSTANT}
-      currentRole={currentRole}
-      currentAlignment={currentAlignment}
-      currentGender={currentGender}
-      RoleIcon={RoleIcon}
-      fieldVisibility={fieldVisibility}
-      advancedSectionOpen={advancedSectionOpen}
-      openSections={openSections}
-      toggleSection={toggleSection}
-      powerLinks={characterPowerLinks}
-      onBack={handleBack}
-      onNavigationSidebarToggle={handleNavigationSidebarToggle}
-      onNavigationSidebarClose={handleNavigationSidebarClose}
-      onCharacterSelect={handleCharacterSelect}
-      onEdit={handleEdit}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onDeleteModalOpen={handleDeleteModalOpen}
-      onDeleteModalClose={handleDeleteModalClose}
-      onConfirmDelete={handleConfirmDelete}
-      onVersionChange={handleVersionChange}
-      onVersionCreate={handleVersionCreate}
-      onVersionDelete={handleVersionDelete}
-      onVersionUpdate={handleVersionUpdate}
-      onImageFileChange={handleImageFileChange}
-      onAgeChange={handleAgeChange}
-      onEditDataChange={handleEditDataChange}
-      onRelationshipAdd={handleAddRelationship}
-      onRelationshipRemove={handleRemoveRelationship}
-      onRelationshipIntensityUpdate={handleUpdateRelationshipIntensity}
-      onRelationshipCharacterChange={handleRelationshipCharacterChange}
-      onRelationshipTypeChange={handleRelationshipTypeChange}
-      onRelationshipIntensityChange={handleRelationshipIntensityChange}
-      onFieldVisibilityToggle={handleFieldVisibilityToggle}
-      onAdvancedSectionToggle={handleAdvancedSectionToggle}
-      getRelationshipTypeData={getRelationshipTypeData}
-      onNavigateToPowerInstance={handleNavigateToPowerInstance}
-      onEditPowerLink={handleEditLink}
-      onDeletePowerLink={handleDeleteLink}
-      isEditLinkModalOpen={isEditLinkModalOpen}
-      selectedLinkForEdit={selectedLinkForEdit}
-      onCloseEditLinkModal={() => setIsEditLinkModalOpen(false)}
-      onSavePowerLink={handleSaveLink}
-    />
+    <>
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={setShowUnsavedChangesDialog}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <CharacterDetailView
+        character={character}
+        editData={editData}
+        isEditing={isEditing}
+        hasChanges={hasChanges}
+        bookId={dashboardId}
+        versions={versions}
+        currentVersion={currentVersion}
+        showDeleteModal={showDeleteModal}
+        isNavigationSidebarOpen={isNavigationSidebarOpen}
+        newQuality={newQuality}
+        imagePreview={imagePreview}
+        selectedRelationshipCharacter={selectedRelationshipCharacter}
+        selectedRelationshipType={selectedRelationshipType}
+        relationshipIntensity={relationshipIntensity}
+        fileInputRef={fileInputRef}
+        mockCharacters={allCharacters}
+        mockLocations={mockLocations}
+        mockFactions={mockFactions}
+        roles={CHARACTER_ROLES_CONSTANT}
+        alignments={ALIGNMENTS_CONSTANT}
+        genders={GENDERS_CONSTANT_MODAL}
+        relationshipTypes={RELATIONSHIP_TYPES_CONSTANT}
+        currentRole={currentRole}
+        currentAlignment={currentAlignment}
+        currentGender={currentGender}
+        RoleIcon={RoleIcon}
+        fieldVisibility={fieldVisibility}
+        advancedSectionOpen={advancedSectionOpen}
+        openSections={openSections}
+        toggleSection={toggleSection}
+        powerLinks={characterPowerLinks}
+        errors={errors}
+        validateField={validateField}
+        hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+        missingFields={missingFields}
+        onBack={handleBack}
+        onNavigationSidebarToggle={handleNavigationSidebarToggle}
+        onNavigationSidebarClose={handleNavigationSidebarClose}
+        onCharacterSelect={handleCharacterSelect}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDeleteModalOpen={handleDeleteModalOpen}
+        onDeleteModalClose={handleDeleteModalClose}
+        onConfirmDelete={handleConfirmDelete}
+        onVersionChange={handleVersionChange}
+        onVersionCreate={handleVersionCreate}
+        onVersionDelete={handleVersionDelete}
+        onVersionUpdate={handleVersionUpdate}
+        onImageFileChange={handleImageFileChange}
+        onAgeChange={handleAgeChange}
+        onEditDataChange={handleEditDataChange}
+        onRelationshipAdd={handleAddRelationship}
+        onRelationshipRemove={handleRemoveRelationship}
+        onRelationshipIntensityUpdate={handleUpdateRelationshipIntensity}
+        onRelationshipCharacterChange={handleRelationshipCharacterChange}
+        onRelationshipTypeChange={handleRelationshipTypeChange}
+        onRelationshipIntensityChange={handleRelationshipIntensityChange}
+        onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        onAdvancedSectionToggle={handleAdvancedSectionToggle}
+        getRelationshipTypeData={getRelationshipTypeData}
+        onNavigateToPowerInstance={handleNavigateToPowerInstance}
+        onEditPowerLink={handleEditLink}
+        onDeletePowerLink={handleDeleteLink}
+        isEditLinkModalOpen={isEditLinkModalOpen}
+        selectedLinkForEdit={selectedLinkForEdit}
+        onCloseEditLinkModal={() => setIsEditLinkModalOpen(false)}
+        onSavePowerLink={handleSaveLink}
+      />
+    </>
   );
 }

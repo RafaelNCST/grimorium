@@ -112,7 +112,8 @@ export function CreateVersionDialog({
             {/* Version Name */}
             <div className="space-y-2">
               <Label htmlFor="version-name" className="text-sm font-medium">
-                {t("versions.create_dialog.name_label")} *
+                {t("versions.create_dialog.name_label")}
+                <span className="text-destructive ml-1">*</span>
               </Label>
               <Input
                 id="version-name"
@@ -155,7 +156,8 @@ export function CreateVersionDialog({
                 htmlFor="version-description"
                 className="text-sm font-medium"
               >
-                {t("versions.create_dialog.description_label")} *
+                {t("versions.create_dialog.description_label")}
+                <span className="text-destructive ml-1">*</span>
               </Label>
               <Textarea
                 id="version-description"

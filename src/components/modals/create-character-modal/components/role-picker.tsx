@@ -14,7 +14,8 @@ export function RolePicker({ value, onChange, error }: PropsRolePicker) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">
-        {t("modal.character_role")} *
+        {t("modal.character_role")}
+        <span className="text-destructive ml-1">*</span>
       </label>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {CHARACTER_ROLES_CONSTANT.map((role) => {

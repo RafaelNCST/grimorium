@@ -223,5 +223,30 @@
     "link_deleted": "Link deletado com sucesso",
     "error_updating_link": "Erro ao atualizar link",
     "error_deleting_link": "Erro ao deletar link"
+  },
+  "validation": {
+    "missing_fields": "Campos obrigatórios faltando",
+    "fill_required_fields": "Preencha todos os campos obrigatórios",
+    "name_required": "Nome é obrigatório",
+    "name_max_length": "Nome deve ter no máximo 100 caracteres",
+    "age_required": "Idade é obrigatória",
+    "age_max_length": "Idade deve ter no máximo 50 caracteres",
+    "role_required": "Papel é obrigatório",
+    "gender_required": "Gênero é obrigatório",
+    "description_required": "Descrição é obrigatória",
+    "description_max_length": "Descrição deve ter no máximo 500 caracteres",
+    "height_max_length": "Altura deve ter no máximo 50 caracteres",
+    "weight_max_length": "Peso deve ter no máximo 50 caracteres",
+    "skin_tone_max_length": "Tom de pele deve ter no máximo 100 caracteres",
+    "hair_max_length": "Cabelo deve ter no máximo 100 caracteres",
+    "eyes_max_length": "Olhos deve ter no máximo 200 caracteres",
+    "face_max_length": "Rosto deve ter no máximo 200 caracteres",
+    "distinguishing_features_max_length": "Características distintas deve ter no máximo 400 caracteres",
+    "personality_max_length": "Personalidade deve ter no máximo 500 caracteres",
+    "hobbies_max_length": "Hobbies deve ter no máximo 500 caracteres",
+    "dreams_and_goals_max_length": "Sonhos e objetivos deve ter no máximo 500 caracteres",
+    "fears_and_traumas_max_length": "Medos e traumas deve ter no máximo 500 caracteres",
+    "favorite_food_max_length": "Comida favorita deve ter no máximo 100 caracteres",
+    "favorite_music_max_length": "Música favorita deve ter no máximo 100 caracteres"
   }
 }

@@ -126,7 +126,8 @@ export function CreateCharacterModalView({
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-sm font-medium text-primary">
-              {t("modal.character_name")} *
+              {t("modal.character_name")}
+              <span className="text-destructive ml-1">*</span>
             </Label>
             <Input
               id="name"
@@ -145,7 +146,8 @@ export function CreateCharacterModalView({
             {/* Age */}
             <div className="space-y-2">
               <Label htmlFor="age" className="text-sm font-medium text-primary">
-                {t("modal.age")} *
+                {t("modal.age")}
+                <span className="text-destructive ml-1">*</span>
               </Label>
               <Input
                 id="age"
@@ -162,7 +164,8 @@ export function CreateCharacterModalView({
             {/* Gender */}
             <div className="space-y-2">
               <Label htmlFor="gender" className="text-sm font-medium text-primary">
-                {t("modal.gender")} *
+                {t("modal.gender")}
+                <span className="text-destructive ml-1">*</span>
               </Label>
               <Select
                 value={watchedValues.gender}
@@ -207,7 +210,8 @@ export function CreateCharacterModalView({
       {/* Simple Description */}
       <div className="space-y-2">
         <Label htmlFor="description" className="text-sm font-medium text-primary">
-          {t("modal.simple_description")} *
+          {t("modal.simple_description")}
+          <span className="text-destructive ml-1">*</span>
         </Label>
         <Textarea
           id="description"

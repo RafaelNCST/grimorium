@@ -329,7 +329,457 @@ export function CharacterCard({ character, onClick }: Props) {
 
 ## Passo 2: Detalhes de Entidade
 
-### 2.1 Container dos Detalhes (`[entidade]-detail/index.tsx`)
+### 2.1 Lógicas de Edição
+
+Toda tela de detalhes de entidade deve implementar as seguintes lógicas para garantir uma experiência de edição consistente e segura:
+
+#### 2.1.1 Detecção de Mudanças (hasChanges)
+
+A lógica `hasChanges` detecta se houve qualquer alteração nos dados desde que o usuário entrou em modo de edição. Isso é usado para:
+- Habilitar/desabilitar o botão "Salvar"
+- Mostrar modal de confirmação ao cancelar edição com mudanças não salvas
+- Prevenir perda acidental de dados
+
+**Implementação:**
+
+```tsx
+// Check if there are changes between original and editData
+const hasChanges = useMemo(() => {
+  if (!isEditing) return false;
+
+  // Check if visibility has changed
+  if (
+    JSON.stringify(fieldVisibility) !==
+    JSON.stringify(originalFieldVisibility)
+  )
+    return true;
+
+  // Helper function to compare arrays
+  const arraysEqual = (
+    a: unknown[] | undefined,
+    b: unknown[] | undefined
+  ): boolean => {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    if (a.length !== b.length) return false;
+
+    // For string arrays, order matters
+    if (a.length > 0 && typeof a[0] === "string") {
+      return a.every((item, index) => item === b[index]);
+    }
+
+    // For ID arrays, order doesn't matter
+    const sortedA = [...a].sort();
+    const sortedB = [...b].sort();
+    return sortedA.every((item, index) => item === sortedB[index]);
+  };
+
+  // Compare basic fields
+  if (entity.name !== editData.name) return true;
+  if (entity.field1 !== editData.field1) return true;
+  // ... compare all fields
+
+  // Compare arrays
+  if (!arraysEqual(entity.arrayField, editData.arrayField)) return true;
+
+  // Compare complex objects (relationships, family)
+  if (JSON.stringify(entity.relationships) !== JSON.stringify(editData.relationships))
+    return true;
+
+  return false;
+}, [
+  entity,
+  editData,
+  isEditing,
+  fieldVisibility,
+  originalFieldVisibility,
+]);
+```
+
+**Pontos importantes:**
+- `arraysEqual` trata arrays de strings (ordem importa) e arrays de IDs (ordem não importa) de forma diferente
+- Comparação de objetos complexos usa `JSON.stringify`
+- Inclui comparação de `fieldVisibility` para detectar mudanças em campos opcionais
+- Retorna `false` quando não está em modo de edição
+
+#### 2.1.2 Validação de Campos Obrigatórios
+
+A validação de campos obrigatórios garante que o usuário não possa salvar uma entidade sem preencher os campos essenciais. Usa o schema Zod para validar.
+
+**Estados necessários:**
+
+```tsx
+// Validation state
+const [errors, setErrors] = useState<Record<string, string>>({});
+
+// Original states for comparison
+const [originalFieldVisibility, setOriginalFieldVisibility] =
+  useState<IFieldVisibility>({});
+```
+
+**Função de validação individual (onBlur):**
+
+```tsx
+const validateField = useCallback((field: string, value: any) => {
+  try {
+    // Validar apenas este campo
+    const fieldSchema = EntitySchema.pick({ [field]: true } as any);
+    fieldSchema.parse({ [field]: value });
+
+    // Se passou, remover erro
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+
+    return true;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: error.errors[0].message,
+      }));
+      return false;
+    }
+  }
+}, []);
+```
+
+**Verificação de campos vazios:**
+
+```tsx
+const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
+  if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
+
+  try {
+    // Validar apenas campos obrigatórios
+    EntitySchema.pick({
+      name: true,
+      requiredField1: true,
+      requiredField2: true,
+    } as any).parse({
+      name: editData.name,
+      requiredField1: editData.requiredField1,
+      requiredField2: editData.requiredField2,
+    });
+    return { hasRequiredFieldsEmpty: false, missingFields: [] };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const missing = error.errors.map((e) => e.path[0] as string);
+      return { hasRequiredFieldsEmpty: true, missingFields: missing };
+    }
+    return { hasRequiredFieldsEmpty: true, missingFields: [] };
+  }
+}, [editData]);
+```
+
+**Uso nos inputs (View):**
+
+```tsx
+<Input
+  value={editData.name}
+  onChange={(e) => onEditDataChange("name", e.target.value)}
+  onBlur={() => validateField("name", editData.name)}
+  className={errors.name ? "border-destructive" : ""}
+  required
+/>
+{errors.name && (
+  <p className="text-sm text-destructive flex items-center gap-1">
+    <AlertCircle className="h-4 w-4" />
+    {errors.name}
+  </p>
+)}
+```
+
+**Mensagem de validação no EntityDetailLayout:**
+
+```tsx
+<EntityDetailLayout
+  hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+  validationMessage={
+    hasRequiredFieldsEmpty ? (
+      <p className="text-xs text-destructive">
+        {missingFields.length > 0 ? (
+          <>
+            {t("entity-detail:missing_fields")}:{" "}
+            {missingFields
+              .map((field) => {
+                const fieldNames: Record<string, string> = {
+                  name: t("entity-detail:fields.name"),
+                  // ... outros campos
+                };
+                return fieldNames[field] || field;
+              })
+              .join(", ")}
+          </>
+        ) : (
+          t("entity-detail:fill_required_fields")
+        )}
+      </p>
+    ) : undefined
+  }
+  // ... outras props
+/>
+```
+
+#### 2.1.3 Modal de Confirmação ao Cancelar
+
+Quando o usuário tenta cancelar a edição com mudanças não salvas, deve aparecer um modal de confirmação para evitar perda acidental de dados.
+
+**Estados necessários:**
+
+```tsx
+const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+```
+
+**Componente UnsavedChangesDialog:**
+
+Criar em `[entidade]-detail/components/unsaved-changes-dialog.tsx`:
+
+```tsx
+import {
+  WarningDialog,
+  WarningDialogProps,
+} from "@/components/dialogs/WarningDialog";
+
+interface UnsavedChangesDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  title?: string;
+  description?: string;
+}
+
+export function UnsavedChangesDialog({
+  open,
+  onOpenChange,
+  onConfirm,
+  title = "Descartar alterações?",
+  description = "Você tem alterações não salvas. Se sair agora, todas as mudanças serão perdidas.",
+}: UnsavedChangesDialogProps) {
+  return (
+    <WarningDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      onConfirm={onConfirm}
+      title={title}
+      description={description}
+      cancelText="Continuar Editando"
+      confirmText="Descartar Alterações"
+    />
+  );
+}
+```
+
+**Handlers no container:**
+
+```tsx
+const handleCancel = useCallback(() => {
+  if (hasChanges) {
+    setShowUnsavedChangesDialog(true);
+    return;
+  }
+
+  // If no changes, cancel immediately
+  setEditData(entity);
+  setFieldVisibility(originalFieldVisibility);
+  setErrors({});
+  setIsEditing(false);
+}, [entity, originalFieldVisibility, hasChanges]);
+
+const handleConfirmCancel = useCallback(() => {
+  setEditData(entity);
+  setFieldVisibility(originalFieldVisibility);
+  setErrors({});
+  setIsEditing(false);
+  setShowUnsavedChangesDialog(false);
+}, [entity, originalFieldVisibility]);
+```
+
+**Uso no render:**
+
+```tsx
+return (
+  <>
+    <UnsavedChangesDialog
+      open={showUnsavedChangesDialog}
+      onOpenChange={setShowUnsavedChangesDialog}
+      onConfirm={handleConfirmCancel}
+    />
+
+    <EntityDetailView
+      hasChanges={hasChanges}
+      onCancel={handleCancel}
+      // ... outras props
+    />
+  </>
+);
+```
+
+#### 2.1.4 Validação no handleSave
+
+O `handleSave` deve validar todos os campos com Zod antes de salvar no banco de dados:
+
+```tsx
+const handleSave = useCallback(async () => {
+  try {
+    console.log("[handleSave] Starting save...", { currentVersion, editData });
+
+    // Validar TUDO com Zod
+    const validatedData = EntitySchema.parse({
+      name: editData.name,
+      field1: editData.field1,
+      // ... todos os campos
+    });
+
+    const updatedEntity = { ...editData, fieldVisibility };
+    setEntity(updatedEntity);
+
+    // Atualizar dados na versão atual
+    const updatedVersions = versions.map((v) =>
+      v.id === currentVersion?.id
+        ? { ...v, entityData: updatedEntity as IEntity }
+        : v
+    );
+    setVersions(updatedVersions);
+
+    const activeVersion = updatedVersions.find(
+      (v) => v.id === currentVersion?.id
+    );
+    if (activeVersion) {
+      setCurrentVersion(activeVersion);
+    }
+
+    // Salvar no banco de dados
+    if (currentVersion?.isMain) {
+      await updateEntity(entityId, updatedEntity);
+    } else {
+      await updateEntityVersionData(currentVersion.id, updatedEntity);
+    }
+
+    // Update original visibility to match saved state
+    setOriginalFieldVisibility(fieldVisibility);
+
+    setErrors({}); // Limpar erros
+    setIsEditing(false);
+    toast.success("Entidade atualizada com sucesso!");
+  } catch (error) {
+    console.error("[handleSave] Error caught:", error);
+    if (error instanceof z.ZodError) {
+      console.error("[handleSave] Zod validation errors:", error.errors);
+      // Mapear erros para cada campo
+      const newErrors: Record<string, string> = {};
+      error.errors.forEach((err) => {
+        const field = err.path[0] as string;
+        newErrors[field] = err.message;
+      });
+      setErrors(newErrors);
+    } else {
+      console.error("Error saving entity:", error);
+      toast.error("Erro ao salvar entidade");
+    }
+  }
+}, [
+  editData,
+  fieldVisibility,
+  versions,
+  currentVersion,
+  entityId,
+]);
+```
+
+#### 2.1.5 Carregar e Salvar originalFieldVisibility
+
+É crucial carregar o `originalFieldVisibility` quando a entidade é carregada e atualizá-lo após salvar:
+
+**No useEffect de carregamento:**
+
+```tsx
+useEffect(() => {
+  const loadEntity = async () => {
+    try {
+      const entityFromDB = await getEntityById(entityId);
+      if (entityFromDB) {
+        setEntity(entityFromDB);
+        setEditData(entityFromDB);
+        setFieldVisibility(entityFromDB.fieldVisibility || {});
+        setOriginalFieldVisibility(entityFromDB.fieldVisibility || {}); // IMPORTANTE
+        // ...
+      }
+    } catch (error) {
+      console.error("Error loading entity:", error);
+    }
+  };
+
+  loadEntity();
+}, [entityId]);
+```
+
+**Após salvar com sucesso:**
+
+```tsx
+// Update original visibility to match saved state
+setOriginalFieldVisibility(fieldVisibility);
+```
+
+#### 2.1.6 Schema de Validação (Zod)
+
+Criar em `src/lib/validation/[entidade]-schema.ts`:
+
+```tsx
+import { z } from "zod";
+
+export const EntitySchema = z.object({
+  // Campos obrigatórios
+  name: z
+    .string()
+    .min(1, "Nome é obrigatório")
+    .max(100, "Nome deve ter no máximo 100 caracteres")
+    .trim(),
+
+  requiredField: z.string().min(1, "Campo é obrigatório"),
+
+  // Campos opcionais
+  optionalField: z
+    .string()
+    .max(200, "Campo deve ter no máximo 200 caracteres")
+    .trim()
+    .optional(),
+
+  // Arrays
+  arrayField: z.array(z.string()).optional(),
+
+  // Objetos complexos (não validamos aqui)
+  complexObject: z.any().optional(),
+});
+
+export type EntityFormData = z.infer<typeof EntitySchema>;
+```
+
+#### 2.1.7 Checklist de Implementação
+
+Para garantir que todas as lógicas de edição estejam implementadas corretamente:
+
+- [ ] **hasChanges** implementado comparando todos os campos
+- [ ] **validateField** implementado para validação onBlur
+- [ ] **hasRequiredFieldsEmpty** e **missingFields** calculados com useMemo
+- [ ] **Schema Zod** criado com todos os campos e validações
+- [ ] **UnsavedChangesDialog** criado e importado
+- [ ] **handleCancel** verifica hasChanges antes de cancelar
+- [ ] **handleConfirmCancel** implementado para descartar mudanças
+- [ ] **handleSave** valida com Zod antes de salvar
+- [ ] **errors** mapeados e exibidos nos inputs
+- [ ] **originalFieldVisibility** carregado no useEffect
+- [ ] **originalFieldVisibility** atualizado após salvar
+- [ ] **hasChanges** passado para EntityDetailLayout
+- [ ] **hasRequiredFieldsEmpty** passado para EntityDetailLayout
+- [ ] **validationMessage** configurado no EntityDetailLayout
+- [ ] **onBlur** adicionado em todos os campos obrigatórios
+- [ ] **className com border-destructive** em inputs com erro
+- [ ] Imports: `z` from "zod", `AlertCircle` from "lucide-react"
+
+### 2.2 Container dos Detalhes (`[entidade]-detail/index.tsx`)
 
 **Responsabilidades:**
 - Carregar entidade por ID
@@ -1300,10 +1750,20 @@ export const EntitySchema = z.object({
 - [ ] Criar `[entidade]-detail/index.tsx` com lógica de versões
 - [ ] Criar `[entidade]-detail/view.tsx` com `EntityDetailLayout`
 - [ ] Implementar modo edição vs visualização
-- [ ] Criar schema Zod para validação
+- [ ] Criar schema Zod para validação em `src/lib/validation/[entidade]-schema.ts`
 - [ ] Implementar sistema de versões (main + alternativas)
 - [ ] Adicionar toggle de visibilidade de campos
-- [ ] Implementar salvar/cancelar com validação
+- [ ] **Implementar lógicas de edição:**
+  - [ ] hasChanges para detectar mudanças
+  - [ ] validateField para validação onBlur
+  - [ ] hasRequiredFieldsEmpty e missingFields
+  - [ ] UnsavedChangesDialog para confirmação ao cancelar
+  - [ ] handleCancel com verificação de hasChanges
+  - [ ] handleSave com validação Zod completa
+  - [ ] errors exibidos nos inputs com border-destructive
+  - [ ] originalFieldVisibility carregado e atualizado
+  - [ ] hasChanges e hasRequiredFieldsEmpty passados para EntityDetailLayout
+  - [ ] validationMessage configurado no EntityDetailLayout
 - [ ] Adicionar modal de exclusão com `DeleteEntityModal`
 - [ ] **Implementar persistência de estado no localStorage:**
   - [ ] Seção avançada com `[entidade]DetailAdvancedSectionOpen`
