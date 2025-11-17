@@ -5,13 +5,21 @@ export interface ICharacterRelationship {
     | "friend"
     | "rival"
     | "mentor"
-    | "student"
+    | "apprentice"
     | "enemy"
     | "love_interest"
     | "ally"
     | "acquaintance"
-    | "leader";
+    | "leader"
+    | "subordinate"
+    | "family_love"
+    | "romantic_relationship"
+    | "best_friend"
+    | "hatred"
+    | "neutral"
+    | "devotion";
   intensity: number; // 1-10
+  description?: string; // Optional description (max 200 characters)
 }
 
 export interface ICharacterFamily {

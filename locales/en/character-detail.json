@@ -16,7 +16,7 @@
     "alignment": "Alignment",
     "locations_orgs": "Locations and Organizations",
     "relationships": "Relationships",
-    "family": "Family Relations",
+    "family": "Family",
     "versions": "Versions",
     "powers": "Powers"
   },
@@ -108,6 +108,8 @@
     "relationship_type": "Relationship Type",
     "intensity": "Intensity",
     "current_relationships": "Current Relationships",
+    "description_label": "Relationship Description (Optional)",
+    "description_placeholder": "Add a description about this relationship...",
     "intensity_labels": {
       "weak": "Weak",
       "moderate": "Moderate",
@@ -126,12 +128,19 @@
     "friend": "Friend",
     "rival": "Rival",
     "mentor": "Mentor",
-    "student": "Student",
+    "apprentice": "Apprentice",
     "enemy": "Enemy",
     "love_interest": "Love Interest",
     "ally": "Ally",
     "acquaintance": "Acquaintance",
-    "leader": "Leader"
+    "leader": "Leader",
+    "subordinate": "Subordinate",
+    "family_love": "Family Love",
+    "romantic_relationship": "Romantic Relationship",
+    "best_friend": "Best Friend",
+    "hatred": "Hatred",
+    "neutral": "Neutral",
+    "devotion": "Devotion"
   },
   "family": {
     "view_tree": "View Family Tree",

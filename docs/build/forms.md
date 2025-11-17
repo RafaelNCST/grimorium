@@ -73,19 +73,24 @@ Classificação dos componentes base reutilizáveis de formulário utilizados no
 **Uso:** Seleção visual em grid com ícones e descrições (Escala, Estação, Arquétipos, Alinhamento D&D)
 **Descrição:** Grid de botões com ícones à esquerda, label e descrição à direita. Cores customizáveis seguindo o padrão visual do projeto.
 
-**⚠️ IMPORTANTE - Classes de Cor Obrigatórias:**
-Para manter a consistência visual com o resto do projeto, você **DEVE** passar as classes de cor manualmente para cada opção:
+**⚠️ IMPORTANTE - Padrão Universal de Grids:**
+FormSelectGrid segue o **mesmo padrão de hover/active** usado em todos os grids do projeto (veja FormSimpleGrid para detalhes completos):
+- **Hover**: Apenas muda cores (mantém border-2 p-4)
+- **Active**: Mantém border-2 p-4 + adiciona ring-4 externo (ZERO movimento dos cards)
+
+**Classes de Cor Obrigatórias:**
+Para manter a consistência visual, você **DEVE** passar as classes de cor manualmente para cada opção:
 
 - **`baseColorClass`**: Estado neutro/não selecionado
   - Padrão: `"bg-card text-muted-foreground border-border"`
 
-- **`hoverColorClass`**: Estado hover (fundo transparente colorido + borda colorida fraca)
+- **`hoverColorClass`**: Estado hover (cores suaves SEM ring)
   - Padrão: `"hover:bg-{cor}-500/10 hover:border-{cor}-500/20"`
   - Exemplo: `"hover:bg-emerald-500/10 hover:border-emerald-500/20"`
 
-- **`activeColorClass`**: Estado selecionado (fundo transparente colorido mais forte + borda colorida + ring)
-  - Padrão: `"bg-{cor}-500/20 border-{cor}-500/30 ring-2 ring-{cor}-500/50 text-white"`
-  - Exemplo: `"bg-emerald-500/20 border-emerald-500/30 ring-2 ring-emerald-500/50 text-white"`
+- **`activeColorClass`**: Estado selecionado (cores fortes + ring-4)
+  - Padrão: `"bg-{cor}-500/20 border-{cor}-500/30 ring-4 ring-{cor}-500/50 text-white"`
+  - Exemplo: `"bg-emerald-500/20 border-emerald-500/30 ring-4 ring-emerald-500/50 text-white"`
 
 **Exemplo de uso:**
 ```tsx
@@ -103,7 +108,7 @@ Para manter a consistência visual com o resto do projeto, você **DEVE** passar
       icon: MapPin,
       baseColorClass: "bg-card text-muted-foreground border-border",
       hoverColorClass: "hover:bg-emerald-500/10 hover:border-emerald-500/20",
-      activeColorClass: "bg-emerald-500/20 border-emerald-500/30 ring-2 ring-emerald-500/50 text-white",
+      activeColorClass: "bg-emerald-500/20 border-emerald-500/30 ring-4 ring-emerald-500/50 text-white",
     },
     // ... mais opções
   ]}
@@ -126,50 +131,116 @@ Para manter a consistência visual com o resto do projeto, você **DEVE** passar
 
 ## 9. FormSimpleGrid (Grid de Seleção Simples - Ícone em Cima)
 **Componente:** `FormSimpleGrid` (`src/components/forms/FormSimpleGrid.tsx`)
-**Uso:** Seleção única em grid com ícone no topo e label abaixo (Roles de Personagem, Status, Categorias)
+**Uso:** Seleção única em grid com ícone no topo e label abaixo (Roles de Personagem, Status, Categorias, Tipos de Relacionamento)
 **Descrição:** Grid de botões com layout vertical: ícone no topo e label abaixo. **Diferente do FormSelectGrid** que tem layout horizontal (ícone à esquerda, label à direita). Não possui campo de descrição. Ideal para seleções visuais simples onde o ícone é o elemento principal.
 
-**⚠️ IMPORTANTE - Classes de Cor Obrigatórias:**
-Assim como o FormSelectGrid, você **DEVE** passar as classes de cor manualmente para cada opção para manter a consistência visual:
+**⚠️ IMPORTANTE - Padrão Universal de Hover/Active para Grids:**
+
+### **Padrão de Bordas (CRÍTICO - VALE PARA TODOS OS GRIDS DO PROJETO):**
+**Este padrão é usado em FormSimpleGrid, FormSelectGrid e todos os componentes de grid do projeto.**
+
+**Estados:**
+- **Estado Normal**: `border-2 p-4` com `baseColorClass` (borda 2px + padding 16px)
+- **Estado Hover**: `border-2 p-4` com cores do active SEM ring (apenas cores mudam)
+- **Estado Active**: `border-2 p-4` com cores do active + `ring-4` (ring externo de 4px cria efeito de borda grossa)
+
+**Lógica do padrão:**
+1. **Hover** "antecipa" a seleção mostrando as cores ativas (background, texto e borda coloridos)
+2. **Active** mantém border-2 + p-4, mas adiciona `ring-4` que cria visualmente uma borda mais grossa via box-shadow
+3. **Resultado:** Border e padding permanecem constantes em todos os estados = **ZERO movimento dos cards** 🎯
+
+### **Classes de Cor Obrigatórias:**
 
 - **`baseColorClass`**: Estado neutro/não selecionado
-  - Padrão: `"bg-card text-muted-foreground border-border"`
+  - Padrão: `"border-muted"` (minimalista, apenas borda cinza)
+  - Exemplo: `"border-muted"`
 
-- **`hoverColorClass`**: Estado hover (fundo transparente colorido + borda colorida fraca)
-  - Padrão: `"hover:bg-{cor}-500/10 hover:border-{cor}-500/20"`
-  - Exemplo: `"hover:bg-yellow-500/10 hover:border-yellow-500/20"`
+- **`hoverColorClass`**: Estado hover (cores do active SEM border-4/ring)
+  - **Padrão Correto**: `"hover:{cores-do-active}"` (apenas cores, mantém border-2)
+  - Exemplo: `"hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/20"`
+  - ⚠️ **ATENÇÃO**: As cores devem ser IDÊNTICAS ao activeColorClass mas SEM o ring. A borda permanece `border-2`.
 
-- **`activeColorClass`**: Estado selecionado (fundo transparente colorido mais forte + borda colorida + ring)
-  - Padrão: `"bg-{cor}-500/20 border-{cor}-500/30 ring-2 ring-{cor}-500/50"`
-  - Exemplo: `"bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50"`
+- **`activeColorClass`**: Estado selecionado (fundo + texto + borda + ring coloridos)
+  - **Padrão COMPLETO**: `"bg-{cor}-500/20 border-{cor}-500/30 ring-4 ring-{cor}-500/50 text-{cor}-600"`
+  - Exemplo: `"bg-yellow-500/20 border-yellow-500/30 ring-4 ring-yellow-500/50 text-yellow-600"`
+  - **Componentes da cor:**
+    - `bg-{cor}-500/20`: Fundo com 20% de opacidade
+    - `text-{cor}-600`: Texto colorido (mais escuro que o bg)
+    - `border-{cor}-500/30`: Borda com 30% de opacidade
+    - `ring-4 ring-{cor}-500/50`: Ring externo de 4px com 50% de opacidade (cria efeito de borda grossa)
+  - **Nota técnica**: Border e padding permanecem `border-2 p-4` sempre. O `ring-4` é um box-shadow externo que não afeta o layout, criando o efeito visual de borda mais grossa sem mover cards
 
-**Exemplo de uso:**
+**Exemplo de uso CORRETO:**
 ```tsx
 <FormSimpleGrid
-  value={role}
-  onChange={setRole}
-  label="Role do Personagem"
+  value={relationshipType}
+  onChange={setRelationshipType}
+  label="Tipo de Relacionamento"
   required
-  columns={5}
+  columns={4}
   options={[
     {
-      value: "protagonist",
-      label: "Protagonista",
-      icon: Star,
-      baseColorClass: "bg-card text-muted-foreground border-border",
-      hoverColorClass: "hover:bg-yellow-500/10 hover:border-yellow-500/20",
-      activeColorClass: "bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50",
+      value: "friend",
+      label: "Amigo",
+      icon: Users,
+      baseColorClass: "border-muted",
+      // Hover = cores mais suaves do active (SEM ring)
+      hoverColorClass: "hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/20",
+      // Active = cores mais fortes + ring-4
+      activeColorClass: "bg-green-500/20 border-green-500/30 ring-4 ring-green-500/50 text-green-600",
     },
     {
-      value: "antagonist",
-      label: "Antagonista",
+      value: "rival",
+      label: "Rival",
       icon: Swords,
-      baseColorClass: "bg-card text-muted-foreground border-border",
-      hoverColorClass: "hover:bg-orange-500/10 hover:border-orange-500/20",
-      activeColorClass: "bg-orange-500/20 border-orange-500/30 ring-2 ring-orange-500/50",
+      baseColorClass: "border-muted",
+      // Hover = cores mais suaves do active (SEM ring)
+      hoverColorClass: "hover:bg-orange-500/10 hover:text-orange-600 hover:border-orange-500/20",
+      // Active = cores mais fortes + ring-4
+      activeColorClass: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50 text-orange-600",
     },
     // ... mais opções
   ]}
+/>
+```
+
+**Exemplo programático (recomendado para muitas opções):**
+```tsx
+// Primeiro, defina um constant com as cores de cada tipo
+const RELATIONSHIP_TYPES = [
+  {
+    value: "friend",
+    translationKey: "friend",
+    icon: Users,
+    // Active = cores fortes + ring-4
+    color: "bg-green-500/20 border-green-500/30 ring-4 ring-green-500/50 text-green-600",
+    // Hover = cores mais suaves (SEM ring)
+    hoverColor: "hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/20",
+  },
+  {
+    value: "rival",
+    translationKey: "rival",
+    icon: Swords,
+    color: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50 text-orange-600",
+    hoverColor: "hover:bg-orange-500/10 hover:text-orange-600 hover:border-orange-500/20",
+  },
+  // ... outros tipos
+];
+
+// Depois use no FormSimpleGrid
+<FormSimpleGrid
+  value={selectedType}
+  onChange={setSelectedType}
+  label="Tipo de Relacionamento"
+  columns={4}
+  options={RELATIONSHIP_TYPES.map((type) => ({
+    value: type.value,
+    label: t(`relationship_types.${type.translationKey}`),
+    icon: type.icon,
+    baseColorClass: "border-muted",
+    hoverColorClass: type.hoverColor,  // Cores suaves
+    activeColorClass: type.color,      // Cores fortes + ring-4
+  }))}
 />
 ```
 
@@ -179,18 +250,20 @@ Assim como o FormSelectGrid, você **DEVE** passar as classes de cor manualmente
 - `required`: Se o campo é obrigatório
 - `error`: Mensagem de erro opcional
 - `className`: Classe CSS customizada para o grid
-- **`baseColorClass`**: Classes CSS para estado neutro (OBRIGATÓRIO)
-- **`hoverColorClass`**: Classes CSS para hover (OBRIGATÓRIO)
-- **`activeColorClass`**: Classes CSS para selecionado (OBRIGATÓRIO)
+- **`baseColorClass`**: Classes CSS para estado neutro (OBRIGATÓRIO) - apenas borda cinza
+- **`hoverColorClass`**: Classes CSS para hover (OBRIGATÓRIO) - cores suaves do active SEM ring
+- **`activeColorClass`**: Classes CSS para selecionado (OBRIGATÓRIO) - cores fortes + ring-4 (border-2 p-4 sempre)
 
 **Diferenças do FormSelectGrid:**
 - ✅ **Layout Vertical**: Ícone no topo, label abaixo
 - ✅ **Sem Descrição**: Apenas ícone e label (mais compacto)
 - ✅ **Mais Colunas**: Suporta até 6 colunas (FormSelectGrid limita a 4)
-- ✅ **Uso**: Ideal para seleções simples e visuais (roles, status, categorias)
+- ✅ **Mesmo Padrão de Hover/Active**: Ambos seguem o padrão universal (hover = cores, active = cores + ring-4, border constante)
+- ✅ **Uso**: Ideal para seleções simples e visuais (roles, status, categorias, tipos)
 
 **Casos de uso no projeto:**
 - **Roles de Personagem:** Protagonista, Antagonista, Vilão, Secundário, Extra
+- **Tipos de Relacionamento:** Amigo, Rival, Mentor, Aprendiz, Inimigo, etc. (16 tipos)
 - **Status de Projeto:** Planejamento, Em Andamento, Revisão, Concluído
 - **Categorias Simples:** Qualquer seleção que não precise de descrição detalhada
 

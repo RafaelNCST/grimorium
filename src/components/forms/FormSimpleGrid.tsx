@@ -132,9 +132,9 @@ export function FormSimpleGrid<T extends string = string>({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                "relative p-4 rounded-lg border-2 transition-all flex flex-col items-center justify-center gap-2 min-h-[100px]",
+                "relative rounded-lg border-2 p-4 transition-all flex flex-col items-center justify-center gap-2 min-h-[100px]",
                 isSelected
-                  ? option.activeColorClass || "bg-primary text-white border-primary"
+                  ? option.activeColorClass || "bg-primary text-white border-primary ring-4 ring-primary/50"
                   : cn(
                       option.baseColorClass || "bg-background text-foreground border-border",
                       option.hoverColorClass || "hover:bg-primary hover:text-white hover:border-primary"
