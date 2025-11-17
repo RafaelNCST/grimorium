@@ -464,6 +464,137 @@ export function EntityDetailView({
 
 ---
 
+### 2.3 Persistência de Estado das Seções (localStorage)
+
+**IMPORTANTE:** Todas as seções colapsáveis (avançada e especiais) devem **lembrar** seu estado (aberta/fechada) mesmo quando o usuário sair e voltar para a página.
+
+#### 2.3.1 Seção Avançada
+
+A seção avançada é controlada diretamente no container da entidade e deve persistir no localStorage.
+
+**Pattern no Container (`[entidade]-detail/index.tsx`):**
+
+```tsx
+export function EntityDetail() {
+  // ... outros estados
+
+  // Estado da seção avançada com localStorage
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("[entidade]DetailAdvancedSectionOpen");
+    return stored ? JSON.parse(stored) : false; // false = começa fechada
+  });
+
+  // Salvar no localStorage sempre que mudar
+  useEffect(() => {
+    localStorage.setItem(
+      "[entidade]DetailAdvancedSectionOpen",
+      JSON.stringify(advancedSectionOpen)
+    );
+  }, [advancedSectionOpen]);
+
+  // Handler para toggle
+  const handleAdvancedSectionToggle = useCallback(() => {
+    setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
+  return (
+    <EntityDetailView
+      // ... outras props
+      advancedSectionOpen={advancedSectionOpen}
+      onAdvancedSectionToggle={handleAdvancedSectionToggle}
+    />
+  );
+}
+```
+
+**Passar para a View:**
+
+```tsx
+<EntityDetailLayout
+  // ... outras props
+  advancedFields={renderAdvancedFields()}
+  advancedSectionTitle={t("entity-detail:sections.advanced_info")}
+  advancedSectionOpen={advancedSectionOpen}
+  onAdvancedSectionToggle={onAdvancedSectionToggle}
+/>
+```
+
+#### 2.3.2 Seções Especiais (Relacionamentos, Família, Timeline, etc.)
+
+As seções especiais são gerenciadas automaticamente pelo `EntityDetailLayout` através do localStorage, **mas você pode adicionar controle manual se necessário**.
+
+**Padrão Automático (Recomendado):**
+
+O `EntityDetailLayout` já gerencia a persistência automaticamente usando a chave `entityDetailExtraSectionsState`. Apenas passe as seções com `defaultOpen`:
+
+```tsx
+<EntityDetailLayout
+  extraSections={[
+    {
+      id: "timeline",
+      title: t("entity-detail:sections.timeline"),
+      content: <TimelineSection />,
+      isCollapsible: true,
+      defaultOpen: false, // Define o estado inicial (apenas primeira vez)
+    },
+    {
+      id: "relationships",
+      title: t("entity-detail:sections.relationships"),
+      content: <RelationshipsSection />,
+      isCollapsible: true,
+      defaultOpen: false,
+    },
+  ]}
+/>
+```
+
+**Padrão Manual (Opcional):**
+
+Se você quiser controlar manualmente o estado das seções especiais (ex: para lógica específica):
+
+```tsx
+// No container
+const [timelineSectionOpen, setTimelineSectionOpen] = useState(() => {
+  const stored = localStorage.getItem("[entidade]DetailTimelineSectionOpen");
+  return stored ? JSON.parse(stored) : false;
+});
+
+useEffect(() => {
+  localStorage.setItem(
+    "[entidade]DetailTimelineSectionOpen",
+    JSON.stringify(timelineSectionOpen)
+  );
+}, [timelineSectionOpen]);
+```
+
+#### 2.3.3 Chaves do localStorage
+
+**Convenção de nomenclatura:**
+
+```
+[entidade]Detail[NomeSeção]Open
+```
+
+**Exemplos:**
+- `characterDetailAdvancedSectionOpen` - Seção avançada de personagens
+- `regionDetailAdvancedSectionOpen` - Seção avançada de regiões
+- `regionDetailTimelineSectionOpen` - Timeline de região (manual)
+- `entityDetailExtraSectionsState` - Todas as seções especiais (automático)
+
+#### 2.3.4 Comportamento Esperado
+
+✅ **Primeira visita:** Seção começa no estado definido em `defaultOpen`
+✅ **Usuário abre/fecha:** Estado é salvo automaticamente no localStorage
+✅ **Sair e voltar:** Seção aparece exatamente como o usuário deixou
+✅ **Persistência:** Estado mantido mesmo após fechar o navegador
+
+**⚠️ IMPORTANTE:**
+- Sempre definir `defaultOpen: false` para seções começarem fechadas
+- O estado persiste por entidade (personagem, região, etc.)
+- Não usar `defaultOpen: true` a menos que a seção deva realmente começar aberta por padrão
+
+---
+
 ## Passo 3: Tipos TypeScript
 
 **Arquivo:** `types/[entidade]-types.ts`
@@ -763,6 +894,9 @@ export const EntitySchema = z.object({
 - [ ] Adicionar toggle de visibilidade de campos
 - [ ] Implementar salvar/cancelar com validação
 - [ ] Adicionar modal de exclusão com `DeleteEntityModal`
+- [ ] **Implementar persistência de estado no localStorage:**
+  - [ ] Seção avançada com `[entidade]DetailAdvancedSectionOpen`
+  - [ ] Seções especiais usando `defaultOpen: false` (automático via EntityDetailLayout)
 
 ### Database
 - [ ] Criar service `lib/db/[entidade]s.service.ts` com CRUD
