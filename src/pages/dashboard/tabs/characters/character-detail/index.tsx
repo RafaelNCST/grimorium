@@ -129,6 +129,7 @@ export function CharacterDetail() {
   });
   const [_isLoading, setIsLoading] = useState(true);
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   // Power links state
   const [characterPowerLinks, setCharacterPowerLinks] = useState<
@@ -764,6 +765,13 @@ export function CharacterDetail() {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
 
+  const toggleSection = useCallback((sectionName: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionName]: !prev[sectionName],
+    }));
+  }, []);
+
   // Power links handlers
   const handleNavigateToPowerInstance = useCallback(
     (linkId: string) => {
@@ -838,6 +846,8 @@ export function CharacterDetail() {
       RoleIcon={RoleIcon}
       fieldVisibility={fieldVisibility}
       advancedSectionOpen={advancedSectionOpen}
+      openSections={openSections}
+      toggleSection={toggleSection}
       powerLinks={characterPowerLinks}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}

@@ -595,7 +595,418 @@ useEffect(() => {
 
 ---
 
-## Passo 3: Tipos TypeScript
+## Passo 3: Modo Visualização dos Campos
+
+**IMPORTANTE:** Cada tipo de campo tem uma forma específica de ser exibido no modo visualização. Siga os padrões abaixo.
+
+### 3.1 Campos Básicos vs Avançados
+
+**⚠️ REGRA FUNDAMENTAL:**
+
+**Campos Básicos (obrigatórios):**
+- ❌ **NÃO** podem ser ocultados
+- ❌ **NÃO** usam `FieldWithVisibilityToggle`
+- ✅ Sempre visíveis (nome, resumo, campos obrigatórios)
+- ✅ Renderizados diretamente sem toggle
+
+**Campos Avançados (opcionais):**
+- ✅ **PODEM** ser ocultados
+- ✅ **DEVEM** usar `FieldWithVisibilityToggle`
+- ✅ Usuário pode mostrar/ocultar em modo visualização
+- ✅ Todos estão dentro da seção "Avançado"
+
+**Exemplo de estrutura:**
+
+```tsx
+// ❌ Campo BÁSICO (obrigatório) - SEM FieldWithVisibilityToggle
+{isEditing ? (
+  <div className="space-y-2">
+    <Label className="text-primary">
+      Nome <span className="text-destructive ml-1">*</span>
+    </Label>
+    <Input
+      value={editData.name}
+      onChange={(e) => onEditDataChange("name", e.target.value)}
+    />
+  </div>
+) : (
+  <h2 className="text-3xl font-bold">{entity.name}</h2>
+)}
+
+// ✅ Campo AVANÇADO (opcional) - COM FieldWithVisibilityToggle
+<FieldWithVisibilityToggle
+  fieldName="climate"
+  label={t("climate_label")}
+  isOptional
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={onFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <Textarea value={editData.climate} ... />
+  ) : entity.climate ? (
+    <p className="text-sm">{entity.climate}</p>
+  ) : (
+    <EmptyFieldState t={t} />
+  )}
+</FieldWithVisibilityToggle>
+```
+
+### 3.2 Estrutura Geral com FieldWithVisibilityToggle
+
+Apenas campos **opcionais/avançados** devem usar `FieldWithVisibilityToggle`:
+
+```tsx
+<FieldWithVisibilityToggle
+  fieldName="nomeDocampo"
+  label={isEditing ? t("label") : ""} // Label vazia em view mode para alguns casos
+  isOptional
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={onFieldVisibilityToggle}
+>
+  {isEditing ? (
+    {/* Renderizar campo de input */}
+  ) : (
+    {/* Renderizar visualização */}
+  )}
+</FieldWithVisibilityToggle>
+```
+
+### 3.2 Estado Vazio (EmptyFieldState)
+
+Quando o campo está vazio em modo visualização, sempre usar:
+
+```tsx
+<EmptyFieldState t={t} />
+```
+
+**Renderiza:**
+```tsx
+<span className="italic text-muted-foreground/60">
+  Não especificado
+</span>
+```
+
+### 3.3 Padrões por Tipo de Campo
+
+#### 3.3.1 Texto Curto (Input)
+
+**Edição:** `<Input />`
+**Visualização:** Texto simples com `text-sm`
+
+```tsx
+{isEditing ? (
+  <Input
+    value={editData.field || ""}
+    onChange={(e) => onEditDataChange("field", e.target.value)}
+    placeholder={t("placeholder")}
+  />
+) : entity.field ? (
+  <p className="text-sm">{entity.field}</p>
+) : (
+  <EmptyFieldState t={t} />
+)}
+```
+
+#### 3.3.2 Texto Longo (Textarea)
+
+**Edição:** `<Textarea />` com contador de caracteres
+**Visualização:** Texto com `whitespace-pre-wrap` para preservar quebras de linha
+
+```tsx
+{isEditing ? (
+  <>
+    <Textarea
+      value={editData.description || ""}
+      onChange={(e) => onEditDataChange("description", e.target.value)}
+      placeholder={t("placeholder")}
+      maxLength={1000}
+      rows={5}
+      className="resize-none"
+    />
+    <div className="flex justify-end text-xs text-muted-foreground">
+      <span>{editData.description?.length || 0}/1000</span>
+    </div>
+  </>
+) : entity.description ? (
+  <p className="text-sm whitespace-pre-wrap">{entity.description}</p>
+) : (
+  <EmptyFieldState t={t} />
+)}
+```
+
+#### 3.3.3 Select Personalizado (ex: SeasonPicker)
+
+**Edição:** Componente customizado
+**Visualização:** Card colorido com ícone
+
+```tsx
+{isEditing ? (
+  <SeasonPicker
+    value={editData.season}
+    customSeasonName={editData.customSeasonName}
+    onSeasonChange={(season) => onEditDataChange("season", season)}
+    onCustomNameChange={(name) => onEditDataChange("customSeasonName", name)}
+  />
+) : entity.season ? (
+  (() => {
+    const selectedSeason = SEASONS.find(s => s.value === entity.season);
+    if (!selectedSeason) return null;
+
+    const Icon = selectedSeason.icon;
+    const displayLabel = entity.season === "custom" && entity.customSeasonName
+      ? entity.customSeasonName
+      : t(`seasons.${entity.season}`);
+
+    return (
+      <div className={`relative p-4 rounded-lg border-2 text-left ${SEASON_COLORS[entity.season]} text-foreground`}>
+        <div className="flex items-start gap-3">
+          <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm">{displayLabel}</p>
+            <p className="text-xs mt-1 opacity-80">{selectedSeason.description}</p>
+          </div>
+        </div>
+      </div>
+    );
+  })()
+) : (
+  <EmptyFieldState t={t} />
+)}
+```
+
+#### 3.3.4 Lista de Strings (ListInput)
+
+**Edição:** `<ListInput />`
+**Visualização:** Collapsible com lista `ul > li`
+
+**⚠️ IMPORTANTE:**
+- Label **vazia** em modo edição e visualização no FieldWithVisibilityToggle (para evitar duplicação)
+- Label **preenchida** no CollapsibleTrigger em visualização
+- Contador de itens ao lado do label
+
+```tsx
+<FieldWithVisibilityToggle
+  fieldName="mysteries"
+  label=""
+  isOptional
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={onFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <ListInput
+      label=""
+      placeholder={t("placeholder")}
+      buttonText={t("add_button")}
+      value={editData.mysteries ? safeJsonParse(editData.mysteries) : []}
+      onChange={(value) => onEditDataChange("mysteries", JSON.stringify(value))}
+      labelClassName="text-sm font-medium text-primary"
+    />
+  ) : (
+    <Collapsible
+      open={openSections.mysteries}
+      onOpenChange={() => toggleSection("mysteries")}
+    >
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+        <p className="text-sm font-semibold text-primary">
+          {t("label")}
+          {safeJsonParse(entity.mysteries).length > 0 && (
+            <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+              ({safeJsonParse(entity.mysteries).length})
+            </span>
+          )}
+        </p>
+        {openSections.mysteries ? (
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        {safeJsonParse(entity.mysteries).length > 0 ? (
+          <ul className="list-disc list-inside space-y-1">
+            {safeJsonParse(entity.mysteries).map((item: string, index: number) => (
+              <li key={index} className="text-sm">{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyFieldState t={t} />
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  )}
+</FieldWithVisibilityToggle>
+```
+
+**Estado necessário para collapsibles:**
+
+```tsx
+// No container
+const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+const toggleSection = (sectionName: string) => {
+  setOpenSections(prev => ({
+    ...prev,
+    [sectionName]: !prev[sectionName]
+  }));
+};
+```
+
+#### 3.3.5 Multi-Select de Entidades (FormEntityMultiSelectAuto)
+
+**Edição:** `<FormEntityMultiSelectAuto />`
+**Visualização:** Collapsible com cards de entidade (imagem + nome)
+
+**⚠️ IMPORTANTE:**
+- Label **vazia** no FieldWithVisibilityToggle (para evitar duplicação)
+- Label **preenchida** no CollapsibleTrigger em visualização
+- Contador de itens ao lado do label
+
+```tsx
+<FieldWithVisibilityToggle
+  fieldName="relatedCharacters"
+  label=""
+  isOptional
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={onFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <FormEntityMultiSelectAuto
+      entityType="character"
+      bookId={bookId}
+      label=""
+      placeholder={t("placeholder")}
+      emptyText={t("no_characters")}
+      noSelectionText={t("no_selection")}
+      searchPlaceholder={t("search")}
+      value={editData.relatedCharacters ? safeJsonParse(editData.relatedCharacters) : []}
+      onChange={(value) => onEditDataChange("relatedCharacters", JSON.stringify(value))}
+      labelClassName="text-sm font-medium text-primary"
+    />
+  ) : (
+    <Collapsible
+      open={openSections.relatedCharacters}
+      onOpenChange={() => toggleSection("relatedCharacters")}
+    >
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+        <p className="text-sm font-semibold text-primary">
+          {t("label")}
+          {safeJsonParse(entity.relatedCharacters).length > 0 && (
+            <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+              ({safeJsonParse(entity.relatedCharacters).length})
+            </span>
+          )}
+        </p>
+        {openSections.relatedCharacters ? (
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        {safeJsonParse(entity.relatedCharacters).length > 0 ? (
+          <div className="flex flex-col gap-2">
+            {safeJsonParse(entity.relatedCharacters).map((characterId: string) => {
+              const character = characters.find(c => c.id === characterId);
+              return character ? (
+                <div
+                  key={characterId}
+                  className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                >
+                  {character.image ? (
+                    <img
+                      src={convertFileSrc(character.image)}
+                      alt={character.name}
+                      className="w-8 h-8 rounded object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs text-muted-foreground font-semibold">
+                        {character.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-sm font-medium">{character.name}</span>
+                </div>
+              ) : null;
+            })}
+          </div>
+        ) : (
+          <EmptyFieldState t={t} />
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  )}
+</FieldWithVisibilityToggle>
+```
+
+#### 3.3.6 Imagem (FormImageUpload)
+
+**Edição:** `<FormImageUpload />`
+**Visualização:** Imagem ou placeholder com ícone
+
+```tsx
+{isEditing ? (
+  <FormImageUpload
+    value={imagePreview}
+    onChange={(value) => onEditDataChange("image", value)}
+    label={t("image_label")}
+    helperText={`opcional - ${t("recommended_size")}`}
+    height="h-[28rem]"
+    shape="rounded"
+    placeholderIcon={IconeDoTema}
+    placeholderText={t("upload_image")}
+    id="entity-image-upload"
+  />
+) : entity.image ? (
+  <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
+    <img
+      src={entity.image}
+      alt={entity.name}
+      className="w-full h-full object-fill"
+    />
+  </div>
+) : (
+  <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
+    <IconeDoTema className="w-16 h-16 text-muted-foreground/30" />
+  </div>
+)}
+```
+
+### 3.4 Imports Necessários
+
+```tsx
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { EmptyFieldState } from "@/components/detail-page/empty-field-state";
+import { safeJsonParse } from "@/lib/utils/json-parse";
+```
+
+### 3.5 Checklist de Visualização
+
+- [ ] **Campos básicos (obrigatórios) NÃO usam `FieldWithVisibilityToggle`**
+- [ ] **Campos avançados (opcionais) DEVEM usar `FieldWithVisibilityToggle`**
+- [ ] Labels vazias (`""`) em modo edição para ListInput e FormEntityMultiSelectAuto
+- [ ] Labels preenchidas no `CollapsibleTrigger` em modo visualização
+- [ ] Contador de itens ao lado da label nos collapsibles
+- [ ] `EmptyFieldState` para campos vazios
+- [ ] `whitespace-pre-wrap` para textos longos
+- [ ] Estado `openSections` para controlar collapsibles
+- [ ] Cards com imagem/avatar para multi-selects de entidades
+- [ ] Placeholder com gradiente e ícone para imagens vazias
+- [ ] Import de `convertFileSrc` do Tauri para converter caminhos de arquivo
+
+---
+
+## Passo 4: Tipos TypeScript
 
 **Arquivo:** `types/[entidade]-types.ts`
 

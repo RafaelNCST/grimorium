@@ -1,27 +1,41 @@
 import React from "react";
 
-import { Users, Calendar, Shield, type LucideIcon } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  Shield,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
+import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
-import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
+import { CreateCharacterModal } from "@/components/modals/create-character-modal";
 import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-archetypes";
 import { type ICharacterRole } from "@/components/modals/create-character-modal/constants/character-roles";
 import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
-import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import {
+  PHYSICAL_TYPE_ACTIVE_COLOR,
   PHYSICAL_TYPE_BASE_COLOR,
   PHYSICAL_TYPE_HOVER_COLOR,
-  PHYSICAL_TYPE_ACTIVE_COLOR,
 } from "@/components/modals/create-character-modal/constants/physical-type-colors";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -33,6 +47,10 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  EntityVersionManager,
+  CreateVersionWithEntityDialog,
+} from "@/components/version-system";
 import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
 import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
@@ -45,8 +63,8 @@ import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { FamilySection } from "./components/family-section";
 import { RelationshipsSection } from "./components/relationships-section";
-import { VersionManager } from "./components/version-manager";
-import { ALIGNMENTS_CONSTANT, type IAlignment } from "./constants/alignments-constant";
+import { VersionCard } from "./components/version-card";
+import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 
 // Helper component for empty state
@@ -127,9 +145,7 @@ interface CharacterDetailViewProps {
   selectedRelationshipCharacter: string;
   selectedRelationshipType: string;
   relationshipIntensity: number[];
-  fileInputRef: React.RefObject<HTMLInputElement>;
   mockCharacters: ICharacter[];
-  mockLocations: Array<{ id: string; name: string }>;
   mockFactions: Array<{ id: string; name: string }>;
   roles: ICharacterRole[];
   alignments: IAlignment[];
@@ -141,6 +157,8 @@ interface CharacterDetailViewProps {
   RoleIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
+  openSections: Record<string, boolean>;
+  toggleSection: (sectionName: string) => void;
   powerLinks: IPowerCharacterLink[];
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
@@ -198,9 +216,7 @@ export function CharacterDetailView({
   showDeleteModal,
   isNavigationSidebarOpen,
   imagePreview,
-  fileInputRef,
   mockCharacters,
-  mockLocations,
   roles,
   genders,
   currentRole,
@@ -209,6 +225,8 @@ export function CharacterDetailView({
   RoleIcon,
   fieldVisibility,
   advancedSectionOpen,
+  openSections,
+  toggleSection,
   powerLinks,
   onBack,
   onNavigationSidebarToggle,
@@ -237,10 +255,6 @@ export function CharacterDetailView({
 }: CharacterDetailViewProps) {
   const { t } = useTranslation(["character-detail", "create-character"]);
 
-  // Helper: Check field visibility
-  const isFieldVisible = (fieldName: string) =>
-    fieldVisibility[fieldName] !== false;
-
   // Convert role constants to FormSimpleGrid format
   const roleOptions = roles.map((role) => ({
     value: role.value,
@@ -261,17 +275,6 @@ export function CharacterDetailView({
     label: t(`create-character:${archetype.translationKey}`),
     description: t(`create-character:${archetype.descriptionKey}`),
     icon: archetype.icon,
-  }));
-
-  // Convert alignment constants to FormSelectGrid format
-  const alignmentOptions = ALIGNMENTS_CONSTANT.map((alignment) => ({
-    value: alignment.value,
-    label: t(`create-character:${alignment.translationKey}`),
-    description: alignment.description,
-    icon: alignment.icon,
-    baseColorClass: alignment.bgColor,
-    hoverColorClass: `hover:${alignment.bgColor}`,
-    activeColorClass: `${alignment.bgColor} ${alignment.color}`,
   }));
 
   // Convert physical type constants to FormSimpleGrid format
@@ -475,7 +478,9 @@ export function CharacterDetailView({
                 )}
               </div>
 
-              <p className="text-foreground text-base">{character.description}</p>
+              <p className="text-foreground text-base">
+                {character.description}
+              </p>
             </div>
           </div>
         </div>
@@ -494,10 +499,14 @@ export function CharacterDetailView({
 
         {/* Height and Weight */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.height")}
-            </Label>
+          <FieldWithVisibilityToggle
+            fieldName="height"
+            label={t("character-detail:fields.height")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
             {isEditing ? (
               <>
                 <Input
@@ -515,12 +524,16 @@ export function CharacterDetailView({
             ) : (
               <EmptyFieldState t={t} />
             )}
-          </div>
+          </FieldWithVisibilityToggle>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
-              {t("character-detail:fields.weight")}
-            </Label>
+          <FieldWithVisibilityToggle
+            fieldName="weight"
+            label={t("character-detail:fields.weight")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
             {isEditing ? (
               <>
                 <Input
@@ -538,14 +551,18 @@ export function CharacterDetailView({
             ) : (
               <EmptyFieldState t={t} />
             )}
-          </div>
+          </FieldWithVisibilityToggle>
         </div>
 
         {/* Skin Tone */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-primary">
-            {t("character-detail:fields.skin_tone")}
-          </Label>
+        <FieldWithVisibilityToggle
+          fieldName="skinTone"
+          label={t("character-detail:fields.skin_tone")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
           {isEditing ? (
             <>
               <Input
@@ -563,14 +580,19 @@ export function CharacterDetailView({
           ) : (
             <EmptyFieldState t={t} />
           )}
-        </div>
+        </FieldWithVisibilityToggle>
 
-        {/* Hair, Eyes, Face - Similar pattern */}
+        {/* Hair, Eyes, Face */}
         {["hair", "eyes", "face"].map((field) => (
-          <div key={field} className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
-              {t(`character-detail:fields.${field}`)}
-            </Label>
+          <FieldWithVisibilityToggle
+            key={field}
+            fieldName={field}
+            label={t(`character-detail:fields.${field}`)}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
             {isEditing ? (
               <>
                 <Input
@@ -591,14 +613,18 @@ export function CharacterDetailView({
             ) : (
               <EmptyFieldState t={t} />
             )}
-          </div>
+          </FieldWithVisibilityToggle>
         ))}
 
         {/* Species and Race */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-primary">
-            {t("create-character:modal.species_and_race")}
-          </Label>
+        <FieldWithVisibilityToggle
+          fieldName="speciesAndRace"
+          label=""
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
           {isEditing ? (
             <FormEntityMultiSelectAuto
               entityType="race"
@@ -612,24 +638,57 @@ export function CharacterDetailView({
               onChange={(value) => onEditDataChange("speciesAndRace", value)}
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : character.speciesAndRace && character.speciesAndRace.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {character.speciesAndRace.map((speciesId) => (
-                <Badge key={speciesId} variant="secondary" className="text-sm">
-                  {speciesId}
-                </Badge>
-              ))}
-            </div>
           ) : (
-            <EmptyFieldState t={t} />
+            <Collapsible
+              open={openSections.speciesAndRace}
+              onOpenChange={() => toggleSection("speciesAndRace")}
+            >
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                <p className="text-sm font-semibold text-primary">
+                  {t("create-character:modal.species_and_race")}
+                  {character.speciesAndRace &&
+                    character.speciesAndRace.length > 0 && (
+                      <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                        ({character.speciesAndRace.length})
+                      </span>
+                    )}
+                </p>
+                {openSections.speciesAndRace ? (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                {character.speciesAndRace &&
+                character.speciesAndRace.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {character.speciesAndRace.map((raceId) => (
+                      <div
+                        key={raceId}
+                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                      >
+                        <span className="text-sm font-medium">{raceId}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyFieldState t={t} />
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           )}
-        </div>
+        </FieldWithVisibilityToggle>
 
         {/* Physical Type */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-primary">
-            {t("character-detail:fields.physical_type")}
-          </Label>
+        <FieldWithVisibilityToggle
+          fieldName="physicalType"
+          label={t("character-detail:fields.physical_type")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
           {isEditing ? (
             <FormSimpleGrid
               value={editData.physicalType || ""}
@@ -662,13 +721,17 @@ export function CharacterDetailView({
           ) : (
             <EmptyFieldState t={t} />
           )}
-        </div>
+        </FieldWithVisibilityToggle>
 
         {/* Distinguishing Features */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-primary">
-            {t("character-detail:fields.distinguishing_features")}
-          </Label>
+        <FieldWithVisibilityToggle
+          fieldName="distinguishingFeatures"
+          label={t("character-detail:fields.distinguishing_features")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
           {isEditing ? (
             <>
               <Textarea
@@ -676,15 +739,15 @@ export function CharacterDetailView({
                 onChange={(e) =>
                   onEditDataChange("distinguishingFeatures", e.target.value)
                 }
-                placeholder={t("character-detail:fields.distinguishing_features")}
+                placeholder={t(
+                  "character-detail:fields.distinguishing_features"
+                )}
                 rows={3}
                 maxLength={400}
                 className="resize-none"
               />
               <div className="flex justify-end text-xs text-muted-foreground">
-                <span>
-                  {editData.distinguishingFeatures?.length || 0}/400
-                </span>
+                <span>{editData.distinguishingFeatures?.length || 0}/400</span>
               </div>
             </>
           ) : character.distinguishingFeatures ? (
@@ -694,7 +757,7 @@ export function CharacterDetailView({
           ) : (
             <EmptyFieldState t={t} />
           )}
-        </div>
+        </FieldWithVisibilityToggle>
       </div>
 
       <Separator className="my-6" />
@@ -705,55 +768,73 @@ export function CharacterDetailView({
           {t("character-detail:sections.behavior")}
         </h4>
 
-        {/* Archetype - Using FormSelectGrid */}
-        {isEditing ? (
-          <FormSelectGrid
-            value={editData.archetype || ""}
-            onChange={(value) => onEditDataChange("archetype", value)}
-            label={t("character-detail:fields.archetype")}
-            columns={4}
-            options={archetypeOptions}
-          />
-        ) : character.archetype ? (
-          (() => {
-            const archetype = CHARACTER_ARCHETYPES_CONSTANT.find(
-              (a) => a.value === character.archetype
-            );
-            if (!archetype) {
-              return <EmptyFieldState t={t} />;
-            }
-            const ArchetypeIcon = archetype.icon;
-            return (
-              <div className="border-2 border-primary bg-primary/10 p-6 rounded-lg shadow-md">
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <ArchetypeIcon className="w-12 h-12 text-primary" />
-                  <span className="text-lg font-semibold">
-                    {t(`create-character:${archetype.translationKey}`)}
-                  </span>
-                  <p className="text-sm text-muted-foreground max-w-md">
-                    {t(`create-character:${archetype.descriptionKey}`)}
-                  </p>
+        {/* Archetype */}
+        <FieldWithVisibilityToggle
+          fieldName="archetype"
+          label={t("character-detail:fields.archetype")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormSelectGrid
+              value={editData.archetype || ""}
+              onChange={(value) => onEditDataChange("archetype", value)}
+              label=""
+              columns={4}
+              options={archetypeOptions}
+            />
+          ) : character.archetype ? (
+            (() => {
+              const archetype = CHARACTER_ARCHETYPES_CONSTANT.find(
+                (a) => a.value === character.archetype
+              );
+              if (!archetype) {
+                return <EmptyFieldState t={t} />;
+              }
+              const ArchetypeIcon = archetype.icon;
+              return (
+                <div className="border-2 border-primary bg-primary/10 p-6 rounded-lg shadow-md">
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <ArchetypeIcon className="w-12 h-12 text-primary" />
+                    <span className="text-lg font-semibold">
+                      {t(`create-character:${archetype.translationKey}`)}
+                    </span>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      {t(`create-character:${archetype.descriptionKey}`)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })()
-        ) : (
-          <EmptyFieldState t={t} />
-        )}
+              );
+            })()
+          ) : (
+            <EmptyFieldState t={t} />
+          )}
+        </FieldWithVisibilityToggle>
 
         {/* Favorite Food and Music */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {["favoriteFood", "favoriteMusic"].map((field) => (
-            <div key={field} className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t(`character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`)}
-              </Label>
+            <FieldWithVisibilityToggle
+              key={field}
+              fieldName={field}
+              label={t(
+                `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+              )}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
               {isEditing ? (
                 <>
                   <Input
                     value={(editData as any)[field] || ""}
                     onChange={(e) => onEditDataChange(field, e.target.value)}
-                    placeholder={t(`character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`)}
+                    placeholder={t(
+                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                    )}
                     maxLength={100}
                   />
                   <div className="flex justify-end text-xs text-muted-foreground">
@@ -765,23 +846,32 @@ export function CharacterDetailView({
               ) : (
                 <EmptyFieldState t={t} />
               )}
-            </div>
+            </FieldWithVisibilityToggle>
           ))}
         </div>
 
         {/* Personality, Hobbies, Dreams, Fears */}
         {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
           (field) => (
-            <div key={field} className="space-y-2">
-              <Label className="text-sm font-medium text-primary">
-                {t(`character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`)}
-              </Label>
+            <FieldWithVisibilityToggle
+              key={field}
+              fieldName={field}
+              label={t(
+                `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+              )}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
               {isEditing ? (
                 <>
                   <Textarea
                     value={(editData as any)[field] || ""}
                     onChange={(e) => onEditDataChange(field, e.target.value)}
-                    placeholder={t(`character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`)}
+                    placeholder={t(
+                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                    )}
                     rows={3}
                     maxLength={500}
                     className="resize-none"
@@ -797,7 +887,7 @@ export function CharacterDetailView({
               ) : (
                 <EmptyFieldState t={t} />
               )}
-            </div>
+            </FieldWithVisibilityToggle>
           )
         )}
       </div>
@@ -825,15 +915,24 @@ export function CharacterDetailView({
           {t("character-detail:sections.locations_orgs")}
         </h4>
 
-        <div className="space-y-2">
+        <FieldWithVisibilityToggle
+          fieldName="birthPlace"
+          label=""
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
           {isEditing ? (
             <FormEntityMultiSelectAuto
               entityType="region"
               bookId={bookId}
-              label={t("character-detail:fields.birth_place")}
+              label=""
               placeholder={t("create-character:modal.birth_place_placeholder")}
               emptyText={t("create-character:modal.no_locations_warning")}
-              noSelectionText={t("create-character:modal.no_birth_place_selected")}
+              noSelectionText={t(
+                "create-character:modal.no_birth_place_selected"
+              )}
               searchPlaceholder={t("create-character:modal.search_location")}
               value={editData.birthPlace || []}
               onChange={(value) => onEditDataChange("birthPlace", value)}
@@ -841,18 +940,44 @@ export function CharacterDetailView({
               maxSelections={1}
             />
           ) : (
-            <>
-              <Label className="text-sm font-medium text-primary">
-                {t("character-detail:fields.birth_place")}
-              </Label>
-              {character.birthPlace && character.birthPlace.length > 0 ? (
-                <p className="text-sm">{character.birthPlace.join(", ")}</p>
-              ) : (
-                <EmptyFieldState t={t} />
-              )}
-            </>
+            <Collapsible
+              open={openSections.birthPlace}
+              onOpenChange={() => toggleSection("birthPlace")}
+            >
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                <p className="text-sm font-semibold text-primary">
+                  {t("character-detail:fields.birth_place")}
+                  {character.birthPlace && character.birthPlace.length > 0 && (
+                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                      ({character.birthPlace.length})
+                    </span>
+                  )}
+                </p>
+                {openSections.birthPlace ? (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                {character.birthPlace && character.birthPlace.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {character.birthPlace.map((regionId) => (
+                      <div
+                        key={regionId}
+                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                      >
+                        <span className="text-sm font-medium">{regionId}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyFieldState t={t} />
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           )}
-        </div>
+        </FieldWithVisibilityToggle>
       </div>
     </>
   );
@@ -937,21 +1062,91 @@ export function CharacterDetailView({
 
   // Versions Panel
   const versionsPanel = (
-    <Card className="card-magical sticky top-24 h-fit">
-      <CardHeader>
+    <Card className="card-magical sticky top-24 flex flex-col max-h-[calc(100vh-8rem)]">
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-base">
           {t("character-detail:sections.versions")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="max-h-[600px] overflow-y-auto">
-        <VersionManager
+      <CardContent className="flex-1 min-h-0 p-6 pt-0 overflow-hidden">
+        <EntityVersionManager<
+          ICharacterVersion,
+          ICharacter,
+          ICharacterFormData
+        >
           versions={versions}
           currentVersion={currentVersion}
           onVersionChange={onVersionChange}
           onVersionCreate={onVersionCreate}
-          onVersionDelete={onVersionDelete}
-          isEditMode={isEditing}
-          mainCharacterData={character as any}
+          baseEntity={character}
+          i18nNamespace="character-detail"
+          renderVersionCard={({ version, isSelected, onClick }) => {
+            // Check if version has valid data
+            const hasValidData = !!version.characterData;
+
+            return (
+              <div className="relative">
+                <div
+                  className={
+                    !hasValidData
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }
+                >
+                  <VersionCard
+                    version={version}
+                    isSelected={isSelected}
+                    onClick={hasValidData ? onClick : () => {}}
+                  />
+                </div>
+                {!hasValidData && !version.isMain && (
+                  <div className="flex items-center justify-between mt-1 px-2">
+                    <div className="text-xs text-destructive">
+                      ⚠️ Dados corrompidos
+                    </div>
+                    <Button
+                      variant="ghost-destructive"
+                      size="sm"
+                      className="h-6 text-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onVersionDelete(version.id);
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 mr-1" />
+                      Excluir
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          }}
+          renderCreateDialog={({
+            open,
+            onClose,
+            onConfirm,
+            baseEntity,
+          }) => (
+            <CreateVersionWithEntityDialog<ICharacter, ICharacterFormData>
+              open={open}
+              onClose={onClose}
+              onConfirm={onConfirm}
+              baseEntity={baseEntity}
+              i18nNamespace="character-detail"
+              renderEntityModal={({
+                open,
+                onOpenChange,
+                onConfirm,
+              }) => (
+                <CreateCharacterModal
+                  open={open}
+                  onOpenChange={(isOpen) => onOpenChange(isOpen)}
+                  onConfirm={onConfirm}
+                  bookId={bookId}
+                />
+              )}
+            />
+          )}
         />
       </CardContent>
     </Card>
@@ -976,7 +1171,7 @@ export function CharacterDetailView({
           <EntityDetailLayout
             onBack={onBack}
             backLabel={t("character-detail:header.back")}
-            showMenuButton={true}
+            showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
             isEditMode={isEditing}
             onEdit={onEdit}
@@ -987,7 +1182,7 @@ export function CharacterDetailView({
             deleteLabel={t("character-detail:header.delete")}
             saveLabel={t("character-detail:header.save")}
             cancelLabel={t("character-detail:header.cancel")}
-            hasChanges={true}
+            hasChanges
             basicFields={basicFields}
             advancedFields={advancedFields}
             advancedSectionTitle={t("character-detail:sections.advanced_info")}

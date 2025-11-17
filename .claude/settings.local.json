@@ -152,7 +152,8 @@
       "Bash(Select-String -Pattern \"filterRows|hoverClass|colorConfig\" -Context 3,3)",
       "Bash(/tmp/old_characters_view.tsx)",
       "Bash(cmd /c \"taskkill /F /PID 38708\")",
-      "Bash(cmd //c \"taskkill //F //PID 38708\")"
+      "Bash(cmd //c \"taskkill //F //PID 38708\")",
+      "Bash(cmd /c \"taskkill /F /IM app.exe /T\")"
     ],
     "deny": [],
     "ask": []
