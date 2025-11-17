@@ -49,6 +49,13 @@ import { VersionManager } from "./components/version-manager";
 import { ALIGNMENTS_CONSTANT, type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 
+// Helper component for empty state
+const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
+  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
+    <p>{t("character-detail:empty_states.no_data")}</p>
+  </div>
+);
+
 interface ICharacter {
   id: string;
   name: string;
@@ -481,7 +488,7 @@ export function CharacterDetailView({
     <>
       {/* Appearance Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("character-detail:sections.appearance")}
         </h4>
 
@@ -506,9 +513,7 @@ export function CharacterDetailView({
             ) : character.height ? (
               <p className="text-sm">{character.height}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {t("character-detail:empty_states.no_data")}
-              </p>
+              <EmptyFieldState t={t} />
             )}
           </div>
 
@@ -531,9 +536,7 @@ export function CharacterDetailView({
             ) : character.weight ? (
               <p className="text-sm">{character.weight}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {t("character-detail:empty_states.no_data")}
-              </p>
+              <EmptyFieldState t={t} />
             )}
           </div>
         </div>
@@ -558,9 +561,7 @@ export function CharacterDetailView({
           ) : character.skinTone ? (
             <p className="text-sm">{character.skinTone}</p>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {t("character-detail:empty_states.no_data")}
-            </p>
+            <EmptyFieldState t={t} />
           )}
         </div>
 
@@ -588,9 +589,7 @@ export function CharacterDetailView({
             ) : (character as any)[field] ? (
               <p className="text-sm">{(character as any)[field]}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {t("character-detail:empty_states.no_data")}
-              </p>
+              <EmptyFieldState t={t} />
             )}
           </div>
         ))}
@@ -622,9 +621,7 @@ export function CharacterDetailView({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {t("character-detail:empty_states.no_data")}
-            </p>
+            <EmptyFieldState t={t} />
           )}
         </div>
 
@@ -647,11 +644,7 @@ export function CharacterDetailView({
                 (t) => t.value === character.physicalType
               );
               if (!type) {
-                return (
-                  <p className="text-sm text-muted-foreground">
-                    {t("character-detail:empty_states.no_data")}
-                  </p>
-                );
+                return <EmptyFieldState t={t} />;
               }
               const TypeIcon = type.icon;
               const colorClass = PHYSICAL_TYPE_ACTIVE_COLOR[type.value];
@@ -667,9 +660,7 @@ export function CharacterDetailView({
               );
             })()
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {t("character-detail:empty_states.no_data")}
-            </p>
+            <EmptyFieldState t={t} />
           )}
         </div>
 
@@ -701,18 +692,16 @@ export function CharacterDetailView({
               {character.distinguishingFeatures}
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {t("character-detail:empty_states.no_data")}
-            </p>
+            <EmptyFieldState t={t} />
           )}
         </div>
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Behavior Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("character-detail:sections.behavior")}
         </h4>
 
@@ -731,11 +720,7 @@ export function CharacterDetailView({
               (a) => a.value === character.archetype
             );
             if (!archetype) {
-              return (
-                <p className="text-sm text-muted-foreground">
-                  {t("character-detail:empty_states.no_data")}
-                </p>
-              );
+              return <EmptyFieldState t={t} />;
             }
             const ArchetypeIcon = archetype.icon;
             return (
@@ -753,9 +738,7 @@ export function CharacterDetailView({
             );
           })()
         ) : (
-          <p className="text-sm text-muted-foreground">
-            {t("character-detail:empty_states.no_data")}
-          </p>
+          <EmptyFieldState t={t} />
         )}
 
         {/* Favorite Food and Music */}
@@ -780,9 +763,7 @@ export function CharacterDetailView({
               ) : (character as any)[field] ? (
                 <p className="text-sm">{(character as any)[field]}</p>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  {t("character-detail:empty_states.no_data")}
-                </p>
+                <EmptyFieldState t={t} />
               )}
             </div>
           ))}
@@ -814,20 +795,18 @@ export function CharacterDetailView({
                   {(character as any)[field]}
                 </p>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  {t("character-detail:empty_states.no_data")}
-                </p>
+                <EmptyFieldState t={t} />
               )}
             </div>
           )
         )}
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Alignment Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("character-detail:sections.alignment")}
         </h4>
 
@@ -838,11 +817,11 @@ export function CharacterDetailView({
         />
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Locations Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("character-detail:sections.locations_orgs")}
         </h4>
 
@@ -869,9 +848,7 @@ export function CharacterDetailView({
               {character.birthPlace && character.birthPlace.length > 0 ? (
                 <p className="text-sm">{character.birthPlace.join(", ")}</p>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  {t("character-detail:empty_states.no_data")}
-                </p>
+                <EmptyFieldState t={t} />
               )}
             </>
           )}

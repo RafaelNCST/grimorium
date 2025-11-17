@@ -228,7 +228,7 @@ export function CreateCharacterModalView({
     <>
       {/* Appearance Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("modal.appearance_section")}
         </h4>
 
@@ -378,11 +378,11 @@ export function CreateCharacterModalView({
         </div>
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Behavior and Tastes Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("modal.behavior_section")}
         </h4>
 
@@ -503,11 +503,11 @@ export function CreateCharacterModalView({
         </div>
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Alignment Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("modal.alignment_section")}
         </h4>
 
@@ -518,11 +518,11 @@ export function CreateCharacterModalView({
         />
       </div>
 
-      <Separator />
+      <Separator className="my-6" />
 
       {/* Locations Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-primary uppercase tracking-wide">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("modal.locations_section")}
         </h4>
 
