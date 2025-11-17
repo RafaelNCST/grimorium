@@ -179,6 +179,30 @@ export function EntityDetailLayout({
   // Styling
   className,
 }: EntityDetailLayoutProps) {
+  // State to track which extra sections are open - persisted in localStorage
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = React.useState<Record<string, boolean>>(() => {
+    // Try to load from localStorage first
+    const stored = localStorage.getItem('entityDetailExtraSectionsState');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        // If parsing fails, use defaults
+      }
+    }
+
+    // Use defaults from section config
+    const initialState: Record<string, boolean> = {};
+    extraSections.forEach(section => {
+      initialState[section.id] = section.defaultOpen || false;
+    });
+    return initialState;
+  });
+
+  // Save to localStorage whenever state changes
+  React.useEffect(() => {
+    localStorage.setItem('entityDetailExtraSectionsState', JSON.stringify(extraSectionsOpenState));
+  }, [extraSectionsOpenState]);
   // Loading state
   if (isLoading) {
     return (
@@ -342,79 +366,84 @@ export function EntityDetailLayout({
                 return null;
               }
 
-              const ExtraSectionComponent = () => {
-                const [isOpen, setIsOpen] = React.useState(section.defaultOpen || false);
+              const isOpen = extraSectionsOpenState[section.id] ?? section.defaultOpen ?? false;
 
-                return (
-                  <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-                    <Card
-                      className={cn(
-                        "card-magical transition-all duration-200",
-                        section.isVisible === false && isEditMode
-                          ? "opacity-50 bg-muted/30 border-dashed border-muted-foreground/30"
-                          : ""
-                      )}
-                    >
-                      <CardHeader>
-                        <CollapsibleTrigger asChild>
-                          <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
-                            <CardTitle>{section.title}</CardTitle>
-                            <div className="flex items-center gap-2">
-                              {isEditMode && section.onVisibilityToggle && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        section.onVisibilityToggle?.();
-                                      }}
-                                      className="h-6 w-6 p-0"
-                                    >
-                                      {section.isVisible !== false ? (
-                                        <Eye className="w-3 h-3" />
-                                      ) : (
-                                        <EyeOff className="w-3 h-3" />
-                                      )}
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>
-                                      {section.isVisible !== false
-                                        ? "Ocultar seção"
-                                        : "Mostrar seção"}
-                                    </p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                              {section.isCollapsible !== false && (
-                                <>
-                                  {isOpen ? (
-                                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                                  ) : (
-                                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </button>
-                        </CollapsibleTrigger>
-                      </CardHeader>
-                      {section.isCollapsible !== false ? (
-                        <CollapsibleContent>
-                          <CardContent>{section.content}</CardContent>
-                        </CollapsibleContent>
-                      ) : (
+              return (
+                <Collapsible
+                  key={section.id}
+                  open={isOpen}
+                  onOpenChange={(open) => {
+                    setExtraSectionsOpenState(prev => ({
+                      ...prev,
+                      [section.id]: open
+                    }));
+                  }}
+                >
+                  <Card
+                    className={cn(
+                      "card-magical transition-all duration-200",
+                      section.isVisible === false && isEditMode
+                        ? "opacity-50 bg-muted/30 border-dashed border-muted-foreground/30"
+                        : ""
+                    )}
+                  >
+                    <CardHeader>
+                      <CollapsibleTrigger asChild>
+                        <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+                          <CardTitle>{section.title}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            {isEditMode && section.onVisibilityToggle && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      section.onVisibilityToggle?.();
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    {section.isVisible !== false ? (
+                                      <Eye className="w-3 h-3" />
+                                    ) : (
+                                      <EyeOff className="w-3 h-3" />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    {section.isVisible !== false
+                                      ? "Ocultar seção"
+                                      : "Mostrar seção"}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            {section.isCollapsible !== false && (
+                              <>
+                                {isOpen ? (
+                                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </button>
+                      </CollapsibleTrigger>
+                    </CardHeader>
+                    {section.isCollapsible !== false ? (
+                      <CollapsibleContent>
                         <CardContent>{section.content}</CardContent>
-                      )}
-                    </Card>
-                  </Collapsible>
-                );
-              };
-
-              return <ExtraSectionComponent key={section.id} />;
+                      </CollapsibleContent>
+                    ) : (
+                      <CardContent>{section.content}</CardContent>
+                    )}
+                  </Card>
+                </Collapsible>
+              );
             })}
           </div>
         </main>

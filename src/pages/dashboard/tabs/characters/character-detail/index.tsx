@@ -123,7 +123,10 @@ export function CharacterDetail() {
   const [currentVersion, setCurrentVersion] =
     useState<ICharacterVersion | null>(versions[0]);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
+    return stored ? JSON.parse(stored) : false;
+  });
   const [_isLoading, setIsLoading] = useState(true);
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
 
@@ -134,6 +137,14 @@ export function CharacterDetail() {
   const [isEditLinkModalOpen, setIsEditLinkModalOpen] = useState(false);
   const [selectedLinkForEdit, setSelectedLinkForEdit] =
     useState<IPowerCharacterLink | null>(null);
+
+  // Save advanced section state to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "characterDetailAdvancedSectionOpen",
+      JSON.stringify(advancedSectionOpen)
+    );
+  }, [advancedSectionOpen]);
 
   // Load character from database
   useEffect(() => {
