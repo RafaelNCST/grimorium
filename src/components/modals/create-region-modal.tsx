@@ -57,7 +57,7 @@ interface CreateRegionModalProps {
 
 const regionFormSchema = z.object({
   // Basic fields
-  name: z.string().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
+  name: z.string().min(1, "Nome é obrigatório").max(100, "Nome muito longo"),
   parentId: z.string().nullable(),
   scale: z.enum([
     "local",
@@ -294,7 +294,8 @@ export function CreateRegionModal({
                       <FormInput
                         {...field}
                         placeholder={t("create_region.name_placeholder")}
-                        maxLength={200}
+                        maxLength={100}
+                        showCharCount
                       />
                     </FormControl>
                   </FormItem>

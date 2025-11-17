@@ -19,7 +19,7 @@ export function AdvancedSection({ children }: AdvancedSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mt-6">
       <Card className="card-magical">
         <CardHeader>
           <CollapsibleTrigger asChild>

@@ -11,6 +11,7 @@ export interface FormInputProps extends React.ComponentProps<"input"> {
   containerClassName?: string;
   showOptionalLabel?: boolean;
   labelClassName?: string;
+  showCharCount?: boolean;
 }
 
 /**
@@ -40,12 +41,16 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
       labelClassName,
       id,
       name,
+      showCharCount = false,
+      maxLength,
+      value,
       ...props
     },
     ref
   ) => {
     const inputId = id || name;
     const hasError = Boolean(error);
+    const currentLength = String(value || "").length;
 
     return (
       <div className={cn("space-y-2", containerClassName)}>
@@ -68,6 +73,8 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           aria-invalid={hasError}
           className={cn(hasError && "border-destructive", className)}
           required={required}
+          maxLength={maxLength}
+          value={value}
           {...props}
         />
         {hasError && (
@@ -77,6 +84,13 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         )}
         {!hasError && helperText && (
           <p className="text-sm text-muted-foreground">{helperText}</p>
+        )}
+        {showCharCount && maxLength && !hasError && (
+          <div className="flex justify-end">
+            <p className="text-xs text-muted-foreground">
+              {currentLength}/{maxLength}
+            </p>
+          </div>
         )}
       </div>
     );

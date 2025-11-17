@@ -56,8 +56,8 @@ export function EntityModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${maxWidth} max-h-[90vh] overflow-y-auto`}>
-        <DialogHeader>
+      <DialogContent className={`${maxWidth} max-h-[90vh] flex flex-col gap-0`}>
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Icon className="w-5 h-5 text-primary" />
             {header.title}
@@ -65,21 +65,25 @@ export function EntityModal({
           <DialogDescription>{header.description}</DialogDescription>
         </DialogHeader>
 
-        {/* Important Note Alert */}
-        {header.warning && <InfoAlert>{header.warning}</InfoAlert>}
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto px-1 pb-6 mt-4">
+          {/* Important Note Alert */}
+          {header.warning && <InfoAlert>{header.warning}</InfoAlert>}
 
-        {/* Basic Fields Section */}
-        <div className="space-y-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">
-            {basicFieldsTitle}
-          </h3>
-          {basicFields}
+          {/* Basic Fields Section */}
+          <div className="space-y-6 mt-4">
+            <h3 className="text-2xl font-semibold leading-none tracking-tight">
+              {basicFieldsTitle}
+            </h3>
+            {basicFields}
+          </div>
+
+          {/* Advanced Section */}
+          {advancedFields && <AdvancedSection>{advancedFields}</AdvancedSection>}
         </div>
 
-        {/* Advanced Section */}
-        {advancedFields && <AdvancedSection>{advancedFields}</AdvancedSection>}
-
-        <DialogFooter>
+        {/* Fixed Footer */}
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
           <Button
             type="button"
             variant="secondary"

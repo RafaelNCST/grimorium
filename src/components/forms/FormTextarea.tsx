@@ -63,25 +63,18 @@ export const FormTextarea = React.forwardRef<
     return (
       <div className={cn("space-y-2", containerClassName)}>
         {label && (
-          <div className="flex items-center justify-between">
-            <Label
-              htmlFor={inputId}
-              className={cn("flex items-center gap-1", labelClassName)}
-            >
-              {label}
-              {required && <span className="text-destructive">*</span>}
-              {!required && showOptionalLabel && (
-                <span className="text-xs text-muted-foreground">
-                  (opcional)
-                </span>
-              )}
-            </Label>
-            {showCharCount && maxLength && (
+          <Label
+            htmlFor={inputId}
+            className={cn("flex items-center gap-1", labelClassName)}
+          >
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {!required && showOptionalLabel && (
               <span className="text-xs text-muted-foreground">
-                {charCount}/{maxLength}
+                (opcional)
               </span>
             )}
-          </div>
+          </Label>
         )}
         <Textarea
           id={inputId}
@@ -101,6 +94,13 @@ export const FormTextarea = React.forwardRef<
         )}
         {!hasError && helperText && (
           <p className="text-sm text-muted-foreground">{helperText}</p>
+        )}
+        {showCharCount && maxLength && !hasError && (
+          <div className="flex justify-end">
+            <p className="text-xs text-muted-foreground">
+              {charCount}/{maxLength}
+            </p>
+          </div>
         )}
       </div>
     );
