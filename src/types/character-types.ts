@@ -23,15 +23,14 @@ export interface ICharacterRelationship {
 }
 
 export interface ICharacterFamily {
-  father: string | null;
-  mother: string | null;
-  spouse: string | null;
-  children: string[];
-  siblings: string[];
-  halfSiblings: string[];
-  grandparents: string[];
-  unclesAunts: string[];
-  cousins: string[];
+  grandparents: string[];  // Avós
+  parents: string[];       // Pais (substitui father/mother)
+  spouses: string[];       // Cônjuges (substitui spouse)
+  unclesAunts: string[];   // Tios
+  cousins: string[];       // Primos
+  children: string[];      // Filhos
+  siblings: string[];      // Irmãos
+  halfSiblings: string[];  // Meio-irmãos
 }
 
 export interface IFieldVisibility {

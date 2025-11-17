@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 
-import { Heart, Users, X, TreePine } from "lucide-react";
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { ChevronDown, ChevronRight, Heart, TreePine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { EmptyFieldState } from "@/components/detail-page/empty-field-state";
+import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { type ICharacterFamily } from "@/types/character-types";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { type ICharacterFamily, type IFieldVisibility } from "@/types/character-types";
 
+import { FamilyFieldOptimized } from "./family-field-optimized";
 import { FamilyTreeDialog } from "./family-tree-dialog";
 
 interface ICharacter {
@@ -29,132 +28,141 @@ interface FamilySectionProps {
   family: ICharacterFamily;
   allCharacters: ICharacter[];
   currentCharacterId: string;
+  bookId: string;
   isEditMode: boolean;
+  fieldVisibility: IFieldVisibility;
   onFamilyChange: (family: ICharacterFamily) => void;
+  onFieldVisibilityToggle: (fieldName: string) => void;
 }
 
-interface FamilyMemberCardProps {
-  character: ICharacter;
-  relation: string;
-  onRemove?: () => void;
-  isEditMode: boolean;
-}
-
-function FamilyMemberCard({
-  character,
-  relation,
-  onRemove,
-  isEditMode,
-}: FamilyMemberCardProps) {
-  const { t } = useTranslation("character-detail");
-
-  return (
-    <div className="flex items-center gap-2 p-2 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
-      <Avatar className="w-8 h-8">
-        <AvatarImage src={character.image} className="object-cover" />
-        <AvatarFallback className="text-xs">
-          {character.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .slice(0, 2)}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{character.name}</p>
-        <p className="text-xs text-muted-foreground">
-          {t(`character-detail:family.${relation}`)}
-        </p>
-      </div>
-      {isEditMode && onRemove && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground hover:text-destructive"
-          onClick={onRemove}
-        >
-          <X className="w-3 h-3" />
-        </Button>
-      )}
-    </div>
-  );
-}
-
-export function FamilySection({
+export const FamilySection = React.memo(function FamilySection({
   family,
   allCharacters,
   currentCharacterId,
+  bookId,
   isEditMode,
+  fieldVisibility,
   onFamilyChange,
+  onFieldVisibilityToggle,
 }: FamilySectionProps) {
   const { t } = useTranslation("character-detail");
   const [isTreeDialogOpen, setIsTreeDialogOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
-  // Filter available characters (exclude self and already selected)
-  const getAvailableCharacters = (excludeIds: string[] = []) =>
-    allCharacters.filter(
-      (char) => char.id !== currentCharacterId && !excludeIds.includes(char.id)
-    );
-
-  const getCharacterById = (id: string): ICharacter | undefined =>
-    allCharacters.find((char) => char.id === id);
-
-  // Handle single-value family relations (father, mother, spouse)
-  const handleSingleRelationChange = (
-    relationType: "father" | "mother" | "spouse",
-    value: string
-  ) => {
-    onFamilyChange({
-      ...family,
-      [relationType]: value === "none" ? null : value,
-    });
-  };
-
-  // Handle multi-value family relations
-  const handleMultiRelationAdd = (
-    relationType: keyof ICharacterFamily,
-    characterId: string
-  ) => {
-    if (characterId === "none") return;
-
-    const currentRelations = family[relationType];
-    if (
-      Array.isArray(currentRelations) &&
-      !currentRelations.includes(characterId)
-    ) {
-      onFamilyChange({
-        ...family,
-        [relationType]: [...currentRelations, characterId],
-      });
-    }
-  };
-
-  const handleMultiRelationRemove = (
-    relationType: keyof ICharacterFamily,
-    characterId: string
-  ) => {
-    const currentRelations = family[relationType];
-    if (Array.isArray(currentRelations)) {
-      onFamilyChange({
-        ...family,
-        [relationType]: currentRelations.filter((id) => id !== characterId),
-      });
-    }
-  };
+  const toggleSection = useCallback((sectionName: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionName]: !prev[sectionName],
+    }));
+  }, []);
 
   // Check if family has any members
-  const hasFamilyMembers = () => {
+  const hasFamilyMembers = useMemo(() => {
     if (!family) return false;
     return (
-      family.father ||
-      family.mother ||
-      family.spouse ||
+      (family.grandparents && family.grandparents.length > 0) ||
+      (family.parents && family.parents.length > 0) ||
+      (family.spouses && family.spouses.length > 0) ||
+      (family.unclesAunts && family.unclesAunts.length > 0) ||
+      (family.cousins && family.cousins.length > 0) ||
       (family.children && family.children.length > 0) ||
       (family.siblings && family.siblings.length > 0) ||
-      (family.halfSiblings && family.halfSiblings.length > 0) ||
-      (family.grandparents && family.grandparents.length > 0) ||
-      (family.unclesAunts && family.unclesAunts.length > 0) ||
-      (family.cousins && family.cousins.length > 0)
+      (family.halfSiblings && family.halfSiblings.length > 0)
+    );
+  }, [family]);
+
+  // Render function for family fields - NOT a hook, just a regular function
+  const renderFamilyField = (
+    fieldName: keyof ICharacterFamily,
+    labelKey: string,
+    placeholderKey: string,
+    noSelectionKey: string
+  ) => {
+    const value = family[fieldName] || [];
+
+    return (
+      <FieldWithVisibilityToggle
+        key={fieldName}
+        fieldName={fieldName}
+        label={isEditMode ? t(labelKey) : ""}
+        isOptional
+        fieldVisibility={fieldVisibility}
+        isEditing={isEditMode}
+        onFieldVisibilityToggle={onFieldVisibilityToggle}
+      >
+        {isEditMode ? (
+          <FamilyFieldOptimized
+            label=""
+            placeholder={t(placeholderKey)}
+            emptyText={t("character-detail:family.no_characters")}
+            noSelectionText={t(noSelectionKey)}
+            searchPlaceholder={t("character-detail:family.search_characters")}
+            value={value as string[]}
+            onChange={(newValue) =>
+              onFamilyChange({ ...family, [fieldName]: newValue })
+            }
+            allCharacters={allCharacters}
+            currentCharacterId={currentCharacterId}
+          />
+        ) : (
+          <Collapsible
+            open={openSections[fieldName]}
+            onOpenChange={() => toggleSection(fieldName)}
+          >
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+              <p className="text-sm font-semibold text-primary">
+                {t(labelKey)}
+                {value.length > 0 && (
+                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                    ({value.length})
+                  </span>
+                )}
+              </p>
+              {openSections[fieldName] ? (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              )}
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2">
+              {value.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  {(value as string[]).map((characterId) => {
+                    const character = allCharacters.find(
+                      (c) => c.id === characterId
+                    );
+                    return character ? (
+                      <div
+                        key={characterId}
+                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                      >
+                        {character.image ? (
+                          <img
+                            src={convertFileSrc(character.image)}
+                            alt={character.name}
+                            className="w-8 h-8 rounded object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-muted-foreground font-semibold">
+                              {character.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                        <span className="text-sm font-medium">
+                          {character.name}
+                        </span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              ) : (
+                <EmptyFieldState t={t} />
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+      </FieldWithVisibilityToggle>
     );
   };
 
@@ -174,7 +182,7 @@ export function FamilySection({
   }
 
   // Empty state in view mode
-  if (!hasFamilyMembers() && !isEditMode) {
+  if (!hasFamilyMembers && !isEditMode) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">
         <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -189,9 +197,9 @@ export function FamilySection({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* View Tree Button - Only in View Mode and with family members */}
-      {!isEditMode && hasFamilyMembers() && (
+      {!isEditMode && hasFamilyMembers && (
         <Button
           onClick={() => setIsTreeDialogOpen(true)}
           className="w-full"
@@ -202,635 +210,72 @@ export function FamilySection({
         </Button>
       )}
 
-      {/* Edit Mode */}
-      {isEditMode && (
-        <div className="space-y-6">
-          {/* Single Relations */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
-              {t("character-detail:family.direct_family")}
-            </h4>
+      {/* Family Fields - All in vertical sequence, no groupings */}
+      <div className="space-y-4">
+        {/* 1. Avós (Grandparents) */}
+        {renderFamilyField(
+          "grandparents",
+          "character-detail:family.grandparents",
+          "character-detail:family.select_grandparents",
+          "character-detail:family.no_grandparents_selected"
+        )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Father */}
-              <div className="space-y-2">
-                <Label className="text-sm">
-                  {t("character-detail:family.father")}
-                </Label>
-                <Select
-                  value={family.father || "none"}
-                  onValueChange={(value) =>
-                    handleSingleRelationChange("father", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("character-detail:family.select_father")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      {t("character-detail:family.none")}
-                    </SelectItem>
-                    {getAvailableCharacters([
-                      family.mother || "",
-                      family.spouse || "",
-                    ]).map((char) => (
-                      <SelectItem key={char.id} value={char.id}>
-                        {char.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* 2. Pais (Parents) */}
+        {renderFamilyField(
+          "parents",
+          "character-detail:family.parents",
+          "character-detail:family.select_parents",
+          "character-detail:family.no_parents_selected"
+        )}
 
-              {/* Mother */}
-              <div className="space-y-2">
-                <Label className="text-sm">
-                  {t("character-detail:family.mother")}
-                </Label>
-                <Select
-                  value={family.mother || "none"}
-                  onValueChange={(value) =>
-                    handleSingleRelationChange("mother", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("character-detail:family.select_mother")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      {t("character-detail:family.none")}
-                    </SelectItem>
-                    {getAvailableCharacters([
-                      family.father || "",
-                      family.spouse || "",
-                    ]).map((char) => (
-                      <SelectItem key={char.id} value={char.id}>
-                        {char.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* 3. Cônjuges (Spouses) */}
+        {renderFamilyField(
+          "spouses",
+          "character-detail:family.spouses",
+          "character-detail:family.select_spouses",
+          "character-detail:family.no_spouses_selected"
+        )}
 
-              {/* Spouse */}
-              <div className="space-y-2">
-                <Label className="text-sm">
-                  {t("character-detail:family.spouse")}
-                </Label>
-                <Select
-                  value={family.spouse || "none"}
-                  onValueChange={(value) =>
-                    handleSingleRelationChange("spouse", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("character-detail:family.select_spouse")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      {t("character-detail:family.none")}
-                    </SelectItem>
-                    {getAvailableCharacters([
-                      family.father || "",
-                      family.mother || "",
-                    ]).map((char) => (
-                      <SelectItem key={char.id} value={char.id}>
-                        {char.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
+        {/* 4. Tios (Uncles/Aunts) */}
+        {renderFamilyField(
+          "unclesAunts",
+          "character-detail:family.uncles_aunts",
+          "character-detail:family.select_uncles_aunts",
+          "character-detail:family.no_uncles_aunts_selected"
+        )}
 
-          <Separator />
+        {/* 5. Primos (Cousins) */}
+        {renderFamilyField(
+          "cousins",
+          "character-detail:family.cousins",
+          "character-detail:family.select_cousins",
+          "character-detail:family.no_cousins_selected"
+        )}
 
-          {/* Multi-value Relations - Children */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.children")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("children", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_child")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* 6. Filhos (Children) */}
+        {renderFamilyField(
+          "children",
+          "character-detail:family.children",
+          "character-detail:family.select_children",
+          "character-detail:family.no_children_selected"
+        )}
 
-            {family.children.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.children.map((childId) => {
-                  const character = getCharacterById(childId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={childId}
-                      character={character}
-                      relation="child"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("children", childId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
+        {/* 7. Irmãos (Siblings) */}
+        {renderFamilyField(
+          "siblings",
+          "character-detail:family.siblings",
+          "character-detail:family.select_siblings",
+          "character-detail:family.no_siblings_selected"
+        )}
 
-          {/* Siblings */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.siblings")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("siblings", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_sibling")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.siblings,
-                  ...family.halfSiblings,
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {family.siblings.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.siblings.map((siblingId) => {
-                  const character = getCharacterById(siblingId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={siblingId}
-                      character={character}
-                      relation="sibling"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("siblings", siblingId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Half Siblings */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.half_siblings")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("halfSiblings", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_half_sibling")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.siblings,
-                  ...family.halfSiblings,
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {family.halfSiblings.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.halfSiblings.map((halfSiblingId) => {
-                  const character = getCharacterById(halfSiblingId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={halfSiblingId}
-                      character={character}
-                      relation="half_sibling"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("halfSiblings", halfSiblingId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-
-          <Separator />
-
-          {/* Extended Family */}
-          <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
-            {t("character-detail:family.extended_family")}
-          </h4>
-
-          {/* Grandparents */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.grandparents")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("grandparents", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_grandparent")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.grandparents,
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {family.grandparents.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.grandparents.map((grandparentId) => {
-                  const character = getCharacterById(grandparentId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={grandparentId}
-                      character={character}
-                      relation="grandparent"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("grandparents", grandparentId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Uncles/Aunts */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.uncles_aunts")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("unclesAunts", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_uncle_aunt")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.unclesAunts,
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {family.unclesAunts.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.unclesAunts.map((uncleAuntId) => {
-                  const character = getCharacterById(uncleAuntId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={uncleAuntId}
-                      character={character}
-                      relation="uncle_aunt"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("unclesAunts", uncleAuntId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Cousins */}
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold">
-              {t("character-detail:family.cousins")}
-            </Label>
-            <Select
-              value="none"
-              onValueChange={(value) =>
-                handleMultiRelationAdd("cousins", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={t("character-detail:family.add_cousin")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">
-                  {t("character-detail:family.select")}
-                </SelectItem>
-                {getAvailableCharacters([
-                  ...family.cousins,
-                  ...family.siblings,
-                  ...family.halfSiblings,
-                  ...family.children,
-                  family.father || "",
-                  family.mother || "",
-                  family.spouse || "",
-                ]).map((char) => (
-                  <SelectItem key={char.id} value={char.id}>
-                    {char.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {family.cousins.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.cousins.map((cousinId) => {
-                  const character = getCharacterById(cousinId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={cousinId}
-                      character={character}
-                      relation="cousin"
-                      isEditMode={isEditMode}
-                      onRemove={() =>
-                        handleMultiRelationRemove("cousins", cousinId)
-                      }
-                    />
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* View Mode */}
-      {!isEditMode && hasFamilyMembers() && (
-        <div className="space-y-6">
-          {/* Direct Family */}
-          {(family.father || family.mother || family.spouse) && (
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
-                {t("character-detail:family.direct_family")}
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.father && getCharacterById(family.father) && (
-                  <FamilyMemberCard
-                    character={getCharacterById(family.father)!}
-                    relation="father"
-                    isEditMode={false}
-                  />
-                )}
-                {family.mother && getCharacterById(family.mother) && (
-                  <FamilyMemberCard
-                    character={getCharacterById(family.mother)!}
-                    relation="mother"
-                    isEditMode={false}
-                  />
-                )}
-                {family.spouse && getCharacterById(family.spouse) && (
-                  <FamilyMemberCard
-                    character={getCharacterById(family.spouse)!}
-                    relation="spouse"
-                    isEditMode={false}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Children */}
-          {family.children.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold">
-                {t("character-detail:family.children")}
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {family.children.map((childId) => {
-                  const character = getCharacterById(childId);
-                  return character ? (
-                    <FamilyMemberCard
-                      key={childId}
-                      character={character}
-                      relation="child"
-                      isEditMode={false}
-                    />
-                  ) : null;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Siblings */}
-          {(family.siblings.length > 0 || family.halfSiblings.length > 0) && (
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold">
-                {t("character-detail:family.siblings")}
-              </h4>
-              <div className="space-y-4">
-                {family.siblings.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      {t("character-detail:family.full_siblings")}
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {family.siblings.map((siblingId) => {
-                        const character = getCharacterById(siblingId);
-                        return character ? (
-                          <FamilyMemberCard
-                            key={siblingId}
-                            character={character}
-                            relation="sibling"
-                            isEditMode={false}
-                          />
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                )}
-                {family.halfSiblings.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      {t("character-detail:family.half_siblings")}
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {family.halfSiblings.map((halfSiblingId) => {
-                        const character = getCharacterById(halfSiblingId);
-                        return character ? (
-                          <FamilyMemberCard
-                            key={halfSiblingId}
-                            character={character}
-                            relation="half_sibling"
-                            isEditMode={false}
-                          />
-                        ) : null;
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Extended Family */}
-          {(family.grandparents.length > 0 ||
-            family.unclesAunts.length > 0 ||
-            family.cousins.length > 0) && (
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-primary uppercase tracking-wide">
-                {t("character-detail:family.extended_family")}
-              </h4>
-
-              {family.grandparents.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    {t("character-detail:family.grandparents")}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {family.grandparents.map((grandparentId) => {
-                      const character = getCharacterById(grandparentId);
-                      return character ? (
-                        <FamilyMemberCard
-                          key={grandparentId}
-                          character={character}
-                          relation="grandparent"
-                          isEditMode={false}
-                        />
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {family.unclesAunts.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    {t("character-detail:family.uncles_aunts")}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {family.unclesAunts.map((uncleAuntId) => {
-                      const character = getCharacterById(uncleAuntId);
-                      return character ? (
-                        <FamilyMemberCard
-                          key={uncleAuntId}
-                          character={character}
-                          relation="uncle_aunt"
-                          isEditMode={false}
-                        />
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {family.cousins.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    {t("character-detail:family.cousins")}
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {family.cousins.map((cousinId) => {
-                      const character = getCharacterById(cousinId);
-                      return character ? (
-                        <FamilyMemberCard
-                          key={cousinId}
-                          character={character}
-                          relation="cousin"
-                          isEditMode={false}
-                        />
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+        {/* 8. Meio-irmãos (Half Siblings) */}
+        {renderFamilyField(
+          "halfSiblings",
+          "character-detail:family.half_siblings",
+          "character-detail:family.select_half_siblings",
+          "character-detail:family.no_half_siblings_selected"
+        )}
+      </div>
 
       {/* Family Tree Dialog */}
       <FamilyTreeDialog
@@ -842,4 +287,4 @@ export function FamilySection({
       />
     </div>
   );
-}
+});

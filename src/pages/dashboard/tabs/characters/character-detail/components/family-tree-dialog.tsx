@@ -121,21 +121,15 @@ export function FamilyTreeDialog({
     getCharacterById(currentCharacterId);
 
   // Organize family members by generation
-  const grandparents = family.grandparents
+  const grandparents = (family.grandparents || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
 
-  const parents: ICharacter[] = [];
-  if (family.father) {
-    const father = getCharacterById(family.father);
-    if (father) parents.push(father);
-  }
-  if (family.mother) {
-    const mother = getCharacterById(family.mother);
-    if (mother) parents.push(mother);
-  }
+  const parents = (family.parents || [])
+    .map((id) => getCharacterById(id))
+    .filter((c): c is ICharacter => c !== undefined);
 
-  const unclesAunts = family.unclesAunts
+  const unclesAunts = (family.unclesAunts || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
 
@@ -144,22 +138,24 @@ export function FamilyTreeDialog({
   if (currentChar) currentGeneration.push(currentChar);
 
   // Add siblings
-  const siblings = family.siblings
+  const siblings = (family.siblings || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
   currentGeneration.push(...siblings);
 
-  const halfSiblings = family.halfSiblings
+  const halfSiblings = (family.halfSiblings || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
 
-  const cousins = family.cousins
+  const cousins = (family.cousins || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
 
-  const spouse = family.spouse ? getCharacterById(family.spouse) : null;
+  const spouses = (family.spouses || [])
+    .map((id) => getCharacterById(id))
+    .filter((c): c is ICharacter => c !== undefined);
 
-  const children = family.children
+  const children = (family.children || [])
     .map((id) => getCharacterById(id))
     .filter((c): c is ICharacter => c !== undefined);
 
@@ -171,7 +167,7 @@ export function FamilyTreeDialog({
     siblings.length > 0 ||
     halfSiblings.length > 0 ||
     cousins.length > 0 ||
-    spouse ||
+    spouses.length > 0 ||
     children.length > 0;
 
   return (
@@ -225,13 +221,7 @@ export function FamilyTreeDialog({
                       <div className="space-y-4">
                         <TreeLevel
                           characters={parents}
-                          relation={
-                            parents.length > 1
-                              ? "parents"
-                              : parents[0].id === family.father
-                                ? "father"
-                                : "mother"
-                          }
+                          relation="parents"
                           currentCharacterId={currentCharacterId}
                         />
                       </div>
@@ -298,22 +288,22 @@ export function FamilyTreeDialog({
                   )}
                 </div>
 
-                {/* Connection to spouse and children */}
-                {(spouse || children.length > 0) && (
+                {/* Connection to spouses and children */}
+                {(spouses.length > 0 || children.length > 0) && (
                   <div className="flex justify-center">
                     <ConnectionLine />
                   </div>
                 )}
               </div>
 
-              {/* Spouse */}
-              {spouse && (
+              {/* Spouses */}
+              {spouses.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex justify-center">
-                    <TreeNode
-                      character={spouse}
-                      relation="spouse"
-                      isCurrentCharacter={false}
+                    <TreeLevel
+                      characters={spouses}
+                      relation="spouses"
+                      currentCharacterId={currentCharacterId}
                     />
                   </div>
                   {children.length > 0 && (

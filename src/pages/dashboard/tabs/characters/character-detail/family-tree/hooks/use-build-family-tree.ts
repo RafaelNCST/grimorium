@@ -39,37 +39,42 @@ export const useBuildFamilyTree = (
 
     addToTree(character.id, 0, "main");
 
-    if (character.family?.father) {
-      addToTree(character.family.father, -1, "pai");
-    }
-    if (character.family?.mother) {
-      addToTree(character.family.mother, -1, "mãe");
-    }
-
+    // Grandparents (generation -2)
     character.family?.grandparents?.forEach((grandparentId: string) => {
       addToTree(grandparentId, -2, "avô/avó");
     });
 
-    if (character.family?.spouse) {
-      addToTree(character.family.spouse, 0, "cônjuge");
-    }
-
-    character.family?.siblings?.forEach((siblingId: string) => {
-      addToTree(siblingId, 0, "irmão/irmã");
+    // Parents (generation -1)
+    character.family?.parents?.forEach((parentId: string) => {
+      addToTree(parentId, -1, "pai/mãe");
     });
 
-    character.family?.halfSiblings?.forEach((halfSiblingId: string) => {
-      addToTree(halfSiblingId, 0, "meio-irmão/irmã");
-    });
-
+    // Uncles/Aunts (generation -1)
     character.family?.unclesAunts?.forEach((uncleAuntId: string) => {
       addToTree(uncleAuntId, -1, "tio/tia");
     });
 
+    // Spouses (generation 0)
+    character.family?.spouses?.forEach((spouseId: string) => {
+      addToTree(spouseId, 0, "cônjuge");
+    });
+
+    // Siblings (generation 0)
+    character.family?.siblings?.forEach((siblingId: string) => {
+      addToTree(siblingId, 0, "irmão/irmã");
+    });
+
+    // Half Siblings (generation 0)
+    character.family?.halfSiblings?.forEach((halfSiblingId: string) => {
+      addToTree(halfSiblingId, 0, "meio-irmão/irmã");
+    });
+
+    // Cousins (generation 0)
     character.family?.cousins?.forEach((cousinId: string) => {
       addToTree(cousinId, 0, "primo/prima");
     });
 
+    // Children (generation 1)
     character.family?.children?.forEach((childId: string) => {
       addToTree(childId, 1, "filho/filha");
     });

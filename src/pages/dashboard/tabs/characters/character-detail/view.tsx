@@ -1086,21 +1086,23 @@ export function CharacterDetailView({
         <FamilySection
           family={
             (isEditing ? editData.family : character.family) || {
-              father: null,
-              mother: null,
-              spouse: null,
+              grandparents: [],
+              parents: [],
+              spouses: [],
+              unclesAunts: [],
+              cousins: [],
               children: [],
               siblings: [],
               halfSiblings: [],
-              grandparents: [],
-              unclesAunts: [],
-              cousins: [],
             }
           }
           allCharacters={mockCharacters}
           currentCharacterId={character.id}
+          bookId={bookId}
           isEditMode={isEditing}
+          fieldVisibility={fieldVisibility}
           onFamilyChange={(family) => onEditDataChange("family", family)}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
         />
       ),
       isCollapsible: true,
