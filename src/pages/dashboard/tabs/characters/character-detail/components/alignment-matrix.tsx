@@ -52,15 +52,15 @@ const ALIGNMENT_HOVER: Record<string, string> = {
 };
 
 const ALIGNMENT_RING: Record<string, string> = {
-  "lawful-good": "ring-2 ring-green-500/50",
-  "neutral-good": "ring-2 ring-green-500/50",
-  "chaotic-good": "ring-2 ring-green-500/50",
-  "lawful-neutral": "ring-2 ring-gray-500/50",
-  "true-neutral": "ring-2 ring-gray-500/50",
-  "chaotic-neutral": "ring-2 ring-gray-500/50",
-  "lawful-evil": "ring-2 ring-purple-500/50",
-  "neutral-evil": "ring-2 ring-purple-500/50",
-  "chaotic-evil": "ring-2 ring-red-500/50",
+  "lawful-good": "ring-4 ring-green-500/50",
+  "neutral-good": "ring-4 ring-green-500/50",
+  "chaotic-good": "ring-4 ring-green-500/50",
+  "lawful-neutral": "ring-4 ring-gray-500/50",
+  "true-neutral": "ring-4 ring-gray-500/50",
+  "chaotic-neutral": "ring-4 ring-gray-500/50",
+  "lawful-evil": "ring-4 ring-purple-500/50",
+  "neutral-evil": "ring-4 ring-purple-500/50",
+  "chaotic-evil": "ring-4 ring-red-500/50",
 };
 
 export function AlignmentMatrix({

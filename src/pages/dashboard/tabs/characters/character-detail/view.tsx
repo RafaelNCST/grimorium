@@ -275,18 +275,37 @@ export function CharacterDetailView({
 }: CharacterDetailViewProps) {
   const { t } = useTranslation(["character-detail", "create-character"]);
 
-  // Convert role constants to FormSimpleGrid format
+  // Convert role constants to FormSimpleGrid format with universal pattern
+  const roleColorMap: Record<string, { hover: string; active: string }> = {
+    protagonist: {
+      hover: "hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 hover:border-yellow-500/20",
+      active: "bg-yellow-500/20 border-yellow-500/30 ring-4 ring-yellow-500/50 text-yellow-600 dark:text-yellow-400",
+    },
+    antagonist: {
+      hover: "hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-500/20",
+      active: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50 text-orange-600 dark:text-orange-400",
+    },
+    villain: {
+      hover: "hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:border-red-500/20",
+      active: "bg-red-500/20 border-red-500/30 ring-4 ring-red-500/50 text-red-600 dark:text-red-400",
+    },
+    secondary: {
+      hover: "hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/20",
+      active: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50 text-blue-600 dark:text-blue-400",
+    },
+    extra: {
+      hover: "hover:bg-gray-500/10 hover:text-gray-600 dark:hover:text-gray-400 hover:border-gray-500/20",
+      active: "bg-gray-500/20 border-gray-500/30 ring-4 ring-gray-500/50 text-gray-600 dark:text-gray-400",
+    },
+  };
+
   const roleOptions = roles.map((role) => ({
     value: role.value,
     label: t(`create-character:${role.translationKey}`),
     icon: role.icon,
     baseColorClass: "border-muted",
-    hoverColorClass: "hover:border-muted-foreground/50 hover:bg-muted/50",
-    activeColorClass: role.bgColorClass,
-    iconColorClass: role.colorClass,
-    activeIconColorClass: role.colorClass,
-    textColorClass: "text-muted-foreground",
-    activeTextColorClass: role.colorClass,
+    hoverColorClass: roleColorMap[role.value].hover,
+    activeColorClass: roleColorMap[role.value].active,
   }));
 
   // Convert archetype constants to FormSelectGrid format
@@ -297,7 +316,7 @@ export function CharacterDetailView({
     icon: archetype.icon,
     baseColorClass: "bg-card text-muted-foreground border-border",
     hoverColorClass: "hover:bg-purple-500/10 hover:border-purple-500/20",
-    activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-2 ring-purple-500/50 text-white",
+    activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50 text-white",
   }));
 
   // Convert physical type constants to FormSimpleGrid format

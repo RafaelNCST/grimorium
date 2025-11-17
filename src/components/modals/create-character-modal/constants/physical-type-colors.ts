@@ -19,10 +19,10 @@ export const PHYSICAL_TYPE_HOVER_COLOR: Record<string, string> = {
  * Active colors for physical type picker cards (with ring)
  */
 export const PHYSICAL_TYPE_ACTIVE_COLOR: Record<string, string> = {
-  malnourished: "bg-orange-500/20 border-orange-500/30 ring-2 ring-orange-500/50",
-  thin: "bg-sky-500/20 border-sky-500/30 ring-2 ring-sky-500/50",
-  athletic: "bg-emerald-500/20 border-emerald-500/30 ring-2 ring-emerald-500/50",
-  robust: "bg-blue-500/20 border-blue-500/30 ring-2 ring-blue-500/50",
-  corpulent: "bg-purple-500/20 border-purple-500/30 ring-2 ring-purple-500/50",
-  aberration: "bg-red-500/20 border-red-500/30 ring-2 ring-red-500/50",
+  malnourished: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50",
+  thin: "bg-sky-500/20 border-sky-500/30 ring-4 ring-sky-500/50",
+  athletic: "bg-emerald-500/20 border-emerald-500/30 ring-4 ring-emerald-500/50",
+  robust: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50",
+  corpulent: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50",
+  aberration: "bg-red-500/20 border-red-500/30 ring-4 ring-red-500/50",
 };
