@@ -38,7 +38,9 @@ function characterToDBCharacter(
     eyes: character.eyes,
     face: character.face,
     distinguishing_features: character.distinguishingFeatures,
-    species_and_race: character.speciesAndRace,
+    species_and_race: character.speciesAndRace
+      ? JSON.stringify(character.speciesAndRace)
+      : JSON.stringify([]),
     archetype: character.archetype,
     personality: character.personality,
     hobbies: character.hobbies,
@@ -46,7 +48,9 @@ function characterToDBCharacter(
     fears_and_traumas: character.fearsAndTraumas,
     favorite_food: character.favoriteFood,
     favorite_music: character.favoriteMusic,
-    birth_place: character.birthPlace,
+    birth_place: character.birthPlace
+      ? JSON.stringify(character.birthPlace)
+      : JSON.stringify([]),
     affiliated_place: character.affiliatedPlace,
     organization: character.organization,
     field_visibility: character.fieldVisibility
@@ -81,7 +85,9 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     eyes: dbChar.eyes,
     face: dbChar.face,
     distinguishingFeatures: dbChar.distinguishing_features,
-    speciesAndRace: dbChar.species_and_race,
+    speciesAndRace: dbChar.species_and_race
+      ? JSON.parse(dbChar.species_and_race)
+      : [],
     archetype: dbChar.archetype,
     personality: dbChar.personality,
     hobbies: dbChar.hobbies,
@@ -89,7 +95,9 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     fearsAndTraumas: dbChar.fears_and_traumas,
     favoriteFood: dbChar.favorite_food,
     favoriteMusic: dbChar.favorite_music,
-    birthPlace: dbChar.birth_place,
+    birthPlace: dbChar.birth_place
+      ? JSON.parse(dbChar.birth_place)
+      : [],
     affiliatedPlace: dbChar.affiliated_place,
     organization: dbChar.organization,
     fieldVisibility: dbChar.field_visibility
