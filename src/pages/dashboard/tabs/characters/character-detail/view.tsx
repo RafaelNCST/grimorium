@@ -133,6 +133,10 @@ interface IFieldVisibility {
   [key: string]: boolean;
 }
 
+interface ISectionVisibility {
+  [key: string]: boolean;
+}
+
 interface CharacterDetailViewProps {
   character: ICharacter;
   editData: ICharacter;
@@ -202,6 +206,8 @@ interface CharacterDetailViewProps {
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
   onFieldVisibilityToggle: (field: string) => void;
+  sectionVisibility: ISectionVisibility;
+  onSectionVisibilityToggle: (section: string) => void;
   onAdvancedSectionToggle: () => void;
   getRelationshipTypeData: (type: string) => IRelationshipType;
   onNavigateToPowerInstance: (linkId: string) => void;
@@ -256,6 +262,8 @@ export function CharacterDetailView({
   onImageFileChange,
   onEditDataChange,
   onFieldVisibilityToggle,
+  sectionVisibility,
+  onSectionVisibilityToggle,
   onAdvancedSectionToggle,
   onNavigateToPowerInstance,
   onEditPowerLink,
@@ -1048,6 +1056,8 @@ export function CharacterDetailView({
       ),
       isCollapsible: true,
       defaultOpen: false,
+      isVisible: sectionVisibility.relationships !== false,
+      onVisibilityToggle: () => onSectionVisibilityToggle("relationships"),
     },
     {
       id: "family",
@@ -1075,6 +1085,8 @@ export function CharacterDetailView({
       ),
       isCollapsible: true,
       defaultOpen: false,
+      isVisible: sectionVisibility.family !== false,
+      onVisibilityToggle: () => onSectionVisibilityToggle("family"),
     },
   ];
 

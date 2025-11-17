@@ -36,6 +36,7 @@ import {
   type ICharacter,
   type IFieldVisibility,
 } from "@/types/character-types";
+import { type ISectionVisibility } from "@/components/detail-page/visibility-helpers";
 
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
@@ -127,6 +128,7 @@ export function CharacterDetail() {
   const [currentVersion, setCurrentVersion] =
     useState<ICharacterVersion | null>(versions[0]);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [sectionVisibility, setSectionVisibility] = useState<ISectionVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -149,6 +151,8 @@ export function CharacterDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
+  const [originalSectionVisibility, setOriginalSectionVisibility] =
+    useState<ISectionVisibility>({});
 
   // Save advanced section state to localStorage
   useEffect(() => {
@@ -230,6 +234,13 @@ export function CharacterDetail() {
     )
       return true;
 
+    // Check if section visibility has changed
+    if (
+      JSON.stringify(sectionVisibility) !==
+      JSON.stringify(originalSectionVisibility)
+    )
+      return true;
+
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
     const arraysEqual = (
       a: unknown[] | undefined,
@@ -303,6 +314,8 @@ export function CharacterDetail() {
     isEditing,
     fieldVisibility,
     originalFieldVisibility,
+    sectionVisibility,
+    originalSectionVisibility,
   ]);
 
   // Load character from database
@@ -735,17 +748,19 @@ export function CharacterDetail() {
     // If no changes, cancel immediately
     setEditData({ ...character, relationships: character.relationships || [] });
     setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
-  }, [character, originalFieldVisibility, hasChanges]);
+  }, [character, originalFieldVisibility, originalSectionVisibility, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
     setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [character, originalFieldVisibility]);
+  }, [character, originalFieldVisibility, originalSectionVisibility]);
 
   const handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
@@ -993,6 +1008,13 @@ export function CharacterDetail() {
     }));
   }, []);
 
+  const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
+    setSectionVisibility((prev) => ({
+      ...prev,
+      [sectionName]: prev[sectionName] === false ? true : false,
+    }));
+  }, []);
+
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
@@ -1117,6 +1139,8 @@ export function CharacterDetail() {
         onRelationshipTypeChange={handleRelationshipTypeChange}
         onRelationshipIntensityChange={handleRelationshipIntensityChange}
         onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        sectionVisibility={sectionVisibility}
+        onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         getRelationshipTypeData={getRelationshipTypeData}
         onNavigateToPowerInstance={handleNavigateToPowerInstance}
