@@ -5,8 +5,9 @@ import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 
-import { SCALE_COLORS } from "../constants/scale-colors";
+import { REGION_SCALES_CONSTANT } from "../constants/scale-colors";
 import { IRegion } from "../types/region-types";
 
 interface RegionCardProps {
@@ -18,6 +19,9 @@ interface RegionCardProps {
 export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation("world");
+
+  // Find scale data
+  const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
 
   return (
     <Card
@@ -44,35 +48,32 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
         )}
 
         <div className="p-4 space-y-3">
-          {/* Region Name */}
-          <div>
+          {/* Region Name with Scale Badge */}
+          <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-lg leading-tight">
               {region.name}
             </h3>
-          </div>
-
-          {/* Scale and Parent Region Badges */}
-          <div className="flex flex-wrap gap-1.5">
-            {/* Scale Badge */}
-            <Badge
-              className={`flex items-center gap-1 ${SCALE_COLORS[region.scale]} bg-transparent border px-2 py-0.5 pointer-events-none`}
-            >
-              <span className="text-xs font-medium">
-                {t(`scales.${region.scale}`)}
-              </span>
-            </Badge>
-
-            {/* Parent Region Badge */}
-            {parentRegion && (
-              <Badge
-                variant="outline"
-                className="flex items-center gap-1 px-2 py-0.5 pointer-events-none"
-              >
-                <MapPin className="w-3 h-3" />
-                <span className="text-xs font-medium">{parentRegion.name}</span>
-              </Badge>
+            {scaleData && (
+              <EntityTagBadge
+                config={scaleData}
+                label={t(`scales.${region.scale}`)}
+                className="pointer-events-none"
+              />
             )}
           </div>
+
+          {/* Parent Region or Neutral Badge */}
+          {parentRegion ? (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="font-medium">{parentRegion.name}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="font-medium">{t("region_card.neutral_region")}</span>
+            </div>
+          )}
 
           {/* Summary with maximum of 3 lines */}
           <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">

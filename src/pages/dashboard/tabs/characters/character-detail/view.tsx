@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import {
   Collapsible,
   CollapsibleContent,
@@ -161,7 +162,6 @@ interface CharacterDetailViewProps {
   currentRole: ICharacterRole | undefined;
   currentAlignment: IAlignment | undefined;
   currentGender: IGenderModal | undefined;
-  RoleIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
   openSections: Record<string, boolean>;
@@ -236,7 +236,6 @@ export function CharacterDetailView({
   currentRole,
   currentAlignment,
   currentGender,
-  RoleIcon,
   fieldVisibility,
   advancedSectionOpen,
   openSections,
@@ -516,10 +515,12 @@ export function CharacterDetailView({
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
                 <h2 className="text-3xl font-bold">{character.name}</h2>
-                <Badge className={currentRole?.bgColorClass}>
-                  <RoleIcon className="w-4 h-4 mr-1" />
-                  {t(`create-character:role.${character.role}`)}
-                </Badge>
+                {currentRole && (
+                  <EntityTagBadge
+                    config={currentRole}
+                    label={t(`create-character:role.${character.role}`)}
+                  />
+                )}
               </div>
 
               <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">

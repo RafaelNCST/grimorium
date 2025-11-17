@@ -113,10 +113,11 @@ export function AlignmentMatrix({
 
     const Icon = selectedAlignment.icon;
     const gradientClass = ALIGNMENT_GRADIENTS[selectedAlignment.value] || "";
+    const ringClass = ALIGNMENT_RING[selectedAlignment.value] || "";
 
     return (
       <div
-        className={`flex flex-col items-center justify-center gap-4 p-6 rounded-lg border-2 ${gradientClass} shadow-md`}
+        className={`flex flex-col items-center justify-center gap-4 p-6 rounded-lg border-2 ${gradientClass} ${ringClass} shadow-md`}
       >
         <Icon className="w-12 h-12" />
         <span className="text-lg font-semibold text-center">

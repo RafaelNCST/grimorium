@@ -30,6 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import {
   Dialog,
@@ -44,6 +45,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/relationship-types-badge-constant";
 
 interface ICharacterRelationship {
   id: string;
@@ -401,17 +403,19 @@ export function RelationshipsSection({
                       <h4 className="font-semibold text-sm truncate">
                         {character.name}
                       </h4>
-                      <Badge
-                        variant="outline"
-                        className={`${typeConfig.color} flex items-center gap-1`}
-                      >
-                        <TypeIcon className="w-3 h-3" />
-                        <span className="text-xs">
-                          {t(
-                            `character-detail:relationship_types.${typeConfig.translationKey}`
-                          )}
-                        </span>
-                      </Badge>
+                      {(() => {
+                        const badgeConfig = RELATIONSHIP_TYPES_BADGE_CONSTANT.find(
+                          (r) => r.value === relationship.type
+                        );
+                        return badgeConfig ? (
+                          <EntityTagBadge
+                            config={badgeConfig}
+                            label={t(
+                              `character-detail:relationship_types.${badgeConfig.translationKey}`
+                            )}
+                          />
+                        ) : null;
+                      })()}
                     </div>
 
                     {/* Intensity Bar */}
@@ -447,9 +451,9 @@ export function RelationshipsSection({
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="ghost"
+                        variant="ghost-destructive"
                         size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        className="h-8 w-8"
                         onClick={() =>
                           handleDeleteRelationship(relationship.id)
                         }

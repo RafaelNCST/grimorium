@@ -452,7 +452,6 @@ export function CharacterDetail() {
     () => GENDERS_CONSTANT_MODAL.find((g) => g.value === character.gender),
     [character.gender]
   );
-  const RoleIcon = currentRole?.icon || Users;
 
   const handleVersionChange = useCallback(
     (versionId: string | null) => {
@@ -1105,7 +1104,6 @@ export function CharacterDetail() {
         currentRole={currentRole}
         currentAlignment={currentAlignment}
         currentGender={currentGender}
-        RoleIcon={RoleIcon}
         fieldVisibility={fieldVisibility}
         advancedSectionOpen={advancedSectionOpen}
         openSections={openSections}

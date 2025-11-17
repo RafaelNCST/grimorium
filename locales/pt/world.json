@@ -169,6 +169,7 @@
   },
   "region_card": {
     "parent_badge": "Região Pai:",
+    "neutral_region": "Neutra",
     "no_summary": "Sem descrição",
     "view_details": "Ver detalhes"
   },

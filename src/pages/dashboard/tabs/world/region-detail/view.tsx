@@ -28,6 +28,7 @@ import { SeasonPicker } from "@/components/modals/create-region-modal/components
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import {
   Tooltip,
   TooltipContent,
@@ -55,7 +56,7 @@ import {
   type IRegionFormData,
 } from "@/pages/dashboard/tabs/world/types/region-types";
 import { type IRegionVersion } from "@/lib/db/regions.service";
-import { SCALE_COLORS } from "@/pages/dashboard/tabs/world/constants/scale-colors";
+import { REGION_SCALES_CONSTANT } from "@/pages/dashboard/tabs/world/constants/scale-colors";
 import { Badge } from "@/components/ui/badge";
 import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/constants/season-colors";
 import { Button } from "@/components/ui/button";
@@ -195,6 +196,9 @@ export function RegionDetailView({
 }: RegionDetailViewProps) {
   const { t } = useTranslation(["region-detail", "world"]);
   const [refreshKey, setRefreshKey] = React.useState(0);
+
+  // Find scale data
+  const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
 
   // Force refresh of entity selects when entering edit mode
   React.useEffect(() => {
@@ -413,13 +417,12 @@ export function RegionDetailView({
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <h2 className="text-3xl font-bold">{region.name}</h2>
-            <Badge
-              className={`${SCALE_COLORS[region.scale]} bg-transparent border px-2 py-1`}
-            >
-              <span className="text-sm font-medium">
-                {t(`world:scales.${region.scale}`)}
-              </span>
-            </Badge>
+            {scaleData && (
+              <EntityTagBadge
+                config={scaleData}
+                label={t(`world:scales.${region.scale}`)}
+              />
+            )}
           </div>
 
           {parentRegion && (

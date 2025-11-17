@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { ICharacter } from "@/types/character-types";
 
@@ -21,7 +21,6 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
   // Find role data
   const roleData = CHARACTER_ROLES_CONSTANT.find((r) => r.value === character.role);
-  const RoleIcon = roleData?.icon;
 
   // Find gender data
   const genderData = GENDERS_CONSTANT.find((g) => g.value === character.gender);
@@ -75,16 +74,14 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
             </div>
 
             {/* Role Badge */}
-            <div className="flex">
-              <Badge
-                className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
-              >
-                {RoleIcon && <RoleIcon className="w-3.5 h-3.5 mr-1.5" />}
-                <span className="text-xs font-medium">
-                  {t(`create-character:role.${character.role}`)}
-                </span>
-              </Badge>
-            </div>
+            {roleData && (
+              <div className="flex">
+                <EntityTagBadge
+                  config={roleData}
+                  label={t(`create-character:role.${character.role}`)}
+                />
+              </div>
+            )}
           </div>
         </div>
 

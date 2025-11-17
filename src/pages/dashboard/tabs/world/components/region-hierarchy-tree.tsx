@@ -32,9 +32,10 @@ import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { cn } from "@/lib/utils";
 
-import { SCALE_COLORS } from "../constants/scale-colors";
+import { REGION_SCALES_CONSTANT } from "../constants/scale-colors";
 import { IRegionWithChildren } from "../types/region-types";
 
 interface RegionHierarchyTreeProps {
@@ -79,6 +80,9 @@ const RegionItem = memo(
   }) => {
     const { t } = useTranslation("world");
     const hasChildren = region.children.length > 0;
+
+    // Find scale data
+    const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
 
     return (
       <div
@@ -137,15 +141,12 @@ const RegionItem = memo(
         {/* Region Name and Scale Badge */}
         <div className={cn("flex items-center gap-2 flex-1 min-w-0")}>
           <span className="text-sm font-medium truncate">{region.name}</span>
-          <Badge
-            variant="secondary"
-            className={cn(
-              SCALE_COLORS[region.scale],
-              "text-xs px-2 py-0 shrink-0"
-            )}
-          >
-            {t(`scales.${region.scale}`)}
-          </Badge>
+          {scaleData && (
+            <EntityTagBadge
+              config={scaleData}
+              label={t(`scales.${region.scale}`)}
+            />
+          )}
         </div>
 
         {/* Children Count */}

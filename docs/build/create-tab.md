@@ -291,9 +291,71 @@ export function CharacterCard({ character, onClick }: Props) {
 
 ---
 
+#### Tags Padronizadas nos Cards
+
+**IMPORTANTE:** Todas as tags de categorização (pequenas, com ícone + texto + background colorido) devem seguir o padrão unificado do projeto.
+
+**O que é uma Tag:**
+- ✅ Pequena (uma linha)
+- ✅ Ícone + texto curto
+- ✅ Background translúcido colorido
+- ✅ Usado para categorização rápida
+- **Exemplos:** Role, Scale, Status, Type
+
+**O que NÃO é uma Tag (são Cards):**
+- ❌ Alignment Matrix
+- ❌ Season Selector
+- ❌ Parent Region Info
+
+**Padrão de Tag:**
+
+```tsx
+// 1. Criar constante (em constants/)
+export interface ITagConfig {
+  value: string;
+  icon: LucideIcon;
+  translationKey: string;
+  colorClass: string;
+  bgColorClass: string;
+}
+
+export const TAG_CONSTANT: ITagConfig[] = [
+  {
+    value: "example",
+    icon: IconName,
+    translationKey: "namespace.example",
+    colorClass: "text-blue-600 dark:text-blue-400",
+    bgColorClass: "bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20",
+  },
+];
+
+// 2. No componente
+const tagData = TAG_CONSTANT.find(t => t.value === entity.tag);
+const TagIcon = tagData?.icon;
+
+// 3. Renderizar
+<Badge className={`${tagData?.bgColorClass} ${tagData?.colorClass} border px-3 py-1`}>
+  {TagIcon && <TagIcon className="w-3.5 h-3.5 mr-1.5" />}
+  <span className="text-xs font-medium">
+    {t(tagData?.translationKey)}
+  </span>
+</Badge>
+```
+
+**Características obrigatórias:**
+- Classes: `${bgColorClass} ${colorClass} border px-3 py-1` (nessa ordem exata)
+- Ícone: `w-3.5 h-3.5 mr-1.5`
+- Texto: `text-xs font-medium`
+- Cores texto: `text-[color]-600 dark:text-[color]-400`
+- Background: `bg-[color]-500/10 border-[color]-500/30 hover:bg-[color]-500/20`
+
+**Ver documentação completa:** `docs/build/components.md` seção 3.1
+
+---
+
 **Customize conforme sua entidade:**
 - Estrutura do conteúdo (cabeçalho, corpo, rodapé)
-- Badges e tags
+- Tags de categorização (seguindo o padrão acima)
 - Informações exibidas
 - Tamanho e proporção da imagem/avatar
 - Border-radius do overlay (rounded-t-lg, rounded-full, etc.)
