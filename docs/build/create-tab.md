@@ -782,14 +782,14 @@ Quando o campo está vazio em modo visualização, sempre usar:
 **Visualização:** Collapsible com lista `ul > li`
 
 **⚠️ IMPORTANTE:**
-- Label **vazia** em modo edição e visualização no FieldWithVisibilityToggle (para evitar duplicação)
+- Label **presente em modo edição**, **vazia em visualização** no FieldWithVisibilityToggle
 - Label **preenchida** no CollapsibleTrigger em visualização
 - Contador de itens ao lado do label
 
 ```tsx
 <FieldWithVisibilityToggle
   fieldName="mysteries"
-  label=""
+  label={isEditing ? t("label") : ""}
   isOptional
   fieldVisibility={fieldVisibility}
   isEditing={isEditing}
@@ -860,14 +860,14 @@ const toggleSection = (sectionName: string) => {
 **Visualização:** Collapsible com cards de entidade (imagem + nome)
 
 **⚠️ IMPORTANTE:**
-- Label **vazia** no FieldWithVisibilityToggle (para evitar duplicação)
+- Label **presente em modo edição**, **vazia em visualização** no FieldWithVisibilityToggle
 - Label **preenchida** no CollapsibleTrigger em visualização
 - Contador de itens ao lado do label
 
 ```tsx
 <FieldWithVisibilityToggle
   fieldName="relatedCharacters"
-  label=""
+  label={isEditing ? t("label") : ""}
   isOptional
   fieldVisibility={fieldVisibility}
   isEditing={isEditing}

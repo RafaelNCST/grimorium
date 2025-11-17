@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Shield,
   Trash2,
+  User,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -275,6 +276,9 @@ export function CharacterDetailView({
     label: t(`create-character:${archetype.translationKey}`),
     description: t(`create-character:${archetype.descriptionKey}`),
     icon: archetype.icon,
+    baseColorClass: "bg-card text-muted-foreground border-border",
+    hoverColorClass: "hover:bg-purple-500/10 hover:border-purple-500/20",
+    activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-2 ring-purple-500/50 text-white",
   }));
 
   // Convert physical type constants to FormSimpleGrid format
@@ -307,6 +311,10 @@ export function CharacterDetailView({
               height="h-24"
               width="w-24"
               imageFit="cover"
+              showLabel={false}
+              placeholderIcon={User}
+              placeholderText={t("create-character:modal.upload_image")}
+              placeholderTextSize="text-[0.5rem]"
             />
 
             {/* Name, Age, Gender */}
@@ -619,7 +627,7 @@ export function CharacterDetailView({
         {/* Species and Race */}
         <FieldWithVisibilityToggle
           fieldName="speciesAndRace"
-          label=""
+          label={isEditing ? t("create-character:modal.species_and_race") : ""}
           isOptional
           fieldVisibility={fieldVisibility}
           isEditing={isEditing}
@@ -917,7 +925,7 @@ export function CharacterDetailView({
 
         <FieldWithVisibilityToggle
           fieldName="birthPlace"
-          label=""
+          label={isEditing ? t("character-detail:fields.birth_place") : ""}
           isOptional
           fieldVisibility={fieldVisibility}
           isEditing={isEditing}
@@ -1140,7 +1148,7 @@ export function CharacterDetailView({
               }) => (
                 <CreateCharacterModal
                   open={open}
-                  onOpenChange={(isOpen) => onOpenChange(isOpen)}
+                  onClose={() => onOpenChange(false)}
                   onConfirm={onConfirm}
                   bookId={bookId}
                 />
