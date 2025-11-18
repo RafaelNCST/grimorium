@@ -27,3 +27,6 @@ export type {
   VersionManagerProps,
   VersionManagerVersion,
 } from "./VersionManager";
+
+export { VersionsPanel } from "./VersionsPanel";
+export type { VersionsPanelProps } from "./VersionsPanel";

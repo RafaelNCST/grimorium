@@ -53,6 +53,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   EntityVersionManager,
   CreateVersionWithEntityDialog,
+  VersionsPanel,
 } from "@/components/version-system";
 import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
 import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
@@ -1140,94 +1141,87 @@ export function CharacterDetailView({
 
   // Versions Panel
   const versionsPanel = (
-    <Card className="card-magical sticky top-24 flex flex-col max-h-[calc(100vh-8rem)]">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="text-base">
-          {t("character-detail:sections.versions")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 min-h-0 p-6 pt-0 overflow-hidden">
-        <EntityVersionManager<
-          ICharacterVersion,
-          ICharacter,
-          ICharacterFormData
-        >
-          versions={versions}
-          currentVersion={currentVersion}
-          onVersionChange={onVersionChange}
-          onVersionCreate={onVersionCreate}
-          baseEntity={character}
-          i18nNamespace="character-detail"
-          renderVersionCard={({ version, isSelected, onClick }) => {
-            // Check if version has valid data
-            const hasValidData = !!version.characterData;
+    <VersionsPanel title={t("character-detail:sections.versions")}>
+      <EntityVersionManager<
+        ICharacterVersion,
+        ICharacter,
+        ICharacterFormData
+      >
+        versions={versions}
+        currentVersion={currentVersion}
+        onVersionChange={onVersionChange}
+        onVersionCreate={onVersionCreate}
+        baseEntity={character}
+        i18nNamespace="character-detail"
+        renderVersionCard={({ version, isSelected, onClick }) => {
+          // Check if version has valid data
+          const hasValidData = !!version.characterData;
 
-            return (
-              <div className="relative">
-                <div
-                  className={
-                    !hasValidData
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
-                  }
-                >
-                  <VersionCard
-                    version={version}
-                    isSelected={isSelected}
-                    onClick={hasValidData ? onClick : () => {}}
-                  />
-                </div>
-                {!hasValidData && !version.isMain && (
-                  <div className="flex items-center justify-between mt-1 px-2">
-                    <div className="text-xs text-destructive">
-                      ⚠️ Dados corrompidos
-                    </div>
-                    <Button
-                      variant="ghost-destructive"
-                      size="sm"
-                      className="h-6 text-xs"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onVersionDelete(version.id);
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3 mr-1" />
-                      Excluir
-                    </Button>
-                  </div>
-                )}
-              </div>
-            );
-          }}
-          renderCreateDialog={({
-            open,
-            onClose,
-            onConfirm,
-            baseEntity,
-          }) => (
-            <CreateVersionWithEntityDialog<ICharacter, ICharacterFormData>
-              open={open}
-              onClose={onClose}
-              onConfirm={onConfirm}
-              baseEntity={baseEntity}
-              i18nNamespace="character-detail"
-              renderEntityModal={({
-                open,
-                onOpenChange,
-                onConfirm,
-              }) => (
-                <CreateCharacterModal
-                  open={open}
-                  onClose={() => onOpenChange(false)}
-                  onConfirm={onConfirm}
-                  bookId={bookId}
+          return (
+            <div className="relative">
+              <div
+                className={
+                  !hasValidData
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
+              >
+                <VersionCard
+                  version={version}
+                  isSelected={isSelected}
+                  onClick={hasValidData ? onClick : () => {}}
                 />
+              </div>
+              {!hasValidData && !version.isMain && (
+                <div className="flex items-center justify-between mt-1 px-2">
+                  <div className="text-xs text-destructive">
+                    ⚠️ Dados corrompidos
+                  </div>
+                  <Button
+                    variant="ghost-destructive"
+                    size="sm"
+                    className="h-6 text-xs"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onVersionDelete(version.id);
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Excluir
+                  </Button>
+                </div>
               )}
-            />
-          )}
-        />
-      </CardContent>
-    </Card>
+            </div>
+          );
+        }}
+        renderCreateDialog={({
+          open,
+          onClose,
+          onConfirm,
+          baseEntity,
+        }) => (
+          <CreateVersionWithEntityDialog<ICharacter, ICharacterFormData>
+            open={open}
+            onClose={onClose}
+            onConfirm={onConfirm}
+            baseEntity={baseEntity}
+            i18nNamespace="character-detail"
+            renderEntityModal={({
+              open,
+              onOpenChange,
+              onConfirm,
+            }) => (
+              <CreateCharacterModal
+                open={open}
+                onClose={() => onOpenChange(false)}
+                onConfirm={onConfirm}
+                bookId={bookId}
+              />
+            )}
+          />
+        )}
+      />
+    </VersionsPanel>
   );
 
   return (
