@@ -976,11 +976,73 @@ export function EntityDetailView({
 
 ---
 
-### 2.3 Persistência de Estado das Seções (localStorage)
+### 2.3 Estrutura do Container (Header Fixo)
+
+**⚠️ IMPORTANTE:** O `EntityDetailLayout` possui um **header fixo** (sticky) que permanece visível durante o scroll. Para que isso funcione corretamente, o container pai **NÃO PODE** ter propriedades de overflow.
+
+#### 2.3.1 Estrutura Correta
+
+```tsx
+// ✅ CORRETO - Permite header fixo funcionar
+return (
+  <div className="relative min-h-screen">
+    {/* Navigation Sidebar (se houver) */}
+    <NavigationSidebar ... />
+
+    {/* Main Layout */}
+    <div className="w-full">
+      <div className="container mx-auto px-4 max-w-7xl py-8">
+        <EntityDetailLayout
+          // ... props
+        />
+      </div>
+    </div>
+  </div>
+);
+```
+
+#### 2.3.2 Estrutura Incorreta (NÃO USE)
+
+```tsx
+// ❌ INCORRETO - overflow-hidden quebra o sticky positioning
+return (
+  <div className="relative min-h-screen">
+    <NavigationSidebar ... />
+
+    {/* overflow-hidden aqui quebra o header fixo! */}
+    <div className="w-full overflow-hidden">
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <EntityDetailLayout ... />
+      </div>
+    </div>
+  </div>
+);
+```
+
+#### 2.3.3 Propriedades que Quebram Sticky
+
+**NÃO use no container pai do EntityDetailLayout:**
+- ❌ `overflow-hidden`
+- ❌ `overflow-y-auto`
+- ❌ `overflow-x-auto`
+- ❌ `overflow: scroll`
+
+Estas propriedades quebram o `position: sticky` do header!
+
+#### 2.3.4 Checklist
+
+- [ ] Container pai usa apenas `className="w-full"`
+- [ ] Container interno tem `container mx-auto px-4 max-w-7xl py-8`
+- [ ] Nenhum container pai tem propriedades de overflow
+- [ ] Header fica fixo ao fazer scroll na página
+
+---
+
+### 2.4 Persistência de Estado das Seções (localStorage)
 
 **IMPORTANTE:** Todas as seções colapsáveis (avançada e especiais) devem **lembrar** seu estado (aberta/fechada) mesmo quando o usuário sair e voltar para a página.
 
-#### 2.3.1 Seção Avançada
+#### 2.4.1 Seção Avançada
 
 A seção avançada é controlada diretamente no container da entidade e deve persistir no localStorage.
 
@@ -1031,7 +1093,7 @@ export function EntityDetail() {
 />
 ```
 
-#### 2.3.2 Seções Especiais (Relacionamentos, Família, Timeline, etc.)
+#### 2.4.2 Seções Especiais (Relacionamentos, Família, Timeline, etc.)
 
 As seções especiais são gerenciadas automaticamente pelo `EntityDetailLayout` através do localStorage, **mas você pode adicionar controle manual se necessário**.
 
@@ -1079,7 +1141,7 @@ useEffect(() => {
 }, [timelineSectionOpen]);
 ```
 
-#### 2.3.3 Chaves do localStorage
+#### 2.4.3 Chaves do localStorage
 
 **Convenção de nomenclatura:**
 
@@ -1093,7 +1155,7 @@ useEffect(() => {
 - `regionDetailTimelineSectionOpen` - Timeline de região (manual)
 - `entityDetailExtraSectionsState` - Todas as seções especiais (automático)
 
-#### 2.3.4 Comportamento Esperado
+#### 2.4.4 Comportamento Esperado
 
 ✅ **Primeira visita:** Seção começa no estado definido em `defaultOpen`
 ✅ **Usuário abre/fecha:** Estado é salvo automaticamente no localStorage
@@ -1827,6 +1889,10 @@ export const EntitySchema = z.object({
   - [ ] hasChanges e hasRequiredFieldsEmpty passados para EntityDetailLayout
   - [ ] validationMessage configurado no EntityDetailLayout
 - [ ] Adicionar modal de exclusão com `DeleteEntityModal`
+- [ ] **Estrutura do container para header fixo:**
+  - [ ] Container pai usa `className="w-full"` (SEM overflow-hidden)
+  - [ ] Container interno tem `container mx-auto px-4 max-w-7xl py-8`
+  - [ ] Header fica fixo ao fazer scroll
 - [ ] **Implementar persistência de estado no localStorage:**
   - [ ] Seção avançada com `[entidade]DetailAdvancedSectionOpen`
   - [ ] Seções especiais usando `defaultOpen: false` (automático via EntityDetailLayout)

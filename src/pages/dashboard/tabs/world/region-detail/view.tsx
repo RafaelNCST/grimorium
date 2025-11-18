@@ -1546,7 +1546,7 @@ export function RegionDetailView({
   ) : undefined;
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
       {/* Navigation Sidebar */}
       <RegionNavigationSidebar
         isOpen={isNavigationSidebarOpen}
@@ -1561,8 +1561,8 @@ export function RegionDetailView({
       />
 
       {/* Main Layout */}
-      <div className="w-full overflow-hidden">
-        <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="w-full">
+        <div className="container mx-auto px-4 max-w-7xl py-8">
           <EntityDetailLayout
             // Header
             onBack={onBack}

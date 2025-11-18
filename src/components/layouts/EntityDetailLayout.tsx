@@ -107,33 +107,9 @@ export interface EntityDetailLayoutProps {
  * EntityDetailLayout - Reusable layout for entity detail pages
  *
  * Provides a consistent 3-column layout structure:
- * - Header with back button, navigation, and action buttons
+ * - Header with back button, navigation, and action buttons (STICKY/FIXED)
  * - Main content area (basic info, advanced fields, extra sections)
  * - Optional versions sidebar
- *
- * @example
- * ```tsx
- * <EntityDetailLayout
- *   onBack={() => navigate(-1)}
- *   isEditMode={isEditing}
- *   onEdit={handleEdit}
- *   onSave={handleSave}
- *   onCancel={handleCancel}
- *   onDelete={handleDelete}
- *   hasChanges={hasChanges}
- *   basicFields={<BasicInfoFields />}
- *   advancedFields={<AdvancedFields />}
- *   extraSections={[
- *     {
- *       id: 'timeline',
- *       title: 'Timeline',
- *       content: <TimelineComponent />,
- *       isVisible: sectionVisibility.timeline
- *     }
- *   ]}
- *   versionsPanel={<VersionManager />}
- * />
- * ```
  */
 export function EntityDetailLayout({
   // Header
@@ -228,9 +204,9 @@ export function EntityDetailLayout({
   }
 
   return (
-    <div className={cn("flex flex-col h-full", className)}>
+    <div className={cn("flex flex-col", className)}>
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 mb-6 border-b">
+      <header className="sticky top-0 z-50 bg-background border-b shadow-sm py-4 -mx-4 px-4">
         <div className="flex items-center justify-between">
           {/* Left side - Back button and Menu */}
           <div className="flex items-center gap-4">
@@ -316,15 +292,15 @@ export function EntityDetailLayout({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-1 overflow-hidden gap-4">
+      <div className="flex flex-1 gap-4 py-6">
         {/* Central content */}
         <main
           className={cn(
-            "flex-1 min-w-0 overflow-y-auto",
+            "flex-1 min-w-0",
             isEditMode ? "w-full" : versionsPanel ? "lg:flex-[3]" : "w-full"
           )}
         >
-          <div className="space-y-6 max-w-7xl mx-auto px-4">
+          <div className="space-y-6 max-w-7xl mx-auto pb-6">
             {/* Basic Information Card */}
             <Card className="card-magical">
               <CardHeader>
@@ -450,7 +426,7 @@ export function EntityDetailLayout({
 
         {/* Versions sidebar - Only show in view mode */}
         {!isEditMode && versionsPanel && (
-          <aside className="hidden lg:flex lg:flex-[1] lg:min-w-[280px] lg:max-w-[400px] h-full overflow-y-auto">
+          <aside className="hidden lg:flex lg:flex-[1] lg:min-w-[280px] lg:max-w-[400px]">
             {versionsPanel}
           </aside>
         )}

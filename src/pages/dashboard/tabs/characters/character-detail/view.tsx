@@ -1244,8 +1244,8 @@ export function CharacterDetailView({
         onCharacterSelect={onCharacterSelect}
       />
 
-      <div className="w-full overflow-hidden">
-        <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="w-full">
+        <div className="container mx-auto px-4 max-w-7xl py-8">
           <EntityDetailLayout
             onBack={onBack}
             backLabel={t("character-detail:header.back")}
