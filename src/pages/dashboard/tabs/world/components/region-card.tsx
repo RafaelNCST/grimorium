@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 
 import { REGION_SCALES_CONSTANT } from "../constants/scale-colors";
 import { IRegion } from "../types/region-types";
@@ -42,9 +43,12 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
             />
           </div>
         ) : (
-          <div className="w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
-            <Map className="w-16 h-16 text-muted-foreground/30" />
-          </div>
+          <FormImageDisplay
+            icon={Map}
+            height="h-[28rem]"
+            width="w-full"
+            shape="square"
+          />
         )}
 
         <div className="p-4 space-y-3">

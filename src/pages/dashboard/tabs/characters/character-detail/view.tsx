@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
@@ -161,6 +162,8 @@ interface CharacterDetailViewProps {
   selectedRelationshipType: string;
   relationshipIntensity: number[];
   mockCharacters: ICharacter[];
+  regions: Array<{ id: string; name: string; image?: string }>;
+  races: Array<{ id: string; name: string; image?: string }>;
   mockFactions: Array<{ id: string; name: string }>;
   roles: ICharacterRole[];
   alignments: IAlignment[];
@@ -238,6 +241,8 @@ export function CharacterDetailView({
   isNavigationSidebarOpen,
   imagePreview,
   mockCharacters,
+  regions,
+  races,
   roles,
   genders,
   currentRole,
@@ -366,8 +371,6 @@ export function CharacterDetailView({
               imageFit="cover"
               showLabel={false}
               placeholderIcon={User}
-              placeholderText={t("create-character:modal.upload_image")}
-              placeholderTextSize="text-[0.5rem]"
             />
 
             {/* Name, Age, Gender */}
@@ -526,16 +529,25 @@ export function CharacterDetailView({
       ) : (
         <div className="space-y-4">
           <div className="flex items-start gap-6">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={character.image} className="object-cover" />
-              <AvatarFallback className="text-xl">
-                {character.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
+            {character.image ? (
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={character.image} className="object-cover" />
+                <AvatarFallback className="text-xl">
+                  {character.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <FormImageDisplay
+                icon={User}
+                height="h-24"
+                width="w-24"
+                shape="circle"
+              />
+            )}
 
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
@@ -771,14 +783,30 @@ export function CharacterDetailView({
                 {character.speciesAndRace &&
                 character.speciesAndRace.length > 0 ? (
                   <div className="flex flex-col gap-2">
-                    {character.speciesAndRace.map((raceId) => (
-                      <div
-                        key={raceId}
-                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                      >
-                        <span className="text-sm font-medium">{raceId}</span>
-                      </div>
-                    ))}
+                    {character.speciesAndRace.map((raceId) => {
+                      const race = races.find(r => r.id === raceId);
+                      return race ? (
+                        <div
+                          key={raceId}
+                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                        >
+                          {race.image ? (
+                            <img
+                              src={race.image}
+                              alt={race.name}
+                              className="w-8 h-8 rounded object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs text-muted-foreground font-semibold">
+                                {race.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-sm font-medium">{race.name}</span>
+                        </div>
+                      ) : null;
+                    })}
                   </div>
                 ) : (
                   <EmptyFieldState t={t} />
@@ -1071,14 +1099,30 @@ export function CharacterDetailView({
               <CollapsibleContent className="mt-2">
                 {character.birthPlace && character.birthPlace.length > 0 ? (
                   <div className="flex flex-col gap-2">
-                    {character.birthPlace.map((regionId) => (
-                      <div
-                        key={regionId}
-                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                      >
-                        <span className="text-sm font-medium">{regionId}</span>
-                      </div>
-                    ))}
+                    {character.birthPlace.map((regionId) => {
+                      const region = regions.find(r => r.id === regionId);
+                      return region ? (
+                        <div
+                          key={regionId}
+                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+                        >
+                          {region.image ? (
+                            <img
+                              src={region.image}
+                              alt={region.name}
+                              className="w-8 h-8 rounded object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs text-muted-foreground font-semibold">
+                                {region.name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-sm font-medium">{region.name}</span>
+                        </div>
+                      ) : null;
+                    })}
                   </div>
                 ) : (
                   <EmptyFieldState t={t} />

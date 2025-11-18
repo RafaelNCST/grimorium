@@ -25,6 +25,8 @@ export type {
 // Advanced form components
 export { FormImageUpload } from "./FormImageUpload";
 
+export { FormImageDisplay } from "./FormImageDisplay";
+
 export { FormSelectGrid } from "./FormSelectGrid";
 export type { GridSelectOption } from "./FormSelectGrid";
 

@@ -272,7 +272,6 @@ export function CreateRegionModal({
                         height="h-[28rem]"
                         shape="rounded"
                         placeholderIcon={Map}
-                        placeholderText={t("create_region.upload_image")}
                         id="region-image-upload"
                       />
                     </FormControl>

@@ -195,16 +195,50 @@ export function RegionDetail() {
     if (JSON.stringify(timeline) !== JSON.stringify(originalTimeline))
       return true;
 
+    // Helper function to compare field visibility
+    // Treats undefined and true as equivalent (both = visible)
+    const visibilityChanged = (
+      current: IFieldVisibility,
+      original: IFieldVisibility
+    ): boolean => {
+      const allFields = new Set([
+        ...Object.keys(current),
+        ...Object.keys(original),
+      ]);
+
+      for (const field of allFields) {
+        const currentValue = current[field] !== false; // undefined or true = visible
+        const originalValue = original[field] !== false; // undefined or true = visible
+        if (currentValue !== originalValue) return true;
+      }
+
+      return false;
+    };
+
+    // Helper function to compare section visibility
+    // Treats undefined and true as equivalent (both = visible)
+    const sectionVisibilityChanged = (
+      current: ISectionVisibility,
+      original: ISectionVisibility
+    ): boolean => {
+      const allSections = new Set([
+        ...Object.keys(current),
+        ...Object.keys(original),
+      ]);
+
+      for (const section of allSections) {
+        const currentValue = current[section] !== false; // undefined or true = visible
+        const originalValue = original[section] !== false; // undefined or true = visible
+        if (currentValue !== originalValue) return true;
+      }
+
+      return false;
+    };
+
     // Check if visibility has changed
-    if (
-      JSON.stringify(fieldVisibility) !==
-      JSON.stringify(originalFieldVisibility)
-    )
+    if (visibilityChanged(fieldVisibility, originalFieldVisibility))
       return true;
-    if (
-      JSON.stringify(sectionVisibility) !==
-      JSON.stringify(originalSectionVisibility)
-    )
+    if (sectionVisibilityChanged(sectionVisibility, originalSectionVisibility))
       return true;
 
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)

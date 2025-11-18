@@ -131,6 +131,7 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     <ItemsView
       items={items}
       filteredItems={filteredItems}
+      isLoading={isLoading}
       searchTerm={searchTerm}
       selectedCategories={selectedCategories}
       selectedStatuses={selectedStatuses}

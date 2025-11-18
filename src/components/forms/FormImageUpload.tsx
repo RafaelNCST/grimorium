@@ -56,7 +56,7 @@ interface FormImageUploadProps {
    */
   placeholderIcon?: LucideIcon;
   /**
-   * Text to show in placeholder (default: "Click to upload image")
+   * Text to show in placeholder (optional - default: no text, only icon)
    */
   placeholderText?: string;
   /**
@@ -140,7 +140,7 @@ export function FormImageUpload({
   shape = "rounded",
   imageFit = "fill",
   placeholderIcon: PlaceholderIcon = ImagePlus,
-  placeholderText = "Click to upload image",
+  placeholderText,
   placeholderTextSize = "text-sm",
   accept = "image/png,image/jpeg,image/jpg,image/webp,image/gif",
   error,
@@ -238,9 +238,11 @@ export function FormImageUpload({
               className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}
             >
               <PlaceholderIcon className="h-8 w-8 text-muted-foreground/60" />
-              <span className={`${placeholderTextSize} text-muted-foreground`}>
-                {placeholderText}
-              </span>
+              {placeholderText && (
+                <span className={`${placeholderTextSize} text-muted-foreground`}>
+                  {placeholderText}
+                </span>
+              )}
             </div>
           </label>
         )}

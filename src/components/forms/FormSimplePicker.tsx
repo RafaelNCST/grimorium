@@ -63,7 +63,10 @@ interface FormSimplePickerProps<T = string> {
 }
 
 // Helper function to get the CSS color from Tailwind class
-const getColorFromTailwindClass = (className: string): string => {
+const getColorFromTailwindClass = (className: string | undefined): string => {
+  // Guard against undefined or null className
+  if (!className) return "currentColor";
+
   // Extract the base color from classes like "text-green-600 dark:text-green-400"
   // In light mode, we use the first color (e.g., green-600)
   // In dark mode, the dark: variant will apply automatically via the Tailwind class
@@ -89,7 +92,10 @@ const getColorFromTailwindClass = (className: string): string => {
 };
 
 // Helper to get dark mode color
-const getDarkColorFromTailwindClass = (className: string): string => {
+const getDarkColorFromTailwindClass = (className: string | undefined): string => {
+  // Guard against undefined or null className
+  if (!className) return "currentColor";
+
   if (className.includes("dark:text-green-400")) return "rgb(74 222 128)";
   if (className.includes("dark:text-slate-300")) return "rgb(203 213 225)";
   if (className.includes("dark:text-red-400")) return "rgb(248 113 113)";

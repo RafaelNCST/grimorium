@@ -1,8 +1,9 @@
 import { useState } from "react";
 
-import { Calendar } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
@@ -41,16 +42,25 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
         {/* Top Section: Image + Name/Age/Gender/Role */}
         <div className="flex gap-4">
           {/* Character Image - Circular */}
-          <Avatar className="w-20 h-20 flex-shrink-0">
-            <AvatarImage src={character.image} className="object-cover" />
-            <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-              {character.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .slice(0, 2)}
-            </AvatarFallback>
-          </Avatar>
+          {character.image ? (
+            <Avatar className="w-20 h-20 flex-shrink-0">
+              <AvatarImage src={character.image} className="object-cover" />
+              <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                {character.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <FormImageDisplay
+              icon={User}
+              height="h-20"
+              width="w-20"
+              shape="circle"
+            />
+          )}
 
           {/* Name, Age, Gender, and Role */}
           <div className="flex-1 min-w-0 space-y-2">

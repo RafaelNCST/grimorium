@@ -24,7 +24,11 @@ import {
   updatePowerCharacterLinkLabel,
   deletePowerCharacterLink,
 } from "@/lib/db/power-system.service";
-import { mockLocations, mockFactions } from "@/mocks/global";
+import { getRegionsByBookId } from "@/lib/db/regions.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import { mockFactions } from "@/mocks/global";
+import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
+import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import { useCharactersStore } from "@/stores/characters-store";
 import {
@@ -131,6 +135,8 @@ export function CharacterDetail() {
   });
   const [_isLoading, setIsLoading] = useState(true);
   const [allCharacters, setAllCharacters] = useState<ICharacter[]>([]);
+  const [regions, setRegions] = useState<IRegion[]>([]);
+  const [races, setRaces] = useState<IRace[]>([]);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   // Power links state
@@ -223,18 +229,52 @@ export function CharacterDetail() {
   const hasChanges = useMemo(() => {
     if (!isEditing) return false;
 
+    // Helper function to compare field visibility
+    // Treats undefined and true as equivalent (both = visible)
+    const visibilityChanged = (
+      current: IFieldVisibility,
+      original: IFieldVisibility
+    ): boolean => {
+      const allFields = new Set([
+        ...Object.keys(current),
+        ...Object.keys(original),
+      ]);
+
+      for (const field of allFields) {
+        const currentValue = current[field] !== false; // undefined or true = visible
+        const originalValue = original[field] !== false; // undefined or true = visible
+        if (currentValue !== originalValue) return true;
+      }
+
+      return false;
+    };
+
+    // Helper function to compare section visibility
+    // Treats undefined and true as equivalent (both = visible)
+    const sectionVisibilityChanged = (
+      current: ISectionVisibility,
+      original: ISectionVisibility
+    ): boolean => {
+      const allSections = new Set([
+        ...Object.keys(current),
+        ...Object.keys(original),
+      ]);
+
+      for (const section of allSections) {
+        const currentValue = current[section] !== false; // undefined or true = visible
+        const originalValue = original[section] !== false; // undefined or true = visible
+        if (currentValue !== originalValue) return true;
+      }
+
+      return false;
+    };
+
     // Check if visibility has changed
-    if (
-      JSON.stringify(fieldVisibility) !==
-      JSON.stringify(originalFieldVisibility)
-    )
+    if (visibilityChanged(fieldVisibility, originalFieldVisibility))
       return true;
 
     // Check if section visibility has changed
-    if (
-      JSON.stringify(sectionVisibility) !==
-      JSON.stringify(originalSectionVisibility)
-    )
+    if (sectionVisibilityChanged(sectionVisibility, originalSectionVisibility))
       return true;
 
     // Helper function to compare arrays (order-independent for IDs, order-dependent for strings)
@@ -331,6 +371,8 @@ export function CharacterDetail() {
           versionsFromDB,
           allCharsFromBook,
           powerLinks,
+          regionsFromDB,
+          racesFromDB,
         ] = await Promise.all([
           getCharacterById(characterId),
           getCharacterRelationships(characterId),
@@ -338,6 +380,8 @@ export function CharacterDetail() {
           getCharacterVersions(characterId),
           dashboardId ? getCharactersByBookId(dashboardId) : Promise.resolve([]),
           getPowerLinksWithTitlesByCharacterId(characterId),
+          dashboardId ? getRegionsByBookId(dashboardId) : Promise.resolve([]),
+          dashboardId ? getRacesByBookId(dashboardId) : Promise.resolve([]),
         ]);
 
         // Only update state if component is still mounted
@@ -410,6 +454,10 @@ export function CharacterDetail() {
 
           // Set all characters from the same book
           setAllCharacters(allCharsFromBook);
+
+          // Set regions and races from the same book
+          setRegions(regionsFromDB);
+          setRaces(racesFromDB);
         }
       } catch (error) {
         // Don't log errors or show toasts if component is unmounted
@@ -1078,7 +1126,8 @@ export function CharacterDetail() {
         relationshipIntensity={relationshipIntensity}
         fileInputRef={fileInputRef}
         mockCharacters={allCharacters}
-        mockLocations={mockLocations}
+        regions={regions}
+        races={races}
         mockFactions={mockFactions}
         roles={CHARACTER_ROLES_CONSTANT}
         alignments={ALIGNMENTS_CONSTANT}

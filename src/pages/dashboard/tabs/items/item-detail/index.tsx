@@ -1,8 +1,9 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import {
   getItemById,
@@ -11,14 +12,19 @@ import {
   createItemVersion,
   deleteItemVersion,
   updateItemVersion,
+  updateItem,
+  updateItemVersionData,
   type IItem,
   type IItemVersion,
 } from "@/lib/db/items.service";
+import { ItemSchema } from "@/lib/validation/item-schema";
 import { useItemsStore } from "@/stores/items-store";
+import { type IFieldVisibility } from "@/types/character-types";
 
-import { ITEM_CATEGORIES_CONSTANT } from "./constants/item-categories-constant";
-import { ITEM_STATUSES_CONSTANT } from "./constants/item-statuses-constant";
-import { STORY_RARITIES_CONSTANT } from "./constants/story-rarities-constant";
+import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
+import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ItemDetailView } from "./view";
 
 export default function ItemDetail() {
@@ -27,8 +33,6 @@ export default function ItemDetail() {
   });
   const navigate = useNavigate();
   const { t } = useTranslation("item-detail");
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Usar o store para atualizar itens
   const updateItemInStore = useItemsStore((state) => state.updateItemInCache);
@@ -58,8 +62,23 @@ export default function ItemDetail() {
   const [item, setItem] = useState<IItem>(emptyItem);
   const [editData, setEditData] = useState<IItem>(emptyItem);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
+  const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("itemDetailAdvancedSectionOpen");
+    return stored ? JSON.parse(stored) : false;
+  });
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    alternativeNames: false,
+  });
+
+  // Validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Original states for comparison
+  const [originalFieldVisibility, setOriginalFieldVisibility] =
+    useState<IFieldVisibility>({});
   const [versions, setVersions] = useState<IItemVersion[]>([
     {
       id: "main-version",
@@ -76,6 +95,14 @@ export default function ItemDetail() {
   const [_isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
 
+  // Save advanced section state to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "itemDetailAdvancedSectionOpen",
+      JSON.stringify(advancedSectionOpen)
+    );
+  }, [advancedSectionOpen]);
+
   useEffect(() => {
     const loadItem = async () => {
       try {
@@ -83,7 +110,8 @@ export default function ItemDetail() {
         if (itemFromDB) {
           setItem(itemFromDB);
           setEditData(itemFromDB);
-          setImagePreview(itemFromDB.image || "");
+          setFieldVisibility(itemFromDB.fieldVisibility || {});
+          setOriginalFieldVisibility(itemFromDB.fieldVisibility || {});
 
           // Carregar versões do banco de dados
           const versionsFromDB = await getItemVersions(itemId);
@@ -149,6 +177,142 @@ export default function ItemDetail() {
     () => STORY_RARITIES_CONSTANT.find((r) => r.value === item.storyRarity),
     [item.storyRarity]
   );
+
+  // Função de validação de campo individual (onBlur)
+  const validateField = useCallback((field: string, value: any) => {
+    try {
+      // Validar apenas este campo
+      const fieldSchema = ItemSchema.pick({ [field]: true } as any);
+      fieldSchema.parse({ [field]: value });
+
+      // Se passou, remover erro
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Traduzir a mensagem de erro
+        const errorMessage = error.errors[0].message;
+        const translatedMessage = errorMessage.startsWith("item-detail:")
+          ? t(errorMessage)
+          : errorMessage;
+
+        setErrors((prev) => ({
+          ...prev,
+          [field]: translatedMessage,
+        }));
+        return false;
+      }
+    }
+  }, [t]);
+
+  // Verificar se tem campos obrigatórios vazios e quais são
+  const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
+    if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
+
+    try {
+      // Validar apenas campos obrigatórios
+      ItemSchema.pick({
+        name: true,
+        status: true,
+        category: true,
+        basicDescription: true,
+      } as any).parse({
+        name: editData.name,
+        status: editData.status,
+        category: editData.category,
+        basicDescription: editData.basicDescription,
+      });
+      return { hasRequiredFieldsEmpty: false, missingFields: [] };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const missing = error.errors.map((e) => e.path[0] as string);
+        return { hasRequiredFieldsEmpty: true, missingFields: missing };
+      }
+      return { hasRequiredFieldsEmpty: true, missingFields: [] };
+    }
+  }, [editData]);
+
+  // Check if there are changes between item and editData
+  const hasChanges = useMemo(() => {
+    if (!isEditing) return false;
+
+    // Helper function to compare field visibility
+    // Treats undefined and true as equivalent (both = visible)
+    const visibilityChanged = (
+      current: IFieldVisibility,
+      original: IFieldVisibility
+    ): boolean => {
+      const allFields = new Set([
+        ...Object.keys(current),
+        ...Object.keys(original),
+      ]);
+
+      for (const field of allFields) {
+        const currentValue = current[field] !== false; // undefined or true = visible
+        const originalValue = original[field] !== false; // undefined or true = visible
+        if (currentValue !== originalValue) return true;
+      }
+
+      return false;
+    };
+
+    // Check if visibility has changed
+    if (visibilityChanged(fieldVisibility, originalFieldVisibility))
+      return true;
+
+    // Helper function to compare arrays
+    const arraysEqual = (
+      a: unknown[] | undefined,
+      b: unknown[] | undefined
+    ): boolean => {
+      if (!a && !b) return true;
+      if (!a || !b) return false;
+      if (a.length !== b.length) return false;
+
+      // For string arrays, order matters
+      if (a.length > 0 && typeof a[0] === "string") {
+        return a.every((item, index) => item === b[index]);
+      }
+
+      // For ID arrays, order doesn't matter
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((item, index) => item === sortedB[index]);
+    };
+
+    // Compare basic fields
+    if (item.name !== editData.name) return true;
+    if (item.status !== editData.status) return true;
+    if (item.category !== editData.category) return true;
+    if (item.basicDescription !== editData.basicDescription) return true;
+    if (item.image !== editData.image) return true;
+    if (item.customCategory !== editData.customCategory) return true;
+
+    // Compare advanced fields
+    if (item.appearance !== editData.appearance) return true;
+    if (item.origin !== editData.origin) return true;
+    if (item.storyRarity !== editData.storyRarity) return true;
+    if (item.narrativePurpose !== editData.narrativePurpose) return true;
+    if (item.usageRequirements !== editData.usageRequirements) return true;
+    if (item.usageConsequences !== editData.usageConsequences) return true;
+
+    // Compare arrays
+    if (!arraysEqual(item.alternativeNames, editData.alternativeNames))
+      return true;
+
+    return false;
+  }, [
+    item,
+    editData,
+    isEditing,
+    fieldVisibility,
+    originalFieldVisibility,
+  ]);
 
   const handleVersionChange = useCallback(
     (versionId: string | null) => {
@@ -259,30 +423,85 @@ export default function ItemDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    const updatedItem = { ...editData };
-    setItem(updatedItem);
-
-    const updatedVersions = versions.map((v) =>
-      v.id === currentVersion?.id ? { ...v, itemData: updatedItem } : v
-    );
-    setVersions(updatedVersions);
-
-    const activeVersion = updatedVersions.find(
-      (v) => v.id === currentVersion?.id
-    );
-    if (activeVersion) {
-      setCurrentVersion(activeVersion);
-    }
-
     try {
-      // Atualizar no store (que também salva no DB)
-      await updateItemInStore(itemId, updatedItem);
+      console.log("[handleSave] Starting save...", { currentVersion, editData });
+
+      // Validar TUDO com Zod
+      const validatedData = ItemSchema.parse({
+        name: editData.name,
+        status: editData.status,
+        category: editData.category,
+        basicDescription: editData.basicDescription,
+        image: editData.image,
+        customCategory: editData.customCategory,
+        appearance: editData.appearance,
+        origin: editData.origin,
+        storyRarity: editData.storyRarity,
+        narrativePurpose: editData.narrativePurpose,
+        usageRequirements: editData.usageRequirements,
+        usageConsequences: editData.usageConsequences,
+        alternativeNames: editData.alternativeNames,
+      });
+
+      const updatedItem = { ...editData, fieldVisibility };
+      setItem(updatedItem);
+
+      // Atualizar dados na versão atual
+      const updatedVersions = versions.map((v) =>
+        v.id === currentVersion?.id
+          ? { ...v, itemData: updatedItem as IItem }
+          : v
+      );
+      setVersions(updatedVersions);
+
+      const activeVersion = updatedVersions.find(
+        (v) => v.id === currentVersion?.id
+      );
+      if (activeVersion) {
+        setCurrentVersion(activeVersion);
+      }
+
+      // Salvar no banco de dados
+      if (currentVersion?.isMain) {
+        await updateItem(itemId, updatedItem);
+      } else {
+        await updateItemVersionData(currentVersion.id, updatedItem);
+      }
+
+      // Update original visibility to match saved state
+      setOriginalFieldVisibility(fieldVisibility);
+
+      setErrors({}); // Limpar erros
       setIsEditing(false);
       toast.success("Item atualizado com sucesso!");
-    } catch (_error) {
-      toast.error("Erro ao salvar item");
+    } catch (error) {
+      console.error("[handleSave] Error caught:", error);
+      if (error instanceof z.ZodError) {
+        console.error("[handleSave] Zod validation errors:", error.errors);
+        // Mapear erros para cada campo
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const field = err.path[0] as string;
+          const errorMessage = err.message;
+          newErrors[field] = errorMessage.startsWith("item-detail:")
+            ? t(errorMessage)
+            : errorMessage;
+        });
+        setErrors(newErrors);
+        toast.error("Por favor, corrija os erros nos campos destacados");
+      } else {
+        console.error("Error saving item:", error);
+        toast.error("Erro ao salvar item");
+      }
     }
-  }, [editData, versions, currentVersion, itemId, updateItemInStore]);
+  }, [
+    editData,
+    fieldVisibility,
+    versions,
+    currentVersion,
+    itemId,
+    t,
+  ]);
 
   const navigateToItemsTab = useCallback(() => {
     if (!dashboardId) return;
@@ -334,25 +553,26 @@ export default function ItemDetail() {
   ]);
 
   const handleCancel = useCallback(() => {
-    setEditData({ ...item });
-    setIsEditing(false);
-  }, [item]);
+    if (hasChanges) {
+      setShowUnsavedChangesDialog(true);
+      return;
+    }
 
-  const handleImageFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const result = e.target?.result as string;
-          setImagePreview(result);
-          setEditData((prev) => ({ ...prev, image: result }));
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    []
-  );
+    // If no changes, cancel immediately
+    setEditData(item);
+    setFieldVisibility(originalFieldVisibility);
+    setErrors({});
+    setIsEditing(false);
+  }, [item, originalFieldVisibility, hasChanges]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setEditData(item);
+    setFieldVisibility(originalFieldVisibility);
+    setErrors({});
+    setIsEditing(false);
+    setShowUnsavedChangesDialog(false);
+  }, [item, originalFieldVisibility]);
+
 
   const handleBack = useCallback(() => {
     navigateToItemsTab();
@@ -394,40 +614,78 @@ export default function ItemDetail() {
     setEditData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const handleFieldVisibilityToggle = useCallback((field: string) => {
+    setFieldVisibility((prev) => {
+      // Trata undefined como true (visível), então inverte corretamente
+      const currentValue = prev[field] !== false;
+      return {
+        ...prev,
+        [field]: !currentValue,
+      };
+    });
+  }, []);
+
+  const handleAdvancedSectionToggle = useCallback(() => {
+    setAdvancedSectionOpen((prev) => !prev);
+  }, []);
+
+  const toggleSection = useCallback((sectionName: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionName]: !prev[sectionName],
+    }));
+  }, []);
+
   return (
-    <ItemDetailView
-      item={item}
-      editData={editData}
-      isEditing={isEditing}
-      versions={versions}
-      currentVersion={currentVersion}
-      showDeleteModal={showDeleteModal}
-      isNavigationSidebarOpen={isNavigationSidebarOpen}
-      imagePreview={imagePreview}
-      fileInputRef={fileInputRef}
-      allItems={allItems}
-      categories={ITEM_CATEGORIES_CONSTANT}
-      statuses={ITEM_STATUSES_CONSTANT}
-      rarities={STORY_RARITIES_CONSTANT}
-      currentCategory={currentCategory}
-      currentStatus={currentStatus}
-      currentRarity={currentRarity}
-      onBack={handleBack}
-      onNavigationSidebarToggle={handleNavigationSidebarToggle}
-      onNavigationSidebarClose={handleNavigationSidebarClose}
-      onItemSelect={handleItemSelect}
-      onEdit={handleEdit}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onDeleteModalOpen={handleDeleteModalOpen}
-      onDeleteModalClose={handleDeleteModalClose}
-      onConfirmDelete={handleConfirmDelete}
-      onVersionChange={handleVersionChange}
-      onVersionCreate={handleVersionCreate}
-      onVersionDelete={handleVersionDelete}
-      onVersionUpdate={handleVersionUpdate}
-      onImageFileChange={handleImageFileChange}
-      onEditDataChange={handleEditDataChange}
-    />
+    <>
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={setShowUnsavedChangesDialog}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <ItemDetailView
+        item={item}
+        editData={editData}
+        isEditing={isEditing}
+        versions={versions}
+        currentVersion={currentVersion}
+        showDeleteModal={showDeleteModal}
+        isNavigationSidebarOpen={isNavigationSidebarOpen}
+        allItems={allItems}
+        categories={ITEM_CATEGORIES_CONSTANT}
+        statuses={ITEM_STATUSES_CONSTANT}
+        rarities={STORY_RARITIES_CONSTANT}
+        currentCategory={currentCategory}
+        currentStatus={currentStatus}
+        currentRarity={currentRarity}
+        hasChanges={hasChanges}
+        hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+        missingFields={missingFields}
+        errors={errors}
+        fieldVisibility={fieldVisibility}
+        advancedSectionOpen={advancedSectionOpen}
+        openSections={openSections}
+        onBack={handleBack}
+        onNavigationSidebarToggle={handleNavigationSidebarToggle}
+        onNavigationSidebarClose={handleNavigationSidebarClose}
+        onItemSelect={handleItemSelect}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDeleteModalOpen={handleDeleteModalOpen}
+        onDeleteModalClose={handleDeleteModalClose}
+        onConfirmDelete={handleConfirmDelete}
+        onVersionChange={handleVersionChange}
+        onVersionCreate={handleVersionCreate}
+        onVersionDelete={handleVersionDelete}
+        onVersionUpdate={handleVersionUpdate}
+        onEditDataChange={handleEditDataChange}
+        validateField={validateField}
+        onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        onAdvancedSectionToggle={handleAdvancedSectionToggle}
+        toggleSection={toggleSection}
+      />
+    </>
   );
 }

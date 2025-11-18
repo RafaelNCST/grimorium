@@ -1,6 +1,7 @@
 {
   "modal": {
     "create_item": "Criar Novo Item",
+    "description": "Adicione um novo item ao seu livro",
     "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história.",
     "basic_fields": "Campos Básicos",
     "change_image": "Alterar Imagem",
@@ -21,7 +22,8 @@
     "origin": "Origem",
     "origin_placeholder": "Forjada há mil anos pelo ferreiro lendário Thorgrim nas Montanhas Eternas.",
     "alternative_names": "Nomes Alternativos",
-    "alternative_names_placeholder": "A Lâmina do Rei, Cortadora de Sombras",
+    "alternative_names_placeholder": "Digite um nome alternativo...",
+    "add_alternative_name": "Adicionar Nome Alternativo",
     "story_rarity": "Raridade na História",
     "rarity_explanation": "A raridade determina quão único é o item no mundo da sua história. Isso não serve para definir mecânicas de jogo, mas sim a raridade disso na sua narrativa.",
     "narrative_purpose": "Propósito Narrativo",
@@ -48,13 +50,13 @@
     "consumable": "Consumível",
     "resource": "Recurso",
     "artifact": "Artefato",
+    "tool": "Ferramenta",
+    "treasure": "Tesouro",
     "other": "Outro"
   },
   "rarity": {
     "common": "Comum",
     "common_desc": "Existem várias na sua história",
-    "uncommon": "Incomum",
-    "uncommon_desc": "Poucas existem, mas não é única",
     "rare": "Raro",
     "rare_desc": "Muito difícil de encontrar",
     "legendary": "Lendário",

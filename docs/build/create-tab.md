@@ -913,10 +913,25 @@ export function EntityDetail() {
 **Componentes principais:**
 - `EntityDetailLayout` - Layout padrão com header, sidebar, versões
 - `Card` + `CardContent` - Seções de conteúdo
+- `FieldWithVisibilityToggle` - **SOMENTE** para campos opcionais das informações avançadas
 - Form fields em modo edição
 - Display fields em modo visualização
 
-**Pattern:**
+**⚠️ IMPORTANTE - Estrutura de Campos:**
+
+**Campos BÁSICOS (obrigatórios):**
+- ❌ **NÃO PODEM** ser escondidos
+- ❌ **NÃO USAM** `FieldWithVisibilityToggle`
+- ✅ Sempre visíveis (nome, campos obrigatórios, imagem principal)
+- ✅ Organizados em `basicFields`
+
+**Campos AVANÇADOS (opcionais):**
+- ✅ **PODEM** ser escondidos
+- ✅ **DEVEM USAR** `FieldWithVisibilityToggle`
+- ✅ Usuário pode mostrar/ocultar em modo visualização
+- ✅ Organizados em `advancedFields` com seções temáticas
+
+**Pattern Completo:**
 ```tsx
 export function EntityDetailView({
   entity,
@@ -924,55 +939,163 @@ export function EntityDetailView({
   isEditing,
   versions,
   currentVersion,
+  fieldVisibility,
+  advancedSectionOpen,
+  onAdvancedSectionToggle,
+  onFieldVisibilityToggle,
   ...
 }: Props) {
-  return (
-    <EntityDetailLayout
-      icon={IconeDoTema}
-      title={entity.name}
-      isEditing={isEditing}
-      hasChanges={hasChanges}
-      onBack={onBack}
-      onEdit={onEdit}
-      onSave={onSave}
-      onCancel={onCancel}
-      onDelete={onDeleteModalOpen}
-      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+  // Estado para collapsibles
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (sectionName: string) => {
+    setOpenSections(prev => ({...prev, [sectionName]: !prev[sectionName]}));
+  };
+
+  // ==================
+  // BASIC FIELDS (NÃO usam FieldWithVisibilityToggle)
+  // ==================
+  const basicFields = (
+    <div className="space-y-6">
+      {/* Card: Informações Principais */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("sections.main_info")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Nome (obrigatório) */}
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("fields.name")} <span className="text-destructive ml-1">*</span>
+            </Label>
+            {isEditing ? (
+              <Input value={editData.name} onChange={...} />
+            ) : (
+              <h2 className="text-3xl font-bold">{entity.name}</h2>
+            )}
+          </div>
+
+          {/* Outros campos obrigatórios */}
+        </CardContent>
+      </Card>
+
+      {/* Card: Imagem */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("fields.image")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isEditing ? (
+            <FormImageUpload {...} />
+          ) : entity.image ? (
+            <img src={entity.image} />
+          ) : (
+            <div className="bg-gradient-to-br from-primary/20 to-primary/10">
+              <IconeDoTema className="w-16 h-16 text-muted-foreground/30" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  // ==================
+  // ADVANCED FIELDS (USAM FieldWithVisibilityToggle)
+  // ==================
+  const advancedFields = (
+    <>
+      {/* Seção 1: Descrições Avançadas */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("sections.descriptions")}
+        </h4>
+
+        <FieldWithVisibilityToggle
+          fieldName="detailedDescription"
+          label={t("fields.detailed_description")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <Textarea value={editData.detailedDescription} onChange={...} />
+          ) : entity.detailedDescription ? (
+            <p className="text-sm whitespace-pre-wrap">{entity.detailedDescription}</p>
+          ) : (
+            <EmptyFieldState t={t} />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Mais campos opcionais com FieldWithVisibilityToggle */}
+      </div>
+
+      <Separator className="my-6" />
+
+      {/* Seção 2: Outra categoria */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("sections.other_category")}
+        </h4>
+
+        {/* Campos opcionais */}
+      </div>
+    </>
+  );
+
+  // ==================
+  // VERSIONS PANEL
+  // ==================
+  const versionsPanel = (
+    <EntityVersionManager
       versions={versions}
       currentVersion={currentVersion}
       onVersionChange={onVersionChange}
       onVersionCreate={onVersionCreate}
-      onVersionDelete={onVersionDelete}
-      primaryActions={[/* ações extras */]}
-    >
-      {/* Informações Básicas */}
-      <Card>
-        <CardContent>
-          {isEditing ? (
-            <FormField ... />
-          ) : (
-            <FieldWithVisibilityToggle
-              label="Campo"
-              value={entity.field}
-              isVisible={fieldVisibility.field}
-              onToggle={() => onFieldVisibilityToggle("field")}
-            />
-          )}
-        </CardContent>
-      </Card>
+      baseEntity={entity}
+      i18nNamespace="entity-detail"
+      renderVersionCard={...}
+      renderCreateDialog={...}
+    />
+  );
 
-      {/* Seções Avançadas */}
-      <CollapsibleSection
-        title="Seção Avançada"
-        isOpen={sectionOpen}
-        onToggle={onToggleSec}
-      >
-        {/* Campos avançados */}
-      </CollapsibleSection>
-    </EntityDetailLayout>
+  // ==================
+  // RENDER
+  // ==================
+  return (
+    <div className="relative min-h-screen">
+      <NavigationSidebar {...} />
+
+      <div className="w-full">
+        <div className="container mx-auto px-4 max-w-7xl py-8">
+          <EntityDetailLayout
+            icon={IconeDoTema}
+            title={entity.name}
+            isEditing={isEditing}
+            hasChanges={hasChanges}
+            onBack={onBack}
+            onEdit={onEdit}
+            onSave={onSave}
+            onCancel={onCancel}
+            onDelete={onDeleteModalOpen}
+            hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+            validationMessage={/* mensagem de validação */}
+            basicFields={basicFields}
+            advancedFields={advancedFields}
+            advancedSectionTitle={t("sections.advanced_info")}
+            advancedSectionOpen={advancedSectionOpen}
+            onAdvancedSectionToggle={onAdvancedSectionToggle}
+            versionsPanel={versionsPanel}
+            primaryActions={[/* ações extras */]}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 ```
+
+**Exemplo de referência completo:** `src/pages/dashboard/tabs/items/item-detail/view.tsx`
 
 ---
 
@@ -1177,54 +1300,173 @@ useEffect(() => {
 
 **⚠️ REGRA FUNDAMENTAL:**
 
-**Campos Básicos (obrigatórios):**
+**`FieldWithVisibilityToggle` é usado SOMENTE para campos opcionais das INFORMAÇÕES AVANÇADAS.**
+
+---
+
+**Campos BÁSICOS (obrigatórios ou principais):**
 - ❌ **NÃO** podem ser ocultados
 - ❌ **NÃO** usam `FieldWithVisibilityToggle`
-- ✅ Sempre visíveis (nome, resumo, campos obrigatórios)
-- ✅ Renderizados diretamente sem toggle
+- ✅ Sempre visíveis (nome, campos obrigatórios, imagem principal)
+- ✅ Renderizados diretamente dentro de `basicFields`
+- ✅ Organizados em Cards com títulos claros
 
-**Campos Avançados (opcionais):**
+**Exemplos de campos básicos:**
+- Nome
+- Status/Role
+- Categoria/Tipo
+- Resumo/Descrição Principal
+- Imagem Principal
+
+---
+
+**Campos AVANÇADOS (opcionais):**
 - ✅ **PODEM** ser ocultados
 - ✅ **DEVEM** usar `FieldWithVisibilityToggle`
-- ✅ Usuário pode mostrar/ocultar em modo visualização
-- ✅ Todos estão dentro da seção "Avançado"
+- ✅ Usuário pode mostrar/ocultar em modo visualização (toggle de olho)
+- ✅ Organizados dentro de `advancedFields`
+- ✅ Divididos em seções temáticas com títulos `h4` e `Separator`
 
-**Exemplo de estrutura:**
+**Exemplos de campos avançados:**
+- Descrições detalhadas opcionais
+- Campos de narrativa (raridade, propósito)
+- Mecânicas (requisitos, consequências)
+- Listas opcionais (nomes alternativos, alcunhas)
+
+---
+
+**Estrutura Visual:**
+
+```
+┌─────────────────────────────────┐
+│  CAMPOS BÁSICOS (basicFields)   │
+│  ❌ Sem FieldWithVisibilityToggle│
+├─────────────────────────────────┤
+│  Card: Informações Principais   │
+│  • Nome (obrigatório)            │
+│  • Status (obrigatório)          │
+│  • Categoria (obrigatória)       │
+│  • Descrição (obrigatória)       │
+├─────────────────────────────────┤
+│  Card: Imagem                    │
+│  • Imagem principal              │
+└─────────────────────────────────┘
+
+┌─────────────────────────────────┐
+│ CAMPOS AVANÇADOS (advancedFields)│
+│ ✅ COM FieldWithVisibilityToggle │
+├─────────────────────────────────┤
+│ Seção: Descrições Detalhadas    │
+│  • Campo opcional 1 [👁]         │
+│  • Campo opcional 2 [👁]         │
+├─────────────────────────────────┤
+│ ─────────── (Separator) ────────│
+├─────────────────────────────────┤
+│ Seção: Narrativa                 │
+│  • Campo opcional 3 [👁]         │
+│  • Campo opcional 4 [👁]         │
+├─────────────────────────────────┤
+│ ─────────── (Separator) ────────│
+├─────────────────────────────────┤
+│ Seção: Outros                    │
+│  • Campo opcional 5 [👁]         │
+└─────────────────────────────────┘
+```
+
+[👁] = Toggle de visibilidade do FieldWithVisibilityToggle
+
+---
+
+**Exemplo de código:**
 
 ```tsx
-// ❌ Campo BÁSICO (obrigatório) - SEM FieldWithVisibilityToggle
-{isEditing ? (
-  <div className="space-y-2">
-    <Label className="text-primary">
-      Nome <span className="text-destructive ml-1">*</span>
-    </Label>
-    <Input
-      value={editData.name}
-      onChange={(e) => onEditDataChange("name", e.target.value)}
-    />
-  </div>
-) : (
-  <h2 className="text-3xl font-bold">{entity.name}</h2>
-)}
+// ==================
+// BASIC FIELDS - SEM FieldWithVisibilityToggle
+// ==================
+const basicFields = (
+  <div className="space-y-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("sections.main_info")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* ❌ Campo BÁSICO (obrigatório) - SEM FieldWithVisibilityToggle */}
+        <div className="space-y-2">
+          <Label className="text-primary">
+            {t("fields.name")} <span className="text-destructive ml-1">*</span>
+          </Label>
+          {isEditing ? (
+            <Input
+              value={editData.name}
+              onChange={(e) => onEditDataChange("name", e.target.value)}
+            />
+          ) : (
+            <h2 className="text-3xl font-bold">{entity.name}</h2>
+          )}
+        </div>
 
-// ✅ Campo AVANÇADO (opcional) - COM FieldWithVisibilityToggle
-<FieldWithVisibilityToggle
-  fieldName="climate"
-  label={t("climate_label")}
-  isOptional
-  fieldVisibility={fieldVisibility}
-  isEditing={isEditing}
-  onFieldVisibilityToggle={onFieldVisibilityToggle}
->
-  {isEditing ? (
-    <Textarea value={editData.climate} ... />
-  ) : entity.climate ? (
-    <p className="text-sm">{entity.climate}</p>
-  ) : (
-    <EmptyFieldState t={t} />
-  )}
-</FieldWithVisibilityToggle>
+        {/* Outros campos básicos (status, categoria, descrição principal) */}
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("fields.image")}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Imagem principal */}
+      </CardContent>
+    </Card>
+  </div>
+);
+
+// ==================
+// ADVANCED FIELDS - COM FieldWithVisibilityToggle
+// ==================
+const advancedFields = (
+  <>
+    {/* Seção 1 */}
+    <div className="space-y-4">
+      <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+        {t("sections.detailed_descriptions")}
+      </h4>
+
+      {/* ✅ Campo AVANÇADO (opcional) - COM FieldWithVisibilityToggle */}
+      <FieldWithVisibilityToggle
+        fieldName="detailedDescription"
+        label={t("fields.detailed_description")}
+        isOptional
+        fieldVisibility={fieldVisibility}
+        isEditing={isEditing}
+        onFieldVisibilityToggle={onFieldVisibilityToggle}
+      >
+        {isEditing ? (
+          <Textarea value={editData.detailedDescription} ... />
+        ) : entity.detailedDescription ? (
+          <p className="text-sm whitespace-pre-wrap">{entity.detailedDescription}</p>
+        ) : (
+          <EmptyFieldState t={t} />
+        )}
+      </FieldWithVisibilityToggle>
+
+      {/* Mais campos opcionais */}
+    </div>
+
+    <Separator className="my-6" />
+
+    {/* Seção 2 */}
+    <div className="space-y-4">
+      <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+        {t("sections.narrative")}
+      </h4>
+
+      {/* Campos opcionais com FieldWithVisibilityToggle */}
+    </div>
+  </>
+);
 ```
+
+**Ver exemplo completo:** `src/pages/dashboard/tabs/items/item-detail/view.tsx`
 
 ### 3.2 Estrutura Geral com FieldWithVisibilityToggle
 
@@ -1990,6 +2232,10 @@ export const EntitySchema = z.object({
 ## Exemplos de Referência
 
 **Ver implementação completa:**
+- 📁 `src/pages/dashboard/tabs/items/` - Tab Itens (REFERÊNCIA ATUALIZADA)
+- 📁 `src/pages/dashboard/tabs/items/item-detail/` - Detalhes de item (PADRÃO COMPLETO)
+- 📁 `src/pages/dashboard/tabs/characters/` - Tab Personagens
+- 📁 `src/pages/dashboard/tabs/characters/character-detail/` - Detalhes de personagem
 - 📁 `src/pages/dashboard/tabs/world/` - Tab Mundo (regiões)
 - 📁 `src/pages/dashboard/tabs/world/region-detail/` - Detalhes de região
 
@@ -1998,3 +2244,88 @@ export const EntitySchema = z.object({
 - 📄 `docs/build/forms.md` - Componentes de formulário
 - 📄 `docs/build/modals.md` - Modais reutilizáveis
 - 📄 `docs/build/buttons.md` - Estilos de botões
+
+---
+
+## Resumo dos Pontos Críticos de Implementação
+
+### ✅ **DEVE FAZER** (Obrigatório)
+
+#### **Estrutura de Detalhes:**
+1. ✅ Usar `EntityDetailLayout` - **NÃO** criar header/grid customizado
+2. ✅ Organizar campos em `basicFields` (visíveis sempre) e `advancedFields` (colapsável)
+3. ✅ Usar `FieldWithVisibilityToggle` **SOMENTE** em campos opcionais do `advancedFields`
+4. ✅ Organizar `advancedFields` em seções temáticas com títulos `h4` e `Separator`
+5. ✅ Usar `EntityVersionManager` para painel de versões
+6. ✅ Definir `EmptyFieldState` localmente no arquivo da view
+
+#### **Campos Básicos (basicFields):**
+1. ✅ Nome - sempre visível, `h2` em visualização
+2. ✅ Campos obrigatórios - sempre visíveis, validação com asterisco vermelho
+3. ✅ Imagem principal - Card separado
+4. ✅ **NÃO** usar `FieldWithVisibilityToggle` em nenhum campo básico
+
+#### **Campos Avançados (advancedFields):**
+1. ✅ **TODOS** os campos opcionais devem usar `FieldWithVisibilityToggle`
+2. ✅ Dividir em seções com `<div className="space-y-4">` + título `h4`
+3. ✅ Separar seções com `<Separator className="my-6" />`
+4. ✅ Textos longos: `whitespace-pre-wrap` + contador de caracteres
+5. ✅ Listas: Collapsible com `ul > li` em visualização
+6. ✅ Multi-selects: Collapsible com cards de entidade em visualização
+7. ✅ Status/Role: Usar `EntityTagBadge` em visualização
+
+#### **Container (index.tsx):**
+1. ✅ Implementar **TODAS** as lógicas de edição (seção 2.1):
+   - `hasChanges` - comparar todos os campos
+   - `validateField` - validação onBlur com Zod
+   - `hasRequiredFieldsEmpty` + `missingFields`
+   - `handleSave` - validação completa com Zod
+   - `handleCancel` - verificar mudanças não salvas
+   - `UnsavedChangesDialog` - modal de confirmação
+2. ✅ Estado `advancedSectionOpen` com localStorage
+3. ✅ Estado `fieldVisibility` e `originalFieldVisibility`
+4. ✅ Passar props corretas para a view
+
+#### **Outros:**
+1. ✅ Container pai **SEM** `overflow-hidden` (quebra sticky header)
+2. ✅ Usar componentes de `forms.md` (FormImageUpload, FormListInput, etc)
+3. ✅ Imports de `convertFileSrc` do Tauri para imagens
+4. ✅ Schema Zod para validação completa
+
+### ❌ **NÃO FAZER** (Evitar)
+
+1. ❌ **NÃO** criar header customizado - usar EntityDetailLayout
+2. ❌ **NÃO** criar grid layout manual - EntityDetailLayout gerencia
+3. ❌ **NÃO** usar `FieldWithVisibilityToggle` em campos básicos
+4. ❌ **NÃO** usar componentes customizados - verificar `forms.md` primeiro
+5. ❌ **NÃO** criar estrutura de versões customizada - usar EntityVersionManager
+6. ❌ **NÃO** importar EmptyFieldState - definir localmente
+7. ❌ **NÃO** adicionar `overflow-hidden` no container pai
+8. ❌ **NÃO** esquecer de organizar campos avançados em seções
+9. ❌ **NÃO** misturar campos básicos e avançados
+
+### 📋 Checklist Rápido
+
+**Antes de começar:**
+- [ ] Li a seção 2.2 (estrutura de detalhes)
+- [ ] Li a seção 3.1 (campos básicos vs avançados)
+- [ ] Verifiquei `forms.md` para componentes disponíveis
+- [ ] Tenho referência aberta: `src/pages/dashboard/tabs/items/item-detail/view.tsx`
+
+**Durante implementação:**
+- [ ] Usei EntityDetailLayout (não header customizado)
+- [ ] Separei basicFields e advancedFields
+- [ ] Campos básicos SEM FieldWithVisibilityToggle
+- [ ] Campos avançados COM FieldWithVisibilityToggle
+- [ ] Organizei advancedFields em seções (h4 + Separator)
+- [ ] Implementei todas as lógicas de edição (seção 2.1)
+- [ ] Estado advancedSectionOpen com localStorage
+- [ ] Container SEM overflow-hidden
+
+**Depois de implementar:**
+- [ ] Build executado sem erros
+- [ ] Sticky header funciona (scroll na página)
+- [ ] Campos avançados podem ser ocultados (toggle de olho)
+- [ ] Seção avançada mantém estado ao sair/voltar (localStorage)
+- [ ] Validação funciona (campos obrigatórios)
+- [ ] Modal de confirmação aparece ao cancelar com mudanças

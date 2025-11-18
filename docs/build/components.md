@@ -325,3 +325,5 @@ export const REGION_SCALES_CONSTANT: IRegionScale[] = [
 - ✅ Ícone de olho para alternar visibilidade
 - ✅ Indicador visual (asterisco *) para campos obrigatórios
 
+---
+

@@ -12,6 +12,11 @@
     "basic_info": "Basic Information",
     "additional_info": "Additional Information",
     "advanced_info": "Advanced Information",
+    "main_info": "Main Information",
+    "detailed_descriptions": "Detailed Descriptions",
+    "narrative": "Narrative Information",
+    "mechanics": "Mechanics and Usage",
+    "other": "Other Information",
     "versions": "Versions"
   },
   "actions": {
@@ -24,12 +29,28 @@
     "category": "Category",
     "status": "Status",
     "rarity": "Rarity",
+    "story_rarity": "Story Rarity",
     "basic_description": "Basic Description",
     "appearance": "Appearance",
     "origin": "Origin",
     "narrative_purpose": "Narrative Purpose",
     "usage_requirements": "Usage Requirements",
-    "usage_consequences": "Usage Consequences"
+    "usage_consequences": "Usage Consequences",
+    "alternative_names": "Alternative Names"
+  },
+  "placeholders": {
+    "alternative_name": "Enter an alternative name...",
+    "appearance": "Describe the physical appearance...",
+    "origin": "Describe the origin or history...",
+    "narrative_purpose": "What role does this item play in the story?",
+    "usage_requirements": "What is needed to use this item?",
+    "usage_consequences": "What happens when this item is used?"
+  },
+  "buttons": {
+    "add_alternative_name": "Add Alternative Name"
+  },
+  "helpers": {
+    "recommended_image_size": "Recommended: 800x600px"
   },
   "empty_states": {
     "no_data": "Nothing added yet",
@@ -105,5 +126,10 @@
   },
   "upload": {
     "click": "Click to upload"
-  }
+  },
+  "warnings": {
+    "story_rarity": "Story rarity indicates how rare or significant this item is in your narrative."
+  },
+  "missing_fields": "Missing required fields",
+  "fill_required_fields": "Please fill in all required fields before saving"
 }

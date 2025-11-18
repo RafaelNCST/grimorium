@@ -1,6 +1,7 @@
 {
   "modal": {
     "create_item": "Create New Item",
+    "description": "Add a new item to your book",
     "info_message": "Everything can be edited later. Start with basic information and add details as you develop your story.",
     "basic_fields": "Basic Fields",
     "change_image": "Change Image",
@@ -21,7 +22,8 @@
     "origin": "Origin",
     "origin_placeholder": "Forged a thousand years ago by the legendary blacksmith Thorgrim in the Eternal Mountains.",
     "alternative_names": "Alternative Names",
-    "alternative_names_placeholder": "The King's Blade, Shadow Cutter",
+    "alternative_names_placeholder": "Enter an alternative name...",
+    "add_alternative_name": "Add Alternative Name",
     "story_rarity": "Story Rarity",
     "rarity_explanation": "Rarity determines how unique the item is in your story world. This does not serve to define game mechanics, but rather the rarity of it in its narrative.",
     "narrative_purpose": "Narrative Purpose",
@@ -48,13 +50,13 @@
     "consumable": "Consumable",
     "resource": "Resource",
     "artifact": "Artifact",
+    "tool": "Tool",
+    "treasure": "Treasure",
     "other": "Other"
   },
   "rarity": {
     "common": "Common",
     "common_desc": "Several exist in your story",
-    "uncommon": "Uncommon",
-    "uncommon_desc": "Few exist, but not unique",
     "rare": "Rare",
     "rare_desc": "Very difficult to find",
     "legendary": "Legendary",

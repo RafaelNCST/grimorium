@@ -129,8 +129,6 @@ export function CreateCharacterModalView({
           imageFit="cover"
           showLabel={false}
           placeholderIcon={User}
-          placeholderText={t("modal.upload_image")}
-          placeholderTextSize="text-[0.5rem]"
         />
 
         {/* Name, Age, Gender */}

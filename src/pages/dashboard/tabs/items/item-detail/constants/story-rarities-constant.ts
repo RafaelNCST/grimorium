@@ -1,6 +1,5 @@
 import {
   Circle,
-  Hexagon,
   Diamond,
   Star,
   Crown,
@@ -24,14 +23,6 @@ export const STORY_RARITIES_CONSTANT: IStoryRarity[] = [
     icon: Circle,
     color: "text-gray-600 dark:text-gray-400",
     bgColorClass: "bg-gray-500/10 border-gray-500/30 hover:bg-gray-500/20",
-  },
-  {
-    value: "uncommon",
-    translationKey: "rarity.uncommon",
-    descriptionKey: "rarity.uncommon_desc",
-    icon: Hexagon,
-    color: "text-green-600 dark:text-green-400",
-    bgColorClass: "bg-green-500/10 border-green-500/30 hover:bg-green-500/20",
   },
   {
     value: "rare",

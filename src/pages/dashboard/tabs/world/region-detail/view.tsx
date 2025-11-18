@@ -21,6 +21,7 @@ import {
 } from "@/components/detail-page";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
@@ -288,7 +289,6 @@ export function RegionDetailView({
                 height="h-[28rem]"
                 shape="rounded"
                 placeholderIcon={Map}
-                placeholderText={t("world:create_region.upload_image")}
                 id="region-image-upload"
               />
             </div>
@@ -407,9 +407,13 @@ export function RegionDetailView({
                 />
               </div>
             ) : (
-              <div className="relative w-full h-[28rem] bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg flex items-center justify-center">
-                <Map className="w-16 h-16 text-muted-foreground/30" />
-              </div>
+              <FormImageDisplay
+                icon={Map}
+                text={t("world:region_map.no_image")}
+                height="h-[28rem]"
+                width="w-full"
+                shape="rounded"
+              />
             )}
           </div>
         </div>

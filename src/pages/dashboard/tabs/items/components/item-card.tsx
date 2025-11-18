@@ -1,5 +1,9 @@
+import React from "react";
+
+import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
 import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +34,7 @@ interface PropsItemCard {
 
 export function ItemCard({ item, onClick }: PropsItemCard) {
   const { t } = useTranslation(["items", "create-item"]);
+  const [isHovered, setIsHovered] = React.useState(false);
 
   const statusData = ITEM_STATUSES_CONSTANT.find(
     (s) => s.value === item.status
@@ -48,8 +53,10 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
 
   return (
     <Card
-      className="cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
+      className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80"
       onClick={() => onClick?.(item.id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
@@ -62,47 +69,60 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
             />
           </div>
         ) : (
-          <div className="relative w-full h-48 bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
-            <span className="text-4xl text-muted-foreground">
-              {item.name.charAt(0).toUpperCase()}
-            </span>
+          <div className="relative w-full h-48 rounded-t-lg overflow-hidden">
+            <FormImageDisplay
+              icon={Package}
+              height="h-48"
+              width="w-full"
+              shape="square"
+              className="rounded-t-lg"
+            />
           </div>
         )}
 
         <div className="p-4 space-y-3">
-          {/* Name on one side and status with icon and color on the same line at the end */}
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-lg leading-tight flex-1">
-              {item.name}
-            </h3>
+          {/* Name */}
+          <h3 className="font-semibold text-lg leading-tight">
+            {item.name}
+          </h3>
+
+          {/* Category and Status side by side */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {categoryData && CategoryIcon && (
+              <Badge
+                className={`${categoryData.bgColorClass} ${categoryData.colorClass} border px-3 py-1 pointer-events-none select-none`}
+              >
+                <CategoryIcon className="w-3.5 h-3.5 mr-1.5" />
+                <span className="text-xs font-medium">{displayCategory}</span>
+              </Badge>
+            )}
             {statusData && StatusIcon && (
               <Badge
-                className={`flex items-center gap-1.5 ${statusData.activeColor} bg-transparent border-none px-2 py-1 pointer-events-none`}
+                className={`${statusData.bgColorClass} ${statusData.colorClass} border px-3 py-1 pointer-events-none select-none`}
               >
-                <StatusIcon className="w-4 h-4" />
-                <span className="text-xs">
+                <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
+                <span className="text-xs font-medium">
                   {t(`create-item:status.${item.status}`)}
                 </span>
               </Badge>
             )}
           </div>
 
-          {/* Below: category with icon and name */}
-          <div className="flex items-center gap-1.5">
-            {CategoryIcon && (
-              <CategoryIcon className="w-4 h-4 text-primary flex-shrink-0" />
-            )}
-            <span className="text-sm font-medium text-muted-foreground">
-              {displayCategory}
-            </span>
-          </div>
-
-          {/* At the end: basic description showing a maximum of 2 lines, hiding the rest */}
+          {/* Basic description showing a maximum of 2 lines, hiding the rest */}
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {item.basicDescription}
           </p>
         </div>
       </CardContent>
+
+      {/* Overlay cobrindo todo o card */}
+      <div
+        className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="text-white text-lg font-semibold">Ver detalhes</span>
+      </div>
     </Card>
   );
 }

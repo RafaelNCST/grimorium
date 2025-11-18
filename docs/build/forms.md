@@ -533,7 +533,7 @@ const PRIORITY_LEVELS = [
 ## 13. FormImageUpload (Upload de Imagem)
 **Componente:** `FormImageUpload` (`src/components/forms/FormImageUpload.tsx`)
 **Uso:** Upload de imagens com preview e customização de forma
-**Descrição:** Componente de upload de imagem altamente customizável. Permite diferentes formas (quadrado, arredondado, circular), ajuste de como a imagem se encaixa no container, e ícone/texto customizável no placeholder. O placeholder possui fundo roxo escuro.
+**Descrição:** Componente de upload de imagem altamente customizável. Permite diferentes formas (quadrado, arredondado, circular), ajuste de como a imagem se encaixa no container, e ícone customizável no placeholder. O placeholder possui fundo roxo escuro e mostra apenas o ícone (texto é opcional).
 
 **Exemplo de uso básico:**
 ```tsx
@@ -591,7 +591,7 @@ const PRIORITY_LEVELS = [
   - `"cover"`: Cobre todo espaço (pode cortar)
   - `"contain"`: Mantém proporção (pode ter espaços vazios)
 - `placeholderIcon`: (Opcional) Ícone Lucide para o placeholder (default: ImagePlus)
-- `placeholderText`: (Opcional) Texto do placeholder (default: "Click to upload image")
+- `placeholderText`: (Opcional) Texto do placeholder (default: sem texto, apenas ícone)
 - `accept`: (Opcional) Tipos de arquivo aceitos
 - `error`: (Opcional) Mensagem de erro
 - `id`: (Opcional) ID do input
@@ -604,7 +604,139 @@ const PRIORITY_LEVELS = [
 - ✅ Botão de remover imagem
 - ✅ Placeholder com fundo roxo escuro (bg-purple-950/40)
 - ✅ Ícone customizável no placeholder
+- ✅ Texto opcional no placeholder (padrão: apenas ícone)
 - ✅ Três formas: quadrado, arredondado, circular
 - ✅ Três modos de fit: fill, cover, contain
 - ✅ Validação e mensagens de erro
 - ✅ Helper text para recomendações de tamanho
+
+---
+
+## 14. FormImageDisplay (Display Visual de Imagem Vazia)
+**Componente:** `FormImageDisplay` (`src/components/forms/FormImageDisplay.tsx`)
+**Uso:** Exibir estado vazio de imagem em modo visualização (não editável)
+**Descrição:** Componente puramente visual (sem interatividade) usado para mostrar um placeholder quando não há imagem disponível e o usuário não está no modo de edição. Possui fundo roxo translúcido e exibe um ícone com texto opcional.
+
+**Diferenças críticas com FormImageUpload:**
+| Característica | FormImageDisplay | FormImageUpload |
+|---------------|------------------|-----------------|
+| **Propósito** | Visualização de estado vazio | Upload de imagem |
+| **Interatividade** | NENHUMA (apenas visual) | Upload via clique |
+| **Borda** | Nenhuma | Tracejada (`border-dashed border-2`) |
+| **Hover** | Nenhum | Muda borda (`hover:border-muted-foreground/50`) |
+| **Elemento HTML** | `<div>` estático | `<button>` clicável |
+| **Quando usar** | Modo visualização SEM imagem | Modo edição (com ou sem imagem) |
+
+**Exemplo de uso (modo visualização vs edição):**
+```tsx
+import { FormImageDisplay, FormImageUpload } from "@/components/forms";
+import { ImagePlus } from "lucide-react";
+
+// No componente
+const [isEditing, setIsEditing] = useState(false);
+const [image, setImage] = useState<string | null>(null);
+
+// Renderização condicional
+{isEditing ? (
+  // Modo EDIÇÃO: sempre usa FormImageUpload
+  <FormImageUpload
+    value={image}
+    onChange={setImage}
+    label="Imagem da Região"
+    height="h-[28rem]"
+  />
+) : (
+  // Modo VISUALIZAÇÃO: se tem imagem, mostra; se não tem, usa FormImageDisplay
+  image ? (
+    <img src={image} alt="Região" className="h-[28rem] w-full object-cover rounded-lg" />
+  ) : (
+    <FormImageDisplay
+      icon={ImagePlus}
+      text="Sem imagem"
+      height="h-[28rem]"
+    />
+  )
+)}
+```
+
+**Exemplo avatar circular vazio:**
+```tsx
+{!isEditing && !avatar && (
+  <FormImageDisplay
+    icon={User}
+    text="Sem avatar"
+    height="h-40"
+    width="w-40"
+    shape="circle"
+  />
+)}
+```
+
+**Exemplo com forma customizada:**
+```tsx
+{!isEditing && !emblem && (
+  <FormImageDisplay
+    icon={Shield}
+    text="Emblema não definido"
+    height="h-64"
+    width="w-64"
+    shape="rounded"
+    className="mx-auto"
+  />
+)}
+```
+
+**Propriedades principais:**
+- `icon`: Ícone do Lucide React (obrigatório)
+- `text`: (Opcional) Texto exibido abaixo do ícone
+- `height`: (Opcional) Altura do container (default: "h-40")
+- `width`: (Opcional) Largura do container (default: "w-40")
+- `shape`: (Opcional) Forma do container
+  - `"square"`: Bordas retas
+  - `"rounded"`: Bordas arredondadas (default)
+  - `"circle"`: Circular (requer width/height iguais)
+- `className`: (Opcional) Classes CSS adicionais
+
+**Características visuais:**
+- ✅ Fundo roxo translúcido: `bg-purple-950/40`
+- ✅ SEM bordas
+- ✅ SEM hover (é apenas visualização)
+- ✅ SEM clique (não interativo)
+- ✅ Ícone roxo claro: `text-purple-400`
+- ✅ Texto roxo: `text-purple-300`
+- ✅ Layout vertical (ícone no topo, texto abaixo)
+- ✅ Gap de `0.5rem` entre ícone e texto
+
+**Quando usar:**
+- ✅ Modo visualização (não editando) E sem imagem disponível
+- ✅ Placeholder visual para estado vazio
+- ✅ Indicar que não há imagem sem permitir upload
+
+**Quando NÃO usar:**
+- ❌ Modo edição (use FormImageUpload)
+- ❌ Quando há imagem disponível (mostre a imagem)
+- ❌ Quando precisa de interação (use FormImageUpload)
+
+**Fluxo de decisão completo:**
+```tsx
+{isEditing ? (
+  // EDIÇÃO: sempre FormImageUpload (com ou sem imagem)
+  <FormImageUpload value={image} onChange={setImage} label="Imagem" />
+) : (
+  // VISUALIZAÇÃO: mostra imagem ou FormImageDisplay
+  image ? (
+    <img src={image} alt="Preview" />
+  ) : (
+    <FormImageDisplay icon={ImagePlus} text="Sem imagem" />
+  )
+)}
+```
+
+**Checklist de implementação:**
+- [ ] Usar APENAS em modo visualização (`isEditing === false`)
+- [ ] Verificar se NÃO há imagem (`!image`)
+- [ ] Importar: `import { FormImageDisplay } from "@/components/forms"`
+- [ ] Importar ícone: `import { IconName } from "lucide-react"`
+- [ ] Configurar altura/largura apropriadas
+- [ ] Adicionar texto descritivo apropriado
+- [ ] Nunca adicionar onClick ou handlers de evento
