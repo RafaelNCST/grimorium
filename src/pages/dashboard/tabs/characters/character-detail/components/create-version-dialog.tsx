@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 
 import { ArrowRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -66,7 +65,6 @@ export function CreateVersionDialog({
 
   const handleStep1Continue = useCallback(() => {
     if (!canProceedToStep2) {
-      toast.error(t("versions.create_dialog.step1_validation_error"));
       return;
     }
     setStep(2);
@@ -86,7 +84,6 @@ export function CreateVersionDialog({
         characterData: characterData as unknown as ICharacterFormData,
       });
       handleClose();
-      toast.success(t("versions.create_dialog.success"));
     },
     [versionName, versionDescription, onConfirm, handleClose, t]
   );

@@ -44,7 +44,6 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/hooks/use-toast";
 import { RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/relationship-types-badge-constant";
 
 interface ICharacterRelationship {
@@ -286,12 +285,6 @@ export function RelationshipsSection({
 
   const handleOpenAddDialog = () => {
     if (availableCharacters.length === 0) {
-      toast({
-        title: t("character-detail:relationships.no_characters_available"),
-        description: t(
-          "character-detail:relationships.no_characters_available_hint"
-        ),
-      });
       return;
     }
     setIsAddDialogOpen(true);

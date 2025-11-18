@@ -3,7 +3,6 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
@@ -414,7 +413,6 @@ export function CharacterDetail() {
         if (!isMounted) return;
 
         console.error("Error loading character:", error);
-        toast.error("Erro ao carregar personagem");
       } finally {
         // Only update loading state if component is still mounted
         if (isMounted) {
@@ -469,8 +467,6 @@ export function CharacterDetail() {
       });
       setImagePreview(version.characterData.image || "");
       setFieldVisibility(version.characterData.fieldVisibility || {});
-
-      toast.success(`Versão "${version.name}" ativada`);
     },
     [versions]
   );
@@ -496,10 +492,8 @@ export function CharacterDetail() {
 
         // Atualizar o estado apenas se o save for bem-sucedido
         setVersions((prev) => [...prev, newVersion]);
-        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
       } catch (error) {
         console.error("Error creating character version:", error);
-        toast.error("Erro ao criar versão");
       }
     },
     [characterId]
@@ -511,7 +505,6 @@ export function CharacterDetail() {
 
       // Não permitir deletar versão principal
       if (versionToDelete?.isMain) {
-        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -537,10 +530,8 @@ export function CharacterDetail() {
         }
 
         setVersions(updatedVersions);
-        toast.success("Versão excluída com sucesso!");
       } catch (error) {
         console.error("Error deleting character version:", error);
-        toast.error("Erro ao excluir versão");
       }
     },
     [versions, currentVersion]
@@ -563,7 +554,6 @@ export function CharacterDetail() {
         }
       } catch (error) {
         console.error("Error updating character version:", error);
-        toast.error("Erro ao atualizar versão");
       }
     },
     [versions, currentVersion]
@@ -646,7 +636,6 @@ export function CharacterDetail() {
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
-      toast.success("Personagem atualizado com sucesso!");
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -665,7 +654,6 @@ export function CharacterDetail() {
         setErrors(newErrors);
       } else {
         console.error("Error saving character:", error);
-        toast.error("Erro ao salvar personagem");
       }
     }
   }, [
@@ -711,7 +699,6 @@ export function CharacterDetail() {
       }
 
       setVersions(updatedVersions);
-      toast.success(t("delete.version.success"));
     } else {
       // Delete entire character (main version)
       console.log("Attempting to delete character");
@@ -720,13 +707,11 @@ export function CharacterDetail() {
         if (!dashboardId) return;
         // Deletar do store (que também deleta do DB)
         await deleteCharacterFromStore(dashboardId, characterId);
-        console.log("Delete successful, showing toast");
-        toast.success(t("delete.character.step2.success"));
+        console.log("Delete successful");
         console.log("Navigating to characters tab");
         navigateToCharactersTab();
       } catch (error) {
         console.error("Error deleting character:", error);
-        toast.error("Erro ao excluir personagem");
       }
     }
   }, [
@@ -884,7 +869,6 @@ export function CharacterDetail() {
       setSelectedRelationshipCharacter("");
       setSelectedRelationshipType("");
       setRelationshipIntensity([50]);
-      toast.success("Relacionamento adicionado com sucesso!");
     }
   }, [
     selectedRelationshipCharacter,
@@ -898,7 +882,6 @@ export function CharacterDetail() {
       relationships:
         prev.relationships?.filter((rel) => rel.id !== relationshipId) || [],
     }));
-    toast.success("Relacionamento removido com sucesso!");
   }, []);
 
   const handleUpdateRelationshipIntensity = useCallback(
@@ -1036,10 +1019,9 @@ export function CharacterDetail() {
       try {
         await updatePowerCharacterLinkLabel(linkId, customLabel);
         await loadPowerLinks();
-        toast.success(t("character-detail:power_links.link_updated"));
         setIsEditLinkModalOpen(false);
       } catch (error) {
-        toast.error(t("character-detail:power_links.error_updating_link"));
+        console.error("Error updating power link:", error);
       }
     },
     [t]
@@ -1050,10 +1032,9 @@ export function CharacterDetail() {
       try {
         await deletePowerCharacterLink(linkId);
         await loadPowerLinks();
-        toast.success(t("character-detail:power_links.link_deleted"));
         setIsEditLinkModalOpen(false);
       } catch (error) {
-        toast.error(t("character-detail:power_links.error_deleting_link"));
+        console.error("Error deleting power link:", error);
       }
     },
     [t]
