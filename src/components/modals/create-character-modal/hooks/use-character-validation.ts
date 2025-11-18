@@ -14,6 +14,7 @@ export const characterFormSchema = z.object({
     .min(1, "validation.description_required")
     .max(500, "validation.description_max_length"),
   image: z.string().optional(),
+  status: z.string().optional(),
 
   // Appearance (Advanced - all optional)
   height: z.string().optional(),
@@ -48,10 +49,12 @@ export const characterFormSchema = z.object({
   // Alignment (Advanced - optional)
   alignment: z.string().optional(),
 
-  // Locations and Organizations (Advanced - all optional)
+  // History (Advanced - all optional)
   birthPlace: z.array(z.string()).optional(),
   affiliatedPlace: z.string().optional(),
   organization: z.string().optional(),
+  nicknames: z.array(z.string()).optional(),
+  past: z.string().max(1000, "validation.past_max_length").optional(),
 });
 
 export type CharacterFormSchema = z.infer<typeof characterFormSchema>;

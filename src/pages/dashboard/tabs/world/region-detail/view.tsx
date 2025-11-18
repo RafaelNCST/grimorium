@@ -21,9 +21,9 @@ import {
 } from "@/components/detail-page";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormListInput } from "@/components/forms/FormListInput";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
-import { ListInput } from "@/components/modals/create-region-modal/components/list-input";
 import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
@@ -602,7 +602,7 @@ export function RegionDetailView({
               onFieldVisibilityToggle={onFieldVisibilityToggle}
             >
               {isEditing ? (
-                <ListInput
+                <FormListInput
                   label=""
                   placeholder={t("world:create_region.anomaly_placeholder")}
                   buttonText={t("world:create_region.add_anomaly")}
@@ -1403,7 +1403,7 @@ export function RegionDetailView({
             onFieldVisibilityToggle={onFieldVisibilityToggle}
           >
             {isEditing ? (
-              <ListInput
+              <FormListInput
                 label=""
                 placeholder={t("world:create_region.mystery_placeholder")}
                 buttonText={t("world:create_region.add_mystery")}
@@ -1466,7 +1466,7 @@ export function RegionDetailView({
             onFieldVisibilityToggle={onFieldVisibilityToggle}
           >
             {isEditing ? (
-              <ListInput
+              <FormListInput
                 label=""
                 placeholder={t("world:create_region.inspiration_placeholder")}
                 buttonText={t("world:create_region.add_inspiration")}

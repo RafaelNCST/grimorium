@@ -265,6 +265,7 @@ export function CharacterDetail() {
     if (character.description !== editData.description) return true;
     if (character.image !== editData.image) return true;
     if (character.alignment !== editData.alignment) return true;
+    if (character.status !== editData.status) return true;
 
     // Compare appearance fields
     if (character.height !== editData.height) return true;
@@ -289,8 +290,10 @@ export function CharacterDetail() {
     if (character.favoriteFood !== editData.favoriteFood) return true;
     if (character.favoriteMusic !== editData.favoriteMusic) return true;
 
-    // Compare locations
+    // Compare history fields
     if (!arraysEqual(character.birthPlace, editData.birthPlace)) return true;
+    if (!arraysEqual(character.nicknames, editData.nicknames)) return true;
+    if (character.past !== editData.past) return true;
 
     // Compare relationships
     if (
@@ -572,6 +575,7 @@ export function CharacterDetail() {
         description: editData.description,
         image: editData.image,
         alignment: editData.alignment,
+        status: editData.status,
         // Appearance
         height: editData.height,
         weight: editData.weight,
@@ -590,8 +594,10 @@ export function CharacterDetail() {
         fearsAndTraumas: editData.fearsAndTraumas,
         favoriteFood: editData.favoriteFood,
         favoriteMusic: editData.favoriteMusic,
-        // Locations
+        // History
         birthPlace: editData.birthPlace,
+        nicknames: editData.nicknames,
+        past: editData.past,
         // Relations
         family: editData.family,
         relationships: editData.relationships,

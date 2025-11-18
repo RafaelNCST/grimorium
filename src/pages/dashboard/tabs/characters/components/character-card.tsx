@@ -4,6 +4,7 @@ import { Calendar } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
+import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
@@ -21,6 +22,9 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
 
   // Find role data
   const roleData = CHARACTER_ROLES_CONSTANT.find((r) => r.value === character.role);
+
+  // Find status data
+  const statusData = CHARACTER_STATUS_CONSTANT.find((s) => s.value === character.status);
 
   // Find gender data
   const genderData = GENDERS_CONSTANT.find((g) => g.value === character.gender);
@@ -73,15 +77,21 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
               )}
             </div>
 
-            {/* Role Badge */}
-            {roleData && (
-              <div className="flex">
+            {/* Role and Status Badges */}
+            <div className="flex gap-2 flex-wrap">
+              {roleData && (
                 <EntityTagBadge
                   config={roleData}
                   label={t(`create-character:role.${character.role}`)}
                 />
-              </div>
-            )}
+              )}
+              {statusData && (
+                <EntityTagBadge
+                  config={statusData}
+                  label={t(`create-character:status.${character.status}`)}
+                />
+              )}
+            </div>
           </div>
         </div>
 

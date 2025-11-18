@@ -71,6 +71,7 @@ async function runMigrations(database: Database): Promise<void> {
       description TEXT,
       image TEXT,
       alignment TEXT,
+      status TEXT,
 
       -- Aparência
       height TEXT,
@@ -93,10 +94,12 @@ async function runMigrations(database: Database): Promise<void> {
       favorite_food TEXT,
       favorite_music TEXT,
 
-      -- Localização
+      -- História
       birth_place TEXT,
       affiliated_place TEXT,
       organization TEXT,
+      nicknames TEXT,
+      past TEXT,
 
       -- Metadata
       field_visibility TEXT,
@@ -762,6 +765,36 @@ async function runMigrations(database: Database): Promise<void> {
         "ALTER TABLE region_map_markers ADD COLUMN scale REAL DEFAULT 1.0"
       );
       console.log("[db] Added scale column to region_map_markers table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add status column to characters table
+    try {
+      await database.execute(
+        "ALTER TABLE characters ADD COLUMN status TEXT"
+      );
+      console.log("[db] Added status column to characters table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add nicknames column to characters table
+    try {
+      await database.execute(
+        "ALTER TABLE characters ADD COLUMN nicknames TEXT"
+      );
+      console.log("[db] Added nicknames column to characters table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add past column to characters table
+    try {
+      await database.execute(
+        "ALTER TABLE characters ADD COLUMN past TEXT"
+      );
+      console.log("[db] Added past column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }

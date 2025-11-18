@@ -63,17 +63,32 @@
     "alignment_section": "Alinhamento",
     "alignment": "Alinhamento",
 
-    "locations_section": "Localizações e Organizações",
+    "locations_section": "História",
+    "status": "Status",
+    "status_placeholder": "Selecione o status",
     "birth_place": "Local de Nascimento",
     "birth_place_placeholder": "Selecione um local",
     "affiliated_place": "Local Afiliado",
     "affiliated_place_placeholder": "Selecione um local",
     "organization": "Organização",
     "organization_placeholder": "Selecione uma organização",
+    "nicknames": "Alcunhas",
+    "nickname_placeholder": "A Sombra, O Lendário, Destruidor de Mundos",
+    "nicknames_placeholder": "Digite alcunhas do personagem",
+    "add_nickname": "Adicionar Alcunha",
+    "past": "Passado",
+    "past_placeholder": "Descreva eventos importantes do passado do personagem, sua origem, experiências formativas e momentos marcantes que moldaram quem ele é hoje.",
     "no_locations_warning": "Nenhum local cadastrado. Vá para a aba Mundo para criar um.",
     "no_organizations_warning": "Nenhuma organização cadastrada. Vá para a aba Organizações para criar uma.",
     "no_birth_place_selected": "Nenhum local de nascimento selecionado",
     "search_location": "Buscar local..."
+  },
+  "status": {
+    "alive": "Vivo",
+    "unconscious": "Inconsciente",
+    "dead": "Morto",
+    "sealed": "Selado",
+    "missing": "Desaparecido"
   },
   "role": {
     "protagonist": "Protagonista",
@@ -164,7 +179,8 @@
     "personality_max_length": "Personalidade deve ter no máximo 500 caracteres",
     "hobbies_max_length": "Hobbies devem ter no máximo 250 caracteres",
     "dreams_max_length": "Sonhos e objetivos devem ter no máximo 250 caracteres",
-    "fears_max_length": "Medos e traumas devem ter no máximo 250 caracteres"
+    "fears_max_length": "Medos e traumas devem ter no máximo 250 caracteres",
+    "past_max_length": "Passado deve ter no máximo 1000 caracteres"
   },
   "button": {
     "cancel": "Cancelar",

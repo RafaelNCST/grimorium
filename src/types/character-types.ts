@@ -45,6 +45,7 @@ export interface ICharacter {
   gender?: string;
   description: string;
   image?: string;
+  status?: string;
 
   // Appearance
   height?: string;
@@ -70,10 +71,12 @@ export interface ICharacter {
   // Alignment
   alignment?: string;
 
-  // Locations and Organizations
+  // History
   birthPlace?: string[];
   affiliatedPlace?: string;
   organization?: string;
+  nicknames?: string[];
+  past?: string;
 
   // Relationships
   relationships?: ICharacterRelationship[];
@@ -101,6 +104,7 @@ export interface ICharacterFormData {
   gender: string;
   description: string;
   image: string;
+  status: string;
 
   // Appearance (Advanced)
   height: string;
@@ -126,10 +130,12 @@ export interface ICharacterFormData {
   // Alignment (Advanced)
   alignment: string;
 
-  // Locations and Organizations (Advanced)
+  // History (Advanced)
   birthPlace: string[];
   affiliatedPlace: string;
   organization: string;
+  nicknames: string[];
+  past: string;
 }
 
 export interface ICharacterVersion {

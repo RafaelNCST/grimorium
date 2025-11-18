@@ -1350,16 +1350,85 @@ Quando o campo está vazio em modo visualização, sempre usar:
 )}
 ```
 
-#### 3.3.4 Lista de Strings (ListInput)
+#### 3.3.4 Lista de Strings (FormListInput)
 
-**Edição:** `<ListInput />`
-**Visualização:** Collapsible com lista `ul > li`
+**Componente:** `FormListInput` (`src/components/forms/FormListInput.tsx`)
 
-**⚠️ IMPORTANTE:**
-- Label **presente em modo edição**, **vazia em visualização** no FieldWithVisibilityToggle
-- Label **preenchida** no CollapsibleTrigger em visualização
-- Contador de itens ao lado do label
+**Edição:** Lista editável com drag-and-drop
+**Visualização:** Lista colapsável com bullets (`ul > li`)
 
+**⚠️ PADRÃO DE VISUALIZAÇÃO:**
+- ❌ **NÃO** usar badges ou tags
+- ✅ **USAR** lista colapsável com bullets (igual às Anomalias da região)
+- ✅ Label **presente em modo edição**, **vazia em visualização** no FieldWithVisibilityToggle
+- ✅ Label **preenchida** no CollapsibleTrigger em visualização
+- ✅ Contador de itens ao lado do label em visualização
+
+**Opções do FormListInput:**
+- `inputSize="small"` - Input de uma linha (para itens curtos como alcunhas)
+- `inputSize="large"` - Textarea multi-linha (padrão - para itens longos como mistérios)
+
+**Exemplos:**
+
+**1. Lista com itens curtos (Alcunhas):**
+```tsx
+<FieldWithVisibilityToggle
+  fieldName="nicknames"
+  label={isEditing ? t("character-detail:fields.nicknames") : ""}
+  isOptional
+  fieldVisibility={fieldVisibility}
+  isEditing={isEditing}
+  onFieldVisibilityToggle={onFieldVisibilityToggle}
+>
+  {isEditing ? (
+    <FormListInput
+      value={editData.nicknames || []}
+      onChange={(value) => onEditDataChange("nicknames", value)}
+      label=""
+      placeholder={t("create-character:modal.nickname_placeholder")}
+      buttonText={t("create-character:modal.add_nickname")}
+      inputSize="small" // Input de uma linha
+      maxLength={100}
+    />
+  ) : (
+    <Collapsible
+      open={openSections.nicknames}
+      onOpenChange={() => toggleSection("nicknames")}
+    >
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+        <p className="text-sm font-semibold text-primary">
+          {t("character-detail:fields.nicknames")}
+          {character.nicknames && character.nicknames.length > 0 && (
+            <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+              ({character.nicknames.length})
+            </span>
+          )}
+        </p>
+        {openSections.nicknames ? (
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        {character.nicknames && character.nicknames.length > 0 ? (
+          <ul className="list-disc list-inside space-y-1">
+            {character.nicknames.map((nickname, index) => (
+              <li key={index} className="text-sm">
+                {nickname}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyFieldState t={t} />
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  )}
+</FieldWithVisibilityToggle>
+```
+
+**2. Lista com itens longos (Mistérios):**
 ```tsx
 <FieldWithVisibilityToggle
   fieldName="mysteries"
@@ -1370,13 +1439,14 @@ Quando o campo está vazio em modo visualização, sempre usar:
   onFieldVisibilityToggle={onFieldVisibilityToggle}
 >
   {isEditing ? (
-    <ListInput
+    <FormListInput
       label=""
       placeholder={t("placeholder")}
       buttonText={t("add_button")}
       value={editData.mysteries ? safeJsonParse(editData.mysteries) : []}
       onChange={(value) => onEditDataChange("mysteries", JSON.stringify(value))}
       labelClassName="text-sm font-medium text-primary"
+      inputSize="large" // Textarea multi-linha (padrão)
     />
   ) : (
     <Collapsible
@@ -1417,8 +1487,12 @@ Quando o campo está vazio em modo visualização, sempre usar:
 **Estado necessário para collapsibles:**
 
 ```tsx
-// No container
-const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+// No container (character-detail/view.tsx ou region-detail/view.tsx)
+const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+  nicknames: false,
+  mysteries: false,
+  // ... outras seções colapsáveis
+});
 
 const toggleSection = (sectionName: string) => {
   setOpenSections(prev => ({
@@ -1427,6 +1501,10 @@ const toggleSection = (sectionName: string) => {
   }));
 };
 ```
+
+**Quando usar `inputSize`:**
+- `inputSize="small"`: Alcunhas, Tags, Palavras-chave, Nomes curtos (< 50 caracteres)
+- `inputSize="large"`: Mistérios, Anomalias, Inspirações, Descrições (> 50 caracteres)
 
 #### 3.3.5 Multi-Select de Entidades (FormEntityMultiSelectAuto)
 

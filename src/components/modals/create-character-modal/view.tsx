@@ -6,6 +6,8 @@ import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
+import { FormListInput } from "@/components/forms/FormListInput";
+import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { AlignmentMatrix } from "@/pages/dashboard/tabs/characters/character-detail/components/alignment-matrix";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -23,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { CHARACTER_ARCHETYPES_CONSTANT } from "./constants/character-archetypes";
 import { CHARACTER_ROLES_CONSTANT } from "./constants/character-roles";
+import { CHARACTER_STATUS_CONSTANT } from "./constants/character-status";
 import { GENDERS_CONSTANT } from "./constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "./constants/physical-types";
 import {
@@ -101,6 +104,15 @@ export function CreateCharacterModalView({
     baseColorClass: "bg-card text-muted-foreground border-border",
     hoverColorClass: "hover:bg-purple-500/10 hover:border-purple-500/20",
     activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-2 ring-purple-500/50 text-white",
+  }));
+
+  // Convert status constants to FormSimplePicker format
+  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => ({
+    value: status.value,
+    translationKey: status.translationKey,
+    icon: status.icon,
+    color: "text-muted-foreground",
+    activeColor: status.colorClass,
   }));
 
   const basicFields = (
@@ -197,16 +209,6 @@ export function CreateCharacterModalView({
         </div>
       </div>
 
-      {/* Role Picker - Using FormSimpleGrid */}
-      <FormSimpleGrid
-        value={watchedValues.role || ""}
-        onChange={(value) => setValue("role", value)}
-        label={t("modal.role")}
-        required
-        columns={5}
-        options={roleOptions}
-      />
-
       {/* Simple Description */}
       <div className="space-y-2">
         <Label htmlFor="description" className="text-sm font-medium text-primary">
@@ -225,6 +227,25 @@ export function CreateCharacterModalView({
           <span>{watchedValues.description?.length || 0}/500</span>
         </div>
       </div>
+
+      {/* Status - Using FormSimplePicker */}
+      <FormSimplePicker
+        value={watchedValues.status || null}
+        onChange={(value) => setValue("status", value)}
+        options={statusOptions}
+        label={t("modal.status")}
+        translationNamespace="create-character"
+      />
+
+      {/* Role Picker - Using FormSimpleGrid */}
+      <FormSimpleGrid
+        value={watchedValues.role || ""}
+        onChange={(value) => setValue("role", value)}
+        label={t("modal.role")}
+        required
+        columns={5}
+        options={roleOptions}
+      />
     </>
   );
 
@@ -524,7 +545,7 @@ export function CreateCharacterModalView({
 
       <Separator className="my-6" />
 
-      {/* Locations Section */}
+      {/* History Section */}
       <div className="space-y-4">
         <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("modal.locations_section")}
@@ -543,6 +564,35 @@ export function CreateCharacterModalView({
           labelClassName="text-sm font-medium text-primary"
           maxSelections={1}
         />
+
+        {/* Nicknames - FormListInput */}
+        <FormListInput
+          label={t("modal.nicknames")}
+          placeholder={t("modal.nicknames_placeholder")}
+          buttonText={t("modal.add_nickname")}
+          value={watchedValues.nicknames || []}
+          onChange={(value) => setValue("nicknames", value)}
+          labelClassName="text-sm font-medium text-primary"
+          inputSize="small"
+        />
+
+        {/* Past - Textarea */}
+        <div className="space-y-2">
+          <Label htmlFor="past" className="text-sm font-medium text-primary">
+            {t("modal.past")}
+          </Label>
+          <Textarea
+            id="past"
+            {...register("past")}
+            placeholder={t("modal.past_placeholder")}
+            rows={5}
+            maxLength={1000}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.past?.length || 0}/1000</span>
+          </div>
+        </div>
       </div>
     </>
   );

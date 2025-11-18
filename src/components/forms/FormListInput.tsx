@@ -1,13 +1,40 @@
 import { useState } from "react";
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Plus, X } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FormListInputProps {
+  /**
+   * Label for the field
+   */
+  label: string;
+  /**
+   * Placeholder for the input
+   */
+  placeholder: string;
+  /**
+   * Text for the add button (optional, used for accessibility)
+   */
+  buttonText?: string;
   /**
    * Current list of values
    */
@@ -17,135 +44,235 @@ interface FormListInputProps {
    */
   onChange: (value: string[]) => void;
   /**
-   * Label for the field
+   * Custom className for label
    */
-  label: string;
-  /**
-   * Placeholder for the input
-   */
-  placeholder?: string;
-  /**
-   * Text for the add button
-   */
-  addButtonText?: string;
-  /**
-   * Whether the field is required
-   */
-  required?: boolean;
+  labelClassName?: string;
   /**
    * Maximum length for each item
    */
   maxLength?: number;
   /**
-   * Optional error message
+   * Size of the input field
+   * - "small": Single-line Input for short items (e.g., nicknames)
+   * - "large": Multi-line Textarea for longer items (e.g., mysteries, anomalies)
+   * @default "large"
    */
-  error?: string;
-  /**
-   * Custom className for label
-   */
-  labelClassName?: string;
+  inputSize?: "small" | "large";
+}
+
+interface ListItem {
+  id: string;
+  text: string;
+}
+
+interface SortableItemProps {
+  id: string;
+  text: string;
+  onTextChange: (text: string) => void;
+  onDelete: () => void;
+}
+
+function SortableItem({ id, text, onTextChange, onDelete }: SortableItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="flex items-center gap-2 group"
+    >
+      <span className="text-muted-foreground">•</span>
+      <Input
+        data-no-drag="true"
+        value={text}
+        onChange={(e) => onTextChange(e.target.value)}
+        className="flex-1"
+      />
+      <Button
+        data-no-drag="true"
+        variant="ghost-destructive"
+        size="icon"
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        className="h-8 w-8 transition-opacity cursor-pointer"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </li>
+  );
 }
 
 /**
- * FormListInput - Reusable list input component
+ * FormListInput - Reusable list input component with drag-and-drop support
  *
- * Allows adding and removing string items to/from a list.
+ * Allows adding, removing, editing, and reordering string items in a list.
+ * Features drag-and-drop reordering and inline editing.
  *
  * @example
  * ```tsx
+ * // Large textarea input (default) - for longer items
  * <FormListInput
  *   value={anomalies}
  *   onChange={setAnomalies}
  *   label="Region Anomalies"
  *   placeholder="Rivers that flow upward..."
- *   addButtonText="Add Anomaly"
+ *   buttonText="Add Anomaly"
  *   maxLength={200}
+ *   inputSize="large" // optional, this is the default
+ * />
+ *
+ * // Small single-line input - for short items like nicknames
+ * <FormListInput
+ *   value={nicknames}
+ *   onChange={setNicknames}
+ *   label="Nicknames"
+ *   placeholder="The Shadow..."
+ *   buttonText="Add Nickname"
+ *   inputSize="small"
  * />
  * ```
  */
 export function FormListInput({
+  label,
+  placeholder,
+  buttonText,
   value,
   onChange,
-  label,
-  placeholder = "Enter text...",
-  addButtonText = "Add Item",
-  required = false,
+  labelClassName,
   maxLength,
-  error,
-  labelClassName = "text-sm font-medium text-primary",
+  inputSize = "large",
 }: FormListInputProps) {
-  const [inputValue, setInputValue] = useState("");
+  const [newItem, setNewItem] = useState("");
 
-  const handleAdd = () => {
-    if (inputValue.trim()) {
-      onChange([...value, inputValue.trim()]);
-      setInputValue("");
+  // Convert string array to object array with IDs
+  const items: ListItem[] = value.map((text, index) => ({
+    id: `item-${index}`,
+    text,
+  }));
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+
+      const reorderedItems = arrayMove(items, oldIndex, newIndex);
+      onChange(reorderedItems.map((item) => item.text));
     }
   };
 
-  const handleRemove = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
+  const handleAddItem = () => {
+    if (newItem.trim()) {
+      onChange([...value, newItem.trim()]);
+      setNewItem("");
+    }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleDeleteItem = (id: string) => {
+    const itemIndex = items.findIndex((item) => item.id === id);
+    onChange(value.filter((_, i) => i !== itemIndex));
+  };
+
+  const handleUpdateItem = (id: string, text: string) => {
+    const itemIndex = items.findIndex((item) => item.id === id);
+    onChange(value.map((v, i) => (i === itemIndex ? text : v)));
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    // For small inputs: Enter always adds the item
+    // For large inputs: Enter without Shift adds, Shift+Enter creates new line
     if (e.key === "Enter") {
-      e.preventDefault();
-      handleAdd();
+      if (inputSize === "small" || !e.shiftKey) {
+        e.preventDefault();
+        handleAddItem();
+      }
     }
   };
 
   return (
     <div className="space-y-3">
-      <Label className={labelClassName}>
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      <Label className={labelClassName || "text-sm font-medium"}>{label}</Label>
 
-      {/* Input + Add Button */}
-      <div className="flex gap-2">
-        <Input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={placeholder}
-          maxLength={maxLength}
-        />
+      <div className="flex items-start gap-2">
+        {inputSize === "small" ? (
+          <Input
+            data-no-drag="true"
+            placeholder={placeholder}
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            onKeyDown={handleKeyDown}
+            maxLength={maxLength}
+            className="flex-1"
+          />
+        ) : (
+          <Textarea
+            data-no-drag="true"
+            placeholder={placeholder}
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={2}
+            maxLength={maxLength}
+            className="flex-1 resize-none"
+          />
+        )}
         <Button
-          type="button"
-          variant="outline"
+          data-no-drag="true"
+          onClick={handleAddItem}
           size="icon"
-          onClick={handleAdd}
-          disabled={!inputValue.trim()}
+          variant="secondary"
+          className="cursor-pointer"
+          disabled={!newItem.trim()}
         >
           <Plus className="h-4 w-4" />
         </Button>
       </div>
 
-      {/* List of items */}
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {value.map((item, index) => (
-            <Badge
-              key={index}
-              variant="secondary"
-              className="pr-1 py-1.5 text-sm"
-            >
-              <span className="mr-2">{item}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-destructive/20"
-                onClick={() => handleRemove(index)}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          ))}
-        </div>
+      {items.length > 0 && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={items.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <ul className="space-y-2">
+              {items.map((item) => (
+                <SortableItem
+                  key={item.id}
+                  id={item.id}
+                  text={item.text}
+                  onTextChange={(text) => handleUpdateItem(item.id, text)}
+                  onDelete={() => handleDeleteItem(item.id)}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

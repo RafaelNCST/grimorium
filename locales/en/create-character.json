@@ -63,17 +63,32 @@
     "alignment_section": "Alignment",
     "alignment": "Alignment",
 
-    "locations_section": "Locations and Organizations",
+    "locations_section": "History",
+    "status": "Status",
+    "status_placeholder": "Select status",
     "birth_place": "Birth Place",
     "birth_place_placeholder": "Select a location",
     "affiliated_place": "Affiliated Place",
     "affiliated_place_placeholder": "Select a location",
     "organization": "Organization",
     "organization_placeholder": "Select an organization",
+    "nicknames": "Nicknames",
+    "nickname_placeholder": "The Shadow, The Legendary, World Breaker",
+    "nicknames_placeholder": "Enter character nicknames",
+    "add_nickname": "Add Nickname",
+    "past": "Past",
+    "past_placeholder": "Describe important events from the character's past, their origin, formative experiences, and significant moments that shaped who they are today.",
     "no_locations_warning": "No locations registered. Go to the World tab to create one.",
     "no_organizations_warning": "No organizations registered. Go to the Organizations tab to create one.",
     "no_birth_place_selected": "No birth place selected",
     "search_location": "Search location..."
+  },
+  "status": {
+    "alive": "Alive",
+    "unconscious": "Unconscious",
+    "dead": "Dead",
+    "sealed": "Sealed",
+    "missing": "Missing"
   },
   "role": {
     "protagonist": "Protagonist",
@@ -164,7 +179,8 @@
     "personality_max_length": "Personality must be at most 500 characters",
     "hobbies_max_length": "Hobbies must be at most 250 characters",
     "dreams_max_length": "Dreams and goals must be at most 250 characters",
-    "fears_max_length": "Fears and traumas must be at most 250 characters"
+    "fears_max_length": "Fears and traumas must be at most 250 characters",
+    "past_max_length": "Past must be at most 1000 characters"
   },
   "button": {
     "cancel": "Cancel",

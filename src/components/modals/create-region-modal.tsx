@@ -9,6 +9,7 @@ import { z } from "zod";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormInput } from "@/components/forms/FormInput";
+import { FormListInput } from "@/components/forms/FormListInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import {
@@ -37,7 +38,6 @@ import {
 import { ICharacter } from "@/types/character-types";
 import { IFaction } from "@/types/faction-types";
 
-import { ListInput } from "./create-region-modal/components/list-input";
 import { SeasonPicker } from "./create-region-modal/components/season-picker";
 
 interface CreateRegionModalProps {
@@ -472,7 +472,7 @@ export function CreateRegionModal({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <ListInput
+                    <FormListInput
                       label={t("create_region.region_anomalies_label")}
                       placeholder={t("create_region.anomaly_placeholder")}
                       buttonText={t("create_region.add_anomaly")}
@@ -769,7 +769,7 @@ export function CreateRegionModal({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <ListInput
+                    <FormListInput
                       label={t("create_region.region_mysteries_label")}
                       placeholder={t("create_region.mystery_placeholder")}
                       buttonText={t("create_region.add_mystery")}
@@ -789,7 +789,7 @@ export function CreateRegionModal({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <ListInput
+                    <FormListInput
                       label={t("create_region.inspirations_label")}
                       placeholder={t("create_region.inspiration_placeholder")}
                       buttonText={t("create_region.add_inspiration")}

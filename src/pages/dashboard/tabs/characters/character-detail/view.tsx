@@ -16,12 +16,15 @@ import { CharacterNavigationSidebar } from "@/components/character-navigation-si
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
+import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
 import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-archetypes";
 import { type ICharacterRole } from "@/components/modals/create-character-modal/constants/character-roles";
+import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
 import {
   PHYSICAL_TYPE_ACTIVE_COLOR,
@@ -87,6 +90,7 @@ interface ICharacter {
   alignment: string;
   gender: string;
   description: string;
+  status?: string;
 
   // Appearance
   height?: string;
@@ -108,8 +112,10 @@ interface ICharacter {
   favoriteFood?: string;
   favoriteMusic?: string;
 
-  // Locations
+  // History
   birthPlace?: string[];
+  nicknames?: string[];
+  past?: string;
 
   // Relations
   family: {
@@ -329,6 +335,15 @@ export function CharacterDetailView({
     activeColorClass: PHYSICAL_TYPE_ACTIVE_COLOR[type.value],
   }));
 
+  // Convert status constants to FormSimplePicker format
+  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => ({
+    value: status.value,
+    translationKey: status.translationKey,
+    icon: status.icon,
+    color: "text-muted-foreground",
+    activeColor: status.colorClass,
+  }));
+
   // Basic Fields
   const basicFields = (
     <div className="space-y-6">
@@ -461,6 +476,15 @@ export function CharacterDetailView({
             </div>
           </div>
 
+          {/* Status - Using FormSimplePicker */}
+          <FormSimplePicker
+            value={editData.status || ""}
+            onChange={(value) => onEditDataChange("status", value)}
+            label={t("character-detail:fields.status")}
+            options={statusOptions}
+            translationNamespace="create-character"
+          />
+
           {/* Role - Using FormSimpleGrid */}
           <FormSimpleGrid
             value={editData.role}
@@ -522,6 +546,17 @@ export function CharacterDetailView({
                     label={t(`create-character:role.${character.role}`)}
                   />
                 )}
+                {character.status && (() => {
+                  const currentStatus = CHARACTER_STATUS_CONSTANT.find(
+                    (s) => s.value === character.status
+                  );
+                  return currentStatus ? (
+                    <EntityTagBadge
+                      config={currentStatus}
+                      label={t(`create-character:${currentStatus.translationKey}`)}
+                    />
+                  ) : null;
+                })()}
               </div>
 
               <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
@@ -982,12 +1017,13 @@ export function CharacterDetailView({
 
       <Separator className="my-6" />
 
-      {/* Locations Section */}
+      {/* History Section */}
       <div className="space-y-4">
         <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
           {t("character-detail:sections.locations_orgs")}
         </h4>
 
+        {/* Birth Place */}
         <FieldWithVisibilityToggle
           fieldName="birthPlace"
           label={isEditing ? t("character-detail:fields.birth_place") : ""}
@@ -1049,6 +1085,92 @@ export function CharacterDetailView({
                 )}
               </CollapsibleContent>
             </Collapsible>
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Nicknames */}
+        <FieldWithVisibilityToggle
+          fieldName="nicknames"
+          label={isEditing ? t("character-detail:fields.nicknames") : ""}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.nicknames || []}
+              onChange={(value) => onEditDataChange("nicknames", value)}
+              label=""
+              placeholder={t("create-character:modal.nickname_placeholder")}
+              buttonText={t("create-character:modal.add_nickname")}
+              inputSize="small"
+              maxLength={100}
+            />
+          ) : (
+            <Collapsible
+              open={openSections.nicknames}
+              onOpenChange={() => toggleSection("nicknames")}
+            >
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+                <p className="text-sm font-semibold text-primary">
+                  {t("character-detail:fields.nicknames")}
+                  {character.nicknames && character.nicknames.length > 0 && (
+                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
+                      ({character.nicknames.length})
+                    </span>
+                  )}
+                </p>
+                {openSections.nicknames ? (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                {character.nicknames && character.nicknames.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1">
+                    {character.nicknames.map((nickname, index) => (
+                      <li key={index} className="text-sm">
+                        {nickname}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <EmptyFieldState t={t} />
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Past */}
+        <FieldWithVisibilityToggle
+          fieldName="past"
+          label={t("character-detail:fields.past")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.past || ""}
+                onChange={(e) => onEditDataChange("past", e.target.value)}
+                placeholder={t("create-character:modal.past_placeholder")}
+                rows={5}
+                maxLength={1000}
+                className="resize-none"
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.past?.length || 0}/1000</span>
+              </div>
+            </>
+          ) : character.past ? (
+            <p className="text-sm whitespace-pre-wrap">{character.past}</p>
+          ) : (
+            <EmptyFieldState t={t} />
           )}
         </FieldWithVisibilityToggle>
       </div>

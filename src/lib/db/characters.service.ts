@@ -29,6 +29,7 @@ function characterToDBCharacter(
     description: character.description,
     image: character.image,
     alignment: character.alignment,
+    status: character.status,
     height: character.height,
     weight: character.weight,
     skin_tone: character.skinTone,
@@ -53,6 +54,10 @@ function characterToDBCharacter(
       : JSON.stringify([]),
     affiliated_place: character.affiliatedPlace,
     organization: character.organization,
+    nicknames: character.nicknames
+      ? JSON.stringify(character.nicknames)
+      : JSON.stringify([]),
+    past: character.past,
     field_visibility: character.fieldVisibility
       ? JSON.stringify(character.fieldVisibility)
       : undefined,
@@ -76,6 +81,7 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     description: dbChar.description || "",
     image: dbChar.image,
     alignment: dbChar.alignment,
+    status: dbChar.status,
     height: dbChar.height,
     weight: dbChar.weight,
     skinTone: dbChar.skin_tone,
@@ -100,6 +106,10 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
       : [],
     affiliatedPlace: dbChar.affiliated_place,
     organization: dbChar.organization,
+    nicknames: dbChar.nicknames
+      ? JSON.parse(dbChar.nicknames)
+      : [],
+    past: dbChar.past,
     fieldVisibility: dbChar.field_visibility
       ? JSON.parse(dbChar.field_visibility)
       : undefined,
@@ -137,15 +147,15 @@ export async function createCharacter(
 
   await db.execute(
     `INSERT INTO characters (
-      id, book_id, name, age, gender, role, description, image, alignment,
+      id, book_id, name, age, gender, role, description, image, alignment, status,
       height, weight, skin_tone, skin_tone_color, physical_type, hair, eyes, face,
       distinguishing_features, species_and_race, archetype, personality, hobbies,
       dreams_and_goals, fears_and_traumas, favorite_food, favorite_music,
-      birth_place, affiliated_place, organization, field_visibility,
+      birth_place, affiliated_place, organization, nicknames, past, field_visibility,
       created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-      $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32
+      $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34
     )`,
     [
       dbChar.id,
@@ -157,6 +167,7 @@ export async function createCharacter(
       dbChar.description,
       dbChar.image,
       dbChar.alignment,
+      dbChar.status,
       dbChar.height,
       dbChar.weight,
       dbChar.skin_tone,
@@ -177,6 +188,8 @@ export async function createCharacter(
       dbChar.birth_place,
       dbChar.affiliated_place,
       dbChar.organization,
+      dbChar.nicknames,
+      dbChar.past,
       dbChar.field_visibility,
       dbChar.created_at,
       dbChar.updated_at,
@@ -216,13 +229,13 @@ export async function updateCharacter(
   await db.execute(
     `UPDATE characters SET
       name = $1, age = $2, gender = $3, role = $4, description = $5, image = $6,
-      alignment = $7, height = $8, weight = $9, skin_tone = $10, skin_tone_color = $11,
-      physical_type = $12, hair = $13, eyes = $14, face = $15,
-      distinguishing_features = $16, species_and_race = $17, archetype = $18,
-      personality = $19, hobbies = $20, dreams_and_goals = $21, fears_and_traumas = $22,
-      favorite_food = $23, favorite_music = $24, birth_place = $25, affiliated_place = $26,
-      organization = $27, field_visibility = $28, updated_at = $29
-    WHERE id = $30`,
+      alignment = $7, status = $8, height = $9, weight = $10, skin_tone = $11, skin_tone_color = $12,
+      physical_type = $13, hair = $14, eyes = $15, face = $16,
+      distinguishing_features = $17, species_and_race = $18, archetype = $19,
+      personality = $20, hobbies = $21, dreams_and_goals = $22, fears_and_traumas = $23,
+      favorite_food = $24, favorite_music = $25, birth_place = $26, affiliated_place = $27,
+      organization = $28, nicknames = $29, past = $30, field_visibility = $31, updated_at = $32
+    WHERE id = $33`,
     [
       dbChar.name,
       dbChar.age,
@@ -231,6 +244,7 @@ export async function updateCharacter(
       dbChar.description,
       dbChar.image,
       dbChar.alignment,
+      dbChar.status,
       dbChar.height,
       dbChar.weight,
       dbChar.skin_tone,
@@ -251,6 +265,8 @@ export async function updateCharacter(
       dbChar.birth_place,
       dbChar.affiliated_place,
       dbChar.organization,
+      dbChar.nicknames,
+      dbChar.past,
       dbChar.field_visibility,
       dbChar.updated_at,
       id,

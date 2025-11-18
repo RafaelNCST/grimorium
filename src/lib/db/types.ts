@@ -45,6 +45,7 @@ export interface DBCharacter {
   description?: string;
   image?: string;
   alignment?: string;
+  status?: string;
 
   // Appearance
   height?: string;
@@ -67,10 +68,12 @@ export interface DBCharacter {
   favorite_food?: string;
   favorite_music?: string;
 
-  // Location
+  // History
   birth_place?: string;
   affiliated_place?: string;
   organization?: string;
+  nicknames?: string; // JSON array string
+  past?: string;
 
   // Metadata
   field_visibility?: string; // JSON object string

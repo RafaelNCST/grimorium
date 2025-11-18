@@ -13,6 +13,7 @@ const DEFAULT_FORM_VALUES: CharacterFormSchema = {
   gender: "",
   description: "",
   image: "",
+  status: "",
   height: "",
   skinTone: "",
   skinToneColor: "",
@@ -34,6 +35,8 @@ const DEFAULT_FORM_VALUES: CharacterFormSchema = {
   birthPlace: [],
   affiliatedPlace: "",
   organization: "",
+  nicknames: [],
+  past: "",
 };
 
 export const useCharacterForm = () => {

@@ -14,7 +14,7 @@
     "appearance": "Physical Appearance",
     "behavior": "Behavior and Tastes",
     "alignment": "Alignment",
-    "locations_orgs": "Locations and Organizations",
+    "locations_orgs": "History",
     "relationships": "Relationships",
     "family": "Family",
     "versions": "Versions",
@@ -26,6 +26,7 @@
     "age": "Age",
     "gender": "Gender",
     "role": "Role",
+    "status": "Status",
     "description": "Simple Description",
     "height": "Height",
     "weight": "Weight",
@@ -46,7 +47,9 @@
     "alignment": "Alignment",
     "birth_place": "Birth Place",
     "affiliated_place": "Affiliated Place",
-    "organization": "Organization"
+    "organization": "Organization",
+    "nicknames": "Nicknames",
+    "past": "Past"
   },
   "empty_states": {
     "no_data": "Nothing added yet",
@@ -253,6 +256,7 @@
     "dreams_and_goals_max_length": "Dreams and goals must be at most 500 characters",
     "fears_and_traumas_max_length": "Fears and traumas must be at most 500 characters",
     "favorite_food_max_length": "Favorite food must be at most 100 characters",
-    "favorite_music_max_length": "Favorite music must be at most 100 characters"
+    "favorite_music_max_length": "Favorite music must be at most 100 characters",
+    "past_max_length": "Past must be at most 1000 characters"
   }
 }

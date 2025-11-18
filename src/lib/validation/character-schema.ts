@@ -31,6 +31,7 @@ export const CharacterSchema = z.object({
   // Campos opcionais
   image: z.string().optional(),
   alignment: z.string().optional(),
+  status: z.string().optional(),
 
   // Appearance fields
   height: z.string().max(50, { message: "character-detail:validation.height_max_length" }).optional(),
@@ -52,8 +53,10 @@ export const CharacterSchema = z.object({
   favoriteFood: z.string().max(100, { message: "character-detail:validation.favorite_food_max_length" }).optional(),
   favoriteMusic: z.string().max(100, { message: "character-detail:validation.favorite_music_max_length" }).optional(),
 
-  // Locations
+  // History
   birthPlace: z.array(z.string()).optional(),
+  nicknames: z.array(z.string()).optional(),
+  past: z.string().max(1000, { message: "character-detail:validation.past_max_length" }).optional(),
 
   // Relations (não validamos aqui pois são objetos complexos)
   family: z.any().optional(),

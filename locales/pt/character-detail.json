@@ -14,7 +14,7 @@
     "appearance": "Aparência Física",
     "behavior": "Comportamento e Gostos",
     "alignment": "Alinhamento",
-    "locations_orgs": "Localizações e Organizações",
+    "locations_orgs": "História",
     "relationships": "Relacionamentos",
     "family": "Familia",
     "versions": "Versões",
@@ -26,6 +26,7 @@
     "age": "Idade",
     "gender": "Gênero",
     "role": "Papel",
+    "status": "Status",
     "description": "Resumo",
     "height": "Altura",
     "weight": "Peso",
@@ -46,7 +47,9 @@
     "alignment": "Alinhamento",
     "birth_place": "Local de Nascimento",
     "affiliated_place": "Local Afiliado",
-    "organization": "Organização"
+    "organization": "Organização",
+    "nicknames": "Alcunhas",
+    "past": "Passado"
   },
   "empty_states": {
     "no_data": "Nada foi adicionado ainda",
@@ -248,6 +251,7 @@
     "dreams_and_goals_max_length": "Sonhos e objetivos deve ter no máximo 500 caracteres",
     "fears_and_traumas_max_length": "Medos e traumas deve ter no máximo 500 caracteres",
     "favorite_food_max_length": "Comida favorita deve ter no máximo 100 caracteres",
-    "favorite_music_max_length": "Música favorita deve ter no máximo 100 caracteres"
+    "favorite_music_max_length": "Música favorita deve ter no máximo 100 caracteres",
+    "past_max_length": "Passado deve ter no máximo 1000 caracteres"
   }
 }
