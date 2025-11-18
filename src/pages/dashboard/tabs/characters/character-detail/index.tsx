@@ -475,7 +475,7 @@ export function CharacterDetail() {
     async (versionData: {
       name: string;
       description: string;
-      characterData: ICharacterFormData;
+      entityData: ICharacterFormData;
     }) => {
       try {
         const newVersion: ICharacterVersion = {
@@ -484,7 +484,7 @@ export function CharacterDetail() {
           description: versionData.description,
           createdAt: new Date().toISOString(),
           isMain: false,
-          characterData: versionData.characterData as unknown as ICharacter,
+          characterData: versionData.entityData as unknown as ICharacter,
         };
 
         // Salvar no banco de dados
