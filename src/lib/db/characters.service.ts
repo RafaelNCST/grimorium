@@ -191,26 +191,26 @@ export async function updateCharacter(
   const db = await getDB();
   const now = Date.now();
 
-  // Get current character to preserve book_id
-  const current = await db.select<DBCharacter[]>(
+  // Get current character data
+  const currentCharacter = await getCharacterById(id);
+
+  if (!currentCharacter) {
+    throw new Error("Character not found");
+  }
+
+  // Get book_id from database
+  const bookIdResult = await db.select<DBCharacter[]>(
     "SELECT book_id FROM characters WHERE id = $1",
     [id]
   );
 
-  if (current.length === 0) {
-    throw new Error("Character not found");
-  }
-
-  // Build a full character object from updates
+  // Merge current data with updates (preserves existing fields)
   const fullCharacter: ICharacter = {
-    id,
-    name: updates.name || "",
-    role: updates.role || "",
-    description: updates.description || "",
+    ...currentCharacter,
     ...updates,
   };
 
-  const dbChar = characterToDBCharacter(current[0].book_id, fullCharacter);
+  const dbChar = characterToDBCharacter(bookIdResult[0].book_id, fullCharacter);
   dbChar.updated_at = now;
 
   await db.execute(
@@ -287,18 +287,25 @@ export async function saveCharacterRelationships(
 ): Promise<void> {
   const db = await getDB();
 
-  // Delete existing relationships
-  await db.execute("DELETE FROM relationships WHERE character_id = $1", [
-    characterId,
-  ]);
+  try {
+    // Delete existing relationships
+    await db.execute("DELETE FROM relationships WHERE character_id = $1", [
+      characterId,
+    ]);
 
-  // Insert new relationships
-  for (const rel of relationships) {
-    const relId = `${characterId}-${rel.characterId}-${rel.type}-${Date.now()}`;
-    await db.execute(
-      `INSERT INTO relationships (id, character_id, related_character_id, type, intensity, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [relId, characterId, rel.characterId, rel.type, rel.intensity, Date.now()]
+    // Insert new relationships
+    for (const rel of relationships) {
+      const relId = `${characterId}-${rel.characterId}-${rel.type}-${Date.now()}`;
+      await db.execute(
+        `INSERT INTO relationships (id, character_id, related_character_id, type, intensity, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [relId, characterId, rel.characterId, rel.type, rel.intensity, Date.now()]
+      );
+    }
+  } catch (error) {
+    // Re-throw the error to be handled by the caller
+    throw new Error(
+      `Failed to save character relationships: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
@@ -314,28 +321,28 @@ export async function getCharacterFamily(
   );
 
   const family: ICharacterFamily = {
-    father: null,
-    mother: null,
-    spouse: null,
+    grandparents: [],
+    parents: [],
+    spouses: [],
+    unclesAunts: [],
+    cousins: [],
     children: [],
     siblings: [],
     halfSiblings: [],
-    grandparents: [],
-    unclesAunts: [],
-    cousins: [],
   };
 
   for (const rel of result) {
     const relatedId = rel.related_character_id;
     switch (rel.relation_type) {
+      // Map both "father" and "mother" to parents array
       case "father":
-        family.father = relatedId;
-        break;
       case "mother":
-        family.mother = relatedId;
+      case "parent":
+        family.parents.push(relatedId);
         break;
+      // Map "spouse" to spouses array
       case "spouse":
-        family.spouse = relatedId;
+        family.spouses.push(relatedId);
         break;
       case "child":
         family.children.push(relatedId);
@@ -367,38 +374,48 @@ export async function saveCharacterFamily(
 ): Promise<void> {
   const db = await getDB();
 
-  // Delete existing family relations
-  await db.execute("DELETE FROM family_relations WHERE character_id = $1", [
-    characterId,
-  ]);
+  try {
+    // Delete existing family relations
+    await db.execute("DELETE FROM family_relations WHERE character_id = $1", [
+      characterId,
+    ]);
 
-  const now = Date.now();
-  const relations: Array<{ type: string; id: string }> = [];
+    const now = Date.now();
+    const relations: Array<{ type: string; id: string }> = [];
 
-  if (family.father) relations.push({ type: "father", id: family.father });
-  if (family.mother) relations.push({ type: "mother", id: family.mother });
-  if (family.spouse) relations.push({ type: "spouse", id: family.spouse });
+    // Map parents array to "parent" relation type
+    family.parents.forEach((id) => relations.push({ type: "parent", id }));
 
-  family.children.forEach((id) => relations.push({ type: "child", id }));
-  family.siblings.forEach((id) => relations.push({ type: "sibling", id }));
-  family.halfSiblings.forEach((id) =>
-    relations.push({ type: "half_sibling", id })
-  );
-  family.grandparents.forEach((id) =>
-    relations.push({ type: "grandparent", id })
-  );
-  family.unclesAunts.forEach((id) =>
-    relations.push({ type: "uncle_aunt", id })
-  );
-  family.cousins.forEach((id) => relations.push({ type: "cousin", id }));
+    // Map spouses array to "spouse" relation type
+    family.spouses.forEach((id) => relations.push({ type: "spouse", id }));
 
-  // Insert new family relations
-  for (const rel of relations) {
-    const relId = `${characterId}-${rel.id}-${rel.type}-${now}`;
-    await db.execute(
-      `INSERT INTO family_relations (id, character_id, related_character_id, relation_type, created_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [relId, characterId, rel.id, rel.type, now]
+    // Map other family members
+    family.children.forEach((id) => relations.push({ type: "child", id }));
+    family.siblings.forEach((id) => relations.push({ type: "sibling", id }));
+    family.halfSiblings.forEach((id) =>
+      relations.push({ type: "half_sibling", id })
+    );
+    family.grandparents.forEach((id) =>
+      relations.push({ type: "grandparent", id })
+    );
+    family.unclesAunts.forEach((id) =>
+      relations.push({ type: "uncle_aunt", id })
+    );
+    family.cousins.forEach((id) => relations.push({ type: "cousin", id }));
+
+    // Insert new family relations
+    for (const rel of relations) {
+      const relId = `${characterId}-${rel.id}-${rel.type}-${now}`;
+      await db.execute(
+        `INSERT INTO family_relations (id, character_id, related_character_id, relation_type, created_at)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [relId, characterId, rel.id, rel.type, now]
+      );
+    }
+  } catch (error) {
+    // Re-throw the error to be handled by the caller
+    throw new Error(
+      `Failed to save character family: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }

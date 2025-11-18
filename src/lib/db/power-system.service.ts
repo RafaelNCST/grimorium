@@ -826,6 +826,58 @@ export async function getPowerLinksByCharacterId(
   }
 }
 
+/**
+ * Get power links for a character with their associated page/section titles.
+ * This function uses a single query with JOINs to avoid N+1 query problems.
+ *
+ * @param characterId - The ID of the character
+ * @returns Array of power links with pageTitle and sectionTitle fields
+ */
+export async function getPowerLinksWithTitlesByCharacterId(
+  characterId: string
+): Promise<Array<IPowerCharacterLink & { pageTitle?: string; sectionTitle?: string }>> {
+  try {
+    const db = await getDB();
+
+    // Single query with LEFT JOINs to get all data at once
+    const result = await db.select<Array<DBPowerCharacterLink & {
+      page_name?: string;
+      section_title?: string;
+    }>>(
+      `SELECT
+        pcl.id,
+        pcl.character_id,
+        pcl.page_id,
+        pcl.section_id,
+        pcl.custom_label,
+        pcl.created_at,
+        pp.name as page_name,
+        ps.title as section_title
+      FROM power_character_links pcl
+      LEFT JOIN power_pages pp ON pcl.page_id = pp.id
+      LEFT JOIN power_sections ps ON pcl.section_id = ps.id
+      WHERE pcl.character_id = $1
+      ORDER BY pcl.created_at DESC`,
+      [characterId]
+    );
+
+    // Transform to the expected format
+    return result.map(row => ({
+      id: row.id,
+      characterId: row.character_id,
+      pageId: row.page_id,
+      sectionId: row.section_id,
+      customLabel: row.custom_label,
+      createdAt: new Date(row.created_at).toISOString(),
+      pageTitle: row.page_name,
+      sectionTitle: row.section_title,
+    }));
+  } catch (error) {
+    console.error("Error fetching power links with titles by character:", error);
+    throw error;
+  }
+}
+
 export async function getPowerLinksByPageId(
   pageId: string
 ): Promise<IPowerCharacterLink[]> {

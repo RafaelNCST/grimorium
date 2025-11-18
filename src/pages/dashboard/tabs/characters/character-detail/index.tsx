@@ -21,11 +21,9 @@ import {
   updateCharacterVersion,
 } from "@/lib/db/characters.service";
 import {
-  getPowerLinksByCharacterId,
+  getPowerLinksWithTitlesByCharacterId,
   updatePowerCharacterLinkLabel,
   deletePowerCharacterLink,
-  getPowerPageById,
-  getPowerSectionById,
 } from "@/lib/db/power-system.service";
 import { mockLocations, mockFactions } from "@/mocks/global";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
@@ -319,29 +317,50 @@ export function CharacterDetail() {
 
   // Load character from database
   useEffect(() => {
+    let isMounted = true;
+
     const loadCharacter = async () => {
       try {
-        const characterFromDB = await getCharacterById(characterId);
+        // Execute all independent queries in parallel for better performance
+        const [
+          characterFromDB,
+          relationships,
+          family,
+          versionsFromDB,
+          allCharsFromBook,
+          powerLinks,
+        ] = await Promise.all([
+          getCharacterById(characterId),
+          getCharacterRelationships(characterId),
+          getCharacterFamily(characterId),
+          getCharacterVersions(characterId),
+          dashboardId ? getCharactersByBookId(dashboardId) : Promise.resolve([]),
+          getPowerLinksWithTitlesByCharacterId(characterId),
+        ]);
+
+        // Only update state if component is still mounted
+        if (!isMounted) return;
+
         if (characterFromDB) {
-          setCharacter(characterFromDB);
-          setEditData(characterFromDB);
+          // Set character data with all loaded information
+          setCharacter({
+            ...characterFromDB,
+            relationships,
+            family,
+          });
+          setEditData({
+            ...characterFromDB,
+            relationships,
+            family,
+          });
           setImagePreview(characterFromDB.image || "");
           setFieldVisibility(characterFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(characterFromDB.fieldVisibility || {});
 
-          // Load relationships
-          const relationships = await getCharacterRelationships(characterId);
-          setCharacter((prev) => ({ ...prev, relationships }));
-          setEditData((prev) => ({ ...prev, relationships }));
-
-          // Load family
-          const family = await getCharacterFamily(characterId);
-          setCharacter((prev) => ({ ...prev, family }));
-          setEditData((prev) => ({ ...prev, family }));
+          // Set power links
+          setCharacterPowerLinks(powerLinks);
 
           // Load versions from database
-          const versionsFromDB = await getCharacterVersions(characterId);
-
           // Se não houver versões, criar a versão principal
           if (versionsFromDB.length === 0) {
             const mainVersion: ICharacterVersion = {
@@ -358,6 +377,10 @@ export function CharacterDetail() {
             };
 
             await createCharacterVersion(characterId, mainVersion);
+
+            // Check again before setState after async operation
+            if (!isMounted) return;
+
             setVersions([mainVersion]);
             setCurrentVersion(mainVersion);
           } else {
@@ -383,56 +406,35 @@ export function CharacterDetail() {
             }
           }
 
-          // Load all characters from the same book
-          if (dashboardId) {
-            const allCharsFromBook = await getCharactersByBookId(dashboardId);
-            setAllCharacters(allCharsFromBook);
-          }
+          // Set all characters from the same book
+          setAllCharacters(allCharsFromBook);
         }
       } catch (error) {
+        // Don't log errors or show toasts if component is unmounted
+        if (!isMounted) return;
+
         console.error("Error loading character:", error);
         toast.error("Erro ao carregar personagem");
       } finally {
-        setIsLoading(false);
+        // Only update loading state if component is still mounted
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadCharacter();
-  }, [characterId, dashboardId]);
 
-  // Load power links when character loads
-  useEffect(() => {
-    if (characterId) {
-      loadPowerLinks();
-    }
-  }, [characterId]);
+    // Cleanup function to prevent memory leaks
+    return () => {
+      isMounted = false;
+    };
+  }, [characterId, dashboardId]);
 
   async function loadPowerLinks() {
     try {
-      const links = await getPowerLinksByCharacterId(characterId);
-
-      // Fetch page/section titles for each link
-      const linksWithTitles = await Promise.all(
-        links.map(async (link) => {
-          let pageTitle: string | undefined;
-          let sectionTitle: string | undefined;
-
-          if (link.pageId) {
-            const page = await getPowerPageById(link.pageId);
-            pageTitle = page?.name;
-          } else if (link.sectionId) {
-            const section = await getPowerSectionById(link.sectionId);
-            sectionTitle = section?.title;
-          }
-
-          return {
-            ...link,
-            pageTitle,
-            sectionTitle,
-          };
-        })
-      );
-
+      // Optimized: Single query with JOINs instead of N+1 queries
+      const linksWithTitles = await getPowerLinksWithTitlesByCharacterId(characterId);
       setCharacterPowerLinks(linksWithTitles);
     } catch (error) {
       console.error("Error loading power links:", error);

@@ -157,7 +157,11 @@
       "Bash(cmd /c \"taskkill /PID 33228 /F\")",
       "Bash(cmd /c \"taskkill /F /PID 30848\")",
       "Bash(Select-String -Pattern \"family-section|FormEntityMultiSelectAuto\" -Context 2,2)",
-      "Bash(del \"src\\pages\\dashboard\\tabs\\characters\\character-detail\\components\\family-tree-dialog.tsx\")"
+      "Bash(del \"src\\pages\\dashboard\\tabs\\characters\\character-detail\\components\\family-tree-dialog.tsx\")",
+      "Bash(cmd //c \"taskkill //F //PID 36720\")",
+      "Bash(cmd /c \"taskkill /F /PID 36720\")",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)"
     ],
     "deny": [],
     "ask": []
