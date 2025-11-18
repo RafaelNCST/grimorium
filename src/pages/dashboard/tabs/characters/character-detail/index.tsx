@@ -901,9 +901,16 @@ export function CharacterDetail() {
     window.history.back();
   }, []);
 
-  const handleNavigateToCharacter = useCallback((characterId: string) => {
-    window.location.replace(`/book/1/character/${characterId}`);
-  }, []);
+  const handleNavigateToCharacter = useCallback(
+    (targetCharacterId: string) => {
+      if (!dashboardId) return;
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/character/$characterId/",
+        params: { dashboardId, characterId: targetCharacterId },
+      });
+    },
+    [navigate, dashboardId]
+  );
 
   const handleBack = useCallback(() => {
     navigateToCharactersTab();
