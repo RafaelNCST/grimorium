@@ -1,15 +1,12 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Heart, TreePine } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
-import { Button } from "@/components/ui/button";
 import { type ICharacterFamily, type IFieldVisibility } from "@/types/character-types";
-
-import { FamilyTreeDialog } from "./family-tree-dialog";
 
 interface ICharacter {
   id: string;
@@ -174,7 +171,6 @@ export const FamilySection = React.memo(function FamilySection({
   onFieldVisibilityToggle,
 }: FamilySectionProps) {
   const { t } = useTranslation("character-detail");
-  const [isTreeDialogOpen, setIsTreeDialogOpen] = useState(false);
 
   // Check if family has any members
   const hasFamilyMembers = useMemo(() => {
@@ -329,18 +325,6 @@ export const FamilySection = React.memo(function FamilySection({
 
   return (
     <div className="space-y-4">
-      {/* View Tree Button - Only in View Mode and with family members */}
-      {!isEditMode && hasFamilyMembers && (
-        <Button
-          onClick={() => setIsTreeDialogOpen(true)}
-          className="w-full"
-          variant="outline"
-        >
-          <TreePine className="w-4 h-4 mr-2" />
-          {t("character-detail:family.view_tree")}
-        </Button>
-      )}
-
       {/* Family Fields - All in vertical sequence, no groupings */}
       <div className="space-y-4">
         {/* 1. Avós (Grandparents) - Max 4 (2 paternal + 2 maternal) */}
@@ -409,15 +393,6 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_half_siblings_selected"
         )}
       </div>
-
-      {/* Family Tree Dialog */}
-      <FamilyTreeDialog
-        isOpen={isTreeDialogOpen}
-        onClose={() => setIsTreeDialogOpen(false)}
-        family={family}
-        allCharacters={allCharacters}
-        currentCharacterId={currentCharacterId}
-      />
     </div>
   );
 });

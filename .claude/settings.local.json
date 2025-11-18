@@ -156,7 +156,8 @@
       "Bash(cmd /c \"taskkill /F /IM app.exe /T\")",
       "Bash(cmd /c \"taskkill /PID 33228 /F\")",
       "Bash(cmd /c \"taskkill /F /PID 30848\")",
-      "Bash(Select-String -Pattern \"family-section|FormEntityMultiSelectAuto\" -Context 2,2)"
+      "Bash(Select-String -Pattern \"family-section|FormEntityMultiSelectAuto\" -Context 2,2)",
+      "Bash(del \"src\\pages\\dashboard\\tabs\\characters\\character-detail\\components\\family-tree-dialog.tsx\")"
     ],
     "deny": [],
     "ask": []

@@ -916,14 +916,6 @@ export function CharacterDetail() {
     window.history.back();
   }, []);
 
-  const navigateToFamilyTree = useCallback(() => {
-    if (!dashboardId || !characterId) return;
-    navigate({
-      to: "/dashboard/$dashboardId/tabs/character/$characterId/family-tree",
-      params: { dashboardId, characterId },
-    });
-  }, [navigate, dashboardId, characterId]);
-
   const handleNavigateToCharacter = useCallback((characterId: string) => {
     window.location.replace(`/book/1/character/${characterId}`);
   }, []);
@@ -994,10 +986,6 @@ export function CharacterDetail() {
     },
     []
   );
-
-  const handleNavigateToFamilyTree = useCallback(() => {
-    navigateToFamilyTree();
-  }, [navigateToFamilyTree]);
 
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
     setFieldVisibility((prev) => ({

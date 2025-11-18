@@ -143,9 +143,6 @@
     "devotion": "Devoção"
   },
   "family": {
-    "view_tree": "Ver Árvore Genealógica",
-    "family_tree": "Árvore Genealógica",
-    "family_tree_description": "Visualização hierárquica da família do personagem",
     "no_characters": "Nenhum personagem disponível",
     "search_characters": "Buscar personagens...",
     "grandparents": "Avós",

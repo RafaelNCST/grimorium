@@ -143,9 +143,6 @@
     "devotion": "Devotion"
   },
   "family": {
-    "view_tree": "View Family Tree",
-    "family_tree": "Family Tree",
-    "family_tree_description": "Hierarchical view of character's family",
     "direct_family": "Direct Family",
     "father": "Father",
     "mother": "Mother",
