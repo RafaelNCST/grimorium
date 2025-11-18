@@ -161,7 +161,8 @@
       "Bash(cmd //c \"taskkill //F //PID 36720\")",
       "Bash(cmd /c \"taskkill /F /PID 36720\")",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:gist.github.com)"
+      "WebFetch(domain:gist.github.com)",
+      "Bash(C:/Users/rafae/Desktop/dev/grimorium/docs/build/forms_temp.md)"
     ],
     "deny": [],
     "ask": []

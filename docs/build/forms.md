@@ -376,8 +376,161 @@ const RELATIONSHIP_TYPES = [
 - ✅ Atalho de teclado: Enter adiciona item, Shift+Enter quebra linha
 
 ---
+## 12. FormSimplePicker (Seleção Visual com Ícone e Label)
+**Componente:** `FormSimplePicker` (`src/components/forms/FormSimplePicker.tsx`)
+**Uso:** Seleção visual com ícone no topo e label abaixo, com efeitos de hover e scale (Status de Item, Níveis de Prioridade, Estados)
+**Descrição:** Componente leve de seleção visual baseado no StatusPicker. Exibe opções horizontalmente com ícone grande no topo e label pequeno abaixo. Possui efeitos visuais de hover (mudança de cor) e seleção (scale + cor). Perfeito para escolhas visuais onde o ícone é o elemento principal de identificação.
 
-## 12. FormImageUpload (Upload de Imagem)
+**Diferenças do FormSimpleGrid:**
+- **Layout Horizontal**: Opções dispostas em linha (flex), não em grid
+- **Mais Visual**: Foco maior no ícone (w-7 h-7 vs w-8 h-8)
+- **Efeito Scale**: Hover e seleção possuem animação de escala (105% e 110%)
+- **Hover Personalizado**: Usa estilos inline para cores de hover específicas por opção
+- **Sem Bordas**: Não possui bordas/cards, apenas ícone + label flutuantes
+- **Menos Opções**: Ideal para 3-7 opções (FormSimpleGrid suporta mais)
+
+**Estrutura Visual:**
+- **Estado Normal**: Ícone + label em `text-muted-foreground`, scale 100%
+- **Estado Hover**: Cores do active (via style tag inline), scale 105%
+- **Estado Selecionado**: Cores do active (via className), scale 110%
+
+**Classes de Cor Obrigatórias:**
+
+- **`color`**: Cor base quando NÃO selecionado
+  - Geralmente: `"text-muted-foreground"` (cinza neutro)
+
+- **`activeColor`**: Cor quando selecionado (e também hover via style tag)
+  - Suporta variantes dark mode: `"text-{cor}-600 dark:text-{cor}-400"`
+  - Exemplos:
+    - `"text-green-600 dark:text-green-400"` (sucesso, completo)
+    - `"text-red-600 dark:text-red-400"` (erro, destruído)
+    - `"text-yellow-600 dark:text-yellow-400"` (aviso, ápice)
+    - `"text-blue-600 dark:text-blue-400"` (info, fortalecido)
+    - `"text-purple-600 dark:text-purple-400"` (especial, selado)
+    - `"text-orange-600 dark:text-orange-400"` (alerta, enfraquecido)
+
+**Cores suportadas** (light/dark mode automático):
+- green, red, yellow, blue, purple, orange (cores principais)
+- slate, cyan, pink, indigo, emerald, lime, amber, teal, sky (cores extras)
+
+**Exemplo de uso básico (Status de Item):**
+```tsx
+import { GiBroadsword, GiBrokenShield, GiPadlock } from "react-icons/gi";
+import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
+
+const ITEM_STATUSES = [
+  {
+    value: "complete",
+    translationKey: "status.complete",
+    icon: GiBroadsword,
+    color: "text-muted-foreground",
+    activeColor: "text-green-600 dark:text-green-400",
+  },
+  {
+    value: "destroyed",
+    translationKey: "status.destroyed",
+    icon: GiBrokenShield,
+    color: "text-muted-foreground",
+    activeColor: "text-red-600 dark:text-red-400",
+  },
+  {
+    value: "sealed",
+    translationKey: "status.sealed",
+    icon: GiPadlock,
+    color: "text-muted-foreground",
+    activeColor: "text-purple-600 dark:text-purple-400",
+  },
+];
+
+<FormSimplePicker
+  value={itemStatus}
+  onChange={setItemStatus}
+  label="Item Status"
+  required
+  options={ITEM_STATUSES}
+  translationNamespace="create-item"
+  error={errors.status?.message}
+/>
+```
+
+**Exemplo com ícones Lucide (Prioridade):**
+```tsx
+import { AlertCircle, TrendingUp, Zap } from "lucide-react";
+import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
+
+const PRIORITY_LEVELS = [
+  {
+    value: "low",
+    translationKey: "priority.low",
+    icon: AlertCircle,
+    color: "text-muted-foreground",
+    activeColor: "text-blue-600 dark:text-blue-400",
+  },
+  {
+    value: "medium",
+    translationKey: "priority.medium",
+    icon: TrendingUp,
+    color: "text-muted-foreground",
+    activeColor: "text-yellow-600 dark:text-yellow-400",
+  },
+  {
+    value: "high",
+    translationKey: "priority.high",
+    icon: Zap,
+    color: "text-muted-foreground",
+    activeColor: "text-red-600 dark:text-red-400",
+  },
+];
+
+<FormSimplePicker
+  value={priority}
+  onChange={setPriority}
+  label="Priority Level"
+  options={PRIORITY_LEVELS}
+/>
+```
+
+**Propriedades principais:**
+- `value`: Valor selecionado (string | null)
+- `onChange`: Callback quando valor muda
+- `options`: Array de opções (value, translationKey, icon, color, activeColor)
+- `label`: Label do campo
+- `required`: Se o campo é obrigatório (adiciona asterisco)
+- `error`: Mensagem de erro (traduzida via i18next)
+- `translationNamespace`: Namespace de tradução (default: "translation")
+
+**Quando usar FormSimplePicker vs FormSimpleGrid:**
+
+**Use FormSimplePicker quando:**
+- ✅ Tem 3-7 opções visuais
+- ✅ Ícone é o elemento principal de identificação
+- ✅ Quer efeito visual de scale no hover/seleção
+- ✅ Não precisa de bordas/cards (visual mais limpo)
+- ✅ Layout horizontal em linha funciona bem
+- ✅ Exemplos: Status de item, níveis de prioridade, estados de processo
+
+**Use FormSimpleGrid quando:**
+- ✅ Tem muitas opções (8+)
+- ✅ Precisa organizar em grid multi-coluna
+- ✅ Quer cards com bordas e padding
+- ✅ Precisa de layout mais estruturado
+- ✅ Quer efeito de ring no selecionado
+- ✅ Exemplos: Roles de personagem, tipos de relacionamento, categorias
+
+**Funcionalidades:**
+- ✅ Efeito scale animado (hover 105%, selected 110%)
+- ✅ Cores customizáveis por opção
+- ✅ Suporte light/dark mode automático
+- ✅ Tradução via react-i18next
+- ✅ Validação com mensagem de erro
+- ✅ Campo obrigatório (asterisco)
+- ✅ Ícones de qualquer biblioteca (react-icons, lucide-react)
+- ✅ Hover com cores específicas por opção (via style tag inline)
+
+---
+
+
+## 13. FormImageUpload (Upload de Imagem)
 **Componente:** `FormImageUpload` (`src/components/forms/FormImageUpload.tsx`)
 **Uso:** Upload de imagens com preview e customização de forma
 **Descrição:** Componente de upload de imagem altamente customizável. Permite diferentes formas (quadrado, arredondado, circular), ajuste de como a imagem se encaixa no container, e ícone/texto customizável no placeholder. O placeholder possui fundo roxo escuro.
