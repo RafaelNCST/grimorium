@@ -2,6 +2,7 @@
   "form": {
     "selected": "selected",
     "selected_plural": "selected",
-    "max_selections_reached": "Maximum of {{max}} selection(s) reached"
+    "max_selections_reached": "Maximum of {{max}} selection(s) reached",
+    "all_options_selected": "All options have been selected"
   }
 }

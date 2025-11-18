@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { X, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -201,33 +201,45 @@ export function FormEntityMultiSelectAuto({
   // Use translated text if counterText not provided
   const displayCounterText = counterText || t("form.selected");
 
-  // Load entities from database
+  // Load entities from database (only once per entityType/bookId)
   useEffect(() => {
     const fetchEntities = async () => {
       if (!bookId) return;
 
       setIsLoading(true);
       const entities = await loadEntities(entityType, bookId);
-
-      // Apply filter if provided
-      const filteredEntities = filter ? entities.filter(filter) : entities;
-
-      setOptions(filteredEntities);
+      setOptions(entities);
       setIsLoading(false);
     };
 
     fetchEntities();
-  }, [entityType, bookId, filter]);
+  }, [entityType, bookId]);
 
-  const selectedOptions = options.filter((opt) => value.includes(opt.id));
-  const availableOptions = options.filter((opt) => !value.includes(opt.id));
+  // Selected options should come from ALL options, not filtered ones
+  // Because we want to show selected items even if they don't pass the filter
+  const selectedOptions = useMemo(
+    () => options.filter((opt) => value.includes(opt.id)),
+    [options, value]
+  );
+
+  // Available options should be filtered AND exclude selected ones
+  const availableOptions = useMemo(() => {
+    // First filter by custom filter (if provided)
+    const filtered = filter ? options.filter(filter) : options;
+    // Then exclude already selected items
+    return filtered.filter((opt) => !value.includes(opt.id));
+  }, [options, filter, value]);
 
   // Check if max selections is reached
   const isMaxReached = maxSelections !== undefined && value.length >= maxSelections;
 
   // Filter available options by search query
-  const filteredOptions = availableOptions.filter((opt) =>
-    opt.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const searchFilteredOptions = useMemo(
+    () =>
+      availableOptions.filter((opt) =>
+        opt.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [availableOptions, searchQuery]
   );
 
   const handleAdd = (optionId: string) => {
@@ -271,125 +283,133 @@ export function FormEntityMultiSelectAuto({
   return (
     <div className="space-y-3">
       {/* Header with label and counter */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between min-h-[20px]">
         <Label className={labelClassName}>
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </Label>
-        {selectedOptions.length > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {selectedOptions.length}
-            {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
-          </span>
-        )}
+        <span className="text-xs text-muted-foreground">
+          {selectedOptions.length > 0 ? (
+            <>
+              {selectedOptions.length}
+              {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+            </>
+          ) : (
+            <span className="opacity-0">
+              0{maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+            </span>
+          )}
+        </span>
       </div>
 
       {/* No options available */}
       {options.length === 0 ? (
-        <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
+        <div className="h-[168px] flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
           <p className="text-sm">{emptyText}</p>
         </div>
       ) : (
-        <>
-          {/* Max selections reached message */}
-          {isMaxReached && (
-            <div className="text-center py-3 text-xs text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
-              <p>
-                {t("form.max_selections_reached", { max: maxSelections })}
-              </p>
-            </div>
-          )}
-
-          {/* Dropdown selector */}
-          {availableOptions.length > 0 && !isMaxReached && (
-            <Select onValueChange={handleAdd} disabled={disabled}>
-              <SelectTrigger>
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
-              <SelectContent>
-                {/* Search input inside dropdown */}
-                <div className="px-2 pb-2 pt-1 border-b sticky top-0 bg-popover z-10">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <Input
-                      placeholder={searchPlaceholder}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 h-9"
-                      onClick={(e) => e.stopPropagation()}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    />
-                  </div>
-                </div>
-
-                {/* Options list */}
-                <div className="max-h-[300px] overflow-y-auto">
-                  {filteredOptions.length === 0 ? (
-                    <div className="py-6 text-center text-sm text-muted-foreground">
-                      {noResultsText}
-                    </div>
-                  ) : (
-                    filteredOptions.map((option) => (
-                      <SelectItem
-                        key={option.id}
-                        value={option.id}
-                        className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="w-8 h-8 rounded-md">
-                            <AvatarImage src={option.image} alt={option.name} />
-                            <AvatarFallback className="text-xs rounded-md !text-foreground">
-                              {getInitials(option.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{option.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))
-                  )}
-                </div>
-              </SelectContent>
-            </Select>
-          )}
-
-          {/* Selected items display */}
-          {selectedOptions.length > 0 && (
-            <div className="max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-              <div className="flex flex-wrap gap-3">
-                {selectedOptions.map((option) => (
-                  <div
-                    key={option.id}
-                    className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                  >
-                    <Avatar className="w-10 h-10 rounded-md">
-                      <AvatarImage src={option.image} alt={option.name} />
-                      <AvatarFallback className="text-xs rounded-md">
-                        {getInitials(option.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium">{option.name}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 ml-1"
-                      onClick={() => handleRemove(option.id)}
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ))}
+        <div className="space-y-3">
+          {/* Dropdown selector area - Fixed height to prevent layout shift */}
+          <div className="h-10">
+            {isMaxReached ? (
+              <div className="h-full flex items-center justify-center text-xs text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
+                <p>
+                  {t("form.max_selections_reached", { max: maxSelections })}
+                </p>
               </div>
-            </div>
-          )}
+            ) : availableOptions.length > 0 ? (
+              <Select value="" onValueChange={handleAdd} disabled={disabled}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  {/* Search input inside dropdown */}
+                  <div className="px-2 pb-2 pt-1 border-b sticky top-0 bg-popover z-10">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      <Input
+                        placeholder={searchPlaceholder}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9 h-9"
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  </div>
 
-          {/* Empty state when no selection */}
-          {selectedOptions.length === 0 && options.length > 0 && (
-            <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
-              <p className="text-sm">{noSelectionText}</p>
-            </div>
-          )}
-        </>
+                  {/* Options list */}
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {searchFilteredOptions.length === 0 ? (
+                      <div className="py-6 text-center text-sm text-muted-foreground">
+                        {noResultsText}
+                      </div>
+                    ) : (
+                      searchFilteredOptions.map((option) => (
+                        <SelectItem
+                          key={option.id}
+                          value={option.id}
+                          className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-8 h-8 rounded-md">
+                              <AvatarImage src={option.image} alt={option.name} />
+                              <AvatarFallback className="text-xs rounded-md !text-foreground">
+                                {getInitials(option.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{option.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
+                  </div>
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="h-full flex items-center justify-center text-xs text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
+                <p>{t("form.all_options_selected")}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Selected items display - Fixed height to prevent layout shift */}
+          <div className="h-[115px]">
+            {selectedOptions.length > 0 ? (
+              <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+                <div className="flex flex-wrap gap-3">
+                  {selectedOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+                    >
+                      <Avatar className="w-10 h-10 rounded-md">
+                        <AvatarImage src={option.image} alt={option.name} />
+                        <AvatarFallback className="text-xs rounded-md">
+                          {getInitials(option.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">{option.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 ml-1"
+                        onClick={() => handleRemove(option.id)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg">
+                <p className="text-sm">{noSelectionText}</p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {error && <p className="text-sm text-destructive">{error}</p>}

@@ -1,20 +1,14 @@
 import React, { useState, useMemo, useCallback } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { ChevronDown, ChevronRight, Heart, TreePine } from "lucide-react";
+import { Heart, TreePine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyFieldState } from "@/components/detail-page/empty-field-state";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { type ICharacterFamily, type IFieldVisibility } from "@/types/character-types";
 
-import { FamilyFieldOptimized } from "./family-field-optimized";
 import { FamilyTreeDialog } from "./family-tree-dialog";
 
 interface ICharacter {
@@ -23,6 +17,140 @@ interface ICharacter {
   image?: string;
   role?: string;
 }
+
+// Optimized wrapper component for family fields
+interface FamilyFieldOptimizedProps {
+  fieldName: keyof ICharacterFamily;
+  value: string[];
+  family: ICharacterFamily;
+  currentCharacterId: string;
+  bookId: string;
+  label: string;
+  placeholder: string;
+  noSelectionText: string;
+  onChange: (newValue: string[]) => void;
+  maxSelections?: number;
+}
+
+const FamilyFieldOptimized = React.memo(
+  function FamilyFieldOptimized({
+    fieldName,
+    value,
+    family,
+    currentCharacterId,
+    bookId,
+    label,
+    placeholder,
+    noSelectionText,
+    onChange,
+    maxSelections,
+  }: FamilyFieldOptimizedProps) {
+    const { t } = useTranslation("character-detail");
+
+    // Granular memoization: only recalculate when OTHER fields' IDs change
+    const filterFn = useMemo(() => {
+      // Collect IDs from all OTHER fields
+      const otherFieldsIds = new Set<string>();
+      const allFields: Array<keyof ICharacterFamily> = [
+        "grandparents",
+        "parents",
+        "spouses",
+        "unclesAunts",
+        "cousins",
+        "children",
+        "siblings",
+        "halfSiblings",
+      ];
+
+      for (const otherField of allFields) {
+        if (otherField !== fieldName) {
+          const fieldValue = family[otherField];
+          if (Array.isArray(fieldValue)) {
+            fieldValue.forEach((id) => otherFieldsIds.add(id));
+          }
+        }
+      }
+
+      return (char: { id: string; name: string; image?: string }) => {
+        // Exclude current character
+        if (char.id === currentCharacterId) return false;
+        // Exclude characters used in other fields
+        if (otherFieldsIds.has(char.id)) return false;
+        return true;
+      };
+    }, [
+      // Only depend on OTHER fields, not the current field
+      fieldName,
+      family.grandparents,
+      family.parents,
+      family.spouses,
+      family.unclesAunts,
+      family.cousins,
+      family.children,
+      family.siblings,
+      family.halfSiblings,
+      currentCharacterId,
+    ]);
+
+    return (
+      <FormEntityMultiSelectAuto
+        entityType="character"
+        bookId={bookId}
+        label=""
+        placeholder={placeholder}
+        emptyText={t("character-detail:family.no_characters")}
+        noSelectionText={noSelectionText}
+        searchPlaceholder={t("character-detail:family.search_characters")}
+        value={value}
+        onChange={onChange}
+        filter={filterFn}
+        maxSelections={maxSelections}
+      />
+    );
+  },
+  // Custom comparison function
+  (prevProps, nextProps) => {
+    // Re-render only if these specific props change
+    if (prevProps.fieldName !== nextProps.fieldName) return false;
+    if (prevProps.bookId !== nextProps.bookId) return false;
+    if (prevProps.currentCharacterId !== nextProps.currentCharacterId) return false;
+    if (prevProps.maxSelections !== nextProps.maxSelections) return false;
+    if (prevProps.label !== nextProps.label) return false;
+    if (prevProps.placeholder !== nextProps.placeholder) return false;
+    if (prevProps.noSelectionText !== nextProps.noSelectionText) return false;
+
+    // Check if the VALUE of current field changed (array comparison)
+    const prevValue = prevProps.value;
+    const nextValue = nextProps.value;
+    if (prevValue.length !== nextValue.length) return false;
+    if (!prevValue.every((id, idx) => id === nextValue[idx])) return false;
+
+    // Check if OTHER fields changed (this determines if filter needs update)
+    const allFields: Array<keyof ICharacterFamily> = [
+      "grandparents",
+      "parents",
+      "spouses",
+      "unclesAunts",
+      "cousins",
+      "children",
+      "siblings",
+      "halfSiblings",
+    ];
+
+    for (const field of allFields) {
+      if (field !== prevProps.fieldName) {
+        const prevFieldValue = prevProps.family[field] || [];
+        const nextFieldValue = nextProps.family[field] || [];
+
+        if (prevFieldValue.length !== nextFieldValue.length) return false;
+        if (!prevFieldValue.every((id, idx) => id === nextFieldValue[idx])) return false;
+      }
+    }
+
+    // If we got here, props are equal - skip re-render
+    return true;
+  }
+);
 
 interface FamilySectionProps {
   family: ICharacterFamily;
@@ -47,14 +175,6 @@ export const FamilySection = React.memo(function FamilySection({
 }: FamilySectionProps) {
   const { t } = useTranslation("character-detail");
   const [isTreeDialogOpen, setIsTreeDialogOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-
-  const toggleSection = useCallback((sectionName: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [sectionName]: !prev[sectionName],
-    }));
-  }, []);
 
   // Check if family has any members
   const hasFamilyMembers = useMemo(() => {
@@ -71,14 +191,39 @@ export const FamilySection = React.memo(function FamilySection({
     );
   }, [family]);
 
+  // Create stable onChange handlers using useMemo to cache them per field
+  const fieldChangeHandlers = useMemo(() => {
+    const handlers: Record<string, (newValue: string[]) => void> = {};
+    const allFields: Array<keyof ICharacterFamily> = [
+      "grandparents",
+      "parents",
+      "spouses",
+      "unclesAunts",
+      "cousins",
+      "children",
+      "siblings",
+      "halfSiblings",
+    ];
+
+    for (const fieldName of allFields) {
+      handlers[fieldName] = (newValue: string[]) => {
+        onFamilyChange({ ...family, [fieldName]: newValue });
+      };
+    }
+
+    return handlers;
+  }, [family, onFamilyChange]);
+
   // Render function for family fields - NOT a hook, just a regular function
   const renderFamilyField = (
     fieldName: keyof ICharacterFamily,
     labelKey: string,
     placeholderKey: string,
-    noSelectionKey: string
+    noSelectionKey: string,
+    maxSelections?: number
   ) => {
     const value = family[fieldName] || [];
+    const handleChange = fieldChangeHandlers[fieldName];
 
     return (
       <FieldWithVisibilityToggle
@@ -92,94 +237,80 @@ export const FamilySection = React.memo(function FamilySection({
       >
         {isEditMode ? (
           <FamilyFieldOptimized
+            fieldName={fieldName}
+            value={value as string[]}
+            family={family}
+            currentCharacterId={currentCharacterId}
+            bookId={bookId}
             label=""
             placeholder={t(placeholderKey)}
-            emptyText={t("character-detail:family.no_characters")}
             noSelectionText={t(noSelectionKey)}
-            searchPlaceholder={t("character-detail:family.search_characters")}
-            value={value as string[]}
-            onChange={(newValue) =>
-              onFamilyChange({ ...family, [fieldName]: newValue })
-            }
-            allCharacters={allCharacters}
-            currentCharacterId={currentCharacterId}
+            onChange={handleChange}
+            maxSelections={maxSelections}
           />
         ) : (
-          <Collapsible
-            open={openSections[fieldName]}
-            onOpenChange={() => toggleSection(fieldName)}
-          >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
+          <div className="space-y-3">
+            {/* Header with label and counter - matching FormEntityMultiSelectAuto pattern */}
+            <div className="flex items-center justify-between min-h-[20px]">
               <p className="text-sm font-semibold text-primary">
                 {t(labelKey)}
-                {value.length > 0 && (
-                  <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                    ({value.length})
-                  </span>
-                )}
               </p>
-              {openSections[fieldName] ? (
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              {value.length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {value.length}
+                  {maxSelections !== undefined && ` / ${maxSelections}`}
+                </span>
               )}
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-2">
-              {value.length > 0 ? (
-                <div className="flex flex-col gap-2">
-                  {(value as string[]).map((characterId) => {
-                    const character = allCharacters.find(
-                      (c) => c.id === characterId
-                    );
-                    return character ? (
-                      <div
-                        key={characterId}
-                        className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                      >
-                        {character.image ? (
-                          <img
-                            src={convertFileSrc(character.image)}
-                            alt={character.name}
-                            className="w-8 h-8 rounded object-cover flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs text-muted-foreground font-semibold">
-                              {character.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                        <span className="text-sm font-medium">
-                          {character.name}
-                        </span>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              ) : (
-                <EmptyFieldState t={t} />
-              )}
-            </CollapsibleContent>
-          </Collapsible>
+            </div>
+
+            {/* Selected items display - matching FormEntityMultiSelectAuto pattern */}
+            {value.length > 0 ? (
+              <div className="flex flex-wrap gap-3">
+                {(value as string[]).map((characterId) => {
+                  const character = allCharacters.find(
+                    (c) => c.id === characterId
+                  );
+                  return character ? (
+                    <div
+                      key={characterId}
+                      className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
+                    >
+                      {character.image ? (
+                        <img
+                          src={convertFileSrc(character.image)}
+                          alt={character.name}
+                          className="w-10 h-10 rounded-md object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs text-muted-foreground font-semibold">
+                            {character.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-sm font-medium">
+                        {character.name}
+                      </span>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
+                <p className="text-sm">{t(noSelectionKey)}</p>
+              </div>
+            )}
+          </div>
         )}
       </FieldWithVisibilityToggle>
     );
   };
 
-  // Empty state when no characters available
-  if (allCharacters.length <= 1 && isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <TreePine className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t("character-detail:empty_states.need_more_characters_family")}
-        </p>
-        <p className="text-xs mt-1">
-          {t("character-detail:empty_states.need_more_characters_family_hint")}
-        </p>
-      </div>
-    );
-  }
 
   // Empty state in view mode
   if (!hasFamilyMembers && !isEditMode) {
@@ -212,23 +343,25 @@ export const FamilySection = React.memo(function FamilySection({
 
       {/* Family Fields - All in vertical sequence, no groupings */}
       <div className="space-y-4">
-        {/* 1. Avós (Grandparents) */}
+        {/* 1. Avós (Grandparents) - Max 4 (2 paternal + 2 maternal) */}
         {renderFamilyField(
           "grandparents",
           "character-detail:family.grandparents",
           "character-detail:family.select_grandparents",
-          "character-detail:family.no_grandparents_selected"
+          "character-detail:family.no_grandparents_selected",
+          4
         )}
 
-        {/* 2. Pais (Parents) */}
+        {/* 2. Pais (Parents) - Max 2 */}
         {renderFamilyField(
           "parents",
           "character-detail:family.parents",
           "character-detail:family.select_parents",
-          "character-detail:family.no_parents_selected"
+          "character-detail:family.no_parents_selected",
+          2
         )}
 
-        {/* 3. Cônjuges (Spouses) */}
+        {/* 3. Cônjuges (Spouses) - No limit */}
         {renderFamilyField(
           "spouses",
           "character-detail:family.spouses",
@@ -236,7 +369,7 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_spouses_selected"
         )}
 
-        {/* 4. Tios (Uncles/Aunts) */}
+        {/* 4. Tios (Uncles/Aunts) - No limit */}
         {renderFamilyField(
           "unclesAunts",
           "character-detail:family.uncles_aunts",
@@ -244,7 +377,7 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_uncles_aunts_selected"
         )}
 
-        {/* 5. Primos (Cousins) */}
+        {/* 5. Primos (Cousins) - No limit */}
         {renderFamilyField(
           "cousins",
           "character-detail:family.cousins",
@@ -252,7 +385,7 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_cousins_selected"
         )}
 
-        {/* 6. Filhos (Children) */}
+        {/* 6. Filhos (Children) - No limit */}
         {renderFamilyField(
           "children",
           "character-detail:family.children",
@@ -260,7 +393,7 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_children_selected"
         )}
 
-        {/* 7. Irmãos (Siblings) */}
+        {/* 7. Irmãos (Siblings) - No limit */}
         {renderFamilyField(
           "siblings",
           "character-detail:family.siblings",
@@ -268,7 +401,7 @@ export const FamilySection = React.memo(function FamilySection({
           "character-detail:family.no_siblings_selected"
         )}
 
-        {/* 8. Meio-irmãos (Half Siblings) */}
+        {/* 8. Meio-irmãos (Half Siblings) - No limit */}
         {renderFamilyField(
           "halfSiblings",
           "character-detail:family.half_siblings",

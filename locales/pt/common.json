@@ -2,7 +2,8 @@
   "form": {
     "selected": "selecionado",
     "selected_plural": "selecionados",
-    "max_selections_reached": "Máximo de {{max}} seleção(ões) atingido"
+    "max_selections_reached": "Máximo de {{max}} seleção(ões) atingido",
+    "all_options_selected": "Todas as opções foram selecionadas"
   },
   "empty_field": "Não especificado"
 }
