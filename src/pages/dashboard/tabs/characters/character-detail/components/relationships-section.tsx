@@ -73,123 +73,44 @@ interface RelationshipTypeConfig {
   value: string;
   translationKey: string;
   icon: LucideIcon;
-  color: string;
-  hoverColor: string;
 }
 
+const RELATIONSHIP_COLOR_MAP: Record<string, { bg: string; border: string }> = {
+  friend: { bg: "green-500/10", border: "green-500/20" },
+  rival: { bg: "orange-500/10", border: "orange-500/20" },
+  mentor: { bg: "blue-500/10", border: "blue-500/20" },
+  apprentice: { bg: "cyan-500/10", border: "cyan-500/20" },
+  enemy: { bg: "red-500/10", border: "red-500/20" },
+  love_interest: { bg: "pink-500/10", border: "pink-500/20" },
+  ally: { bg: "indigo-500/10", border: "indigo-500/20" },
+  acquaintance: { bg: "gray-500/10", border: "gray-500/20" },
+  leader: { bg: "purple-500/10", border: "purple-500/20" },
+  subordinate: { bg: "slate-500/10", border: "slate-500/20" },
+  family_love: { bg: "pink-400/10", border: "pink-400/20" },
+  romantic_relationship: { bg: "fuchsia-500/10", border: "fuchsia-500/20" },
+  best_friend: { bg: "teal-500/10", border: "teal-500/20" },
+  hatred: { bg: "red-700/10", border: "red-700/20" },
+  neutral: { bg: "gray-400/10", border: "gray-400/20" },
+  devotion: { bg: "violet-500/10", border: "violet-500/20" },
+};
+
 const RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
-  {
-    value: "friend",
-    translationKey: "friend",
-    icon: Users,
-    color: "bg-green-500/20 border-green-500/30 ring-4 ring-green-500/50 text-green-600",
-    hoverColor: "hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/20",
-  },
-  {
-    value: "rival",
-    translationKey: "rival",
-    icon: Swords,
-    color: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50 text-orange-600",
-    hoverColor: "hover:bg-orange-500/10 hover:text-orange-600 hover:border-orange-500/20",
-  },
-  {
-    value: "mentor",
-    translationKey: "mentor",
-    icon: GraduationCap,
-    color: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50 text-blue-600",
-    hoverColor: "hover:bg-blue-500/10 hover:text-blue-600 hover:border-blue-500/20",
-  },
-  {
-    value: "apprentice",
-    translationKey: "apprentice",
-    icon: BookOpen,
-    color: "bg-cyan-500/20 border-cyan-500/30 ring-4 ring-cyan-500/50 text-cyan-600",
-    hoverColor: "hover:bg-cyan-500/10 hover:text-cyan-600 hover:border-cyan-500/20",
-  },
-  {
-    value: "enemy",
-    translationKey: "enemy",
-    icon: Skull,
-    color: "bg-red-500/20 border-red-500/30 ring-4 ring-red-500/50 text-red-600",
-    hoverColor: "hover:bg-red-500/10 hover:text-red-600 hover:border-red-500/20",
-  },
-  {
-    value: "love_interest",
-    translationKey: "love_interest",
-    icon: Heart,
-    color: "bg-pink-500/20 border-pink-500/30 ring-4 ring-pink-500/50 text-pink-600",
-    hoverColor: "hover:bg-pink-500/10 hover:text-pink-600 hover:border-pink-500/20",
-  },
-  {
-    value: "ally",
-    translationKey: "ally",
-    icon: Shield,
-    color: "bg-indigo-500/20 border-indigo-500/30 ring-4 ring-indigo-500/50 text-indigo-600",
-    hoverColor: "hover:bg-indigo-500/10 hover:text-indigo-600 hover:border-indigo-500/20",
-  },
-  {
-    value: "acquaintance",
-    translationKey: "acquaintance",
-    icon: Sparkles,
-    color: "bg-gray-500/20 border-gray-500/30 ring-4 ring-gray-500/50 text-gray-600",
-    hoverColor: "hover:bg-gray-500/10 hover:text-gray-600 hover:border-gray-500/20",
-  },
-  {
-    value: "leader",
-    translationKey: "leader",
-    icon: Crown,
-    color: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50 text-purple-600",
-    hoverColor: "hover:bg-purple-500/10 hover:text-purple-600 hover:border-purple-500/20",
-  },
-  {
-    value: "subordinate",
-    translationKey: "subordinate",
-    icon: UserMinus,
-    color: "bg-slate-500/20 border-slate-500/30 ring-4 ring-slate-500/50 text-slate-600",
-    hoverColor: "hover:bg-slate-500/10 hover:text-slate-600 hover:border-slate-500/20",
-  },
-  {
-    value: "family_love",
-    translationKey: "family_love",
-    icon: Home,
-    color: "bg-pink-400/20 border-pink-400/30 ring-4 ring-pink-400/50 text-pink-500",
-    hoverColor: "hover:bg-pink-400/10 hover:text-pink-500 hover:border-pink-400/20",
-  },
-  {
-    value: "romantic_relationship",
-    translationKey: "romantic_relationship",
-    icon: HeartHandshake,
-    color: "bg-fuchsia-500/20 border-fuchsia-500/30 ring-4 ring-fuchsia-500/50 text-fuchsia-600",
-    hoverColor: "hover:bg-fuchsia-500/10 hover:text-fuchsia-600 hover:border-fuchsia-500/20",
-  },
-  {
-    value: "best_friend",
-    translationKey: "best_friend",
-    icon: UserCheck,
-    color: "bg-teal-500/20 border-teal-500/30 ring-4 ring-teal-500/50 text-teal-600",
-    hoverColor: "hover:bg-teal-500/10 hover:text-teal-600 hover:border-teal-500/20",
-  },
-  {
-    value: "hatred",
-    translationKey: "hatred",
-    icon: Flame,
-    color: "bg-red-700/20 border-red-700/30 ring-4 ring-red-700/50 text-red-700",
-    hoverColor: "hover:bg-red-700/10 hover:text-red-700 hover:border-red-700/20",
-  },
-  {
-    value: "neutral",
-    translationKey: "neutral",
-    icon: Minus,
-    color: "bg-gray-400/20 border-gray-400/30 ring-4 ring-gray-400/50 text-gray-500",
-    hoverColor: "hover:bg-gray-400/10 hover:text-gray-500 hover:border-gray-400/20",
-  },
-  {
-    value: "devotion",
-    translationKey: "devotion",
-    icon: Sparkle,
-    color: "bg-violet-500/20 border-violet-500/30 ring-4 ring-violet-500/50 text-violet-600",
-    hoverColor: "hover:bg-violet-500/10 hover:text-violet-600 hover:border-violet-500/20",
-  },
+  { value: "friend", translationKey: "friend", icon: Users },
+  { value: "rival", translationKey: "rival", icon: Swords },
+  { value: "mentor", translationKey: "mentor", icon: GraduationCap },
+  { value: "apprentice", translationKey: "apprentice", icon: BookOpen },
+  { value: "enemy", translationKey: "enemy", icon: Skull },
+  { value: "love_interest", translationKey: "love_interest", icon: Heart },
+  { value: "ally", translationKey: "ally", icon: Shield },
+  { value: "acquaintance", translationKey: "acquaintance", icon: Sparkles },
+  { value: "leader", translationKey: "leader", icon: Crown },
+  { value: "subordinate", translationKey: "subordinate", icon: UserMinus },
+  { value: "family_love", translationKey: "family_love", icon: Home },
+  { value: "romantic_relationship", translationKey: "romantic_relationship", icon: HeartHandshake },
+  { value: "best_friend", translationKey: "best_friend", icon: UserCheck },
+  { value: "hatred", translationKey: "hatred", icon: Flame },
+  { value: "neutral", translationKey: "neutral", icon: Minus },
+  { value: "devotion", translationKey: "devotion", icon: Sparkle },
 ];
 
 export function RelationshipsSection({
@@ -573,9 +494,8 @@ export function RelationshipsSection({
                         `character-detail:relationship_types.${type.translationKey}`
                       ),
                       icon: type.icon,
-                      baseColorClass: "border-muted",
-                      hoverColorClass: type.hoverColor,
-                      activeColorClass: type.color,
+                      backgroundColor: RELATIONSHIP_COLOR_MAP[type.value].bg,
+                      borderColor: RELATIONSHIP_COLOR_MAP[type.value].border,
                     }))}
                   />
 
@@ -698,9 +618,8 @@ export function RelationshipsSection({
                     `character-detail:relationship_types.${type.translationKey}`
                   ),
                   icon: type.icon,
-                  baseColorClass: "border-muted",
-                  hoverColorClass: type.hoverColor,
-                  activeColorClass: type.color,
+                  backgroundColor: RELATIONSHIP_COLOR_MAP[type.value].bg,
+                  borderColor: RELATIONSHIP_COLOR_MAP[type.value].border,
                 }))}
               />
 

@@ -13,11 +13,6 @@ import {
   GridSelectOption,
 } from "@/components/forms/FormSelectGrid";
 
-import {
-  SCALE_BASE_COLOR,
-  SCALE_HOVER_COLOR,
-  SCALE_ACTIVE_COLOR,
-} from "../constants/scale-colors";
 import { RegionScale } from "../types/region-types";
 
 interface ScalePickerProps {
@@ -49,14 +44,22 @@ const SCALES: RegionScale[] = [
 export function ScalePicker({ value, onChange }: ScalePickerProps) {
   const { t } = useTranslation("world");
 
+  const scaleColorMap: Record<RegionScale, { bg: string; border: string }> = {
+    local: { bg: "emerald-500/10", border: "emerald-500/20" },
+    continental: { bg: "blue-500/10", border: "blue-500/20" },
+    planetary: { bg: "violet-500/10", border: "violet-500/20" },
+    galactic: { bg: "purple-500/10", border: "purple-500/20" },
+    universal: { bg: "amber-500/10", border: "amber-500/20" },
+    multiversal: { bg: "pink-500/10", border: "pink-500/20" },
+  };
+
   const scaleOptions: GridSelectOption<RegionScale>[] = SCALES.map((scale) => ({
     value: scale,
     label: t(`scales.${scale}`),
     description: t(`scale_descriptions.${scale}`),
     icon: SCALE_ICONS[scale],
-    baseColorClass: SCALE_BASE_COLOR,
-    hoverColorClass: SCALE_HOVER_COLOR[scale],
-    activeColorClass: `${SCALE_ACTIVE_COLOR[scale]} text-white`,
+    backgroundColor: scaleColorMap[scale].bg,
+    borderColor: scaleColorMap[scale].border,
   }));
 
   return (

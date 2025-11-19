@@ -8,11 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RegionSeason } from "@/pages/dashboard/tabs/world/types/region-types";
 
-import {
-  SEASON_BASE_COLOR,
-  SEASON_HOVER_COLOR,
-  SEASON_ACTIVE_COLOR,
-} from "../constants/season-colors";
 import { REGION_SEASONS } from "../constants/seasons";
 
 interface SeasonPickerProps {
@@ -31,15 +26,22 @@ export function SeasonPicker({
   const { t } = useTranslation("world");
   const isCustom = value === "custom";
 
+  const seasonColorMap: Record<RegionSeason, { bg: string; border: string }> = {
+    spring: { bg: "green-500/10", border: "green-500/20" },
+    summer: { bg: "red-500/10", border: "red-500/20" },
+    autumn: { bg: "orange-500/10", border: "orange-500/20" },
+    winter: { bg: "blue-500/10", border: "blue-500/20" },
+    custom: { bg: "purple-500/10", border: "purple-500/20" },
+  };
+
   const seasonOptions: GridSelectOption<RegionSeason>[] = REGION_SEASONS.map(
     (season) => ({
       value: season.value,
       label: season.label,
       description: season.description,
       icon: season.icon,
-      baseColorClass: SEASON_BASE_COLOR,
-      hoverColorClass: `${SEASON_HOVER_COLOR[season.value]} hover:text-foreground`,
-      activeColorClass: `${SEASON_ACTIVE_COLOR[season.value]} text-foreground`,
+      backgroundColor: seasonColorMap[season.value].bg,
+      borderColor: seasonColorMap[season.value].border,
       colSpan: season.value === "custom" ? 2 : undefined,
     })
   );

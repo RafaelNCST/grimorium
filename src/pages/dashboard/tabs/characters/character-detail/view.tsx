@@ -27,11 +27,6 @@ import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-charac
 import { type ICharacterRole } from "@/components/modals/create-character-modal/constants/character-roles";
 import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
-import {
-  PHYSICAL_TYPE_ACTIVE_COLOR,
-  PHYSICAL_TYPE_BASE_COLOR,
-  PHYSICAL_TYPE_HOVER_COLOR,
-} from "@/components/modals/create-character-modal/constants/physical-type-colors";
 import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -287,36 +282,18 @@ export function CharacterDetailView({
   const { t } = useTranslation(["character-detail", "create-character"]);
 
   // Convert role constants to FormSimpleGrid format with universal pattern
-  const roleColorMap: Record<string, { hover: string; active: string }> = {
-    protagonist: {
-      hover: "hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 hover:border-yellow-500/20",
-      active: "bg-yellow-500/20 border-yellow-500/30 ring-4 ring-yellow-500/50 text-yellow-600 dark:text-yellow-400",
-    },
-    antagonist: {
-      hover: "hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-500/20",
-      active: "bg-orange-500/20 border-orange-500/30 ring-4 ring-orange-500/50 text-orange-600 dark:text-orange-400",
-    },
-    villain: {
-      hover: "hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:border-red-500/20",
-      active: "bg-red-500/20 border-red-500/30 ring-4 ring-red-500/50 text-red-600 dark:text-red-400",
-    },
-    secondary: {
-      hover: "hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-500/20",
-      active: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50 text-blue-600 dark:text-blue-400",
-    },
-    extra: {
-      hover: "hover:bg-gray-500/10 hover:text-gray-600 dark:hover:text-gray-400 hover:border-gray-500/20",
-      active: "bg-gray-500/20 border-gray-500/30 ring-4 ring-gray-500/50 text-gray-600 dark:text-gray-400",
-    },
-  };
-
   const roleOptions = roles.map((role) => ({
     value: role.value,
     label: t(`create-character:${role.translationKey}`),
     icon: role.icon,
-    baseColorClass: "border-muted",
-    hoverColorClass: roleColorMap[role.value].hover,
-    activeColorClass: roleColorMap[role.value].active,
+    backgroundColor: role.value === 'protagonist' ? 'yellow-500/10' :
+                     role.value === 'antagonist' ? 'orange-500/10' :
+                     role.value === 'villain' ? 'red-500/10' :
+                     role.value === 'secondary' ? 'blue-500/10' : 'gray-500/10',
+    borderColor: role.value === 'protagonist' ? 'yellow-500/20' :
+                 role.value === 'antagonist' ? 'orange-500/20' :
+                 role.value === 'villain' ? 'red-500/20' :
+                 role.value === 'secondary' ? 'blue-500/20' : 'gray-500/20',
   }));
 
   // Convert archetype constants to FormSelectGrid format
@@ -325,9 +302,8 @@ export function CharacterDetailView({
     label: t(`create-character:${archetype.translationKey}`),
     description: t(`create-character:${archetype.descriptionKey}`),
     icon: archetype.icon,
-    baseColorClass: "bg-card text-muted-foreground border-border",
-    hoverColorClass: "hover:bg-purple-500/10 hover:border-purple-500/20",
-    activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50 text-white",
+    backgroundColor: "purple-500/10",
+    borderColor: "purple-500/20",
   }));
 
   // Convert physical type constants to FormSimpleGrid format
@@ -335,9 +311,16 @@ export function CharacterDetailView({
     value: type.value,
     label: t(`create-character:${type.translationKey}`),
     icon: type.icon,
-    baseColorClass: PHYSICAL_TYPE_BASE_COLOR,
-    hoverColorClass: PHYSICAL_TYPE_HOVER_COLOR[type.value],
-    activeColorClass: PHYSICAL_TYPE_ACTIVE_COLOR[type.value],
+    backgroundColor: type.value === 'malnourished' ? 'orange-500/10' :
+                     type.value === 'thin' ? 'sky-500/10' :
+                     type.value === 'athletic' ? 'emerald-500/10' :
+                     type.value === 'robust' ? 'blue-500/10' :
+                     type.value === 'corpulent' ? 'purple-500/10' : 'red-500/10',
+    borderColor: type.value === 'malnourished' ? 'orange-500/20' :
+                 type.value === 'thin' ? 'sky-500/20' :
+                 type.value === 'athletic' ? 'emerald-500/20' :
+                 type.value === 'robust' ? 'blue-500/20' :
+                 type.value === 'corpulent' ? 'purple-500/20' : 'red-500/20',
   }));
 
   // Convert status constants to FormSimplePicker format

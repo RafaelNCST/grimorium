@@ -221,9 +221,12 @@ export function CreateItemModalView({
               label: t(rarity.translationKey),
               description: t(rarity.descriptionKey),
               icon: rarity.icon,
-              baseColorClass: rarity.baseColorClass,
-              hoverColorClass: rarity.hoverColorClass,
-              activeColorClass: rarity.activeColorClass,
+              backgroundColor: rarity.value === 'common' ? 'gray-500/10' :
+                               rarity.value === 'rare' ? 'blue-500/10' :
+                               rarity.value === 'legendary' ? 'purple-500/10' : 'yellow-500/10',
+              borderColor: rarity.value === 'common' ? 'gray-500/20' :
+                           rarity.value === 'rare' ? 'blue-500/20' :
+                           rarity.value === 'legendary' ? 'purple-500/20' : 'yellow-500/20',
             }))}
             className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
           />

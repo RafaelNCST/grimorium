@@ -28,16 +28,6 @@ import { CHARACTER_ROLES_CONSTANT } from "./constants/character-roles";
 import { CHARACTER_STATUS_CONSTANT } from "./constants/character-status";
 import { GENDERS_CONSTANT } from "./constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "./constants/physical-types";
-import {
-  ROLE_BASE_COLOR,
-  ROLE_HOVER_COLOR,
-  ROLE_ACTIVE_COLOR,
-} from "./constants/role-colors";
-import {
-  PHYSICAL_TYPE_BASE_COLOR,
-  PHYSICAL_TYPE_HOVER_COLOR,
-  PHYSICAL_TYPE_ACTIVE_COLOR,
-} from "./constants/physical-type-colors";
 import { type CharacterFormSchema } from "./hooks/use-character-validation";
 
 interface PropsCreateCharacterModalView {
@@ -80,9 +70,14 @@ export function CreateCharacterModalView({
     value: role.value,
     label: t(role.translationKey),
     icon: role.icon,
-    baseColorClass: ROLE_BASE_COLOR,
-    hoverColorClass: ROLE_HOVER_COLOR[role.value],
-    activeColorClass: ROLE_ACTIVE_COLOR[role.value],
+    backgroundColor: role.value === 'protagonist' ? 'yellow-500/10' :
+                     role.value === 'antagonist' ? 'orange-500/10' :
+                     role.value === 'villain' ? 'red-500/10' :
+                     role.value === 'secondary' ? 'blue-500/10' : 'gray-500/10',
+    borderColor: role.value === 'protagonist' ? 'yellow-500/20' :
+                 role.value === 'antagonist' ? 'orange-500/20' :
+                 role.value === 'villain' ? 'red-500/20' :
+                 role.value === 'secondary' ? 'blue-500/20' : 'gray-500/20',
   }));
 
   // Convert physical type constants to FormSimpleGrid format
@@ -90,9 +85,16 @@ export function CreateCharacterModalView({
     value: type.value,
     label: t(type.translationKey),
     icon: type.icon,
-    baseColorClass: PHYSICAL_TYPE_BASE_COLOR,
-    hoverColorClass: PHYSICAL_TYPE_HOVER_COLOR[type.value],
-    activeColorClass: PHYSICAL_TYPE_ACTIVE_COLOR[type.value],
+    backgroundColor: type.value === 'malnourished' ? 'orange-500/10' :
+                     type.value === 'thin' ? 'sky-500/10' :
+                     type.value === 'athletic' ? 'emerald-500/10' :
+                     type.value === 'robust' ? 'blue-500/10' :
+                     type.value === 'corpulent' ? 'purple-500/10' : 'red-500/10',
+    borderColor: type.value === 'malnourished' ? 'orange-500/20' :
+                 type.value === 'thin' ? 'sky-500/20' :
+                 type.value === 'athletic' ? 'emerald-500/20' :
+                 type.value === 'robust' ? 'blue-500/20' :
+                 type.value === 'corpulent' ? 'purple-500/20' : 'red-500/20',
   }));
 
   // Convert archetype constants to FormSelectGrid format
@@ -101,9 +103,8 @@ export function CreateCharacterModalView({
     label: t(archetype.translationKey),
     description: t(archetype.descriptionKey),
     icon: archetype.icon,
-    baseColorClass: "bg-card text-muted-foreground border-border",
-    hoverColorClass: "hover:bg-purple-500/10 hover:border-purple-500/20",
-    activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-2 ring-purple-500/50 text-white",
+    backgroundColor: "purple-500/10",
+    borderColor: "purple-500/20",
   }));
 
   // Convert status constants to FormSimplePicker format
