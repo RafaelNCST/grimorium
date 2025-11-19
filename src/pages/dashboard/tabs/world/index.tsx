@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import { useEntityFilters } from "@/hooks/use-entity-filters";
 import { useToast } from "@/hooks/use-toast";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
@@ -12,6 +13,7 @@ import {
   createRegion,
   getRegionHierarchy,
 } from "@/lib/db/regions.service";
+import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
 import {
   IRegion,
@@ -32,8 +34,6 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [regions, setRegions] = useState<IRegion[]>([]);
   const [hierarchy, setHierarchy] = useState<IRegionWithChildren[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedScales, setSelectedScales] = useState<RegionScale[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showHierarchyModal, setShowHierarchyModal] = useState(false);
 
@@ -89,47 +89,40 @@ export function WorldTab({ bookId }: WorldTabProps) {
     loadRegions();
   }, [loadRegions]);
 
-  // Filter regions by search and selected scales
-  const filteredRegions = useMemo(() => {
-    let filtered = regions;
+  // Use entity filters hook
+  const {
+    filteredEntities: filteredRegions,
+    searchTerm: searchQuery,
+    setSearchTerm: setSearchQuery,
+    selectedFilters,
+    toggleFilter,
+    clearFilters,
+  } = useEntityFilters({
+    entities: regions,
+    searchFields: ["name", "summary"],
+    filterGroups: [
+      {
+        key: "scale",
+        filterFn: (region, selectedScales) =>
+          selectedScales.includes(region.scale),
+      },
+    ],
+  });
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (region) =>
-          region.name.toLowerCase().includes(query) ||
-          region.summary?.toLowerCase().includes(query)
-      );
-    }
-
-    // Filter by selected scales
-    if (selectedScales.length > 0) {
-      filtered = filtered.filter((region) =>
-        selectedScales.includes(region.scale)
-      );
-    }
-
-    return filtered;
-  }, [regions, searchQuery, selectedScales]);
+  const selectedScales = selectedFilters.scale || [];
 
   // Calculate scale statistics
-  const scaleStats = useMemo(() => {
-    const stats = {
-      local: 0,
-      continental: 0,
-      planetary: 0,
-      galactic: 0,
-      universal: 0,
-      multiversal: 0,
-    };
-
-    regions.forEach((region) => {
-      stats[region.scale]++;
-    });
-
-    return stats;
-  }, [regions]);
+  const scaleStats = useMemo(
+    () => calculateEntityStats(regions, "scale", [
+      "local",
+      "continental",
+      "planetary",
+      "galactic",
+      "universal",
+      "multiversal",
+    ]),
+    [regions]
+  );
 
   // Create region map for quick parent lookup
   const regionMap = useMemo(() => {
@@ -141,18 +134,15 @@ export function WorldTab({ bookId }: WorldTabProps) {
   // Handle search query change
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
-  }, []);
+  }, [setSearchQuery]);
 
   // Handle scale filter toggle
-  const handleScaleToggle = useCallback((scale: RegionScale) => {
-    setSelectedScales((prev) => {
-      if (prev.includes(scale)) {
-        return prev.filter((s) => s !== scale);
-      } else {
-        return [...prev, scale];
-      }
-    });
-  }, []);
+  const handleScaleToggle = useCallback(
+    (scale: RegionScale) => {
+      toggleFilter("scale", scale);
+    },
+    [toggleFilter]
+  );
 
   // Helper to convert arrays to JSON strings
   const arrayToJson = (arr: string[] | undefined): string | undefined => {

@@ -3,10 +3,11 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
+import { useEntityFilters } from "@/hooks/use-entity-filters";
 import { type IItem } from "@/lib/db/items.service";
 import { useItemsStore } from "@/stores/items-store";
+import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
-import { filterItems } from "./utils/filter-items";
 import { ItemsView } from "./view";
 
 interface PropsItemsTab {
@@ -15,12 +16,26 @@ interface PropsItemsTab {
 
 const EMPTY_ARRAY: IItem[] = [];
 
+const CATEGORY_VALUES = [
+  "weapon",
+  "armor",
+  "tool",
+  "artifact",
+  "consumable",
+  "accessory",
+  "container",
+  "vehicle",
+  "currency",
+  "document",
+  "key",
+  "other",
+];
+
+const STATUS_VALUES = ["common", "rare", "epic", "legendary", "mythical", "unique"];
+
 export function ItemsTab({ bookId }: PropsItemsTab) {
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Usar o store para gerenciar items - seletores otimizados
@@ -41,15 +56,43 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId]); // Apenas bookId como dependência
 
-  const filteredItems = useMemo(
-    () =>
-      filterItems({
-        items,
-        searchTerm,
-        selectedCategories,
-        selectedStatuses,
-      }),
-    [items, searchTerm, selectedCategories, selectedStatuses]
+  // Use entity filters hook
+  const {
+    filteredEntities: filteredItems,
+    searchTerm,
+    setSearchTerm,
+    selectedFilters,
+    toggleFilter,
+    clearFilters,
+  } = useEntityFilters({
+    entities: items,
+    searchFields: ["name", "basicDescription"],
+    filterGroups: [
+      {
+        key: "category",
+        filterFn: (item, selectedCategories) =>
+          selectedCategories.includes(item.category),
+      },
+      {
+        key: "status",
+        filterFn: (item, selectedStatuses) =>
+          selectedStatuses.includes(item.status),
+      },
+    ],
+  });
+
+  const selectedCategories = selectedFilters.category || [];
+  const selectedStatuses = selectedFilters.status || [];
+
+  // Calculate stats
+  const categoryStats = useMemo(
+    () => calculateEntityStats(items, "category", CATEGORY_VALUES),
+    [items]
+  );
+
+  const statusStats = useMemo(
+    () => calculateEntityStats(items, "status", STATUS_VALUES),
+    [items]
   );
 
   const handleNavigateToItem = useCallback(
@@ -62,32 +105,19 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
     [navigate, bookId]
   );
 
-  const handleSearchTermChange = useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
+  const handleCategoryFilterChange = useCallback(
+    (category: string) => {
+      toggleFilter("category", category);
+    },
+    [toggleFilter]
+  );
 
-  const handleCategoryFilterChange = useCallback((category: string) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(category)) {
-        return prev.filter((c) => c !== category);
-      }
-      return [...prev, category];
-    });
-  }, []);
-
-  const handleStatusFilterChange = useCallback((status: string) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(status)) {
-        return prev.filter((s) => s !== status);
-      }
-      return [...prev, status];
-    });
-  }, []);
-
-  const handleClearFilters = useCallback(() => {
-    setSelectedCategories([]);
-    setSelectedStatuses([]);
-  }, []);
+  const handleStatusFilterChange = useCallback(
+    (status: string) => {
+      toggleFilter("status", status);
+    },
+    [toggleFilter]
+  );
 
   const handleShowCreateModalChange = useCallback((show: boolean) => {
     setShowCreateModal(show);
@@ -134,10 +164,10 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
       selectedCategories={selectedCategories}
       selectedStatuses={selectedStatuses}
       showCreateModal={showCreateModal}
-      onSearchTermChange={handleSearchTermChange}
+      onSearchTermChange={setSearchTerm}
       onCategoryFilterChange={handleCategoryFilterChange}
       onStatusFilterChange={handleStatusFilterChange}
-      onClearFilters={handleClearFilters}
+      onClearFilters={clearFilters}
       onShowCreateModalChange={handleShowCreateModalChange}
       onNavigateToItem={handleNavigateToItem}
       onCreateItem={handleCreateItem}

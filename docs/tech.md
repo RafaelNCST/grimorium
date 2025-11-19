@@ -1,16 +1,49 @@
 # Arquitetura do Projeto
 
 ## Tecnologias
+
+### Core
 - **Tauri, Vite, React, TypeScript** como principais
+- **@vitejs/plugin-react-swc** compilador SWC para melhor performance
 - **Tanstack Router** para roteamento
-- **Tailwind CSS + Radix UI + shadcn/ui** para estilização
 - **Zustand** para gerenciamento de estados globais
-- **React Hook Form + Zod** para manipulação de formulários
-- **Lucide React** para ícones
-- **Internacionalização** com i18n
-- **ESLint + Prettier** para padronização de código
 - **pnpm** como gerenciador de pacotes
 - **Named Exports** como padrão de exportação
+
+### UI & Estilização
+- **Tailwind CSS + Radix UI + shadcn/ui** para estilização
+- **class-variance-authority (CVA)** para gerenciamento de variantes de componentes
+- **clsx + tailwind-merge** para utilitários de classes CSS
+- **Lucide React + React Icons** para ícones
+- **tailwindcss-animate** plugin de animações
+- **@tailwindcss/typography** plugin de tipografia
+
+### Formulários & Validação
+- **React Hook Form + Zod** para manipulação e validação de formulários
+
+### Componentes Especializados
+- **@dnd-kit** (core, sortable, utilities) para drag and drop
+- **cmdk** para command menu/paleta de comandos
+- **embla-carousel-react** para carrosséis
+- **react-day-picker** para seletor de datas
+- **react-easy-crop** para crop/recorte de imagens
+- **react-resizable-panels** para painéis redimensionáveis
+- **react-zoom-pan-pinch** para zoom e pan em imagens
+- **recharts** para gráficos e visualização de dados
+- **@tanstack/react-virtual** para virtualização de listas longas
+
+### Utilitários
+- **date-fns** para manipulação de datas
+- **Internacionalização** com i18n
+
+### Plugins Tauri
+- **@tauri-apps/plugin-dialog** para diálogos nativos
+- **@tauri-apps/plugin-fs** para sistema de arquivos
+- **@tauri-apps/plugin-sql** para banco de dados SQL
+
+### Qualidade de Código
+- **ESLint + Prettier** para padronização de código
+- **TypeScript** para tipagem estática
 
 ---
 
