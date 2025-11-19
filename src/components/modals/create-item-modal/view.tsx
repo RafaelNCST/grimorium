@@ -47,12 +47,12 @@ export function CreateItemModalView({
   const basicFields = (
     <div className="space-y-6">
       {/* Item Image */}
-      <div className="max-w-sm mx-auto">
+      <div className="max-w-[534px] mx-auto">
         <FormImageUpload
           value={watchedValues.image || ""}
           onChange={(value) => setValue("image", value)}
           label={t("modal.image")}
-          height="aspect-square"
+          height="h-96"
           shape="rounded"
           imageFit="cover"
           placeholderIcon={Package}

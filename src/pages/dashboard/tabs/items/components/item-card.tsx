@@ -53,7 +53,7 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
 
   return (
     <Card
-      className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80 max-w-xs"
+      className="relative cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80 max-w-[470px]"
       onClick={() => onClick?.(item.id)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -61,7 +61,7 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
         {item.image ? (
-          <div className="relative w-full aspect-square">
+          <div className="relative w-full h-80">
             <img
               src={item.image}
               alt={item.name}
@@ -69,7 +69,7 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
             />
           </div>
         ) : (
-          <div className="relative w-full aspect-square rounded-t-lg overflow-hidden">
+          <div className="relative w-full h-80 rounded-t-lg overflow-hidden">
             <FormImageDisplay
               icon={Package}
               height="h-full"

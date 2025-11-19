@@ -177,13 +177,13 @@ export const ItemDetailView = React.memo(function ItemDetailView({
       {isEditing ? (
         <div className="space-y-6">
           {/* Item Image */}
-          <div className="max-w-sm mx-auto">
+          <div className="max-w-[534px] mx-auto">
             <FormImageUpload
               value={editData.image || ""}
               onChange={(value) => onEditDataChange("image", value)}
               label={t("create-item:modal.image")}
               helperText={t("create-item:modal.upload_image")}
-              height="aspect-square"
+              height="h-96"
               shape="rounded"
               imageFit="cover"
               placeholderIcon={Package}
@@ -279,7 +279,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
         <>
           {/* View mode - keep original layout */}
           {item.image ? (
-            <div className="relative w-full max-w-sm mx-auto aspect-square">
+            <div className="relative w-full max-w-[534px] mx-auto h-96">
               <img
                 src={item.image}
                 alt={item.name}
@@ -287,7 +287,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
               />
             </div>
           ) : (
-            <div className="max-w-sm mx-auto aspect-square">
+            <div className="max-w-[534px] mx-auto h-96">
               <FormImageDisplay
                 icon={Package}
                 height="h-full"
