@@ -21,6 +21,7 @@ interface PropsCategorySelector {
   onChange: (value: string) => void;
   onCustomCategoryChange: (value: string) => void;
   error?: string;
+  customCategoryError?: string;
 }
 
 export function CategorySelector({
@@ -29,6 +30,7 @@ export function CategorySelector({
   onChange,
   onCustomCategoryChange,
   error,
+  customCategoryError,
 }: PropsCategorySelector) {
   const { t } = useTranslation("create-item");
   const [isCustomMode, setIsCustomMode] = useState(false);
@@ -87,7 +89,7 @@ export function CategorySelector({
             onChange={(e) => onCustomCategoryChange(e.target.value)}
             placeholder={t("modal.custom_category_placeholder")}
             maxLength={50}
-            className={error ? "border-destructive" : ""}
+            className={customCategoryError ? "border-destructive" : ""}
           />
           <Button
             type="button"
@@ -108,6 +110,7 @@ export function CategorySelector({
       )}
 
       {error && <p className="text-sm text-destructive">{t(error)}</p>}
+      {customCategoryError && <p className="text-sm text-destructive">{customCategoryError}</p>}
     </div>
   );
 }

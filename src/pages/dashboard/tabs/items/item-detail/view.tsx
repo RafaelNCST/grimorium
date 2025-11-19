@@ -13,8 +13,8 @@ import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { ItemNavigationSidebar } from "@/components/item-navigation-sidebar";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CategorySelector } from "@/components/modals/create-item-modal/components/category-selector";
-import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
-import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
+import { ITEM_CATEGORIES_CONSTANT, type IItemCategory } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT, type IItemStatus } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { STORY_RARITIES_CONSTANT, type IStoryRarity } from "@/components/modals/create-item-modal/constants/story-rarities";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -33,8 +33,6 @@ import { type IFieldVisibility } from "@/types/character-types";
 
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { VersionCard } from "./components/version-card";
-import { type IItemCategory } from "./constants/item-categories-constant";
-import { type IItemStatus } from "./constants/item-statuses-constant";
 
 // Helper component for empty state
 const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
@@ -79,6 +77,8 @@ interface ItemDetailViewProps {
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
   openSections: Record<string, boolean>;
+  customCategoryError?: string;
+  isValid: boolean;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -108,7 +108,7 @@ interface ItemDetailViewProps {
   toggleSection: (sectionName: string) => void;
 }
 
-export function ItemDetailView({
+export const ItemDetailView = React.memo(function ItemDetailView({
   item,
   editData,
   isEditing,
@@ -127,6 +127,8 @@ export function ItemDetailView({
   fieldVisibility,
   advancedSectionOpen,
   openSections,
+  customCategoryError,
+  isValid,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -236,6 +238,7 @@ export function ItemDetailView({
               onEditDataChange("customCategory", value)
             }
             error={errors.category}
+            customCategoryError={customCategoryError}
           />
 
           {/* Basic Description */}
@@ -737,9 +740,9 @@ export function ItemDetailView({
             onSave={onSave}
             onCancel={onCancel}
             onDelete={onDeleteModalOpen}
-            hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+            hasRequiredFieldsEmpty={!isValid}
             validationMessage={
-              hasRequiredFieldsEmpty ? (
+              !isValid ? (
                 <p className="text-xs text-destructive">
                   {missingFields.length > 0 ? (
                     <>
@@ -758,6 +761,8 @@ export function ItemDetailView({
                         })
                         .join(", ")}
                     </>
+                  ) : customCategoryError ? (
+                    customCategoryError
                   ) : (
                     t("item-detail:fill_required_fields")
                   )}
@@ -793,4 +798,4 @@ export function ItemDetailView({
       />
     </div>
   );
-}
+});

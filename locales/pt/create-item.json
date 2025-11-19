@@ -79,7 +79,8 @@
     "narrative_purpose_max_length": "Propósito narrativo deve ter no máximo 500 caracteres",
     "usage_requirements_max_length": "Requisitos de uso devem ter no máximo 250 caracteres",
     "usage_consequences_max_length": "Consequências de uso devem ter no máximo 250 caracteres",
-    "item_usage_max_length": "Uso do item deve ter no máximo 500 caracteres"
+    "item_usage_max_length": "Uso do item deve ter no máximo 500 caracteres",
+    "custom_category_required": "Por favor, insira um nome para a categoria personalizada"
   },
   "button": {
     "cancel": "Cancelar",

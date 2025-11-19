@@ -77,7 +77,8 @@
     "narrative_purpose_max_length": "Narrative purpose must be at most 500 characters",
     "usage_requirements_max_length": "Usage requirements must be at most 250 characters",
     "usage_consequences_max_length": "Usage consequences must be at most 250 characters",
-    "item_usage_max_length": "Item usage must be at most 500 characters"
+    "item_usage_max_length": "Item usage must be at most 500 characters",
+    "custom_category_required": "Please enter a custom category name"
   },
   "button": {
     "cancel": "Cancel",

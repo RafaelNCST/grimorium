@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import { type IItem } from "@/lib/db/items.service";
@@ -119,9 +118,8 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
         // Adicionar ao store (que também salva no DB)
         await addItem(bookId, newItem);
         setShowCreateModal(false);
-        toast.success("Item criado com sucesso!");
-      } catch (_error) {
-        toast.error("Erro ao criar item");
+      } catch (error) {
+        console.error("Error creating item:", error);
       }
     },
     [bookId, addItem]

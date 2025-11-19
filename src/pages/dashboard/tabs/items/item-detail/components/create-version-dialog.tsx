@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo } from "react";
 
 import { ArrowRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { CreateItemModal } from "@/components/modals/create-item-modal";
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
@@ -64,12 +63,11 @@ export function CreateVersionDialog({
 
   const handleStep1Continue = useCallback(() => {
     if (!canProceedToStep2) {
-      toast.error(t("versions.create_dialog.step1_validation_error"));
       return;
     }
     setStep(2);
     setIsItemModalOpen(true);
-  }, [canProceedToStep2, t]);
+  }, [canProceedToStep2]);
 
   const handleItemModalClose = useCallback(() => {
     setIsItemModalOpen(false);
@@ -84,9 +82,8 @@ export function CreateVersionDialog({
         itemData: itemData as unknown as IItem,
       });
       handleClose();
-      toast.success(t("versions.create_dialog.success"));
     },
-    [versionName, versionDescription, onConfirm, handleClose, t]
+    [versionName, versionDescription, onConfirm, handleClose]
   );
 
   return (

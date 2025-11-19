@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import {
@@ -17,7 +16,7 @@ import {
   type IItem,
   type IItemVersion,
 } from "@/lib/db/items.service";
-import { ItemSchema } from "@/lib/validation/item-schema";
+import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
 import { useItemsStore } from "@/stores/items-store";
 import { type IFieldVisibility } from "@/types/character-types";
 
@@ -61,6 +60,7 @@ export default function ItemDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [item, setItem] = useState<IItem>(emptyItem);
   const [editData, setEditData] = useState<IItem>(emptyItem);
+  const [imagePreview, setImagePreview] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
@@ -156,7 +156,6 @@ export default function ItemDetail() {
         }
       } catch (error) {
         console.error("Error loading item:", error);
-        toast.error("Erro ao carregar item");
       } finally {
         setIsLoading(false);
       }
@@ -179,62 +178,73 @@ export default function ItemDetail() {
   );
 
   // Função de validação de campo individual (onBlur)
-  const validateField = useCallback((field: string, value: any) => {
+  const validateField = useCallback((field: string, value: unknown) => {
     try {
-      // Validar apenas este campo
-      const fieldSchema = ItemSchema.pick({ [field]: true } as any);
-      fieldSchema.parse({ [field]: value });
+      // Validar apenas este campo usando safeParse
+      const result = ItemSchemaBase.shape[field as keyof typeof ItemSchemaBase.shape]?.safeParse(value);
 
-      // Se passou, remover erro
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Traduzir a mensagem de erro
-        const errorMessage = error.errors[0].message;
-        const translatedMessage = errorMessage.startsWith("item-detail:")
-          ? t(errorMessage)
-          : errorMessage;
-
-        setErrors((prev) => ({
-          ...prev,
-          [field]: translatedMessage,
-        }));
-        return false;
+      if (!result) {
+        // Campo não tem validação específica
+        return true;
       }
+
+      if (result.success) {
+        // Se passou, remover erro
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+        return true;
+      }
+
+      // Traduzir a mensagem de erro
+      const errorMessage = result.error.errors[0].message;
+      const translatedMessage = errorMessage.startsWith("item-detail:")
+        ? t(errorMessage)
+        : errorMessage;
+
+      setErrors((prev) => ({
+        ...prev,
+        [field]: translatedMessage,
+      }));
+      return false;
+    } catch (error) {
+      console.error("Error validating field:", field, error);
+      return false;
     }
   }, [t]);
+
+  // Verificar se customCategory está inválida
+  const isCustomCategoryInvalid = useMemo(() => {
+    if (!editData) return false;
+    return editData.category === "other" && (!editData.customCategory || editData.customCategory.trim().length === 0);
+  }, [editData]);
 
   // Verificar se tem campos obrigatórios vazios e quais são
   const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
     if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
 
-    try {
-      // Validar apenas campos obrigatórios
-      ItemSchema.pick({
-        name: true,
-        status: true,
-        category: true,
-        basicDescription: true,
-      } as any).parse({
-        name: editData.name,
-        status: editData.status,
-        category: editData.category,
-        basicDescription: editData.basicDescription,
-      });
+    const requiredFields = {
+      name: editData.name,
+      status: editData.status,
+      category: editData.category,
+      basicDescription: editData.basicDescription,
+    };
+
+    const result = ItemSchemaBase.pick({
+      name: true,
+      status: true,
+      category: true,
+      basicDescription: true,
+    }).safeParse(requiredFields);
+
+    if (result.success) {
       return { hasRequiredFieldsEmpty: false, missingFields: [] };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const missing = error.errors.map((e) => e.path[0] as string);
-        return { hasRequiredFieldsEmpty: true, missingFields: missing };
-      }
-      return { hasRequiredFieldsEmpty: true, missingFields: [] };
     }
+
+    const missing = result.error.errors.map((e) => e.path[0] as string);
+    return { hasRequiredFieldsEmpty: true, missingFields: missing };
   }, [editData]);
 
   // Check if there are changes between item and editData
@@ -325,8 +335,6 @@ export default function ItemDetail() {
       setItem(version.itemData);
       setEditData(version.itemData);
       setImagePreview(version.itemData.image || "");
-
-      toast.success(`Versão "${version.name}" ativada`);
     },
     [versions]
   );
@@ -352,10 +360,8 @@ export default function ItemDetail() {
 
         // Atualizar o estado apenas se o save for bem-sucedido
         setVersions((prev) => [...prev, newVersion]);
-        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
       } catch (error) {
         console.error("Error creating item version:", error);
-        toast.error("Erro ao criar versão");
       }
     },
     [itemId]
@@ -367,7 +373,6 @@ export default function ItemDetail() {
 
       // Não permitir deletar versão principal
       if (versionToDelete?.isMain) {
-        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -390,10 +395,8 @@ export default function ItemDetail() {
         }
 
         setVersions(updatedVersions);
-        toast.success("Versão excluída com sucesso!");
       } catch (error) {
         console.error("Error deleting item version:", error);
-        toast.error("Erro ao excluir versão");
       }
     },
     [versions, currentVersion]
@@ -416,7 +419,6 @@ export default function ItemDetail() {
         }
       } catch (error) {
         console.error("Error updating item version:", error);
-        toast.error("Erro ao atualizar versão");
       }
     },
     [versions, currentVersion]
@@ -424,10 +426,8 @@ export default function ItemDetail() {
 
   const handleSave = useCallback(async () => {
     try {
-      console.log("[handleSave] Starting save...", { currentVersion, editData });
-
       // Validar TUDO com Zod
-      const validatedData = ItemSchema.parse({
+      ItemSchema.parse({
         name: editData.name,
         status: editData.status,
         category: editData.category,
@@ -464,6 +464,8 @@ export default function ItemDetail() {
       // Salvar no banco de dados
       if (currentVersion?.isMain) {
         await updateItem(itemId, updatedItem);
+        // Atualizar cache do store para refletir mudanças na listagem
+        await updateItemInStore(itemId, updatedItem);
       } else {
         await updateItemVersionData(currentVersion.id, updatedItem);
       }
@@ -473,7 +475,6 @@ export default function ItemDetail() {
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
-      toast.success("Item atualizado com sucesso!");
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -488,10 +489,8 @@ export default function ItemDetail() {
             : errorMessage;
         });
         setErrors(newErrors);
-        toast.error("Por favor, corrija os erros nos campos destacados");
       } else {
         console.error("Error saving item:", error);
-        toast.error("Erro ao salvar item");
       }
     }
   }, [
@@ -530,16 +529,14 @@ export default function ItemDetail() {
       }
 
       setVersions(updatedVersions);
-      toast.success(t("delete.version.success"));
     } else {
       try {
         if (!dashboardId) return;
         // Deletar do store (que também deleta do DB)
         await deleteItemFromStore(dashboardId, itemId);
-        toast.success(t("delete.item.step2.success"));
         navigateToItemsTab();
-      } catch (_error) {
-        toast.error("Erro ao excluir item");
+      } catch (error) {
+        console.error("Error deleting item:", error);
       }
     }
   }, [
@@ -666,6 +663,8 @@ export default function ItemDetail() {
         fieldVisibility={fieldVisibility}
         advancedSectionOpen={advancedSectionOpen}
         openSections={openSections}
+        customCategoryError={isCustomCategoryInvalid ? t("item-detail:validation.custom_category_required") : undefined}
+        isValid={!hasRequiredFieldsEmpty && !isCustomCategoryInvalid}
         onBack={handleBack}
         onNavigationSidebarToggle={handleNavigationSidebarToggle}
         onNavigationSidebarClose={handleNavigationSidebarClose}

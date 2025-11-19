@@ -135,6 +135,19 @@
   "missing_fields": "Missing required fields",
   "fill_required_fields": "Please fill in all required fields before saving",
   "validation": {
+    "name_required": "Name is required",
+    "name_max_length": "Name must be at most 150 characters",
+    "status_required": "Status is required",
+    "category_required": "Category is required",
+    "basic_description_required": "Basic description is required",
+    "basic_description_max_length": "Basic description must be at most 500 characters",
+    "custom_category_max_length": "Custom category must be at most 100 characters",
+    "custom_category_required": "Please enter a custom category name",
+    "appearance_max_length": "Appearance must be at most 500 characters",
+    "origin_max_length": "Origin must be at most 500 characters",
+    "narrative_purpose_max_length": "Narrative purpose must be at most 500 characters",
+    "usage_requirements_max_length": "Usage requirements must be at most 250 characters",
+    "usage_consequences_max_length": "Usage consequences must be at most 250 characters",
     "item_usage_max_length": "Item usage must be at most 500 characters"
   }
 }

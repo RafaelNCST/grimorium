@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const ItemSchema = z.object({
+// Schema base sem validações condicionais (para uso com .pick(), .shape, etc.)
+export const ItemSchemaBase = z.object({
   // Campos obrigatórios
   name: z
     .string()
@@ -68,5 +69,20 @@ export const ItemSchema = z.object({
   // Arrays
   alternativeNames: z.array(z.string()).optional(),
 });
+
+// Schema completo com validações condicionais
+export const ItemSchema = ItemSchemaBase.refine(
+  (data) => {
+    // Se category é "other", customCategory deve estar preenchido
+    if (data.category === "other") {
+      return !!data.customCategory && data.customCategory.trim().length > 0;
+    }
+    return true;
+  },
+  {
+    message: "item-detail:validation.custom_category_required",
+    path: ["customCategory"], // O erro será associado ao campo customCategory
+  }
+);
 
 export type ItemFormData = z.infer<typeof ItemSchema>;

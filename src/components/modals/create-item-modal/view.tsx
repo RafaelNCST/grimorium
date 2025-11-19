@@ -339,6 +339,7 @@ export function CreateItemModalView({
         isValid,
         onSubmit,
         onCancel: onClose,
+        submitLabel: t("button.create"),
       }}
       maxWidth="max-w-3xl"
       basicFieldsTitle={t("modal.basic_fields")}
