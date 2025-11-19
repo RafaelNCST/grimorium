@@ -92,3 +92,33 @@ import { DisplaySelectGrid } from "@/components/displays";
   activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50 text-white"
 }
 ```
+
+---
+
+## 3. DisplayImage
+**Componente:** `DisplayImage` (`src/components/displays/DisplayImage.tsx`)
+**Descrição:** Placeholder visual para estado vazio de imagem em modo visualização. Sem interatividade.
+
+**Usado com:** `FormImageUpload` (versão de formulário para upload)
+
+**Exemplo:**
+```tsx
+import { DisplayImage } from "@/components/displays";
+
+{!isEditing && !image && (
+  <DisplayImage
+    icon={ImagePlus}
+    text="Sem imagem"
+    height="h-64"
+    shape="rounded"
+  />
+)}
+```
+
+**Propriedades:**
+- `icon`: LucideIcon (obrigatório)
+- `text`: string (opcional)
+- `height`: string (default: "h-40")
+- `width`: string (default: "w-40")
+- `shape`: 'square' | 'rounded' | 'circle' (default: 'rounded')
+- `className`: string (opcional)

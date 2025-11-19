@@ -4,3 +4,5 @@ export type { DisplaySimpleGridOption } from "./DisplaySimpleGrid";
 
 export { DisplaySelectGrid } from "./DisplaySelectGrid";
 export type { DisplaySelectGridOption } from "./DisplaySelectGrid";
+
+export { DisplayImage } from "./DisplayImage";
