@@ -26,17 +26,13 @@ export interface GridSelectOption<T = string> {
    */
   icon?: LucideIcon;
   /**
-   * Base background color class when not selected
+   * Background color for hover and active states (e.g., "blue-500/10")
    */
-  baseColorClass?: string;
+  backgroundColor: string;
   /**
-   * Hover color class
+   * Border color for hover and active states (e.g., "blue-500/30")
    */
-  hoverColorClass?: string;
-  /**
-   * Active/selected color class
-   */
-  activeColorClass?: string;
+  borderColor: string;
   /**
    * Number of columns this option should span (e.g., 2 for full width in a 2-column grid)
    */
@@ -105,8 +101,8 @@ interface FormSelectGridProps<T = string> {
  *       label: "Local",
  *       description: "Cities, towns, forests",
  *       icon: MapPin,
- *       activeColorClass: "bg-emerald-500 text-white",
- *       hoverColorClass: "hover:bg-emerald-500 hover:text-white"
+ *       backgroundColor: "emerald-500/10",
+ *       borderColor: "emerald-500/30"
  *     },
  *     // ... more options
  *   ]}
@@ -160,16 +156,11 @@ export function FormSelectGrid<T extends string = string>({
               onClick={() => onChange(option.value)}
               className={cn(
                 "relative p-4 rounded-lg border-2 transition-all text-left",
+                "bg-card text-foreground border-border",
                 option.colSpan ? getColSpanClass(option.colSpan) : "",
                 isSelected
-                  ? option.activeColorClass ||
-                      "bg-primary text-white border-primary"
-                  : cn(
-                      option.baseColorClass ||
-                        "bg-background text-foreground border-border",
-                      option.hoverColorClass ||
-                        "hover:bg-primary hover:text-white hover:border-primary"
-                    )
+                  ? `bg-${option.backgroundColor} border-${option.borderColor} ring-4 ring-${option.borderColor}`
+                  : `hover:bg-${option.backgroundColor} hover:border-${option.borderColor}`
               )}
             >
               <div className="flex items-start gap-3">

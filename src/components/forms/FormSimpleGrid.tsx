@@ -20,17 +20,13 @@ export interface SimpleGridSelectOption<T = string> {
    */
   icon?: LucideIcon;
   /**
-   * Base background color class when not selected
+   * Background color for hover and active states (e.g., "blue-500/10")
    */
-  baseColorClass?: string;
+  backgroundColor: string;
   /**
-   * Hover color class
+   * Border color for hover and active states (e.g., "blue-500/30")
    */
-  hoverColorClass?: string;
-  /**
-   * Active/selected color class
-   */
-  activeColorClass?: string;
+  borderColor: string;
 }
 
 interface FormSimpleGridProps<T = string> {
@@ -87,9 +83,8 @@ interface FormSimpleGridProps<T = string> {
  *       value: "protagonist",
  *       label: "Protagonist",
  *       icon: Star,
- *       activeColorClass: "bg-yellow-500 border-yellow-500",
- *       iconColorClass: "text-muted-foreground",
- *       activeIconColorClass: "text-white"
+ *       backgroundColor: "yellow-500/10",
+ *       borderColor: "yellow-500/30"
  *     },
  *     // ... more options
  *   ]}
@@ -133,12 +128,10 @@ export function FormSimpleGrid<T extends string = string>({
               onClick={() => onChange(option.value)}
               className={cn(
                 "relative rounded-lg border-2 p-4 transition-all flex flex-col items-center justify-center gap-2 min-h-[100px]",
+                "bg-card text-foreground border-border",
                 isSelected
-                  ? option.activeColorClass || "bg-primary text-white border-primary ring-4 ring-primary/50"
-                  : cn(
-                      option.baseColorClass || "bg-background text-foreground border-border",
-                      option.hoverColorClass || "hover:bg-primary hover:text-white hover:border-primary"
-                    )
+                  ? `bg-${option.backgroundColor} border-${option.borderColor} ring-4 ring-${option.borderColor}`
+                  : `hover:bg-${option.backgroundColor} hover:border-${option.borderColor}`
               )}
             >
               {Icon && <Icon className="w-8 h-8 flex-shrink-0" />}

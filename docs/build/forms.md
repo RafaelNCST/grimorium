@@ -41,10 +41,10 @@ Componentes base reutilizáveis de formulário utilizados no projeto.
 **Componente:** `FormSelectGrid` (`src/components/forms/FormSelectGrid.tsx`)
 **Descrição:** Grid de seleção com ícones à esquerda, label e descrição à direita. Layout horizontal.
 
-**Padrão de estados:**
-- **Normal**: `border-2 p-4` com `baseColorClass`
-- **Hover**: `border-2 p-4` com cores ativas (SEM ring)
-- **Active**: `border-2 p-4` com cores ativas + `ring-4`
+**Padrão de estados (automático no componente):**
+- **Normal**: Fundo cinza padrão (`bg-card`), borda cinza (`border-border`) com `border-2`
+- **Hover**: Fundo acende na cor passada (`backgroundColor`), borda acende na cor passada (`borderColor`)
+- **Active**: Fundo e borda permanecem acesos + borda aumenta automaticamente com `ring-4`
 
 **Exemplo:**
 ```tsx
@@ -59,9 +59,8 @@ Componentes base reutilizáveis de formulário utilizados no projeto.
       label: "Opção 1",
       description: "Descrição da opção",
       icon: IconComponent,
-      baseColorClass: "bg-card text-muted-foreground border-border",
-      hoverColorClass: "hover:bg-blue-500/10 hover:border-blue-500/20",
-      activeColorClass: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50 text-white",
+      backgroundColor: "blue-500/10",
+      borderColor: "blue-500/30",
     },
   ]}
 />
@@ -83,10 +82,10 @@ Componentes base reutilizáveis de formulário utilizados no projeto.
 **Componente:** `FormSimpleGrid` (`src/components/forms/FormSimpleGrid.tsx`)
 **Descrição:** Grid de seleção com ícone no topo e label abaixo. Layout vertical. Sem descrição.
 
-**Padrão de estados:**
-- **Normal**: `border-2 p-4` com `baseColorClass`
-- **Hover**: `border-2 p-4` com cores ativas (SEM ring)
-- **Active**: `border-2 p-4` com cores ativas + `ring-4`
+**Padrão de estados (automático no componente):**
+- **Normal**: Fundo cinza padrão (`bg-card`), borda cinza (`border-border`) com `border-2`
+- **Hover**: Fundo acende na cor passada (`backgroundColor`), borda acende na cor passada (`borderColor`)
+- **Active**: Fundo e borda permanecem acesos + borda aumenta automaticamente com `ring-4`
 
 **Exemplo:**
 ```tsx
@@ -100,9 +99,8 @@ Componentes base reutilizáveis de formulário utilizados no projeto.
       value: "option1",
       label: "Opção 1",
       icon: IconComponent,
-      baseColorClass: "border-muted",
-      hoverColorClass: "hover:bg-yellow-500/10 hover:text-yellow-600 hover:border-yellow-500/20",
-      activeColorClass: "bg-yellow-500/20 border-yellow-500/30 ring-4 ring-yellow-500/50 text-yellow-600",
+      backgroundColor: "yellow-500/10",
+      borderColor: "yellow-500/30",
     },
   ]}
 />
