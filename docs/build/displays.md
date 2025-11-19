@@ -122,3 +122,156 @@ import { DisplayImage } from "@/components/displays";
 - `width`: string (default: "w-40")
 - `shape`: 'square' | 'rounded' | 'circle' (default: 'rounded')
 - `className`: string (opcional)
+
+---
+
+## 4. DisplayText
+**Componente:** `DisplayText` (`src/components/displays/DisplayText.tsx`)
+**Descrição:** Componente para exibir texto simples e curto em modo visualização. Lida automaticamente com valores vazios mostrando estado vazio em itálico e cor atenuada.
+
+**Usado com:** `Input` (versão de formulário para edição)
+
+**Exemplo de uso:**
+```tsx
+import { DisplayText } from "@/components/displays";
+
+{!isEditing ? (
+  <DisplayText
+    value={character.height}
+    emptyText="Altura não definida"
+  />
+) : (
+  <Input
+    value={editData.height || ""}
+    onChange={(e) => onEditDataChange("height", e.target.value)}
+  />
+)}
+```
+
+**Propriedades:**
+- `value`: string | null | undefined
+- `emptyText`: string (default: "Não definido")
+- `className`: string (opcional)
+
+---
+
+## 5. DisplayTextarea
+**Componente:** `DisplayTextarea` (`src/components/displays/DisplayTextarea.tsx`)
+**Descrição:** Componente para exibir texto longo com múltiplas linhas em modo visualização. Preserva quebras de linha (`whitespace-pre-wrap`) e lida automaticamente com valores vazios.
+
+**Usado com:** `Textarea` (versão de formulário para edição)
+
+**Exemplo de uso:**
+```tsx
+import { DisplayTextarea } from "@/components/displays";
+
+{!isEditing ? (
+  <DisplayTextarea
+    value={character.personality}
+    emptyText="Personalidade não definida"
+  />
+) : (
+  <Textarea
+    value={editData.personality || ""}
+    onChange={(e) => onEditDataChange("personality", e.target.value)}
+    rows={3}
+  />
+)}
+```
+
+**Propriedades:**
+- `value`: string | null | undefined
+- `emptyText`: string (default: "Não definido")
+- `className`: string (opcional)
+
+---
+
+## 6. DisplayEntityList
+**Componente:** `DisplayEntityList` (`src/components/displays/DisplayEntityList.tsx`)
+**Descrição:** Lista colapsável de entidades relacionadas com imagem (ou inicial como fallback) e nome. Exibe contador de itens no header e lida automaticamente com estado vazio.
+
+**Usado com:** `FormEntityMultiSelectAuto` (versão de formulário para edição)
+
+**Exemplo de uso:**
+```tsx
+import { DisplayEntityList, DisplayEntityItem } from "@/components/displays";
+
+// Preparar dados das entidades
+const raceEntities: DisplayEntityItem[] = character.speciesAndRace?.map(raceId => {
+  const race = races.find(r => r.id === raceId);
+  return race ? { id: race.id, name: race.name, image: race.image } : null;
+}).filter(Boolean) || [];
+
+{!isEditing ? (
+  <DisplayEntityList
+    label="Espécies e Raças"
+    entities={raceEntities}
+    emptyText="Nenhuma espécie definida"
+    open={openSections.speciesAndRace}
+    onOpenChange={() => toggleSection("speciesAndRace")}
+  />
+) : (
+  <FormEntityMultiSelectAuto
+    entityType="race"
+    value={editData.speciesAndRace || []}
+    onChange={(value) => onEditDataChange("speciesAndRace", value)}
+  />
+)}
+```
+
+**Propriedades:**
+- `label`: string (obrigatório)
+- `entities`: DisplayEntityItem[] | null | undefined
+- `emptyText`: string (default: "Nenhum item")
+- `defaultOpen`: boolean (default: false)
+- `open`: boolean (opcional, para controle externo)
+- `onOpenChange`: (open: boolean) => void (opcional)
+- `className`: string (opcional)
+
+**Estrutura do item de entidade:**
+```tsx
+interface DisplayEntityItem {
+  id: string;
+  name: string;
+  image?: string; // Se não fornecido, mostra inicial do nome
+}
+```
+
+---
+
+## 7. DisplayStringList
+**Componente:** `DisplayStringList` (`src/components/displays/DisplayStringList.tsx`)
+**Descrição:** Lista colapsável de strings simples renderizada como lista com bullets. Exibe contador de itens no header e lida automaticamente com estado vazio.
+
+**Usado com:** `FormListInput` (versão de formulário para edição)
+
+**Exemplo de uso:**
+```tsx
+import { DisplayStringList } from "@/components/displays";
+
+{!isEditing ? (
+  <DisplayStringList
+    label="Apelidos"
+    items={character.nicknames}
+    emptyText="Nenhum apelido definido"
+    open={openSections.nicknames}
+    onOpenChange={() => toggleSection("nicknames")}
+  />
+) : (
+  <FormListInput
+    value={editData.nicknames || []}
+    onChange={(value) => onEditDataChange("nicknames", value)}
+    placeholder="Digite um apelido"
+    buttonText="Adicionar apelido"
+  />
+)}
+```
+
+**Propriedades:**
+- `label`: string (obrigatório)
+- `items`: string[] | null | undefined
+- `emptyText`: string (default: "Nenhum item")
+- `defaultOpen`: boolean (default: false)
+- `open`: boolean (opcional, para controle externo)
+- `onOpenChange`: (open: boolean) => void (opcional)
+- `className`: string (opcional)

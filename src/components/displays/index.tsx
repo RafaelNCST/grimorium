@@ -6,3 +6,12 @@ export { DisplaySelectGrid } from "./DisplaySelectGrid";
 export type { DisplaySelectGridOption } from "./DisplaySelectGrid";
 
 export { DisplayImage } from "./DisplayImage";
+
+export { DisplayText } from "./DisplayText";
+
+export { DisplayTextarea } from "./DisplayTextarea";
+
+export { DisplayEntityList } from "./DisplayEntityList";
+export type { DisplayEntityItem } from "./DisplayEntityList";
+
+export { DisplayStringList } from "./DisplayStringList";
