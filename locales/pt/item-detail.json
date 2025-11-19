@@ -13,9 +13,9 @@
     "additional_info": "Informações Adicionais",
     "advanced_info": "Informações Avançadas",
     "main_info": "Informações Principais",
-    "detailed_descriptions": "Descrições Detalhadas",
-    "narrative": "Informações Narrativas",
-    "mechanics": "Mecânicas e Uso",
+    "detailed_descriptions": "Descrição e História",
+    "narrative": "Narrativa",
+    "mechanics": "Mecânicas do Item",
     "other": "Outras Informações",
     "versions": "Versões"
   },
@@ -36,7 +36,8 @@
     "narrative_purpose": "Propósito Narrativo",
     "usage_requirements": "Requisitos de Uso",
     "usage_consequences": "Consequências de Uso",
-    "alternative_names": "Nomes Alternativos"
+    "alternative_names": "Nomes Alternativos",
+    "item_usage": "Uso do Item"
   },
   "placeholders": {
     "alternative_name": "Digite um nome alternativo...",
@@ -44,7 +45,8 @@
     "origin": "Descreva a origem ou história...",
     "narrative_purpose": "Qual o papel deste item na história?",
     "usage_requirements": "O que é necessário para usar este item?",
-    "usage_consequences": "O que acontece quando este item é usado?"
+    "usage_consequences": "O que acontece quando este item é usado?",
+    "item_usage": "Como este item é usado? Quais técnicas são necessárias?"
   },
   "buttons": {
     "add_alternative_name": "Adicionar Nome Alternativo"
@@ -131,5 +133,8 @@
     "story_rarity": "A raridade na história indica o quão raro ou significativo este item é na sua narrativa."
   },
   "missing_fields": "Campos obrigatórios não preenchidos",
-  "fill_required_fields": "Por favor, preencha todos os campos obrigatórios antes de salvar"
+  "fill_required_fields": "Por favor, preencha todos os campos obrigatórios antes de salvar",
+  "validation": {
+    "item_usage_max_length": "Uso do item deve ter no máximo 500 caracteres"
+  }
 }

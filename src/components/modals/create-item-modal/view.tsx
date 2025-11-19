@@ -50,7 +50,7 @@ export function CreateItemModalView({
       <FormImageUpload
         value={watchedValues.image || ""}
         onChange={(value) => setValue("image", value)}
-        label={t("modal.change_image")}
+        label={t("modal.image")}
         height="h-48"
         shape="rounded"
         imageFit="cover"
@@ -134,141 +134,189 @@ export function CreateItemModalView({
   // Advanced Fields
   const advancedFields = (
     <div className="space-y-6">
-      {/* Appearance */}
-      <div className="space-y-2">
-        <Label htmlFor="appearance" className="text-sm font-medium text-primary">
-          {t("modal.appearance")}
-        </Label>
-        <Textarea
-          id="appearance"
-          {...register("appearance")}
-          placeholder={t("modal.appearance_placeholder")}
-          rows={4}
-          maxLength={500}
-          className="resize-none"
-        />
-        <div className="flex justify-end text-xs text-muted-foreground">
-          <span>{watchedValues.appearance?.length || 0}/500</span>
+      {/* ==================== */}
+      {/* DESCRIÇÃO E HISTÓRIA */}
+      {/* ==================== */}
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+          Descrição e História
+        </h4>
+
+        {/* Appearance */}
+        <div className="space-y-2">
+          <Label htmlFor="appearance" className="text-sm font-medium text-primary">
+            {t("modal.appearance")}
+          </Label>
+          <Textarea
+            id="appearance"
+            {...register("appearance")}
+            placeholder={t("modal.appearance_placeholder")}
+            rows={4}
+            maxLength={500}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.appearance?.length || 0}/500</span>
+          </div>
         </div>
-      </div>
 
-      {/* Origin */}
-      <div className="space-y-2">
-        <Label htmlFor="origin" className="text-sm font-medium text-primary">
-          {t("modal.origin")}
-        </Label>
-        <Textarea
-          id="origin"
-          {...register("origin")}
-          placeholder={t("modal.origin_placeholder")}
-          rows={4}
-          maxLength={500}
-          className="resize-none"
-        />
-        <div className="flex justify-end text-xs text-muted-foreground">
-          <span>{watchedValues.origin?.length || 0}/500</span>
+        {/* Origin */}
+        <div className="space-y-2">
+          <Label htmlFor="origin" className="text-sm font-medium text-primary">
+            {t("modal.origin")}
+          </Label>
+          <Textarea
+            id="origin"
+            {...register("origin")}
+            placeholder={t("modal.origin_placeholder")}
+            rows={4}
+            maxLength={500}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.origin?.length || 0}/500</span>
+          </div>
         </div>
-      </div>
 
-      {/* Alternative Names */}
-      <FormListInput
-        value={watchedValues.alternativeNames || []}
-        onChange={(names) => setValue("alternativeNames", names)}
-        label={t("modal.alternative_names")}
-        placeholder={t("modal.alternative_names_placeholder")}
-        buttonText={t("modal.add_alternative_name")}
-        maxLength={100}
-        inputSize="small"
-      />
-
-      <Separator />
-
-      {/* Story Rarity */}
-      <div className="space-y-3">
-        <Alert className="bg-primary/5 border-primary/20">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertDescription className="text-xs">
-            {t("modal.rarity_explanation")}
-          </AlertDescription>
-        </Alert>
-
-        <FormSelectGrid
-          value={watchedValues.storyRarity || ""}
-          onChange={(value) => setValue("storyRarity", value)}
-          label={t("modal.story_rarity")}
-          columns={4}
-          options={STORY_RARITIES_CONSTANT.map((rarity) => ({
-            value: rarity.value,
-            label: t(rarity.translationKey),
-            description: t(rarity.descriptionKey),
-            icon: rarity.icon,
-            baseColorClass: rarity.baseColorClass,
-            hoverColorClass: rarity.hoverColorClass,
-            activeColorClass: rarity.activeColorClass,
-          }))}
-          className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+        {/* Alternative Names */}
+        <FormListInput
+          value={watchedValues.alternativeNames || []}
+          onChange={(names) => setValue("alternativeNames", names)}
+          label={t("modal.alternative_names")}
+          placeholder={t("modal.alternative_names_placeholder")}
+          buttonText={t("modal.add_alternative_name")}
+          maxLength={100}
+          inputSize="small"
         />
       </div>
 
       <Separator />
 
-      {/* Narrative Purpose */}
-      <div className="space-y-2">
-        <Label htmlFor="narrativePurpose" className="text-sm font-medium text-primary">
-          {t("modal.narrative_purpose")}
-        </Label>
-        <Textarea
-          id="narrativePurpose"
-          {...register("narrativePurpose")}
-          placeholder={t("modal.narrative_purpose_placeholder")}
-          rows={4}
-          maxLength={500}
-          className="resize-none"
-        />
-        <div className="flex justify-end text-xs text-muted-foreground">
-          <span>{watchedValues.narrativePurpose?.length || 0}/500</span>
+      {/* ==================== */}
+      {/* NARRATIVA */}
+      {/* ==================== */}
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+          Narrativa
+        </h4>
+
+        {/* Story Rarity */}
+        <div className="space-y-3">
+          <Alert className="bg-primary/5 border-primary/20">
+            <Info className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-xs">
+              {t("modal.rarity_explanation")}
+            </AlertDescription>
+          </Alert>
+
+          <FormSelectGrid
+            value={watchedValues.storyRarity || ""}
+            onChange={(value) => setValue("storyRarity", value)}
+            label={t("modal.story_rarity")}
+            columns={4}
+            options={STORY_RARITIES_CONSTANT.map((rarity) => ({
+              value: rarity.value,
+              label: t(rarity.translationKey),
+              description: t(rarity.descriptionKey),
+              icon: rarity.icon,
+              baseColorClass: rarity.baseColorClass,
+              hoverColorClass: rarity.hoverColorClass,
+              activeColorClass: rarity.activeColorClass,
+            }))}
+            className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+          />
+        </div>
+
+        {/* Narrative Purpose */}
+        <div className="space-y-2">
+          <Label htmlFor="narrativePurpose" className="text-sm font-medium text-primary">
+            {t("modal.narrative_purpose")}
+          </Label>
+          <Textarea
+            id="narrativePurpose"
+            {...register("narrativePurpose")}
+            placeholder={t("modal.narrative_purpose_placeholder")}
+            rows={4}
+            maxLength={500}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.narrativePurpose?.length || 0}/500</span>
+          </div>
         </div>
       </div>
 
-      {/* Usage Requirements */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="usageRequirements"
-          className="text-sm font-medium text-primary"
-        >
-          {t("modal.usage_requirements")}
-        </Label>
-        <Textarea
-          id="usageRequirements"
-          {...register("usageRequirements")}
-          placeholder={t("modal.usage_requirements_placeholder")}
-          rows={3}
-          maxLength={250}
-          className="resize-none"
-        />
-        <div className="flex justify-end text-xs text-muted-foreground">
-          <span>{watchedValues.usageRequirements?.length || 0}/250</span>
-        </div>
-      </div>
+      <Separator />
 
-      {/* Usage Consequences */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="usageConsequences"
-          className="text-sm font-medium text-primary"
-        >
-          {t("modal.usage_consequences")}
-        </Label>
-        <Textarea
-          id="usageConsequences"
-          {...register("usageConsequences")}
-          placeholder={t("modal.usage_consequences_placeholder")}
-          rows={3}
-          maxLength={250}
-          className="resize-none"
-        />
-        <div className="flex justify-end text-xs text-muted-foreground">
-          <span>{watchedValues.usageConsequences?.length || 0}/250</span>
+      {/* ==================== */}
+      {/* MECÂNICAS DO ITEM */}
+      {/* ==================== */}
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+          Mecânicas do Item
+        </h4>
+
+        {/* Usage Requirements */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="usageRequirements"
+            className="text-sm font-medium text-primary"
+          >
+            {t("modal.usage_requirements")}
+          </Label>
+          <Textarea
+            id="usageRequirements"
+            {...register("usageRequirements")}
+            placeholder={t("modal.usage_requirements_placeholder")}
+            rows={3}
+            maxLength={250}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.usageRequirements?.length || 0}/250</span>
+          </div>
+        </div>
+
+        {/* Usage Consequences */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="usageConsequences"
+            className="text-sm font-medium text-primary"
+          >
+            {t("modal.usage_consequences")}
+          </Label>
+          <Textarea
+            id="usageConsequences"
+            {...register("usageConsequences")}
+            placeholder={t("modal.usage_consequences_placeholder")}
+            rows={3}
+            maxLength={250}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.usageConsequences?.length || 0}/250</span>
+          </div>
+        </div>
+
+        {/* Item Usage */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="itemUsage"
+            className="text-sm font-medium text-primary"
+          >
+            {t("modal.item_usage")}
+          </Label>
+          <Textarea
+            id="itemUsage"
+            {...register("itemUsage")}
+            placeholder={t("modal.item_usage_placeholder")}
+            rows={4}
+            maxLength={500}
+            className="resize-none"
+          />
+          <div className="flex justify-end text-xs text-muted-foreground">
+            <span>{watchedValues.itemUsage?.length || 0}/500</span>
+          </div>
         </div>
       </div>
     </div>

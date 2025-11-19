@@ -49,7 +49,9 @@ export function CategorySelector({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">{t("modal.category")} *</label>
+      <label className="text-sm font-medium text-primary">
+        {t("modal.category")} <span className="text-destructive ml-1">*</span>
+      </label>
 
       {!isCustomMode ? (
         <Select

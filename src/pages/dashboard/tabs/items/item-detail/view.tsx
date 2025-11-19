@@ -180,7 +180,7 @@ export function ItemDetailView({
             <FormImageUpload
               value={editData.image || ""}
               onChange={(value) => onEditDataChange("image", value)}
-              label={t("create-item:modal.change_image")}
+              label={t("create-item:modal.image")}
               helperText={t("create-item:modal.upload_image")}
               height="h-48"
               shape="rounded"
@@ -408,6 +408,38 @@ export function ItemDetailView({
             <EmptyFieldState t={t} />
           )}
         </FieldWithVisibilityToggle>
+
+        {/* Alternative Names */}
+        <FieldWithVisibilityToggle
+          fieldName="alternativeNames"
+          label={t("item-detail:fields.alternative_names")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.alternativeNames || []}
+              onChange={(names) => onEditDataChange("alternativeNames", names)}
+              label=""
+              placeholder={t("item-detail:placeholders.alternative_name")}
+              buttonText={t("item-detail:buttons.add_alternative_name")}
+              maxLength={100}
+              inputSize="small"
+            />
+          ) : item.alternativeNames && item.alternativeNames.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {item.alternativeNames.map((name, index) => (
+                <EntityTagBadge key={index} variant="outline">
+                  {name}
+                </EntityTagBadge>
+              ))}
+            </div>
+          ) : (
+            <EmptyFieldState t={t} />
+          )}
+        </FieldWithVisibilityToggle>
       </div>
 
       <Separator className="my-6" />
@@ -580,6 +612,40 @@ export function ItemDetailView({
           ) : item.usageConsequences ? (
             <p className="text-sm whitespace-pre-wrap">
               {item.usageConsequences}
+            </p>
+          ) : (
+            <EmptyFieldState t={t} />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Item Usage */}
+        <FieldWithVisibilityToggle
+          fieldName="itemUsage"
+          label={t("item-detail:fields.item_usage")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <>
+              <Textarea
+                value={editData.itemUsage || ""}
+                onChange={(e) =>
+                  onEditDataChange("itemUsage", e.target.value)
+                }
+                className="resize-none"
+                rows={4}
+                maxLength={500}
+                placeholder={t("item-detail:placeholders.item_usage")}
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.itemUsage?.length || 0}/500</span>
+              </div>
+            </>
+          ) : item.itemUsage ? (
+            <p className="text-sm whitespace-pre-wrap">
+              {item.itemUsage}
             </p>
           ) : (
             <EmptyFieldState t={t} />

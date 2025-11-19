@@ -162,7 +162,9 @@
       "Bash(cmd /c \"taskkill /F /PID 36720\")",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
-      "Bash(C:/Users/rafae/Desktop/dev/grimorium/docs/build/forms_temp.md)"
+      "Bash(C:/Users/rafae/Desktop/dev/grimorium/docs/build/forms_temp.md)",
+      "Bash(awk 'NR==800{print \"\"\"\"; print \"\"    // Add item_usage column to items table\"\"; print \"\"    try {\"\"; print \"\"      await database.execute(\"\"; print \"\"        \\\"\"ALTER TABLE items ADD COLUMN item_usage TEXT\\\"\"\"\"; print \"\"      );\"\"; print \"\"      console.log(\\\"\"[db] Added item_usage column to items table\\\"\");\"\"; print \"\"    } catch (error) {\"\"; print \"\"      // Column already exists - safe to ignore\"\"; print \"\"    }\"\"}1' index.ts.bak)",
+      "Bash(index.ts)"
     ],
     "deny": [],
     "ask": []

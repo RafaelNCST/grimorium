@@ -13,9 +13,9 @@
     "additional_info": "Additional Information",
     "advanced_info": "Advanced Information",
     "main_info": "Main Information",
-    "detailed_descriptions": "Detailed Descriptions",
-    "narrative": "Narrative Information",
-    "mechanics": "Mechanics and Usage",
+    "detailed_descriptions": "Description and History",
+    "narrative": "Narrative",
+    "mechanics": "Item Mechanics",
     "other": "Other Information",
     "versions": "Versions"
   },
@@ -36,7 +36,8 @@
     "narrative_purpose": "Narrative Purpose",
     "usage_requirements": "Usage Requirements",
     "usage_consequences": "Usage Consequences",
-    "alternative_names": "Alternative Names"
+    "alternative_names": "Alternative Names",
+    "item_usage": "Item Usage"
   },
   "placeholders": {
     "alternative_name": "Enter an alternative name...",
@@ -44,7 +45,8 @@
     "origin": "Describe the origin or history...",
     "narrative_purpose": "What role does this item play in the story?",
     "usage_requirements": "What is needed to use this item?",
-    "usage_consequences": "What happens when this item is used?"
+    "usage_consequences": "What happens when this item is used?",
+    "item_usage": "How is this item used? What techniques are required?"
   },
   "buttons": {
     "add_alternative_name": "Add Alternative Name"
@@ -131,5 +133,8 @@
     "story_rarity": "Story rarity indicates how rare or significant this item is in your narrative."
   },
   "missing_fields": "Missing required fields",
-  "fill_required_fields": "Please fill in all required fields before saving"
+  "fill_required_fields": "Please fill in all required fields before saving",
+  "validation": {
+    "item_usage_max_length": "Item usage must be at most 500 characters"
+  }
 }

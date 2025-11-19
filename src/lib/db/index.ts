@@ -799,6 +799,16 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add item_usage column to items table
+    try {
+      await database.execute(
+        "ALTER TABLE items ADD COLUMN item_usage TEXT"
+      );
+      console.log("[db] Added item_usage column to items table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Add advanced fields to regions table
     // Environment fields
     const environmentFields = [

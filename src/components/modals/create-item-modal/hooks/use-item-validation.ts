@@ -34,6 +34,10 @@ export const itemFormSchema = z.object({
     .string()
     .max(250, "validation.usage_consequences_max_length")
     .optional(),
+  itemUsage: z
+    .string()
+    .max(500, "validation.item_usage_max_length")
+    .optional(),
 
   // Custom category (only used when category is "other")
   customCategory: z.string().max(50).optional(),

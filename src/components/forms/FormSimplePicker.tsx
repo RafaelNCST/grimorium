@@ -209,7 +209,7 @@ export function FormSimplePicker<T extends string = string>({
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium">
+      <Label className="text-sm font-medium text-primary">
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>

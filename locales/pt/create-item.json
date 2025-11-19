@@ -4,6 +4,7 @@
     "description": "Adicione um novo item ao seu livro",
     "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história.",
     "basic_fields": "Campos Básicos",
+    "image": "Imagem",
     "change_image": "Alterar Imagem",
     "upload_image": "Enviar Imagem",
 
@@ -31,7 +32,9 @@
     "usage_requirements": "Requisitos de Uso",
     "usage_requirements_placeholder": "Apenas pode ser empunhada por alguém de sangue real, requer grande força física.",
     "usage_consequences": "Consequências ou Custo de Uso",
-    "usage_consequences_placeholder": "Drena a energia vital do usuário, atrai criaturas das sombras quando desembainhada."
+    "usage_consequences_placeholder": "Drena a energia vital do usuário, atrai criaturas das sombras quando desembainhada.",
+    "item_usage": "Uso do Item",
+    "item_usage_placeholder": "Descreva como o item é usado, técnicas necessárias, métodos de ativação, etc."
   },
   "status": {
     "complete": "Completa",
@@ -75,7 +78,8 @@
     "origin_max_length": "Origem deve ter no máximo 500 caracteres",
     "narrative_purpose_max_length": "Propósito narrativo deve ter no máximo 500 caracteres",
     "usage_requirements_max_length": "Requisitos de uso devem ter no máximo 250 caracteres",
-    "usage_consequences_max_length": "Consequências de uso devem ter no máximo 250 caracteres"
+    "usage_consequences_max_length": "Consequências de uso devem ter no máximo 250 caracteres",
+    "item_usage_max_length": "Uso do item deve ter no máximo 500 caracteres"
   },
   "button": {
     "cancel": "Cancelar",

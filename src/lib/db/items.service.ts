@@ -18,6 +18,7 @@ export interface IItem {
   narrativePurpose?: string;
   usageRequirements?: string;
   usageConsequences?: string;
+  itemUsage?: string;
 
   fieldVisibility?: Record<string, boolean>;
   createdAt?: string;
@@ -52,6 +53,7 @@ function itemToDBItem(bookId: string, item: IItem): DBItem {
     narrative_purpose: item.narrativePurpose,
     usage_requirements: item.usageRequirements,
     usage_consequences: item.usageConsequences,
+    item_usage: item.itemUsage,
     field_visibility: item.fieldVisibility
       ? JSON.stringify(item.fieldVisibility)
       : undefined,
@@ -82,6 +84,7 @@ function dbItemToItem(dbItem: DBItem): IItem {
     narrativePurpose: dbItem.narrative_purpose,
     usageRequirements: dbItem.usage_requirements,
     usageConsequences: dbItem.usage_consequences,
+    itemUsage: dbItem.item_usage,
     fieldVisibility: dbItem.field_visibility
       ? JSON.parse(dbItem.field_visibility)
       : {},
@@ -116,9 +119,9 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
     `INSERT INTO items (
       id, book_id, name, status, category, custom_category, basic_description, image,
       appearance, origin, alternative_names, story_rarity, narrative_purpose,
-      usage_requirements, usage_consequences, field_visibility, created_at, updated_at
+      usage_requirements, usage_consequences, item_usage, field_visibility, created_at, updated_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
     )`,
     [
       dbItem.id,
@@ -136,6 +139,7 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
       dbItem.narrative_purpose,
       dbItem.usage_requirements,
       dbItem.usage_consequences,
+      dbItem.item_usage,
       dbItem.field_visibility,
       dbItem.created_at,
       dbItem.updated_at,
@@ -173,9 +177,9 @@ export async function updateItem(
       name = $1, status = $2, category = $3, custom_category = $4,
       basic_description = $5, image = $6, appearance = $7, origin = $8,
       alternative_names = $9, story_rarity = $10, narrative_purpose = $11,
-      usage_requirements = $12, usage_consequences = $13, field_visibility = $14,
-      updated_at = $15
-    WHERE id = $16`,
+      usage_requirements = $12, usage_consequences = $13, item_usage = $14,
+      field_visibility = $15, updated_at = $16
+    WHERE id = $17`,
     [
       dbItem.name,
       dbItem.status,
@@ -190,6 +194,7 @@ export async function updateItem(
       dbItem.narrative_purpose,
       dbItem.usage_requirements,
       dbItem.usage_consequences,
+      dbItem.item_usage,
       dbItem.field_visibility,
       dbItem.updated_at,
       id,

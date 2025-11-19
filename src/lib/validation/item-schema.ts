@@ -59,6 +59,12 @@ export const ItemSchema = z.object({
     .trim()
     .optional(),
 
+  itemUsage: z
+    .string()
+    .max(500, "item-detail:validation.item_usage_max_length")
+    .trim()
+    .optional(),
+
   // Arrays
   alternativeNames: z.array(z.string()).optional(),
 });

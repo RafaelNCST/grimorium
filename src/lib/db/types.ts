@@ -125,6 +125,7 @@ export interface DBItem {
   narrative_purpose?: string;
   usage_requirements?: string;
   usage_consequences?: string;
+  item_usage?: string;
 
   field_visibility?: string;
   created_at: number;

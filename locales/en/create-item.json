@@ -4,9 +4,9 @@
     "description": "Add a new item to your book",
     "info_message": "Everything can be edited later. Start with basic information and add details as you develop your story.",
     "basic_fields": "Basic Fields",
+    "image": "Image",
     "change_image": "Change Image",
     "upload_image": "Upload Image",
-
     "item_name": "Item Name",
     "name_placeholder": "Excalibur, Ring of Destiny, Healing Potion",
     "item_status": "Item Status",
@@ -16,7 +16,6 @@
     "back_to_categories": "Back to categories",
     "basic_description": "Basic Description",
     "basic_description_placeholder": "A legendary sword forged in the flames of an ancient dragon, capable of cutting any material.",
-
     "appearance": "Appearance",
     "appearance_placeholder": "Silver blade with golden runes that glow when near danger, hilt wrapped in black dragon leather.",
     "origin": "Origin",
@@ -31,7 +30,9 @@
     "usage_requirements": "Usage Requirements",
     "usage_requirements_placeholder": "Can only be wielded by someone of royal blood, requires great physical strength.",
     "usage_consequences": "Consequences or Cost of Use",
-    "usage_consequences_placeholder": "Drains the user's life energy, attracts shadow creatures when unsheathed."
+    "usage_consequences_placeholder": "Drains the user's life energy, attracts shadow creatures when unsheathed.",
+    "item_usage": "Item Usage",
+    "item_usage_placeholder": "Describe how the item is used, required techniques, activation methods, etc."
   },
   "status": {
     "complete": "Complete",
@@ -75,7 +76,8 @@
     "origin_max_length": "Origin must be at most 500 characters",
     "narrative_purpose_max_length": "Narrative purpose must be at most 500 characters",
     "usage_requirements_max_length": "Usage requirements must be at most 250 characters",
-    "usage_consequences_max_length": "Usage consequences must be at most 250 characters"
+    "usage_consequences_max_length": "Usage consequences must be at most 250 characters",
+    "item_usage_max_length": "Item usage must be at most 500 characters"
   },
   "button": {
     "cancel": "Cancel",
