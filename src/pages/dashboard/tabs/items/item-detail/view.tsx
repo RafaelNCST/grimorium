@@ -674,11 +674,6 @@ export const ItemDetailView = React.memo(function ItemDetailView({
   // ==================
   // VERSIONS PANEL
   // ==================
-  console.log("[ItemDetailView] versions prop:", versions);
-  console.log("[ItemDetailView] versions.length:", versions.length);
-  console.log("[ItemDetailView] Main version:", versions.find(v => v.isMain));
-  console.log("[ItemDetailView] currentVersion:", currentVersion);
-
   const versionsPanel = (
     <VersionsPanel title={t("item-detail:sections.versions")}>
       <EntityVersionManager<IItemVersion, IItem, ItemFormSchema>

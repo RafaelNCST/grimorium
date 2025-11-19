@@ -107,12 +107,6 @@ export default function ItemDetail() {
 
           // Carregar versões do banco de dados
           const versionsFromDB = await getItemVersions(itemId);
-          console.log("[ItemDetail] versionsFromDB:", versionsFromDB);
-          console.log("[ItemDetail] versionsFromDB.length:", versionsFromDB.length);
-          if (versionsFromDB.length > 0) {
-            console.log("[ItemDetail] First version:", versionsFromDB[0]);
-            console.log("[ItemDetail] First version isMain:", versionsFromDB[0].isMain);
-          }
 
           // Check if main version exists
           const hasMainVersion = versionsFromDB.some((v) => v.isMain);
@@ -128,12 +122,10 @@ export default function ItemDetail() {
               itemData: itemFromDB,
             };
 
-            console.log("[ItemDetail] Creating main version:", mainVersion);
             await createItemVersion(itemId, mainVersion);
 
             // Add main version to the array
             const allVersions = [mainVersion, ...versionsFromDB];
-            console.log("[ItemDetail] Setting versions:", allVersions);
             setVersions(allVersions);
             setCurrentVersion(mainVersion);
           } else {
@@ -146,12 +138,10 @@ export default function ItemDetail() {
                   }
                 : v
             );
-            console.log("[ItemDetail] Setting versions:", updatedVersions);
             setVersions(updatedVersions);
 
             // Set main version as current
             const mainVersion = updatedVersions.find((v) => v.isMain);
-            console.log("[ItemDetail] Main version found:", mainVersion);
             if (mainVersion) {
               setCurrentVersion(mainVersion);
             }
