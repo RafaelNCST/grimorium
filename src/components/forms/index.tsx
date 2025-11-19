@@ -30,6 +30,11 @@ export { FormImageDisplay } from "./FormImageDisplay";
 export { FormSelectGrid } from "./FormSelectGrid";
 export type { GridSelectOption } from "./FormSelectGrid";
 
+export { FormSimpleGrid } from "./FormSimpleGrid";
+export type { SimpleGridSelectOption } from "./FormSimpleGrid";
+
+export { FormSimplePicker } from "./FormSimplePicker";
+
 export { FormListInput } from "./FormListInput";
 
 // Entity Multi-Select (Auto-loading from DB)
