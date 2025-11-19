@@ -1,182 +1,608 @@
-# Arquitetura do Projeto
+# Grimorium - Tech Stack & Architecture
 
-## Tecnologias
+## Table of Contents
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Architecture Patterns](#architecture-patterns)
+- [Naming Conventions](#naming-conventions)
+- [Code Organization](#code-organization)
+- [Best Practices](#best-practices)
+
+---
+
+## Tech Stack
 
 ### Core
-- **Tauri, Vite, React, TypeScript** como principais
-- **@vitejs/plugin-react-swc** compilador SWC para melhor performance
-- **Tanstack Router** para roteamento
-- **Zustand** para gerenciamento de estados globais
-- **pnpm** como gerenciador de pacotes
-- **Named Exports** como padrão de exportação
+- **Tauri 2.x** - Native desktop application framework
+- **React 18.x** - UI library
+- **TypeScript 5.x** - Type-safe JavaScript
+- **Vite 5.x** - Build tool and dev server
+- **@vitejs/plugin-react-swc** - Fast React compiler using SWC
+- **pnpm** - Package manager
 
-### UI & Estilização
-- **Tailwind CSS + Radix UI + shadcn/ui** para estilização
-- **class-variance-authority (CVA)** para gerenciamento de variantes de componentes
-- **clsx + tailwind-merge** para utilitários de classes CSS
-- **Lucide React + React Icons** para ícones
-- **tailwindcss-animate** plugin de animações
-- **@tailwindcss/typography** plugin de tipografia
+### Routing & State
+- **Tanstack Router** - Type-safe file-based routing
+- **Zustand** - Lightweight state management
 
-### Formulários & Validação
-- **React Hook Form + Zod** para manipulação e validação de formulários
+### UI & Styling
+- **Tailwind CSS** - Utility-first CSS framework
+- **Radix UI** - Unstyled accessible components
+- **shadcn/ui** - Re-usable component collection
+- **class-variance-authority (CVA)** - Component variant management
+- **clsx + tailwind-merge** - Conditional className utilities
+- **Lucide React + React Icons** - Icon libraries
+- **tailwindcss-animate** - Animation utilities
+- **@tailwindcss/typography** - Typography plugin
 
-### Componentes Especializados
-- **@dnd-kit** (core, sortable, utilities) para drag and drop
-- **cmdk** para command menu/paleta de comandos
-- **embla-carousel-react** para carrosséis
-- **react-day-picker** para seletor de datas
-- **react-easy-crop** para crop/recorte de imagens
-- **react-resizable-panels** para painéis redimensionáveis
-- **react-zoom-pan-pinch** para zoom e pan em imagens
-- **recharts** para gráficos e visualização de dados
-- **@tanstack/react-virtual** para virtualização de listas longas
+### Forms & Validation
+- **React Hook Form** - Performant form library
+- **Zod** - TypeScript-first schema validation
 
-### Utilitários
-- **date-fns** para manipulação de datas
-- **Internacionalização** com i18n
+### Specialized Components
+- **@dnd-kit** - Drag and drop functionality
+- **cmdk** - Command palette
+- **embla-carousel-react** - Carousel component
+- **react-day-picker** - Date picker
+- **react-easy-crop** - Image cropping
+- **react-resizable-panels** - Resizable panel layouts
+- **react-zoom-pan-pinch** - Image zoom/pan
+- **recharts** - Chart library
+- **@tanstack/react-virtual** - Virtual scrolling for large lists
 
-### Plugins Tauri
-- **@tauri-apps/plugin-dialog** para diálogos nativos
-- **@tauri-apps/plugin-fs** para sistema de arquivos
-- **@tauri-apps/plugin-sql** para banco de dados SQL
+### Utilities
+- **date-fns** - Date manipulation and formatting
+- **i18next + react-i18next** - Internationalization
 
-### Qualidade de Código
-- **ESLint + Prettier** para padronização de código
-- **TypeScript** para tipagem estática
+### Tauri Plugins
+- **@tauri-apps/plugin-dialog** - Native dialogs
+- **@tauri-apps/plugin-fs** - File system access
+- **@tauri-apps/plugin-sql** - SQLite database
 
----
-
-## Regras gerais
-- Sempre componentize componentes visuais muito grandes, lembre-se que eles devem ser puros
-- Sempre evite implementações de soluções com gambiarra
-- Sempre siga inicialmente as melhores práticas para qualquer implementação
-- Navegações que precisam ser passadas pra view, devem ser funções que encapsulam a função de navegação do hook de navegação
-- Não distribua comentários e consoles.logs pelo código
-
-## Organização de Pastas
-
-> Toda página visualizável ou modal deve ser separada em **controller (lógica)** e **view (visualização)**
-
-**index.tsx (Controller)**
-- Contém toda a lógica da página/modal: navegação, chamadas de hooks e utils
-- É a entrada da página/modal e será exportado para uso na rota
-- Chama e utiliza a **view**
-- Funções e variáveis usadas na view devem ser passadas por props
-- Funções devem ser memoizadas com `useCallback` e variáveis complexas com `useMemo`
-- Funções devem seguir os padrões de SOLID, sendo légiveis
-- Estrutura sugerida: variáveis, states e hooks no topo; funções no meio; chamada da view no final
-
-**view.tsx**
-- Componente puro.
-- Contém apenas tags HTML ou componentes importados
-- Pode ter variáveis que não disparam re-renderizações
-- Contém o hook de i18n para traduções
-
-**Pastas de apoio**
-- Uma pasta pode ter subpastas auxiliares locais: `hooks`, `utils`, `components`, `mocks`
-- Importante: não confundir com versões globais (estas ficam em `/src`)
-
-**Visão final (Exemplo)**
-Home
-├── index.tsx
-├── view.tsx
-├── hooks/ (opcional)
-├── utils/ (opcional)
-├── components/ (opcional)
-└── mocks/ (opcional)
-└── constants/ (opcional)
-
-## Regras Gerais de Pastas
-- Existem arquivos **globais** (em `/src`) e **locais** (dentro de uma página)
-- Arquivos globais são criados apenas quando usados em várias páginas diferentes
-- Arquivos locais servem apenas para a página onde estão inseridos
-- Sempre use **inglês** para nomeações
+### Code Quality
+- **ESLint** - JavaScript/TypeScript linting
+- **Prettier** - Code formatting
+- **TypeScript** - Static type checking
 
 ---
 
-## Mocks
-- Todo mock deve estar em uma pasta `mocks`
-- **Nunca** devem estar dentro de `index` (controller) ou `view`
-- Arquivos devem usar `kebab-case` com prefixo `mock` (ex: `mock-characters.ts`)
-- Dentro do arquivo, mocks devem estar em **UPPER_SNAKE_CASE** (ex: `const MOCK_CHARACTERS`)
+## Project Structure
+
+```
+src/
+├── components/          # Global reusable components
+│   ├── ui/             # shadcn/ui components
+│   ├── modals/         # Modal components
+│   ├── dialogs/        # Dialog components
+│   ├── forms/          # Form components
+│   └── ...             # Other global components
+├── pages/              # Page components (with controller/view pattern)
+│   └── [page-name]/
+│       ├── index.tsx   # Controller (logic)
+│       ├── view.tsx    # View (presentation)
+│       ├── components/ # Page-specific components
+│       ├── hooks/      # Page-specific hooks
+│       ├── utils/      # Page-specific utilities
+│       ├── types/      # Page-specific types
+│       └── constants/  # Page-specific constants
+├── routes/             # Tanstack Router file-based routes
+├── lib/                # Core utilities and services
+│   ├── db/            # Database services (Tauri SQL)
+│   ├── validation/    # Zod schemas
+│   ├── utils/         # Global utility functions
+│   ├── assets/        # Static assets management
+│   └── i18n.ts        # i18n configuration
+├── stores/             # Zustand global stores
+├── types/              # Global TypeScript types and interfaces
+├── mocks/              # Mock data (development only)
+│   ├── global/        # Global mock data
+│   └── local/         # Local mock data
+├── hooks/              # Global custom hooks
+├── utils/              # Global utility functions
+├── App.tsx             # App component
+├── main.tsx            # Application entry point
+└── index.css           # Global styles
+```
 
 ---
 
-## Components
-- Devem ser puros e representar partes complexas separadas da view
-- **Não** devem conter lógica
-- Podem conter variáveis simples ou chamar o hook de i18n
-- Ficam em `components/` com nome de arquivo em `kebab-case` (ex: `tab-bar.tsx`)
-- O nome do componente (export) deve estar em **PascalCase** (ex: `TabBar`)
+## Architecture Patterns
+
+### 1. Controller/View Pattern (Pages & Modals)
+
+All pages and complex modals follow the **Controller/View** separation pattern.
+
+#### **Controller (index.tsx)**
+- Contains all business logic
+- Manages state with hooks (`useState`, `useEffect`, etc.)
+- Handles data fetching and side effects
+- Defines event handlers (prefix with `handle`)
+- Memoizes functions with `useCallback`
+- Memoizes computed values with `useMemo`
+- Passes data and callbacks to the View as props
+
+**Example:**
+```tsx
+// src/pages/home/index.tsx
+import { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { HomeView } from './view';
+
+export function HomePage() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Event handlers use 'handle' prefix
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  const handleBookSelect = useCallback((bookId: string) => {
+    navigate({ to: '/dashboard/$dashboardId', params: { dashboardId: bookId } });
+  }, [navigate]);
+
+  // Computed values are memoized
+  const filteredBooks = useMemo(() => {
+    return books.filter(book =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [books, searchTerm]);
+
+  // Pass data and callbacks to View with 'on' prefix for callbacks
+  return (
+    <HomeView
+      filteredBooks={filteredBooks}
+      searchTerm={searchTerm}
+      onSearchChange={handleSearchChange}
+      onBookSelect={handleBookSelect}
+    />
+  );
+}
+```
+
+#### **View (view.tsx)**
+- Pure presentational component
+- Receives all data via props
+- Contains only JSX markup
+- Can use `useTranslation` hook for i18n
+- Can have simple derived values that don't cause re-renders
+- Event handlers received as props use `on` prefix
+
+**Example:**
+```tsx
+// src/pages/home/view.tsx
+import { useTranslation } from 'react-i18next';
+import { BookCard } from './components/book-card';
+
+interface HomeViewProps {
+  filteredBooks: Book[];
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onBookSelect: (bookId: string) => void;
+}
+
+export function HomeView({
+  filteredBooks,
+  searchTerm,
+  onSearchChange,
+  onBookSelect,
+}: HomeViewProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="container">
+      <h1>{t('home.title')}</h1>
+      <input
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+      />
+      {filteredBooks.map(book => (
+        <BookCard
+          key={book.id}
+          book={book}
+          onClick={() => onBookSelect(book.id)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+### 2. Component Organization
+
+#### **Global Components** (`src/components/`)
+- Reusable across multiple pages
+- Should be framework-agnostic (no page-specific logic)
+- Export as named exports
+
+#### **Local Components** (`src/pages/[page-name]/components/`)
+- Used only within a specific page
+- Can be more coupled to page context
+- Organize by feature if needed
+
+#### **UI Components** (`src/components/ui/`)
+- Low-level, highly reusable components (from shadcn/ui)
+- Typically wrappers around Radix UI
+- Should have no business logic
+
+### 3. Service Layer (Database)
+
+All database operations go through services in `src/lib/db/`.
+
+**Example:**
+```tsx
+// src/lib/db/books.service.ts
+import Database from '@tauri-apps/plugin-sql';
+
+export async function getAllBooks(): Promise<Book[]> {
+  const db = await Database.load('sqlite:grimorium.db');
+  return await db.select<Book[]>('SELECT * FROM books ORDER BY last_opened DESC');
+}
+
+export async function createBook(bookData: BookFormData): Promise<Book> {
+  const db = await Database.load('sqlite:grimorium.db');
+  const result = await db.execute(
+    'INSERT INTO books (title, genre, created_at) VALUES (?, ?, ?)',
+    [bookData.title, bookData.genre, new Date().toISOString()]
+  );
+  return { id: result.lastInsertId, ...bookData };
+}
+```
+
+### 4. State Management
+
+#### **Local State** - `useState`, `useReducer`
+Use for component-specific state that doesn't need to be shared.
+
+#### **Global State** - Zustand stores (`src/stores/`)
+Use for state shared across multiple components/pages.
+
+**Example:**
+```tsx
+// src/stores/book-store.ts
+import { create } from 'zustand';
+
+interface BookStore {
+  books: Book[];
+  setBooks: (books: Book[]) => void;
+  addBook: (book: Book) => void;
+  removeBook: (bookId: string) => void;
+}
+
+export const useBookStore = create<BookStore>((set) => ({
+  books: [],
+  setBooks: (books) => set({ books }),
+  addBook: (book) => set((state) => ({ books: [...state.books, book] })),
+  removeBook: (bookId) => set((state) => ({
+    books: state.books.filter(b => b.id !== bookId)
+  })),
+}));
+```
+
+### 5. Form Handling
+
+Use **React Hook Form** with **Zod** for validation.
+
+**Example:**
+```tsx
+// src/lib/validation/book-schema.ts
+import { z } from 'zod';
+
+export const bookSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  genre: z.array(z.string()).min(1, 'Select at least one genre'),
+  synopsis: z.string().optional(),
+});
+
+export type BookFormData = z.infer<typeof bookSchema>;
+```
+
+```tsx
+// In component
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { bookSchema, BookFormData } from '@/lib/validation/book-schema';
+
+function BookForm() {
+  const form = useForm<BookFormData>({
+    resolver: zodResolver(bookSchema),
+    defaultValues: { title: '', genre: [], synopsis: '' },
+  });
+
+  const onSubmit = form.handleSubmit((data) => {
+    console.log(data); // Type-safe data
+  });
+
+  return <form onSubmit={onSubmit}>...</form>;
+}
+```
 
 ---
 
-## Hooks
-- Criados para separar lógicas complexas do controller que usam hooks
-- Usados somente dentro de controllers (`index.tsx`)
-- Arquivos em `hooks/`, nomeados em `kebab-case` (ex: `use-characters-relationship.ts`)
-- O nome do hook (export) deve estar em **camelCase** (ex: `useCharactersRelationship`)
+## Naming Conventions
+
+### Files and Folders
+- **kebab-case** for all files and folders: `user-profile.tsx`, `get-user-data.ts`
+- Exception: Route parameters use `$` prefix: `routes/$bookId.tsx`
+
+### Components
+- **PascalCase** for component names: `UserProfile`, `BookCard`
+- **kebab-case** for file names: `user-profile.tsx`, `book-card.tsx`
+
+### Functions and Variables
+- **camelCase** for functions: `getUserData`, `calculateTotal`
+- **camelCase** for variables: `userName`, `bookList`
+- **Event handlers** in controllers: prefix with `handle` → `handleClick`, `handleSubmit`
+- **Event handler props** in views: prefix with `on` → `onClick`, `onSubmit`
+
+### Booleans
+Use descriptive prefixes:
+- `is` - state: `isLoading`, `isActive`
+- `has` - possession: `hasPermission`, `hasError`
+- `should` - condition: `shouldRedirect`, `shouldValidate`
+- `can` - ability: `canEdit`, `canDelete`
+
+### Collections
+- Use plural: `users`, `books`, `characters`
+
+### Constants
+- **UPPER_SNAKE_CASE**: `MAX_RETRIES`, `API_URL`, `DEFAULT_TIMEOUT`
+
+### TypeScript Types
+
+#### Component Props
+- Suffix with `Props`: `ButtonProps`, `HomeViewProps`, `BookCardProps`
+
+```tsx
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+}
+
+export function Button({ label, onClick }: ButtonProps) {
+  return <button onClick={onClick}>{label}</button>;
+}
+```
+
+#### Other Interfaces/Types
+- Prefix with `I` for interfaces: `IUser`, `IBook`, `ICharacter`
+- No prefix for types: `BookStatus`, `UserRole`
+
+```tsx
+// Interface
+interface IBook {
+  id: string;
+  title: string;
+  author: IAuthor;
+}
+
+// Type
+type BookStatus = 'draft' | 'published' | 'archived';
+```
 
 ---
 
-## Utils
-- Servem para pequenas lógicas **sem hooks**
-- Usados apenas dentro de controllers
-- Arquivos em `utils/`, nomeados em `kebab-case` (ex: `filter-characters.ts`)
-- Dentro de `utils`, devem ser organizados por domínio (ex: `utils/filters/`, `utils/gets/`)
-- O nome da função exportada deve estar em **camelCase** (ex: `filterCharacters`)
+## Code Organization
+
+### Custom Hooks
+
+#### Global Hooks (`src/hooks/`)
+- Reusable across the app
+- Start with `use`: `useDebounce`, `useLocalStorage`
+
+#### Local Hooks (`src/pages/[page]/hooks/`)
+- Specific to a page
+- Extract complex logic from controllers
+
+**Example:**
+```tsx
+// src/pages/home/hooks/use-book-filters.ts
+import { useMemo } from 'react';
+
+export function useBookFilters(books: Book[], searchTerm: string) {
+  return useMemo(() => {
+    return books.filter(book =>
+      book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [books, searchTerm]);
+}
+```
+
+### Utility Functions
+
+#### Global Utils (`src/utils/` or `src/lib/utils/`)
+- Pure functions with no React dependencies
+- Reusable across the app
+
+#### Local Utils (`src/pages/[page]/utils/`)
+- Specific to a page
+- Can be organized by subdirectories: `utils/filters/`, `utils/formatters/`, `utils/calculators/`
+
+**Example:**
+```tsx
+// src/pages/dashboard/utils/formatters/get-status-color.ts
+export function getStatusColor(status: BookStatus): string {
+  const colors: Record<BookStatus, string> = {
+    draft: 'text-yellow-500',
+    published: 'text-green-500',
+    archived: 'text-gray-500',
+  };
+  return colors[status];
+}
+```
+
+### Constants
+
+#### Global Constants (`src/constants/`)
+- Used across multiple pages
+- Example: `src/constants/api-endpoints.ts`
+
+#### Local Constants (`src/pages/[page]/constants/`)
+- Specific to a page
+- Example: `src/pages/characters/constants/character-roles.ts`
+
+**Example:**
+```tsx
+// src/pages/characters/constants/character-roles.ts
+export const CHARACTER_ROLES = [
+  'protagonist',
+  'antagonist',
+  'supporting',
+  'background',
+] as const;
+
+export type CharacterRole = typeof CHARACTER_ROLES[number];
+```
+
+### Mocks
+
+All mock data goes in `src/mocks/` (development only).
+
+#### Structure:
+- `src/mocks/global/` - Mock data used globally
+- `src/mocks/local/` - Mock data for specific features
+
+**Naming:**
+- Files: prefix with `mock-` → `mock-users.ts`, `mock-books.ts`
+- Variables: `UPPER_SNAKE_CASE` → `MOCK_USERS`, `MOCK_BOOKS`
+
+**Example:**
+```tsx
+// src/mocks/global/books.ts
+import { IBook } from '@/types/book-types';
+
+export const MOCK_BOOKS: IBook[] = [
+  { id: '1', title: 'The Great Adventure', genre: ['fantasy'], createdAt: '2024-01-01' },
+  { id: '2', title: 'Mystery of the Manor', genre: ['mystery'], createdAt: '2024-01-02' },
+];
+```
 
 ---
 
-## Stores (Zustand)
-- Cada store deve ficar em `stores/` ou como subpasta local se for restrito a uma página
-- Arquivos em `kebab-case` (ex: `user-store.ts`)
-- O hook exportado do store deve estar em **camelCase** começando com `use` (ex: `useUserStore`)
-- Stores globais ficam em `/src/stores`, stores locais ficam dentro da respectiva página
+## Best Practices
+
+### General Guidelines
+
+1. **Keep components small and focused** - If a component exceeds 200-250 lines, consider breaking it down
+2. **Extract complex logic** - Move complex logic to custom hooks or utility functions
+3. **Avoid prop drilling** - Use Zustand for deeply nested state
+4. **Type everything** - Never use `any`; create proper types instead
+5. **Colocate related code** - Keep related files close in the file structure
+
+### React Best Practices
+
+1. **Use functional components** - No class components
+2. **Memoize expensive computations** - Use `useMemo` for derived data
+3. **Memoize callbacks** - Use `useCallback` for functions passed as props
+4. **Handle loading and error states** - Always show feedback to users
+5. **Avoid inline styles** - Use Tailwind classes
+
+### TypeScript Best Practices
+
+1. **Prefer interfaces for objects** - Use `type` for unions, primitives, or computed types
+2. **Use `const` assertions** for literal arrays** - `as const` for immutable arrays
+3. **Avoid type assertions** - Use type guards instead
+4. **Export types** - Make types reusable across the codebase
+
+### Code Quality
+
+1. **No `console.log` in production code** - Remove or use proper logging
+2. **Write meaningful comments** - Only when code intent is unclear
+3. **Use descriptive variable names** - Avoid abbreviations
+4. **Keep functions pure when possible** - Easier to test and reason about
+5. **Follow ESLint and Prettier rules** - Run `pnpm format` before committing
+
+### Performance
+
+1. **Use virtual scrolling** - For lists with 100+ items (use `@tanstack/react-virtual`)
+2. **Lazy load images** - Defer loading of images below the fold
+3. **Code splitting** - Use dynamic imports for large components
+4. **Debounce search inputs** - Avoid excessive re-renders during typing
+5. **Optimize Zustand selectors** - Only subscribe to needed state slices
+
+### Accessibility
+
+1. **Use semantic HTML** - Proper heading hierarchy, landmarks
+2. **Add ARIA labels** - For icon buttons and interactive elements
+3. **Keyboard navigation** - Ensure all interactions work with keyboard
+4. **Focus management** - Restore focus after modal closes
+5. **Color contrast** - Ensure text meets WCAG standards
 
 ---
 
-## Constants 
-- Organizado na pasta constants quando há valores constantes que não se enquadram em mocks, já que são valores constantes que subirão para produção
-- Arquivos em `kebab-case` (ex: `user-names.ts`)
-- A constant exportado do store deve estar em **UPPER_SNAKE_CASE** com o sufixo `CONSTANT`
-- Constants globais ficam em `/src/constants`, constants locais ficam dentro da respectiva página
+## Internationalization (i18n)
+
+### Structure
+- Translation files: `locales/[language]/[namespace].json`
+- Namespaces by feature: `home.json`, `characters.json`, `common.json`
+
+### Keys
+- Use dot notation: `page.home.title`, `form.validation.required`
+- Keep keys descriptive and hierarchical
+
+**Example:**
+```json
+// locales/en/home.json
+{
+  "title": "My Books",
+  "search": {
+    "placeholder": "Search books...",
+    "noResults": "No books found"
+  },
+  "actions": {
+    "create": "Create New Book",
+    "delete": "Delete"
+  }
+}
+```
+
+```tsx
+// In component
+import { useTranslation } from 'react-i18next';
+
+function HomePage() {
+  const { t } = useTranslation('home');
+
+  return (
+    <div>
+      <h1>{t('title')}</h1>
+      <input placeholder={t('search.placeholder')} />
+      <button>{t('actions.create')}</button>
+    </div>
+  );
+}
+```
 
 ---
 
-## Internacionalização (i18n)
-- Chaves de tradução devem ser organizadas por domínio com notação em `dot.case`  
-  - Exemplo: `page.home.title`, `form.login.submit`
-- Arquivos de tradução ficam em `locales/`, organizados por idioma (ex: `locales/en`, `locales/pt`)
-- Nome dos arquivos de tradução em `kebab-case` (ex: `home.json`, `login.json`)
-- Uso em componentes/views deve ser feito apenas com o hook `useTranslation`
+## Git Workflow
+
+1. **Named exports only** - No default exports (except for route files)
+2. **Commit frequently** - Small, focused commits
+3. **Write descriptive commit messages** - Follow conventional commits format
+4. **Branch naming**: `feature/feature-name`, `fix/bug-name`
 
 ---
 
-## TypeScript
-- Interfaces usadas em componentes devem ter o prefixo `Props` no nome (ex: `PropsButton`)
-- Interfaces não relacionadas a componentes devem ter o prefixo `I` (ex: `IJourney`)
-- Todas as tipagens e interfaces globais devem estar em `/src/types`
-- Arquivos em `kebab-case` (ex: `user-types.ts`)
-- Nunca use `any` para atribuir tipagem, sempre olha as tipagens globais em `src/types` para ver se existe algum tipo, se não crie um tipo no arquivo
+## When to Break the Rules
+
+These guidelines are strong conventions, but not absolute laws. You may break them when:
+
+1. **It improves readability** - Clarity > strict adherence
+2. **Library conventions differ** - Follow the library's recommended patterns
+3. **Performance requirements** - Optimize when needed
+4. **Team consensus** - Discuss and document exceptions
+
+**Always document why you're deviating from conventions.**
 
 ---
 
-## Padrões de Nomeação
+## Additional Resources
 
-**Pastas e arquivos**
-- Pastas e arquivos em `kebab-case`
-- Exceção: parâmetros dentro de `routes/$worldId.tsx`
-
-**Funções e variáveis**
-- Funções em **camelCase**
-- Funções de eventos em controllers começam com `handle` (ex: `handleClickCharacter`). Quando passadas para views, tornam-se props com prefixo `on` (ex: `onClickCharacter`). Outros tipos de funções devem conter no seu nome tudo o que elas fazem, inclusive seus efeitos colaterais
-- Booleans com prefixos `is/has/should/can` (ex: `isActive`)
-- Números indicando quantidade ou limite (ex: `maxRetries`)
-- Coleções no plural (ex: `users`)
-- Constantes em **UPPER_SNAKE_CASE** (ex: `MAX_CONNECTIONS`)
-
-**Componentes**
-- Nome do componente em **PascalCase**
-- Nome do arquivo em `kebab-case`
+- [React Documentation](https://react.dev)
+- [Tauri Documentation](https://v2.tauri.app)
+- [Tanstack Router](https://tanstack.com/router)
+- [Zustand](https://docs.pmnd.rs/zustand)
+- [React Hook Form](https://react-hook-form.com)
+- [Zod](https://zod.dev)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Radix UI](https://www.radix-ui.com)
