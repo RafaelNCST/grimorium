@@ -153,3 +153,79 @@ gridCols={{ sm: 1, md: 2 }}
 - `onCancel`: () => void
 - `onDelete`: () => void
 - `children`: ReactNode
+
+---
+
+## 4. CollapsibleSection
+**Componente:** `CollapsibleSection` (`src/components/layouts/CollapsibleSection.tsx`)
+**Descrição:** Seção colapsável padronizada para páginas de detalhes. Fornece estrutura consistente com Card, header com título, ícone de chevron e padding interno padronizado.
+
+**Funcionalidades:**
+- Card com estilo "card-magical" automático
+- Header com título e ícone de chevron (expande/colapsa)
+- Toggle de visibilidade opcional (ícone de olho) em modo edição
+- Padding interno padronizado via CardContent
+- Estilos automáticos para estado visível/invisível
+- Opção de desabilitar comportamento colapsável
+
+**Exemplo básico:**
+```tsx
+<CollapsibleSection
+  title="Informações Avançadas"
+  isOpen={isAdvancedOpen}
+  onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
+>
+  <div className="space-y-4">
+    {/* Conteúdo da seção */}
+    <p>Seus campos e informações aqui</p>
+  </div>
+</CollapsibleSection>
+```
+
+**Com controle de visibilidade:**
+```tsx
+<CollapsibleSection
+  title="Relacionamentos"
+  isOpen={isRelationshipsOpen}
+  onToggle={() => setIsRelationshipsOpen(!isRelationshipsOpen)}
+  isEditMode={isEditing}
+  isVisible={showRelationships}
+  onVisibilityToggle={() => setShowRelationships(!showRelationships)}
+>
+  <RelationshipsContent />
+</CollapsibleSection>
+```
+
+**Modo não-colapsável:**
+```tsx
+<CollapsibleSection
+  title="Seção Sempre Visível"
+  isOpen={true}
+  onToggle={() => {}}
+  isCollapsible={false}
+>
+  <p>Esta seção não pode ser colapsada</p>
+</CollapsibleSection>
+```
+
+**Propriedades obrigatórias:**
+- `title`: string - Título exibido no header
+- `isOpen`: boolean - Estado de abertura da seção
+- `onToggle`: () => void - Callback quando estado de abertura muda
+- `children`: ReactNode - Conteúdo interno (com padding automático)
+
+**Propriedades opcionais:**
+- `isEditMode`: boolean (default: false) - Habilita toggle de visibilidade
+- `isVisible`: boolean (default: true) - Controla visibilidade (opacidade e estilo)
+- `onVisibilityToggle`: () => void - Callback quando visibilidade muda
+- `className`: string - Classes CSS adicionais para o Card
+- `isCollapsible`: boolean (default: true) - Se a seção pode ser colapsada
+
+**Comportamento de visibilidade:**
+Quando `isVisible = false` e `isEditMode = true`:
+- Opacidade reduzida (50%)
+- Background com cor muted/30
+- Border tracejada com cor muted-foreground/30
+
+**Nota sobre padding:**
+O padding interno é gerenciado automaticamente pelo componente `CardContent`. Não é necessário adicionar padding extra ao conteúdo passado como `children`.

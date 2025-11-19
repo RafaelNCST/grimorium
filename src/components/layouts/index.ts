@@ -31,3 +31,6 @@ export type {
   Version,
   EntityDetailVersionPanelProps,
 } from "./EntityDetailVersionPanel";
+
+export { CollapsibleSection } from "./CollapsibleSection";
+export type { CollapsibleSectionProps } from "./CollapsibleSection";
