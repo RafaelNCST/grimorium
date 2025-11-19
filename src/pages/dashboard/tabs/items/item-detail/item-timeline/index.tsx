@@ -2,15 +2,12 @@ import { useState, useCallback, useMemo } from "react";
 
 import { useParams } from "@tanstack/react-router";
 
-import { useToast } from "@/hooks/use-toast";
-
 import { type ITimelineEvent, ItemTimelineView } from "./view";
 
 export default function ItemTimeline() {
   const { itemId: _itemId } = useParams({
     from: "/dashboard/$dashboardId/tabs/item/$itemId/timeline",
   });
-  const { toast } = useToast();
 
   const [events, setEvents] = useState<ITimelineEvent[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -35,7 +32,7 @@ export default function ItemTimeline() {
     setNewEvent({ eventType: "other" });
   }, []);
 
-  const handleCreateEventAndShowToast = useCallback(() => {
+  const handleCreateEvent = useCallback(() => {
     if (!newEvent.title || !newEvent.description) return;
 
     const event: ITimelineEvent = {
@@ -51,12 +48,7 @@ export default function ItemTimeline() {
     setEvents((prev) => [...prev, event]);
     setNewEvent({ eventType: "other" });
     setShowCreateModal(false);
-
-    toast({
-      title: "Evento adicionado",
-      description: "O evento foi adicionado à timeline.",
-    });
-  }, [newEvent, toast]);
+  }, [newEvent]);
 
   const handleEditEvent = useCallback((event: ITimelineEvent) => {
     setEditingEvent(event);
@@ -64,7 +56,7 @@ export default function ItemTimeline() {
     setShowCreateModal(true);
   }, []);
 
-  const handleUpdateEventAndShowToast = useCallback(() => {
+  const handleUpdateEvent = useCallback(() => {
     if (!editingEvent || !newEvent.title || !newEvent.description) return;
 
     const updatedEvent: ITimelineEvent = {
@@ -83,22 +75,13 @@ export default function ItemTimeline() {
     setEditingEvent(null);
     setNewEvent({ eventType: "other" });
     setShowCreateModal(false);
+  }, [editingEvent, newEvent]);
 
-    toast({
-      title: "Evento atualizado",
-      description: "O evento foi atualizado com sucesso.",
-    });
-  }, [editingEvent, newEvent, toast]);
-
-  const handleDeleteEventAndShowToast = useCallback(
+  const handleDeleteEvent = useCallback(
     (eventId: string) => {
       setEvents((prev) => prev.filter((e) => e.id !== eventId));
-      toast({
-        title: "Evento removido",
-        description: "O evento foi removido da timeline.",
-      });
     },
-    [toast]
+    []
   );
 
   const handleNewEventChange = useCallback((field: string, value: any) => {
@@ -115,10 +98,10 @@ export default function ItemTimeline() {
       onBack={handleBack}
       onCreateModalOpen={handleCreateModalOpen}
       onCreateModalClose={handleCreateModalClose}
-      onCreateEvent={handleCreateEventAndShowToast}
-      onUpdateEvent={handleUpdateEventAndShowToast}
+      onCreateEvent={handleCreateEvent}
+      onUpdateEvent={handleUpdateEvent}
       onEditEvent={handleEditEvent}
-      onDeleteEvent={handleDeleteEventAndShowToast}
+      onDeleteEvent={handleDeleteEvent}
       onNewEventChange={handleNewEventChange}
     />
   );

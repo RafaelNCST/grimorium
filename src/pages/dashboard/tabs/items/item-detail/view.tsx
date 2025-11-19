@@ -12,9 +12,20 @@ import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { ItemNavigationSidebar } from "@/components/item-navigation-sidebar";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CategorySelector } from "@/components/modals/create-item-modal/components/category-selector";
-import { ITEM_CATEGORIES_CONSTANT, type IItemCategory } from "@/components/modals/create-item-modal/constants/item-categories";
-import { ITEM_STATUSES_CONSTANT, type IItemStatus } from "@/components/modals/create-item-modal/constants/item-statuses";
-import { STORY_RARITIES_CONSTANT, type IStoryRarity } from "@/components/modals/create-item-modal/constants/story-rarities";
+import {
+  ITEM_CATEGORIES_CONSTANT,
+  type IItemCategory,
+} from "@/components/modals/create-item-modal/constants/item-categories";
+import {
+  ITEM_STATUSES_CONSTANT,
+  type IItemStatus,
+} from "@/components/modals/create-item-modal/constants/item-statuses";
+import {
+  STORY_RARITIES_CONSTANT,
+  type IStoryRarity,
+} from "@/components/modals/create-item-modal/constants/story-rarities";
+import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
+import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
@@ -92,7 +103,7 @@ interface ItemDetailViewProps {
   onVersionCreate: (versionData: {
     name: string;
     description: string;
-    itemData: IItem;
+    entityData: ItemFormSchema;
   }) => void;
   onVersionDelete: (versionId: string) => void;
   onVersionUpdate: (
@@ -194,7 +205,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-sm font-medium text-primary">
-              {t("create-item:modal.item_name")} <span className="text-destructive ml-1">*</span>
+              {t("create-item:modal.item_name")}{" "}
+              <span className="text-destructive ml-1">*</span>
             </Label>
             <Input
               id="name"
@@ -242,8 +254,12 @@ export const ItemDetailView = React.memo(function ItemDetailView({
 
           {/* Basic Description */}
           <div className="space-y-2">
-            <Label htmlFor="basicDescription" className="text-sm font-medium text-primary">
-              {t("create-item:modal.basic_description")} <span className="text-destructive ml-1">*</span>
+            <Label
+              htmlFor="basicDescription"
+              className="text-sm font-medium text-primary"
+            >
+              {t("create-item:modal.basic_description")}{" "}
+              <span className="text-destructive ml-1">*</span>
             </Label>
             <Textarea
               id="basicDescription"
@@ -635,9 +651,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
             <>
               <Textarea
                 value={editData.itemUsage || ""}
-                onChange={(e) =>
-                  onEditDataChange("itemUsage", e.target.value)
-                }
+                onChange={(e) => onEditDataChange("itemUsage", e.target.value)}
                 className="resize-none"
                 rows={4}
                 maxLength={500}
@@ -648,9 +662,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
               </div>
             </>
           ) : item.itemUsage ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {item.itemUsage}
-            </p>
+            <p className="text-sm whitespace-pre-wrap">{item.itemUsage}</p>
           ) : (
             <EmptyFieldState t={t} />
           )}
@@ -662,9 +674,14 @@ export const ItemDetailView = React.memo(function ItemDetailView({
   // ==================
   // VERSIONS PANEL
   // ==================
+  console.log("[ItemDetailView] versions prop:", versions);
+  console.log("[ItemDetailView] versions.length:", versions.length);
+  console.log("[ItemDetailView] Main version:", versions.find(v => v.isMain));
+  console.log("[ItemDetailView] currentVersion:", currentVersion);
+
   const versionsPanel = (
     <VersionsPanel title={t("item-detail:sections.versions")}>
-      <EntityVersionManager<IItemVersion, IItem, IItem>
+      <EntityVersionManager<IItemVersion, IItem, ItemFormSchema>
         versions={versions}
         currentVersion={currentVersion}
         onVersionChange={onVersionChange}
@@ -678,9 +695,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
           return (
             <div className="relative">
               <div
-                className={
-                  !hasValidData ? "opacity-50 cursor-not-allowed" : ""
-                }
+                className={!hasValidData ? "opacity-50 cursor-not-allowed" : ""}
               >
                 <VersionCard
                   version={version}
@@ -699,13 +714,19 @@ export const ItemDetailView = React.memo(function ItemDetailView({
           );
         }}
         renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
-          <CreateVersionWithEntityDialog<IItem, IItem>
+          <CreateVersionWithEntityDialog<IItem, ItemFormSchema>
             open={open}
             onClose={onClose}
             onConfirm={onConfirm}
             baseEntity={baseEntity}
             i18nNamespace="item-detail"
-            renderEntityModal={() => null}
+            renderEntityModal={({ open, onOpenChange, onConfirm }) => (
+              <CreateItemModal
+                open={open}
+                onClose={() => onOpenChange(false)}
+                onConfirm={onConfirm}
+              />
+            )}
           />
         )}
       />

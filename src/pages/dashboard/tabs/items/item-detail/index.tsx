@@ -23,6 +23,7 @@ import { type IFieldVisibility } from "@/types/character-types";
 import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
 import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
+import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ItemDetailView } from "./view";
 
@@ -79,18 +80,9 @@ export default function ItemDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
-  const [versions, setVersions] = useState<IItemVersion[]>([
-    {
-      id: "main-version",
-      name: "Versão Principal",
-      description: "Versão principal do item",
-      createdAt: new Date().toISOString(),
-      isMain: true,
-      itemData: emptyItem,
-    },
-  ]);
+  const [versions, setVersions] = useState<IItemVersion[]>([]);
   const [currentVersion, setCurrentVersion] = useState<IItemVersion | null>(
-    versions[0]
+    null
   );
   const [_isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
@@ -115,9 +107,18 @@ export default function ItemDetail() {
 
           // Carregar versões do banco de dados
           const versionsFromDB = await getItemVersions(itemId);
+          console.log("[ItemDetail] versionsFromDB:", versionsFromDB);
+          console.log("[ItemDetail] versionsFromDB.length:", versionsFromDB.length);
+          if (versionsFromDB.length > 0) {
+            console.log("[ItemDetail] First version:", versionsFromDB[0]);
+            console.log("[ItemDetail] First version isMain:", versionsFromDB[0].isMain);
+          }
 
-          // Se não houver versões, criar a versão principal
-          if (versionsFromDB.length === 0) {
+          // Check if main version exists
+          const hasMainVersion = versionsFromDB.some((v) => v.isMain);
+
+          if (!hasMainVersion) {
+            // Create main version if it doesn't exist
             const mainVersion: IItemVersion = {
               id: "main-version",
               name: "Versão Principal",
@@ -127,11 +128,16 @@ export default function ItemDetail() {
               itemData: itemFromDB,
             };
 
+            console.log("[ItemDetail] Creating main version:", mainVersion);
             await createItemVersion(itemId, mainVersion);
-            setVersions([mainVersion]);
+
+            // Add main version to the array
+            const allVersions = [mainVersion, ...versionsFromDB];
+            console.log("[ItemDetail] Setting versions:", allVersions);
+            setVersions(allVersions);
             setCurrentVersion(mainVersion);
           } else {
-            // Atualizar versão principal com dados carregados
+            // Main version exists, update it with fresh data
             const updatedVersions = versionsFromDB.map((v) =>
               v.isMain
                 ? {
@@ -140,10 +146,12 @@ export default function ItemDetail() {
                   }
                 : v
             );
+            console.log("[ItemDetail] Setting versions:", updatedVersions);
             setVersions(updatedVersions);
 
-            // Definir versão principal como atual
+            // Set main version as current
             const mainVersion = updatedVersions.find((v) => v.isMain);
+            console.log("[ItemDetail] Main version found:", mainVersion);
             if (mainVersion) {
               setCurrentVersion(mainVersion);
             }
@@ -343,16 +351,37 @@ export default function ItemDetail() {
     async (versionData: {
       name: string;
       description: string;
-      itemData: IItem;
+      entityData: ItemFormSchema;
     }) => {
       try {
+        // Convert ItemFormSchema to complete IItem object
+        const itemData: IItem = {
+          id: item.id, // Use the current item's ID for the version
+          name: versionData.entityData.name,
+          status: versionData.entityData.status,
+          category: versionData.entityData.category,
+          customCategory: versionData.entityData.customCategory,
+          basicDescription: versionData.entityData.basicDescription,
+          image: versionData.entityData.image,
+          appearance: versionData.entityData.appearance,
+          origin: versionData.entityData.origin,
+          alternativeNames: versionData.entityData.alternativeNames,
+          storyRarity: versionData.entityData.storyRarity,
+          narrativePurpose: versionData.entityData.narrativePurpose,
+          usageRequirements: versionData.entityData.usageRequirements,
+          usageConsequences: versionData.entityData.usageConsequences,
+          itemUsage: versionData.entityData.itemUsage,
+          fieldVisibility: {}, // Default empty visibility
+          createdAt: new Date().toISOString(),
+        };
+
         const newVersion: IItemVersion = {
           id: `version-${Date.now()}`,
           name: versionData.name,
           description: versionData.description,
           createdAt: new Date().toISOString(),
           isMain: false,
-          itemData: versionData.itemData,
+          itemData: itemData, // Use the complete converted object
         };
 
         // Salvar no banco de dados
@@ -364,7 +393,7 @@ export default function ItemDetail() {
         console.error("Error creating item version:", error);
       }
     },
-    [itemId]
+    [itemId, item.id]
   );
 
   const handleVersionDelete = useCallback(
