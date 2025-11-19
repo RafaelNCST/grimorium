@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS characters (
   description TEXT,
   image TEXT,
   alignment TEXT,
+  status TEXT,
 
   -- Aparência
   height TEXT,
@@ -52,10 +53,12 @@ CREATE TABLE IF NOT EXISTS characters (
   favorite_food TEXT,
   favorite_music TEXT,
 
-  -- Localização
+  -- História
   birth_place TEXT,
   affiliated_place TEXT,
   organization TEXT,
+  nicknames TEXT,
+  past TEXT,
 
   -- Metadata
   field_visibility TEXT,
