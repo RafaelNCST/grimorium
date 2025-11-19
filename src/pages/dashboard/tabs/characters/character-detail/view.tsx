@@ -3,8 +3,6 @@ import React from "react";
 import {
   AlertCircle,
   Calendar,
-  ChevronDown,
-  ChevronRight,
   Shield,
   Trash2,
   User,
@@ -14,6 +12,14 @@ import { useTranslation } from "react-i18next";
 
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import {
+  DisplayEntityList,
+  DisplaySelectGrid,
+  DisplaySimpleGrid,
+  DisplayStringList,
+  DisplayText,
+  DisplayTextarea,
+} from "@/components/displays";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
@@ -33,11 +39,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -69,13 +70,6 @@ import { RelationshipsSection } from "./components/relationships-section";
 import { VersionCard } from "./components/version-card";
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
-
-// Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
-  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-    <p>{t("character-detail:empty_states.no_data")}</p>
-  </div>
-);
 
 interface ICharacter {
   id: string;
@@ -622,10 +616,11 @@ export function CharacterDetailView({
                   <span>{editData.height?.length || 0}/50</span>
                 </div>
               </>
-            ) : character.height ? (
-              <p className="text-sm">{character.height}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={character.height}
+                emptyText={t("character-detail:empty_states.no_data")}
+              />
             )}
           </FieldWithVisibilityToggle>
 
@@ -649,10 +644,11 @@ export function CharacterDetailView({
                   <span>{editData.weight?.length || 0}/50</span>
                 </div>
               </>
-            ) : character.weight ? (
-              <p className="text-sm">{character.weight}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={character.weight}
+                emptyText={t("character-detail:empty_states.no_data")}
+              />
             )}
           </FieldWithVisibilityToggle>
         </div>
@@ -678,10 +674,11 @@ export function CharacterDetailView({
                 <span>{editData.skinTone?.length || 0}/100</span>
               </div>
             </>
-          ) : character.skinTone ? (
-            <p className="text-sm">{character.skinTone}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayText
+              value={character.skinTone}
+              emptyText={t("character-detail:empty_states.no_data")}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -711,10 +708,11 @@ export function CharacterDetailView({
                   </span>
                 </div>
               </>
-            ) : (character as any)[field] ? (
-              <p className="text-sm">{(character as any)[field]}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={(character as any)[field]}
+                emptyText={t("character-detail:empty_states.no_data")}
+              />
             )}
           </FieldWithVisibilityToggle>
         ))}
@@ -742,60 +740,20 @@ export function CharacterDetailView({
               labelClassName="text-sm font-medium text-primary"
             />
           ) : (
-            <Collapsible
+            <DisplayEntityList
+              label={t("create-character:modal.species_and_race")}
+              entities={
+                character.speciesAndRace?.map((raceId) => {
+                  const race = races.find((r) => r.id === raceId);
+                  return race
+                    ? { id: race.id, name: race.name, image: race.image }
+                    : null;
+                }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
+              }
+              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.speciesAndRace}
               onOpenChange={() => toggleSection("speciesAndRace")}
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                <p className="text-sm font-semibold text-primary">
-                  {t("create-character:modal.species_and_race")}
-                  {character.speciesAndRace &&
-                    character.speciesAndRace.length > 0 && (
-                      <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                        ({character.speciesAndRace.length})
-                      </span>
-                    )}
-                </p>
-                {openSections.speciesAndRace ? (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2">
-                {character.speciesAndRace &&
-                character.speciesAndRace.length > 0 ? (
-                  <div className="flex flex-col gap-2">
-                    {character.speciesAndRace.map((raceId) => {
-                      const race = races.find(r => r.id === raceId);
-                      return race ? (
-                        <div
-                          key={raceId}
-                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                        >
-                          {race.image ? (
-                            <img
-                              src={race.image}
-                              alt={race.name}
-                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                              <span className="text-xs text-muted-foreground font-semibold">
-                                {race.name.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <span className="text-sm font-medium">{race.name}</span>
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
-                ) : (
-                  <EmptyFieldState t={t} />
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -816,29 +774,12 @@ export function CharacterDetailView({
               columns={6}
               options={physicalTypeOptions}
             />
-          ) : character.physicalType ? (
-            (() => {
-              const type = PHYSICAL_TYPES_CONSTANT.find(
-                (t) => t.value === character.physicalType
-              );
-              if (!type) {
-                return <EmptyFieldState t={t} />;
-              }
-              const TypeIcon = type.icon;
-              const colorClass = PHYSICAL_TYPE_ACTIVE_COLOR[type.value];
-              return (
-                <div className={`border-2 p-4 rounded-lg ${colorClass}`}>
-                  <div className="flex items-center gap-3">
-                    <TypeIcon className="w-8 h-8" />
-                    <span className="text-base font-semibold">
-                      {t(`create-character:${type.translationKey}`)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })()
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySimpleGrid
+              value={character.physicalType}
+              options={physicalTypeOptions}
+              emptyText={t("character-detail:empty_states.no_data")}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -869,12 +810,11 @@ export function CharacterDetailView({
                 <span>{editData.distinguishingFeatures?.length || 0}/400</span>
               </div>
             </>
-          ) : character.distinguishingFeatures ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {character.distinguishingFeatures}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={character.distinguishingFeatures}
+              emptyText={t("character-detail:empty_states.no_data")}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -904,31 +844,13 @@ export function CharacterDetailView({
               columns={4}
               options={archetypeOptions}
             />
-          ) : character.archetype ? (
-            (() => {
-              const archetype = CHARACTER_ARCHETYPES_CONSTANT.find(
-                (a) => a.value === character.archetype
-              );
-              if (!archetype) {
-                return <EmptyFieldState t={t} />;
-              }
-              const ArchetypeIcon = archetype.icon;
-              return (
-                <div className="border-2 border-primary bg-primary/10 p-6 rounded-lg shadow-md">
-                  <div className="flex flex-col items-center gap-4 text-center">
-                    <ArchetypeIcon className="w-12 h-12 text-primary" />
-                    <span className="text-lg font-semibold">
-                      {t(`create-character:${archetype.translationKey}`)}
-                    </span>
-                    <p className="text-sm text-muted-foreground max-w-md">
-                      {t(`create-character:${archetype.descriptionKey}`)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })()
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={character.archetype}
+              options={archetypeOptions}
+              emptyText={t("character-detail:empty_states.no_data")}
+              emptyDescription={t("character-detail:empty_states.no_data")}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -960,10 +882,11 @@ export function CharacterDetailView({
                     <span>{(editData as any)[field]?.length || 0}/100</span>
                   </div>
                 </>
-              ) : (character as any)[field] ? (
-                <p className="text-sm">{(character as any)[field]}</p>
               ) : (
-                <EmptyFieldState t={t} />
+                <DisplayText
+                  value={(character as any)[field]}
+                  emptyText={t("character-detail:empty_states.no_data")}
+                />
               )}
             </FieldWithVisibilityToggle>
           ))}
@@ -999,12 +922,11 @@ export function CharacterDetailView({
                     <span>{(editData as any)[field]?.length || 0}/500</span>
                   </div>
                 </>
-              ) : (character as any)[field] ? (
-                <p className="text-sm whitespace-pre-wrap">
-                  {(character as any)[field]}
-                </p>
               ) : (
-                <EmptyFieldState t={t} />
+                <DisplayTextarea
+                  value={(character as any)[field]}
+                  emptyText={t("character-detail:empty_states.no_data")}
+                />
               )}
             </FieldWithVisibilityToggle>
           )
@@ -1060,58 +982,20 @@ export function CharacterDetailView({
               maxSelections={1}
             />
           ) : (
-            <Collapsible
+            <DisplayEntityList
+              label={t("character-detail:fields.birth_place")}
+              entities={
+                character.birthPlace?.map((regionId) => {
+                  const region = regions.find((r) => r.id === regionId);
+                  return region
+                    ? { id: region.id, name: region.name, image: region.image }
+                    : null;
+                }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
+              }
+              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.birthPlace}
               onOpenChange={() => toggleSection("birthPlace")}
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                <p className="text-sm font-semibold text-primary">
-                  {t("character-detail:fields.birth_place")}
-                  {character.birthPlace && character.birthPlace.length > 0 && (
-                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                      ({character.birthPlace.length})
-                    </span>
-                  )}
-                </p>
-                {openSections.birthPlace ? (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2">
-                {character.birthPlace && character.birthPlace.length > 0 ? (
-                  <div className="flex flex-col gap-2">
-                    {character.birthPlace.map((regionId) => {
-                      const region = regions.find(r => r.id === regionId);
-                      return region ? (
-                        <div
-                          key={regionId}
-                          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                        >
-                          {region.image ? (
-                            <img
-                              src={region.image}
-                              alt={region.name}
-                              className="w-8 h-8 rounded object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                              <span className="text-xs text-muted-foreground font-semibold">
-                                {region.name.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <span className="text-sm font-medium">{region.name}</span>
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
-                ) : (
-                  <EmptyFieldState t={t} />
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -1135,39 +1019,13 @@ export function CharacterDetailView({
               maxLength={100}
             />
           ) : (
-            <Collapsible
+            <DisplayStringList
+              label={t("character-detail:fields.nicknames")}
+              items={character.nicknames}
+              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.nicknames}
               onOpenChange={() => toggleSection("nicknames")}
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                <p className="text-sm font-semibold text-primary">
-                  {t("character-detail:fields.nicknames")}
-                  {character.nicknames && character.nicknames.length > 0 && (
-                    <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                      ({character.nicknames.length})
-                    </span>
-                  )}
-                </p>
-                {openSections.nicknames ? (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                )}
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2">
-                {character.nicknames && character.nicknames.length > 0 ? (
-                  <ul className="list-disc list-inside space-y-1">
-                    {character.nicknames.map((nickname, index) => (
-                      <li key={index} className="text-sm">
-                        {nickname}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <EmptyFieldState t={t} />
-                )}
-              </CollapsibleContent>
-            </Collapsible>
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -1194,10 +1052,11 @@ export function CharacterDetailView({
                 <span>{editData.past?.length || 0}/1000</span>
               </div>
             </>
-          ) : character.past ? (
-            <p className="text-sm whitespace-pre-wrap">{character.past}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={character.past}
+              emptyText={t("character-detail:empty_states.no_data")}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>

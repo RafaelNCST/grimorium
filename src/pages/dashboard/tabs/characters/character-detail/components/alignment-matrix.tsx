@@ -86,7 +86,7 @@ export function AlignmentMatrix({
   if (!isEditable) {
     if (!value) {
       return (
-        <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center">
+        <div className="border-2 border-muted-foreground/30 bg-muted/20 p-6 rounded-lg text-center ring-4 ring-gray-500/30">
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
               <Target className="w-6 h-6 text-muted-foreground" />
