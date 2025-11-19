@@ -76,9 +76,9 @@ export function ItemNavigationSidebar({
       {currentItem && (
         <div className="p-2 border-b border-border bg-card">
           <div className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/30 cursor-default">
-            <Avatar className="w-10 h-10 flex-shrink-0">
-              <AvatarImage src={currentItem.image} />
-              <AvatarFallback className="text-sm">
+            <Avatar className="w-10 h-10 flex-shrink-0 rounded-md">
+              <AvatarImage src={currentItem.image} className="object-cover" />
+              <AvatarFallback className="text-sm rounded-md">
                 {currentItem.name
                   .split(" ")
                   .map((n) => n[0])
@@ -113,9 +113,9 @@ export function ItemNavigationSidebar({
                   }}
                   className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors hover:bg-muted/50"
                 >
-                  <Avatar className="w-10 h-10 flex-shrink-0">
-                    <AvatarImage src={item.image} />
-                    <AvatarFallback className="text-sm">
+                  <Avatar className="w-10 h-10 flex-shrink-0 rounded-md">
+                    <AvatarImage src={item.image} className="object-cover" />
+                    <AvatarFallback className="text-sm rounded-md">
                       {item.name
                         .split(" ")
                         .map((n) => n[0])

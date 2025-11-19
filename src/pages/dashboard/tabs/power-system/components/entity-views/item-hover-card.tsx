@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
@@ -81,17 +80,24 @@ export function ItemHoverCard({ itemId, children }: ItemHoverCardProps) {
           <div className="p-1 space-y-4">
             {/* Top Section: Image + Name/Category/Status */}
             <div className="flex gap-4">
-              {/* Item Image - Circular */}
-              <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage src={item.image} className="object-cover" />
-                <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                  {item.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              {/* Item Image - Square */}
+              <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10">
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xl font-semibold">
+                    {item.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)}
+                  </div>
+                )}
+              </div>
 
               {/* Name, Category, and Status */}
               <div className="flex-1 min-w-0 space-y-2">

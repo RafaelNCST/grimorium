@@ -129,14 +129,11 @@ const ItemsViewComponent = function ItemsView({
         }}
         showNoResultsState={filteredItems.length === 0 && items.length > 0}
       >
-        <EntityCardList
-          items={filteredItems}
-          renderCard={(item) => (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4">
+          {filteredItems.map((item) => (
             <ItemCard key={item.id} item={item} onClick={onNavigateToItem} />
-          )}
-          gridCols={{ sm: 1, md: 2, lg: 3, xl: 4 }}
-          gap={4}
-        />
+          ))}
+        </div>
       </EntityListLayout>
 
       <CreateItemModal

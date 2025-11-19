@@ -120,7 +120,7 @@ export function ItemSelector({
                       >
                         <div className="flex items-center gap-3">
                           <Avatar className="w-8 h-8 rounded-md">
-                            <AvatarImage src={item.image} alt={item.name} />
+                            <AvatarImage src={item.image} alt={item.name} className="object-cover" />
                             <AvatarFallback className="text-xs rounded-md !text-foreground">
                               {getInitials(item.name)}
                             </AvatarFallback>
@@ -144,7 +144,7 @@ export function ItemSelector({
                     className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
                   >
                     <Avatar className="w-10 h-10 rounded-md">
-                      <AvatarImage src={item.image} alt={item.name} />
+                      <AvatarImage src={item.image} alt={item.name} className="object-cover" />
                       <AvatarFallback className="text-xs rounded-md">
                         {getInitials(item.name)}
                       </AvatarFallback>

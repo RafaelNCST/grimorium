@@ -2,7 +2,6 @@ import React from "react";
 
 import { AlertCircle, Info, Menu, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { convertFileSrc } from "@tauri-apps/api/core";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
@@ -178,13 +177,13 @@ export const ItemDetailView = React.memo(function ItemDetailView({
       {isEditing ? (
         <div className="space-y-6">
           {/* Item Image */}
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-sm mx-auto">
             <FormImageUpload
               value={editData.image || ""}
               onChange={(value) => onEditDataChange("image", value)}
               label={t("create-item:modal.image")}
               helperText={t("create-item:modal.upload_image")}
-              height="h-48"
+              height="aspect-square"
               shape="rounded"
               imageFit="cover"
               placeholderIcon={Package}
@@ -280,20 +279,22 @@ export const ItemDetailView = React.memo(function ItemDetailView({
         <>
           {/* View mode - keep original layout */}
           {item.image ? (
-            <div className="relative w-full h-48">
+            <div className="relative w-full max-w-sm mx-auto aspect-square">
               <img
-                src={convertFileSrc(item.image)}
+                src={item.image}
                 alt={item.name}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
           ) : (
-            <FormImageDisplay
-              icon={Package}
-              height="h-48"
-              width="w-full"
-              shape="rounded"
-            />
+            <div className="max-w-sm mx-auto aspect-square">
+              <FormImageDisplay
+                icon={Package}
+                height="h-full"
+                width="w-full"
+                shape="rounded"
+              />
+            </div>
           )}
 
           <div className="space-y-3 mt-4">
