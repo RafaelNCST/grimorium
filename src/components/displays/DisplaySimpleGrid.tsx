@@ -151,7 +151,7 @@ interface DisplaySimpleGridProps<T = string> {
 export function DisplaySimpleGrid<T extends string = string>({
   value,
   options,
-  emptyText = "Não definido",
+  emptyText = "Sem dados",
   className,
 }: DisplaySimpleGridProps<T>) {
   // Find the matching option

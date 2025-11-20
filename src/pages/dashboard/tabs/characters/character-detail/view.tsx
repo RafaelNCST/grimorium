@@ -619,7 +619,6 @@ export function CharacterDetailView({
             ) : (
               <DisplayText
                 value={character.height}
-                emptyText={t("character-detail:empty_states.no_data")}
               />
             )}
           </FieldWithVisibilityToggle>
@@ -647,7 +646,6 @@ export function CharacterDetailView({
             ) : (
               <DisplayText
                 value={character.weight}
-                emptyText={t("character-detail:empty_states.no_data")}
               />
             )}
           </FieldWithVisibilityToggle>
@@ -677,7 +675,6 @@ export function CharacterDetailView({
           ) : (
             <DisplayText
               value={character.skinTone}
-              emptyText={t("character-detail:empty_states.no_data")}
             />
           )}
         </FieldWithVisibilityToggle>
@@ -711,7 +708,6 @@ export function CharacterDetailView({
             ) : (
               <DisplayText
                 value={(character as any)[field]}
-                emptyText={t("character-detail:empty_states.no_data")}
               />
             )}
           </FieldWithVisibilityToggle>
@@ -732,7 +728,6 @@ export function CharacterDetailView({
               bookId={bookId}
               label=""
               placeholder={t("create-character:modal.species_placeholder")}
-              emptyText={t("create-character:modal.no_species_warning")}
               noSelectionText={t("create-character:modal.no_species_selected")}
               searchPlaceholder={t("create-character:modal.search_species")}
               value={editData.speciesAndRace || []}
@@ -750,7 +745,6 @@ export function CharacterDetailView({
                     : null;
                 }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
               }
-              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.speciesAndRace}
               onOpenChange={() => toggleSection("speciesAndRace")}
             />
@@ -778,7 +772,6 @@ export function CharacterDetailView({
             <DisplaySimpleGrid
               value={character.physicalType}
               options={physicalTypeOptions}
-              emptyText={t("character-detail:empty_states.no_data")}
             />
           )}
         </FieldWithVisibilityToggle>
@@ -813,7 +806,6 @@ export function CharacterDetailView({
           ) : (
             <DisplayTextarea
               value={character.distinguishingFeatures}
-              emptyText={t("character-detail:empty_states.no_data")}
             />
           )}
         </FieldWithVisibilityToggle>
@@ -848,8 +840,6 @@ export function CharacterDetailView({
             <DisplaySelectGrid
               value={character.archetype}
               options={archetypeOptions}
-              emptyText={t("character-detail:empty_states.no_data")}
-              emptyDescription={t("character-detail:empty_states.no_data")}
             />
           )}
         </FieldWithVisibilityToggle>
@@ -885,8 +875,7 @@ export function CharacterDetailView({
               ) : (
                 <DisplayText
                   value={(character as any)[field]}
-                  emptyText={t("character-detail:empty_states.no_data")}
-                />
+                  />
               )}
             </FieldWithVisibilityToggle>
           ))}
@@ -925,8 +914,7 @@ export function CharacterDetailView({
               ) : (
                 <DisplayTextarea
                   value={(character as any)[field]}
-                  emptyText={t("character-detail:empty_states.no_data")}
-                />
+                  />
               )}
             </FieldWithVisibilityToggle>
           )
@@ -971,7 +959,6 @@ export function CharacterDetailView({
               bookId={bookId}
               label=""
               placeholder={t("create-character:modal.birth_place_placeholder")}
-              emptyText={t("create-character:modal.no_locations_warning")}
               noSelectionText={t(
                 "create-character:modal.no_birth_place_selected"
               )}
@@ -992,7 +979,6 @@ export function CharacterDetailView({
                     : null;
                 }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
               }
-              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.birthPlace}
               onOpenChange={() => toggleSection("birthPlace")}
             />
@@ -1022,7 +1008,6 @@ export function CharacterDetailView({
             <DisplayStringList
               label={t("character-detail:fields.nicknames")}
               items={character.nicknames}
-              emptyText={t("character-detail:empty_states.no_data")}
               open={openSections.nicknames}
               onOpenChange={() => toggleSection("nicknames")}
             />
@@ -1055,7 +1040,6 @@ export function CharacterDetailView({
           ) : (
             <DisplayTextarea
               value={character.past}
-              emptyText={t("character-detail:empty_states.no_data")}
             />
           )}
         </FieldWithVisibilityToggle>

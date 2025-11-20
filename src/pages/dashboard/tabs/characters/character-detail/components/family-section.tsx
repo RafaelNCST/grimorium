@@ -95,7 +95,6 @@ const FamilyFieldOptimized = React.memo(
         bookId={bookId}
         label=""
         placeholder={placeholder}
-        emptyText={t("character-detail:family.no_characters")}
         noSelectionText={noSelectionText}
         searchPlaceholder={t("character-detail:family.search_characters")}
         value={value}

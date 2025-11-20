@@ -97,7 +97,7 @@ interface DisplayEntityListProps {
 export function DisplayEntityList({
   label,
   entities,
-  emptyText = "Nenhum item",
+  emptyText = "Sem dados",
   defaultOpen = false,
   open,
   onOpenChange,

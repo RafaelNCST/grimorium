@@ -39,7 +39,7 @@ interface DisplayTextareaProps {
  */
 export function DisplayTextarea({
   value,
-  emptyText = "Não definido",
+  emptyText = "Sem dados",
   className,
 }: DisplayTextareaProps) {
   // If no value, show empty state

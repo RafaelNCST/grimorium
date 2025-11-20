@@ -76,7 +76,7 @@ interface DisplayStringListProps {
 export function DisplayStringList({
   label,
   items,
-  emptyText = "Nenhum item",
+  emptyText = "Sem dados",
   defaultOpen = false,
   open,
   onOpenChange,

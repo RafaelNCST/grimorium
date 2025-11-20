@@ -4,8 +4,15 @@ import { Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import {
+  DisplayText,
+  DisplayTextarea,
+  DisplayStringList,
+  DisplaySelectGrid,
+} from "@/components/displays";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormListInput } from "@/components/forms/FormListInput";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { DietPicker } from "@/components/modals/create-race-modal/components/diet-picker";
 import { DomainPicker } from "@/components/modals/create-race-modal/components/domain-picker";
@@ -13,7 +20,13 @@ import { HabitsPicker } from "@/components/modals/create-race-modal/components/h
 import { MoralTendencyPicker } from "@/components/modals/create-race-modal/components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/components/physical-capacity-picker";
 import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
+import { RACE_COMMUNICATIONS } from "@/components/modals/create-race-modal/constants/communications";
+import { DIET_OPTIONS } from "@/components/modals/create-race-modal/constants/diets";
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
+import { HABITS_OPTIONS } from "@/components/modals/create-race-modal/constants/habits";
+import { MORAL_TENDENCY_OPTIONS } from "@/components/modals/create-race-modal/constants/moral-tendencies";
+import { PHYSICAL_CAPACITY_OPTIONS } from "@/components/modals/create-race-modal/constants/physical-capacities";
+import { REPRODUCTIVE_CYCLE_OPTIONS } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
 import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,9 +35,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
-import { AlternativeNamesDisplay } from "./components/alternative-names-display";
 import { CommunicationDisplay } from "./components/communication-display";
-import { HabitatDisplay } from "./components/habitat-display";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
 import { RaceViewsDisplay } from "./components/race-views-display";
@@ -314,26 +325,27 @@ export function RaceDetailView({
         {/* Alternative Names */}
         <FieldWithVisibilityToggle
           fieldName="alternativeNames"
-          label={t("race-detail:fields.alternative_names")}
           isOptional
           fieldVisibility={fieldVisibility}
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
           {isEditing ? (
-            <AlternativeNamesDisplay
-              names={editData.alternativeNames || []}
-              isEditing={isEditing}
-              onNamesChange={(names) => onEditDataChange("alternativeNames", names)}
-            />
-          ) : race.alternativeNames && race.alternativeNames.length > 0 ? (
-            <AlternativeNamesDisplay
-              names={race.alternativeNames}
-              isEditing={false}
-              onNamesChange={() => {}}
+            <FormListInput
+              value={editData.alternativeNames || []}
+              onChange={(value) => onEditDataChange("alternativeNames", value)}
+              label={t("race-detail:fields.alternative_names")}
+              placeholder={t("create-race:modal.alternative_names_placeholder")}
+              buttonText={t("create-race:modal.add_name")}
+              maxLength={100}
+              inputSize="small"
+              labelClassName="text-sm font-medium text-primary"
             />
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayStringList
+              label={t("race-detail:fields.alternative_names")}
+              items={race.alternativeNames}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -388,10 +400,10 @@ export function RaceDetailView({
                 <span>{editData.culturalNotes?.length || 0}/1500</span>
               </div>
             </>
-          ) : race.culturalNotes ? (
-            <p className="text-sm whitespace-pre-wrap">{race.culturalNotes}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.culturalNotes}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -427,10 +439,10 @@ export function RaceDetailView({
                 <span>{editData.generalAppearance?.length || 0}/500</span>
               </div>
             </>
-          ) : race.generalAppearance ? (
-            <p className="text-sm whitespace-pre-wrap">{race.generalAppearance}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.generalAppearance}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -456,10 +468,10 @@ export function RaceDetailView({
                   <span>{editData.lifeExpectancy?.length || 0}/100</span>
                 </div>
               </>
-            ) : race.lifeExpectancy ? (
-              <p className="text-sm">{race.lifeExpectancy}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={race.lifeExpectancy}
+                />
             )}
           </FieldWithVisibilityToggle>
 
@@ -483,10 +495,10 @@ export function RaceDetailView({
                   <span>{editData.averageHeight?.length || 0}/100</span>
                 </div>
               </>
-            ) : race.averageHeight ? (
-              <p className="text-sm">{race.averageHeight}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={race.averageHeight}
+                />
             )}
           </FieldWithVisibilityToggle>
 
@@ -510,10 +522,10 @@ export function RaceDetailView({
                   <span>{editData.averageWeight?.length || 0}/100</span>
                 </div>
               </>
-            ) : race.averageWeight ? (
-              <p className="text-sm">{race.averageWeight}</p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayText
+                value={race.averageWeight}
+                />
             )}
           </FieldWithVisibilityToggle>
         </div>
@@ -547,12 +559,10 @@ export function RaceDetailView({
                 </span>
               </div>
             </>
-          ) : race.specialPhysicalCharacteristics ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {race.specialPhysicalCharacteristics}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.specialPhysicalCharacteristics}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -579,10 +589,11 @@ export function RaceDetailView({
               value={editData.habits || ""}
               onChange={(value) => onEditDataChange("habits", value)}
             />
-          ) : race.habits ? (
-            <p className="text-sm whitespace-pre-wrap">{race.habits}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={race.habits}
+              options={HABITS_OPTIONS}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -604,10 +615,11 @@ export function RaceDetailView({
                 onEditDataChange("otherCycleDescription", value)
               }
             />
-          ) : race.reproductiveCycle ? (
-            <p className="text-sm whitespace-pre-wrap">{race.reproductiveCycle}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={race.reproductiveCycle}
+              options={REPRODUCTIVE_CYCLE_OPTIONS}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -629,10 +641,11 @@ export function RaceDetailView({
                 onEditDataChange("elementalDiet", value)
               }
             />
-          ) : race.diet ? (
-            <p className="text-sm whitespace-pre-wrap">{race.diet}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={race.diet}
+              options={DIET_OPTIONS}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -654,13 +667,62 @@ export function RaceDetailView({
               }
             />
           ) : race.communication && race.communication.length > 0 ? (
-            <CommunicationDisplay
-              communication={race.communication}
-              isEditing={false}
-              onCommunicationChange={() => {}}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {race.communication.map((commValue) => {
+                const commOption = RACE_COMMUNICATIONS.find((c) => c.value === commValue);
+                if (!commOption) return null;
+
+                // Convert to DisplaySelectGrid format
+                const displayOption = {
+                  value: commOption.value,
+                  label: commOption.label,
+                  description: commOption.description,
+                  icon: commOption.icon,
+                  backgroundColor: commOption.color.includes("blue") ? "blue-500/10" :
+                                 commOption.color.includes("purple") ? "purple-500/10" :
+                                 commOption.color.includes("green") ? "green-500/10" :
+                                 commOption.color.includes("amber") ? "amber-500/10" :
+                                 commOption.color.includes("violet") ? "violet-500/10" :
+                                 "gray-500/10",
+                  borderColor: commOption.color.includes("blue") ? "blue-500/30" :
+                              commOption.color.includes("purple") ? "purple-500/30" :
+                              commOption.color.includes("green") ? "green-500/30" :
+                              commOption.color.includes("amber") ? "amber-500/30" :
+                              commOption.color.includes("violet") ? "violet-500/30" :
+                              "gray-500/30",
+                };
+
+                return (
+                  <DisplaySelectGrid
+                    key={commValue}
+                    value={commValue}
+                    options={[displayOption]}
+                        />
+                );
+              })}
+            </div>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={null}
+              options={RACE_COMMUNICATIONS.map(c => ({
+                value: c.value,
+                label: c.label,
+                description: c.description,
+                icon: c.icon,
+                backgroundColor: c.color.includes("blue") ? "blue-500/10" :
+                               c.color.includes("purple") ? "purple-500/10" :
+                               c.color.includes("green") ? "green-500/10" :
+                               c.color.includes("amber") ? "amber-500/10" :
+                               c.color.includes("violet") ? "violet-500/10" :
+                               "gray-500/10",
+                borderColor: c.color.includes("blue") ? "blue-500/30" :
+                            c.color.includes("purple") ? "purple-500/30" :
+                            c.color.includes("green") ? "green-500/30" :
+                            c.color.includes("amber") ? "amber-500/30" :
+                            c.color.includes("violet") ? "violet-500/30" :
+                            "gray-500/30",
+              }))}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -678,10 +740,11 @@ export function RaceDetailView({
               value={editData.moralTendency || ""}
               onChange={(value) => onEditDataChange("moralTendency", value)}
             />
-          ) : race.moralTendency ? (
-            <p className="text-sm">{race.moralTendency}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={race.moralTendency}
+              options={MORAL_TENDENCY_OPTIONS}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -710,36 +773,37 @@ export function RaceDetailView({
                 <span>{editData.socialOrganization?.length || 0}/500</span>
               </div>
             </>
-          ) : race.socialOrganization ? (
-            <p className="text-sm whitespace-pre-wrap">{race.socialOrganization}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.socialOrganization}
+            />
           )}
         </FieldWithVisibilityToggle>
 
         {/* Habitat */}
         <FieldWithVisibilityToggle
           fieldName="habitat"
-          label={t("race-detail:fields.habitat")}
           isOptional
           fieldVisibility={fieldVisibility}
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
           {isEditing ? (
-            <HabitatDisplay
-              habitat={editData.habitat}
-              isEditing={isEditing}
-              onHabitatChange={(habitat) => onEditDataChange("habitat", habitat)}
-            />
-          ) : race.habitat && race.habitat.length > 0 ? (
-            <HabitatDisplay
-              habitat={race.habitat}
-              isEditing={false}
-              onHabitatChange={() => {}}
+            <FormListInput
+              value={editData.habitat || []}
+              onChange={(value) => onEditDataChange("habitat", value)}
+              label={t("race-detail:fields.habitat")}
+              placeholder={t("create-race:modal.habitat_placeholder")}
+              buttonText={t("create-race:modal.add_habitat")}
+              maxLength={50}
+              inputSize="small"
+              labelClassName="text-sm font-medium text-primary"
             />
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayStringList
+              label={t("race-detail:fields.habitat")}
+              items={race.habitat}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -766,10 +830,11 @@ export function RaceDetailView({
               value={editData.physicalCapacity || ""}
               onChange={(value) => onEditDataChange("physicalCapacity", value)}
             />
-          ) : race.physicalCapacity ? (
-            <p className="text-sm whitespace-pre-wrap">{race.physicalCapacity}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={race.physicalCapacity}
+              options={PHYSICAL_CAPACITY_OPTIONS}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -798,12 +863,10 @@ export function RaceDetailView({
                 <span>{editData.specialCharacteristics?.length || 0}/500</span>
               </div>
             </>
-          ) : race.specialCharacteristics ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {race.specialCharacteristics}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.specialCharacteristics}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -830,10 +893,10 @@ export function RaceDetailView({
                 <span>{editData.weaknesses?.length || 0}/500</span>
               </div>
             </>
-          ) : race.weaknesses ? (
-            <p className="text-sm whitespace-pre-wrap">{race.weaknesses}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.weaknesses}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -869,10 +932,10 @@ export function RaceDetailView({
                 <span>{editData.storyMotivation?.length || 0}/500</span>
               </div>
             </>
-          ) : race.storyMotivation ? (
-            <p className="text-sm whitespace-pre-wrap">{race.storyMotivation}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.storyMotivation}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -899,10 +962,10 @@ export function RaceDetailView({
                 <span>{editData.inspirations?.length || 0}/500</span>
               </div>
             </>
-          ) : race.inspirations ? (
-            <p className="text-sm whitespace-pre-wrap">{race.inspirations}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea
+              value={race.inspirations}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>

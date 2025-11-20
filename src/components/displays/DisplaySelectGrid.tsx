@@ -163,8 +163,8 @@ interface DisplaySelectGridProps<T = string> {
 export function DisplaySelectGrid<T extends string = string>({
   value,
   options,
-  emptyText = "Não definido",
-  emptyDescription = "Nenhuma seleção disponível",
+  emptyText = "Sem dados",
+  emptyDescription = "Sem dados",
   className,
 }: DisplaySelectGridProps<T>) {
   // Find the matching option

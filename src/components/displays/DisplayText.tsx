@@ -39,7 +39,7 @@ interface DisplayTextProps {
  */
 export function DisplayText({
   value,
-  emptyText = "Não definido",
+  emptyText = "Sem dados",
   className,
 }: DisplayTextProps) {
   // If no value, show empty state
