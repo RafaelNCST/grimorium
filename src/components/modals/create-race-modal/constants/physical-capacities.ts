@@ -7,6 +7,8 @@ import {
   LucideIcon,
 } from "lucide-react";
 
+import { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
 export type RacePhysicalCapacity =
   | "powerless"
   | "weaker"
@@ -72,3 +74,32 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
     borderColor: "border-purple-200 dark:border-purple-800",
   },
 ];
+
+// Helper para converter para o formato do FormSelectGrid
+const convertToTailwindAlpha = (bgColor: string): string => {
+  // Converte "bg-red-50 dark:bg-red-950" para "red-500/10"
+  const colorMatch = bgColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/10`;
+  }
+  return "gray-500/10";
+};
+
+const convertBorderToTailwindAlpha = (borderColor: string): string => {
+  // Converte "border-red-200 dark:border-red-800" para "red-500/30"
+  const colorMatch = borderColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/30`;
+  }
+  return "gray-500/30";
+};
+
+export const PHYSICAL_CAPACITY_OPTIONS: GridSelectOption<RacePhysicalCapacity>[] =
+  RACE_PHYSICAL_CAPACITIES.map((capacity) => ({
+    value: capacity.value,
+    label: capacity.label,
+    description: capacity.description,
+    icon: capacity.icon,
+    backgroundColor: convertToTailwindAlpha(capacity.bgColor),
+    borderColor: convertBorderToTailwindAlpha(capacity.borderColor),
+  }));

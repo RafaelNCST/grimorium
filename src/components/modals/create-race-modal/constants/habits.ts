@@ -10,6 +10,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
 export type RaceHabit =
   | "nocturnal"
   | "diurnal"
@@ -104,3 +106,31 @@ export const RACE_HABITS: RaceHabitOption[] = [
     borderColor: "border-red-200 dark:border-red-800",
   },
 ];
+
+// Helper para converter para o formato do FormSelectGrid
+const convertToTailwindAlpha = (bgColor: string): string => {
+  const colorMatch = bgColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/10`;
+  }
+  return "gray-500/10";
+};
+
+const convertBorderToTailwindAlpha = (borderColor: string): string => {
+  const colorMatch = borderColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/30`;
+  }
+  return "gray-500/30";
+};
+
+export const HABITS_OPTIONS: GridSelectOption<RaceHabit>[] = RACE_HABITS.map(
+  (habit) => ({
+    value: habit.value,
+    label: habit.label,
+    description: habit.description,
+    icon: habit.icon,
+    backgroundColor: convertToTailwindAlpha(habit.bgColor),
+    borderColor: convertBorderToTailwindAlpha(habit.borderColor),
+  })
+);

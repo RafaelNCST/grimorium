@@ -49,6 +49,7 @@ export interface IRace {
   // Behaviors (all optional)
   habits?: string;
   reproductiveCycle?: string;
+  otherReproductiveCycleDescription?: string;
   diet?: string;
   elementalDiet?: string;
   communication?: string[];

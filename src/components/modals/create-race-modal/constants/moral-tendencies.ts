@@ -8,6 +8,8 @@ import {
   LucideIcon,
 } from "lucide-react";
 
+import { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
 export type RaceMoralTendency =
   | "chaotic"
   | "neutral"
@@ -88,3 +90,30 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
     borderColor: "border-purple-200 dark:border-purple-800",
   },
 ];
+
+// Helper para converter para o formato do FormSelectGrid
+const convertToTailwindAlpha = (bgColor: string): string => {
+  const colorMatch = bgColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/10`;
+  }
+  return "gray-500/10";
+};
+
+const convertBorderToTailwindAlpha = (borderColor: string): string => {
+  const colorMatch = borderColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/30`;
+  }
+  return "gray-500/30";
+};
+
+export const MORAL_TENDENCY_OPTIONS: GridSelectOption<RaceMoralTendency>[] =
+  RACE_MORAL_TENDENCIES.map((tendency) => ({
+    value: tendency.value,
+    label: tendency.label,
+    description: tendency.description,
+    icon: tendency.icon,
+    backgroundColor: convertToTailwindAlpha(tendency.bgColor),
+    borderColor: convertBorderToTailwindAlpha(tendency.borderColor),
+  }));

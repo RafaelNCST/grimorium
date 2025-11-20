@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { Dna, Users } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -76,7 +76,7 @@ export function CreateRaceModalView({
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"
-                placeholderIcon={Users}
+                placeholderIcon={Dna}
                 id="race-image-upload"
               />
             </div>
@@ -257,6 +257,11 @@ export function CreateRaceModalView({
               <ReproductiveCyclePicker
                 value={watchedValues.reproductiveCycle || ""}
                 onChange={(value) => setValue("reproductiveCycle", value)}
+                otherCycleDescription={watchedValues.otherReproductiveCycleDescription || ""}
+                onOtherCycleDescriptionChange={(value) =>
+                  setValue("otherReproductiveCycleDescription", value)
+                }
+                otherCycleError={errors.otherReproductiveCycleDescription?.message}
               />
 
               {/* Diet */}

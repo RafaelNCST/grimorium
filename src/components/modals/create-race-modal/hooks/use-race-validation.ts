@@ -64,6 +64,10 @@ export const raceFormSchema = z
     // Behaviors (all optional)
     habits: z.string().optional(),
     reproductiveCycle: z.string().optional(),
+    otherReproductiveCycleDescription: z
+      .string()
+      .max(500, "validation.other_reproductive_cycle_max_length")
+      .optional(),
     diet: z.string().optional(),
     elementalDiet: z
       .string()
@@ -97,20 +101,7 @@ export const raceFormSchema = z
       .string()
       .max(500, "validation.inspirations_max_length")
       .optional(),
-  })
-  .refine(
-    (data) => {
-      // If diet is elemental, elementalDiet is required
-      if (data.diet === "elemental") {
-        return !!data.elementalDiet && data.elementalDiet.trim().length > 0;
-      }
-      return true;
-    },
-    {
-      message: "validation.elemental_diet_required",
-      path: ["elementalDiet"],
-    }
-  );
+  });
 
 export type RaceFormSchema = z.infer<typeof raceFormSchema>;
 

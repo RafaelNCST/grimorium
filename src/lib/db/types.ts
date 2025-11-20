@@ -181,6 +181,7 @@ export interface DBRace {
   // Behaviors
   habits?: string;
   reproductive_cycle?: string;
+  other_reproductive_cycle_description?: string;
   diet?: string;
   elemental_diet?: string;
   communication?: string; // JSON array string

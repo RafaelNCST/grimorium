@@ -11,6 +11,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
 export type RaceDiet =
   | "herbivore"
   | "carnivore"
@@ -117,3 +119,31 @@ export const RACE_DIETS: RaceDietOption[] = [
     requiresElement: true,
   },
 ];
+
+// Helper para converter para o formato do FormSelectGrid
+const convertToTailwindAlpha = (bgColor: string): string => {
+  const colorMatch = bgColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/10`;
+  }
+  return "gray-500/10";
+};
+
+const convertBorderToTailwindAlpha = (borderColor: string): string => {
+  const colorMatch = borderColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  if (colorMatch) {
+    return `${colorMatch[1]}-500/30`;
+  }
+  return "gray-500/30";
+};
+
+export const DIET_OPTIONS: GridSelectOption<RaceDiet>[] = RACE_DIETS.map(
+  (diet) => ({
+    value: diet.value,
+    label: diet.label,
+    description: diet.description,
+    icon: diet.icon,
+    backgroundColor: convertToTailwindAlpha(diet.bgColor),
+    borderColor: convertBorderToTailwindAlpha(diet.borderColor),
+  })
+);

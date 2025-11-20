@@ -31,6 +31,7 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     special_physical_characteristics: race.specialPhysicalCharacteristics,
     habits: race.habits,
     reproductive_cycle: race.reproductiveCycle,
+    other_reproductive_cycle_description: race.otherReproductiveCycleDescription,
     diet: race.diet,
     elemental_diet: race.elementalDiet,
     communication: race.communication
@@ -74,6 +75,7 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     specialPhysicalCharacteristics: dbRace.special_physical_characteristics,
     habits: dbRace.habits,
     reproductiveCycle: dbRace.reproductive_cycle,
+    otherReproductiveCycleDescription: dbRace.other_reproductive_cycle_description,
     diet: dbRace.diet,
     elementalDiet: dbRace.elemental_diet,
     communication: dbRace.communication
@@ -122,15 +124,15 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
       alternative_names, race_views, cultural_notes,
       general_appearance, life_expectancy, average_height, average_weight,
       special_physical_characteristics,
-      habits, reproductive_cycle, diet, elemental_diet, communication,
+      habits, reproductive_cycle, other_reproductive_cycle_description, diet, elemental_diet, communication,
       moral_tendency, social_organization, habitat,
       physical_capacity, special_characteristics, weaknesses,
       story_motivation, inspirations,
       field_visibility, created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-      $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29,
-      $30, $31, $32
+      $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+      $31, $32, $33
     )`,
     [
       dbRace.id,
@@ -151,6 +153,7 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
       dbRace.special_physical_characteristics,
       dbRace.habits,
       dbRace.reproductive_cycle,
+      dbRace.other_reproductive_cycle_description,
       dbRace.diet,
       dbRace.elemental_diet,
       dbRace.communication,
@@ -205,12 +208,12 @@ export async function updateRace(
       alternative_names = $7, race_views = $8, cultural_notes = $9,
       general_appearance = $10, life_expectancy = $11, average_height = $12,
       average_weight = $13, special_physical_characteristics = $14,
-      habits = $15, reproductive_cycle = $16, diet = $17, elemental_diet = $18,
-      communication = $19, moral_tendency = $20, social_organization = $21,
-      habitat = $22, physical_capacity = $23, special_characteristics = $24,
-      weaknesses = $25, story_motivation = $26, inspirations = $27,
-      field_visibility = $28, updated_at = $29
-    WHERE id = $30`,
+      habits = $15, reproductive_cycle = $16, other_reproductive_cycle_description = $17, diet = $18, elemental_diet = $19,
+      communication = $20, moral_tendency = $21, social_organization = $22,
+      habitat = $23, physical_capacity = $24, special_characteristics = $25,
+      weaknesses = $26, story_motivation = $27, inspirations = $28,
+      field_visibility = $29, updated_at = $30
+    WHERE id = $31`,
     [
       dbRace.group_id,
       dbRace.name,
@@ -228,6 +231,7 @@ export async function updateRace(
       dbRace.special_physical_characteristics,
       dbRace.habits,
       dbRace.reproductive_cycle,
+      dbRace.other_reproductive_cycle_description,
       dbRace.diet,
       dbRace.elemental_diet,
       dbRace.communication,
