@@ -33,7 +33,7 @@
     "view_description_placeholder": "How Elves see Fire Dragons: dangerous but noble creatures, guardians of ancient secrets.",
 
     "cultural_notes": "Cultural Notes (Rites, Taboos, Curiosities)",
-    "cultural_notes_placeholder": "Describe rites, taboos, and curiosities about this race. For example: sacred rituals, forbidden practices, interesting facts about their culture and customs.",
+    "cultural_notes_placeholder": "Dragons perform the Ritual of Eternal Flames every century, where the entire colony gathers to renew the sacred fire. It is an absolute taboo to intentionally extinguish another dragon's fire. Interestingly, the older the dragon, the more golden their scales become.",
 
     "rites": "Rites",
     "add_rite": "Add Rite",
@@ -82,10 +82,10 @@
     "add_habitat": "Add Habitat",
 
     "other_cycle_description": "Describe the reproductive cycle",
-    "other_cycle_placeholder": "Describe how members of this race reproduce...",
+    "other_cycle_placeholder": "Mate through ritual dance under the full moon. Gestation lasts 18 months and 2 to 4 offspring are born at a time. Offspring stay with parents until they reach 50 years old.",
 
     "other_communication_description": "Describe the form of communication",
-    "other_communication_placeholder": "Describe how members of this race communicate...",
+    "other_communication_placeholder": "Communicate through bioluminescent patterns on their scales that change in color and intensity, creating a complex visual language. They combine this with low-frequency vibrations that only they can perceive.",
 
     "physical_capacity": "Combat Capacity",
     "physical_capacity_description": "This field is to indicate how dangerous an average member of this race is (without anything, including items, clothing, etc.) compared to an average human in your story.",
@@ -117,6 +117,8 @@
     "domain_required": "Select at least one domain",
     "summary_required": "Summary is required",
     "summary_max_length": "Summary must be at most 500 characters",
+    "view_description_required": "View description is required",
+    "view_description_max_length": "View description must be at most 500 characters",
     "general_appearance_max_length": "General appearance must be at most 500 characters",
     "life_expectancy_max_length": "Life expectancy must be at most 100 characters",
     "average_height_max_length": "Average height must be at most 100 characters",

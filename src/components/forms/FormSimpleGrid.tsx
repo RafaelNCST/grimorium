@@ -107,13 +107,13 @@ export interface SimpleGridSelectOption<T = string> {
 
 interface FormSimpleGridProps<T = string> {
   /**
-   * Selected value
+   * Selected value (single selection) or values (multi-selection)
    */
-  value: T | null | undefined;
+  value: T | T[] | null | undefined;
   /**
    * Callback when value changes
    */
-  onChange: (value: T) => void;
+  onChange: (value: T | T[]) => void;
   /**
    * Available options
    */
@@ -138,6 +138,10 @@ interface FormSimpleGridProps<T = string> {
    * Optional custom className for grid container
    */
   className?: string;
+  /**
+   * Enable multi-selection mode (default: false)
+   */
+  multi?: boolean;
 }
 
 /**
@@ -176,6 +180,7 @@ export function FormSimpleGrid<T extends string = string>({
   error,
   columns = 5,
   className,
+  multi = false,
 }: FormSimpleGridProps<T>) {
   const gridColsClass = {
     2: "grid-cols-2",
@@ -184,6 +189,26 @@ export function FormSimpleGrid<T extends string = string>({
     5: "grid-cols-5",
     6: "grid-cols-6",
   }[columns];
+
+  const handleClick = (optionValue: T) => {
+    if (multi) {
+      const currentValues = Array.isArray(value) ? value : [];
+      if (currentValues.includes(optionValue)) {
+        onChange(currentValues.filter((v) => v !== optionValue) as T[]);
+      } else {
+        onChange([...currentValues, optionValue] as T[]);
+      }
+    } else {
+      onChange(optionValue);
+    }
+  };
+
+  const isSelected = (optionValue: T): boolean => {
+    if (multi) {
+      return Array.isArray(value) ? value.includes(optionValue) : false;
+    }
+    return value === optionValue;
+  };
 
   return (
     <div className="space-y-2">
@@ -195,19 +220,19 @@ export function FormSimpleGrid<T extends string = string>({
       <div className={cn(`grid ${gridColsClass} gap-3`, className)}>
         {options.map((option) => {
           const Icon = option.icon;
-          const isSelected = value === option.value;
+          const selected = isSelected(option.value);
 
           return (
             <button
               key={String(option.value)}
               type="button"
-              onClick={() => onChange(option.value)}
+              onClick={() => handleClick(option.value)}
               className={cn(
                 "relative rounded-lg border-2 p-4 transition-all flex flex-col items-center justify-center gap-2 min-h-[100px]",
-                !isSelected && "bg-card text-foreground border-border"
+                !selected && "bg-card text-foreground border-border"
               )}
               style={
-                isSelected
+                selected
                   ? {
                       backgroundColor: getTailwindColor(option.backgroundColor),
                       borderColor: getTailwindColor(option.borderColor),
@@ -216,13 +241,13 @@ export function FormSimpleGrid<T extends string = string>({
                   : undefined
               }
               onMouseEnter={(e) => {
-                if (!isSelected) {
+                if (!selected) {
                   e.currentTarget.style.backgroundColor = getTailwindColor(option.backgroundColor);
                   e.currentTarget.style.borderColor = getTailwindColor(option.borderColor);
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isSelected) {
+                if (!selected) {
                   e.currentTarget.style.backgroundColor = '';
                   e.currentTarget.style.borderColor = '';
                 }

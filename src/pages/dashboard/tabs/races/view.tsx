@@ -235,6 +235,7 @@ export function SpeciesView({
         onClose={() => onSetIsCreateRaceOpen(false)}
         onConfirm={onCreateRace}
         availableRaces={availableRaces}
+        bookId={bookId}
       />
 
       <CreateRaceGroupModal

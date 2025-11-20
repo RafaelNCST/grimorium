@@ -8,7 +8,8 @@ interface PropsCreateRaceModal {
   open: boolean;
   onClose: () => void;
   onConfirm: (raceData: RaceFormSchema) => void;
-  availableRaces?: Array<{ id: string; name: string }>;
+  availableRaces?: Array<{ id: string; name: string; image?: string }>;
+  bookId: string;
 }
 
 export function CreateRaceModal({
@@ -16,6 +17,7 @@ export function CreateRaceModal({
   onClose,
   onConfirm,
   availableRaces = [],
+  bookId,
 }: PropsCreateRaceModal) {
   const form = useRaceForm();
   const { handleSubmit, reset } = form;
@@ -70,6 +72,7 @@ export function CreateRaceModal({
       isValid={isValid}
       isSubmitting={isSubmitting}
       availableRaces={availableRaces}
+      bookId={bookId}
     />
   );
 }

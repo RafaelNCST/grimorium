@@ -30,7 +30,8 @@ interface PropsCreateRaceModalView {
   onSubmit: (e: React.FormEvent) => void;
   isValid: boolean;
   isSubmitting: boolean;
-  availableRaces: Array<{ id: string; name: string }>;
+  availableRaces: Array<{ id: string; name: string; image?: string }>;
+  bookId: string;
 }
 
 export function CreateRaceModalView({
@@ -41,6 +42,7 @@ export function CreateRaceModalView({
   isValid,
   isSubmitting,
   availableRaces,
+  bookId,
 }: PropsCreateRaceModalView) {
   const { t } = useTranslation("create-race");
   const {
@@ -154,6 +156,7 @@ export function CreateRaceModalView({
                 views={(watchedValues.raceViews as RaceView[]) || []}
                 onChange={(views) => setValue("raceViews", views)}
                 availableRaces={availableRaces}
+                bookId={bookId}
               />
 
               {/* Cultural Notes (Rites, Taboos, Curiosities) */}
@@ -279,6 +282,11 @@ export function CreateRaceModalView({
               <CommunicationPicker
                 values={watchedValues.communication || []}
                 onChange={(values) => setValue("communication", values)}
+                otherCommunication={watchedValues.otherCommunication || ""}
+                onOtherCommunicationChange={(value) =>
+                  setValue("otherCommunication", value)
+                }
+                otherCommunicationError={errors.otherCommunication?.message}
               />
 
               {/* Moral Tendency */}

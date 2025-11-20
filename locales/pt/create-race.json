@@ -33,7 +33,7 @@
     "view_description_placeholder": "Como os Elfos veem os Dragões de Fogo: criaturas perigosas mas nobres, guardiãs de segredos antigos.",
 
     "cultural_notes": "Notas Culturais (Ritos, Tabus, Curiosidades)",
-    "cultural_notes_placeholder": "Descreva ritos, tabus e curiosidades sobre essa raça. Por exemplo: rituais sagrados, práticas proibidas, fatos interessantes sobre sua cultura e costumes.",
+    "cultural_notes_placeholder": "Os dragões realizam o Ritual das Chamas Eternas a cada século, onde toda a colônia se reúne para renovar o fogo sagrado. É tabu absoluto apagar intencionalmente o fogo de outro dragão. Curiosamente, quanto mais antigo o dragão, mais douradas ficam suas escamas.",
 
     "rites": "Ritos",
     "add_rite": "Adicionar Rito",
@@ -82,10 +82,10 @@
     "add_habitat": "Adicionar Habitat",
 
     "other_cycle_description": "Descreva o ciclo reprodutivo",
-    "other_cycle_placeholder": "Descreva como os membros dessa raça se reproduzem...",
+    "other_cycle_placeholder": "Acasalam através de dança ritual sob a lua cheia. Gestação dura 18 meses e nascem de 2 a 4 filhotes por vez. Os filhotes ficam com os pais até completarem 50 anos.",
 
     "other_communication_description": "Descreva a forma de comunicação",
-    "other_communication_placeholder": "Descreva como os membros dessa raça se comunicam...",
+    "other_communication_placeholder": "Comunicam-se através de padrões bioluminescentes em suas escamas que mudam de cor e intensidade, criando uma linguagem visual complexa. Combinam isso com vibrações de baixa frequência que apenas eles conseguem perceber.",
 
     "physical_capacity": "Capacidade de Combate",
     "physical_capacity_description": "Este campo serve para indicar o quão perigoso é um membro médio dessa raça (sem nada, isso inclui itens, roupas e etc) comparado a um humano comum na sua história.",
@@ -117,6 +117,8 @@
     "domain_required": "Selecione pelo menos um domínio",
     "summary_required": "Resumo é obrigatório",
     "summary_max_length": "Resumo deve ter no máximo 500 caracteres",
+    "view_description_required": "Descrição da visão é obrigatória",
+    "view_description_max_length": "Descrição da visão deve ter no máximo 500 caracteres",
     "general_appearance_max_length": "Aparência geral deve ter no máximo 500 caracteres",
     "life_expectancy_max_length": "Expectativa de vida deve ter no máximo 100 caracteres",
     "average_height_max_length": "Altura média deve ter no máximo 100 caracteres",
