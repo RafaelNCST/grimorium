@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "@/hooks/use-toast";
 
 import { RACE_RELATIONSHIP_TYPES } from "../constants/race-relationship-types";
 import { type IRaceRelationship } from "../types/race-detail-types";
@@ -121,10 +120,6 @@ export function RaceRelationshipsSection({
 
   const handleOpenAddDialog = () => {
     if (availableRaces.length === 0) {
-      toast({
-        title: t("race-detail:empty_states.no_races_available"),
-        description: t("race-detail:empty_states.no_races_available_hint"),
-      });
       return;
     }
     setIsAddDialogOpen(true);

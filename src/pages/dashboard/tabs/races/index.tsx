@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useEntityFilters } from "@/hooks/use-entity-filters";
-import { useToast } from "@/hooks/use-toast";
 import {
   createRaceGroup,
   getRaceGroupsByBookId,
@@ -66,7 +65,6 @@ const DOMAIN_MAP: Record<string, DomainType> = {
 
 export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [races, setRaces] = useState<IRace[]>([]);
   const [raceGroups, setRaceGroups] = useState<IRaceGroup[]>([]);
@@ -113,11 +111,6 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
         setRaceGroups(groupsWithRaces);
       } catch (error) {
         console.error("Error loading data:", error);
-        toast({
-          title: "Erro ao carregar dados",
-          description: "Não foi possível carregar as raças e grupos.",
-          variant: "destructive",
-        });
       } finally {
         setIsLoading(false);
       }
@@ -257,23 +250,13 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           );
         }
 
-        toast({
-          title: "Raça criada",
-          description: `${data.name} foi criada com sucesso.`,
-        });
-
         setIsCreateRaceOpen(false);
         setSelectedGroupForNewRace(null);
       } catch (error) {
         console.error("Error creating race:", error);
-        toast({
-          title: "Erro ao criar raça",
-          description: "Não foi possível criar a raça. Tente novamente.",
-          variant: "destructive",
-        });
       }
     },
-    [bookId, races, selectedGroupForNewRace, toast]
+    [bookId, races, selectedGroupForNewRace]
   );
 
   const handleEditGroup = useCallback((groupId: string) => {
@@ -323,21 +306,11 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
       // Remover o grupo do estado
       setRaceGroups(raceGroups.filter((g) => g.id !== groupToDelete.id));
 
-      toast({
-        title: "Grupo excluído",
-        description: `O grupo "${groupToDelete.name}" foi excluído com sucesso.`,
-      });
-
       setGroupToDelete(null);
     } catch (error) {
       console.error("Error deleting group:", error);
-      toast({
-        title: "Erro ao excluir grupo",
-        description: "Não foi possível excluir o grupo. Tente novamente.",
-        variant: "destructive",
-      });
     }
-  }, [groupToDelete, raceGroups, races, toast]);
+  }, [groupToDelete, raceGroups, races]);
 
   const handleSaveGroup = useCallback(
     async (data: RaceGroupFormSchema) => {
@@ -361,11 +334,6 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
                 : group
             )
           );
-
-          toast({
-            title: "Grupo atualizado",
-            description: `${data.name} foi atualizado com sucesso.`,
-          });
         } else {
           // Criando novo grupo
           const newGroup: Omit<IRaceGroup, "races"> = {
@@ -378,27 +346,15 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           await createRaceGroup(bookId, newGroup);
 
           setRaceGroups([...raceGroups, { ...newGroup, races: [] }]);
-
-          toast({
-            title: "Grupo criado",
-            description: `${data.name} foi criado com sucesso.`,
-          });
         }
 
         setIsCreateGroupOpen(false);
         setEditingGroupId(null);
       } catch (error) {
         console.error("Error saving group:", error);
-        toast({
-          title: editingGroupId
-            ? "Erro ao atualizar grupo"
-            : "Erro ao criar grupo",
-          description: "Não foi possível salvar o grupo. Tente novamente.",
-          variant: "destructive",
-        });
       }
     },
-    [bookId, raceGroups, editingGroupId, toast]
+    [bookId, raceGroups, editingGroupId]
   );
 
   const handleAddRacesToGroup = useCallback((groupId: string) => {
@@ -436,23 +392,13 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           )
         );
 
-        toast({
-          title: "Raças adicionadas",
-          description: `${raceIds.length} ${raceIds.length === 1 ? "raça foi adicionada" : "raças foram adicionadas"} ao grupo.`,
-        });
-
         setIsAddRacesModalOpen(false);
         setSelectedGroupForAddRaces(null);
       } catch (error) {
         console.error("Error adding races to group:", error);
-        toast({
-          title: "Erro ao adicionar raças",
-          description: "Não foi possível adicionar as raças ao grupo.",
-          variant: "destructive",
-        });
       }
     },
-    [selectedGroupForAddRaces, races, toast]
+    [selectedGroupForAddRaces, races]
   );
 
   const handleCreateRaceInGroup = useCallback((groupId: string) => {
@@ -482,21 +428,11 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
             races: group.races.filter((r) => r.id !== raceId),
           }))
         );
-
-        toast({
-          title: "Raça removida",
-          description: "A raça foi removida do grupo.",
-        });
       } catch (error) {
         console.error("Error removing race from group:", error);
-        toast({
-          title: "Erro ao remover raça",
-          description: "Não foi possível remover a raça do grupo.",
-          variant: "destructive",
-        });
       }
     },
-    [toast]
+    []
   );
 
   const handleRaceClick = useCallback(
@@ -571,32 +507,11 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
             return group;
           });
         });
-
-        // Show success toast
-        const race = races.find((r) => r.id === raceId);
-        const targetGroup = raceGroups.find((g) => g.id === targetGroupId);
-
-        if (targetGroupId) {
-          toast({
-            title: "Raça movida para o grupo",
-            description: `${race?.name} foi adicionada ao grupo "${targetGroup?.name}".`,
-          });
-        } else {
-          toast({
-            title: "Raça removida do grupo",
-            description: `${race?.name} foi removida do grupo.`,
-          });
-        }
       } catch (error) {
         console.error("Error dropping race in group:", error);
-        toast({
-          title: "Erro ao mover raça",
-          description: "Não foi possível mover a raça. Tente novamente.",
-          variant: "destructive",
-        });
       }
     },
-    [races, raceGroups, toast]
+    [races, raceGroups]
   );
 
   // Available races for "add to group" modal (only ungrouped races)
