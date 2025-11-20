@@ -1,6 +1,6 @@
 import React from "react";
 
-import { User } from "lucide-react";
+import { Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -13,7 +13,7 @@ import { HabitsPicker } from "@/components/modals/create-race-modal/components/h
 import { MoralTendencyPicker } from "@/components/modals/create-race-modal/components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/components/physical-capacity-picker";
 import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
-import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
+import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -129,51 +129,52 @@ export function RaceDetailView({
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("race-detail:fields.image")}
                 helperText={t("create-race:modal.image_recommended")}
-                height="h-[28rem]"
+                height="h-96"
                 shape="rounded"
-                placeholderIcon={User}
+                imageFit="cover"
+                placeholderIcon={Dna}
                 id="race-image-upload"
               />
             </div>
           </div>
 
-          {/* Name */}
-          <div className="space-y-2">
-            <Label className="text-primary">
-              {t("race-detail:fields.name")}
-              <span className="text-destructive ml-1">*</span>
-            </Label>
-            <Input
-              value={editData.name}
-              onChange={(e) => onEditDataChange("name", e.target.value)}
-              onBlur={() => validateField?.("name", editData.name)}
-              placeholder={t("create-race:modal.name_placeholder")}
-              maxLength={150}
-              className={errors.name ? "border-destructive" : ""}
-              required
-            />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name}</p>
-            )}
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{editData.name?.length || 0}/150</span>
+          {/* Name and Scientific Name */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("race-detail:fields.name")}
+                <span className="text-destructive ml-1">*</span>
+              </Label>
+              <Input
+                value={editData.name}
+                onChange={(e) => onEditDataChange("name", e.target.value)}
+                onBlur={() => validateField?.("name", editData.name)}
+                placeholder={t("create-race:modal.name_placeholder")}
+                maxLength={150}
+                className={errors.name ? "border-destructive" : ""}
+                required
+              />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name}</p>
+              )}
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.name?.length || 0}/150</span>
+              </div>
             </div>
-          </div>
 
-          {/* Scientific Name */}
-          <div className="space-y-2">
-            <Label className="text-primary">
-              {t("race-detail:fields.scientific_name")}
-              <span className="text-destructive ml-1">*</span>
-            </Label>
-            <Input
-              value={editData.scientificName || ""}
-              onChange={(e) => onEditDataChange("scientificName", e.target.value)}
-              placeholder={t("create-race:modal.scientific_name_placeholder")}
-              maxLength={150}
-            />
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{editData.scientificName?.length || 0}/150</span>
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("race-detail:fields.scientific_name")}
+              </Label>
+              <Input
+                value={editData.scientificName || ""}
+                onChange={(e) => onEditDataChange("scientificName", e.target.value)}
+                placeholder={t("create-race:modal.scientific_name_placeholder")}
+                maxLength={150}
+              />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.scientificName?.length || 0}/150</span>
+              </div>
             </div>
           </div>
 
@@ -214,68 +215,85 @@ export function RaceDetailView({
           </div>
         </>
       ) : (
-        // View Mode
+        // View Mode - Similar to Race Card structure
         <>
           {/* Image Display */}
           <div className="flex justify-center -mx-6">
             <div className="w-full max-w-[587px] px-6">
               {race.image ? (
-                <div className="relative w-full h-[28rem] rounded-lg overflow-hidden border">
+                <div className="relative w-full h-80 rounded-lg overflow-hidden border">
                   <img
                     src={race.image}
                     alt={race.name}
-                    className="w-full h-full object-fill"
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
-                <FormImageDisplay
-                  icon={User}
-                  text={t("race-detail:empty_states.no_image")}
-                  height="h-[28rem]"
-                  width="w-full"
-                  shape="rounded"
-                />
+                <div className="relative w-full h-80 rounded-lg overflow-hidden">
+                  <FormImageDisplay
+                    icon={Dna}
+                    height="h-full"
+                    width="w-full"
+                    shape="square"
+                    className="rounded-lg"
+                  />
+                </div>
               )}
             </div>
           </div>
 
-          {/* Race Info */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
+          {/* Race Info - Card style with fields stacked */}
+          <div className="space-y-3">
+            {/* Name */}
+            <div>
               <h2 className="text-3xl font-bold">{race.name}</h2>
-              {race.domain && race.domain.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  {race.domain.map((d) => {
-                    const domainConfig = RACE_DOMAINS.find((dc) => dc.label === d);
-                    if (!domainConfig) return null;
-                    const DomainIcon = domainConfig.icon;
-                    return (
-                      <Badge
-                        key={d}
-                        className={`${domainConfig.color} ${domainConfig.bgColor}`}
-                      >
-                        <DomainIcon className="w-3 h-3 mr-1" />
-                        {domainConfig.label}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
+            {/* Scientific Name */}
             {race.scientificName && (
-              <p className="text-sm italic text-muted-foreground">
-                {race.scientificName}
-              </p>
+              <div>
+                <p className="text-sm italic text-muted-foreground mt-1">
+                  {race.scientificName}
+                </p>
+              </div>
             )}
 
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-              {race.summary || (
-                <span className="italic text-muted-foreground/60">
-                  Não especificado
-                </span>
-              )}
-            </p>
+            {/* Domains */}
+            {race.domain && race.domain.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {race.domain.map((domainValue) => {
+                  const domainData = DOMAIN_CONSTANT.find(
+                    (d) => d.value === domainValue
+                  );
+                  const DomainIcon = domainData?.icon;
+
+                  if (!domainData || !DomainIcon) return null;
+
+                  return (
+                    <Badge
+                      key={domainValue}
+                      className={`flex items-center gap-1 ${domainData.activeColor} bg-transparent border px-2 py-0.5 pointer-events-none`}
+                    >
+                      <DomainIcon className="w-3.5 h-3.5" />
+                      <span className="text-xs font-medium">
+                        {domainData.label}
+                      </span>
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Summary */}
+            <div>
+              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                {race.summary || (
+                  <span className="italic text-muted-foreground/60">
+                    {t("race-detail:empty_states.no_data")}
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
         </>
       )}
