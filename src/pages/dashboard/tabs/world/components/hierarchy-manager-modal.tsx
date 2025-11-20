@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
 import {
   deleteRegion as deleteRegionFromDB,
   moveRegion,
@@ -40,7 +39,6 @@ export function HierarchyManagerModal({
   onRefresh,
 }: HierarchyManagerModalProps) {
   const { t } = useTranslation("world");
-  const { toast } = useToast();
   const [regionToDelete, setRegionToDelete] =
     useState<IRegionWithChildren | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -62,18 +60,10 @@ export function HierarchyManagerModal({
 
     try {
       await deleteRegionFromDB(regionToDelete.id);
-      toast({
-        title: t("delete_confirmation.success_title"),
-        description: t("delete_confirmation.success_message"),
-      });
       handleDeleteModalClose();
       onRefresh();
     } catch (error) {
-      toast({
-        title: t("delete_confirmation.error_title"),
-        description: t("delete_confirmation.error_message"),
-        variant: "destructive",
-      });
+      console.error("Error deleting region:", error);
     }
   };
 
@@ -85,11 +75,7 @@ export function HierarchyManagerModal({
       await moveRegion(regionId, newParentId);
       // Don't call onRefresh() - rely on optimistic updates for smooth UX
     } catch (error: any) {
-      toast({
-        title: t("hierarchy_manager.move_error_title"),
-        description: error.message || t("hierarchy_manager.move_error_message"),
-        variant: "destructive",
-      });
+      console.error("Error moving region:", error);
       // Only refresh on error to restore correct state
       onRefresh();
     }
@@ -102,12 +88,7 @@ export function HierarchyManagerModal({
     try {
       await reorderRegions(regionIds, parentId);
     } catch (error: any) {
-      toast({
-        title: t("hierarchy_manager.reorder_error_title"),
-        description:
-          error.message || t("hierarchy_manager.reorder_error_message"),
-        variant: "destructive",
-      });
+      console.error("Error reordering regions:", error);
     }
   };
 

@@ -14,7 +14,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
 import { NoteFile } from "@/mocks/local/files-data";
 import { AnnotationLink } from "@/types/annotations";
 
@@ -58,18 +57,9 @@ export default function FileEditor() {
 
     setFile(updatedFile);
     setHasUnsavedChanges(false);
-
-    toast({
-      title: "Arquivo salvo",
-      description: "Suas alterações foram salvas com sucesso.",
-    });
   };
 
   const handleDelete = () => {
-    toast({
-      title: "Arquivo excluído",
-      description: `O arquivo "${file?.name}" foi excluído com sucesso.`,
-    });
     navigate({
       to: "/dashboard/$dashboardId",
       params: { dashboardId: bookId! },

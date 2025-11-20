@@ -10,10 +10,6 @@ import {
   getRacesByBookId,
   getRaceRelationships,
   saveRaceRelationships,
-  getRaceVersions,
-  createRaceVersion,
-  deleteRaceVersion,
-  updateRaceVersion,
 } from "@/lib/db/races.service";
 import { useRacesStore } from "@/stores/races-store";
 
@@ -22,7 +18,6 @@ import { RaceDetailView } from "./view";
 import type { IRace, IRaceGroup } from "../types/race-types";
 import type {
   IRaceRelationship,
-  IRaceVersion,
   IFieldVisibility,
 } from "./types/race-detail-types";
 
@@ -51,16 +46,13 @@ export function RaceDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  const [versions, setVersions] = useState<IRaceVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IRaceVersion | null>(
-    null
-  );
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [allRaces, setAllRaces] = useState<IRace[]>([]);
   const [raceGroups, setRaceGroups] = useState<IRaceGroup[]>([]);
   const [relationships, setRelationships] = useState<IRaceRelationship[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const loadRace = async () => {
@@ -76,36 +68,6 @@ export function RaceDetail() {
           // Load relationships
           const rels = await getRaceRelationships(raceId);
           setRelationships(rels);
-
-          // Load versions
-          const versionsFromDB = await getRaceVersions(raceId);
-          if (versionsFromDB.length === 0) {
-            const mainVersion: IRaceVersion = {
-              id: `main-version-${raceId}`,
-              name: "Versão Principal",
-              description: "Versão principal da raça",
-              createdAt: new Date().toISOString(),
-              isMain: true,
-              raceData: raceFromDB,
-            };
-            await createRaceVersion(raceId, mainVersion);
-            setVersions([mainVersion]);
-            setCurrentVersion(mainVersion);
-          } else {
-            const updatedVersions = versionsFromDB.map((v) =>
-              v.isMain
-                ? {
-                    ...v,
-                    raceData: raceFromDB,
-                  }
-                : v
-            );
-            setVersions(updatedVersions);
-            const mainVersion = updatedVersions.find((v) => v.isMain);
-            if (mainVersion) {
-              setCurrentVersion(mainVersion);
-            }
-          }
 
           // Load all races from the same book
           if (dashboardId) {
@@ -137,27 +99,6 @@ export function RaceDetail() {
       await updateRaceInCache(raceId, updatedRace);
       await saveRaceRelationships(raceId, relationships);
 
-      // Update main version
-      const mainVersion = versions.find((v) => v.isMain);
-      if (mainVersion) {
-        const updatedMainVersion: IRaceVersion = {
-          ...mainVersion,
-          raceData: updatedRace,
-        };
-        await updateRaceVersion(
-          raceId,
-          mainVersion.id,
-          mainVersion.name,
-          mainVersion.description
-        );
-
-        const updatedVersions = versions.map((v) =>
-          v.id === mainVersion.id ? updatedMainVersion : v
-        );
-        setVersions(updatedVersions);
-        setCurrentVersion(updatedMainVersion);
-      }
-
       setRace(updatedRace);
       setIsEditing(false);
       toast.success("Raça salva com sucesso!");
@@ -171,7 +112,6 @@ export function RaceDetail() {
     relationships,
     raceId,
     updateRaceInCache,
-    versions,
   ]);
 
   const handleEdit = useCallback(() => {
@@ -199,112 +139,6 @@ export function RaceDetail() {
     }
   }, [raceId, dashboardId, deleteRaceFromCache, navigate]);
 
-  const handleVersionChange = useCallback(
-    async (versionId: string | null) => {
-      if (!versionId) {
-        // Restore main version
-        const mainVersion = versions.find((v) => v.isMain);
-        if (mainVersion && mainVersion.raceData) {
-          setCurrentVersion(mainVersion);
-          setRace(mainVersion.raceData);
-          setEditData(mainVersion.raceData);
-          setImagePreview(mainVersion.raceData?.image || "");
-          // Reload relationships from database
-          const rels = await getRaceRelationships(raceId);
-          setRelationships(rels);
-        }
-        return;
-      }
-
-      const version = versions.find((v) => v.id === versionId);
-      if (version && version.raceData) {
-        setCurrentVersion(version);
-        setRace(version.raceData);
-        setEditData(version.raceData);
-        setImagePreview(version.raceData?.image || "");
-        // For non-main versions, keep current relationships or reload from DB
-        const rels = await getRaceRelationships(raceId);
-        setRelationships(rels);
-      }
-    },
-    [versions, raceId]
-  );
-
-  const handleVersionCreate = useCallback(
-    async (data: { name: string; description: string; raceData: IRace }) => {
-      try {
-        const newVersion: IRaceVersion = {
-          id: `version-${Date.now()}`,
-          name: data.name,
-          description: data.description,
-          createdAt: new Date().toISOString(),
-          isMain: false,
-          raceData: race,
-        };
-
-        await createRaceVersion(raceId, newVersion);
-        setVersions([...versions, newVersion]);
-        toast.success("Versão criada com sucesso!");
-      } catch (error) {
-        console.error("Error creating version:", error);
-        toast.error("Erro ao criar versão");
-      }
-    },
-    [race, raceId, versions]
-  );
-
-  const handleVersionDelete = useCallback(
-    async (versionId: string) => {
-      try {
-        await deleteRaceVersion(raceId, versionId);
-        const updatedVersions = versions.filter((v) => v.id !== versionId);
-        setVersions(updatedVersions);
-
-        // If deleted version was current, switch to main
-        if (currentVersion?.id === versionId) {
-          const mainVersion = updatedVersions.find((v) => v.isMain);
-          if (mainVersion) {
-            handleVersionChange(mainVersion.id);
-          }
-        }
-
-        toast.success("Versão excluída com sucesso!");
-      } catch (error) {
-        console.error("Error deleting version:", error);
-        toast.error("Erro ao excluir versão");
-      }
-    },
-    [raceId, versions, currentVersion, handleVersionChange]
-  );
-
-  const handleVersionUpdate = useCallback(
-    async (versionId: string, name: string, description?: string) => {
-      try {
-        await updateRaceVersion(raceId, versionId, name, description);
-        const updatedVersions = versions.map((v) =>
-          v.id === versionId
-            ? { ...v, name, description: description || v.description }
-            : v
-        );
-        setVersions(updatedVersions);
-
-        if (currentVersion?.id === versionId) {
-          setCurrentVersion({
-            ...currentVersion,
-            name,
-            description: description || currentVersion.description,
-          });
-        }
-
-        toast.success("Versão atualizada com sucesso!");
-      } catch (error) {
-        console.error("Error updating version:", error);
-        toast.error("Erro ao atualizar versão");
-      }
-    },
-    [raceId, versions, currentVersion]
-  );
-
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
     setFieldVisibility((prev) => ({
       ...prev,
@@ -312,25 +146,16 @@ export function RaceDetail() {
     }));
   }, []);
 
+  const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
+    setSectionVisibility((prev) => ({
+      ...prev,
+      [sectionName]: prev[sectionName] === false ? true : false,
+    }));
+  }, []);
+
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
-
-  const handleImageFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          setImagePreview(base64String);
-          setEditData((prev) => ({ ...prev, image: base64String }));
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    []
-  );
 
   const handleNavigateToRace = useCallback(
     (newRaceId: string) => {
@@ -368,6 +193,36 @@ export function RaceDetail() {
     setEditData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const validateField = useCallback((field: string, value: any) => {
+    const requiredFields = ['name', 'scientificName', 'domain', 'summary'];
+
+    if (requiredFields.includes(field)) {
+      if (!value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())) {
+        setErrors(prev => ({
+          ...prev,
+          [field]: t('race-detail:validation.required')
+        }));
+      } else {
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      }
+    }
+  }, [t]);
+
+  // Computed values
+  const hasChanges = JSON.stringify(race) !== JSON.stringify(editData);
+
+  const missingFields = [];
+  if (!editData.name?.trim()) missingFields.push('name');
+  if (!editData.scientificName?.trim()) missingFields.push('scientificName');
+  if (!editData.domain || editData.domain.length === 0) missingFields.push('domain');
+  if (!editData.summary?.trim()) missingFields.push('summary');
+
+  const hasRequiredFieldsEmpty = missingFields.length > 0;
+
   // Don't render until race is loaded
   if (isLoading || !race.id || race.id === "" || !race.name) {
     return (
@@ -384,17 +239,19 @@ export function RaceDetail() {
       race={race}
       editData={editData}
       isEditing={isEditing}
-      versions={versions}
-      currentVersion={currentVersion}
+      hasChanges={hasChanges}
       showDeleteModal={showDeleteModal}
       isNavigationSidebarOpen={isNavigationSidebarOpen}
       imagePreview={imagePreview}
-      fileInputRef={fileInputRef}
       allRaces={allRaces}
       raceGroups={raceGroups}
       fieldVisibility={fieldVisibility}
+      sectionVisibility={sectionVisibility}
       advancedSectionOpen={advancedSectionOpen}
       relationships={relationships}
+      errors={errors}
+      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+      missingFields={missingFields}
       onBack={handleBack}
       onNavigationSidebarToggle={handleNavigationSidebarToggle}
       onNavigationSidebarClose={handleNavigationSidebarClose}
@@ -405,15 +262,12 @@ export function RaceDetail() {
       onDeleteModalOpen={() => setShowDeleteModal(true)}
       onDeleteModalClose={() => setShowDeleteModal(false)}
       onConfirmDelete={handleConfirmDelete}
-      onVersionChange={handleVersionChange}
-      onVersionCreate={handleVersionCreate}
-      onVersionDelete={handleVersionDelete}
-      onVersionUpdate={handleVersionUpdate}
-      onImageFileChange={handleImageFileChange}
       onEditDataChange={handleEditDataChange}
       onFieldVisibilityToggle={handleFieldVisibilityToggle}
+      onSectionVisibilityToggle={handleSectionVisibilityToggle}
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
       onRelationshipsChange={handleRelationshipsChange}
+      validateField={validateField}
     />
   );
 }

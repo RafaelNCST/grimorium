@@ -117,7 +117,7 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
     };
 
     loadData();
-  }, [bookId, toast]);
+  }, [bookId]);
 
   // Prepare all races for availableRaces prop (race views)
   const availableRaces = useMemo(
@@ -611,32 +611,11 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
             return group;
           });
         });
-
-        // Show success toast
-        const race = races.find((r) => r.id === raceId);
-        const targetGroup = raceGroups.find((g) => g.id === targetGroupId);
-
-        if (targetGroupId) {
-          toast({
-            title: "Raça movida para o grupo",
-            description: `${race?.name} foi adicionada ao grupo "${targetGroup?.name}".`,
-          });
-        } else {
-          toast({
-            title: "Raça removida do grupo",
-            description: `${race?.name} foi removida do grupo.`,
-          });
-        }
       } catch (error) {
         console.error("Error dropping race:", error);
-        toast({
-          title: "Erro ao mover raça",
-          description: "Não foi possível mover a raça. Tente novamente.",
-          variant: "destructive",
-        });
       }
     },
-    [races, raceGroups, toast]
+    [races, raceGroups]
   );
 
   // Calculate initial values for edit mode

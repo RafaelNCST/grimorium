@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { toast } from "@/hooks/use-toast";
 import { AnnotationLink } from "@/types/annotations";
 
 import { NotesView } from "./view";
@@ -140,10 +139,6 @@ export function Notes({ bookId }: PropsNotes) {
     setNotes([...notes, newFile]);
     setNewFileName("");
     setShowCreateFile(false);
-    toast({
-      title: "Arquivo criado",
-      description: `O arquivo "${newFileName}" foi criado com sucesso.`,
-    });
   };
 
   const handleCreateFolder = () => {
@@ -161,10 +156,6 @@ export function Notes({ bookId }: PropsNotes) {
     setNotes([...notes, newFolder]);
     setNewFolderName("");
     setShowCreateFolder(false);
-    toast({
-      title: "Pasta criada",
-      description: `A pasta "${newFolderName}" foi criada com sucesso.`,
-    });
   };
 
   const handleEditFolder = (folder: NoteFolder) => {
@@ -189,10 +180,6 @@ export function Notes({ bookId }: PropsNotes) {
 
     setEditingFolder(null);
     setEditFolderName("");
-    toast({
-      title: "Pasta renomeada",
-      description: "O nome da pasta foi alterado com sucesso.",
-    });
   };
 
   const handleCancelEdit = () => {
@@ -258,10 +245,6 @@ export function Notes({ bookId }: PropsNotes) {
     );
     setShowDeleteConfirm(false);
     setItemToDelete(null);
-    toast({
-      title: "Item excluído",
-      description: "O item foi excluído com sucesso.",
-    });
   };
 
   const handleOpenLinksModal = (file: NoteFile) => {

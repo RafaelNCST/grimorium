@@ -6,7 +6,6 @@
       "Bash(npx:*)",
       "Bash(node:*)",
       "Bash(cargo:*)",
-
       "Bash(mkdir:*)",
       "Bash(rm:*)",
       "Bash(mv:*)",
@@ -19,7 +18,6 @@
       "Bash(dir:*)",
       "Bash(tree:*)",
       "Bash(test:*)",
-
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(findstr:*)",
@@ -30,7 +28,6 @@
       "Bash(awk:*)",
       "Bash(perl:*)",
       "Bash(xargs:*)",
-
       "Bash(echo:*)",
       "Bash(ping:*)",
       "Bash(netstat:*)",
@@ -42,7 +39,6 @@
       "Bash(nul)",
       "Bash(NUL)",
       "Bash(Out-Null)",
-
       "Bash(powershell:*)",
       "Bash(cmd:*)",
       "Bash(cmd.exe:*)",
@@ -50,30 +46,28 @@
       "Bash(for:*)",
       "Bash(do:*)",
       "Bash(done)",
-
       "WebSearch",
       "WebFetch(domain:tanstack.com)",
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:v2.tauri.app)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
-
       "mcp__context7__resolve-library-id",
       "mcp__ide__getDiagnostics",
-
-      "Bash(/tmp:*)"
+      "Bash(/tmp:*)",
+      "Bash(Stop-Process -Force)",
+      "Bash(pkill:*)",
+      "Bash(Stop-Process -Force -Name node)"
     ],
-
-    "ask": [
-      "Bash(git:*)"
-    ],
-
     "deny": [
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",
       "Bash(git clean -fd:*)",
       "Bash(git clean -fdx:*)"
+    ],
+    "ask": [
+      "Bash(git:*)"
     ]
   }
 }

@@ -3,7 +3,6 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useEntityFilters } from "@/hooks/use-entity-filters";
-import { useToast } from "@/hooks/use-toast";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
@@ -29,7 +28,6 @@ interface WorldTabProps {
 
 export function WorldTab({ bookId }: WorldTabProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [regions, setRegions] = useState<IRegion[]>([]);
   const [hierarchy, setHierarchy] = useState<IRegionWithChildren[]>([]);
@@ -74,15 +72,10 @@ export function WorldTab({ bookId }: WorldTabProps) {
       setItems(itemsData.map((i) => ({ id: i.id, name: i.name })));
     } catch (error) {
       console.error("Failed to load regions:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load regions",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
-  }, [bookId, toast]);
+  }, [bookId]);
 
   // Initial load
   useEffect(() => {
@@ -182,23 +175,13 @@ export function WorldTab({ bookId }: WorldTabProps) {
           inspirations: arrayToJson(data.inspirations),
         });
 
-        toast({
-          title: "Success",
-          description: "Region created successfully",
-        });
-
         setShowCreateModal(false);
         loadRegions();
       } catch (error: any) {
         console.error("Failed to create region:", error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to create region",
-          variant: "destructive",
-        });
       }
     },
-    [bookId, toast, loadRegions]
+    [bookId, loadRegions]
   );
 
   // Handle region card click - navigate to region detail

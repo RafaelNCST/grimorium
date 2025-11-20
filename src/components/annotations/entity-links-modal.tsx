@@ -25,7 +25,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
 import { IAnnotationLink, ILinkedEntity } from "@/types/annotations";
 
 interface PropsEntityLinksModal {
@@ -130,10 +129,6 @@ export function EntityLinksModal({
         (link) => link.entityId !== entity.id
       );
       onLinksChange(newLinks);
-      toast({
-        title: "Link removido",
-        description: `Link com ${entity.name} foi removido.`,
-      });
     } else {
       // Add link
       const newLink: IAnnotationLink = {
@@ -144,10 +139,6 @@ export function EntityLinksModal({
         createdAt: new Date(),
       };
       onLinksChange([...currentLinks, newLink]);
-      toast({
-        title: "Link criado",
-        description: `Link com ${entity.name} foi criado.`,
-      });
     }
   };
 
