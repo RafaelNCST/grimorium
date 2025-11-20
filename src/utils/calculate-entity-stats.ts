@@ -13,7 +13,17 @@ export function calculateEntityStats<T extends Record<string, any>>(
   // Count entities
   entities.forEach(entity => {
     const fieldValue = entity[field];
-    if (fieldValue != null && typeof fieldValue === 'string') {
+
+    // Handle array fields (e.g., domain: string[])
+    if (Array.isArray(fieldValue)) {
+      fieldValue.forEach(val => {
+        if (typeof val === 'string' && stats[val] !== undefined) {
+          stats[val]++;
+        }
+      });
+    }
+    // Handle string fields (e.g., scale: string)
+    else if (fieldValue != null && typeof fieldValue === 'string') {
       if (stats[fieldValue] !== undefined) {
         stats[fieldValue]++;
       }

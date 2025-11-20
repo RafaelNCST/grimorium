@@ -1,6 +1,10 @@
+import { useState } from "react";
+
 import { useDraggable } from "@dnd-kit/core";
+import { Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +23,7 @@ export function RaceCard({
   isDragDisabled = false,
 }: PropsRaceCard) {
   const { t } = useTranslation("create-race");
+  const [isHovered, setIsHovered] = useState(false);
 
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `race-${race.id}`,
@@ -35,15 +40,17 @@ export function RaceCard({
       {...listeners}
       {...attributes}
       data-race-id={race.id}
-      className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80 ${
+      className={`relative max-w-[470px] cursor-pointer transition-all duration-300 hover:border-primary/50 hover:bg-card/80 ${
         isDragging ? "opacity-0" : ""
       }`}
       onClick={() => !isDragging && onClick?.(race.id)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="p-0">
         {/* Image covering the top with full width */}
         {race?.image ? (
-          <div className="relative w-full h-52">
+          <div className="relative w-full h-80">
             <img
               src={race.image}
               alt={race?.name || "Race"}
@@ -51,10 +58,14 @@ export function RaceCard({
             />
           </div>
         ) : (
-          <div className="relative w-full h-52 bg-gradient-to-br from-primary/20 to-primary/10 rounded-t-lg flex items-center justify-center">
-            <span className="text-5xl text-muted-foreground">
-              {race.name.charAt(0).toUpperCase()}
-            </span>
+          <div className="relative w-full h-80 rounded-t-lg overflow-hidden">
+            <FormImageDisplay
+              icon={Dna}
+              height="h-full"
+              width="w-full"
+              shape="square"
+              className="rounded-t-lg"
+            />
           </div>
         )}
 
@@ -99,6 +110,17 @@ export function RaceCard({
           </p>
         </div>
       </CardContent>
+
+      {/* Overlay covering entire card */}
+      <div
+        className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg ${
+          isHovered && !isDragging ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <span className="text-white text-lg font-semibold">
+          Ver detalhes
+        </span>
+      </div>
     </Card>
   );
 }

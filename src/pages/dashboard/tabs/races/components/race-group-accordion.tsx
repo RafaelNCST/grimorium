@@ -193,9 +193,12 @@ export function RaceGroupAccordion({
               ) : (
                 <div className={`p-4 ${isOver ? "p-6" : ""} transition-all`}>
                   <div
-                    className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${
+                    className={`grid gap-4 ${
                       isRemoveMode ? "opacity-75" : ""
                     }`}
+                    style={{
+                      gridTemplateColumns: "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
+                    }}
                   >
                     {group.races.map((race) => (
                       <div

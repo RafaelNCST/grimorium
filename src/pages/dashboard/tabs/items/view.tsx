@@ -129,7 +129,12 @@ const ItemsViewComponent = function ItemsView({
         }}
         showNoResultsState={filteredItems.length === 0 && items.length > 0}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
+          }}
+        >
           {filteredItems.map((item) => (
             <ItemCard key={item.id} item={item} onClick={onNavigateToItem} />
           ))}

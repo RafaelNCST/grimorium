@@ -23,6 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useEntityFilters } from "@/hooks/use-entity-filters";
 import { useToast } from "@/hooks/use-toast";
 import {
   createRaceGroup,
@@ -36,12 +37,13 @@ import {
   moveRacesToGroup,
   moveRaceToGroup,
 } from "@/lib/db/races.service";
+import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
 import { RaceCard } from "./components/race-card";
+import { createDomainFilterRows } from "./helpers/domain-filter-config";
 import {
   IRace,
   IRaceGroup,
-  IRaceTypeStats,
   DomainType,
 } from "./types/race-types";
 import { SpeciesView } from "./view";
@@ -68,11 +70,10 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
 
   const [races, setRaces] = useState<IRace[]>([]);
   const [raceGroups, setRaceGroups] = useState<IRaceGroup[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   // Group-related states
   const [selectedGroupForNewRace, setSelectedGroupForNewRace] = useState<
@@ -94,6 +95,7 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   // Load races and groups from database
   useEffect(() => {
     const loadData = async () => {
+      setIsLoading(true);
       try {
         const [loadedRaces, loadedGroups] = await Promise.all([
           getRacesByBookId(bookId),
@@ -116,6 +118,8 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           description: "Não foi possível carregar as raças e grupos.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -132,69 +136,67 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
     [races]
   );
 
-  // Get ungrouped races
+  // Use entity filters hook
+  const {
+    filteredEntities: filteredRaces,
+    searchTerm,
+    setSearchTerm,
+    selectedFilters,
+    toggleFilter,
+    clearFilters: clearAllFilters,
+  } = useEntityFilters({
+    entities: races,
+    searchFields: ["name"],
+    filterGroups: [
+      {
+        key: "domain",
+        filterFn: (race, selectedDomains) =>
+          selectedDomains.some((domain) =>
+            race.domain.includes(domain as DomainType)
+          ),
+      },
+    ],
+  });
+
+  const selectedDomains = selectedFilters.domain || [];
+
+  // Get ungrouped races from filtered results
   const ungroupedRaces = useMemo(
-    () => races.filter((race) => !race.groupId),
-    [races]
+    () => filteredRaces.filter((race) => !race.groupId),
+    [filteredRaces]
   );
 
-  // Filter logic
+  // Filter groups based on filtered races
   const filteredData = useMemo(() => {
-    // When searching, hide groups and show only matching races
-    if (searchTerm.trim()) {
-      const matchingRaces = races.filter((race) =>
-        race.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      return {
-        groups: [],
-        ungroupedRaces: matchingRaces,
-      };
-    }
+    // When searching or filtering, only show matching races
+    const filteredGroups = raceGroups
+      .map((group) => ({
+        ...group,
+        races: group.races.filter((race) =>
+          filteredRaces.some((fr) => fr.id === race.id)
+        ),
+      }))
+      .filter((group) => group.races.length > 0); // Hide groups with no matching races
 
-    // Filter by domains
-    if (selectedDomains.length > 0) {
-      const filteredGroups = raceGroups
-        .map((group) => ({
-          ...group,
-          races: group.races.filter((race) =>
-            selectedDomains.some((domain) =>
-              race.domain.includes(domain as DomainType)
-            )
-          ),
-        }))
-        .filter((group) => group.races.length > 0); // Hide groups with no matching races
-
-      const filteredUngrouped = ungroupedRaces.filter((race) =>
-        selectedDomains.some((domain) =>
-          race.domain.includes(domain as DomainType)
-        )
-      );
-
-      return {
-        groups: filteredGroups,
-        ungroupedRaces: filteredUngrouped,
-      };
-    }
-
-    // No filters - show everything
     return {
-      groups: raceGroups,
+      groups: filteredGroups,
       ungroupedRaces,
     };
-  }, [races, raceGroups, ungroupedRaces, searchTerm, selectedDomains]);
+  }, [raceGroups, filteredRaces, ungroupedRaces]);
 
   // Calculate domain stats from all races
-  const raceTypeStats = useMemo<IRaceTypeStats>(
-    () => ({
-      Aquático: races.filter((r) => r.domain.includes("Aquático")).length,
-      Terrestre: races.filter((r) => r.domain.includes("Terrestre")).length,
-      Aéreo: races.filter((r) => r.domain.includes("Aéreo")).length,
-      Subterrâneo: races.filter((r) => r.domain.includes("Subterrâneo")).length,
-      Elevado: races.filter((r) => r.domain.includes("Elevado")).length,
-      Dimensional: races.filter((r) => r.domain.includes("Dimensional")).length,
-      Espiritual: races.filter((r) => r.domain.includes("Espiritual")).length,
-      Cósmico: races.filter((r) => r.domain.includes("Cósmico")).length,
-    }),
+  const domainStats = useMemo(
+    () =>
+      calculateEntityStats(races, "domain", [
+        "Aquático",
+        "Terrestre",
+        "Aéreo",
+        "Subterrâneo",
+        "Elevado",
+        "Dimensional",
+        "Espiritual",
+        "Cósmico",
+      ]),
     [races]
   );
 
@@ -505,23 +507,23 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
     [navigate, bookId]
   );
 
-  const handleSearchTermChange = useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setSearchTerm(query);
+    },
+    [setSearchTerm]
+  );
 
-  const handleDomainFilterChange = useCallback((domain: string) => {
-    setSelectedDomains((prev) => {
-      if (prev.includes(domain)) {
-        return prev.filter((d) => d !== domain);
-      }
-      return [...prev, domain];
-    });
-  }, []);
+  const handleDomainToggle = useCallback(
+    (domain: DomainType) => {
+      toggleFilter("domain", domain);
+    },
+    [toggleFilter]
+  );
 
   const handleClearFilters = useCallback(() => {
-    setSelectedDomains([]);
-    setSearchTerm("");
-  }, []);
+    clearAllFilters();
+  }, [clearAllFilters]);
 
   const handleDropRaceInGroup = useCallback(
     async (
@@ -738,19 +740,22 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
       onDragEnd={handleDragEnd}
     >
       <SpeciesView
+        bookId={bookId}
         races={races}
+        allRaces={races}
         raceGroups={filteredData.groups}
         ungroupedRaces={filteredData.ungroupedRaces}
+        isLoading={isLoading}
         isCreateRaceOpen={isCreateRaceOpen}
         isCreateGroupOpen={isCreateGroupOpen}
         isAddRacesModalOpen={isAddRacesModalOpen}
         groupInitialValues={groupInitialValues}
         editingGroupId={editingGroupId}
-        raceTypeStats={raceTypeStats}
+        domainStats={domainStats}
         availableRaces={availableRaces}
         racesAvailableForGroup={racesAvailableForGroup}
         selectedGroupForAddRaces={selectedGroupForAddRaces}
-        searchTerm={searchTerm}
+        searchQuery={searchTerm}
         selectedDomains={selectedDomains}
         groupInRemoveMode={groupInRemoveMode}
         onSetIsCreateRaceOpen={setIsCreateRaceOpen}
@@ -766,8 +771,8 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
         onRemoveRaceFromGroup={handleRemoveRaceFromGroup}
         onDropRaceInGroup={handleDropRaceInGroup}
         onRaceClick={handleRaceClick}
-        onSearchTermChange={handleSearchTermChange}
-        onDomainFilterChange={handleDomainFilterChange}
+        onSearchChange={handleSearchChange}
+        onDomainToggle={handleDomainToggle}
         onClearFilters={handleClearFilters}
         onCloseAddRacesModal={() => setIsAddRacesModalOpen(false)}
       />
