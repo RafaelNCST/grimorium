@@ -194,7 +194,7 @@ export function RaceDetail() {
   }, []);
 
   const validateField = useCallback((field: string, value: any) => {
-    const requiredFields = ['name', 'scientificName', 'domain', 'summary'];
+    const requiredFields = ['name', 'domain', 'summary'];
 
     if (requiredFields.includes(field)) {
       if (!value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())) {
@@ -217,7 +217,6 @@ export function RaceDetail() {
 
   const missingFields = [];
   if (!editData.name?.trim()) missingFields.push('name');
-  if (!editData.scientificName?.trim()) missingFields.push('scientificName');
   if (!editData.domain || editData.domain.length === 0) missingFields.push('domain');
   if (!editData.summary?.trim()) missingFields.push('summary');
 

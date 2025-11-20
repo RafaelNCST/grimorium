@@ -11,6 +11,7 @@ interface PropsReproductiveCyclePicker {
   otherCycleDescription?: string;
   onOtherCycleDescriptionChange?: (value: string) => void;
   otherCycleError?: string;
+  hideLabel?: boolean;
 }
 
 export function ReproductiveCyclePicker({
@@ -19,6 +20,7 @@ export function ReproductiveCyclePicker({
   otherCycleDescription = "",
   onOtherCycleDescriptionChange,
   otherCycleError,
+  hideLabel,
 }: PropsReproductiveCyclePicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
@@ -27,7 +29,7 @@ export function ReproductiveCyclePicker({
     <FormSelectGrid
       value={value}
       onChange={onChange}
-      label={t("modal.reproductive_cycle")}
+      label={hideLabel ? "" : t("modal.reproductive_cycle")}
       options={REPRODUCTIVE_CYCLE_OPTIONS}
       columns={3}
       showExpandedContent={isOther}

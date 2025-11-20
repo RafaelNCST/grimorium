@@ -11,6 +11,7 @@ interface PropsDietPicker {
   elementalDiet: string;
   onElementalDietChange: (value: string) => void;
   elementalDietError?: string;
+  hideLabel?: boolean;
 }
 
 export function DietPicker({
@@ -19,6 +20,7 @@ export function DietPicker({
   elementalDiet,
   onElementalDietChange,
   elementalDietError,
+  hideLabel,
 }: PropsDietPicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
@@ -27,7 +29,7 @@ export function DietPicker({
     <FormSelectGrid
       value={value}
       onChange={onChange}
-      label={t("modal.diet")}
+      label={hideLabel ? "" : t("modal.diet")}
       options={DIET_OPTIONS}
       columns={3}
       showExpandedContent={isOther}

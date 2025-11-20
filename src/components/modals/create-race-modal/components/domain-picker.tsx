@@ -11,6 +11,7 @@ interface PropsDomainPicker {
   value: string[];
   onChange: (value: string[]) => void;
   error?: string;
+  hideLabel?: boolean;
 }
 
 // Map para converter as cores do formato atual para o formato do FormSimpleGrid
@@ -49,8 +50,34 @@ const colorMap: Record<string, { bg: string; border: string }> = {
   },
 };
 
-export function DomainPicker({ value, onChange, error }: PropsDomainPicker) {
+// Map para converter entre português (DomainType - usado no DB) e inglês (RaceDomain - usado no picker)
+const domainPtToEn: Record<string, RaceDomain> = {
+  "Aquático": "aquatic",
+  "Terrestre": "terrestrial",
+  "Aéreo": "aerial",
+  "Subterrâneo": "underground",
+  "Elevado": "elevated",
+  "Dimensional": "dimensional",
+  "Espiritual": "spiritual",
+  "Cósmico": "cosmic",
+};
+
+const domainEnToPt: Record<RaceDomain, string> = {
+  "aquatic": "Aquático",
+  "terrestrial": "Terrestre",
+  "aerial": "Aéreo",
+  "underground": "Subterrâneo",
+  "elevated": "Elevado",
+  "dimensional": "Dimensional",
+  "spiritual": "Espiritual",
+  "cosmic": "Cósmico",
+};
+
+export function DomainPicker({ value, onChange, error, hideLabel }: PropsDomainPicker) {
   const { t } = useTranslation("create-race");
+
+  // Converter valores do DB (português) para o picker (inglês)
+  const pickerValue = value.map((v) => domainPtToEn[v] || v) as RaceDomain[];
 
   // Converter RACE_DOMAINS para o formato SimpleGridSelectOption
   const options: SimpleGridSelectOption<RaceDomain>[] = RACE_DOMAINS.map(
@@ -69,12 +96,18 @@ export function DomainPicker({ value, onChange, error }: PropsDomainPicker) {
     }
   );
 
+  // Converter valores do picker (inglês) de volta para o DB (português)
+  const handleChange = (newValue: RaceDomain[]) => {
+    const dbValue = newValue.map((v) => domainEnToPt[v] || v);
+    onChange(dbValue);
+  };
+
   return (
     <FormSimpleGrid
-      value={value as RaceDomain[]}
-      onChange={(newValue) => onChange(newValue as string[])}
+      value={pickerValue}
+      onChange={handleChange}
       options={options}
-      label={t("modal.domain")}
+      label={hideLabel ? "" : t("modal.domain")}
       required
       error={error ? t(error) : undefined}
       columns={4}

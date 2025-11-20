@@ -169,6 +169,11 @@
       "success": "Versão criada com sucesso!"
     }
   },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "missing_fields": "Campos obrigatórios não preenchidos",
+    "fill_required_fields": "Preencha todos os campos obrigatórios para salvar"
+  },
   "delete": {
     "version": {
       "title": "Excluir Versão",

@@ -139,7 +139,6 @@ export function RaceDetailView({
                 value={imagePreview}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("race-detail:fields.image")}
-                helperText={t("create-race:modal.image_recommended")}
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"
@@ -197,8 +196,15 @@ export function RaceDetailView({
             </Label>
             <DomainPicker
               value={editData.domain || []}
-              onChange={(value) => onEditDataChange("domain", value)}
+              onChange={(value) => {
+                onEditDataChange("domain", value);
+                validateField?.("domain", value);
+              }}
+              hideLabel
             />
+            {errors.domain && (
+              <p className="text-sm text-destructive">{errors.domain}</p>
+            )}
           </div>
 
           {/* Summary */}
@@ -588,6 +594,7 @@ export function RaceDetailView({
             <HabitsPicker
               value={editData.habits || ""}
               onChange={(value) => onEditDataChange("habits", value)}
+              hideLabel
             />
           ) : (
             <DisplaySelectGrid
@@ -614,6 +621,7 @@ export function RaceDetailView({
               onOtherCycleDescriptionChange={(value) =>
                 onEditDataChange("otherCycleDescription", value)
               }
+              hideLabel
             />
           ) : (
             <DisplaySelectGrid
@@ -640,6 +648,7 @@ export function RaceDetailView({
               onElementalDietChange={(value) =>
                 onEditDataChange("elementalDiet", value)
               }
+              hideLabel
             />
           ) : (
             <DisplaySelectGrid
@@ -660,10 +669,14 @@ export function RaceDetailView({
         >
           {isEditing ? (
             <CommunicationDisplay
-              communication={editData.communication}
+              communications={editData.communication || []}
               isEditing={isEditing}
-              onCommunicationChange={(communication) =>
-                onEditDataChange("communication", communication)
+              otherCommunication={editData.otherCommunication || ""}
+              onCommunicationsChange={(communications) =>
+                onEditDataChange("communication", communications)
+              }
+              onOtherCommunicationChange={(value) =>
+                onEditDataChange("otherCommunication", value)
               }
             />
           ) : race.communication && race.communication.length > 0 ? (
@@ -739,6 +752,7 @@ export function RaceDetailView({
             <MoralTendencyPicker
               value={editData.moralTendency || ""}
               onChange={(value) => onEditDataChange("moralTendency", value)}
+              hideLabel
             />
           ) : (
             <DisplaySelectGrid
@@ -829,6 +843,7 @@ export function RaceDetailView({
             <PhysicalCapacityPicker
               value={editData.physicalCapacity || ""}
               onChange={(value) => onEditDataChange("physicalCapacity", value)}
+              hideLabel
             />
           ) : (
             <DisplaySelectGrid
@@ -1005,12 +1020,11 @@ export function RaceDetailView({
     <p className="text-xs text-destructive">
       {missingFields.length > 0 ? (
         <>
-          {t("race-detail:missing_fields")}:{" "}
+          {t("race-detail:validation.missing_fields")}:{" "}
           {missingFields
             .map((field) => {
               const fieldNames: Record<string, string> = {
                 name: t("race-detail:fields.name"),
-                scientificName: t("race-detail:fields.scientific_name"),
                 domain: t("race-detail:fields.domain"),
                 summary: t("race-detail:fields.summary"),
               };
@@ -1019,7 +1033,7 @@ export function RaceDetailView({
             .join(", ")}
         </>
       ) : (
-        t("race-detail:fill_required_fields")
+        t("race-detail:validation.fill_required_fields")
       )}
     </p>
   ) : undefined;

@@ -8,11 +8,13 @@ import { PHYSICAL_CAPACITY_OPTIONS } from "../constants/physical-capacities";
 interface PropsPhysicalCapacityPicker {
   value: string;
   onChange: (value: string) => void;
+  hideLabel?: boolean;
 }
 
 export function PhysicalCapacityPicker({
   value,
   onChange,
+  hideLabel,
 }: PropsPhysicalCapacityPicker) {
   const { t } = useTranslation("create-race");
 
@@ -23,7 +25,7 @@ export function PhysicalCapacityPicker({
       <FormSelectGrid
         value={value}
         onChange={onChange}
-        label={t("modal.physical_capacity")}
+        label={hideLabel ? "" : t("modal.physical_capacity")}
         options={PHYSICAL_CAPACITY_OPTIONS}
         columns={3}
       />

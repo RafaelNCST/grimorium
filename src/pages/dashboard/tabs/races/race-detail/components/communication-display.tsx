@@ -28,6 +28,7 @@ export function CommunicationDisplay({
         onChange={onCommunicationsChange}
         otherCommunication={otherCommunication}
         onOtherCommunicationChange={onOtherCommunicationChange}
+        hideLabel
       />
     );
   }

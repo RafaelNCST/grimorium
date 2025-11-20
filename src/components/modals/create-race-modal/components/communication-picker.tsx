@@ -17,6 +17,7 @@ interface PropsCommunicationPicker {
   otherCommunication?: string;
   onOtherCommunicationChange?: (value: string) => void;
   otherCommunicationError?: string;
+  hideLabel?: boolean;
 }
 
 // Map para converter as cores do formato atual para o formato do FormSelectGrid
@@ -49,6 +50,7 @@ export function CommunicationPicker({
   otherCommunication = "",
   onOtherCommunicationChange,
   otherCommunicationError,
+  hideLabel,
 }: PropsCommunicationPicker) {
   const { t } = useTranslation("create-race");
 
@@ -93,7 +95,7 @@ export function CommunicationPicker({
       value={values as RaceCommunication[]}
       onChange={(newValue) => onChange(newValue as string[])}
       options={options}
-      label={t("modal.communication")}
+      label={hideLabel ? "" : t("modal.communication")}
       columns={2}
       multi
       expandedContent={expandedContent}
