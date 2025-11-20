@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useRaceForm } from "./hooks/use-race-form";
 import { type RaceFormSchema } from "./hooks/use-race-validation";
@@ -19,6 +19,7 @@ export function CreateRaceModal({
 }: PropsCreateRaceModal) {
   const form = useRaceForm();
   const { handleSubmit, reset } = form;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const watchedFields = form.watch([
     "name",
@@ -48,10 +49,15 @@ export function CreateRaceModal({
   }, [reset, onClose]);
 
   const handleFormSubmit = useCallback(
-    (data: RaceFormSchema) => {
-      onConfirm(data);
-      reset();
-      onClose();
+    async (data: RaceFormSchema) => {
+      setIsSubmitting(true);
+      try {
+        onConfirm(data);
+        reset();
+        onClose();
+      } finally {
+        setIsSubmitting(false);
+      }
     },
     [onConfirm, reset, onClose]
   );
@@ -71,6 +77,7 @@ export function CreateRaceModal({
       onClose={handleClose}
       onSubmit={onSubmit}
       isValid={isValid}
+      isSubmitting={isSubmitting}
       availableRaces={availableRaces}
     />
   );

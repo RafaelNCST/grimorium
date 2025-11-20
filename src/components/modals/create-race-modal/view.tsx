@@ -1,20 +1,13 @@
-import { Info, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { EntityModal } from "@/components/modals/entity-modal";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
-import { AdvancedSection } from "./components/advanced-section";
 import { CommunicationPicker } from "./components/communication-picker";
 import { DietPicker } from "./components/diet-picker";
 import { DomainPicker } from "./components/domain-picker";
@@ -36,6 +29,7 @@ interface PropsCreateRaceModalView {
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
   isValid: boolean;
+  isSubmitting: boolean;
   availableRaces: Array<{ id: string; name: string }>;
 }
 
@@ -45,6 +39,7 @@ export function CreateRaceModalView({
   onClose,
   onSubmit,
   isValid,
+  isSubmitting,
   availableRaces,
 }: PropsCreateRaceModalView) {
   const { t } = useTranslation("create-race");
@@ -58,29 +53,20 @@ export function CreateRaceModalView({
   const watchedValues = watch();
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            {t("modal.create_race")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Alert className="bg-primary/5 border-primary/20">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertDescription className="text-sm">
-            {t("modal.info_message")}
-          </AlertDescription>
-        </Alert>
-
-        <form onSubmit={onSubmit} className="space-y-6">
-          {/* Basic Fields Section */}
-          <div className="space-y-6">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              {t("sections.basic_fields")}
-            </h3>
-
+    <Form {...form}>
+      <form onSubmit={onSubmit}>
+        <EntityModal
+          open={open}
+          onOpenChange={onClose}
+          header={{
+            title: t("modal.create_race"),
+            icon: Users,
+            description: t("modal.description"),
+            warning: t("modal.info_message"),
+          }}
+          basicFieldsTitle={t("sections.basic_fields")}
+          basicFields={
+            <div className="space-y-6">
             {/* Race Image */}
             <RaceImageUpload
               image={watchedValues.image || ""}
@@ -161,12 +147,10 @@ export function CreateRaceModalView({
                 </span>
               </div>
             </div>
-          </div>
-
-          <Separator />
-
-          {/* Advanced Fields Section */}
-          <AdvancedSection>
+            </div>
+          }
+          advancedFields={
+            <>
             <div className="space-y-6">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                 {t("sections.culture_myths")}
@@ -477,30 +461,20 @@ export function CreateRaceModalView({
                 </div>
               </div>
             </div>
-          </AdvancedSection>
-
-          {/* Form Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-            >
-              {t("button.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              disabled={!isValid}
-              variant="magical"
-              size="lg"
-              className="flex-1 animate-glow"
-            >
-              {t("button.create")}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            </>
+          }
+          footer={{
+            isSubmitting,
+            isValid,
+            onSubmit,
+            onCancel: onClose,
+            editMode: false,
+            submitLabel: t("button.create"),
+            cancelLabel: t("button.cancel"),
+          }}
+          maxWidth="max-w-[800px]"
+        />
+      </form>
+    </Form>
   );
 }
