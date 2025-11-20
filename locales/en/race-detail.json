@@ -131,13 +131,10 @@
     "success": "Race deleted successfully!"
   },
   "sidebar": {
-    "title": "Navigate Between Races",
-    "search_placeholder": "Search races...",
-    "view_all": "All",
-    "view_by_groups": "By Groups",
-    "no_races_found": "No races found",
-    "no_groups_found": "No groups found",
-    "ungrouped": "Ungrouped"
+    "title": "Races",
+    "search_placeholder": "Search race...",
+    "viewing_currently": "Currently viewing",
+    "no_races_found": "No races found"
   },
   "modals": {
     "add_cultural_note": "Add Rite/Taboo/Curiosity"

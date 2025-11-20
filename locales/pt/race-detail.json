@@ -131,13 +131,10 @@
     "success": "Raça excluída com sucesso!"
   },
   "sidebar": {
-    "title": "Navegar entre Raças",
-    "search_placeholder": "Buscar raças...",
-    "view_all": "Todas",
-    "view_by_groups": "Por Grupos",
-    "no_races_found": "Nenhuma raça encontrada",
-    "no_groups_found": "Nenhum grupo encontrado",
-    "ungrouped": "Sem Grupo"
+    "title": "Raças",
+    "search_placeholder": "Buscar raça...",
+    "viewing_currently": "Visualizando atualmente",
+    "no_races_found": "Nenhuma raça encontrada"
   },
   "modals": {
     "add_cultural_note": "Adicionar Rito/Tabu/Curiosidade"

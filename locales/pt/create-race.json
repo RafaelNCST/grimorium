@@ -28,7 +28,8 @@
     "add_view": "Adicionar Visão",
     "edit_view": "Editar Visão",
     "select_race": "Selecionar Raça",
-    "select_race_placeholder": "Escolha uma raça...",
+    "select_race_placeholder": "Selecione uma raça",
+    "no_race_selected": "Nenhuma raça selecionada",
     "view_description": "Descrição da Visão",
     "view_description_placeholder": "Como os Elfos veem os Dragões de Fogo: criaturas perigosas mas nobres, guardiãs de segredos antigos.",
 

@@ -212,7 +212,7 @@ export function RaceViewsManager({
               label={t("modal.select_race")}
               placeholder={t("modal.select_race_placeholder")}
               emptyText={t("modal.no_races_for_views")}
-              noSelectionText={t("modal.select_race_placeholder")}
+              noSelectionText={t("modal.no_race_selected")}
               searchPlaceholder={t("modal.select_race_placeholder")}
               value={selectedRaceIds}
               onChange={setSelectedRaceIds}

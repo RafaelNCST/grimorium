@@ -3,7 +3,6 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { getRaceGroupsByBookId } from "@/lib/db/race-groups.service";
 import {
   getRaceById,
   getRacesByBookId,
@@ -15,7 +14,7 @@ import { useRacesStore } from "@/stores/races-store";
 import { RaceDetailView } from "./view";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 
-import type { IRace, IRaceGroup } from "../types/race-types";
+import type { IRace } from "../types/race-types";
 import type {
   IRaceRelationship,
   IFieldVisibility,
@@ -51,9 +50,9 @@ export function RaceDetail() {
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const [allRaces, setAllRaces] = useState<IRace[]>([]);
-  const [raceGroups, setRaceGroups] = useState<IRaceGroup[]>([]);
   const [relationships, setRelationships] = useState<IRaceRelationship[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] = useState<IFieldVisibility>({});
@@ -81,9 +80,6 @@ export function RaceDetail() {
           if (dashboardId) {
             const allRacesFromBook = await getRacesByBookId(dashboardId);
             setAllRaces(allRacesFromBook);
-
-            const groups = await getRaceGroupsByBookId(dashboardId);
-            setRaceGroups(groups);
           }
         }
       } catch (error) {
@@ -321,6 +317,13 @@ export function RaceDetail() {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
 
+  const toggleSection = useCallback((sectionName: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionName]: !prev[sectionName],
+    }));
+  }, []);
+
   const handleNavigateToRace = useCallback(
     (newRaceId: string) => {
       navigate({
@@ -412,7 +415,6 @@ export function RaceDetail() {
         isNavigationSidebarOpen={isNavigationSidebarOpen}
         imagePreview={imagePreview}
         allRaces={allRaces}
-        raceGroups={raceGroups}
         fieldVisibility={fieldVisibility}
         sectionVisibility={sectionVisibility}
         advancedSectionOpen={advancedSectionOpen}
@@ -420,6 +422,7 @@ export function RaceDetail() {
         errors={errors}
         hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
         missingFields={missingFields}
+        bookId={dashboardId}
         onBack={handleBack}
         onNavigationSidebarToggle={handleNavigationSidebarToggle}
         onNavigationSidebarClose={handleNavigationSidebarClose}
@@ -436,6 +439,8 @@ export function RaceDetail() {
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         onRelationshipsChange={handleRelationshipsChange}
         validateField={validateField}
+        openSections={openSections}
+        toggleSection={toggleSection}
       />
     </>
   );

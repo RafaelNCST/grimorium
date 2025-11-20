@@ -44,7 +44,7 @@ import type {
   IRaceRelationship,
   IFieldVisibility,
 } from "./types/race-detail-types";
-import type { IRace, IRaceGroup } from "../../types/race-types";
+import type { IRace } from "../../types/race-types";
 
 interface RaceDetailViewProps {
   race: IRace;
@@ -55,7 +55,6 @@ interface RaceDetailViewProps {
   isNavigationSidebarOpen: boolean;
   imagePreview: string;
   allRaces: IRace[];
-  raceGroups: IRaceGroup[];
   fieldVisibility: IFieldVisibility;
   sectionVisibility: Record<string, boolean>;
   advancedSectionOpen: boolean;
@@ -63,6 +62,7 @@ interface RaceDetailViewProps {
   errors: Record<string, string>;
   hasRequiredFieldsEmpty: boolean;
   missingFields: string[];
+  bookId: string;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -79,6 +79,8 @@ interface RaceDetailViewProps {
   onAdvancedSectionToggle: () => void;
   onRelationshipsChange: (relationships: IRaceRelationship[]) => void;
   validateField?: (field: string, value: any) => void;
+  openSections: Record<string, boolean>;
+  toggleSection: (sectionName: string) => void;
 }
 
 // Helper component for empty state
@@ -97,7 +99,6 @@ export function RaceDetailView({
   isNavigationSidebarOpen,
   imagePreview,
   allRaces,
-  raceGroups,
   fieldVisibility,
   sectionVisibility,
   advancedSectionOpen,
@@ -105,6 +106,7 @@ export function RaceDetailView({
   errors,
   hasRequiredFieldsEmpty,
   missingFields,
+  bookId,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -121,6 +123,8 @@ export function RaceDetailView({
   onAdvancedSectionToggle,
   onRelationshipsChange,
   validateField,
+  openSections,
+  toggleSection,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
@@ -358,28 +362,36 @@ export function RaceDetailView({
         {/* Race Views */}
         <FieldWithVisibilityToggle
           fieldName="raceViews"
-          label={t("race-detail:fields.race_views")}
           isOptional
           fieldVisibility={fieldVisibility}
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
           {isEditing ? (
+            <>
+              <Label className="text-sm font-medium text-primary">
+                {t("race-detail:fields.race_views")}
+              </Label>
+              <RaceViewsDisplay
+                views={editData.raceViews || []}
+                isEditing={isEditing}
+                allRaces={allRaces}
+                onViewsChange={(views) => onEditDataChange("raceViews", views)}
+                bookId={bookId}
+                currentRaceId={race.id}
+              />
+            </>
+          ) : (
             <RaceViewsDisplay
-              views={editData.raceViews || []}
-              isEditing={isEditing}
-              allRaces={allRaces}
-              onViewsChange={(views) => onEditDataChange("raceViews", views)}
-            />
-          ) : race.raceViews && race.raceViews.length > 0 ? (
-            <RaceViewsDisplay
-              views={race.raceViews}
+              views={race.raceViews || []}
               isEditing={false}
               allRaces={allRaces}
               onViewsChange={() => {}}
+              open={openSections.raceViews}
+              onOpenChange={() => toggleSection("raceViews")}
+              bookId={bookId}
+              currentRaceId={race.id}
             />
-          ) : (
-            <EmptyFieldState t={t} />
           )}
         </FieldWithVisibilityToggle>
 
@@ -1046,7 +1058,6 @@ export function RaceDetailView({
         onClose={onNavigationSidebarClose}
         currentRaceId={race.id}
         allRaces={allRaces}
-        raceGroups={raceGroups}
         onRaceSelect={onRaceSelect}
       />
 
