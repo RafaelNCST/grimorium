@@ -53,7 +53,7 @@ export const VersionCard = React.memo(
     return (
       <Card
         className={cn(
-          "cursor-pointer transition-colors hover:bg-accent/50",
+          "cursor-pointer transition-colors duration-200 hover:bg-white/5 dark:hover:bg-white/10",
           isActive && "ring-2 ring-primary",
           className
         )}
