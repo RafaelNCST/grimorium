@@ -5,6 +5,7 @@
     "info_message": "Everything can be edited later. Start with the basic information and add details as you develop your story.",
     "advanced_items": "Advanced Fields",
 
+    "image": "Race Image",
     "change_image": "Change Image",
     "upload_image": "Upload Image",
 
@@ -19,6 +20,7 @@
 
     "alternative_names": "Alternative Names",
     "alternative_names_placeholder": "Lords of Flames, Scarlet Guardians",
+    "add_name": "Add Name",
 
     "race_views": "Race Views",
     "race_views_description": "Here you can record how other races, peoples, and civilizations view this race. This adds depth to worldbuilding by showing different cultural perspectives and prejudices.",
@@ -77,6 +79,7 @@
 
     "habitat": "Habitat",
     "habitat_placeholder": "Volcanic craters, fire mountains",
+    "add_habitat": "Add Habitat",
 
     "other_cycle_description": "Describe the reproductive cycle",
     "other_cycle_placeholder": "Describe how members of this race reproduce...",

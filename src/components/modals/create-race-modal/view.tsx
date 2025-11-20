@@ -2,11 +2,13 @@ import { Users } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormListInput } from "@/components/forms/FormListInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 
 import { CommunicationPicker } from "./components/communication-picker";
 import { DietPicker } from "./components/diet-picker";
@@ -14,13 +16,11 @@ import { DomainPicker } from "./components/domain-picker";
 import { HabitsPicker } from "./components/habits-picker";
 import { MoralTendencyPicker } from "./components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "./components/physical-capacity-picker";
-import { RaceImageUpload } from "./components/race-image-upload";
 import {
   RaceViewsManager,
   type RaceView,
 } from "./components/race-views-manager";
 import { ReproductiveCyclePicker } from "./components/reproductive-cycle-picker";
-import { TagsInput } from "./components/tags-input";
 import { type RaceFormSchema } from "./hooks/use-race-validation";
 
 interface PropsCreateRaceModalView {
@@ -68,54 +68,43 @@ export function CreateRaceModalView({
           basicFields={
             <div className="space-y-6">
             {/* Race Image */}
-            <RaceImageUpload
-              image={watchedValues.image || ""}
-              onImageChange={(image) => setValue("image", image)}
-            />
+            <div className="max-w-[534px] mx-auto">
+              <FormImageUpload
+                value={watchedValues.image || ""}
+                onChange={(value) => setValue("image", value)}
+                label={t("modal.image")}
+                height="h-96"
+                shape="rounded"
+                imageFit="cover"
+                placeholderIcon={Users}
+                id="race-image-upload"
+              />
+            </div>
 
             {/* Race Name and Scientific Name */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.race_name")} *
-                </label>
-                <Input
-                  {...register("name")}
-                  placeholder={t("modal.name_placeholder")}
-                  maxLength={150}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  {errors.name && (
-                    <p className="text-destructive">
-                      {t(errors.name.message as string)}
-                    </p>
-                  )}
-                  <span className="ml-auto">
-                    {watchedValues.name?.length || 0}/150
-                  </span>
-                </div>
-              </div>
+              <FormInput
+                {...register("name")}
+                label={t("modal.race_name")}
+                placeholder={t("modal.name_placeholder")}
+                maxLength={150}
+                required
+                showCharCount
+                error={errors.name ? t(errors.name.message as string) : undefined}
+                value={watchedValues.name}
+                labelClassName="text-primary"
+              />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.scientific_name")}
-                </label>
-                <Input
-                  {...register("scientificName")}
-                  placeholder={t("modal.scientific_name_placeholder")}
-                  maxLength={150}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  {errors.scientificName && (
-                    <p className="text-destructive">
-                      {t(errors.scientificName.message as string)}
-                    </p>
-                  )}
-                  <span className="ml-auto">
-                    {watchedValues.scientificName?.length || 0}/150
-                  </span>
-                </div>
-              </div>
+              <FormInput
+                {...register("scientificName")}
+                label={t("modal.scientific_name")}
+                placeholder={t("modal.scientific_name_placeholder")}
+                maxLength={150}
+                showCharCount
+                error={errors.scientificName ? t(errors.scientificName.message as string) : undefined}
+                value={watchedValues.scientificName}
+                labelClassName="text-primary"
+              />
             </div>
 
             {/* Domain */}
@@ -126,27 +115,19 @@ export function CreateRaceModalView({
             />
 
             {/* Summary */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                {t("modal.summary")} *
-              </label>
-              <Textarea
-                {...register("summary")}
-                placeholder={t("modal.summary_placeholder")}
-                maxLength={500}
-                rows={4}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                {errors.summary && (
-                  <p className="text-destructive">
-                    {t(errors.summary.message as string)}
-                  </p>
-                )}
-                <span className="ml-auto">
-                  {watchedValues.summary?.length || 0}/500
-                </span>
-              </div>
-            </div>
+            <FormTextarea
+              {...register("summary")}
+              label={t("modal.summary")}
+              placeholder={t("modal.summary_placeholder")}
+              maxLength={500}
+              rows={4}
+              required
+              showCharCount
+              error={errors.summary ? t(errors.summary.message as string) : undefined}
+              value={watchedValues.summary}
+              labelClassName="text-primary"
+              className="resize-none"
+            />
             </div>
           }
           advancedFields={
@@ -157,12 +138,15 @@ export function CreateRaceModalView({
               </h3>
 
               {/* Alternative Names */}
-              <TagsInput
-                tags={watchedValues.alternativeNames || []}
-                onChange={(tags) => setValue("alternativeNames", tags)}
+              <FormListInput
+                value={watchedValues.alternativeNames || []}
+                onChange={(value) => setValue("alternativeNames", value)}
                 label={t("modal.alternative_names")}
                 placeholder={t("modal.alternative_names_placeholder")}
+                buttonText={t("modal.add_name")}
                 maxLength={100}
+                inputSize="small"
+                labelClassName="text-sm font-medium text-primary"
               />
 
               {/* Race Views */}
@@ -173,27 +157,18 @@ export function CreateRaceModalView({
               />
 
               {/* Cultural Notes (Rites, Taboos, Curiosities) */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.cultural_notes")}
-                </label>
-                <Textarea
-                  {...register("culturalNotes")}
-                  placeholder={t("modal.cultural_notes_placeholder")}
-                  maxLength={1500}
-                  rows={6}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  {errors.culturalNotes && (
-                    <p className="text-destructive">
-                      {t(errors.culturalNotes.message)}
-                    </p>
-                  )}
-                  <span className="ml-auto">
-                    {watchedValues.culturalNotes?.length || 0}/1500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("culturalNotes")}
+                label={t("modal.cultural_notes")}
+                placeholder={t("modal.cultural_notes_placeholder")}
+                maxLength={1500}
+                rows={6}
+                showCharCount
+                error={errors.culturalNotes?.message}
+                value={watchedValues.culturalNotes}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
             </div>
 
             <Separator />
@@ -205,94 +180,63 @@ export function CreateRaceModalView({
               </h3>
 
               {/* General Appearance */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.general_appearance")}
-                </label>
-                <Textarea
-                  {...register("generalAppearance")}
-                  placeholder={t("modal.general_appearance_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.generalAppearance?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("generalAppearance")}
+                label={t("modal.general_appearance")}
+                placeholder={t("modal.general_appearance_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.generalAppearance}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
 
               {/* Life Expectancy, Height, Weight */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t("modal.life_expectancy")}
-                  </label>
-                  <Input
-                    {...register("lifeExpectancy")}
-                    placeholder={t("modal.life_expectancy_placeholder")}
-                    maxLength={100}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span className="ml-auto">
-                      {watchedValues.lifeExpectancy?.length || 0}/100
-                    </span>
-                  </div>
-                </div>
+                <FormInput
+                  {...register("lifeExpectancy")}
+                  label={t("modal.life_expectancy")}
+                  placeholder={t("modal.life_expectancy_placeholder")}
+                  maxLength={100}
+                  showCharCount
+                  value={watchedValues.lifeExpectancy}
+                  labelClassName="text-sm font-medium text-primary"
+                />
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t("modal.average_height")}
-                  </label>
-                  <Input
-                    {...register("averageHeight")}
-                    placeholder={t("modal.average_height_placeholder")}
-                    maxLength={100}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span className="ml-auto">
-                      {watchedValues.averageHeight?.length || 0}/100
-                    </span>
-                  </div>
-                </div>
+                <FormInput
+                  {...register("averageHeight")}
+                  label={t("modal.average_height")}
+                  placeholder={t("modal.average_height_placeholder")}
+                  maxLength={100}
+                  showCharCount
+                  value={watchedValues.averageHeight}
+                  labelClassName="text-sm font-medium text-primary"
+                />
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t("modal.average_weight")}
-                  </label>
-                  <Input
-                    {...register("averageWeight")}
-                    placeholder={t("modal.average_weight_placeholder")}
-                    maxLength={100}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span className="ml-auto">
-                      {watchedValues.averageWeight?.length || 0}/100
-                    </span>
-                  </div>
-                </div>
+                <FormInput
+                  {...register("averageWeight")}
+                  label={t("modal.average_weight")}
+                  placeholder={t("modal.average_weight_placeholder")}
+                  maxLength={100}
+                  showCharCount
+                  value={watchedValues.averageWeight}
+                  labelClassName="text-sm font-medium text-primary"
+                />
               </div>
 
               {/* Special Physical Characteristics */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.special_physical_characteristics")}
-                </label>
-                <Textarea
-                  {...register("specialPhysicalCharacteristics")}
-                  placeholder={t(
-                    "modal.special_physical_characteristics_placeholder"
-                  )}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.specialPhysicalCharacteristics?.length || 0}
-                    /500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("specialPhysicalCharacteristics")}
+                label={t("modal.special_physical_characteristics")}
+                placeholder={t("modal.special_physical_characteristics_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.specialPhysicalCharacteristics}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
             </div>
 
             <Separator />
@@ -339,30 +283,28 @@ export function CreateRaceModalView({
               />
 
               {/* Social Organization and Behavioral Tendency */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.social_organization")}
-                </label>
-                <Textarea
-                  {...register("socialOrganization")}
-                  placeholder={t("modal.social_organization_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.socialOrganization?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("socialOrganization")}
+                label={t("modal.social_organization")}
+                placeholder={t("modal.social_organization_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.socialOrganization}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
 
               {/* Habitat */}
-              <TagsInput
-                tags={watchedValues.habitat || []}
-                onChange={(tags) => setValue("habitat", tags)}
+              <FormListInput
+                value={watchedValues.habitat || []}
+                onChange={(value) => setValue("habitat", value)}
                 label={t("modal.habitat")}
                 placeholder={t("modal.habitat_placeholder")}
+                buttonText={t("modal.add_habitat")}
                 maxLength={50}
+                inputSize="small"
+                labelClassName="text-sm font-medium text-primary"
               />
             </div>
 
@@ -381,40 +323,30 @@ export function CreateRaceModalView({
               />
 
               {/* Special Characteristics */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.special_characteristics")}
-                </label>
-                <Textarea
-                  {...register("specialCharacteristics")}
-                  placeholder={t("modal.special_characteristics_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.specialCharacteristics?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("specialCharacteristics")}
+                label={t("modal.special_characteristics")}
+                placeholder={t("modal.special_characteristics_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.specialCharacteristics}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
 
               {/* Weaknesses */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.weaknesses")}
-                </label>
-                <Textarea
-                  {...register("weaknesses")}
-                  placeholder={t("modal.weaknesses_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.weaknesses?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("weaknesses")}
+                label={t("modal.weaknesses")}
+                placeholder={t("modal.weaknesses_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.weaknesses}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
             </div>
 
             <Separator />
@@ -426,40 +358,30 @@ export function CreateRaceModalView({
               </h3>
 
               {/* Story Motivation */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.story_motivation")}
-                </label>
-                <Textarea
-                  {...register("storyMotivation")}
-                  placeholder={t("modal.story_motivation_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.storyMotivation?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("storyMotivation")}
+                label={t("modal.story_motivation")}
+                placeholder={t("modal.story_motivation_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.storyMotivation}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
 
               {/* Inspirations */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {t("modal.inspirations")}
-                </label>
-                <Textarea
-                  {...register("inspirations")}
-                  placeholder={t("modal.inspirations_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="ml-auto">
-                    {watchedValues.inspirations?.length || 0}/500
-                  </span>
-                </div>
-              </div>
+              <FormTextarea
+                {...register("inspirations")}
+                label={t("modal.inspirations")}
+                placeholder={t("modal.inspirations_placeholder")}
+                maxLength={500}
+                rows={4}
+                showCharCount
+                value={watchedValues.inspirations}
+                labelClassName="text-sm font-medium text-primary"
+                className="resize-none"
+              />
             </div>
             </>
           }

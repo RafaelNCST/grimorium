@@ -5,6 +5,7 @@
     "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história.",
     "advanced_items": "Campos Avançados",
 
+    "image": "Imagem da Raça",
     "change_image": "Alterar Imagem",
     "upload_image": "Enviar Imagem",
 
@@ -19,6 +20,7 @@
 
     "alternative_names": "Nomes Alternativos",
     "alternative_names_placeholder": "Senhores das Chamas, Guardiões Escarlates",
+    "add_name": "Adicionar Nome",
 
     "race_views": "Visões de Raça",
     "race_views_description": "Aqui você pode registrar como outras raças, povos e civilizações enxergam essa raça. Isso adiciona profundidade ao worldbuilding, mostrando diferentes perspectivas culturais e preconceitos.",
@@ -77,6 +79,7 @@
 
     "habitat": "Habitat",
     "habitat_placeholder": "Crateras vulcânicas, montanhas de fogo",
+    "add_habitat": "Adicionar Habitat",
 
     "other_cycle_description": "Descreva o ciclo reprodutivo",
     "other_cycle_placeholder": "Descreva como os membros dessa raça se reproduzem...",
