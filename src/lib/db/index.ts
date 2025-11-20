@@ -219,9 +219,11 @@ async function runMigrations(database: Database): Promise<void> {
       -- Behaviors
       habits TEXT,
       reproductive_cycle TEXT,
+      other_reproductive_cycle_description TEXT,
       diet TEXT,
       elemental_diet TEXT,
       communication TEXT,
+      other_communication TEXT,
       moral_tendency TEXT,
       social_organization TEXT,
       habitat TEXT,
@@ -795,6 +797,26 @@ async function runMigrations(database: Database): Promise<void> {
         "ALTER TABLE characters ADD COLUMN past TEXT"
       );
       console.log("[db] Added past column to characters table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add other_reproductive_cycle_description column to races table
+    try {
+      await database.execute(
+        "ALTER TABLE races ADD COLUMN other_reproductive_cycle_description TEXT"
+      );
+      console.log("[db] Added other_reproductive_cycle_description column to races table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add other_communication column to races table
+    try {
+      await database.execute(
+        "ALTER TABLE races ADD COLUMN other_communication TEXT"
+      );
+      console.log("[db] Added other_communication column to races table");
     } catch (error) {
       // Column already exists - safe to ignore
     }

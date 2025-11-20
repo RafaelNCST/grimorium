@@ -53,6 +53,7 @@ export interface IRace {
   diet?: string;
   elementalDiet?: string;
   communication?: string[];
+  otherCommunication?: string;
   moralTendency?: string;
   socialOrganization?: string;
   habitat?: string[];
