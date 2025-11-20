@@ -315,9 +315,9 @@ export const ItemDetailView = React.memo(function ItemDetailView({
 
           <div className="space-y-3 mt-4">
             {/* Name */}
-            <h3 className="font-semibold text-lg leading-tight select-text">
+            <h2 className="text-3xl font-bold select-text">
               {item.name}
-            </h3>
+            </h2>
 
             {/* Category and Status side by side */}
             <div className="flex items-center gap-2 flex-wrap">
