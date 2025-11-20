@@ -97,16 +97,16 @@ export function CollapsibleSection({
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <Card
         className={cn(
-          "card-magical transition-all duration-200",
+          "card-magical transition-all duration-200 overflow-hidden",
           isVisible === false && isEditMode
             ? "opacity-50 bg-muted/30 border-dashed border-muted-foreground/30"
             : "",
           className
         )}
       >
-        <CardHeader>
-          <CollapsibleTrigger asChild>
-            <button className="flex items-center justify-between w-full cursor-pointer hover:opacity-80 transition-opacity">
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200">
+            <div className="flex items-center justify-between w-full">
               <CardTitle>{title}</CardTitle>
               <div className="flex items-center gap-2">
                 {/* Visibility Toggle - Only in edit mode */}
@@ -151,9 +151,9 @@ export function CollapsibleSection({
                   </>
                 )}
               </div>
-            </button>
-          </CollapsibleTrigger>
-        </CardHeader>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
 
         {/* Content with padding */}
         {isCollapsible ? (

@@ -163,6 +163,8 @@ gridCols={{ sm: 1, md: 2 }}
 **Funcionalidades:**
 - Card com estilo "card-magical" automático
 - Header com título e ícone de chevron (expande/colapsa)
+- **Área de clique expandida** - Todo o header é clicável
+- **Hover brilhante** - Fundo branco translúcido (5% light, 10% dark)
 - Toggle de visibilidade opcional (ícone de olho) em modo edição
 - Padding interno padronizado via CardContent
 - Estilos automáticos para estado visível/invisível
@@ -229,3 +231,9 @@ Quando `isVisible = false` e `isEditMode = true`:
 
 **Nota sobre padding:**
 O padding interno é gerenciado automaticamente pelo componente `CardContent`. Não é necessário adicionar padding extra ao conteúdo passado como `children`.
+
+**Interatividade:**
+- **Hover:** Fundo branco translúcido (`white/5` light mode, `white/10` dark mode)
+- **Efeito:** Aparência levemente brilhante e sutil
+- **Área clicável:** Todo o CardHeader é clicável (não apenas o texto)
+- **Transições:** Animação suave de 200ms no background

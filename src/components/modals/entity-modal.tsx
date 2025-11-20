@@ -1,8 +1,8 @@
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { type LucideIcon, Plus, Save, Loader2, X } from "lucide-react";
 
-import { AdvancedSection } from "@/components/modals/create-region-modal/components/advanced-section";
+import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -53,6 +53,7 @@ export function EntityModal({
   basicFieldsTitle = "Informações Básicas",
 }: EntityModalProps) {
   const Icon = header.icon;
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,7 +80,17 @@ export function EntityModal({
           </div>
 
           {/* Advanced Section */}
-          {advancedFields && <AdvancedSection>{advancedFields}</AdvancedSection>}
+          {advancedFields && (
+            <div className="mt-6">
+              <CollapsibleSection
+                title="Campos Avançados"
+                isOpen={isAdvancedOpen}
+                onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
+              >
+                <div className="space-y-6">{advancedFields}</div>
+              </CollapsibleSection>
+            </div>
+          )}
         </div>
 
         {/* Fixed Footer */}

@@ -1,14 +1,8 @@
 import { useState, type ReactNode } from "react";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 
 interface PropsAdvancedSection {
   children: ReactNode;
@@ -19,22 +13,14 @@ export function AdvancedSection({ children }: PropsAdvancedSection) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-4">
-      <CollapsibleTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full flex items-center justify-between"
-        >
-          <span className="font-semibold">{t("modal.advanced_items")}</span>
-          {isOpen ? (
-            <ChevronUp className="w-4 h-4 ml-2" />
-          ) : (
-            <ChevronDown className="w-4 h-4 ml-2" />
-          )}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-6">{children}</CollapsibleContent>
-    </Collapsible>
+    <div className="mt-6">
+      <CollapsibleSection
+        title={t("modal.advanced_items")}
+        isOpen={isOpen}
+        onToggle={() => setIsOpen(!isOpen)}
+      >
+        <div className="space-y-6">{children}</div>
+      </CollapsibleSection>
+    </div>
   );
 }
