@@ -1,12 +1,28 @@
 import React, { useState } from "react";
 
-import { Edit2, Trash2, X, ChevronLeft, UserPlus } from "lucide-react";
+import {
+  Edit2,
+  Trash2,
+  X,
+  ChevronLeft,
+  UserPlus,
+  Skull,
+  Fish,
+  Sparkles,
+  Shield,
+  Handshake,
+  Swords,
+  Equal,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
+import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +33,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
 
-import { RACE_RELATIONSHIP_TYPES } from "../constants/race-relationship-types";
 import { type IRaceRelationship } from "../types/race-detail-types";
 
 interface IRace {
@@ -32,16 +49,43 @@ interface RaceRelationshipsSectionProps {
   relationships: IRaceRelationship[];
   allRaces: IRace[];
   currentRaceId: string;
-  currentRaceName?: string;
   isEditMode: boolean;
   onRelationshipsChange: (relationships: IRaceRelationship[]) => void;
 }
+
+interface RelationshipTypeConfig {
+  value: string;
+  translationKey: string;
+  icon: LucideIcon;
+}
+
+const RACE_RELATIONSHIP_COLOR_MAP: Record<
+  string,
+  { bg: string; border: string }
+> = {
+  predation: { bg: "red-500/10", border: "red-500/20" },
+  prey: { bg: "orange-500/10", border: "orange-500/20" },
+  parasitism: { bg: "purple-500/10", border: "purple-500/20" },
+  commensalism: { bg: "blue-500/10", border: "blue-500/20" },
+  mutualism: { bg: "green-500/10", border: "green-500/20" },
+  competition: { bg: "yellow-500/10", border: "yellow-500/20" },
+  neutralism: { bg: "gray-500/10", border: "gray-500/20" },
+};
+
+const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
+  { value: "predation", translationKey: "predation", icon: Skull },
+  { value: "prey", translationKey: "prey", icon: Fish },
+  { value: "parasitism", translationKey: "parasitism", icon: Sparkles },
+  { value: "commensalism", translationKey: "commensalism", icon: Shield },
+  { value: "mutualism", translationKey: "mutualism", icon: Handshake },
+  { value: "competition", translationKey: "competition", icon: Swords },
+  { value: "neutralism", translationKey: "neutralism", icon: Equal },
+];
 
 export function RaceRelationshipsSection({
   relationships,
   allRaces,
   currentRaceId,
-  currentRaceName,
   isEditMode,
   onRelationshipsChange,
 }: RaceRelationshipsSectionProps) {
@@ -54,8 +98,8 @@ export function RaceRelationshipsSection({
 
   const [selectedRaceId, setSelectedRaceId] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
-  const [hoveredType, setHoveredType] = useState<string | null>(null);
 
   // Filter out current race and already related races
   const availableRaces = allRaces.filter(
@@ -64,7 +108,9 @@ export function RaceRelationshipsSection({
       !relationships.some((rel) => rel.raceId === race.id)
   );
 
-  const getRelationshipTypeConfig = (type: string) =>
+  const getRelationshipTypeConfig = (
+    type: string
+  ): RelationshipTypeConfig | undefined =>
     RACE_RELATIONSHIP_TYPES.find((t) => t.value === type);
 
   const getRaceById = (raceId: string): IRace | undefined =>
@@ -76,7 +122,8 @@ export function RaceRelationshipsSection({
     const newRelationship: IRaceRelationship = {
       id: Date.now().toString(),
       raceId: selectedRaceId,
-      type: selectedType,
+      type: selectedType as IRaceRelationship["type"],
+      description: description.trim() || undefined,
     };
 
     onRelationshipsChange([...relationships, newRelationship]);
@@ -89,7 +136,13 @@ export function RaceRelationshipsSection({
     if (!editingRelationship || !selectedType) return;
 
     const updatedRelationships = relationships.map((rel) =>
-      rel.id === editingRelationship.id ? { ...rel, type: selectedType } : rel
+      rel.id === editingRelationship.id
+        ? {
+            ...rel,
+            type: selectedType as IRaceRelationship["type"],
+            description: description.trim() || undefined,
+          }
+        : rel
     );
 
     onRelationshipsChange(updatedRelationships);
@@ -108,6 +161,7 @@ export function RaceRelationshipsSection({
   const openEditDialog = (relationship: IRaceRelationship) => {
     setEditingRelationship(relationship);
     setSelectedType(relationship.type);
+    setDescription(relationship.description || "");
     setIsEditDialogOpen(true);
   };
 
@@ -115,6 +169,7 @@ export function RaceRelationshipsSection({
     setIsAddDialogOpen(false);
     setSelectedRaceId("");
     setSelectedType("");
+    setDescription("");
     setModalStep(1);
   };
 
@@ -132,6 +187,7 @@ export function RaceRelationshipsSection({
 
   const handleBackToStep1 = () => {
     setSelectedType("");
+    setDescription("");
     setModalStep(1);
   };
 
@@ -139,13 +195,14 @@ export function RaceRelationshipsSection({
     setIsEditDialogOpen(false);
     setEditingRelationship(null);
     setSelectedType("");
+    setDescription("");
   };
 
   // Empty state when no races available
   if (allRaces.length <= 1 && isEditMode) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">
-        <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <Handshake className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p className="font-medium">
           {t("race-detail:empty_states.need_more_races_relationships")}
         </p>
@@ -160,7 +217,7 @@ export function RaceRelationshipsSection({
   if (relationships.length === 0 && !isEditMode) {
     return (
       <div className="text-center text-muted-foreground text-sm py-8">
-        <UserPlus className="w-12 h-12 mx-auto mb-3 opacity-50" />
+        <Swords className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p className="font-medium">
           {t("race-detail:empty_states.no_relationships")}
         </p>
@@ -178,7 +235,7 @@ export function RaceRelationshipsSection({
         <Button
           onClick={handleOpenAddDialog}
           className="w-full"
-          variant="outline"
+          variant="secondary"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           {t("race-detail:relationships.add_relationship")}
@@ -204,9 +261,7 @@ export function RaceRelationshipsSection({
                 <div className="flex items-center gap-4">
                   {/* Race Avatar */}
                   <Avatar className="w-12 h-12">
-                    {race?.image && (
-                      <AvatarImage src={race.image} className="object-cover" />
-                    )}
+                    <AvatarImage src={race.image} className="object-cover" />
                     <AvatarFallback>
                       {race.name
                         .split(" ")
@@ -222,18 +277,28 @@ export function RaceRelationshipsSection({
                       <h4 className="font-semibold text-sm truncate">
                         {race.name}
                       </h4>
-                      <Badge
-                        variant="outline"
-                        className={`${typeConfig.color} flex items-center gap-1`}
-                      >
-                        <TypeIcon className="w-3 h-3" />
-                        <span className="text-xs">
-                          {t(
-                            `race-detail:relationship_types.${typeConfig.translationKey}`
-                          )}
-                        </span>
-                      </Badge>
+                      {(() => {
+                        const badgeConfig =
+                          RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT.find(
+                            (r) => r.value === relationship.type
+                          );
+                        return badgeConfig ? (
+                          <EntityTagBadge
+                            config={badgeConfig}
+                            label={t(
+                              `race-detail:relationship_types.${badgeConfig.translationKey}`
+                            )}
+                          />
+                        ) : null;
+                      })()}
                     </div>
+
+                    {/* Description */}
+                    {relationship.description && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {relationship.description}
+                      </p>
+                    )}
                   </div>
 
                   {/* Action Buttons - Only in Edit Mode */}
@@ -248,9 +313,9 @@ export function RaceRelationshipsSection({
                         <Edit2 className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="ghost"
+                        variant="ghost-destructive"
                         size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        className="h-8 w-8"
                         onClick={() =>
                           handleDeleteRelationship(relationship.id)
                         }
@@ -283,7 +348,7 @@ export function RaceRelationshipsSection({
           </DialogHeader>
 
           <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6">
+            <div className="space-y-6 pr-2 pl-2">
               {/* STEP 1: Race Selection */}
               {modalStep === 1 && (
                 <div className="space-y-3">
@@ -294,17 +359,15 @@ export function RaceRelationshipsSection({
                     {availableRaces.map((race) => (
                       <Card
                         key={race.id}
-                        className="p-4 cursor-pointer transition-all hover:shadow-md hover:bg-muted/30 hover:border-primary/50"
+                        className="p-4 cursor-pointer transition-all border-muted hover:bg-muted/50"
                         onClick={() => handleRaceSelect(race.id)}
                       >
                         <div className="flex items-center gap-4">
                           <Avatar className="w-12 h-12">
-                            {race?.image && (
-                              <AvatarImage
-                                src={race.image}
-                                className="object-cover"
-                              />
-                            )}
+                            <AvatarImage
+                              src={race.image}
+                              className="object-cover"
+                            />
                             <AvatarFallback>
                               {race.name
                                 .split(" ")
@@ -325,33 +388,9 @@ export function RaceRelationshipsSection({
                 </div>
               )}
 
-              {/* STEP 2: Relationship Type */}
+              {/* STEP 2: Relationship Type & Intensity */}
               {modalStep === 2 && selectedRaceId && (
                 <div className="space-y-6">
-                  {/* Introductory Text */}
-                  <div className="h-[72px] transition-all duration-200 ease-in-out">
-                    {currentRaceName && selectedType && (
-                      <div className="h-full p-4 bg-muted/30 border border-muted rounded-md flex items-center justify-center">
-                        <p className="text-sm text-foreground text-center line-clamp-2">
-                          A raça atual{" "}
-                          <span className="font-semibold text-primary">
-                            {currentRaceName}
-                          </span>{" "}
-                          tem um relacionamento com a raça{" "}
-                          <span className="font-semibold text-primary">
-                            {getRaceById(selectedRaceId)?.name}
-                          </span>{" "}
-                          de tipo:{" "}
-                          <span className="font-semibold text-primary">
-                            {t(
-                              `race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find((rt) => rt.value === selectedType)?.translationKey}`
-                            )}
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Selected Race Card (Read-only) */}
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold">
@@ -360,12 +399,10 @@ export function RaceRelationshipsSection({
                     <Card className="p-4 bg-primary/5 border-primary/20">
                       <div className="flex items-center gap-4">
                         <Avatar className="w-12 h-12">
-                          {getRaceById(selectedRaceId)?.image && (
-                            <AvatarImage
-                              src={getRaceById(selectedRaceId)!.image!}
-                              className="object-cover"
-                            />
-                          )}
+                          <AvatarImage
+                            src={getRaceById(selectedRaceId)?.image}
+                            className="object-cover"
+                          />
                           <AvatarFallback>
                             {getRaceById(selectedRaceId)
                               ?.name.split(" ")
@@ -384,50 +421,48 @@ export function RaceRelationshipsSection({
                   </div>
 
                   {/* Relationship Type Selection */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold">
-                      {t("race-detail:relationships.relationship_type")}
-                    </Label>
+                  <FormSelectGrid
+                    value={selectedType}
+                    onChange={setSelectedType}
+                    label={t("race-detail:relationships.relationship_type")}
+                    columns={2}
+                    options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                      value: type.value,
+                      label: t(
+                        `race-detail:relationship_types.${type.translationKey}`
+                      ),
+                      description: t(
+                        `race-detail:relationship_types.${type.translationKey}_desc`
+                      ),
+                      icon: type.icon,
+                      backgroundColor:
+                        RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                      borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value]
+                        .border,
+                    }))}
+                  />
 
-                    <div className="grid grid-cols-3 gap-2 p-1">
-                      {RACE_RELATIONSHIP_TYPES.map((type) => {
-                        const Icon = type.icon;
-                        const isSelected = selectedType === type.value;
-                        const isHovered = hoveredType === type.value;
-
-                        return (
-                          <button
-                            key={type.value}
-                            type="button"
-                            onClick={() => setSelectedType(type.value)}
-                            onMouseEnter={() => setHoveredType(type.value)}
-                            onMouseLeave={() => setHoveredType(null)}
-                            className={`p-3 rounded-lg border-2 transition-all text-left ${
-                              isSelected || isHovered
-                                ? type.color
-                                : "border-muted bg-muted/30"
-                            }`}
-                          >
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Icon className="w-4 h-4" />
-                                <span className="text-sm font-medium">
-                                  {t(
-                                    `race-detail:relationship_types.${type.translationKey}`
-                                  )}
-                                </span>
-                              </div>
-                              <p className="text-xs text-muted-foreground italic line-clamp-2">
-                                {t(
-                                  `race-detail:relationship_types.${type.translationKey}_desc`
-                                )}
-                              </p>
-                            </div>
-                          </button>
-                        );
-                      })}
+                  {/* Description Field */}
+                  {selectedType && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold">
+                        {t("race-detail:relationships.description_label")}
+                      </Label>
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={t(
+                          "race-detail:relationships.description_placeholder"
+                        )}
+                        rows={3}
+                        maxLength={200}
+                        className="resize-none w-full"
+                      />
+                      <div className="flex justify-end text-xs text-muted-foreground">
+                        <span>{description.length}/200</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -435,13 +470,13 @@ export function RaceRelationshipsSection({
 
           <DialogFooter>
             {modalStep === 1 ? (
-              <Button variant="outline" onClick={closeAddDialog}>
+              <Button variant="secondary" onClick={closeAddDialog}>
                 <X className="w-4 h-4 mr-2" />
                 {t("race-detail:relationships.cancel")}
               </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={handleBackToStep1}>
+                <Button variant="secondary" onClick={handleBackToStep1}>
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   {t("race-detail:relationships.back")}
                 </Button>
@@ -450,9 +485,8 @@ export function RaceRelationshipsSection({
                   onClick={handleAddRelationship}
                   disabled={!selectedType}
                   className="animate-glow"
-                  size="lg"
                 >
-                  <UserPlus className="w-5 h-5 mr-2" />
+                  <UserPlus className="w-4 h-4 mr-2" />
                   {t("race-detail:relationships.add")}
                 </Button>
               </>
@@ -477,81 +511,51 @@ export function RaceRelationshipsSection({
           </DialogHeader>
 
           <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6">
-              {/* Introductory Text for Edit */}
-              <div className="h-[72px] transition-all duration-200 ease-in-out">
-                {currentRaceName && editingRelationship && selectedType && (
-                  <div className="h-full p-4 bg-muted/30 border border-muted rounded-md flex items-center justify-center">
-                    <p className="text-sm text-foreground text-center line-clamp-2">
-                      A raça atual{" "}
-                      <span className="font-semibold text-primary">
-                        {currentRaceName}
-                      </span>{" "}
-                      tem um relacionamento com a raça{" "}
-                      <span className="font-semibold text-primary">
-                        {getRaceById(editingRelationship.raceId)?.name}
-                      </span>{" "}
-                      de tipo:{" "}
-                      <span className="font-semibold text-primary">
-                        {t(
-                          `race-detail:relationship_types.${RACE_RELATIONSHIP_TYPES.find((rt) => rt.value === selectedType)?.translationKey}`
-                        )}
-                      </span>
-                    </p>
-                  </div>
-                )}
-              </div>
-
+            <div className="space-y-6 pr-2">
               {/* Relationship Type Selection */}
+              <FormSelectGrid
+                value={selectedType}
+                onChange={setSelectedType}
+                label={t("race-detail:relationships.relationship_type")}
+                columns={2}
+                options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                  value: type.value,
+                  label: t(
+                    `race-detail:relationship_types.${type.translationKey}`
+                  ),
+                  description: t(
+                    `race-detail:relationship_types.${type.translationKey}_desc`
+                  ),
+                  icon: type.icon,
+                  backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                  borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
+                }))}
+              />
+
+              {/* Description Field */}
               <div className="space-y-3">
                 <Label className="text-sm font-semibold">
-                  {t("race-detail:relationships.relationship_type")}
+                  {t("race-detail:relationships.description_label")}
                 </Label>
-
-                <div className="grid grid-cols-3 gap-2 p-1">
-                  {RACE_RELATIONSHIP_TYPES.map((type) => {
-                    const Icon = type.icon;
-                    const isSelected = selectedType === type.value;
-                    const isHovered = hoveredType === type.value;
-
-                    return (
-                      <button
-                        key={type.value}
-                        type="button"
-                        onClick={() => setSelectedType(type.value)}
-                        onMouseEnter={() => setHoveredType(type.value)}
-                        onMouseLeave={() => setHoveredType(null)}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
-                          isSelected || isHovered
-                            ? type.color
-                            : "border-muted bg-muted/30"
-                        }`}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Icon className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                              {t(
-                                `race-detail:relationship_types.${type.translationKey}`
-                              )}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground italic line-clamp-2">
-                            {t(
-                              `race-detail:relationship_types.${type.translationKey}_desc`
-                            )}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <Textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t(
+                    "race-detail:relationships.description_placeholder"
+                  )}
+                  rows={3}
+                  maxLength={200}
+                  className="resize-none w-full"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{description.length}/200</span>
                 </div>
               </div>
             </div>
           </ScrollArea>
 
           <DialogFooter>
-            <Button variant="outline" onClick={closeEditDialog}>
+            <Button variant="secondary" onClick={closeEditDialog}>
               <X className="w-4 h-4 mr-2" />
               {t("race-detail:relationships.cancel")}
             </Button>

@@ -220,6 +220,7 @@ export interface DBRaceRelationship {
   race_id: string;
   related_race_id: string;
   type: string;
+  description?: string;
   created_at: number;
 }
 

@@ -1005,6 +1005,26 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] Timeline migration error or already migrated:", error);
     }
 
+    // Add intensity column to race_relationships table
+    try {
+      await database.execute(
+        "ALTER TABLE race_relationships ADD COLUMN intensity INTEGER NOT NULL DEFAULT 5"
+      );
+      console.log("[db] Added intensity column to race_relationships table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add description column to race_relationships table
+    try {
+      await database.execute(
+        "ALTER TABLE race_relationships ADD COLUMN description TEXT"
+      );
+      console.log("[db] Added description column to race_relationships table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Verify books table exists and log count
     const result = await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"

@@ -369,7 +369,8 @@ export async function getRaceRelationships(
   return result.map((rel) => ({
     id: rel.id,
     raceId: rel.related_race_id,
-    type: rel.type,
+    type: rel.type as IRaceRelationship["type"],
+    description: rel.description,
   }));
 }
 
@@ -388,9 +389,16 @@ export async function saveRaceRelationships(
   for (const rel of relationships) {
     const relId = `${raceId}-${rel.raceId}-${rel.type}-${Date.now()}`;
     await db.execute(
-      `INSERT INTO race_relationships (id, race_id, related_race_id, type, created_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [relId, raceId, rel.raceId, rel.type, Date.now()]
+      `INSERT INTO race_relationships (id, race_id, related_race_id, type, description, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        relId,
+        raceId,
+        rel.raceId,
+        rel.type,
+        rel.description || null,
+        Date.now(),
+      ]
     );
   }
 }

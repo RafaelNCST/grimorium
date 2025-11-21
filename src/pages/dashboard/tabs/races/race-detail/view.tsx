@@ -1007,18 +1007,13 @@ export function RaceDetailView({
       id: "relationships",
       title: t("race-detail:sections.relationships"),
       content: (
-        <Card className="card-magical">
-          <CardContent className="pt-6">
-            <RaceRelationshipsSection
-              relationships={isEditing ? relationships : relationships}
-              allRaces={allRaces}
-              currentRaceId={race.id}
-              currentRaceName={race.name}
-              isEditMode={isEditing}
-              onRelationshipsChange={onRelationshipsChange}
-            />
-          </CardContent>
-        </Card>
+        <RaceRelationshipsSection
+          relationships={isEditing ? relationships : relationships}
+          allRaces={allRaces}
+          currentRaceId={race.id}
+          isEditMode={isEditing}
+          onRelationshipsChange={onRelationshipsChange}
+        />
       ),
       isCollapsible: true,
       defaultOpen: false,
