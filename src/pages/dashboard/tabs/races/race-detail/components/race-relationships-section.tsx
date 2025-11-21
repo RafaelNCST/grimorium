@@ -13,6 +13,7 @@ import {
   Handshake,
   Swords,
   Equal,
+  Heart,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -70,6 +71,7 @@ const RACE_RELATIONSHIP_COLOR_MAP: Record<
   mutualism: { bg: "green-500/10", border: "green-500/20" },
   competition: { bg: "yellow-500/10", border: "yellow-500/20" },
   neutralism: { bg: "gray-500/10", border: "gray-500/20" },
+  adoration: { bg: "pink-500/10", border: "pink-500/20" },
 };
 
 const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
@@ -80,6 +82,7 @@ const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
   { value: "mutualism", translationKey: "mutualism", icon: Handshake },
   { value: "competition", translationKey: "competition", icon: Swords },
   { value: "neutralism", translationKey: "neutralism", icon: Equal },
+  { value: "adoration", translationKey: "adoration", icon: Heart },
 ];
 
 export function RaceRelationshipsSection({
@@ -100,6 +103,10 @@ export function RaceRelationshipsSection({
   const [selectedType, setSelectedType] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
+
+  // Get current race
+  const currentRace = allRaces.find((race) => race.id === currentRaceId);
+  const currentRaceName = currentRace?.name || "";
 
   // Filter out current race and already related races
   const availableRaces = allRaces.filter(
@@ -343,7 +350,7 @@ export function RaceRelationshipsSection({
             <DialogDescription>
               {modalStep === 1
                 ? t("race-detail:relationships.select_race")
-                : t("race-detail:relationships.configure_relationship")}
+                : t("race-detail:relationships.configure_relationship_step2")}
             </DialogDescription>
           </DialogHeader>
 
@@ -418,29 +425,33 @@ export function RaceRelationshipsSection({
                         </div>
                       </div>
                     </Card>
+                    <p className="text-sm text-muted-foreground text-center pt-1">
+                      {t("race-detail:relationships.is_to_the")}{" "}
+                      <span className="font-semibold text-primary">{currentRaceName}</span>:
+                    </p>
                   </div>
 
                   {/* Relationship Type Selection */}
-                  <FormSelectGrid
-                    value={selectedType}
-                    onChange={setSelectedType}
-                    label={t("race-detail:relationships.relationship_type")}
-                    columns={2}
-                    options={RACE_RELATIONSHIP_TYPES.map((type) => ({
-                      value: type.value,
-                      label: t(
-                        `race-detail:relationship_types.${type.translationKey}`
-                      ),
-                      description: t(
-                        `race-detail:relationship_types.${type.translationKey}_desc`
-                      ),
-                      icon: type.icon,
-                      backgroundColor:
-                        RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                      borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value]
-                        .border,
-                    }))}
-                  />
+                  <div className="pb-2">
+                    <FormSelectGrid
+                      value={selectedType}
+                      onChange={setSelectedType}
+                      label={t("race-detail:relationships.relationship_type")}
+                      columns={2}
+                      options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                        value: type.value,
+                        label: t(
+                          `race-detail:relationship_types.${type.translationKey}`
+                        ),
+                        description: t(`race-detail:relationship_types.${type.translationKey}_desc`),
+                        icon: type.icon,
+                        backgroundColor:
+                          RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                        borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value]
+                          .border,
+                      }))}
+                    />
+                  </div>
 
                   {/* Description Field */}
                   {selectedType && (
@@ -513,24 +524,24 @@ export function RaceRelationshipsSection({
           <ScrollArea className="max-h-[60vh] pr-4">
             <div className="space-y-6 pr-2">
               {/* Relationship Type Selection */}
-              <FormSelectGrid
-                value={selectedType}
-                onChange={setSelectedType}
-                label={t("race-detail:relationships.relationship_type")}
-                columns={2}
-                options={RACE_RELATIONSHIP_TYPES.map((type) => ({
-                  value: type.value,
-                  label: t(
-                    `race-detail:relationship_types.${type.translationKey}`
-                  ),
-                  description: t(
-                    `race-detail:relationship_types.${type.translationKey}_desc`
-                  ),
-                  icon: type.icon,
-                  backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                  borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
-                }))}
-              />
+              <div className="pb-2">
+                <FormSelectGrid
+                  value={selectedType}
+                  onChange={setSelectedType}
+                  label={t("race-detail:relationships.relationship_type")}
+                  columns={2}
+                  options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                    value: type.value,
+                    label: t(
+                      `race-detail:relationship_types.${type.translationKey}`
+                    ),
+                    description: t(`race-detail:relationship_types.${type.translationKey}_desc`),
+                    icon: type.icon,
+                    backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                    borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
+                  }))}
+                />
+              </div>
 
               {/* Description Field */}
               <div className="space-y-3">

@@ -7,6 +7,7 @@ import {
   Equal,
   Skull,
   Fish,
+  Heart,
 } from "lucide-react";
 
 export interface IRaceRelationshipTypeBadge {
@@ -67,5 +68,12 @@ export const RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT: IRaceRelationshipTypeBadge[
       translationKey: "neutralism",
       colorClass: "text-gray-600 dark:text-gray-400",
       bgColorClass: "bg-gray-500/10 border-gray-500/30",
+    },
+    {
+      value: "adoration",
+      icon: Heart,
+      translationKey: "adoration",
+      colorClass: "text-pink-600 dark:text-pink-400",
+      bgColorClass: "bg-pink-500/10 border-pink-500/30",
     },
   ];

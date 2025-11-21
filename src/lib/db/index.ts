@@ -206,7 +206,6 @@ async function runMigrations(database: Database): Promise<void> {
 
       -- Culture and Myths
       alternative_names TEXT,
-      race_views TEXT,
       cultural_notes TEXT,
 
       -- Appearance and Characteristics
@@ -1013,6 +1012,92 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] Added description column to race_relationships table");
     } catch (error) {
       // Column already exists - safe to ignore
+    }
+
+    // Remove race_views column from races table (no longer needed)
+    try {
+      // Check if column exists before trying to remove it
+      const tableInfo = await database.select<Array<{ name: string }>>(
+        "PRAGMA table_info(races)"
+      );
+      const hasRaceViews = tableInfo.some((col) => col.name === "race_views");
+
+      if (hasRaceViews) {
+        // SQLite doesn't support DROP COLUMN directly, so we need to recreate the table
+        // Create a backup
+        await database.execute(`
+          CREATE TABLE races_backup AS SELECT * FROM races
+        `);
+
+        // Drop the old table
+        await database.execute("DROP TABLE races");
+
+        // Recreate without race_views column
+        await database.execute(`
+          CREATE TABLE races (
+            id TEXT PRIMARY KEY,
+            book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+            group_id TEXT REFERENCES race_groups(id) ON DELETE SET NULL,
+            name TEXT NOT NULL,
+            domain TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            image TEXT,
+            scientific_name TEXT,
+            alternative_names TEXT,
+            cultural_notes TEXT,
+            general_appearance TEXT,
+            life_expectancy TEXT,
+            average_height TEXT,
+            average_weight TEXT,
+            special_physical_characteristics TEXT,
+            habits TEXT,
+            reproductive_cycle TEXT,
+            other_reproductive_cycle_description TEXT,
+            diet TEXT,
+            elemental_diet TEXT,
+            communication TEXT,
+            other_communication TEXT,
+            moral_tendency TEXT,
+            social_organization TEXT,
+            habitat TEXT,
+            physical_capacity TEXT,
+            special_characteristics TEXT,
+            weaknesses TEXT,
+            story_motivation TEXT,
+            inspirations TEXT,
+            field_visibility TEXT,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+          )
+        `);
+
+        // Copy data back (excluding race_views)
+        await database.execute(`
+          INSERT INTO races SELECT
+            id, book_id, group_id, name, domain, summary, image, scientific_name,
+            alternative_names, cultural_notes, general_appearance, life_expectancy,
+            average_height, average_weight, special_physical_characteristics,
+            habits, reproductive_cycle, other_reproductive_cycle_description,
+            diet, elemental_diet, communication, other_communication,
+            moral_tendency, social_organization, habitat, physical_capacity,
+            special_characteristics, weaknesses, story_motivation, inspirations,
+            field_visibility, created_at, updated_at
+          FROM races_backup
+        `);
+
+        // Drop backup
+        await database.execute("DROP TABLE races_backup");
+
+        // Recreate indexes
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id)");
+        await database.execute("CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)");
+
+        console.log("[db] Removed race_views column from races table");
+      } else {
+        console.log("[db] race_views column already removed or never existed");
+      }
+    } catch (error) {
+      console.log("[db] Error removing race_views column:", error);
     }
 
     // Verify books table exists and log count

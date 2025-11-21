@@ -15,10 +15,6 @@ const DEFAULT_FORM_VALUES: RaceFormSchema = {
 
   // Culture and Myths
   alternativeNames: [],
-  raceViews: [],
-  rites: [],
-  taboos: [],
-  curiosities: [],
 
   // Appearance and Characteristics
   generalAppearance: "",

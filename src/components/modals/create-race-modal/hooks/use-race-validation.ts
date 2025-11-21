@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-import type { RaceView } from "../components/race-views-manager";
-
 export const raceFormSchema = z
   .object({
     // Required basic fields
@@ -24,16 +22,6 @@ export const raceFormSchema = z
 
     // Culture and Myths (all optional)
     alternativeNames: z.array(z.string().max(100)).optional(),
-    raceViews: z
-      .array(
-        z.object({
-          id: z.string(),
-          raceId: z.string(),
-          raceName: z.string(),
-          description: z.string().max(500),
-        })
-      )
-      .optional(),
     culturalNotes: z
       .string()
       .max(1500, "validation.cultural_notes_max_length")
@@ -104,6 +92,3 @@ export const raceFormSchema = z
   });
 
 export type RaceFormSchema = z.infer<typeof raceFormSchema>;
-
-// Export types for manager components
-export type { RaceView, RiteItem };

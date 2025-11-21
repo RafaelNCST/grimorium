@@ -38,7 +38,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { CommunicationDisplay } from "./components/communication-display";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
-import { RaceViewsDisplay } from "./components/race-views-display";
 
 import type {
   IRaceRelationship,
@@ -355,42 +354,6 @@ export function RaceDetailView({
             <DisplayStringList
               label={t("race-detail:fields.alternative_names")}
               items={race.alternativeNames}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Race Views */}
-        <FieldWithVisibilityToggle
-          fieldName="raceViews"
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Label className="text-sm font-medium text-primary">
-                {t("race-detail:fields.race_views")}
-              </Label>
-              <RaceViewsDisplay
-                views={editData.raceViews || []}
-                isEditing={isEditing}
-                allRaces={allRaces}
-                onViewsChange={(views) => onEditDataChange("raceViews", views)}
-                bookId={bookId}
-                currentRaceId={race.id}
-              />
-            </>
-          ) : (
-            <RaceViewsDisplay
-              views={race.raceViews || []}
-              isEditing={false}
-              allRaces={allRaces}
-              onViewsChange={() => {}}
-              open={openSections.raceViews}
-              onOpenChange={() => toggleSection("raceViews")}
-              bookId={bookId}
-              currentRaceId={race.id}
             />
           )}
         </FieldWithVisibilityToggle>

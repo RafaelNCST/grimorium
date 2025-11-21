@@ -175,7 +175,6 @@ export function RaceDetail() {
 
     // Compare culture fields
     if (!arraysEqual(race.alternativeNames, editData.alternativeNames)) return true;
-    if (JSON.stringify(race.raceViews) !== JSON.stringify(editData.raceViews)) return true;
     if (race.culturalNotes !== editData.culturalNotes) return true;
 
     // Compare appearance fields

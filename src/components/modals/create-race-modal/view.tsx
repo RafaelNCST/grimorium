@@ -16,10 +16,6 @@ import { DomainPicker } from "./components/domain-picker";
 import { HabitsPicker } from "./components/habits-picker";
 import { MoralTendencyPicker } from "./components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "./components/physical-capacity-picker";
-import {
-  RaceViewsManager,
-  type RaceView,
-} from "./components/race-views-manager";
 import { ReproductiveCyclePicker } from "./components/reproductive-cycle-picker";
 import { type RaceFormSchema } from "./hooks/use-race-validation";
 
@@ -149,14 +145,6 @@ export function CreateRaceModalView({
                 maxLength={100}
                 inputSize="small"
                 labelClassName="text-sm font-medium text-primary"
-              />
-
-              {/* Race Views */}
-              <RaceViewsManager
-                views={(watchedValues.raceViews as RaceView[]) || []}
-                onChange={(views) => setValue("raceViews", views)}
-                availableRaces={availableRaces}
-                bookId={bookId}
               />
 
               {/* Cultural Notes (Rites, Taboos, Curiosities) */}

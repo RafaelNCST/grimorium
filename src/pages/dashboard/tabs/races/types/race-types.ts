@@ -22,13 +22,6 @@ export interface IRace {
 
   // Culture and Myths (all optional)
   alternativeNames?: string[];
-  raceViews?: Array<{
-    id: string;
-    raceId: string;
-    raceName: string;
-    raceImage?: string;
-    description: string;
-  }>;
   culturalNotes?: string;
 
   // Appearance and Characteristics (all optional)

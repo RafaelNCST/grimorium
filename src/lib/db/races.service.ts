@@ -22,7 +22,6 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     alternative_names: race.alternativeNames
       ? JSON.stringify(race.alternativeNames)
       : undefined,
-    race_views: race.raceViews ? JSON.stringify(race.raceViews) : undefined,
     cultural_notes: race.culturalNotes,
     general_appearance: race.generalAppearance,
     life_expectancy: race.lifeExpectancy,
@@ -66,7 +65,6 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     alternativeNames: dbRace.alternative_names
       ? JSON.parse(dbRace.alternative_names)
       : undefined,
-    raceViews: dbRace.race_views ? JSON.parse(dbRace.race_views) : undefined,
     culturalNotes: dbRace.cultural_notes,
     generalAppearance: dbRace.general_appearance,
     lifeExpectancy: dbRace.life_expectancy,
@@ -122,7 +120,7 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
   await db.execute(
     `INSERT INTO races (
       id, book_id, group_id, name, domain, summary, image, scientific_name,
-      alternative_names, race_views, cultural_notes,
+      alternative_names, cultural_notes,
       general_appearance, life_expectancy, average_height, average_weight,
       special_physical_characteristics,
       habits, reproductive_cycle, other_reproductive_cycle_description, diet, elemental_diet, communication,
@@ -131,9 +129,9 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
       story_motivation, inspirations,
       field_visibility, created_at, updated_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-      $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
-      $31, $32, $33, $34
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+      $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
+      $29, $30, $31, $32, $33
     )`,
     [
       dbRace.id,
@@ -145,7 +143,6 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
       dbRace.image,
       dbRace.scientific_name,
       dbRace.alternative_names,
-      dbRace.race_views,
       dbRace.cultural_notes,
       dbRace.general_appearance,
       dbRace.life_expectancy,
@@ -207,15 +204,15 @@ export async function updateRace(
   await db.execute(
     `UPDATE races SET
       group_id = $1, name = $2, domain = $3, summary = $4, image = $5, scientific_name = $6,
-      alternative_names = $7, race_views = $8, cultural_notes = $9,
-      general_appearance = $10, life_expectancy = $11, average_height = $12,
-      average_weight = $13, special_physical_characteristics = $14,
-      habits = $15, reproductive_cycle = $16, other_reproductive_cycle_description = $17, diet = $18, elemental_diet = $19,
-      communication = $20, other_communication = $21, moral_tendency = $22, social_organization = $23,
-      habitat = $24, physical_capacity = $25, special_characteristics = $26,
-      weaknesses = $27, story_motivation = $28, inspirations = $29,
-      field_visibility = $30, updated_at = $31
-    WHERE id = $32`,
+      alternative_names = $7, cultural_notes = $8,
+      general_appearance = $9, life_expectancy = $10, average_height = $11,
+      average_weight = $12, special_physical_characteristics = $13,
+      habits = $14, reproductive_cycle = $15, other_reproductive_cycle_description = $16, diet = $17, elemental_diet = $18,
+      communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
+      habitat = $23, physical_capacity = $24, special_characteristics = $25,
+      weaknesses = $26, story_motivation = $27, inspirations = $28,
+      field_visibility = $29, updated_at = $30
+    WHERE id = $31`,
     [
       dbRace.group_id,
       dbRace.name,
@@ -224,7 +221,6 @@ export async function updateRace(
       dbRace.image,
       dbRace.scientific_name,
       dbRace.alternative_names,
-      dbRace.race_views,
       dbRace.cultural_notes,
       dbRace.general_appearance,
       dbRace.life_expectancy,

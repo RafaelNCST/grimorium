@@ -168,7 +168,6 @@ export interface DBRace {
 
   // Culture and Myths
   alternative_names?: string; // JSON array string
-  race_views?: string; // JSON array string
   cultural_notes?: string;
 
   // Appearance and Characteristics
