@@ -527,8 +527,27 @@ export function CharacterDetailView({
             )}
 
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <h2 className="text-3xl font-bold">{character.name}</h2>
+              <h2 className="text-3xl font-bold mb-3">{character.name}</h2>
+
+              <div className="flex items-center gap-6 text-sm text-muted-foreground mb-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span>{character.age}</span>
+                </div>
+                {currentGender && (
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const GenderIcon = currentGender.icon;
+                      return <GenderIcon className="w-4 h-4 text-primary" />;
+                    })()}
+                    <span>
+                      {t(`create-character:gender.${character.gender}`)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 flex-wrap mb-4">
                 {currentRole && (
                   <EntityTagBadge
                     config={currentRole}
@@ -546,33 +565,6 @@ export function CharacterDetailView({
                     />
                   ) : null;
                 })()}
-              </div>
-
-              <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>{character.age}</span>
-                </div>
-                {currentGender && (
-                  <div className="flex items-center gap-2">
-                    {(() => {
-                      const GenderIcon = currentGender.icon;
-                      return <GenderIcon className="w-4 h-4" />;
-                    })()}
-                    <span>
-                      {t(`create-character:gender.${character.gender}`)}
-                    </span>
-                  </div>
-                )}
-                {currentAlignment && (
-                  <Badge
-                    variant="secondary"
-                    className={`${currentAlignment.bgColor} ${currentAlignment.color}`}
-                  >
-                    <Shield className="w-3 h-3 mr-1" />
-                    {t(`create-character:alignment.${character.alignment}`)}
-                  </Badge>
-                )}
               </div>
 
               <p className="text-foreground text-base">
