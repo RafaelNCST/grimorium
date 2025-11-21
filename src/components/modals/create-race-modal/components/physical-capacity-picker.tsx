@@ -20,12 +20,11 @@ export function PhysicalCapacityPicker({
 
   return (
     <div className="space-y-3">
-      <InfoAlert>{t("modal.physical_capacity_description")}</InfoAlert>
-
       <FormSelectGrid
         value={value}
         onChange={onChange}
         label={hideLabel ? "" : t("modal.physical_capacity")}
+        alertText={t("modal.physical_capacity_description")}
         options={PHYSICAL_CAPACITY_OPTIONS}
         columns={3}
       />

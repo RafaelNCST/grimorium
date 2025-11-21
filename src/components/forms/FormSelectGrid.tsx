@@ -5,6 +5,8 @@ import { LucideIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
+import { InfoAlert } from "../ui/info-alert";
+
 // Helper para converter cores Tailwind em valores CSS
 const getTailwindColor = (colorString: string): string => {
   const colorMap: Record<string, string> = {
@@ -160,6 +162,7 @@ interface FormSelectGridProps<T = string> {
    * Enable multi-selection mode (default: false)
    */
   multi?: boolean;
+  alertText?: string;
 }
 
 /**
@@ -212,6 +215,7 @@ export function FormSelectGrid<T extends string = string>({
   expandedContent,
   showExpandedContent = false,
   multi = false,
+  alertText = "",
 }: FormSelectGridProps<T>) {
   const getColSpanClass = (colSpan?: number) => {
     if (!colSpan) return "";
@@ -250,6 +254,8 @@ export function FormSelectGrid<T extends string = string>({
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
 
+      {!!alertText.length && <InfoAlert>{alertText}</InfoAlert>}
+
       <div className={cn(`grid grid-cols-${columns} gap-3`, className)}>
         {options.map((option) => {
           const Icon = option.icon;
@@ -270,20 +276,24 @@ export function FormSelectGrid<T extends string = string>({
                   ? {
                       backgroundColor: getTailwindColor(option.backgroundColor),
                       borderColor: getTailwindColor(option.borderColor),
-                      boxShadow: `0 0 0 4px ${getTailwindColor(option.borderColor).replace(/[0-9.]+\)$/, '0.5)')}`,
+                      boxShadow: `0 0 0 4px ${getTailwindColor(option.borderColor).replace(/[0-9.]+\)$/, "0.5)")}`,
                     }
                   : undefined
               }
               onMouseEnter={(e) => {
                 if (!selected) {
-                  e.currentTarget.style.backgroundColor = getTailwindColor(option.backgroundColor);
-                  e.currentTarget.style.borderColor = getTailwindColor(option.borderColor);
+                  e.currentTarget.style.backgroundColor = getTailwindColor(
+                    option.backgroundColor
+                  );
+                  e.currentTarget.style.borderColor = getTailwindColor(
+                    option.borderColor
+                  );
                 }
               }}
               onMouseLeave={(e) => {
                 if (!selected) {
-                  e.currentTarget.style.backgroundColor = '';
-                  e.currentTarget.style.borderColor = '';
+                  e.currentTarget.style.backgroundColor = "";
+                  e.currentTarget.style.borderColor = "";
                 }
               }}
             >

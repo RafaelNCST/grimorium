@@ -65,7 +65,8 @@ export function CreateItemModalView({
       {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="name" className="text-sm font-medium text-primary">
-          {t("modal.item_name")} <span className="text-destructive ml-1">*</span>
+          {t("modal.item_name")}{" "}
+          <span className="text-destructive ml-1">*</span>
         </Label>
         <Input
           id="name"
@@ -76,13 +77,9 @@ export function CreateItemModalView({
         />
         <div className="flex justify-between text-xs text-muted-foreground">
           {errors.name && (
-            <p className="text-destructive">
-              {t(errors.name.message || "")}
-            </p>
+            <p className="text-destructive">{t(errors.name.message || "")}</p>
           )}
-          <span className="ml-auto">
-            {watchedValues.name?.length || 0}/150
-          </span>
+          <span className="ml-auto">{watchedValues.name?.length || 0}/150</span>
         </div>
       </div>
 
@@ -102,16 +99,18 @@ export function CreateItemModalView({
         value={watchedValues.category}
         customCategory={watchedValues.customCategory || ""}
         onChange={(value) => setValue("category", value)}
-        onCustomCategoryChange={(value) =>
-          setValue("customCategory", value)
-        }
+        onCustomCategoryChange={(value) => setValue("customCategory", value)}
         error={errors.category?.message}
       />
 
       {/* Basic Description */}
       <div className="space-y-2">
-        <Label htmlFor="basicDescription" className="text-sm font-medium text-primary">
-          {t("modal.basic_description")} <span className="text-destructive ml-1">*</span>
+        <Label
+          htmlFor="basicDescription"
+          className="text-sm font-medium text-primary"
+        >
+          {t("modal.basic_description")}{" "}
+          <span className="text-destructive ml-1">*</span>
         </Label>
         <Textarea
           id="basicDescription"
@@ -146,7 +145,10 @@ export function CreateItemModalView({
 
         {/* Appearance */}
         <div className="space-y-2">
-          <Label htmlFor="appearance" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="appearance"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.appearance")}
           </Label>
           <Textarea
@@ -202,29 +204,33 @@ export function CreateItemModalView({
 
         {/* Story Rarity */}
         <div className="space-y-3">
-          <Alert className="bg-primary/5 border-primary/20">
-            <Info className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-xs">
-              {t("modal.rarity_explanation")}
-            </AlertDescription>
-          </Alert>
-
           <FormSelectGrid
             value={watchedValues.storyRarity || ""}
             onChange={(value) => setValue("storyRarity", value)}
             label={t("modal.story_rarity")}
             columns={4}
+            alertText={t("modal.rarity_explanation")}
             options={STORY_RARITIES_CONSTANT.map((rarity) => ({
               value: rarity.value,
               label: t(rarity.translationKey),
               description: t(rarity.descriptionKey),
               icon: rarity.icon,
-              backgroundColor: rarity.value === 'common' ? 'gray-500/10' :
-                               rarity.value === 'rare' ? 'blue-500/10' :
-                               rarity.value === 'legendary' ? 'purple-500/10' : 'yellow-500/10',
-              borderColor: rarity.value === 'common' ? 'gray-500/20' :
-                           rarity.value === 'rare' ? 'blue-500/20' :
-                           rarity.value === 'legendary' ? 'purple-500/20' : 'yellow-500/20',
+              backgroundColor:
+                rarity.value === "common"
+                  ? "gray-500/10"
+                  : rarity.value === "rare"
+                    ? "blue-500/10"
+                    : rarity.value === "legendary"
+                      ? "purple-500/10"
+                      : "yellow-500/10",
+              borderColor:
+                rarity.value === "common"
+                  ? "gray-500/20"
+                  : rarity.value === "rare"
+                    ? "blue-500/20"
+                    : rarity.value === "legendary"
+                      ? "purple-500/20"
+                      : "yellow-500/20",
             }))}
             className="grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
           />
@@ -232,7 +238,10 @@ export function CreateItemModalView({
 
         {/* Narrative Purpose */}
         <div className="space-y-2">
-          <Label htmlFor="narrativePurpose" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="narrativePurpose"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.narrative_purpose")}
           </Label>
           <Textarea
