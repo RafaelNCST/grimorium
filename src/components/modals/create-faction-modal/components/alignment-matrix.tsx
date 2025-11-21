@@ -28,6 +28,39 @@ const ALIGNMENT_GRADIENTS: Record<string, string> = {
     "bg-gradient-to-br from-red-500/20 to-purple-500/20 border-red-500/40",
 };
 
+const ALIGNMENT_HOVER: Record<string, string> = {
+  "lawful-good":
+    "hover:bg-gradient-to-br hover:from-green-500/20 hover:to-blue-500/20 hover:border-green-500/40",
+  "neutral-good":
+    "hover:bg-gradient-to-br hover:from-green-500/20 hover:to-gray-500/20 hover:border-green-500/40",
+  "chaotic-good":
+    "hover:bg-gradient-to-br hover:from-green-500/20 hover:to-red-500/20 hover:border-green-500/40",
+  "lawful-neutral":
+    "hover:bg-gradient-to-br hover:from-blue-500/20 hover:to-gray-500/20 hover:border-gray-500/40",
+  "true-neutral":
+    "hover:bg-gradient-to-br hover:from-gray-500/20 hover:to-gray-500/20 hover:border-gray-500/40",
+  "chaotic-neutral":
+    "hover:bg-gradient-to-br hover:from-red-500/20 hover:to-gray-500/20 hover:border-gray-500/40",
+  "lawful-evil":
+    "hover:bg-gradient-to-br hover:from-blue-500/20 hover:to-purple-500/20 hover:border-purple-500/40",
+  "neutral-evil":
+    "hover:bg-gradient-to-br hover:from-gray-500/20 hover:to-purple-500/20 hover:border-purple-500/40",
+  "chaotic-evil":
+    "hover:bg-gradient-to-br hover:from-red-500/20 hover:to-purple-500/20 hover:border-red-500/40",
+};
+
+const ALIGNMENT_RING: Record<string, string> = {
+  "lawful-good": "ring-4 ring-green-500/50",
+  "neutral-good": "ring-4 ring-green-500/50",
+  "chaotic-good": "ring-4 ring-green-500/50",
+  "lawful-neutral": "ring-4 ring-gray-500/50",
+  "true-neutral": "ring-4 ring-gray-500/50",
+  "chaotic-neutral": "ring-4 ring-gray-500/50",
+  "lawful-evil": "ring-4 ring-purple-500/50",
+  "neutral-evil": "ring-4 ring-purple-500/50",
+  "chaotic-evil": "ring-4 ring-red-500/50",
+};
+
 export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
   const { t } = useTranslation("create-faction");
 
@@ -44,7 +77,7 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 max-w-2xl mx-auto">
+    <div className="grid grid-cols-3 gap-3">
       {alignmentOrder.map((alignmentValue) => {
         const alignment = FACTION_ALIGNMENTS_CONSTANT.find(
           (a) => a.value === alignmentValue
@@ -54,23 +87,25 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
         const Icon = alignment.icon;
         const isSelected = value === alignment.value;
         const gradientClass = ALIGNMENT_GRADIENTS[alignment.value] || "";
+        const hoverClass = ALIGNMENT_HOVER[alignment.value] || "";
+        const ringClass = ALIGNMENT_RING[alignment.value] || "";
 
         return (
           <button
             key={alignment.value}
             type="button"
             onClick={() => onChange(isSelected ? "" : alignment.value)}
-            className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 transition-all min-h-[120px] ${
+            className={`flex flex-col items-center justify-center gap-3 p-5 rounded-lg border-2 transition-all min-h-[140px] cursor-pointer ${
               isSelected
-                ? `${gradientClass} scale-105 shadow-lg`
-                : "bg-muted/30 border-muted hover:bg-muted/50 hover:border-muted-foreground/30"
+                ? `${gradientClass} ${ringClass}`
+                : `bg-card border-border ${hoverClass}`
             }`}
           >
             <Icon
-              className={`w-6 h-6 ${isSelected ? "" : "text-muted-foreground"}`}
+              className={`w-7 h-7 ${isSelected ? "" : "text-muted-foreground"}`}
             />
             <span
-              className={`text-[10px] font-medium text-center leading-tight ${isSelected ? "" : "text-muted-foreground"}`}
+              className={`text-xs font-medium text-center leading-tight ${isSelected ? "" : "text-muted-foreground"}`}
             >
               {t(alignment.translationKey)}
             </span>
