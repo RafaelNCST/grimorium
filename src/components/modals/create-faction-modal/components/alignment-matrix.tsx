@@ -5,6 +5,7 @@ import { FACTION_ALIGNMENTS_CONSTANT } from "../constants/faction-alignments";
 interface PropsAlignmentMatrix {
   value: string;
   onChange: (value: string) => void;
+  label?: string;
 }
 
 const ALIGNMENT_GRADIENTS: Record<string, string> = {
@@ -61,7 +62,7 @@ const ALIGNMENT_RING: Record<string, string> = {
   "chaotic-evil": "ring-4 ring-red-500/50",
 };
 
-export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
+export function AlignmentMatrix({ value, onChange, label }: PropsAlignmentMatrix) {
   const { t } = useTranslation("create-faction");
 
   const alignmentOrder = [
@@ -77,7 +78,11 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="space-y-2">
+      {label && (
+        <label className="text-sm font-medium text-primary">{label}</label>
+      )}
+      <div className="grid grid-cols-3 gap-3">
       {alignmentOrder.map((alignmentValue) => {
         const alignment = FACTION_ALIGNMENTS_CONSTANT.find(
           (a) => a.value === alignmentValue
@@ -117,6 +122,7 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
           </button>
         );
       })}
+      </div>
     </div>
   );
 }

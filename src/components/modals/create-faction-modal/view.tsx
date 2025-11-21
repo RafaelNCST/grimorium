@@ -282,18 +282,6 @@ export function CreateFactionModalView({
 
               <Separator />
 
-              {/* Alignment Section */}
-              <div className="space-y-4">
-                <SectionTitle>{t("modal.alignment_section")}</SectionTitle>
-
-                <AlignmentMatrix
-                  value={watchedValues.alignment || ""}
-                  onChange={(value) => setValue("alignment", value)}
-                />
-              </div>
-
-              <Separator />
-
               {/* Culture Section */}
               <div className="space-y-6">
                 <SectionTitle>{t("modal.culture_section")}</SectionTitle>
@@ -428,48 +416,12 @@ export function CreateFactionModalView({
                   value={watchedValues.chronology || []}
                   onChange={(value) => setValue("chronology", value)}
                 />
-              </div>
 
-              <Separator />
-
-              {/* Power Section - Keep as is */}
-              <div className="space-y-4">
-                <SectionTitle>{t("modal.power_section")}</SectionTitle>
-
-                <p className="text-sm text-muted-foreground">
-                  {t("modal.power_description")}
-                </p>
-
-                {/* Military Power */}
-                <PowerSlider
-                  label={t("modal.military_power")}
-                  description={t("modal.military_power_description")}
-                  value={watchedValues.militaryPower || 5}
-                  onChange={(value) => setValue("militaryPower", value)}
-                />
-
-                {/* Political Power */}
-                <PowerSlider
-                  label={t("modal.political_power")}
-                  description={t("modal.political_power_description")}
-                  value={watchedValues.politicalPower || 5}
-                  onChange={(value) => setValue("politicalPower", value)}
-                />
-
-                {/* Cultural Power */}
-                <PowerSlider
-                  label={t("modal.cultural_power")}
-                  description={t("modal.cultural_power_description")}
-                  value={watchedValues.culturalPower || 5}
-                  onChange={(value) => setValue("culturalPower", value)}
-                />
-
-                {/* Economic Power */}
-                <PowerSlider
-                  label={t("modal.economic_power")}
-                  description={t("modal.economic_power_description")}
-                  value={watchedValues.economicPower || 5}
-                  onChange={(value) => setValue("economicPower", value)}
+                {/* Alignment */}
+                <AlignmentMatrix
+                  value={watchedValues.alignment || ""}
+                  onChange={(value) => setValue("alignment", value)}
+                  label={t("modal.alignment")}
                 />
               </div>
 
@@ -520,6 +472,48 @@ export function CreateFactionModalView({
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
                 />
+
+                {/* Power Sliders */}
+                <div className="space-y-4">
+                  <label className="text-sm font-medium text-primary">
+                    {t("modal.power_section")}
+                  </label>
+                  <p className="text-sm text-muted-foreground">
+                    {t("modal.power_description")}
+                  </p>
+
+                  {/* Military Power */}
+                  <PowerSlider
+                    label={t("modal.military_power")}
+                    description={t("modal.military_power_description")}
+                    value={watchedValues.militaryPower || 5}
+                    onChange={(value) => setValue("militaryPower", value)}
+                  />
+
+                  {/* Political Power */}
+                  <PowerSlider
+                    label={t("modal.political_power")}
+                    description={t("modal.political_power_description")}
+                    value={watchedValues.politicalPower || 5}
+                    onChange={(value) => setValue("politicalPower", value)}
+                  />
+
+                  {/* Cultural Power */}
+                  <PowerSlider
+                    label={t("modal.cultural_power")}
+                    description={t("modal.cultural_power_description")}
+                    value={watchedValues.culturalPower || 5}
+                    onChange={(value) => setValue("culturalPower", value)}
+                  />
+
+                  {/* Economic Power */}
+                  <PowerSlider
+                    label={t("modal.economic_power")}
+                    description={t("modal.economic_power_description")}
+                    value={watchedValues.economicPower || 5}
+                    onChange={(value) => setValue("economicPower", value)}
+                  />
+                </div>
               </div>
             </>
           }
