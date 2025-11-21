@@ -189,7 +189,7 @@
     "race": {
       "title": "Excluir Raça",
       "step1": {
-        "message": "Você está prestes a excluir permanentemente a raça '{{raceName}}'. Esta ação não pode ser desfeita.",
+        "message": "Você está prestes a excluir permanentemente a raça '{{entityName}}'. Esta ação não pode ser desfeita.",
         "input_label": "Digite o nome da raça para confirmar:",
         "input_placeholder": "Digite o nome exato da raça",
         "name_mismatch": "O nome não corresponde",
@@ -198,8 +198,8 @@
       },
       "step2": {
         "title": "Confirmação Final",
-        "message": "Você está prestes a excluir '{{raceName}}' e todas as suas {{totalVersions}} versões. Esta ação é IRREVERSÍVEL.",
-        "message_single": "Você está prestes a excluir '{{raceName}}'. Esta ação é IRREVERSÍVEL.",
+        "message": "Você está prestes a excluir '{{entityName}}' e todas as suas {{totalVersions}} versões. Esta ação é IRREVERSÍVEL.",
+        "message_single": "Você está prestes a excluir '{{entityName}}'. Esta ação é IRREVERSÍVEL.",
         "cancel": "Cancelar",
         "confirm": "Excluir Permanentemente"
       }

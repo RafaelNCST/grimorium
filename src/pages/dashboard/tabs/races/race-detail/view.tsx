@@ -1098,6 +1098,7 @@ export function RaceDetailView({
         onClose={onDeleteModalClose}
         entityName={race.name}
         entityType="race"
+        currentVersion={null}
         onConfirmDelete={onConfirmDelete}
         i18nNamespace="race-detail"
       />
