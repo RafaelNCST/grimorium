@@ -8,6 +8,7 @@ import { FormListInput } from "@/components/forms/FormListInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 
 import { CommunicationPicker } from "./components/communication-picker";
@@ -132,9 +133,7 @@ export function CreateRaceModalView({
           advancedFields={
             <>
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("sections.culture_myths")}
-              </h3>
+              <SectionTitle>{t("sections.culture_myths")}</SectionTitle>
 
               {/* Alternative Names */}
               <FormListInput
@@ -167,9 +166,7 @@ export function CreateRaceModalView({
 
             {/* Appearance Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("sections.appearance")}
-              </h3>
+              <SectionTitle>{t("sections.appearance")}</SectionTitle>
 
               {/* General Appearance */}
               <FormTextarea
@@ -235,9 +232,7 @@ export function CreateRaceModalView({
 
             {/* Behaviors Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("sections.behaviors")}
-              </h3>
+              <SectionTitle>{t("sections.behaviors")}</SectionTitle>
 
               {/* Habits */}
               <HabitsPicker
@@ -314,9 +309,7 @@ export function CreateRaceModalView({
 
             {/* Power Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("sections.power")}
-              </h3>
+              <SectionTitle>{t("sections.power")}</SectionTitle>
 
               {/* Physical Capacity */}
               <PhysicalCapacityPicker
@@ -355,9 +348,7 @@ export function CreateRaceModalView({
 
             {/* Narrative Section */}
             <div className="space-y-6">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                {t("sections.narrative")}
-              </h3>
+              <SectionTitle>{t("sections.narrative")}</SectionTitle>
 
               {/* Story Motivation */}
               <FormTextarea

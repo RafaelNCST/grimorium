@@ -12,6 +12,7 @@ import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
@@ -160,9 +161,7 @@ export function CreateFactionModalView({
             <>
               {/* Internal Structure Section */}
               <div className="space-y-6">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.internal_structure_section")}
-                </h3>
+                <SectionTitle>{t("modal.internal_structure_section")}</SectionTitle>
 
                 {/* Government Form */}
                 <FormTextarea
@@ -244,9 +243,7 @@ export function CreateFactionModalView({
 
               {/* Relationships Section */}
               <div className="space-y-6">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.relationships_section")}
-                </h3>
+                <SectionTitle>{t("modal.relationships_section")}</SectionTitle>
 
                 {/* Influence */}
                 <FormSelectGrid
@@ -284,9 +281,7 @@ export function CreateFactionModalView({
 
               {/* Alignment Section */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.alignment_section")}
-                </h3>
+                <SectionTitle>{t("modal.alignment_section")}</SectionTitle>
 
                 <Label className="text-sm font-medium text-primary">
                   {t("modal.alignment")}
@@ -302,9 +297,7 @@ export function CreateFactionModalView({
 
               {/* Culture Section */}
               <div className="space-y-6">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.culture_section")}
-                </h3>
+                <SectionTitle>{t("modal.culture_section")}</SectionTitle>
 
                 {/* Faction Motto */}
                 <FormTextarea
@@ -387,9 +380,7 @@ export function CreateFactionModalView({
 
               {/* History Section */}
               <div className="space-y-6">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.history_section")}
-                </h3>
+                <SectionTitle>{t("modal.history_section")}</SectionTitle>
 
                 {/* Foundation Date */}
                 <FormInput
@@ -440,9 +431,7 @@ export function CreateFactionModalView({
 
               {/* Power Section - Keep as is */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.power_section")}
-                </h3>
+                <SectionTitle>{t("modal.power_section")}</SectionTitle>
 
                 <p className="text-sm text-muted-foreground">
                   {t("modal.power_description")}
@@ -485,9 +474,7 @@ export function CreateFactionModalView({
 
               {/* Narrative Section */}
               <div className="space-y-6">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t("modal.narrative_section")}
-                </h3>
+                <SectionTitle>{t("modal.narrative_section")}</SectionTitle>
 
                 {/* Organization Objectives */}
                 <FormTextarea

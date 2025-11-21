@@ -32,7 +32,10 @@
     "usage_consequences": "Consequences or Cost of Use",
     "usage_consequences_placeholder": "Drains the user's life energy, attracts shadow creatures when unsheathed.",
     "item_usage": "Item Usage",
-    "item_usage_placeholder": "Describe how the item is used, required techniques, activation methods, etc."
+    "item_usage_placeholder": "Describe how the item is used, required techniques, activation methods, etc.",
+    "description_history_section": "Description and history",
+    "narrative_section": "Narrative",
+    "mechanics_section": "Item mechanics"
   },
   "status": {
     "complete": "Complete",

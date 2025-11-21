@@ -10,6 +10,7 @@ import { EntityModal } from "@/components/modals/entity-modal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -140,9 +141,7 @@ export function CreateItemModalView({
       {/* DESCRIÇÃO E HISTÓRIA */}
       {/* ==================== */}
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-          Descrição e História
-        </h4>
+        <SectionTitle>{t("modal.description_history_section")}</SectionTitle>
 
         {/* Appearance */}
         <div className="space-y-2">
@@ -198,9 +197,7 @@ export function CreateItemModalView({
       {/* NARRATIVA */}
       {/* ==================== */}
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-          Narrativa
-        </h4>
+        <SectionTitle>{t("modal.narrative_section")}</SectionTitle>
 
         {/* Story Rarity */}
         <div className="space-y-3">
@@ -257,9 +254,7 @@ export function CreateItemModalView({
       {/* MECÂNICAS DO ITEM */}
       {/* ==================== */}
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-          Mecânicas do Item
-        </h4>
+        <SectionTitle>{t("modal.mechanics_section")}</SectionTitle>
 
         {/* Usage Requirements */}
         <div className="space-y-2">

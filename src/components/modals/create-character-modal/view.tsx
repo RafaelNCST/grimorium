@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -252,9 +253,7 @@ export function CreateCharacterModalView({
     <>
       {/* Appearance Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("modal.appearance_section")}
-        </h4>
+        <SectionTitle>{t("modal.appearance_section")}</SectionTitle>
 
         {/* Height and Weight - 2 columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -406,9 +405,7 @@ export function CreateCharacterModalView({
 
       {/* Behavior and Tastes Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("modal.behavior_section")}
-        </h4>
+        <SectionTitle>{t("modal.behavior_section")}</SectionTitle>
 
         {/* Archetype - Using FormSelectGrid */}
         <FormSelectGrid
@@ -531,9 +528,7 @@ export function CreateCharacterModalView({
 
       {/* Alignment Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("modal.alignment_section")}
-        </h4>
+        <SectionTitle>{t("modal.alignment_section")}</SectionTitle>
 
         <AlignmentMatrix
           value={watchedValues.alignment || ""}
@@ -546,9 +541,7 @@ export function CreateCharacterModalView({
 
       {/* History Section */}
       <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("modal.locations_section")}
-        </h4>
+        <SectionTitle>{t("modal.locations_section")}</SectionTitle>
 
         <FormEntityMultiSelectAuto
           entityType="region"

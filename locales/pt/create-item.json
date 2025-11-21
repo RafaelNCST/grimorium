@@ -35,7 +35,10 @@
     "usage_consequences": "Consequências ou Custo de Uso",
     "usage_consequences_placeholder": "Drena a energia vital do usuário, atrai criaturas das sombras quando desembainhada.",
     "item_usage": "Uso do Item",
-    "item_usage_placeholder": "Descreva como o item é usado, técnicas necessárias, métodos de ativação, etc."
+    "item_usage_placeholder": "Descreva como o item é usado, técnicas necessárias, métodos de ativação, etc.",
+    "description_history_section": "Descrição e história",
+    "narrative_section": "Narrativa",
+    "mechanics_section": "Mecânicas do item"
   },
   "status": {
     "complete": "Completa",

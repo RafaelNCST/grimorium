@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 import { IItem } from "@/lib/db/items.service";
 import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
@@ -390,9 +391,7 @@ export function CreateRegionModal({
         <>
           {/* Environment Section */}
           <div className="space-y-4">
-            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-              {t("create_region.environment_section")}
-            </h4>
+            <SectionTitle>{t("create_region.environment_section")}</SectionTitle>
 
             {/* Climate */}
             <FormField
@@ -490,9 +489,7 @@ export function CreateRegionModal({
 
           {/* Information Section */}
           <div className="space-y-4">
-            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-              {t("create_region.information_section")}
-            </h4>
+            <SectionTitle>{t("create_region.information_section")}</SectionTitle>
 
             {/* Resident Factions */}
             <FormField
@@ -632,9 +629,7 @@ export function CreateRegionModal({
 
           {/* Narrative Section */}
           <div className="space-y-4">
-            <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-              {t("create_region.narrative_section")}
-            </h4>
+            <SectionTitle>{t("create_region.narrative_section")}</SectionTitle>
 
             {/* Narrative Purpose */}
             <FormField
