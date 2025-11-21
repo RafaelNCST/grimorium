@@ -158,7 +158,7 @@ export function CollapsibleSection({
         {/* Content with padding */}
         {isCollapsible ? (
           <CollapsibleContent>
-            <CardContent>{children}</CardContent>
+            <CardContent className="pt-6">{children}</CardContent>
           </CollapsibleContent>
         ) : (
           <CardContent>{children}</CardContent>
