@@ -1,8 +1,10 @@
 import { useState, useCallback, useMemo, ReactNode } from "react";
 
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,9 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InfoAlert } from "@/components/ui/info-alert";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 export interface CreateVersionWithEntityData<TEntityData> {
   name: string;
@@ -84,10 +83,6 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
   const [versionDescription, setVersionDescription] = useState("");
   const [isEntityModalOpen, setIsEntityModalOpen] = useState(false);
 
-  const nameCharsRemaining = maxNameLength - versionName.length;
-  const descriptionCharsRemaining =
-    maxDescriptionLength - versionDescription.length;
-
   const canProceedToStep2 = useMemo(
     () => versionName.trim().length > 0 && versionDescription.trim().length > 0,
     [versionName, versionDescription]
@@ -116,29 +111,11 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
 
   const handleEntityCreate = useCallback(
     (entityData: TEntityData) => {
-      console.log("[CreateVersionWithEntityDialog] handleEntityCreate called");
-      console.log("[CreateVersionWithEntityDialog] versionName:", versionName);
-      console.log(
-        "[CreateVersionWithEntityDialog] versionDescription:",
-        versionDescription
-      );
-      console.log(
-        "[CreateVersionWithEntityDialog] entityData received:",
-        entityData
-      );
-
-      const dataToConfirm = {
+      onConfirm({
         name: versionName.trim(),
         description: versionDescription.trim(),
         entityData,
-      };
-
-      console.log(
-        "[CreateVersionWithEntityDialog] Calling onConfirm with:",
-        dataToConfirm
-      );
-
-      onConfirm(dataToConfirm);
+      });
       handleClose();
     },
     [versionName, versionDescription, onConfirm, handleClose]
@@ -158,93 +135,48 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
           <InfoAlert>{t("versions.create_dialog.info_message")}</InfoAlert>
 
           <div className="space-y-4 pt-2">
-            {/* Version Name */}
-            <div className="space-y-2">
-              <Label htmlFor="version-name" className="text-sm font-medium">
-                {t("versions.create_dialog.name_label")} *
-              </Label>
-              <Input
-                id="version-name"
-                value={versionName}
-                onChange={(e) => {
-                  if (e.target.value.length <= maxNameLength) {
-                    setVersionName(e.target.value);
-                  }
-                }}
-                placeholder={t("versions.create_dialog.name_placeholder")}
-                maxLength={maxNameLength}
-                className={
-                  versionName.trim().length === 0 && versionName.length > 0
-                    ? "border-destructive"
-                    : ""
+            <FormInput
+              label={t("versions.create_dialog.name_label")}
+              value={versionName}
+              onChange={(e) => {
+                if (e.target.value.length <= maxNameLength) {
+                  setVersionName(e.target.value);
                 }
-              />
-              <div className="flex justify-between text-xs">
-                {versionName.trim().length === 0 && versionName.length > 0 && (
-                  <span className="text-destructive">
-                    {t("versions.create_dialog.name_required")}
-                  </span>
-                )}
-                <span
-                  className={`ml-auto ${
-                    nameCharsRemaining < 20
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {nameCharsRemaining}{" "}
-                  {t("versions.create_dialog.chars_remaining")}
-                </span>
-              </div>
-            </div>
+              }}
+              placeholder={t("versions.create_dialog.name_placeholder")}
+              maxLength={maxNameLength}
+              showCharCount
+              required
+              showOptionalLabel={false}
+              error={
+                versionName.trim().length === 0 && versionName.length > 0
+                  ? t("versions.create_dialog.name_required")
+                  : undefined
+              }
+            />
 
-            {/* Version Description */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="version-description"
-                className="text-sm font-medium"
-              >
-                {t("versions.create_dialog.description_label")} *
-              </Label>
-              <Textarea
-                id="version-description"
-                value={versionDescription}
-                onChange={(e) => {
-                  if (e.target.value.length <= maxDescriptionLength) {
-                    setVersionDescription(e.target.value);
-                  }
-                }}
-                placeholder={t(
-                  "versions.create_dialog.description_placeholder"
-                )}
-                maxLength={maxDescriptionLength}
-                rows={4}
-                className={`resize-none ${
-                  versionDescription.trim().length === 0 &&
-                  versionDescription.length > 0
-                    ? "border-destructive"
-                    : ""
-                }`}
-              />
-              <div className="flex justify-between text-xs">
-                {versionDescription.trim().length === 0 &&
-                  versionDescription.length > 0 && (
-                    <span className="text-destructive">
-                      {t("versions.create_dialog.description_required")}
-                    </span>
-                  )}
-                <span
-                  className={`ml-auto ${
-                    descriptionCharsRemaining < 20
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {descriptionCharsRemaining}{" "}
-                  {t("versions.create_dialog.chars_remaining")}
-                </span>
-              </div>
-            </div>
+            <FormTextarea
+              label={t("versions.create_dialog.description_label")}
+              value={versionDescription}
+              onChange={(e) => {
+                if (e.target.value.length <= maxDescriptionLength) {
+                  setVersionDescription(e.target.value);
+                }
+              }}
+              placeholder={t("versions.create_dialog.description_placeholder")}
+              maxLength={maxDescriptionLength}
+              rows={4}
+              showCharCount
+              required
+              showOptionalLabel={false}
+              className="resize-none"
+              error={
+                versionDescription.trim().length === 0 &&
+                versionDescription.length > 0
+                  ? t("versions.create_dialog.description_required")
+                  : undefined
+              }
+            />
           </div>
 
           {/* Action Buttons */}
@@ -255,13 +187,13 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
               onClick={handleClose}
               className="flex-1"
             >
-              <X className="w-4 h-4 mr-2" />
               {t("versions.create_dialog.cancel")}
             </Button>
             <Button
               type="button"
               disabled={!canProceedToStep2}
               variant="magical"
+              size="lg"
               onClick={handleStep1Continue}
               className="flex-1 animate-glow"
             >
