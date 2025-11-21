@@ -8,6 +8,67 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import type { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
+/**
+ * Faction influence options for FormSelectGrid
+ * Used in create-faction-modal for influence selection
+ */
+export const FACTION_INFLUENCE_OPTIONS: GridSelectOption[] = [
+  {
+    value: "nonexistent",
+    label: "influence.nonexistent",
+    description: "influence.nonexistent_desc",
+    icon: Minimize2,
+    backgroundColor: "gray-500/10",
+    borderColor: "gray-500/30",
+  },
+  {
+    value: "low",
+    label: "influence.low",
+    description: "influence.low_desc",
+    icon: TrendingDown,
+    backgroundColor: "yellow-500/10",
+    borderColor: "yellow-500/30",
+  },
+  {
+    value: "medium",
+    label: "influence.medium",
+    description: "influence.medium_desc",
+    icon: Minus,
+    backgroundColor: "orange-500/10",
+    borderColor: "orange-500/30",
+  },
+  {
+    value: "high",
+    label: "influence.high",
+    description: "influence.high_desc",
+    icon: TrendingUp,
+    backgroundColor: "blue-500/10",
+    borderColor: "blue-500/30",
+  },
+  {
+    value: "superior",
+    label: "influence.superior",
+    description: "influence.superior_desc",
+    icon: Zap,
+    backgroundColor: "violet-500/10",
+    borderColor: "violet-500/30",
+  },
+  {
+    value: "dominant",
+    label: "influence.dominant",
+    description: "influence.dominant_desc",
+    icon: Crown,
+    backgroundColor: "purple-500/10",
+    borderColor: "purple-500/30",
+  },
+];
+
+/**
+ * @deprecated Use FACTION_INFLUENCE_OPTIONS instead
+ * Legacy constant for backward compatibility
+ */
 export interface IFactionInfluenceConstant {
   value: string;
   icon: LucideIcon;
@@ -17,6 +78,9 @@ export interface IFactionInfluenceConstant {
   bgColorClass: string;
 }
 
+/**
+ * @deprecated Use FACTION_INFLUENCE_OPTIONS instead
+ */
 export const FACTION_INFLUENCE_CONSTANT: IFactionInfluenceConstant[] = [
   {
     value: "nonexistent",

@@ -16,6 +16,7 @@ import { FactionCard } from "./components/faction-card";
 import { createFactionFilterRows } from "./helpers/filter-config";
 
 interface PropsFactionsView {
+  bookId: string;
   factions: IFaction[];
   filteredFactions: IFaction[];
   searchTerm: string;
@@ -34,6 +35,7 @@ interface PropsFactionsView {
 }
 
 const FactionsViewComponent = function FactionsView({
+  bookId,
   factions,
   filteredFactions,
   searchTerm,
@@ -141,6 +143,7 @@ const FactionsViewComponent = function FactionsView({
         open={showCreateModal}
         onClose={() => onShowCreateModalChange(false)}
         onConfirm={onCreateFaction}
+        bookId={bookId}
       />
     </>
   );

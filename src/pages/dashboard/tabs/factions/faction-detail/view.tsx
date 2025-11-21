@@ -95,6 +95,7 @@ interface FactionDetailViewProps {
   TypeIcon: LucideIcon;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
+  bookId: string;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -223,6 +224,7 @@ export function FactionDetailView({
   TypeIcon,
   fieldVisibility,
   advancedSectionOpen,
+  bookId,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -1442,6 +1444,7 @@ export function FactionDetailView({
                       onVersionDelete={onVersionDelete}
                       isEditMode={isEditing}
                       mainFactionData={faction}
+                      bookId={bookId}
                       translationNamespace="faction-detail"
                     />
                   </CardContent>

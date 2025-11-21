@@ -532,6 +532,7 @@ export function FactionDetail() {
       TypeIcon={TypeIcon}
       fieldVisibility={fieldVisibility}
       fileInputRef={fileInputRef}
+      bookId={dashboardId}
       onBack={handleBack}
       onEdit={handleEdit}
       onSave={handleSave}

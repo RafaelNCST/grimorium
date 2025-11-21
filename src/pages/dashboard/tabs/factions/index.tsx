@@ -125,6 +125,7 @@ export function FactionsTab({ bookId }: PropsFactionsTab) {
 
   return (
     <FactionsView
+      bookId={bookId}
       factions={factions}
       filteredFactions={filteredFactions}
       searchTerm={searchTerm}

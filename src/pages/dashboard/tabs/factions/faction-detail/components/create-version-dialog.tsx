@@ -27,6 +27,7 @@ interface CreateVersionDialogProps {
     factionData: IFactionFormData;
   }) => void;
   baseFaction: IFaction;
+  bookId: string;
 }
 
 export function CreateVersionDialog({
@@ -34,6 +35,7 @@ export function CreateVersionDialog({
   onClose,
   onConfirm,
   baseFaction,
+  bookId,
 }: CreateVersionDialogProps) {
   const { t } = useTranslation("faction-detail");
   const [step, setStep] = useState<1 | 2>(1);
@@ -222,8 +224,7 @@ export function CreateVersionDialog({
           open={isFactionModalOpen}
           onClose={handleFactionModalClose}
           onConfirm={handleFactionCreate}
-          characters={[]}
-          races={[]}
+          bookId={bookId}
         />
       )}
     </>

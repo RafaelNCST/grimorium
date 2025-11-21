@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { type IFactionFormData } from "@/types/faction-types";
 
@@ -9,22 +9,18 @@ interface PropsCreateFactionModal {
   open: boolean;
   onClose: () => void;
   onConfirm: (factionData: IFactionFormData) => void;
-  races?: Array<{ id: string; name: string }>;
-  characters?: Array<{ id: string; name: string }>;
+  bookId: string;
 }
 
 export function CreateFactionModal({
   open,
   onClose,
   onConfirm,
-  races = [],
-  characters = [],
+  bookId,
 }: PropsCreateFactionModal) {
   const form = useFactionForm();
   const { handleSubmit, reset } = form;
-
-  const hasRaces = useMemo(() => races.length > 0, [races]);
-  const hasCharacters = useMemo(() => characters.length > 0, [characters]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const watchedFields = form.watch([
     "name",
@@ -44,10 +40,15 @@ export function CreateFactionModal({
   }, [reset, onClose]);
 
   const handleFormSubmit = useCallback(
-    (data: IFactionFormData) => {
-      onConfirm(data);
-      reset();
-      onClose();
+    async (data: IFactionFormData) => {
+      setIsSubmitting(true);
+      try {
+        await onConfirm(data);
+        reset();
+        onClose();
+      } finally {
+        setIsSubmitting(false);
+      }
     },
     [onConfirm, reset, onClose]
   );
@@ -67,10 +68,8 @@ export function CreateFactionModal({
       onClose={handleClose}
       onSubmit={onSubmit}
       isValid={isValid}
-      hasRaces={hasRaces}
-      hasCharacters={hasCharacters}
-      races={races}
-      characters={characters}
+      isSubmitting={isSubmitting}
+      bookId={bookId}
     />
   );
 }

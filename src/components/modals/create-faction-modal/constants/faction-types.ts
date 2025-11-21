@@ -14,6 +14,115 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import type { GridSelectOption } from "@/components/forms/FormSelectGrid";
+
+/**
+ * Faction type options for FormSelectGrid
+ * Used in create-faction-modal for faction type selection
+ */
+export const FACTION_TYPE_OPTIONS: GridSelectOption[] = [
+  {
+    value: "commercial",
+    label: "faction_type.commercial",
+    description: "faction_type.commercial_desc",
+    icon: Store,
+    backgroundColor: "emerald-500/10",
+    borderColor: "emerald-500/30",
+  },
+  {
+    value: "military",
+    label: "faction_type.military",
+    description: "faction_type.military_desc",
+    icon: Swords,
+    backgroundColor: "red-500/10",
+    borderColor: "red-500/30",
+  },
+  {
+    value: "magical",
+    label: "faction_type.magical",
+    description: "faction_type.magical_desc",
+    icon: Wand2,
+    backgroundColor: "purple-500/10",
+    borderColor: "purple-500/30",
+  },
+  {
+    value: "religious",
+    label: "faction_type.religious",
+    description: "faction_type.religious_desc",
+    icon: Church,
+    backgroundColor: "yellow-500/10",
+    borderColor: "yellow-500/30",
+  },
+  {
+    value: "cult",
+    label: "faction_type.cult",
+    description: "faction_type.cult_desc",
+    icon: Eye,
+    backgroundColor: "indigo-500/10",
+    borderColor: "indigo-500/30",
+  },
+  {
+    value: "tribal",
+    label: "faction_type.tribal",
+    description: "faction_type.tribal_desc",
+    icon: Users,
+    backgroundColor: "orange-500/10",
+    borderColor: "orange-500/30",
+  },
+  {
+    value: "racial",
+    label: "faction_type.racial",
+    description: "faction_type.racial_desc",
+    icon: Shield,
+    backgroundColor: "cyan-500/10",
+    borderColor: "cyan-500/30",
+  },
+  {
+    value: "governmental",
+    label: "faction_type.governmental",
+    description: "faction_type.governmental_desc",
+    icon: Building2,
+    backgroundColor: "blue-500/10",
+    borderColor: "blue-500/30",
+  },
+  {
+    value: "revolutionary",
+    label: "faction_type.revolutionary",
+    description: "faction_type.revolutionary_desc",
+    icon: Flame,
+    backgroundColor: "red-700/10",
+    borderColor: "red-700/30",
+  },
+  {
+    value: "academic",
+    label: "faction_type.academic",
+    description: "faction_type.academic_desc",
+    icon: GraduationCap,
+    backgroundColor: "teal-500/10",
+    borderColor: "teal-500/30",
+  },
+  {
+    value: "royalty",
+    label: "faction_type.royalty",
+    description: "faction_type.royalty_desc",
+    icon: Crown,
+    backgroundColor: "amber-500/10",
+    borderColor: "amber-500/30",
+  },
+  {
+    value: "mercenary",
+    label: "faction_type.mercenary",
+    description: "faction_type.mercenary_desc",
+    icon: Coins,
+    backgroundColor: "slate-500/10",
+    borderColor: "slate-500/30",
+  },
+];
+
+/**
+ * @deprecated Use FACTION_TYPE_OPTIONS instead
+ * Legacy constant for backward compatibility
+ */
 export interface IFactionTypeConstant {
   value: string;
   icon: LucideIcon;
@@ -23,6 +132,9 @@ export interface IFactionTypeConstant {
   bgColorClass: string;
 }
 
+/**
+ * @deprecated Use FACTION_TYPE_OPTIONS instead
+ */
 export const FACTION_TYPES_CONSTANT: IFactionTypeConstant[] = [
   {
     value: "commercial",

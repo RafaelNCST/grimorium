@@ -83,6 +83,10 @@ interface FormImageUploadProps {
    * Custom className for label
    */
   labelClassName?: string;
+  /**
+   * Compact mode - hides label, reduces padding
+   */
+  compact?: boolean;
 }
 
 /**
@@ -147,6 +151,7 @@ export function FormImageUpload({
   id = "image-upload",
   showLabel = true,
   labelClassName = "text-primary",
+  compact = false,
 }: FormImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(value);
@@ -190,8 +195,8 @@ export function FormImageUpload({
   const fitClass = fitClasses[imageFit];
 
   return (
-    <div className="space-y-2">
-      {showLabel && (
+    <div className={compact ? "" : "space-y-2"}>
+      {showLabel && !compact && (
         <Label className={labelClassName}>
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
@@ -203,7 +208,7 @@ export function FormImageUpload({
         </Label>
       )}
 
-      <div className="space-y-3">
+      <div className={compact ? "" : "space-y-3"}>
         <input
           ref={fileInputRef}
           type="file"
@@ -237,9 +242,11 @@ export function FormImageUpload({
             <div
               className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}
             >
-              <PlaceholderIcon className="h-8 w-8 text-muted-foreground/60" />
-              {placeholderText && (
-                <span className={`${placeholderTextSize} text-muted-foreground`}>
+              <PlaceholderIcon className="h-12 w-12 text-muted-foreground/60" />
+              {placeholderText && !compact && (
+                <span
+                  className={`${placeholderTextSize} text-muted-foreground`}
+                >
                   {placeholderText}
                 </span>
               )}

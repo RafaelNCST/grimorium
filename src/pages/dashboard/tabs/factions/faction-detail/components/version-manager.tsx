@@ -27,6 +27,7 @@ interface VersionManagerProps {
   onVersionDelete: (versionId: string) => void;
   isEditMode: boolean;
   mainFactionData: IFaction;
+  bookId: string;
   translationNamespace?: string;
 }
 
@@ -37,6 +38,7 @@ export function VersionManager({
   onVersionCreate,
   isEditMode,
   mainFactionData,
+  bookId,
   translationNamespace = "faction-detail",
 }: VersionManagerProps) {
   const { t } = useTranslation(translationNamespace);
@@ -127,6 +129,7 @@ export function VersionManager({
         onClose={() => setIsCreateDialogOpen(false)}
         onConfirm={handleCreateVersion}
         baseFaction={mainFactionData}
+        bookId={bookId}
       />
     </div>
   );

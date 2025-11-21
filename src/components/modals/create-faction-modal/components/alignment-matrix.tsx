@@ -1,80 +1,11 @@
-import {
-  Heart,
-  Scale,
-  Skull,
-  Shield,
-  CircleDot,
-  Swords,
-  Sparkles,
-  Zap,
-  Flame,
-  type LucideIcon,
-} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-interface IAlignment {
-  value: string;
-  icon: LucideIcon;
-  translationKey: string;
-  descriptionKey: string;
-}
+import { FACTION_ALIGNMENTS_CONSTANT } from "../constants/faction-alignments";
 
-const ALIGNMENTS: IAlignment[] = [
-  {
-    value: "lawful-good",
-    icon: Shield,
-    translationKey: "alignment.lawful_good",
-    descriptionKey: "alignment.lawful_good_desc",
-  },
-  {
-    value: "neutral-good",
-    icon: Heart,
-    translationKey: "alignment.neutral_good",
-    descriptionKey: "alignment.neutral_good_desc",
-  },
-  {
-    value: "chaotic-good",
-    icon: Sparkles,
-    translationKey: "alignment.chaotic_good",
-    descriptionKey: "alignment.chaotic_good_desc",
-  },
-  {
-    value: "lawful-neutral",
-    icon: Scale,
-    translationKey: "alignment.lawful_neutral",
-    descriptionKey: "alignment.lawful_neutral_desc",
-  },
-  {
-    value: "true-neutral",
-    icon: CircleDot,
-    translationKey: "alignment.true_neutral",
-    descriptionKey: "alignment.true_neutral_desc",
-  },
-  {
-    value: "chaotic-neutral",
-    icon: Zap,
-    translationKey: "alignment.chaotic_neutral",
-    descriptionKey: "alignment.chaotic_neutral_desc",
-  },
-  {
-    value: "lawful-evil",
-    icon: Swords,
-    translationKey: "alignment.lawful_evil",
-    descriptionKey: "alignment.lawful_evil_desc",
-  },
-  {
-    value: "neutral-evil",
-    icon: Skull,
-    translationKey: "alignment.neutral_evil",
-    descriptionKey: "alignment.neutral_evil_desc",
-  },
-  {
-    value: "chaotic-evil",
-    icon: Flame,
-    translationKey: "alignment.chaotic_evil",
-    descriptionKey: "alignment.chaotic_evil_desc",
-  },
-];
+interface PropsAlignmentMatrix {
+  value: string;
+  onChange: (value: string) => void;
+}
 
 const ALIGNMENT_GRADIENTS: Record<string, string> = {
   "lawful-good":
@@ -97,11 +28,6 @@ const ALIGNMENT_GRADIENTS: Record<string, string> = {
     "bg-gradient-to-br from-red-500/20 to-purple-500/20 border-red-500/40",
 };
 
-interface PropsAlignmentMatrix {
-  value: string;
-  onChange: (value: string) => void;
-}
-
 export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
   const { t } = useTranslation("create-faction");
 
@@ -120,7 +46,9 @@ export function AlignmentMatrix({ value, onChange }: PropsAlignmentMatrix) {
   return (
     <div className="grid grid-cols-3 gap-2 max-w-2xl mx-auto">
       {alignmentOrder.map((alignmentValue) => {
-        const alignment = ALIGNMENTS.find((a) => a.value === alignmentValue);
+        const alignment = FACTION_ALIGNMENTS_CONSTANT.find(
+          (a) => a.value === alignmentValue
+        );
         if (!alignment) return null;
 
         const Icon = alignment.icon;

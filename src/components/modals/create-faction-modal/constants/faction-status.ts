@@ -7,6 +7,54 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import type { SimplePickerOption } from "@/components/forms/FormSimplePicker";
+
+/**
+ * Faction status options for FormSimplePicker
+ * Used in create-faction-modal for status selection
+ */
+export const FACTION_STATUS_OPTIONS: SimplePickerOption[] = [
+  {
+    value: "active",
+    translationKey: "status.active",
+    icon: Activity,
+    color: "text-muted-foreground",
+    activeColor: "text-green-600 dark:text-green-400",
+  },
+  {
+    value: "weakened",
+    translationKey: "status.weakened",
+    icon: TrendingDown,
+    color: "text-muted-foreground",
+    activeColor: "text-yellow-600 dark:text-yellow-400",
+  },
+  {
+    value: "dissolved",
+    translationKey: "status.dissolved",
+    icon: XCircle,
+    color: "text-muted-foreground",
+    activeColor: "text-red-600 dark:text-red-400",
+  },
+  {
+    value: "reformed",
+    translationKey: "status.reformed",
+    icon: RefreshCw,
+    color: "text-muted-foreground",
+    activeColor: "text-blue-600 dark:text-blue-400",
+  },
+  {
+    value: "apex",
+    translationKey: "status.apex",
+    icon: TrendingUp,
+    color: "text-muted-foreground",
+    activeColor: "text-purple-600 dark:text-purple-400",
+  },
+];
+
+/**
+ * @deprecated Use FACTION_STATUS_OPTIONS instead
+ * Legacy constant for backward compatibility
+ */
 export interface IFactionStatusConstant {
   value: string;
   icon: LucideIcon;
@@ -16,6 +64,9 @@ export interface IFactionStatusConstant {
   bgColorClass: string;
 }
 
+/**
+ * @deprecated Use FACTION_STATUS_OPTIONS instead
+ */
 export const FACTION_STATUS_CONSTANT: IFactionStatusConstant[] = [
   {
     value: "active",
