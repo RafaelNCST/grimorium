@@ -28,16 +28,11 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
     rules_and_laws: faction.rulesAndLaws
       ? JSON.stringify(faction.rulesAndLaws)
       : undefined,
-    important_symbols: faction.importantSymbols
-      ? JSON.stringify(faction.importantSymbols)
-      : undefined,
     main_resources: faction.mainResources
       ? JSON.stringify(faction.mainResources)
       : undefined,
     economy: faction.economy,
-    treasures_and_secrets: faction.treasuresAndSecrets
-      ? JSON.stringify(faction.treasuresAndSecrets)
-      : undefined,
+    symbols_and_secrets: faction.symbolsAndSecrets,
     currencies: faction.currencies
       ? JSON.stringify(faction.currencies)
       : undefined,
@@ -107,16 +102,11 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     rulesAndLaws: dbFaction.rules_and_laws
       ? JSON.parse(dbFaction.rules_and_laws)
       : undefined,
-    importantSymbols: dbFaction.important_symbols
-      ? JSON.parse(dbFaction.important_symbols)
-      : undefined,
     mainResources: dbFaction.main_resources
       ? JSON.parse(dbFaction.main_resources)
       : undefined,
     economy: dbFaction.economy,
-    treasuresAndSecrets: dbFaction.treasures_and_secrets
-      ? JSON.parse(dbFaction.treasures_and_secrets)
-      : undefined,
+    symbolsAndSecrets: dbFaction.symbols_and_secrets,
     currencies: dbFaction.currencies
       ? JSON.parse(dbFaction.currencies)
       : undefined,
@@ -188,8 +178,8 @@ export async function createFaction(
     `INSERT INTO factions (
       id, book_id, name, summary, status, faction_type, image,
       alignment, influence, public_reputation, external_influence,
-      government_form, rules_and_laws, important_symbols, main_resources,
-      economy, treasures_and_secrets, currencies,
+      government_form, rules_and_laws, main_resources,
+      economy, symbols_and_secrets, currencies,
       military_power, political_power, cultural_power, economic_power,
       faction_motto, traditions_and_rituals, beliefs_and_values,
       languages_used, uniform_and_aesthetics, races,
@@ -197,9 +187,9 @@ export async function createFaction(
       organization_objectives, narrative_importance, inspirations,
       created_at
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-      $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-      $29, $30, $31, $32, $33, $34, $35, $36
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+      $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,
+      $28, $29, $30, $31, $32, $33, $34, $35
     )`,
     [
       dbFaction.id,
@@ -215,10 +205,9 @@ export async function createFaction(
       dbFaction.external_influence,
       dbFaction.government_form,
       dbFaction.rules_and_laws,
-      dbFaction.important_symbols,
       dbFaction.main_resources,
       dbFaction.economy,
-      dbFaction.treasures_and_secrets,
+      dbFaction.symbols_and_secrets,
       dbFaction.currencies,
       dbFaction.military_power,
       dbFaction.political_power,
@@ -276,14 +265,14 @@ export async function updateFaction(
     `UPDATE factions SET
       name = $1, summary = $2, status = $3, faction_type = $4, image = $5,
       alignment = $6, influence = $7, public_reputation = $8, external_influence = $9,
-      government_form = $10, rules_and_laws = $11, important_symbols = $12, main_resources = $13,
-      economy = $14, treasures_and_secrets = $15, currencies = $16,
-      military_power = $17, political_power = $18, cultural_power = $19, economic_power = $20,
-      faction_motto = $21, traditions_and_rituals = $22, beliefs_and_values = $23,
-      languages_used = $24, uniform_and_aesthetics = $25, races = $26,
-      foundation_date = $27, foundation_history_summary = $28, founders = $29, chronology = $30,
-      organization_objectives = $31, narrative_importance = $32, inspirations = $33
-    WHERE id = $34`,
+      government_form = $10, rules_and_laws = $11, main_resources = $12,
+      economy = $13, symbols_and_secrets = $14, currencies = $15,
+      military_power = $16, political_power = $17, cultural_power = $18, economic_power = $19,
+      faction_motto = $20, traditions_and_rituals = $21, beliefs_and_values = $22,
+      languages_used = $23, uniform_and_aesthetics = $24, races = $25,
+      foundation_date = $26, foundation_history_summary = $27, founders = $28, chronology = $29,
+      organization_objectives = $30, narrative_importance = $31, inspirations = $32
+    WHERE id = $33`,
     [
       dbFaction.name,
       dbFaction.summary,
@@ -296,10 +285,9 @@ export async function updateFaction(
       dbFaction.external_influence,
       dbFaction.government_form,
       dbFaction.rules_and_laws,
-      dbFaction.important_symbols,
       dbFaction.main_resources,
       dbFaction.economy,
-      dbFaction.treasures_and_secrets,
+      dbFaction.symbols_and_secrets,
       dbFaction.currencies,
       dbFaction.military_power,
       dbFaction.political_power,

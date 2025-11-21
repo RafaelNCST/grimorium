@@ -1100,6 +1100,16 @@ async function runMigrations(database: Database): Promise<void> {
       console.log("[db] Error removing race_views column:", error);
     }
 
+    // Add symbols_and_secrets column to factions table (replacing important_symbols and treasures_and_secrets)
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN symbols_and_secrets TEXT"
+      );
+      console.log("[db] Added symbols_and_secrets column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Verify books table exists and log count
     const result = await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"

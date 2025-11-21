@@ -31,10 +31,12 @@ export const factionFormSchema = z.object({
     .max(500, "validation.government_form_max_length")
     .optional(),
   rulesAndLaws: z.array(z.string()).optional(),
-  importantSymbols: z.array(z.string()).optional(),
   mainResources: z.array(z.string()).optional(),
   economy: z.string().max(500, "validation.economy_max_length").optional(),
-  treasuresAndSecrets: z.array(z.string()).optional(),
+  symbolsAndSecrets: z
+    .string()
+    .max(500, "validation.symbols_and_secrets_max_length")
+    .optional(),
   currencies: z.array(z.string()).optional(),
 
   // Advanced - Power (1-10 scale)
@@ -67,16 +69,6 @@ export const factionFormSchema = z.object({
     .max(500, "validation.foundation_history_max_length")
     .optional(),
   founders: z.array(z.string()).optional(),
-  chronology: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        date: z.string(),
-        description: z.string().max(500),
-      })
-    )
-    .optional(),
 
   // Advanced - Narrative
   organizationObjectives: z

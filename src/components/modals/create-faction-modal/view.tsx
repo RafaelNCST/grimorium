@@ -17,7 +17,6 @@ import { Separator } from "@/components/ui/separator";
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { PowerSlider } from "./components/power-slider";
-import { TimelineInput } from "./components/timeline-input";
 import { FACTION_INFLUENCE_OPTIONS } from "./constants/faction-influence";
 import { FACTION_REPUTATION_OPTIONS } from "./constants/faction-reputation";
 import { FACTION_STATUS_OPTIONS } from "./constants/faction-status";

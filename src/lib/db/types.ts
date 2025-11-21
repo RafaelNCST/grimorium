@@ -243,10 +243,9 @@ export interface DBFaction {
   // Advanced fields - Internal Structure
   government_form?: string;
   rules_and_laws?: string; // JSON array string
-  important_symbols?: string; // JSON array string
   main_resources?: string; // JSON array string
   economy?: string;
-  treasures_and_secrets?: string; // JSON array string
+  symbols_and_secrets?: string;
   currencies?: string; // JSON array string
 
   // Advanced fields - Power (1-10 scale)

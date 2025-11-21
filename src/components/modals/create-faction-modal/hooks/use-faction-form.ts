@@ -24,10 +24,9 @@ const DEFAULT_FORM_VALUES: FactionFormSchema = {
   // Internal Structure
   governmentForm: "",
   rulesAndLaws: [],
-  importantSymbols: [],
   mainResources: [],
   economy: "",
-  treasuresAndSecrets: [],
+  symbolsAndSecrets: "",
   currencies: [],
 
   // Power
@@ -48,7 +47,6 @@ const DEFAULT_FORM_VALUES: FactionFormSchema = {
   foundationDate: "",
   foundationHistorySummary: "",
   founders: [],
-  chronology: [],
 
   // Narrative
   organizationObjectives: "",
