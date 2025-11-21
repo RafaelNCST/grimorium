@@ -8,17 +8,8 @@ export type DomainType =
   | "Espiritual"
   | "Cósmico";
 
-export interface IRaceGroup {
-  id: string;
-  name: string;
-  description: string;
-  orderIndex: number;
-  races: IRace[];
-}
-
 export interface IRace {
   id: string;
-  groupId?: string;
 
   // Basic required fields
   name: string;

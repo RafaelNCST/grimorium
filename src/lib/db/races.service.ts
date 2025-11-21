@@ -13,7 +13,7 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
   return {
     id: race.id,
     book_id: bookId,
-    group_id: race.groupId,
+    group_id: undefined,
     name: race.name,
     domain: JSON.stringify(race.domain),
     summary: race.summary,
@@ -58,7 +58,6 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
 function dbRaceToRace(dbRace: DBRace): IRace {
   return {
     id: dbRace.id,
-    groupId: dbRace.group_id,
     name: dbRace.name,
     domain: JSON.parse(dbRace.domain),
     summary: dbRace.summary,
@@ -257,46 +256,6 @@ export async function updateRace(
 export async function deleteRace(id: string): Promise<void> {
   const db = await getDB();
   await db.execute("DELETE FROM races WHERE id = $1", [id]);
-}
-
-// Get races by group ID
-export async function getRacesByGroupId(groupId: string): Promise<IRace[]> {
-  const db = await getDB();
-  const result = await db.select<DBRace[]>(
-    "SELECT * FROM races WHERE group_id = $1 ORDER BY created_at DESC",
-    [groupId]
-  );
-  return result.map(dbRaceToRace);
-}
-
-// Move race to a group
-export async function moveRaceToGroup(
-  raceId: string,
-  groupId: string | null
-): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
-
-  await db.execute(
-    "UPDATE races SET group_id = $1, updated_at = $2 WHERE id = $3",
-    [groupId, now, raceId]
-  );
-}
-
-// Move multiple races to a group
-export async function moveRacesToGroup(
-  raceIds: string[],
-  groupId: string | null
-): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
-
-  for (const raceId of raceIds) {
-    await db.execute(
-      "UPDATE races SET group_id = $1, updated_at = $2 WHERE id = $3",
-      [groupId, now, raceId]
-    );
-  }
 }
 
 // Race Versions
