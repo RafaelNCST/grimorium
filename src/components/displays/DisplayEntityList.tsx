@@ -35,10 +35,6 @@ interface DisplayEntityListProps {
    */
   entities: DisplayEntityItem[] | null | undefined;
   /**
-   * Empty state text when no entities are provided
-   */
-  emptyText?: string;
-  /**
    * Whether the collapsible is open by default
    */
   defaultOpen?: boolean;
@@ -71,7 +67,6 @@ interface DisplayEntityListProps {
  *     { id: "1", name: "Humano", image: "/human.jpg" },
  *     { id: "2", name: "Elfo" }
  *   ]}
- *   emptyText="Nenhuma espécie definida"
  * />
  * ```
  *
@@ -80,7 +75,6 @@ interface DisplayEntityListProps {
  * <DisplayEntityList
  *   label="Local de Nascimento"
  *   entities={[]}
- *   emptyText="Local não definido"
  * />
  * ```
  *
@@ -97,7 +91,6 @@ interface DisplayEntityListProps {
 export function DisplayEntityList({
   label,
   entities,
-  emptyText = "Sem dados",
   defaultOpen = false,
   open,
   onOpenChange,
@@ -158,7 +151,7 @@ export function DisplayEntityList({
             ))}
           </div>
         ) : (
-          <span className="italic text-muted-foreground/60">{emptyText}</span>
+          <span className="italic text-muted-foreground/60">Sem dados</span>
         )}
       </CollapsibleContent>
     </Collapsible>

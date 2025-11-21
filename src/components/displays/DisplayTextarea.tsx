@@ -6,10 +6,6 @@ interface DisplayTextareaProps {
    */
   value: string | null | undefined;
   /**
-   * Empty state text when no value is provided
-   */
-  emptyText?: string;
-  /**
    * Optional custom className for the text element
    */
   className?: string;
@@ -23,30 +19,23 @@ interface DisplayTextareaProps {
  *
  * @example With value
  * ```tsx
- * <DisplayTextarea
- *   value={character.personality}
- *   emptyText="Personalidade não definida"
- * />
+ * <DisplayTextarea value={character.personality} />
  * ```
  *
  * @example Empty state
  * ```tsx
- * <DisplayTextarea
- *   value={null}
- *   emptyText="Não definido"
- * />
+ * <DisplayTextarea value={null} />
  * ```
  */
 export function DisplayTextarea({
   value,
-  emptyText = "Sem dados",
   className,
 }: DisplayTextareaProps) {
   // If no value, show empty state
   if (!value || value.trim() === "") {
     return (
       <span className={cn("italic text-muted-foreground/60", className)}>
-        {emptyText}
+        Sem dados
       </span>
     );
   }

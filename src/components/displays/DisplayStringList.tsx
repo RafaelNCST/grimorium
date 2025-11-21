@@ -17,10 +17,6 @@ interface DisplayStringListProps {
    */
   items: string[] | null | undefined;
   /**
-   * Empty state text when no items are provided
-   */
-  emptyText?: string;
-  /**
    * Whether the collapsible is open by default
    */
   defaultOpen?: boolean;
@@ -50,7 +46,6 @@ interface DisplayStringListProps {
  * <DisplayStringList
  *   label="Apelidos"
  *   items={["The Great", "Shadow Walker", "Hero of Light"]}
- *   emptyText="Nenhum apelido definido"
  * />
  * ```
  *
@@ -59,7 +54,6 @@ interface DisplayStringListProps {
  * <DisplayStringList
  *   label="Tags"
  *   items={[]}
- *   emptyText="Nenhuma tag"
  * />
  * ```
  *
@@ -76,7 +70,6 @@ interface DisplayStringListProps {
 export function DisplayStringList({
   label,
   items,
-  emptyText = "Sem dados",
   defaultOpen = false,
   open,
   onOpenChange,
@@ -121,7 +114,7 @@ export function DisplayStringList({
             ))}
           </ul>
         ) : (
-          <span className="italic text-muted-foreground/60">{emptyText}</span>
+          <span className="italic text-muted-foreground/60">Sem dados</span>
         )}
       </CollapsibleContent>
     </Collapsible>

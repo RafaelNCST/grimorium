@@ -118,14 +118,6 @@ interface DisplaySelectGridProps<T = string> {
    */
   options: DisplaySelectGridOption<T>[];
   /**
-   * Empty state text when no value is provided
-   */
-  emptyText?: string;
-  /**
-   * Empty state description when no value is provided
-   */
-  emptyDescription?: string;
-  /**
    * Optional custom className for container
    */
   className?: string;
@@ -145,8 +137,6 @@ interface DisplaySelectGridProps<T = string> {
  * <DisplaySelectGrid
  *   value={character.archetype}
  *   options={archetypeOptions}
- *   emptyText="Não definido"
- *   emptyDescription="Nenhum arquétipo foi selecionado"
  * />
  * ```
  *
@@ -155,16 +145,12 @@ interface DisplaySelectGridProps<T = string> {
  * <DisplaySelectGrid
  *   value={null}
  *   options={archetypeOptions}
- *   emptyText="Arquétipo não definido"
- *   emptyDescription="Selecione um arquétipo para visualizar"
  * />
  * ```
  */
 export function DisplaySelectGrid<T extends string = string>({
   value,
   options,
-  emptyText = "Sem dados",
-  emptyDescription = "Sem dados",
   className,
 }: DisplaySelectGridProps<T>) {
   // Find the matching option
@@ -190,13 +176,8 @@ export function DisplaySelectGrid<T extends string = string>({
           <Target className="w-5 h-5 mt-0.5 flex-shrink-0 text-muted-foreground" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm text-muted-foreground">
-              {emptyText}
+              Sem dados
             </p>
-            {emptyDescription && (
-              <p className="text-xs mt-1 opacity-60 text-muted-foreground">
-                {emptyDescription}
-              </p>
-            )}
           </div>
         </div>
       </div>

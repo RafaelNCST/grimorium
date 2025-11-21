@@ -4,6 +4,8 @@ Componentes somente leitura para exibir dados selecionados em modo visualizaçã
 
 **Localização:** `src/components/displays/`
 
+**Estado vazio:** Todos os componentes exibem automaticamente "Sem dados" quando não há valor.
+
 ---
 
 ## 1. DisplaySimpleGrid
@@ -20,7 +22,6 @@ import { DisplaySimpleGrid } from "@/components/displays";
   <DisplaySimpleGrid
     value={data.field || null}
     options={fieldOptions}
-    emptyText="Não definido"
   />
 ) : (
   <FormSimpleGrid
@@ -34,7 +35,6 @@ import { DisplaySimpleGrid } from "@/components/displays";
 **Propriedades:**
 - `value`: string | null | undefined
 - `options`: DisplaySimpleGridOption[]
-- `emptyText`: string (default: "Não definido")
 - `className`: string (opcional)
 
 **Estrutura da opção:**
@@ -43,7 +43,8 @@ import { DisplaySimpleGrid } from "@/components/displays";
   value: "option1",
   label: "Opção 1",
   icon: IconComponent,
-  activeColorClass: "bg-blue-500/20 border-blue-500/30 ring-4 ring-blue-500/50 text-blue-600"
+  backgroundColor: "blue-500/20",
+  borderColor: "blue-500/30"
 }
 ```
 
@@ -63,8 +64,6 @@ import { DisplaySelectGrid } from "@/components/displays";
   <DisplaySelectGrid
     value={data.field || null}
     options={fieldOptions}
-    emptyText="Não definido"
-    emptyDescription="Nenhuma opção selecionada"
   />
 ) : (
   <FormSelectGrid
@@ -78,8 +77,6 @@ import { DisplaySelectGrid } from "@/components/displays";
 **Propriedades:**
 - `value`: string | null | undefined
 - `options`: DisplaySelectGridOption[]
-- `emptyText`: string (default: "Não definido")
-- `emptyDescription`: string (default: "Nenhuma seleção disponível")
 - `className`: string (opcional)
 
 **Estrutura da opção:**
@@ -89,7 +86,8 @@ import { DisplaySelectGrid } from "@/components/displays";
   label: "Opção 1",
   description: "Descrição detalhada da opção",
   icon: IconComponent,
-  activeColorClass: "bg-purple-500/20 border-purple-500/30 ring-4 ring-purple-500/50 text-white"
+  backgroundColor: "purple-500/20",
+  borderColor: "purple-500/30"
 }
 ```
 
@@ -127,7 +125,7 @@ import { DisplayImage } from "@/components/displays";
 
 ## 4. DisplayText
 **Componente:** `DisplayText` (`src/components/displays/DisplayText.tsx`)
-**Descrição:** Componente para exibir texto simples e curto em modo visualização. Lida automaticamente com valores vazios mostrando estado vazio em itálico e cor atenuada.
+**Descrição:** Componente para exibir texto simples e curto em modo visualização. Lida automaticamente com valores vazios mostrando "Sem dados" em itálico e cor atenuada.
 
 **Usado com:** `Input` (versão de formulário para edição)
 
@@ -136,10 +134,7 @@ import { DisplayImage } from "@/components/displays";
 import { DisplayText } from "@/components/displays";
 
 {!isEditing ? (
-  <DisplayText
-    value={character.height}
-    emptyText="Altura não definida"
-  />
+  <DisplayText value={character.height} />
 ) : (
   <Input
     value={editData.height || ""}
@@ -150,7 +145,6 @@ import { DisplayText } from "@/components/displays";
 
 **Propriedades:**
 - `value`: string | null | undefined
-- `emptyText`: string (default: "Não definido")
 - `className`: string (opcional)
 
 ---
@@ -166,10 +160,7 @@ import { DisplayText } from "@/components/displays";
 import { DisplayTextarea } from "@/components/displays";
 
 {!isEditing ? (
-  <DisplayTextarea
-    value={character.personality}
-    emptyText="Personalidade não definida"
-  />
+  <DisplayTextarea value={character.personality} />
 ) : (
   <Textarea
     value={editData.personality || ""}
@@ -181,7 +172,6 @@ import { DisplayTextarea } from "@/components/displays";
 
 **Propriedades:**
 - `value`: string | null | undefined
-- `emptyText`: string (default: "Não definido")
 - `className`: string (opcional)
 
 ---
@@ -206,7 +196,6 @@ const raceEntities: DisplayEntityItem[] = character.speciesAndRace?.map(raceId =
   <DisplayEntityList
     label="Espécies e Raças"
     entities={raceEntities}
-    emptyText="Nenhuma espécie definida"
     open={openSections.speciesAndRace}
     onOpenChange={() => toggleSection("speciesAndRace")}
   />
@@ -222,7 +211,6 @@ const raceEntities: DisplayEntityItem[] = character.speciesAndRace?.map(raceId =
 **Propriedades:**
 - `label`: string (obrigatório)
 - `entities`: DisplayEntityItem[] | null | undefined
-- `emptyText`: string (default: "Nenhum item")
 - `defaultOpen`: boolean (default: false)
 - `open`: boolean (opcional, para controle externo)
 - `onOpenChange`: (open: boolean) => void (opcional)
@@ -253,7 +241,6 @@ import { DisplayStringList } from "@/components/displays";
   <DisplayStringList
     label="Apelidos"
     items={character.nicknames}
-    emptyText="Nenhum apelido definido"
     open={openSections.nicknames}
     onOpenChange={() => toggleSection("nicknames")}
   />
@@ -270,7 +257,6 @@ import { DisplayStringList } from "@/components/displays";
 **Propriedades:**
 - `label`: string (obrigatório)
 - `items`: string[] | null | undefined
-- `emptyText`: string (default: "Nenhum item")
 - `defaultOpen`: boolean (default: false)
 - `open`: boolean (opcional, para controle externo)
 - `onOpenChange`: (open: boolean) => void (opcional)

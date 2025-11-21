@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import {
-  Map,
-  ChevronDown,
-  ChevronRight,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Trash2,
-} from "lucide-react";
+import { Map, AlertCircle, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -19,27 +11,24 @@ import {
   hasVisibleFields,
   isSectionVisible,
 } from "@/components/detail-page";
+import {
+  DisplayImage,
+  DisplayTextarea,
+  DisplayStringList,
+  DisplayEntityList,
+  DisplaySelectGrid,
+  type DisplayEntityItem,
+  type DisplaySelectGridOption,
+} from "@/components/displays";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
-import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -58,8 +47,6 @@ import {
 } from "@/pages/dashboard/tabs/world/types/region-types";
 import { type IRegionVersion } from "@/lib/db/regions.service";
 import { REGION_SCALES_CONSTANT } from "@/pages/dashboard/tabs/world/constants/scale-colors";
-import { Badge } from "@/components/ui/badge";
-import { SEASON_ACTIVE_COLOR } from "@/components/modals/create-region-modal/constants/season-colors";
 import { Button } from "@/components/ui/button";
 import {
   DeleteEntityModal,
@@ -139,13 +126,6 @@ interface RegionDetailViewProps {
   onAdvancedSectionToggle: () => void;
   onTimelineSectionToggle: () => void;
 }
-
-// Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
-  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-    <p>{t("region-detail:empty_states.no_data")}</p>
-  </div>
-);
 
 export function RegionDetailView({
   region,
@@ -407,7 +387,7 @@ export function RegionDetailView({
                 />
               </div>
             ) : (
-              <FormImageDisplay
+              <DisplayImage
                 icon={Map}
                 text={t("world:region_map.no_image")}
                 height="h-[28rem]"
@@ -492,10 +472,8 @@ export function RegionDetailView({
                     <span>{editData.climate?.length || 0}/500</span>
                   </div>
                 </>
-              ) : region.climate ? (
-                <p className="text-sm">{region.climate}</p>
               ) : (
-                <EmptyFieldState t={t} />
+                <DisplayTextarea value={region.climate} />
               )}
             </FieldWithVisibilityToggle>
 
@@ -521,40 +499,31 @@ export function RegionDetailView({
                     onEditDataChange("customSeasonName", name)
                   }
                 />
-              ) : region.currentSeason ? (
-                (() => {
-                  const selectedSeason = REGION_SEASONS.find(
-                    (s) => s.value === region.currentSeason
-                  );
-                  if (!selectedSeason) return null;
-
-                  const Icon = selectedSeason.icon;
-                  const displayLabel =
-                    region.currentSeason === "custom" && region.customSeasonName
-                      ? region.customSeasonName
-                      : t(`world:seasons.${region.currentSeason}`);
-
-                  return (
-                    <div
-                      className={`
-                          relative p-4 rounded-lg border-2 text-left
-                          ${SEASON_ACTIVE_COLOR[region.currentSeason]} text-foreground
-                        `}
-                    >
-                      <div className="flex items-start gap-3">
-                        <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{displayLabel}</p>
-                          <p className="text-xs mt-1 opacity-80">
-                            {selectedSeason.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()
               ) : (
-                <EmptyFieldState t={t} />
+                <DisplaySelectGrid
+                  value={region.currentSeason}
+                  options={REGION_SEASONS.map((season): DisplaySelectGridOption => ({
+                    value: season.value,
+                    label:
+                      season.value === "custom" && region.customSeasonName
+                        ? region.customSeasonName
+                        : t(`world:seasons.${season.value}`),
+                    description: season.description,
+                    icon: season.icon,
+                    backgroundColor:
+                      season.value === "spring" ? "green-500/20" :
+                      season.value === "summer" ? "red-500/20" :
+                      season.value === "autumn" ? "orange-500/20" :
+                      season.value === "winter" ? "blue-500/20" :
+                      "purple-500/20",
+                    borderColor:
+                      season.value === "spring" ? "green-500/30" :
+                      season.value === "summer" ? "red-500/30" :
+                      season.value === "autumn" ? "orange-500/30" :
+                      season.value === "winter" ? "blue-500/30" :
+                      "purple-500/30",
+                  }))}
+                />
               )}
             </FieldWithVisibilityToggle>
 
@@ -585,12 +554,8 @@ export function RegionDetailView({
                     <span>{editData.generalDescription?.length || 0}/1000</span>
                   </div>
                 </>
-              ) : region.generalDescription ? (
-                <p className="text-sm whitespace-pre-wrap">
-                  {region.generalDescription}
-                </p>
               ) : (
-                <EmptyFieldState t={t} />
+                <DisplayTextarea value={region.generalDescription} />
               )}
             </FieldWithVisibilityToggle>
 
@@ -621,41 +586,12 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayStringList
+                  label={t("world:create_region.region_anomalies_label")}
+                  items={safeJsonParse(region.regionAnomalies)}
                   open={openSections.regionAnomalies}
                   onOpenChange={() => toggleSection("regionAnomalies")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.region_anomalies_label")}
-                      {safeJsonParse(region.regionAnomalies).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.regionAnomalies).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.regionAnomalies ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.regionAnomalies).length > 0 ? (
-                      <ul className="list-disc list-inside space-y-1">
-                        {safeJsonParse(region.regionAnomalies).map(
-                          (anomaly: string, index: number) => (
-                            <li key={index} className="text-sm">
-                              {anomaly}
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
           </div>
@@ -731,64 +667,25 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayEntityList
+                  label={t("world:create_region.resident_factions_label")}
+                  entities={safeJsonParse(region.residentFactions).map(
+                    (factionId: string): DisplayEntityItem | null => {
+                      const faction = factions.find((f) => f.id === factionId);
+                      return faction
+                        ? {
+                            id: faction.id,
+                            name: faction.name,
+                            image: faction.image
+                              ? convertFileSrc(faction.image)
+                              : undefined,
+                          }
+                        : null;
+                    }
+                  ).filter(Boolean) as DisplayEntityItem[]}
                   open={openSections.residentFactions}
                   onOpenChange={() => toggleSection("residentFactions")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.resident_factions_label")}
-                      {safeJsonParse(region.residentFactions).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.residentFactions).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.residentFactions ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.residentFactions).length > 0 ? (
-                      <div className="flex flex-col gap-2">
-                        {safeJsonParse(region.residentFactions).map(
-                          (factionId: string) => {
-                            const faction = factions.find(
-                              (f) => f.id === factionId
-                            );
-                            return faction ? (
-                              <div
-                                key={factionId}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                              >
-                                {faction.image ? (
-                                  <img
-                                    src={convertFileSrc(faction.image)}
-                                    alt={faction.name}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground font-semibold">
-                                      {faction.name.charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium">
-                                  {faction.name}
-                                </span>
-                              </div>
-                            ) : null;
-                          }
-                        )}
-                      </div>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
 
@@ -830,64 +727,25 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayEntityList
+                  label={t("world:create_region.dominant_factions_label")}
+                  entities={safeJsonParse(region.dominantFactions).map(
+                    (factionId: string): DisplayEntityItem | null => {
+                      const faction = factions.find((f) => f.id === factionId);
+                      return faction
+                        ? {
+                            id: faction.id,
+                            name: faction.name,
+                            image: faction.image
+                              ? convertFileSrc(faction.image)
+                              : undefined,
+                          }
+                        : null;
+                    }
+                  ).filter(Boolean) as DisplayEntityItem[]}
                   open={openSections.dominantFactions}
                   onOpenChange={() => toggleSection("dominantFactions")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.dominant_factions_label")}
-                      {safeJsonParse(region.dominantFactions).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.dominantFactions).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.dominantFactions ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.dominantFactions).length > 0 ? (
-                      <div className="flex flex-col gap-2">
-                        {safeJsonParse(region.dominantFactions).map(
-                          (factionId: string) => {
-                            const faction = factions.find(
-                              (f) => f.id === factionId
-                            );
-                            return faction ? (
-                              <div
-                                key={factionId}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                              >
-                                {faction.image ? (
-                                  <img
-                                    src={convertFileSrc(faction.image)}
-                                    alt={faction.name}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground font-semibold">
-                                      {faction.name.charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium">
-                                  {faction.name}
-                                </span>
-                              </div>
-                            ) : null;
-                          }
-                        )}
-                      </div>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
 
@@ -932,64 +790,25 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayEntityList
+                  label={t("world:create_region.important_characters_label")}
+                  entities={safeJsonParse(region.importantCharacters).map(
+                    (characterId: string): DisplayEntityItem | null => {
+                      const character = characters.find((c) => c.id === characterId);
+                      return character
+                        ? {
+                            id: character.id,
+                            name: character.name,
+                            image: character.image
+                              ? convertFileSrc(character.image)
+                              : undefined,
+                          }
+                        : null;
+                    }
+                  ).filter(Boolean) as DisplayEntityItem[]}
                   open={openSections.importantCharacters}
                   onOpenChange={() => toggleSection("importantCharacters")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.important_characters_label")}
-                      {safeJsonParse(region.importantCharacters).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.importantCharacters).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.importantCharacters ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.importantCharacters).length > 0 ? (
-                      <div className="flex flex-col gap-2">
-                        {safeJsonParse(region.importantCharacters).map(
-                          (characterId: string) => {
-                            const character = characters.find(
-                              (c) => c.id === characterId
-                            );
-                            return character ? (
-                              <div
-                                key={characterId}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                              >
-                                {character.image ? (
-                                  <img
-                                    src={convertFileSrc(character.image)}
-                                    alt={character.name}
-                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded-full bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground font-semibold">
-                                      {character.name.charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium">
-                                  {character.name}
-                                </span>
-                              </div>
-                            ) : null;
-                          }
-                        )}
-                      </div>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
 
@@ -1025,62 +844,25 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayEntityList
+                  label={t("world:create_region.races_found_label")}
+                  entities={safeJsonParse(region.racesFound).map(
+                    (raceId: string): DisplayEntityItem | null => {
+                      const race = races.find((r) => r.id === raceId);
+                      return race
+                        ? {
+                            id: race.id,
+                            name: race.name,
+                            image: race.image
+                              ? convertFileSrc(race.image)
+                              : undefined,
+                          }
+                        : null;
+                    }
+                  ).filter(Boolean) as DisplayEntityItem[]}
                   open={openSections.racesFound}
                   onOpenChange={() => toggleSection("racesFound")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.races_found_label")}
-                      {safeJsonParse(region.racesFound).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.racesFound).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.racesFound ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.racesFound).length > 0 ? (
-                      <div className="flex flex-col gap-2">
-                        {safeJsonParse(region.racesFound).map(
-                          (raceId: string) => {
-                            const race = races.find((r) => r.id === raceId);
-                            return race ? (
-                              <div
-                                key={raceId}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                              >
-                                {race.image ? (
-                                  <img
-                                    src={convertFileSrc(race.image)}
-                                    alt={race.name}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground font-semibold">
-                                      {race.name.charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium">
-                                  {race.name}
-                                </span>
-                              </div>
-                            ) : null;
-                          }
-                        )}
-                      </div>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
 
@@ -1116,62 +898,25 @@ export function RegionDetailView({
                   labelClassName="text-sm font-medium text-primary"
                 />
               ) : (
-                <Collapsible
+                <DisplayEntityList
+                  label={t("world:create_region.items_found_label")}
+                  entities={safeJsonParse(region.itemsFound).map(
+                    (itemId: string): DisplayEntityItem | null => {
+                      const item = items.find((i) => i.id === itemId);
+                      return item
+                        ? {
+                            id: item.id,
+                            name: item.name,
+                            image: item.image
+                              ? convertFileSrc(item.image)
+                              : undefined,
+                          }
+                        : null;
+                    }
+                  ).filter(Boolean) as DisplayEntityItem[]}
                   open={openSections.itemsFound}
                   onOpenChange={() => toggleSection("itemsFound")}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                    <p className="text-sm font-semibold text-primary">
-                      {t("world:create_region.items_found_label")}
-                      {safeJsonParse(region.itemsFound).length > 0 && (
-                        <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                          ({safeJsonParse(region.itemsFound).length})
-                        </span>
-                      )}
-                    </p>
-                    {openSections.itemsFound ? (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="mt-2">
-                    {safeJsonParse(region.itemsFound).length > 0 ? (
-                      <div className="flex flex-col gap-2">
-                        {safeJsonParse(region.itemsFound).map(
-                          (itemId: string) => {
-                            const item = items.find((i) => i.id === itemId);
-                            return item ? (
-                              <div
-                                key={itemId}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-                              >
-                                {item.image ? (
-                                  <img
-                                    src={convertFileSrc(item.image)}
-                                    alt={item.name}
-                                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground font-semibold">
-                                      {item.name.charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                )}
-                                <span className="text-sm font-medium">
-                                  {item.name}
-                                </span>
-                              </div>
-                            ) : null;
-                          }
-                        )}
-                      </div>
-                    ) : (
-                      <EmptyFieldState t={t} />
-                    )}
-                  </CollapsibleContent>
-                </Collapsible>
+                />
               )}
             </FieldWithVisibilityToggle>
           </div>
@@ -1239,12 +984,8 @@ export function RegionDetailView({
                   <span>{editData.narrativePurpose?.length || 0}/500</span>
                 </div>
               </>
-            ) : region.narrativePurpose ? (
-              <p className="text-sm whitespace-pre-wrap">
-                {region.narrativePurpose}
-              </p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayTextarea value={region.narrativePurpose} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1278,12 +1019,8 @@ export function RegionDetailView({
                   </span>
                 </div>
               </>
-            ) : region.uniqueCharacteristics ? (
-              <p className="text-sm whitespace-pre-wrap">
-                {region.uniqueCharacteristics}
-              </p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayTextarea value={region.uniqueCharacteristics} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1314,12 +1051,8 @@ export function RegionDetailView({
                   <span>{editData.politicalImportance?.length || 0}/500</span>
                 </div>
               </>
-            ) : region.politicalImportance ? (
-              <p className="text-sm whitespace-pre-wrap">
-                {region.politicalImportance}
-              </p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayTextarea value={region.politicalImportance} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1350,12 +1083,8 @@ export function RegionDetailView({
                   <span>{editData.religiousImportance?.length || 0}/500</span>
                 </div>
               </>
-            ) : region.religiousImportance ? (
-              <p className="text-sm whitespace-pre-wrap">
-                {region.religiousImportance}
-              </p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayTextarea value={region.religiousImportance} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1386,12 +1115,8 @@ export function RegionDetailView({
                   <span>{editData.worldPerception?.length || 0}/500</span>
                 </div>
               </>
-            ) : region.worldPerception ? (
-              <p className="text-sm whitespace-pre-wrap">
-                {region.worldPerception}
-              </p>
             ) : (
-              <EmptyFieldState t={t} />
+              <DisplayTextarea value={region.worldPerception} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1422,41 +1147,12 @@ export function RegionDetailView({
                 labelClassName="text-sm font-medium text-primary"
               />
             ) : (
-              <Collapsible
+              <DisplayStringList
+                label={t("world:create_region.region_mysteries_label")}
+                items={safeJsonParse(region.regionMysteries)}
                 open={openSections.regionMysteries}
                 onOpenChange={() => toggleSection("regionMysteries")}
-              >
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                  <p className="text-sm font-semibold text-primary">
-                    {t("world:create_region.region_mysteries_label")}
-                    {safeJsonParse(region.regionMysteries).length > 0 && (
-                      <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                        ({safeJsonParse(region.regionMysteries).length})
-                      </span>
-                    )}
-                  </p>
-                  {openSections.regionMysteries ? (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  {safeJsonParse(region.regionMysteries).length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1">
-                      {safeJsonParse(region.regionMysteries).map(
-                        (mystery: string, index: number) => (
-                          <li key={index} className="text-sm">
-                            {mystery}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  ) : (
-                    <EmptyFieldState t={t} />
-                  )}
-                </CollapsibleContent>
-              </Collapsible>
+              />
             )}
           </FieldWithVisibilityToggle>
 
@@ -1485,41 +1181,12 @@ export function RegionDetailView({
                 labelClassName="text-sm font-medium text-primary"
               />
             ) : (
-              <Collapsible
+              <DisplayStringList
+                label={t("world:create_region.inspirations_label")}
+                items={safeJsonParse(region.inspirations)}
                 open={openSections.inspirations}
                 onOpenChange={() => toggleSection("inspirations")}
-              >
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
-                  <p className="text-sm font-semibold text-primary">
-                    {t("world:create_region.inspirations_label")}
-                    {safeJsonParse(region.inspirations).length > 0 && (
-                      <span className="ml-1 text-purple-600/60 dark:text-purple-400/60">
-                        ({safeJsonParse(region.inspirations).length})
-                      </span>
-                    )}
-                  </p>
-                  {openSections.inspirations ? (
-                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2">
-                  {safeJsonParse(region.inspirations).length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1">
-                      {safeJsonParse(region.inspirations).map(
-                        (inspiration: string, index: number) => (
-                          <li key={index} className="text-sm">
-                            {inspiration}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  ) : (
-                    <EmptyFieldState t={t} />
-                  )}
-                </CollapsibleContent>
-              </Collapsible>
+              />
             )}
           </FieldWithVisibilityToggle>
         </div>

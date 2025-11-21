@@ -6,10 +6,6 @@ interface DisplayTextProps {
    */
   value: string | null | undefined;
   /**
-   * Empty state text when no value is provided
-   */
-  emptyText?: string;
-  /**
    * Optional custom className for the text element
    */
   className?: string;
@@ -23,30 +19,23 @@ interface DisplayTextProps {
  *
  * @example With value
  * ```tsx
- * <DisplayText
- *   value={character.height}
- *   emptyText="Altura não definida"
- * />
+ * <DisplayText value={character.height} />
  * ```
  *
  * @example Empty state
  * ```tsx
- * <DisplayText
- *   value={null}
- *   emptyText="Não definido"
- * />
+ * <DisplayText value={null} />
  * ```
  */
 export function DisplayText({
   value,
-  emptyText = "Sem dados",
   className,
 }: DisplayTextProps) {
   // If no value, show empty state
   if (!value || value.trim() === "") {
     return (
       <span className={cn("italic text-muted-foreground/60", className)}>
-        {emptyText}
+        Sem dados
       </span>
     );
   }

@@ -114,10 +114,6 @@ interface DisplaySimpleGridProps<T = string> {
    */
   options: DisplaySimpleGridOption<T>[];
   /**
-   * Empty state text when no value is provided
-   */
-  emptyText?: string;
-  /**
    * Optional custom className for container
    */
   className?: string;
@@ -135,7 +131,6 @@ interface DisplaySimpleGridProps<T = string> {
  * <DisplaySimpleGrid
  *   value={character.physicalType}
  *   options={physicalTypeOptions}
- *   emptyText="Não definido"
  * />
  * ```
  *
@@ -144,14 +139,12 @@ interface DisplaySimpleGridProps<T = string> {
  * <DisplaySimpleGrid
  *   value={null}
  *   options={physicalTypeOptions}
- *   emptyText="Tipo físico não definido"
  * />
  * ```
  */
 export function DisplaySimpleGrid<T extends string = string>({
   value,
   options,
-  emptyText = "Sem dados",
   className,
 }: DisplaySimpleGridProps<T>) {
   // Find the matching option
@@ -175,7 +168,7 @@ export function DisplaySimpleGrid<T extends string = string>({
       >
         <Target className="w-8 h-8 text-muted-foreground flex-shrink-0" />
         <p className="font-medium text-sm text-center text-muted-foreground">
-          {emptyText}
+          Sem dados
         </p>
       </div>
     );
