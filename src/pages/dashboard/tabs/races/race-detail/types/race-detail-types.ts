@@ -21,6 +21,7 @@ export interface IRaceVersion {
   createdAt: string;
   isMain: boolean;
   raceData: IRace;
+  relationships?: IRaceRelationship[];
 }
 
 export interface IFieldVisibility {

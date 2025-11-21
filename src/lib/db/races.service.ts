@@ -262,14 +262,20 @@ export async function getRaceVersions(raceId: string): Promise<IRaceVersion[]> {
     [raceId]
   );
 
-  return result.map((v) => ({
-    id: v.id,
-    name: v.name,
-    description: v.description || "",
-    createdAt: new Date(v.created_at).toISOString(),
-    isMain: v.is_main === 1,
-    raceData: v.race_data ? JSON.parse(v.race_data) : ({} as IRace),
-  }));
+  return result.map((v) => {
+    const parsedData = v.race_data ? JSON.parse(v.race_data) : {};
+    // Extrair _relationships do JSON e separar
+    const { _relationships, ...raceData } = parsedData;
+    return {
+      id: v.id,
+      name: v.name,
+      description: v.description || "",
+      createdAt: new Date(v.created_at).toISOString(),
+      isMain: v.is_main === 1,
+      raceData: raceData as IRace,
+      relationships: _relationships || [],
+    };
+  });
 }
 
 export async function createRaceVersion(
@@ -277,6 +283,12 @@ export async function createRaceVersion(
   version: IRaceVersion
 ): Promise<void> {
   const db = await getDB();
+
+  // Armazenar raceData e relationships juntos
+  const dataToStore = {
+    ...version.raceData,
+    _relationships: version.relationships || [],
+  };
 
   await db.execute(
     `INSERT INTO race_versions (
@@ -288,7 +300,7 @@ export async function createRaceVersion(
       version.name,
       version.description,
       version.isMain ? 1 : 0,
-      JSON.stringify(version.raceData),
+      JSON.stringify(dataToStore),
       Date.now(),
     ]
   );
@@ -308,6 +320,23 @@ export async function updateRaceVersion(
   await db.execute(
     "UPDATE race_versions SET name = $1, description = $2 WHERE id = $3",
     [name, description, versionId]
+  );
+}
+
+export async function updateRaceVersionData(
+  versionId: string,
+  raceData: IRace,
+  relationships?: IRaceRelationship[]
+): Promise<void> {
+  const db = await getDB();
+  // Armazenar raceData e relationships juntos no campo race_data
+  const dataToStore = {
+    ...raceData,
+    _relationships: relationships || [],
+  };
+  await db.execute(
+    "UPDATE race_versions SET race_data = $1 WHERE id = $2",
+    [JSON.stringify(dataToStore), versionId]
   );
 }
 

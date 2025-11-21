@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo, ReactNode } from "react";
 
 import { ArrowRight, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -104,12 +103,11 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
 
   const handleStep1Continue = useCallback(() => {
     if (!canProceedToStep2) {
-      toast.error(t("versions.create_dialog.step1_validation_error"));
       return;
     }
     setStep(2);
     setIsEntityModalOpen(true);
-  }, [canProceedToStep2, t]);
+  }, [canProceedToStep2]);
 
   const handleEntityModalClose = useCallback(() => {
     setIsEntityModalOpen(false);
@@ -142,9 +140,8 @@ export function CreateVersionWithEntityDialog<TEntity, TEntityData>({
 
       onConfirm(dataToConfirm);
       handleClose();
-      toast.success(t("versions.create_dialog.success"));
     },
-    [versionName, versionDescription, onConfirm, handleClose, t]
+    [versionName, versionDescription, onConfirm, handleClose]
   );
 
   return (
