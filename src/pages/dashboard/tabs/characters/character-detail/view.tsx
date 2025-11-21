@@ -836,6 +836,22 @@ export function CharacterDetailView({
           )}
         </FieldWithVisibilityToggle>
 
+        {/* Alignment */}
+        <FieldWithVisibilityToggle
+          fieldName="alignment"
+          label={t("character-detail:fields.alignment")}
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          <AlignmentMatrix
+            value={isEditing ? editData.alignment : character.alignment}
+            onChange={(value) => onEditDataChange("alignment", value)}
+            isEditable={isEditing}
+          />
+        </FieldWithVisibilityToggle>
+
         {/* Favorite Food and Music */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {["favoriteFood", "favoriteMusic"].map((field) => (
@@ -911,21 +927,6 @@ export function CharacterDetailView({
             </FieldWithVisibilityToggle>
           )
         )}
-      </div>
-
-      <Separator className="my-6" />
-
-      {/* Alignment Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("character-detail:sections.alignment")}
-        </h4>
-
-        <AlignmentMatrix
-          value={isEditing ? editData.alignment : character.alignment}
-          onChange={(value) => onEditDataChange("alignment", value)}
-          isEditable={isEditing}
-        />
       </div>
 
       <Separator className="my-6" />

@@ -416,6 +416,18 @@ export function CreateCharacterModalView({
           options={archetypeOptions}
         />
 
+        {/* Alignment */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-primary">
+            {t("modal.alignment")}
+          </Label>
+          <AlignmentMatrix
+            value={watchedValues.alignment || ""}
+            onChange={(value) => setValue("alignment", value)}
+            isEditable={true}
+          />
+        </div>
+
         {/* Personality */}
         <div className="space-y-2">
           <Label htmlFor="personality" className="text-sm font-medium text-primary">
@@ -522,19 +534,6 @@ export function CreateCharacterModalView({
             <span>{watchedValues.favoriteMusic?.length || 0}/100</span>
           </div>
         </div>
-      </div>
-
-      <Separator className="my-6" />
-
-      {/* Alignment Section */}
-      <div className="space-y-4">
-        <SectionTitle>{t("modal.alignment_section")}</SectionTitle>
-
-        <AlignmentMatrix
-          value={watchedValues.alignment || ""}
-          onChange={(value) => setValue("alignment", value)}
-          isEditable={true}
-        />
       </div>
 
       <Separator className="my-6" />
