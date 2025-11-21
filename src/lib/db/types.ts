@@ -185,6 +185,7 @@ export interface DBRace {
   diet?: string;
   elemental_diet?: string;
   communication?: string; // JSON array string
+  other_communication?: string;
   moral_tendency?: string;
   social_organization?: string;
   habitat?: string; // JSON array string

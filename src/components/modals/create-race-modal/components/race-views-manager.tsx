@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Edit, Eye, Plus, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
@@ -148,10 +148,7 @@ export function RaceViewsManager({
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span className="text-sm font-medium">{view.raceName}</span>
-                    </div>
+                    <span className="text-sm font-medium block">{view.raceName}</span>
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {view.description}
                     </p>
@@ -168,11 +165,11 @@ export function RaceViewsManager({
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="ghost-destructive"
                     size="icon"
                     onClick={() => handleDelete(view.id)}
                   >
-                    <Trash2 className="w-4 h-4 text-destructive" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>

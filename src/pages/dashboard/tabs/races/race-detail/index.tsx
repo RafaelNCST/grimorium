@@ -48,7 +48,10 @@ export function RaceDetail() {
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("raceDetailAdvancedSectionOpen");
+    return stored ? JSON.parse(stored) : false;
+  });
   const [allRaces, setAllRaces] = useState<IRace[]>([]);
   const [relationships, setRelationships] = useState<IRaceRelationship[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -314,7 +317,11 @@ export function RaceDetail() {
   }, []);
 
   const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
+    setAdvancedSectionOpen((prev) => {
+      const newValue = !prev;
+      localStorage.setItem("raceDetailAdvancedSectionOpen", JSON.stringify(newValue));
+      return newValue;
+    });
   }, []);
 
   const toggleSection = useCallback((sectionName: string) => {

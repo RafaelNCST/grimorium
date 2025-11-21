@@ -35,6 +35,7 @@ export interface IRace {
     id: string;
     raceId: string;
     raceName: string;
+    raceImage?: string;
     description: string;
   }>;
   culturalNotes?: string;
@@ -53,7 +54,7 @@ export interface IRace {
   diet?: string;
   elementalDiet?: string;
   communication?: string[];
-  otherCommunication?: string;
+  otherCommunication?: string; // Used when "Outro" is selected in communication
   moralTendency?: string;
   socialOrganization?: string;
   habitat?: string[];

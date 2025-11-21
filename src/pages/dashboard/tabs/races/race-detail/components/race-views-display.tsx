@@ -1,6 +1,7 @@
 import { Eye, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,6 +13,7 @@ import type { RaceView } from "@/components/modals/create-race-modal/components/
 interface IRace {
   id: string;
   name: string;
+  image?: string;
 }
 
 interface RaceViewsDisplayProps {
@@ -40,6 +42,7 @@ export function RaceViewsDisplay({
   const availableRaces = allRaces.map((race) => ({
     id: race.id,
     name: race.name,
+    image: race.image,
   }));
 
   if (isEditing) {
@@ -57,6 +60,21 @@ export function RaceViewsDisplay({
 
   const hasViews = views && views.length > 0;
   const viewCount = views?.length || 0;
+
+  // Helper to get race image from allRaces
+  const getRaceImage = (raceId: string): string | undefined => {
+    return allRaces.find((r) => r.id === raceId)?.image;
+  };
+
+  // Helper to get initials for avatar fallback
+  const getInitials = (name: string): string => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <Collapsible
@@ -85,25 +103,44 @@ export function RaceViewsDisplay({
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-2">
         {hasViews ? (
-          <div className="space-y-2">
-            {views.map((view) => (
-              <div
-                key={view.id}
-                className="p-3 rounded-lg border bg-muted/30 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  <Eye className="w-4 h-4 text-muted-foreground mt-0.5" />
-                  <div className="flex-1 space-y-1">
-                    <span className="text-sm font-medium block">{view.raceName}</span>
-                    {view.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {view.description}
-                      </p>
-                    )}
+          <div className="space-y-3">
+            {views.map((view) => {
+              const raceImage = view.raceImage || getRaceImage(view.raceId);
+
+              return (
+                <div
+                  key={view.id}
+                  className="p-4 rounded-lg border bg-muted/30 hover:bg-muted/40 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Avatar da raça */}
+                    <Avatar className="w-10 h-10 rounded-md flex-shrink-0">
+                      {raceImage && (
+                        <AvatarImage src={raceImage} alt={view.raceName} />
+                      )}
+                      <AvatarFallback className="text-xs rounded-md bg-primary/10">
+                        {getInitials(view.raceName)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Conteúdo da visão */}
+                    <div className="flex-1 space-y-2 min-w-0">
+                      {/* Nome da raça */}
+                      <span className="text-sm font-semibold text-foreground block">
+                        {view.raceName}
+                      </span>
+
+                      {/* Descrição da visão */}
+                      {view.description && (
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {view.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <span className="italic text-muted-foreground/60">
