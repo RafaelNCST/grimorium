@@ -1,10 +1,15 @@
 import React from "react";
 
-import { AlertCircle, Info, Menu, Package } from "lucide-react";
+import { AlertCircle, Info, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
-import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import {
+  DisplayImage,
+  DisplayTextarea,
+  DisplaySelectGrid,
+  type DisplaySelectGridOption,
+} from "@/components/displays";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
@@ -43,13 +48,6 @@ import { type IFieldVisibility } from "@/types/character-types";
 
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { VersionCard } from "./components/version-card";
-
-// Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
-  <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-    <p>{t("item-detail:empty_states.no_data")}</p>
-  </div>
-);
 
 // Info Alert component
 const InfoAlert = ({
@@ -304,7 +302,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
             </div>
           ) : (
             <div className="max-w-[534px] mx-auto h-96">
-              <FormImageDisplay
+              <DisplayImage
                 icon={Package}
                 height="h-full"
                 width="w-full"
@@ -392,10 +390,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.appearance?.length || 0}/1000</span>
               </div>
             </>
-          ) : item.appearance ? (
-            <p className="text-sm whitespace-pre-wrap">{item.appearance}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.appearance} />
           )}
         </FieldWithVisibilityToggle>
 
@@ -422,10 +418,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.origin?.length || 0}/1000</span>
               </div>
             </>
-          ) : item.origin ? (
-            <p className="text-sm whitespace-pre-wrap">{item.origin}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.origin} />
           )}
         </FieldWithVisibilityToggle>
 
@@ -457,7 +451,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
               ))}
             </div>
           ) : (
-            <EmptyFieldState t={t} />
+            <span className="italic text-muted-foreground/60">Sem dados</span>
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -504,29 +498,26 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 }))}
               />
             </>
-          ) : currentRarity ? (
-            (() => {
-              const RarityIcon = currentRarity.icon;
-              return (
-                <div
-                  className={`w-full relative p-4 rounded-lg border-2 transition-all text-left ${currentRarity.activeColorClass}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <RarityIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">
-                        {t(`create-item:${currentRarity.translationKey}`)}
-                      </p>
-                      <p className="text-xs mt-1 opacity-80">
-                        {t(`create-item:${currentRarity.descriptionKey}`)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplaySelectGrid
+              value={item.storyRarity}
+              options={STORY_RARITIES_CONSTANT.map((rarity): DisplaySelectGridOption => ({
+                value: rarity.value,
+                label: t(`create-item:${rarity.translationKey}`),
+                description: t(`create-item:${rarity.descriptionKey}`),
+                icon: rarity.icon,
+                backgroundColor:
+                  rarity.value === "common" ? "gray-500/20" :
+                  rarity.value === "rare" ? "blue-500/20" :
+                  rarity.value === "legendary" ? "purple-500/20" :
+                  "yellow-500/20",
+                borderColor:
+                  rarity.value === "common" ? "gray-500/30" :
+                  rarity.value === "rare" ? "blue-500/30" :
+                  rarity.value === "legendary" ? "purple-500/30" :
+                  "yellow-500/30",
+              }))}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -555,12 +546,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.narrativePurpose?.length || 0}/1000</span>
               </div>
             </>
-          ) : item.narrativePurpose ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {item.narrativePurpose}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.narrativePurpose} />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -598,12 +585,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.usageRequirements?.length || 0}/1000</span>
               </div>
             </>
-          ) : item.usageRequirements ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {item.usageRequirements}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.usageRequirements} />
           )}
         </FieldWithVisibilityToggle>
 
@@ -632,12 +615,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.usageConsequences?.length || 0}/1000</span>
               </div>
             </>
-          ) : item.usageConsequences ? (
-            <p className="text-sm whitespace-pre-wrap">
-              {item.usageConsequences}
-            </p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.usageConsequences} />
           )}
         </FieldWithVisibilityToggle>
 
@@ -664,10 +643,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
                 <span>{editData.itemUsage?.length || 0}/500</span>
               </div>
             </>
-          ) : item.itemUsage ? (
-            <p className="text-sm whitespace-pre-wrap">{item.itemUsage}</p>
           ) : (
-            <EmptyFieldState t={t} />
+            <DisplayTextarea value={item.itemUsage} />
           )}
         </FieldWithVisibilityToggle>
       </div>
