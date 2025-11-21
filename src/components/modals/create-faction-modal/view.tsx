@@ -112,7 +112,9 @@ export function CreateFactionModalView({
                     maxLength={200}
                     required
                     showCharCount
-                    error={errors.name ? t(errors.name.message as string) : undefined}
+                    error={
+                      errors.name ? t(errors.name.message as string) : undefined
+                    }
                     value={watchedValues.name}
                     labelClassName="text-primary"
                   />
@@ -150,7 +152,11 @@ export function CreateFactionModalView({
                 rows={8}
                 required
                 showCharCount
-                error={errors.summary ? t(errors.summary.message as string) : undefined}
+                error={
+                  errors.summary
+                    ? t(errors.summary.message as string)
+                    : undefined
+                }
                 value={watchedValues.summary}
                 labelClassName="text-primary"
                 className="resize-none"
@@ -161,7 +167,9 @@ export function CreateFactionModalView({
             <>
               {/* Internal Structure Section */}
               <div className="space-y-6">
-                <SectionTitle>{t("modal.internal_structure_section")}</SectionTitle>
+                <SectionTitle>
+                  {t("modal.internal_structure_section")}
+                </SectionTitle>
 
                 {/* Government Form */}
                 <FormTextarea
@@ -260,7 +268,9 @@ export function CreateFactionModalView({
                 {/* Public Reputation */}
                 <FormSelectGrid
                   value={watchedValues.publicReputation || ""}
-                  onChange={(value) => setValue("publicReputation", value as string)}
+                  onChange={(value) =>
+                    setValue("publicReputation", value as string)
+                  }
                   label={t("modal.public_reputation")}
                   columns={3}
                   options={translatedReputationOptions}
@@ -388,7 +398,9 @@ export function CreateFactionModalView({
                 <FormTextarea
                   {...register("foundationHistorySummary")}
                   label={t("modal.foundation_history_summary")}
-                  placeholder={t("modal.foundation_history_summary_placeholder")}
+                  placeholder={t(
+                    "modal.foundation_history_summary_placeholder"
+                  )}
                   maxLength={500}
                   rows={4}
                   showCharCount
@@ -410,12 +422,6 @@ export function CreateFactionModalView({
                   value={watchedValues.founders || []}
                   onChange={(value) => setValue("founders", value)}
                   labelClassName="text-sm font-medium text-primary"
-                />
-
-                {/* Chronology - Keep as is */}
-                <TimelineInput
-                  value={watchedValues.chronology || []}
-                  onChange={(value) => setValue("chronology", value)}
                 />
 
                 {/* Alignment */}
