@@ -227,7 +227,12 @@ export function FormSelectGrid<T extends string = string>({
         onChange([...currentValues, optionValue] as T[]);
       }
     } else {
-      onChange(optionValue);
+      // Allow deselection: if clicking on selected item, set to empty string
+      if (value === optionValue) {
+        onChange("" as T);
+      } else {
+        onChange(optionValue);
+      }
     }
   };
 
