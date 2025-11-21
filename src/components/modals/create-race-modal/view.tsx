@@ -73,6 +73,7 @@ export function CreateRaceModalView({
                 value={watchedValues.image || ""}
                 onChange={(value) => setValue("image", value)}
                 label={t("modal.image")}
+                helperText="opcional"
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"

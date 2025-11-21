@@ -217,10 +217,12 @@ export function FormSimpleGrid<T extends string = string>({
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-primary">
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      {label && (
+        <Label className="text-sm font-medium text-primary">
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
 
       <div className={cn(`grid ${gridColsClass} gap-3`, className)}>
         {options.map((option) => {

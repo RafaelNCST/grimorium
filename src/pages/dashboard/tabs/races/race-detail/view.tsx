@@ -164,6 +164,7 @@ export function RaceDetailView({
                 value={imagePreview}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("race-detail:fields.image")}
+                helperText="opcional"
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"
@@ -200,6 +201,7 @@ export function RaceDetailView({
             <div className="space-y-2">
               <Label className="text-primary">
                 {t("race-detail:fields.scientific_name")}
+                <span className="text-xs text-muted-foreground ml-1">(opcional)</span>
               </Label>
               <Input
                 value={editData.scientificName || ""}

@@ -191,7 +191,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
               value={editData.image || ""}
               onChange={(value) => onEditDataChange("image", value)}
               label={t("create-item:modal.image")}
-              helperText={t("create-item:modal.upload_image")}
+              helperText="opcional"
               height="h-96"
               shape="rounded"
               imageFit="cover"

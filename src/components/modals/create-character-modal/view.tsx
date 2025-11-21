@@ -234,6 +234,7 @@ export function CreateCharacterModalView({
         onChange={(value) => setValue("status", value)}
         options={statusOptions}
         label={t("modal.status")}
+        required
         translationNamespace="create-character"
       />
 

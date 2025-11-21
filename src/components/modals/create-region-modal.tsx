@@ -269,7 +269,7 @@ export function CreateRegionModal({
                         value={field.value}
                         onChange={field.onChange}
                         label={t("create_region.image_label")}
-                        helperText={`opcional - ${t("create_region.image_recommended")}`}
+                        helperText="opcional"
                         height="h-[28rem]"
                         shape="rounded"
                         placeholderIcon={Map}

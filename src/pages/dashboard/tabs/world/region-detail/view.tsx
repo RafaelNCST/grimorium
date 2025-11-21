@@ -265,7 +265,7 @@ export function RegionDetailView({
                 value={imagePreview}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("region-detail:fields.image")}
-                helperText={`opcional - ${t("world:create_region.image_recommended")}`}
+                helperText="opcional"
                 height="h-[28rem]"
                 shape="rounded"
                 placeholderIcon={Map}

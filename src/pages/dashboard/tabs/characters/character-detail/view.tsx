@@ -461,6 +461,7 @@ export function CharacterDetailView({
             value={editData.status || ""}
             onChange={(value) => onEditDataChange("status", value)}
             label={t("character-detail:fields.status")}
+            required
             options={statusOptions}
             translationNamespace="create-character"
           />
