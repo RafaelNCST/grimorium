@@ -11,7 +11,6 @@ import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 
@@ -171,6 +170,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.governmentForm}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -208,6 +208,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.economy}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -221,6 +222,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={6}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.symbolsAndSecrets}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -271,6 +273,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.externalInfluence}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -282,10 +285,6 @@ export function CreateFactionModalView({
               {/* Alignment Section */}
               <div className="space-y-4">
                 <SectionTitle>{t("modal.alignment_section")}</SectionTitle>
-
-                <Label className="text-sm font-medium text-primary">
-                  {t("modal.alignment")}
-                </Label>
 
                 <AlignmentMatrix
                   value={watchedValues.alignment || ""}
@@ -307,6 +306,7 @@ export function CreateFactionModalView({
                   maxLength={300}
                   rows={3}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.factionMotto}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -356,6 +356,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.uniformAndAesthetics}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -389,6 +390,7 @@ export function CreateFactionModalView({
                   placeholder={t("modal.foundation_date_placeholder")}
                   maxLength={200}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.foundationDate}
                   labelClassName="text-sm font-medium text-primary"
                 />
@@ -401,6 +403,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.foundationHistorySummary}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -484,6 +487,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.organizationObjectives}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -497,6 +501,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.narrativeImportance}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
@@ -510,6 +515,7 @@ export function CreateFactionModalView({
                   maxLength={500}
                   rows={4}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.inspirations}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"
