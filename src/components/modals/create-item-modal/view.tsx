@@ -348,6 +348,7 @@ export function CreateItemModalView({
       }}
       maxWidth="max-w-3xl"
       basicFieldsTitle={t("modal.basic_fields")}
+      advancedFieldsTitle={t("modal.advanced_fields")}
     />
   );
 }

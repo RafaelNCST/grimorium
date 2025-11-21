@@ -63,6 +63,7 @@ export function CreateRaceModalView({
             warning: t("modal.info_message"),
           }}
           basicFieldsTitle={t("sections.basic_fields")}
+          advancedFieldsTitle={t("sections.advanced_fields")}
           basicFields={
             <div className="space-y-6">
             {/* Race Image */}

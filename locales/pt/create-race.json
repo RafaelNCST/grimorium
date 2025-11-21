@@ -104,7 +104,8 @@
     "inspirations_placeholder": "Dragões clássicos da mitologia europeia mesclados com elementos de dragões asiáticos, inspirados em Smaug e dragões de D&D."
   },
   "sections": {
-    "basic_fields": "Campos Básicos",
+    "basic_fields": "Informações Básicas",
+    "advanced_fields": "Informações Avançadas",
     "culture_myths": "Cultura e Mitos",
     "appearance": "Aparência e Características",
     "behaviors": "Comportamentos",

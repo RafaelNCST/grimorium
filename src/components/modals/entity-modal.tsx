@@ -40,6 +40,7 @@ interface EntityModalProps {
   footer: EntityModalFooter;
   maxWidth?: string; // default: "max-w-2xl"
   basicFieldsTitle?: string; // default traduzível
+  advancedFieldsTitle?: string; // default traduzível
 }
 
 export function EntityModal({
@@ -51,6 +52,7 @@ export function EntityModal({
   footer,
   maxWidth = "max-w-2xl",
   basicFieldsTitle = "Informações Básicas",
+  advancedFieldsTitle = "Informações Avançadas",
 }: EntityModalProps) {
   const Icon = header.icon;
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -83,7 +85,7 @@ export function EntityModal({
           {advancedFields && (
             <div className="mt-6">
               <CollapsibleSection
-                title="Campos Avançados"
+                title={advancedFieldsTitle}
                 isOpen={isAdvancedOpen}
                 onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
               >

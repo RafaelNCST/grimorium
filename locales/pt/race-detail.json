@@ -6,15 +6,15 @@
     "save": "Salvar",
     "cancel": "Cancelar",
     "delete": "Excluir",
-    "show_advanced": "Mostrar campos avançados",
-    "hide_advanced": "Esconder campos avançados",
+    "show_advanced": "Mostrar informações avançadas",
+    "hide_advanced": "Esconder informações avançadas",
     "upload_image": "Clique para adicionar uma imagem",
     "change_image": "Clique para alterar a imagem",
     "add_note": "Adicionar Nota"
   },
   "sections": {
     "basic_info": "Informações Básicas",
-    "advanced_info": "Campos Avançados",
+    "advanced_info": "Informações Avançadas",
     "summary": "Resumo",
     "culture": "Cultura e Mitos",
     "appearance": "Aparência e Características",
