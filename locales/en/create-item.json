@@ -2,7 +2,7 @@
   "modal": {
     "create_item": "Create New Item",
     "description": "Add a new item to your book",
-    "info_message": "Everything can be edited later. Start with basic information and add details as you develop your story.",
+    "info_message": "Everything can be edited later. Start with basic information and add details as you develop your story",
     "basic_fields": "Basic Fields",
     "image": "Image",
     "change_image": "Change Image",

@@ -2,7 +2,7 @@
   "modal": {
     "create_character": "Criar Novo Personagem",
     "header_description": "Crie um novo personagem para sua história",
-    "info_message": "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação do personagem.",
+    "info_message": "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação do personagem",
     "basic_fields": "Informações Básicas",
     "advanced_fields": "Informações Avançadas",
     "advanced_items": "Itens Avançados",

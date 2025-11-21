@@ -1,7 +1,7 @@
 {
   "modal": {
     "create_arc": "Criar Novo Arco Narrativo",
-    "info_message": "Preencha os campos básicos para criar seu arco. Você pode adicionar informações avançadas depois.",
+    "info_message": "Preencha os campos básicos para criar seu arco. Você pode adicionar informações avançadas depois",
     "basic_fields": "Campos Básicos",
     "advanced_fields": "Campos Avançados",
     "arc_name": "Nome do Arco",

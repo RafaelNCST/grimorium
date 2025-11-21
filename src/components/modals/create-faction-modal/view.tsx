@@ -11,6 +11,7 @@ import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
+import { InfoAlert } from "@/components/ui/info-alert";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 
@@ -478,9 +479,7 @@ export function CreateFactionModalView({
                   <label className="text-sm font-medium text-primary">
                     {t("modal.power_section")}
                   </label>
-                  <p className="text-sm text-muted-foreground">
-                    {t("modal.power_description")}
-                  </p>
+                  <InfoAlert>{t("modal.power_description")}</InfoAlert>
 
                   {/* Military Power */}
                   <PowerSlider

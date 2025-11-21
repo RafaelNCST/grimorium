@@ -2,7 +2,7 @@
   "modal": {
     "create_faction": "Create New Faction",
     "description": "Create a new faction for your book",
-    "info_message": "Everything can be edited later. Some special sections can only be added after the faction is created.",
+    "info_message": "Everything can be edited later. Some special sections can only be added after the faction is created",
     "basic_fields": "Basic Fields",
     "advanced_fields": "Advanced Fields",
     "advanced_items": "Advanced Items",
@@ -48,7 +48,7 @@
     "add_currency": "Add Currency",
 
     "power_section": "Power",
-    "power_description": "Define how powerful the faction is in each sector (scale from 1 to 10) relative to your book's universe:",
+    "power_description": "Define how powerful the faction is in each sector (scale from 1 to 10) relative to your book's universe",
     "military_power": "Military Power",
     "military_power_description": "Military strength and combat capability of the faction",
     "political_power": "Political Power",
