@@ -155,6 +155,7 @@ export function CreateRaceModalView({
                 maxLength={1500}
                 rows={6}
                 showCharCount
+                showOptionalLabel={false}
                 error={errors.culturalNotes?.message}
                 value={watchedValues.culturalNotes}
                 labelClassName="text-sm font-medium text-primary"
@@ -176,6 +177,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.generalAppearance}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -189,6 +191,7 @@ export function CreateRaceModalView({
                   placeholder={t("modal.life_expectancy_placeholder")}
                   maxLength={100}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.lifeExpectancy}
                   labelClassName="text-sm font-medium text-primary"
                 />
@@ -199,6 +202,7 @@ export function CreateRaceModalView({
                   placeholder={t("modal.average_height_placeholder")}
                   maxLength={100}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.averageHeight}
                   labelClassName="text-sm font-medium text-primary"
                 />
@@ -209,6 +213,7 @@ export function CreateRaceModalView({
                   placeholder={t("modal.average_weight_placeholder")}
                   maxLength={100}
                   showCharCount
+                  showOptionalLabel={false}
                   value={watchedValues.averageWeight}
                   labelClassName="text-sm font-medium text-primary"
                 />
@@ -222,6 +227,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.specialPhysicalCharacteristics}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -287,6 +293,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.socialOrganization}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -325,6 +332,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.specialCharacteristics}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -338,6 +346,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.weaknesses}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -358,6 +367,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.storyMotivation}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
@@ -371,6 +381,7 @@ export function CreateRaceModalView({
                 maxLength={500}
                 rows={4}
                 showCharCount
+                showOptionalLabel={false}
                 value={watchedValues.inspirations}
                 labelClassName="text-sm font-medium text-primary"
                 className="resize-none"
