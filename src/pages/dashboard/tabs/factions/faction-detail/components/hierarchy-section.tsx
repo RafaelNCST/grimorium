@@ -1,23 +1,43 @@
 import React, { useState } from "react";
 
-import { Plus, Edit2, Trash2, Users as UsersIcon, Info } from "lucide-react";
+import { Settings, UserPlus, Edit2, Trash2, Users as UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoAlert } from "@/components/ui/info-alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { type IHierarchyTitle } from "@/types/faction-types";
 
-import { HierarchyMembersModal } from "./hierarchy-members-modal";
-import { HierarchyTitleModal } from "./hierarchy-title-modal";
+import { AddMemberModal } from "./add-member-modal";
+import { ManageTitlesModal } from "./manage-titles-modal";
 
 interface HierarchySectionProps {
   hierarchy: IHierarchyTitle[];
   availableCharacters: Array<{ id: string; name: string; image?: string }>;
   isEditing: boolean;
   onHierarchyChange: (hierarchy: IHierarchyTitle[]) => void;
+}
+
+// 12 cores predefinidas para títulos (tons suaves com opacidade)
+export const HIERARCHY_TITLE_COLORS = [
+  { value: "slate", bg: "bg-slate-500/20", text: "text-slate-700 dark:text-slate-300", pickerBg: "bg-slate-500" },
+  { value: "red", bg: "bg-red-500/20", text: "text-red-700 dark:text-red-300", pickerBg: "bg-red-500" },
+  { value: "orange", bg: "bg-orange-500/20", text: "text-orange-700 dark:text-orange-300", pickerBg: "bg-orange-500" },
+  { value: "amber", bg: "bg-amber-500/20", text: "text-amber-700 dark:text-amber-300", pickerBg: "bg-amber-500" },
+  { value: "yellow", bg: "bg-yellow-500/20", text: "text-yellow-700 dark:text-yellow-300", pickerBg: "bg-yellow-500" },
+  { value: "lime", bg: "bg-lime-500/20", text: "text-lime-700 dark:text-lime-300", pickerBg: "bg-lime-500" },
+  { value: "green", bg: "bg-green-500/20", text: "text-green-700 dark:text-green-300", pickerBg: "bg-green-500" },
+  { value: "cyan", bg: "bg-cyan-500/20", text: "text-cyan-700 dark:text-cyan-300", pickerBg: "bg-cyan-500" },
+  { value: "blue", bg: "bg-blue-500/20", text: "text-blue-700 dark:text-blue-300", pickerBg: "bg-blue-500" },
+  { value: "violet", bg: "bg-violet-500/20", text: "text-violet-700 dark:text-violet-300", pickerBg: "bg-violet-500" },
+  { value: "purple", bg: "bg-purple-500/20", text: "text-purple-700 dark:text-purple-300", pickerBg: "bg-purple-500" },
+  { value: "pink", bg: "bg-pink-500/20", text: "text-pink-700 dark:text-pink-300", pickerBg: "bg-pink-500" },
+];
+
+export function getColorClasses(colorValue: string | undefined) {
+  const color = HIERARCHY_TITLE_COLORS.find(c => c.value === colorValue);
+  return color || HIERARCHY_TITLE_COLORS[0];
 }
 
 export function HierarchySection({
@@ -27,263 +47,233 @@ export function HierarchySection({
   onHierarchyChange,
 }: HierarchySectionProps) {
   const { t } = useTranslation("faction-detail");
-  const [showTitleModal, setShowTitleModal] = useState(false);
-  const [showMembersModal, setShowMembersModal] = useState(false);
-  const [editingTitle, setEditingTitle] = useState<IHierarchyTitle | null>(
-    null
-  );
-  const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
+  const [showManageTitlesModal, setShowManageTitlesModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [editingMember, setEditingMember] = useState<{ titleId: string; characterId: string } | null>(null);
 
-  // Ensure "Members" title exists
-  React.useEffect(() => {
-    if (hierarchy.length === 0 || !hierarchy.find((t) => t.isMembersTitle)) {
-      const membersTitle: IHierarchyTitle = {
-        id: "members",
-        name: t("hierarchy.members_default_name"),
-        isMembersTitle: true,
-        characterIds: [],
-      };
-      onHierarchyChange([...hierarchy, membersTitle]);
-    }
-  }, []);
+  // Ordenar membros: primeiro por ordem do título (menor = mais importante), depois agrupa por título
+  const getSortedMembers = () => {
+    const members: Array<{
+      characterId: string;
+      character: { id: string; name: string; image?: string };
+      title: IHierarchyTitle;
+    }> = [];
 
-  // Sort titles: custom titles by order, then Members last
-  const sortedHierarchy = [...hierarchy].sort((a, b) => {
-    if (a.isMembersTitle) return 1;
-    if (b.isMembersTitle) return -1;
-    return (a.order || 0) - (b.order || 0);
-  });
+    // Ordenar títulos por ordem (menor primeiro), membros ficam por último
+    const sortedTitles = [...hierarchy].sort((a, b) => {
+      if (a.isMembersTitle) return 1;
+      if (b.isMembersTitle) return -1;
+      return (a.order || 0) - (b.order || 0);
+    });
 
-  const handleAddTitle = () => {
-    setEditingTitle(null);
-    setShowTitleModal(true);
+    sortedTitles.forEach(title => {
+      title.characterIds.forEach(charId => {
+        const character = availableCharacters.find(c => c.id === charId);
+        if (character) {
+          members.push({ characterId: charId, character, title });
+        }
+      });
+    });
+
+    return members;
   };
 
-  const handleEditTitle = (title: IHierarchyTitle) => {
-    setEditingTitle(title);
-    setShowTitleModal(true);
-  };
-
-  const handleDeleteTitle = (titleId: string) => {
-    const title = hierarchy.find((t) => t.id === titleId);
-    if (title?.isMembersTitle) {
-      // eslint-disable-next-line no-alert
-      alert(t("hierarchy.cannot_delete_members"));
-      return;
-    }
-
-    // eslint-disable-next-line no-alert
-    if (confirm(t("hierarchy.delete_confirm"))) {
-      const updated = hierarchy.filter((t) => t.id !== titleId);
-      onHierarchyChange(updated);
-    }
-  };
-
-  const handleSaveTitle = (title: IHierarchyTitle) => {
-    if (editingTitle) {
-      // Update existing title
-      const updated = hierarchy.map((t) =>
-        t.id === editingTitle.id ? title : t
-      );
-      onHierarchyChange(updated);
-    } else {
-      // Add new title
-      onHierarchyChange([...hierarchy, title]);
-    }
-    setShowTitleModal(false);
-    setEditingTitle(null);
-  };
-
-  const handleManageCharacters = (titleId: string) => {
-    setEditingTitleId(titleId);
-    setShowMembersModal(true);
-  };
-
-  const handleSaveCharacters = (titleId: string, characterIds: string[]) => {
-    const updated = hierarchy.map((t) =>
-      t.id === titleId ? { ...t, characterIds } : t
-    );
+  const handleRemoveMember = (titleId: string, characterId: string) => {
+    const updated = hierarchy.map(title => {
+      if (title.id === titleId) {
+        return {
+          ...title,
+          characterIds: title.characterIds.filter(id => id !== characterId)
+        };
+      }
+      return title;
+    });
     onHierarchyChange(updated);
-    setShowMembersModal(false);
-    setEditingTitleId(null);
   };
 
-  const getCharacterById = (characterId: string) =>
-    availableCharacters.find((c) => c.id === characterId);
+  const handleEditMember = (titleId: string, characterId: string) => {
+    setEditingMember({ titleId, characterId });
+    setShowAddMemberModal(true);
+  };
 
-  if (availableCharacters.length === 0) {
+  const handleSaveMember = (characterId: string, newTitleId: string) => {
+    let updated = [...hierarchy];
+
+    // Se estiver editando, remover do título antigo
+    if (editingMember) {
+      updated = updated.map(title => {
+        if (title.id === editingMember.titleId) {
+          return {
+            ...title,
+            characterIds: title.characterIds.filter(id => id !== editingMember.characterId)
+          };
+        }
+        return title;
+      });
+    }
+
+    // Adicionar ao novo título
+    updated = updated.map(title => {
+      if (title.id === newTitleId) {
+        // Verificar se já não está nesse título
+        if (!title.characterIds.includes(characterId)) {
+          return {
+            ...title,
+            characterIds: [...title.characterIds, characterId]
+          };
+        }
+      }
+      return title;
+    });
+
+    onHierarchyChange(updated);
+    setShowAddMemberModal(false);
+    setEditingMember(null);
+  };
+
+  const handleSaveTitles = (titles: IHierarchyTitle[]) => {
+    onHierarchyChange(titles);
+  };
+
+  const sortedMembers = getSortedMembers();
+  const hasNoCharacters = availableCharacters.length === 0;
+  const hasNoTitles = hierarchy.filter(t => !t.isMembersTitle).length === 0;
+
+  // Se não houver personagens, mostrar aviso
+  if (hasNoCharacters) {
     return (
-      <Card className="card-magical">
-        <CardHeader>
-          <CardTitle>{t("sections.hierarchy")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              <p className="font-semibold">{t("hierarchy.no_characters")}</p>
-              <p className="text-sm mt-1">
-                {t("hierarchy.no_characters_message")}
-              </p>
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <InfoAlert>
+        <p className="font-semibold">{t("hierarchy.no_characters")}</p>
+        <p className="text-sm mt-1">
+          {t("hierarchy.no_characters_message")}
+        </p>
+      </InfoAlert>
     );
   }
 
   return (
     <>
-      <Card className="card-magical">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t("sections.hierarchy")}</CardTitle>
-            {isEditing && (
-              <Button
-                variant="magical"
-                size="lg"
-                className="animate-glow"
-                onClick={handleAddTitle}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {t("hierarchy.add_title")}
-              </Button>
-            )}
+      <div className="space-y-4">
+        {/* Botões de ação - só aparecem no modo edição */}
+        {isEditing && (
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowManageTitlesModal(true)}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {t("hierarchy.manage_titles")}
+            </Button>
+            <Button
+              variant="magical"
+              size="sm"
+              className="animate-glow"
+              onClick={() => {
+                setEditingMember(null);
+                setShowAddMemberModal(true);
+              }}
+              disabled={hasNoTitles}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              {t("hierarchy.add_member")}
+            </Button>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {sortedHierarchy.length === 0 ? (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                {t("hierarchy.empty_state.description")}
-              </AlertDescription>
-            </Alert>
-          ) : (
-            sortedHierarchy.map((title) => {
-              const characters = title.characterIds
-                .map(getCharacterById)
-                .filter(Boolean) as Array<{
-                id: string;
-                name: string;
-                image?: string;
-              }>;
+        )}
 
-              return (
-                <Card key={title.id} className="border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-lg">{title.name}</CardTitle>
-                        {title.isMembersTitle && (
-                          <Badge variant="secondary" className="ml-2">
-                            {t("hierarchy.members_title")}
-                          </Badge>
-                        )}
+        {/* Aviso se não houver títulos */}
+        {hasNoTitles && isEditing && (
+          <InfoAlert>
+            {t("hierarchy.no_titles_hint")}
+          </InfoAlert>
+        )}
+
+        {/* Lista de membros */}
+        {sortedMembers.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <UsersIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">{t("hierarchy.empty_state.description")}</p>
+          </div>
+        ) : (
+          <ScrollArea className={sortedMembers.length > 6 ? "max-h-[420px] pr-3" : ""}>
+            <div className="space-y-2">
+              {sortedMembers.map(({ characterId, character, title }) => {
+                const colorClasses = getColorClasses(title.color);
+
+                return (
+                  <div
+                    key={`${title.id}-${characterId}`}
+                    className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg} transition-all`}
+                  >
+                    <Avatar className="w-10 h-10 border-2 border-border">
+                      <AvatarImage
+                        src={character.image}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-sm bg-muted text-muted-foreground">
+                        {character.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate text-foreground">{character.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {title.name}
                         {!title.isMembersTitle && title.order !== undefined && (
-                          <Badge variant="outline" className="ml-2">
-                            #{title.order}
-                          </Badge>
+                          <span className="ml-1">#{title.order}</span>
                         )}
-                      </div>
-                      {isEditing && (
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleManageCharacters(title.id)}
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditTitle(title)}
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          {!title.isMembersTitle && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteTitle(title.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                      )}
+                      </p>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    {characters.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <UsersIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">
-                          {t("hierarchy.no_characters_in_title")}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="max-h-[264px] overflow-y-auto space-y-1">
-                        {characters.map((character) => (
-                          <div
-                            key={character.id}
-                            className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors"
-                          >
-                            <Avatar className="w-8 h-8">
-                              <AvatarImage
-                                src={character.image}
-                                className="object-cover"
-                              />
-                              <AvatarFallback className="text-xs">
-                                {character.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <p className="text-sm font-medium">
-                              {character.name}
-                            </p>
-                          </div>
-                        ))}
+
+                    {isEditing && (
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditMember(title.id, characterId)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost-destructive"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleRemoveMember(title.id, characterId)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-        </CardContent>
-      </Card>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        )}
+      </div>
 
-      {showTitleModal && (
-        <HierarchyTitleModal
-          isOpen={showTitleModal}
-          onClose={() => {
-            setShowTitleModal(false);
-            setEditingTitle(null);
-          }}
-          editingTitle={editingTitle}
-          existingTitles={hierarchy}
-          onSave={handleSaveTitle}
-        />
-      )}
+      {/* Modal de Gerenciar Títulos */}
+      <ManageTitlesModal
+        isOpen={showManageTitlesModal}
+        onClose={() => setShowManageTitlesModal(false)}
+        titles={hierarchy}
+        onSave={handleSaveTitles}
+      />
 
-      {showMembersModal && editingTitleId && (
-        <HierarchyMembersModal
-          isOpen={showMembersModal}
-          onClose={() => {
-            setShowMembersModal(false);
-            setEditingTitleId(null);
-          }}
-          titleId={editingTitleId}
-          titleName={hierarchy.find((t) => t.id === editingTitleId)?.name || ""}
-          selectedCharacterIds={
-            hierarchy.find((t) => t.id === editingTitleId)?.characterIds || []
-          }
-          availableCharacters={availableCharacters}
-          onSave={handleSaveCharacters}
-        />
-      )}
+      {/* Modal de Adicionar/Editar Membro */}
+      <AddMemberModal
+        isOpen={showAddMemberModal}
+        onClose={() => {
+          setShowAddMemberModal(false);
+          setEditingMember(null);
+        }}
+        titles={hierarchy.filter(t => !t.isMembersTitle)}
+        availableCharacters={availableCharacters}
+        existingMemberIds={hierarchy.flatMap(t => t.characterIds)}
+        editingMember={editingMember}
+        onSave={handleSaveMember}
+      />
     </>
   );
 }

@@ -60,6 +60,7 @@ export interface IHierarchyTitle {
   id: string;
   name: string;
   order?: number; // undefined para título "Membros"
+  color?: string; // Cor de background do título
   isMembersTitle?: boolean;
   characterIds: string[];
 }
