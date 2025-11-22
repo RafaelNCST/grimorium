@@ -42,6 +42,30 @@ export interface ITimelineEvent {
   description: string;
 }
 
+// Timeline (Linha do tempo) types
+export interface IFactionTimelineEvent {
+  id: string;
+  name: string;
+  description: string;
+  reason: string;
+  outcome: string;
+  startDate: string;
+  endDate: string;
+  charactersInvolved: string[];
+  factionsInvolved: string[];
+  racesInvolved: string[];
+  itemsInvolved: string[];
+}
+
+export interface IFactionTimelineEra {
+  id: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  events: IFactionTimelineEvent[];
+}
+
 export type DiplomaticStatus =
   | "alliance"
   | "subordinate"
@@ -115,6 +139,9 @@ export interface IFaction {
   narrativeImportance?: string;
   inspirations?: string;
 
+  // Special sections - Timeline
+  timeline?: IFactionTimelineEra[];
+
   // Special sections - Diplomacy
   diplomaticRelations?: IDiplomaticRelation[];
 
@@ -171,6 +198,9 @@ export interface IFactionFormData {
   organizationObjectives?: string;
   narrativeImportance?: string;
   inspirations?: string;
+
+  // Special sections - Timeline
+  timeline?: IFactionTimelineEra[];
 
   // Special sections - Diplomacy
   diplomaticRelations?: IDiplomaticRelation[];

@@ -49,6 +49,7 @@ import {
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DiplomacySection } from "./components/diplomacy-section";
+import { FactionTimeline } from "./components/faction-timeline";
 import { HierarchySection } from "./components/hierarchy-section";
 import { VersionCard } from "./components/version-card";
 
@@ -66,9 +67,10 @@ interface FactionDetailViewProps {
   isNavigationSidebarOpen: boolean;
   imagePreview: string;
   fileInputRef: React.RefObject<HTMLInputElement>;
-  mockCharacters: Array<{ id: string; name: string }>;
-  mockRaces: Array<{ id: string; name: string }>;
+  mockCharacters: Array<{ id: string; name: string; image?: string }>;
+  mockRaces: Array<{ id: string; name: string; image?: string }>;
   mockFactions: Array<{ id: string; name: string; image?: string }>;
+  mockItems: Array<{ id: string; name: string; image?: string }>;
   statuses: typeof FACTION_STATUS_CONSTANT;
   types: typeof FACTION_TYPES_CONSTANT;
   influences: typeof FACTION_INFLUENCE_CONSTANT;
@@ -125,7 +127,9 @@ export function FactionDetailView({
   isNavigationSidebarOpen,
   imagePreview,
   mockCharacters,
+  mockRaces,
   mockFactions,
+  mockItems,
   influences,
   reputations,
   currentStatus,
@@ -165,6 +169,7 @@ export function FactionDetailView({
   const [sectionVisibility, setSectionVisibility] = React.useState<
     Record<string, boolean>
   >({
+    timeline: true,
     diplomacy: true,
     hierarchy: true,
   });
@@ -818,6 +823,28 @@ export function FactionDetailView({
   // EXTRA SECTIONS
   // ==================
   const extraSections = [
+    {
+      id: "timeline",
+      title: t("faction-detail:sections.timeline"),
+      content: (
+        <FactionTimeline
+          factionId={faction.id}
+          timeline={editData.timeline || []}
+          isEditing={isEditing}
+          onTimelineChange={(timeline) =>
+            onEditDataChange("timeline", timeline)
+          }
+          characters={mockCharacters}
+          factions={mockFactions}
+          races={mockRaces}
+          items={mockItems}
+        />
+      ),
+      isCollapsible: true,
+      defaultOpen: false,
+      isVisible: sectionVisibility.timeline !== false,
+      onVisibilityToggle: () => handleSectionVisibilityToggle("timeline"),
+    },
     {
       id: "diplomacy",
       title: t("faction-detail:sections.diplomacy"),

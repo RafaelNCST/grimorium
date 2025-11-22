@@ -19,6 +19,7 @@ import {
 import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
 import { useFactionsStore } from "@/stores/factions-store";
+import { useItemsStore } from "@/stores/items-store";
 import { useRacesStore } from "@/stores/races-store";
 import {
   type IFaction,
@@ -46,6 +47,7 @@ export function FactionDetail() {
   const factionsCache = useFactionsStore((state) => state.cache);
   const racesCache = useRacesStore((state) => state.cache);
   const charactersCache = useCharactersStore((state) => state.cache);
+  const itemsCache = useItemsStore((state) => state.cache);
 
   const emptyFaction: IFaction = {
     id: "",
@@ -234,6 +236,17 @@ export function FactionDetail() {
       image: faction.image,
     }));
   }, [dashboardId, factionsCache]);
+
+  // Get items for the current book
+  const items = useMemo(() => {
+    if (!dashboardId) return [];
+    const bookItems = itemsCache[dashboardId]?.items || [];
+    return bookItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      image: item.image,
+    }));
+  }, [dashboardId, itemsCache]);
 
   // Get current status, type, influence, reputation
   const currentStatus = useMemo(
@@ -614,6 +627,7 @@ export function FactionDetail() {
       mockRaces={races}
       mockCharacters={characters}
       mockFactions={factions}
+      mockItems={items}
       statuses={FACTION_STATUS_CONSTANT}
       types={FACTION_TYPES_CONSTANT}
       influences={FACTION_INFLUENCE_CONSTANT}
