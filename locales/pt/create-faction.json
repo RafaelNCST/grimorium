@@ -175,6 +175,8 @@
     "adored_desc": "Amada e venerada pelo povo"
   },
   "alignment": {
+    "no_alignment": "Nenhum alinhamento escolhido",
+    "no_alignment_hint": "Use o modo de edição para selecionar um alinhamento",
     "lawful_good": "Leal e Bom",
     "lawful_good_desc": "Opera com honra e justiça, segue leis e códigos morais",
     "neutral_good": "Neutro e Bom",

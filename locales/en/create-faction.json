@@ -175,6 +175,8 @@
     "adored_desc": "Loved and revered by the people"
   },
   "alignment": {
+    "no_alignment": "No alignment chosen",
+    "no_alignment_hint": "Use edit mode to select an alignment",
     "lawful_good": "Lawful Good",
     "lawful_good_desc": "Operates with honor and justice, follows laws and moral codes",
     "neutral_good": "Neutral Good",

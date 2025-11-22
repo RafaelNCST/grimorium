@@ -54,7 +54,9 @@
     "economic_power": "Poder Economico",
     "organization_objectives": "Objetivos da Organizacao",
     "narrative_importance": "Importancia Narrativa",
-    "inspirations": "Inspiracoes"
+    "inspirations": "Inspiracoes",
+    "alignment": "Alinhamento",
+    "power": "Poder"
   },
   "actions": {
     "open": "Abrir",
@@ -147,6 +149,9 @@
     "load_failed": "Falha ao carregar faccao",
     "save_failed": "Falha ao salvar faccao",
     "delete_failed": "Falha ao excluir faccao"
+  },
+  "validation": {
+    "fill_required_fields": "Preencha os campos obrigatorios"
   },
   "diplomacy": {
     "title": "Diplomacia",

@@ -54,7 +54,9 @@
     "economic_power": "Economic Power",
     "organization_objectives": "Organization Objectives",
     "narrative_importance": "Narrative Importance",
-    "inspirations": "Inspirations"
+    "inspirations": "Inspirations",
+    "alignment": "Alignment",
+    "power": "Power"
   },
   "actions": {
     "open": "Open",
@@ -147,6 +149,9 @@
     "load_failed": "Failed to load faction",
     "save_failed": "Failed to save faction",
     "delete_failed": "Failed to delete faction"
+  },
+  "validation": {
+    "fill_required_fields": "Fill in the required fields"
   },
   "diplomacy": {
     "title": "Diplomacy",
