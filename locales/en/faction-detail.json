@@ -183,6 +183,7 @@
     "diplomatic_status": "Diplomatic Status",
     "save": "Save Relationship",
     "cancel": "Cancel",
+    "back": "Back",
     "delete": "Remove Relationship",
     "cannot_self_relate": "Cannot create relationship with the same faction",
     "duplicate_relation": "A relationship with this faction already exists",

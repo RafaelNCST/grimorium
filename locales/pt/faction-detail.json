@@ -183,6 +183,7 @@
     "diplomatic_status": "Status Diplomatico",
     "save": "Salvar Relacionamento",
     "cancel": "Cancelar",
+    "back": "Voltar",
     "delete": "Remover Relacionamento",
     "cannot_self_relate": "Nao e possivel criar relacionamento com a propria faccao",
     "duplicate_relation": "Ja existe um relacionamento com esta faccao",

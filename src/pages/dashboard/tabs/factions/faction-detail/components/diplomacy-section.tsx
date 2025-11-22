@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 
-import { Plus, Info } from "lucide-react";
+import { Plus, Shield, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { DIPLOMATIC_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/diplomatic-status";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { InfoAlert } from "@/components/ui/info-alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   type IDiplomaticRelation,
   type DiplomaticStatus,
 } from "@/types/faction-types";
 
-import { DiplomacyEditModal } from "./diplomacy-edit-modal";
+import { DiplomacyAddModal } from "./diplomacy-add-modal";
 
 interface DiplomacySectionProps {
   currentFactionId: string;
@@ -33,9 +30,8 @@ export function DiplomacySection({
   onRelationsChange,
 }: DiplomacySectionProps) {
   const { t } = useTranslation("faction-detail");
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingRelation, setEditingRelation] =
-    useState<IDiplomaticRelation | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<DiplomaticStatus>("neutral");
 
   // Filter out current faction from available factions
   const otherFactions = availableFactions.filter(
@@ -60,28 +56,12 @@ export function DiplomacySection({
   };
 
   const handleAddRelation = () => {
-    setEditingRelation(null);
-    setShowEditModal(true);
-  };
-
-  const handleEditRelation = (relation: IDiplomaticRelation) => {
-    setEditingRelation(relation);
-    setShowEditModal(true);
+    setShowAddModal(true);
   };
 
   const handleSaveRelation = (relation: IDiplomaticRelation) => {
-    if (editingRelation) {
-      // Update existing relation
-      const updated = diplomaticRelations.map((r) =>
-        r.id === editingRelation.id ? relation : r
-      );
-      onRelationsChange(updated);
-    } else {
-      // Add new relation
-      onRelationsChange([...diplomaticRelations, relation]);
-    }
-    setShowEditModal(false);
-    setEditingRelation(null);
+    onRelationsChange([...diplomaticRelations, relation]);
+    setShowAddModal(false);
   };
 
   const handleDeleteRelation = (relationId: string) =>
@@ -91,183 +71,145 @@ export function DiplomacySection({
   const getRelationForFaction = (factionId: string) =>
     diplomaticRelations.find((r) => r.targetFactionId === factionId);
 
-  // Render faction card
-  const renderFactionCard = (
+  // Render faction item (simplified - only image and name)
+  const renderFactionItem = (
     faction: { id: string; name: string; image?: string },
     status: DiplomaticStatus
   ) => {
     const relation = getRelationForFaction(faction.id);
-    const statusConfig = DIPLOMATIC_STATUS_CONSTANT.find(
-      (s) => s.value === status
-    );
-    const StatusIcon = statusConfig?.icon;
 
     return (
-      <Card
+      <div
         key={faction.id}
-        className="hover:border-primary/50 transition-colors"
+        className="flex items-center gap-2 p-2 bg-muted rounded-lg group"
       >
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <Avatar className="w-12 h-12 rounded-lg">
-              <AvatarImage src={faction.image} className="object-cover" />
-              <AvatarFallback className="text-sm rounded-lg">
-                {faction.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold truncate">{faction.name}</h4>
-              {statusConfig && StatusIcon && (
-                <Badge
-                  className={`mt-2 flex items-center gap-1.5 w-fit ${statusConfig.bgColorClass} ${statusConfig.colorClass} border px-2 py-0.5`}
-                >
-                  <StatusIcon className="w-3 h-3" />
-                  <span className="text-xs">
-                    {t(`diplomatic_status.${status}`)}
-                  </span>
-                </Badge>
-              )}
-            </div>
-            {isEditing && relation && status !== "neutral" && (
-              <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEditRelation(relation)}
-                >
-                  {t("diplomacy.edit_relation")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteRelation(relation.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  {t("diplomacy.delete")}
-                </Button>
-              </div>
-            )}
+        {faction.image ? (
+          <img
+            src={faction.image}
+            alt={faction.name}
+            className="w-8 h-8 rounded object-cover flex-shrink-0"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+            <Shield className="w-4 h-4 text-muted-foreground" />
           </div>
-        </CardContent>
-      </Card>
+        )}
+        <span className="text-sm font-medium flex-1 truncate">{faction.name}</span>
+        {isEditing && relation && status !== "neutral" && (
+          <Button
+            variant="ghost-destructive"
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => handleDeleteRelation(relation.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
     );
   };
 
   if (otherFactions.length === 0) {
     return (
-      <Card className="card-magical">
-        <CardHeader>
-          <CardTitle>{t("sections.diplomacy")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              <p className="font-semibold">{t("diplomacy.no_factions")}</p>
-              <p className="text-sm mt-1">
-                {t("diplomacy.no_factions_message")}
-              </p>
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <InfoAlert>
+        <p className="font-semibold">{t("diplomacy.no_factions")}</p>
+        <p className="text-sm mt-1">
+          {t("diplomacy.no_factions_message")}
+        </p>
+      </InfoAlert>
     );
   }
 
   return (
     <>
-      <Card className="card-magical">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{t("sections.diplomacy")}</CardTitle>
-            {isEditing && (
-              <Button
-                variant="magical"
-                size="lg"
-                className="animate-glow"
-                onClick={handleAddRelation}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {t("diplomacy.add_relation")}
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="neutral" className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
-              {DIPLOMATIC_STATUS_CONSTANT.map((status) => {
-                const Icon = status.icon;
-                const count = getFactionsWithStatus(
-                  status.value as DiplomaticStatus
-                ).length;
-                return (
-                  <TabsTrigger
-                    key={status.value}
-                    value={status.value}
-                    className="flex items-center gap-1 sm:gap-2"
-                  >
-                    <Icon
-                      className={`w-4 h-4 flex-shrink-0 ${status.colorClass}`}
-                    />
-                    <span className="hidden md:inline truncate">
-                      {t(`diplomatic_status.${status.value}`)}
-                    </span>
-                    <Badge variant="secondary" className="ml-auto">
-                      {count}
-                    </Badge>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+      <div className="space-y-4">
+        {/* Add Relation Button - Only in Edit Mode */}
+        {isEditing && (
+          <Button
+            variant="magical"
+            size="lg"
+            className="w-full animate-glow"
+            onClick={handleAddRelation}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {t("diplomacy.add_relation")}
+          </Button>
+        )}
 
-            {DIPLOMATIC_STATUS_CONSTANT.map((status) => {
-              const factions = getFactionsWithStatus(
+        {/* Tabs Container */}
+        <div className="w-full">
+          {/* Custom Tab List */}
+          <div className="grid w-full grid-cols-6 bg-muted rounded-lg overflow-hidden">
+            {DIPLOMATIC_STATUS_CONSTANT.map((status, index) => {
+              const Icon = status.icon;
+              const count = getFactionsWithStatus(
                 status.value as DiplomaticStatus
-              );
+              ).length;
+              const isActive = activeTab === status.value;
+              const isFirst = index === 0;
+              const isLast = index === DIPLOMATIC_STATUS_CONSTANT.length - 1;
               return (
-                <TabsContent
+                <button
                   key={status.value}
-                  value={status.value}
-                  className="mt-4"
+                  onClick={() => setActiveTab(status.value as DiplomaticStatus)}
+                  className={`
+                    flex items-center justify-center gap-1 sm:gap-2 px-2 py-2
+                    transition-colors duration-200
+                    ${isFirst ? "rounded-l-lg" : ""}
+                    ${isLast ? "rounded-r-lg" : ""}
+                    ${isActive
+                      ? "bg-purple-600 text-white"
+                      : "hover:bg-white/5 dark:hover:bg-white/10"
+                    }
+                  `}
                 >
-                  {factions.length === 0 ? (
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        {t("diplomacy.empty_state.description")}
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {factions.map((faction) =>
-                        renderFactionCard(
-                          faction,
-                          status.value as DiplomaticStatus
-                        )
-                      )}
-                    </div>
-                  )}
-                </TabsContent>
+                  <Icon
+                    className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-white" : status.colorClass}`}
+                  />
+                  <span className="hidden md:inline truncate text-sm">
+                    {t(`diplomatic_status.${status.value}`)}
+                  </span>
+                  <span className={`ml-auto text-xs ${isActive ? "text-white" : "text-muted-foreground"}`}>
+                    {count}
+                  </span>
+                </button>
               );
             })}
-          </Tabs>
-        </CardContent>
-      </Card>
+          </div>
 
-      {showEditModal && (
-        <DiplomacyEditModal
-          isOpen={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setEditingRelation(null);
-          }}
+          {/* Tab Content */}
+          <div className="mt-4 border rounded-lg">
+            <ScrollArea className="h-[280px]">
+              <div className="p-3">
+                {(() => {
+                  const factions = getFactionsWithStatus(activeTab);
+                  return factions.length === 0 ? (
+                    <InfoAlert>
+                      {t("diplomacy.empty_state.description")}
+                    </InfoAlert>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {factions.map((faction) =>
+                        renderFactionItem(faction, activeTab)
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      </div>
+
+      {showAddModal && (
+        <DiplomacyAddModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
           currentFactionId={currentFactionId}
           availableFactions={otherFactions}
           existingRelations={diplomaticRelations}
-          editingRelation={editingRelation}
+          defaultStatus={activeTab}
           onSave={handleSaveRelation}
-          onDelete={editingRelation ? handleDeleteRelation : undefined}
         />
       )}
     </>
