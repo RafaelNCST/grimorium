@@ -3,7 +3,6 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { Shield, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
@@ -197,7 +196,6 @@ export function FactionDetail() {
         }
       } catch (error) {
         console.error("Error loading faction:", error);
-        toast.error(t("errors.load_failed"));
       } finally {
         setIsLoading(false);
       }
@@ -269,8 +267,6 @@ export function FactionDetail() {
       setFaction(version.factionData);
       setEditData(version.factionData);
       setImagePreview(version.factionData.image || "");
-
-      toast.success(`Versão "${version.name}" ativada`);
     },
     [versions]
   );
@@ -296,10 +292,8 @@ export function FactionDetail() {
 
         // Atualizar o estado apenas se o save for bem-sucedido
         setVersions((prev) => [...prev, newVersion]);
-        toast.success(`Versão "${versionData.name}" criada com sucesso!`);
       } catch (error) {
         console.error("Error creating faction version:", error);
-        toast.error("Erro ao criar versão");
       }
     },
     [factionId]
@@ -311,7 +305,6 @@ export function FactionDetail() {
 
       // Não permitir deletar versão principal
       if (versionToDelete?.isMain) {
-        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -334,10 +327,8 @@ export function FactionDetail() {
         }
 
         setVersions(updatedVersions);
-        toast.success("Versão excluída com sucesso!");
       } catch (error) {
         console.error("Error deleting faction version:", error);
-        toast.error("Erro ao excluir versão");
       }
     },
     [versions, selectedVersion]
@@ -360,7 +351,6 @@ export function FactionDetail() {
         }
       } catch (error) {
         console.error("Error updating faction version:", error);
-        toast.error("Erro ao atualizar versão");
       }
     },
     [versions, selectedVersion]
@@ -405,12 +395,10 @@ export function FactionDetail() {
       // Atualizar no store (que também salva no DB)
       await updateFactionInStore(factionId, updatedFaction);
       setIsEditing(false);
-      toast.success(t("messages.save_success"));
     } catch (error) {
       console.error("Error saving faction:", error);
-      toast.error(t("errors.save_failed"));
     }
-  }, [editData, versions, selectedVersion, factionId, updateFactionInStore, t]);
+  }, [editData, versions, selectedVersion, factionId, updateFactionInStore]);
 
   const navigateToFactionsTab = useCallback(() => {
     if (!dashboardId) return;
@@ -443,17 +431,14 @@ export function FactionDetail() {
       }
 
       setVersions(updatedVersions);
-      toast.success(t("delete.version.success"));
     } else {
       // Delete entire faction (main version)
       try {
         if (!dashboardId) return;
         await deleteFactionFromStore(dashboardId, factionId);
-        toast.success(t("messages.delete_success"));
         navigateToFactionsTab();
       } catch (error) {
         console.error("Error deleting faction:", error);
-        toast.error(t("errors.delete_failed"));
       }
     }
   }, [
@@ -463,7 +448,6 @@ export function FactionDetail() {
     factionId,
     dashboardId,
     deleteFactionFromStore,
-    t,
   ]);
 
   const handleCancel = useCallback(() => {

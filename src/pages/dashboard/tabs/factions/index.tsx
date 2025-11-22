@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { useFactionsStore } from "@/stores/factions-store";
 import { type IFaction, type IFactionFormData } from "@/types/faction-types";
@@ -115,9 +114,8 @@ export function FactionsTab({ bookId }: PropsFactionsTab) {
         // Add to store (which also saves to DB)
         await addFaction(bookId, newFaction);
         setShowCreateModal(false);
-        toast.success("Faction created successfully!");
       } catch (_error) {
-        toast.error("Error creating faction");
+        console.error("Error creating faction:", _error);
       }
     },
     [bookId, addFaction]

@@ -78,7 +78,7 @@
       "description": "Tem certeza que deseja excluir \"{{name}}\"? Esta acao nao pode ser desfeita.",
       "warning": "Todos os dados associados a esta faccao serao removidos permanentemente.",
       "step1": {
-        "message": "Esta acao excluira a faccao '{{factionName}}' e todas as suas versoes permanentemente.",
+        "message": "Esta acao excluira a faccao '{{entityName}}' e todas as suas versoes permanentemente.",
         "input_label": "Digite o nome completo da faccao para confirmar:",
         "input_placeholder": "Digite o nome da faccao",
         "name_mismatch": "O nome digitado nao corresponde ao nome da faccao",
@@ -87,8 +87,8 @@
       },
       "step2": {
         "title": "Confirmacao Final",
-        "message": "Voce esta prestes a excluir permanentemente a faccao '{{factionName}}' e todas as suas {{totalVersions}} versoes. Esta acao nao pode ser desfeita.",
-        "message_single": "Voce esta prestes a excluir permanentemente a faccao '{{factionName}}' e sua versao. Esta acao nao pode ser desfeita.",
+        "message": "Voce esta prestes a excluir permanentemente a faccao '{{entityName}}' e todas as suas {{totalVersions}} versoes. Esta acao nao pode ser desfeita.",
+        "message_single": "Voce esta prestes a excluir permanentemente a faccao '{{entityName}}' e sua versao. Esta acao nao pode ser desfeita.",
         "cancel": "Nao, cancelar",
         "confirm": "Sim, excluir permanentemente",
         "success": "Faccao excluida com sucesso"
