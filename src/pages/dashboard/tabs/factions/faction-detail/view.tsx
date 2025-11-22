@@ -82,6 +82,10 @@ interface FactionDetailViewProps {
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
   bookId: string;
+  errors: Record<string, string>;
+  validateField: (field: string, value: unknown) => void;
+  hasRequiredFieldsEmpty: boolean;
+  missingFields: string[];
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -108,6 +112,7 @@ interface FactionDetailViewProps {
   onEditDataChange: (field: string, value: unknown) => void;
   onFieldVisibilityToggle: (field: string) => void;
   onAdvancedSectionToggle: () => void;
+  hasChanges: boolean;
 }
 
 export function FactionDetailView({
@@ -132,6 +137,10 @@ export function FactionDetailView({
   fieldVisibility,
   advancedSectionOpen,
   bookId,
+  errors,
+  validateField,
+  hasRequiredFieldsEmpty,
+  missingFields,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -148,6 +157,7 @@ export function FactionDetailView({
   onEditDataChange,
   onFieldVisibilityToggle,
   onAdvancedSectionToggle,
+  hasChanges,
 }: FactionDetailViewProps) {
   const { t } = useTranslation(["faction-detail", "create-faction"]);
 
@@ -165,9 +175,6 @@ export function FactionDetailView({
       [sectionName]: !prev[sectionName],
     }));
   };
-
-  // Check if there are changes
-  const hasChanges = JSON.stringify(faction) !== JSON.stringify(editData);
 
   // ==================
   // BASIC FIELDS
@@ -203,12 +210,19 @@ export function FactionDetailView({
               id="name"
               value={editData.name}
               onChange={(e) => onEditDataChange("name", e.target.value)}
+              onBlur={(e) => validateField("name", e.target.value)}
               placeholder={t("create-faction:modal.name_placeholder")}
               maxLength={200}
               required
+              className={errors.name ? "border-destructive" : ""}
             />
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{editData.name?.length || 0}/200</span>
+            <div className="flex justify-between text-xs">
+              {errors.name ? (
+                <span className="text-destructive">{errors.name}</span>
+              ) : (
+                <span />
+              )}
+              <span className="text-muted-foreground">{editData.name?.length || 0}/200</span>
             </div>
           </div>
 
@@ -234,14 +248,20 @@ export function FactionDetailView({
               id="summary"
               value={editData.summary}
               onChange={(e) => onEditDataChange("summary", e.target.value)}
+              onBlur={(e) => validateField("summary", e.target.value)}
               placeholder={t("create-faction:modal.summary_placeholder")}
               rows={8}
               maxLength={500}
-              className="resize-none"
+              className={`resize-none ${errors.summary ? "border-destructive" : ""}`}
               required
             />
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{editData.summary?.length || 0}/500</span>
+            <div className="flex justify-between text-xs">
+              {errors.summary ? (
+                <span className="text-destructive">{errors.summary}</span>
+              ) : (
+                <span />
+              )}
+              <span className="text-muted-foreground">{editData.summary?.length || 0}/500</span>
             </div>
           </div>
         </>
@@ -944,11 +964,28 @@ export function FactionDetailView({
             saveLabel={t("faction-detail:header.save")}
             cancelLabel={t("faction-detail:header.cancel")}
             hasChanges={hasChanges}
-            hasRequiredFieldsEmpty={!editData.name || !editData.summary}
+            hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
             validationMessage={
-              (!editData.name || !editData.summary) && isEditing ? (
+              hasRequiredFieldsEmpty && isEditing ? (
                 <p className="text-xs text-destructive">
-                  {t("faction-detail:validation.fill_required_fields")}
+                  {missingFields.length > 0 ? (
+                    <>
+                      {t("faction-detail:validation.missing_fields")}:{" "}
+                      {missingFields
+                        .map((field) => {
+                          const fieldNames: Record<string, string> = {
+                            name: t("faction-detail:fields.name"),
+                            summary: t("faction-detail:fields.summary"),
+                            status: t("faction-detail:fields.status"),
+                            factionType: t("faction-detail:fields.faction_type"),
+                          };
+                          return fieldNames[field] || field;
+                        })
+                        .join(", ")}
+                    </>
+                  ) : (
+                    t("faction-detail:validation.fill_required_fields")
+                  )}
                 </p>
               ) : undefined
             }

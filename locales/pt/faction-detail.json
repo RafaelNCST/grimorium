@@ -151,7 +151,25 @@
     "delete_failed": "Falha ao excluir faccao"
   },
   "validation": {
-    "fill_required_fields": "Preencha os campos obrigatorios"
+    "fill_required_fields": "Preencha os campos obrigatorios",
+    "missing_fields": "Campos obrigatorios faltando",
+    "name_required": "Nome e obrigatorio",
+    "name_max_length": "Nome deve ter no maximo 200 caracteres",
+    "summary_required": "Resumo e obrigatorio",
+    "summary_max_length": "Resumo deve ter no maximo 500 caracteres",
+    "status_required": "Status e obrigatorio",
+    "faction_type_required": "Tipo de faccao e obrigatorio",
+    "government_form_max_length": "Forma de governo deve ter no maximo 500 caracteres",
+    "economy_max_length": "Economia deve ter no maximo 500 caracteres",
+    "symbols_and_secrets_max_length": "Simbolos e segredos deve ter no maximo 500 caracteres",
+    "external_influence_max_length": "Influencia externa deve ter no maximo 500 caracteres",
+    "faction_motto_max_length": "Lema deve ter no maximo 300 caracteres",
+    "uniform_and_aesthetics_max_length": "Uniforme e estetica deve ter no maximo 500 caracteres",
+    "foundation_date_max_length": "Data de fundacao deve ter no maximo 200 caracteres",
+    "foundation_history_summary_max_length": "Historia da fundacao deve ter no maximo 500 caracteres",
+    "organization_objectives_max_length": "Objetivos deve ter no maximo 500 caracteres",
+    "narrative_importance_max_length": "Importancia narrativa deve ter no maximo 500 caracteres",
+    "inspirations_max_length": "Inspiracoes deve ter no maximo 500 caracteres"
   },
   "diplomacy": {
     "title": "Diplomacia",

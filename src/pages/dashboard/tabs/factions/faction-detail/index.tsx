@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { Shield, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
 import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
@@ -16,6 +17,7 @@ import {
   deleteFactionVersion,
   updateFactionVersion,
 } from "@/lib/db/factions.service";
+import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
 import { useFactionsStore } from "@/stores/factions-store";
 import { useRacesStore } from "@/stores/races-store";
@@ -25,6 +27,7 @@ import {
   type IFactionVersion,
 } from "@/types/faction-types";
 
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { FactionDetailView } from "./view";
 
 export function FactionDetail() {
@@ -59,6 +62,7 @@ export function FactionDetail() {
   const [faction, setFaction] = useState<IFaction>(emptyFaction);
   const [editData, setEditData] = useState<IFaction>(emptyFaction);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -76,7 +80,74 @@ export function FactionDetail() {
     hierarchy: true,
   });
 
+  // Validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Função de validação de campo individual (onBlur)
+  const validateField = useCallback((field: string, value: unknown) => {
+    try {
+      // Validar apenas este campo
+      const fieldSchema = FactionSchema.pick({ [field]: true } as Record<string, true>);
+      fieldSchema.parse({ [field]: value });
+
+      // Se passou, limpar erro deste campo
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Traduzir a mensagem de erro
+        const errorMessage = error.errors[0].message;
+        const translatedMessage = errorMessage.startsWith("faction-detail:")
+          ? t(errorMessage)
+          : errorMessage;
+
+        setErrors((prev) => ({
+          ...prev,
+          [field]: translatedMessage,
+        }));
+      }
+    }
+  }, [t]);
+
+  // Verificar se tem campos obrigatórios vazios e quais são
+  const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
+    if (!editData) return { hasRequiredFieldsEmpty: false, missingFields: [] };
+
+    try {
+      // Validar apenas campos obrigatórios
+      const requiredSchema = FactionSchema.pick({
+        name: true,
+        summary: true,
+        status: true,
+        factionType: true,
+      });
+
+      requiredSchema.parse({
+        name: editData.name,
+        summary: editData.summary,
+        status: editData.status,
+        factionType: editData.factionType,
+      });
+      return { hasRequiredFieldsEmpty: false, missingFields: [] };
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const missing = error.errors.map((e) => e.path[0] as string);
+        return { hasRequiredFieldsEmpty: true, missingFields: missing };
+      }
+      return { hasRequiredFieldsEmpty: true, missingFields: [] };
+    }
+  }, [editData]);
+
+  // Check if there are changes between faction and editData
+  const hasChanges = useMemo(() => {
+    if (!isEditing) return false;
+    return JSON.stringify(faction) !== JSON.stringify(editData);
+  }, [isEditing, faction, editData]);
 
   // Load faction from database
   useEffect(() => {
@@ -396,9 +467,24 @@ export function FactionDetail() {
   ]);
 
   const handleCancel = useCallback(() => {
+    if (hasChanges) {
+      setShowUnsavedChangesDialog(true);
+      return;
+    }
+
+    // If no changes, cancel immediately
     setEditData({ ...faction });
     setImagePreview(faction.image || "");
+    setErrors({});
     setIsEditing(false);
+  }, [faction, hasChanges]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setEditData({ ...faction });
+    setImagePreview(faction.image || "");
+    setErrors({});
+    setIsEditing(false);
+    setShowUnsavedChangesDialog(false);
   }, [faction]);
 
   const handleBack = useCallback(() => {
@@ -428,7 +514,24 @@ export function FactionDetail() {
 
   const handleEditDataChange = useCallback((field: string, value: unknown) => {
     setEditData((prev) => ({ ...prev, [field]: value }));
-  }, []);
+
+    // Clear error for this field when user starts typing (for required fields)
+    if (errors[field]) {
+      // Re-validate the field to clear error if value is now valid
+      try {
+        const fieldSchema = FactionSchema.pick({ [field]: true } as Record<string, true>);
+        fieldSchema.parse({ [field]: value });
+        // If validation passes, clear the error
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      } catch {
+        // Keep the error if still invalid (will be shown properly on blur)
+      }
+    }
+  }, [errors]);
 
   const handleImageChange = useCallback((image: string) => {
     setImagePreview(image);
@@ -507,7 +610,14 @@ export function FactionDetail() {
   const TypeIcon = currentType?.icon || Building2;
 
   return (
-    <FactionDetailView
+    <>
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={setShowUnsavedChangesDialog}
+        onConfirm={handleConfirmCancel}
+      />
+
+      <FactionDetailView
       faction={faction}
       editData={editData}
       isEditing={isEditing}
@@ -533,6 +643,10 @@ export function FactionDetail() {
       fieldVisibility={fieldVisibility}
       fileInputRef={fileInputRef}
       bookId={dashboardId}
+      errors={errors}
+      validateField={validateField}
+      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+      missingFields={missingFields}
       onBack={handleBack}
       onEdit={handleEdit}
       onSave={handleSave}
@@ -551,6 +665,8 @@ export function FactionDetail() {
       onVersionCreate={handleVersionCreate}
       onVersionDelete={handleVersionDelete}
       onVersionUpdate={handleVersionUpdate}
+      hasChanges={hasChanges}
     />
+    </>
   );
 }
