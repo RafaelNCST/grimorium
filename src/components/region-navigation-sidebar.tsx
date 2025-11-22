@@ -41,7 +41,7 @@ export function RegionNavigationSidebar({
 
   return (
     <div
-      className={`fixed left-0 top-[32px] bottom-0 w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out z-40 ${
+      className={`fixed left-0 top-[104px] bottom-0 w-80 bg-background border-r border-border shadow-lg transition-all duration-300 ease-in-out z-40 ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
@@ -105,7 +105,7 @@ export function RegionNavigationSidebar({
       )}
 
       {/* Region List */}
-      <ScrollArea className="flex-1 h-[calc(100vh-32px-220px)]">
+      <ScrollArea className="flex-1 h-[calc(100vh-104px-220px)]">
         <div className="p-2">
           {filteredOtherRegions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
