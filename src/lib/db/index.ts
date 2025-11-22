@@ -279,7 +279,11 @@ async function runMigrations(database: Database): Promise<void> {
       -- Advanced fields - Relationships
       influence TEXT,
       public_reputation TEXT,
-      external_influence TEXT,
+
+      -- Advanced fields - Territory
+      dominated_areas TEXT,
+      main_base TEXT,
+      areas_of_interest TEXT,
 
       -- Advanced fields - Internal Structure
       government_form TEXT,
@@ -1106,6 +1110,34 @@ async function runMigrations(database: Database): Promise<void> {
         "ALTER TABLE factions ADD COLUMN symbols_and_secrets TEXT"
       );
       console.log("[db] Added symbols_and_secrets column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add territory columns to factions table
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN dominated_areas TEXT"
+      );
+      console.log("[db] Added dominated_areas column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN main_base TEXT"
+      );
+      console.log("[db] Added main_base column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN areas_of_interest TEXT"
+      );
+      console.log("[db] Added areas_of_interest column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }

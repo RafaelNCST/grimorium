@@ -20,10 +20,11 @@ export const factionFormSchema = z.object({
   // Advanced - Relationships
   influence: z.string().optional(),
   publicReputation: z.string().optional(),
-  externalInfluence: z
-    .string()
-    .max(500, "validation.external_influence_max_length")
-    .optional(),
+
+  // Advanced - Territory
+  dominatedAreas: z.array(z.string()).optional(),
+  mainBase: z.array(z.string()).optional(),
+  areasOfInterest: z.array(z.string()).optional(),
 
   // Advanced - Internal Structure
   governmentForm: z

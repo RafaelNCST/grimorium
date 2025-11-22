@@ -238,7 +238,11 @@ export interface DBFaction {
   // Advanced fields - Relationships
   influence?: string;
   public_reputation?: string;
-  external_influence?: string;
+
+  // Advanced fields - Territory
+  dominated_areas?: string; // JSON array string
+  main_base?: string; // JSON array string
+  areas_of_interest?: string; // JSON array string
 
   // Advanced fields - Internal Structure
   government_form?: string;

@@ -21,7 +21,15 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
     // Advanced fields - Relationships
     influence: faction.influence,
     public_reputation: faction.publicReputation,
-    external_influence: faction.externalInfluence,
+
+    // Advanced fields - Territory
+    dominated_areas: faction.dominatedAreas
+      ? JSON.stringify(faction.dominatedAreas)
+      : undefined,
+    main_base: faction.mainBase ? JSON.stringify(faction.mainBase) : undefined,
+    areas_of_interest: faction.areasOfInterest
+      ? JSON.stringify(faction.areasOfInterest)
+      : undefined,
 
     // Advanced fields - Internal Structure
     government_form: faction.governmentForm,
@@ -95,7 +103,17 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     influence: dbFaction.influence as IFaction["influence"],
     publicReputation:
       dbFaction.public_reputation as IFaction["publicReputation"],
-    externalInfluence: dbFaction.external_influence,
+
+    // Advanced fields - Territory
+    dominatedAreas: dbFaction.dominated_areas
+      ? JSON.parse(dbFaction.dominated_areas)
+      : undefined,
+    mainBase: dbFaction.main_base
+      ? JSON.parse(dbFaction.main_base)
+      : undefined,
+    areasOfInterest: dbFaction.areas_of_interest
+      ? JSON.parse(dbFaction.areas_of_interest)
+      : undefined,
 
     // Advanced fields - Internal Structure
     governmentForm: dbFaction.government_form,
@@ -177,7 +195,8 @@ export async function createFaction(
   await db.execute(
     `INSERT INTO factions (
       id, book_id, name, summary, status, faction_type, image,
-      alignment, influence, public_reputation, external_influence,
+      alignment, influence, public_reputation,
+      dominated_areas, main_base, areas_of_interest,
       government_form, rules_and_laws, main_resources,
       economy, symbols_and_secrets, currencies,
       military_power, political_power, cultural_power, economic_power,
@@ -189,7 +208,7 @@ export async function createFaction(
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
       $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,
-      $28, $29, $30, $31, $32, $33, $34, $35
+      $28, $29, $30, $31, $32, $33, $34, $35, $36, $37
     )`,
     [
       dbFaction.id,
@@ -202,7 +221,9 @@ export async function createFaction(
       dbFaction.alignment,
       dbFaction.influence,
       dbFaction.public_reputation,
-      dbFaction.external_influence,
+      dbFaction.dominated_areas,
+      dbFaction.main_base,
+      dbFaction.areas_of_interest,
       dbFaction.government_form,
       dbFaction.rules_and_laws,
       dbFaction.main_resources,
@@ -264,15 +285,16 @@ export async function updateFaction(
   await db.execute(
     `UPDATE factions SET
       name = $1, summary = $2, status = $3, faction_type = $4, image = $5,
-      alignment = $6, influence = $7, public_reputation = $8, external_influence = $9,
-      government_form = $10, rules_and_laws = $11, main_resources = $12,
-      economy = $13, symbols_and_secrets = $14, currencies = $15,
-      military_power = $16, political_power = $17, cultural_power = $18, economic_power = $19,
-      faction_motto = $20, traditions_and_rituals = $21, beliefs_and_values = $22,
-      languages_used = $23, uniform_and_aesthetics = $24, races = $25,
-      foundation_date = $26, foundation_history_summary = $27, founders = $28, chronology = $29,
-      organization_objectives = $30, narrative_importance = $31, inspirations = $32
-    WHERE id = $33`,
+      alignment = $6, influence = $7, public_reputation = $8,
+      dominated_areas = $9, main_base = $10, areas_of_interest = $11,
+      government_form = $12, rules_and_laws = $13, main_resources = $14,
+      economy = $15, symbols_and_secrets = $16, currencies = $17,
+      military_power = $18, political_power = $19, cultural_power = $20, economic_power = $21,
+      faction_motto = $22, traditions_and_rituals = $23, beliefs_and_values = $24,
+      languages_used = $25, uniform_and_aesthetics = $26, races = $27,
+      foundation_date = $28, foundation_history_summary = $29, founders = $30, chronology = $31,
+      organization_objectives = $32, narrative_importance = $33, inspirations = $34
+    WHERE id = $35`,
     [
       dbFaction.name,
       dbFaction.summary,
@@ -282,7 +304,9 @@ export async function updateFaction(
       dbFaction.alignment,
       dbFaction.influence,
       dbFaction.public_reputation,
-      dbFaction.external_influence,
+      dbFaction.dominated_areas,
+      dbFaction.main_base,
+      dbFaction.areas_of_interest,
       dbFaction.government_form,
       dbFaction.rules_and_laws,
       dbFaction.main_resources,

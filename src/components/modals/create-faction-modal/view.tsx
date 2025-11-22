@@ -274,19 +274,55 @@ export function CreateFactionModalView({
                   columns={3}
                   options={translatedReputationOptions}
                 />
+              </div>
 
-                {/* External Influence */}
-                <FormTextarea
-                  {...register("externalInfluence")}
-                  label={t("modal.external_influence")}
-                  placeholder={t("modal.external_influence_placeholder")}
-                  maxLength={500}
-                  rows={4}
-                  showCharCount
-                  showOptionalLabel={false}
-                  value={watchedValues.externalInfluence}
+              <Separator />
+
+              {/* Territory Section */}
+              <div className="space-y-6">
+                <SectionTitle>{t("modal.territory_section")}</SectionTitle>
+
+                {/* Dominated Areas */}
+                <FormEntityMultiSelectAuto
+                  entityType="region"
+                  bookId={bookId}
+                  label={t("modal.dominated_areas")}
+                  placeholder={t("modal.dominated_areas_placeholder")}
+                  emptyText={t("modal.no_regions_warning")}
+                  noSelectionText={t("modal.no_dominated_areas_selected")}
+                  searchPlaceholder={t("modal.search_regions")}
+                  value={watchedValues.dominatedAreas || []}
+                  onChange={(value) => setValue("dominatedAreas", value)}
                   labelClassName="text-sm font-medium text-primary"
-                  className="resize-none"
+                />
+
+                {/* Main Base */}
+                <FormEntityMultiSelectAuto
+                  entityType="region"
+                  bookId={bookId}
+                  label={t("modal.main_base")}
+                  placeholder={t("modal.main_base_placeholder")}
+                  emptyText={t("modal.no_regions_warning")}
+                  noSelectionText={t("modal.no_main_base_selected")}
+                  searchPlaceholder={t("modal.search_regions")}
+                  value={watchedValues.mainBase || []}
+                  onChange={(value) => setValue("mainBase", value)}
+                  labelClassName="text-sm font-medium text-primary"
+                  maxSelections={1}
+                />
+
+                {/* Areas of Interest */}
+                <FormEntityMultiSelectAuto
+                  entityType="region"
+                  bookId={bookId}
+                  label={t("modal.areas_of_interest")}
+                  placeholder={t("modal.areas_of_interest_placeholder")}
+                  emptyText={t("modal.no_regions_warning")}
+                  noSelectionText={t("modal.no_areas_of_interest_selected")}
+                  searchPlaceholder={t("modal.search_regions")}
+                  value={watchedValues.areasOfInterest || []}
+                  onChange={(value) => setValue("areasOfInterest", value)}
+                  labelClassName="text-sm font-medium text-primary"
                 />
               </div>
 

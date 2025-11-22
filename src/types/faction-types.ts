@@ -104,7 +104,11 @@ export interface IFaction {
   // Advanced fields - Relationships
   influence?: FactionInfluence;
   publicReputation?: FactionReputation;
-  externalInfluence?: string;
+
+  // Advanced fields - Territory
+  dominatedAreas?: string[];
+  mainBase?: string[];
+  areasOfInterest?: string[];
 
   // Advanced fields - Internal Structure
   governmentForm?: string;
@@ -164,7 +168,11 @@ export interface IFactionFormData {
   // Advanced fields - Relationships
   influence?: FactionInfluence;
   publicReputation?: FactionReputation;
-  externalInfluence?: string;
+
+  // Advanced fields - Territory
+  dominatedAreas?: string[];
+  mainBase?: string[];
+  areasOfInterest?: string[];
 
   // Advanced fields - Internal Structure
   governmentForm?: string;
