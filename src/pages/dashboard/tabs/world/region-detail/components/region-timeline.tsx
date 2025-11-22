@@ -355,27 +355,13 @@ export function RegionTimeline({
 
                     {/* Era Card with Enhanced Styling */}
                     <div className="ml-20 relative">
-                      <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden">
-                        <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20">
-                          <div className="flex items-start justify-between w-full">
-                            <div className="text-left flex-1">
+                      <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden [&[data-state=open]_.chevron-icon]:rotate-0 [&[data-state=closed]_.chevron-icon]:-rotate-90">
+                        <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 pr-10 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20 relative">
+                          <div className="text-left flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                                 {era.name}
                               </h3>
-                              <Badge
-                                variant="secondary"
-                                className="mt-2 bg-primary/10 text-primary border-primary/20"
-                              >
-                                <Clock className="w-3 h-3 mr-1" />
-                                {era.startDate} - {era.endDate}
-                              </Badge>
-                              {era.description && (
-                                <p className="text-sm text-muted-foreground leading-relaxed mt-3">
-                                  {era.description}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
                               {era.events.length > 0 && (
                                 <Badge variant="outline" className="text-xs">
                                   {era.events.length} evento
@@ -383,7 +369,20 @@ export function RegionTimeline({
                                 </Badge>
                               )}
                             </div>
+                            <Badge
+                              variant="secondary"
+                              className="mt-2 bg-primary/10 text-primary border-primary/20"
+                            >
+                              <Clock className="w-3 h-3 mr-1" />
+                              {era.startDate} - {era.endDate}
+                            </Badge>
+                            {era.description && (
+                              <p className="text-sm text-muted-foreground leading-relaxed mt-3">
+                                {era.description}
+                              </p>
+                            )}
                           </div>
+                          <ChevronDown className="chevron-icon absolute right-4 top-6 w-4 h-4 text-muted-foreground transition-transform duration-200" />
                         </div>
                       </AccordionTrigger>
 
@@ -459,11 +458,6 @@ export function RegionTimeline({
                           </Tooltip>
                         </div>
                       )}
-
-                      {/* ChevronDown positioned at the end (rightmost) */}
-                      <div className="absolute top-6 right-4 z-10">
-                        <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform duration-200" />
-                      </div>
 
                       <AccordionContent className="pt-4 pb-0">
                         <div className="ml-6 border-l-2 border-dashed border-muted-foreground/20 pl-6 space-y-4">
@@ -653,7 +647,28 @@ export function RegionTimeline({
       )}
 
       {/* Event Details/Edit Modal */}
-      <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
+      <Dialog
+        open={showEventModal}
+        onOpenChange={(open) => {
+          setShowEventModal(open);
+          if (!open) {
+            setSelectedEvent(null);
+            setEditingEvent(false);
+            setNewEvent({
+              name: "",
+              description: "",
+              reason: "",
+              outcome: "",
+              startDate: "",
+              endDate: "",
+              charactersInvolved: [],
+              factionsInvolved: [],
+              racesInvolved: [],
+              itemsInvolved: [],
+            });
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -980,7 +995,15 @@ export function RegionTimeline({
       </Dialog>
 
       {/* Create Era Modal */}
-      <Dialog open={showCreateEraModal} onOpenChange={setShowCreateEraModal}>
+      <Dialog
+        open={showCreateEraModal}
+        onOpenChange={(open) => {
+          setShowCreateEraModal(open);
+          if (!open) {
+            setNewEra({ name: "", description: "", startDate: "", endDate: "" });
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Era</DialogTitle>
@@ -991,7 +1014,7 @@ export function RegionTimeline({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="era-name">Nome da Era *</Label>
+              <Label htmlFor="era-name">Nome da Era <span className="text-destructive">*</span></Label>
               <Input
                 id="era-name"
                 value={newEra.name}
@@ -1007,7 +1030,7 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="era-description">Descrição *</Label>
+              <Label htmlFor="era-description">Descrição <span className="text-destructive">*</span></Label>
               <Textarea
                 id="era-description"
                 value={newEra.description}
@@ -1029,7 +1052,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start">Início *</Label>
+                <Label htmlFor="era-start">Início <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1047,7 +1070,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end">Fim *</Label>
+                <Label htmlFor="era-end">Fim <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1331,7 +1354,16 @@ export function RegionTimeline({
       </Dialog>
 
       {/* Edit Era Modal */}
-      <Dialog open={showEditEraModal} onOpenChange={setShowEditEraModal}>
+      <Dialog
+        open={showEditEraModal}
+        onOpenChange={(open) => {
+          setShowEditEraModal(open);
+          if (!open) {
+            setEditEra({ name: "", description: "", startDate: "", endDate: "" });
+            setEditingEra(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Era</DialogTitle>
