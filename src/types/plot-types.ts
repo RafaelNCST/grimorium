@@ -23,6 +23,22 @@ export interface IPlotArc {
   importantCharacters: string[];
   importantFactions: string[];
   importantItems: string[];
+  importantRegions: string[];
+  arcMessage?: string;
+  worldImpact?: string;
+}
+
+export interface IPlotArcFormData {
+  name: string;
+  description: string;
+  status: string;
+  size: string;
+  focus: string;
+  events: IPlotEvent[];
+  importantCharacters?: string[];
+  importantFactions?: string[];
+  importantItems?: string[];
+  importantRegions?: string[];
   arcMessage?: string;
   worldImpact?: string;
 }

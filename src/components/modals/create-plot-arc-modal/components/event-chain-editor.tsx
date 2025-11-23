@@ -95,7 +95,7 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
         </Button>
         <Button
           type="button"
-          variant="ghost"
+          variant="ghost-destructive"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
@@ -103,7 +103,7 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
           }}
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
-          className="cursor-pointer hover:bg-red-500/10 hover:text-red-500"
+          className="cursor-pointer"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
@@ -203,13 +203,13 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">
-          {t("modal.event_chain")} *
+        <Label className="text-sm font-medium text-primary">
+          {t("modal.event_chain")} <span className="text-destructive">*</span>
         </Label>
         {!isAddingEvent && !editingEvent && (
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => setIsAddingEvent(true)}
           >
@@ -259,7 +259,7 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={handleCancelEdit}
               className="flex-1"

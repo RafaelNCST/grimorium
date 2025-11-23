@@ -6,7 +6,7 @@ import {
   getPlotArcsByBookId,
   createPlotArc,
 } from "@/lib/db/plot.service";
-import type { IPlotArc, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
+import type { IPlotArc, IPlotArcFormData, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
 
 import { calculateTotalBySize } from "./utils/calculators/calculate-total-by-size";
 import { calculateTotalByStatus } from "./utils/calculators/calculate-total-by-status";
@@ -119,12 +119,23 @@ export function PlotTab({ bookId }: PropsPlotTab) {
   }, []);
 
   const handleCreateArc = useCallback(
-    async (arcData: Omit<IPlotArc, "id" | "progress" | "order">) => {
+    async (arcData: IPlotArcFormData) => {
       const newArc: IPlotArc = {
-        ...arcData,
         id: crypto.randomUUID(),
+        name: arcData.name,
+        description: arcData.description,
+        size: arcData.size as PlotArcSize,
+        focus: arcData.focus,
+        status: arcData.status as PlotArcStatus,
+        events: arcData.events,
         progress: 0,
         order: arcs.length + 1,
+        importantCharacters: arcData.importantCharacters || [],
+        importantFactions: arcData.importantFactions || [],
+        importantItems: arcData.importantItems || [],
+        importantRegions: arcData.importantRegions || [],
+        arcMessage: arcData.arcMessage,
+        worldImpact: arcData.worldImpact,
       };
 
       try {
@@ -150,6 +161,7 @@ export function PlotTab({ bookId }: PropsPlotTab) {
       sizeStats={sizeStats}
       showCreateModal={showCreateModal}
       isLoading={isLoading}
+      bookId={bookId}
       onSearchTermChange={handleSearchTermChange}
       onStatusFilterChange={handleStatusFilterChange}
       onSizeFilterChange={handleSizeFilterChange}

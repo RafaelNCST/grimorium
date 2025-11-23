@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { EntityListLayout, EntityCardList } from "@/components/layouts";
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
-import type { IPlotArc, PlotArcSize, PlotArcStatus } from "@/types/plot-types";
+import type { IPlotArc, IPlotArcFormData, PlotArcSize, PlotArcStatus } from "@/types/plot-types";
 
 import { PlotArcCard } from "./components/plot-arc-card";
 import { createPlotFilterRows } from "./helpers/filter-config";
@@ -26,6 +26,7 @@ interface PropsPlotView {
   sizeStats: Record<PlotArcSize, number>;
   showCreateModal: boolean;
   isLoading: boolean;
+  bookId: string;
   onSearchTermChange: (term: string) => void;
   onStatusFilterChange: (status: string) => void;
   onSizeFilterChange: (size: string) => void;
@@ -33,7 +34,7 @@ interface PropsPlotView {
   onShowCreateModalChange: (show: boolean) => void;
   onNavigateToArc: (arcId: string) => void;
   onNavigateToTimeline: () => void;
-  onCreateArc: (arcData: Omit<IPlotArc, "id" | "progress" | "order">) => void;
+  onCreateArc: (arcData: IPlotArcFormData) => void;
 }
 
 const PlotViewComponent = function PlotView({
@@ -46,6 +47,7 @@ const PlotViewComponent = function PlotView({
   sizeStats,
   showCreateModal,
   isLoading,
+  bookId,
   onSearchTermChange,
   onStatusFilterChange,
   onSizeFilterChange,
@@ -146,8 +148,9 @@ const PlotViewComponent = function PlotView({
 
       <CreatePlotArcModal
         open={showCreateModal}
-        onOpenChange={onShowCreateModalChange}
-        onCreateArc={onCreateArc}
+        onClose={() => onShowCreateModalChange(false)}
+        onConfirm={onCreateArc}
+        bookId={bookId}
         existingArcs={arcs}
       />
     </>
