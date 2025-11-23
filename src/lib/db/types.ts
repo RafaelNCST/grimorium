@@ -312,6 +312,7 @@ export interface DBPlotArc {
   important_characters?: string; // JSON array string
   important_factions?: string; // JSON array string
   important_items?: string; // JSON array string
+  important_regions?: string; // JSON array string
   arc_message?: string;
   world_impact?: string;
   created_at: number;

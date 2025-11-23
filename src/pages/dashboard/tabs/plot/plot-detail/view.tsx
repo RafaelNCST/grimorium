@@ -26,17 +26,25 @@ import {
   Circle,
   Save,
   X,
-  GripVertical,
   Check,
-  Users,
-  Shield,
-  Package,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import {
+  DisplayTextarea,
+  DisplayEntityList,
+  type DisplayEntityItem,
+} from "@/components/displays";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
+import { StatusSelector } from "@/components/modals/create-plot-arc-modal/components/status-selector";
+import { ARC_SIZE_OPTIONS } from "@/components/modals/create-plot-arc-modal/constants/arc-size-options";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -44,31 +52,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { ARC_SIZES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-sizes-constant";
@@ -88,8 +83,14 @@ interface PropsPlotArcDetailView {
   editForm: Partial<IPlotArc>;
   showDeleteArcDialog: boolean;
   showDeleteEventDialog: boolean;
+  eventChainSectionOpen: boolean;
   advancedSectionOpen: boolean;
-  validationErrors: Set<string>;
+  validationErrors: Record<string, string>;
+  hasChanges: boolean;
+  hasRequiredFieldsEmpty: boolean;
+  missingFields: string[];
+  hasCurrentArc: boolean;
+  bookId: string;
   onBack: () => void;
   onEdit: () => void;
   onSave: () => void;
@@ -102,16 +103,17 @@ interface PropsPlotArcDetailView {
     field: K,
     value: IPlotArc[K]
   ) => void;
+  validateField: (field: string, value: unknown) => boolean;
   onToggleEventCompletion: (eventId: string) => void;
   onEventDeleteRequest: (eventId: string) => void;
   onReorderEvents: (events: IPlotEvent[]) => void;
   onAddEvent: (event: Omit<IPlotEvent, "id" | "order">) => void;
+  onEventChainSectionToggle: () => void;
   onAdvancedSectionToggle: () => void;
-  getSizeColor: (size: PlotArcSize) => string;
-  getStatusColor: (status: PlotArcStatus) => string;
   characters?: Array<{ id: string; name: string; image?: string }>;
   factions?: Array<{ id: string; name: string; emblem?: string }>;
   items?: Array<{ id: string; name: string; image?: string }>;
+  regions?: Array<{ id: string; name: string; image?: string }>;
 }
 
 interface PropsSortableEvent {
@@ -234,8 +236,14 @@ export function PlotArcDetailView({
   editForm,
   showDeleteArcDialog,
   showDeleteEventDialog,
+  eventChainSectionOpen,
   advancedSectionOpen,
   validationErrors,
+  hasChanges,
+  hasRequiredFieldsEmpty,
+  missingFields,
+  hasCurrentArc,
+  bookId,
   onBack,
   onEdit,
   onSave,
@@ -245,18 +253,19 @@ export function PlotArcDetailView({
   onDeleteArcDialogChange,
   onDeleteEventDialogChange,
   onEditFormChange,
+  validateField,
   onToggleEventCompletion,
   onEventDeleteRequest,
   onReorderEvents,
   onAddEvent,
+  onEventChainSectionToggle,
   onAdvancedSectionToggle,
-  getSizeColor,
-  getStatusColor,
   characters = [],
   factions = [],
   items = [],
+  regions = [],
 }: PropsPlotArcDetailView) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "create-plot-arc"]);
   const [isAddingEvent, setIsAddingEvent] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);
   const [newEventName, setNewEventName] = useState("");
@@ -271,12 +280,13 @@ export function PlotArcDetailView({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    const currentEvents = isEditing ? (editForm.events || arc.events) : arc.events;
 
     if (over && active.id !== over.id) {
-      const oldIndex = arc.events.findIndex((e) => e.id === active.id);
-      const newIndex = arc.events.findIndex((e) => e.id === over.id);
+      const oldIndex = currentEvents.findIndex((e) => e.id === active.id);
+      const newIndex = currentEvents.findIndex((e) => e.id === over.id);
 
-      const reordered = arrayMove(arc.events, oldIndex, newIndex).map(
+      const reordered = arrayMove(currentEvents, oldIndex, newIndex).map(
         (e, idx) => ({ ...e, order: idx + 1 })
       );
       onReorderEvents(reordered);
@@ -308,8 +318,8 @@ export function PlotArcDetailView({
     if (!editingEvent || !newEventName.trim() || !newEventDescription.trim())
       return;
 
-    // Update via parent component
-    const updatedEvents = arc.events.map((e) =>
+    const currentEvents = isEditing ? (editForm.events || arc.events) : arc.events;
+    const updatedEvents = currentEvents.map((e) =>
       e.id === editingEvent.id
         ? {
             ...e,
@@ -341,953 +351,510 @@ export function PlotArcDetailView({
 
   // Use editForm when editing, otherwise use arc
   const activeArc = isEditing ? editForm : arc;
+  const currentEvents = isEditing ? (editForm.events || arc.events) : arc.events;
 
-  const selectedCharacters = characters.filter((c) =>
-    activeArc.importantCharacters?.includes(c.id)
-  );
-  const selectedFactions = factions.filter((f) =>
-    activeArc.importantFactions?.includes(f.id)
-  );
-  const selectedItems = items.filter((i) =>
-    activeArc.importantItems?.includes(i.id)
-  );
+  // Translate options for FormSelectGrid
+  const translatedSizeOptions = ARC_SIZE_OPTIONS.map((opt) => ({
+    ...opt,
+    label: t(`create-plot-arc:${opt.label}`),
+    description: opt.description ? t(`create-plot-arc:${opt.description}`) : undefined,
+  }));
 
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  // Map entities for display
+  const selectedCharacters: DisplayEntityItem[] = characters
+    .filter((c) => activeArc.importantCharacters?.includes(c.id))
+    .map((c) => ({ id: c.id, name: c.name, image: c.image }));
+
+  const selectedFactions: DisplayEntityItem[] = factions
+    .filter((f) => activeArc.importantFactions?.includes(f.id))
+    .map((f) => ({ id: f.id, name: f.name, image: f.emblem }));
+
+  const selectedItems: DisplayEntityItem[] = items
+    .filter((i) => activeArc.importantItems?.includes(i.id))
+    .map((i) => ({ id: i.id, name: i.name, image: i.image }));
+
+  const selectedRegions: DisplayEntityItem[] = regions
+    .filter((r) => activeArc.importantRegions?.includes(r.id))
+    .map((r) => ({ id: r.id, name: r.name, image: r.image }));
+
+  // Get status and size colors
+  const getStatusColor = (status: PlotArcStatus) => {
+    switch (status) {
+      case "finalizado":
+        return "bg-emerald-500/20 text-emerald-600 border-emerald-500/30";
+      case "atual":
+        return "bg-blue-500/20 text-blue-600 border-blue-500/30";
+      case "planejamento":
+        return "bg-amber-500/20 text-amber-600 border-amber-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-600 border-gray-500/30";
+    }
+  };
+
+  const getSizeColor = (size: PlotArcSize) => {
+    switch (size) {
+      case "mini":
+        return "bg-violet-500/20 text-violet-600 border-violet-500/30";
+      case "pequeno":
+        return "bg-blue-500/20 text-blue-600 border-blue-500/30";
+      case "médio":
+        return "bg-indigo-500/20 text-indigo-600 border-indigo-500/30";
+      case "grande":
+        return "bg-purple-500/20 text-purple-600 border-purple-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-600 border-gray-500/30";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        {/* Fixed Header */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pb-4 mb-6 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {!isEditing && (
-                <Button variant="ghost" onClick={onBack}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  {t("button.back")}
-                </Button>
-              )}
-            </div>
+      {/* Fixed Header */}
+      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-4 px-4">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          {/* Left side - Back button */}
+          <div className="flex items-center gap-4">
+            {!isEditing && (
+              <Button variant="ghost" onClick={onBack}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t("plot:header.back")}
+              </Button>
+            )}
+          </div>
 
-            <div className="flex gap-2">
-              {isEditing ? (
-                <>
-                  <Button variant="outline" onClick={onCancel}>
-                    {t("button.cancel")}
+          {/* Right side - Action buttons */}
+          <div className="flex flex-col items-end gap-1">
+            {isEditing ? (
+              <>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={onCancel}>
+                    <X className="w-4 h-4 mr-2" />
+                    {t("plot:header.cancel")}
                   </Button>
                   <Button
                     variant="magical"
                     className="animate-glow"
                     onClick={onSave}
+                    disabled={!hasChanges || hasRequiredFieldsEmpty}
                   >
-                    {t("button.save")}
+                    <Save className="w-4 h-4 mr-2" />
+                    {t("plot:header.save")}
                   </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="outline" size="icon" onClick={onEdit}>
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => onDeleteArcDialogChange(true)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
-            </div>
+                </div>
+                {hasRequiredFieldsEmpty && (
+                  <p className="text-xs text-destructive">
+                    {missingFields.length > 0 && (
+                      <>
+                        {t("plot:validation.missing_fields")}:{" "}
+                        {missingFields
+                          .map((field) => t(`plot:fields.${field}`))
+                          .join(", ")}
+                      </>
+                    )}
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" onClick={onEdit}>
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost-destructive"
+                  size="icon"
+                  onClick={() => onDeleteArcDialogChange(true)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
+      </header>
 
+      {/* Spacer for fixed header */}
+      <div className="h-[72px]" />
+
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="space-y-6">
           {/* Basic Information Section */}
           <Card className="card-magical">
             <CardHeader>
-              {isEditing ? (
-                <>
-                  <CardTitle>{t("detail.title")}</CardTitle>
-                  <div className="space-y-4 pt-4">
-                    <div className="space-y-2">
-                      <Label>{t("modal.arc_name")} *</Label>
-                      <Input
-                        value={editForm.name || ""}
-                        onChange={(e) =>
-                          onEditFormChange("name", e.target.value)
-                        }
-                        maxLength={200}
-                        className={
-                          validationErrors.has("name")
-                            ? "border-red-500 focus-visible:ring-red-500"
-                            : ""
-                        }
-                      />
-                      {validationErrors.has("name") && (
-                        <p className="text-xs text-red-500">
-                          Este campo é obrigatório
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>{t("modal.arc_summary")} *</Label>
-                      <Textarea
-                        value={editForm.description || ""}
-                        onChange={(e) =>
-                          onEditFormChange("description", e.target.value)
-                        }
-                        rows={3}
-                        maxLength={1000}
-                        className={`resize-none ${validationErrors.has("description") ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                      />
-                      {validationErrors.has("description") && (
-                        <p className="text-xs text-red-500">
-                          Este campo é obrigatório
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div>
-                  <CardTitle className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span>{arc.name}</span>
-                    <Badge
-                      className={`${getStatusColor(arc.status)} pointer-events-none`}
-                    >
-                      {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
-                      {t(
-                        `statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
-                      )}
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription>{arc.description}</CardDescription>
-                </div>
-              )}
+              <CardTitle>{t("plot:detail.basic_info")}</CardTitle>
             </CardHeader>
-
             <CardContent>
               {isEditing ? (
                 <div className="space-y-6">
-                  {/* Status */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium">
-                      {t("modal.arc_status")} *
-                    </Label>
+                  {/* Arc Name */}
+                  <FormInput
+                    label={t("create-plot-arc:modal.arc_name")}
+                    placeholder={t("create-plot-arc:modal.arc_name_placeholder")}
+                    value={editForm.name || ""}
+                    onChange={(e) => onEditFormChange("name", e.target.value)}
+                    onBlur={(e) => validateField("name", e.target.value)}
+                    maxLength={200}
+                    required
+                    showCharCount
+                    error={validationErrors.name}
+                    labelClassName="text-primary"
+                  />
 
-                    <div className="flex gap-4">
-                      {ARC_STATUSES_CONSTANT.map((status) => {
-                        const Icon = status.icon;
-                        const isSelected = editForm.status === status.value;
+                  {/* Arc Summary */}
+                  <FormTextarea
+                    label={t("create-plot-arc:modal.arc_summary")}
+                    placeholder={t("create-plot-arc:modal.arc_summary_placeholder")}
+                    value={editForm.description || ""}
+                    onChange={(e) => onEditFormChange("description", e.target.value)}
+                    onBlur={(e) => validateField("description", e.target.value)}
+                    maxLength={1000}
+                    rows={4}
+                    required
+                    showCharCount
+                    error={validationErrors.description}
+                    labelClassName="text-primary"
+                    className="resize-none"
+                  />
 
-                        // Define cores específicas para cada status
-                        let activeColor = "";
-                        let hoverColor = "";
+                  {/* Status Selector */}
+                  <StatusSelector
+                    value={editForm.status as PlotArcStatus | ""}
+                    onChange={(value) => onEditFormChange("status", value)}
+                    hasCurrentArc={hasCurrentArc}
+                    error={validationErrors.status}
+                  />
 
-                        if (status.value === "finalizado") {
-                          activeColor = "text-emerald-600";
-                          hoverColor = "hover:text-emerald-600";
-                        } else if (status.value === "atual") {
-                          activeColor = "text-blue-600";
-                          hoverColor = "hover:text-blue-600";
-                        } else if (status.value === "planejamento") {
-                          activeColor = "text-amber-600";
-                          hoverColor = "hover:text-amber-600";
-                        }
+                  {/* Size Selector */}
+                  <FormSelectGrid
+                    value={editForm.size || ""}
+                    onChange={(value) => onEditFormChange("size", value as PlotArcSize)}
+                    label={t("create-plot-arc:modal.arc_size")}
+                    required
+                    columns={2}
+                    options={translatedSizeOptions}
+                    error={validationErrors.size}
+                    alertText={t("create-plot-arc:modal.arc_size_intro")}
+                  />
 
-                        return (
-                          <div key={status.value} className="flex-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                onEditFormChange("status", status.value)
-                              }
-                              className={`
-                              w-full flex items-center justify-center gap-3 py-3 transition-all rounded-lg
-                              ${isSelected ? `${activeColor} scale-105` : "text-muted-foreground"}
-                              ${!isSelected ? `${hoverColor} hover:scale-105` : ""}
-                              cursor-pointer
-                            `}
-                            >
-                              <Icon className="w-6 h-6" />
-                              <span className="text-base font-medium">
-                                {t(status.translationKey)}
-                              </span>
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {validationErrors.has("status") && (
-                      <p className="text-xs text-red-500">
-                        Selecione um status
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Size */}
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="text-sm font-medium">
-                        {t("modal.arc_size")} *
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {t("modal.arc_size_intro")}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {ARC_SIZES_CONSTANT.map((size) => {
-                        const Icon = size.icon;
-                        const isSelected = editForm.size === size.value;
-
-                        return (
-                          <button
-                            key={size.value}
-                            type="button"
-                            onClick={() => onEditFormChange("size", size.value)}
-                            className={`
-                            relative p-4 rounded-lg border-2 transition-all text-left
-                            ${isSelected ? `${size.activeColor} text-white` : size.color}
-                            ${!isSelected ? `${size.hoverColor} hover:text-white` : ""}
-                          `}
-                          >
-                            <div className="flex items-start gap-3">
-                              <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm">
-                                  {t(size.translationKey)}
-                                </p>
-                                <p className="text-xs mt-1 opacity-80">
-                                  {t(size.descriptionKey)}
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {validationErrors.has("size") && (
-                      <p className="text-xs text-red-500">
-                        Selecione um tamanho
-                      </p>
-                    )}
-                  </div>
+                  {/* Arc Focus */}
+                  <FormTextarea
+                    label={t("create-plot-arc:modal.arc_focus")}
+                    placeholder={t("create-plot-arc:modal.arc_focus_placeholder")}
+                    value={editForm.focus || ""}
+                    onChange={(e) => onEditFormChange("focus", e.target.value)}
+                    onBlur={(e) => validateField("focus", e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    required
+                    showCharCount
+                    error={validationErrors.focus}
+                    labelClassName="text-primary"
+                    className="resize-none"
+                  />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Status */}
+                <div className="space-y-6">
+                  {/* Arc Title and Badges */}
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      {t("detail.status")}
-                    </label>
-                    <div className="mt-1">
-                      <Badge
-                        className={`${getStatusColor(arc.status)} pointer-events-none`}
-                      >
+                    <h2 className="text-3xl font-bold mb-3">{arc.name}</h2>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <Badge className={`${getStatusColor(arc.status)} pointer-events-none`}>
                         {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
-                        {t(
-                          `statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
-                        )}
+                        {t(`plot:statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`)}
                       </Badge>
-                    </div>
-                  </div>
-
-                  {/* Size */}
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      {t("detail.size")}
-                    </label>
-                    <div className="mt-1">
-                      <Badge
-                        className={`${getSizeColor(arc.size)} pointer-events-none`}
-                      >
+                      <Badge className={`${getSizeColor(arc.size)} pointer-events-none`}>
                         {SizeIcon && <SizeIcon className="w-3 h-3 mr-1" />}
-                        {t(
-                          `sizes.${arc.size === "mini" ? "mini" : arc.size === "pequeno" ? "small" : arc.size === "médio" ? "medium" : "large"}`
-                        )}
+                        {t(`plot:sizes.${arc.size === "mini" ? "mini" : arc.size === "pequeno" ? "small" : arc.size === "médio" ? "medium" : "large"}`)}
                       </Badge>
                     </div>
                   </div>
-                </div>
-              )}
 
-              {/* Focus */}
-              <div className="mt-6">
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <Label>{t("modal.arc_focus")} *</Label>
-                    <Textarea
-                      value={editForm.focus || ""}
-                      onChange={(e) =>
-                        onEditFormChange("focus", e.target.value)
-                      }
-                      rows={3}
-                      maxLength={500}
-                      className={`resize-none ${validationErrors.has("focus") ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                    />
-                    {validationErrors.has("focus") && (
-                      <p className="text-xs text-red-500">
-                        Este campo é obrigatório
-                      </p>
-                    )}
-                  </div>
-                ) : (
+                  {/* Summary */}
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      {t("detail.focus")}
-                    </label>
-                    <p className="mt-1">{arc.focus}</p>
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t("plot:fields.summary")}
+                    </Label>
+                    <p className="mt-1 text-foreground whitespace-pre-wrap">{arc.description}</p>
                   </div>
-                )}
-              </div>
 
-              {/* Progress - Only visible when not editing */}
-              {!isEditing && (
-                <div className="mt-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium">{t("detail.progress")}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {arc.progress.toFixed(0)}%
-                    </span>
+                  {/* Focus */}
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t("create-plot-arc:modal.arc_focus")}
+                    </Label>
+                    <p className="mt-1 text-foreground">{arc.focus}</p>
                   </div>
-                  <Progress value={arc.progress} className="h-3" />
+
+                  {/* Progress */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">{t("plot:detail.progress")}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {arc.progress.toFixed(0)}%
+                      </span>
+                    </div>
+                    <Progress value={arc.progress} className="h-3" />
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Event Chain Section */}
-          <Card className="card-magical">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>{t("detail.event_chain")}</CardTitle>
-                {isEditing && !isAddingEvent && !editingEvent && (
+          {/* Event Chain Section - Collapsible */}
+          <CollapsibleSection
+            title={t("plot:detail.event_chain")}
+            isOpen={eventChainSectionOpen}
+            onToggle={onEventChainSectionToggle}
+          >
+            {/* Add/Edit Event Form */}
+            {isEditing && (isAddingEvent || editingEvent) && (
+              <div className="mb-4 p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
+                <div className="space-y-2">
+                  <Label>{t("create-plot-arc:modal.event_name")} *</Label>
+                  <Input
+                    value={newEventName}
+                    onChange={(e) => setNewEventName(e.target.value)}
+                    placeholder={t("create-plot-arc:modal.event_name_placeholder")}
+                    maxLength={100}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t("create-plot-arc:modal.event_description")} *</Label>
+                  <Textarea
+                    value={newEventDescription}
+                    onChange={(e) => setNewEventDescription(e.target.value)}
+                    placeholder={t("create-plot-arc:modal.event_description_placeholder")}
+                    rows={3}
+                    maxLength={500}
+                    className="resize-none"
+                  />
+                </div>
+
+                <div className="flex gap-2">
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsAddingEvent(true)}
+                    onClick={handleCancelEdit}
+                    className="flex-1"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t("modal.add_event")}
+                    <X className="w-4 h-4 mr-2" />
+                    {t("plot:button.cancel")}
                   </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Add/Edit Event Form */}
-              {isEditing && (isAddingEvent || editingEvent) && (
-                <div className="mb-4 p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
-                  <div className="space-y-2">
-                    <Label>{t("modal.event_name")} *</Label>
-                    <Input
-                      value={newEventName}
-                      onChange={(e) => setNewEventName(e.target.value)}
-                      maxLength={100}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>{t("modal.event_description")} *</Label>
-                    <Textarea
-                      value={newEventDescription}
-                      onChange={(e) => setNewEventDescription(e.target.value)}
-                      rows={3}
-                      maxLength={500}
-                      className="resize-none"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCancelEdit}
-                      className="flex-1"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      {t("button.cancel")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="magical"
-                      size="sm"
-                      onClick={editingEvent ? handleEditEvent : handleAddEvent}
-                      disabled={
-                        !newEventName.trim() || !newEventDescription.trim()
-                      }
-                      className="flex-1 animate-glow"
-                    >
-                      <Check className="w-4 h-4 mr-2" />
-                      {editingEvent ? t("button.save") : t("button.add")}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Events List */}
-              {arc.events.length > 0 ? (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={arc.events.map((e) => e.id)}
-                    strategy={verticalListSortingStrategy}
+                  <Button
+                    type="button"
+                    variant="magical"
+                    size="sm"
+                    onClick={editingEvent ? handleEditEvent : handleAddEvent}
+                    disabled={!newEventName.trim() || !newEventDescription.trim()}
+                    className="flex-1 animate-glow"
                   >
-                    <div className="space-y-3">
-                      {arc.events.map((event) => (
-                        <SortableEvent
-                          key={event.id}
-                          event={event}
-                          isEditing={isEditing}
-                          onToggle={onToggleEventCompletion}
-                          onDelete={onEventDeleteRequest}
-                          onEdit={handleStartEdit}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
-                  <p className="text-sm">{t("detail.no_events")}</p>
+                    <Check className="w-4 h-4 mr-2" />
+                    {editingEvent ? t("plot:button.save") : t("plot:button.add")}
+                  </Button>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+
+            {/* Add Event Button */}
+            {isEditing && !isAddingEvent && !editingEvent && (
+              <div className="mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsAddingEvent(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t("create-plot-arc:modal.add_event")}
+                </Button>
+              </div>
+            )}
+
+            {/* Events List */}
+            {currentEvents.length > 0 ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={currentEvents.map((e) => e.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {currentEvents.map((event) => (
+                      <SortableEvent
+                        key={event.id}
+                        event={event}
+                        isEditing={isEditing}
+                        onToggle={onToggleEventCompletion}
+                        onDelete={onEventDeleteRequest}
+                        onEdit={handleStartEdit}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
+                <p className="text-sm">{t("plot:detail.no_events")}</p>
+              </div>
+            )}
+          </CollapsibleSection>
 
           {/* Advanced Section - Collapsible */}
-          <Collapsible
-            open={advancedSectionOpen}
-            onOpenChange={onAdvancedSectionToggle}
+          <CollapsibleSection
+            title={t("plot:detail.advanced_section")}
+            isOpen={advancedSectionOpen}
+            onToggle={onAdvancedSectionToggle}
           >
-            <Card className="card-magical">
-              <CardHeader>
-                <CollapsibleTrigger asChild>
-                  <div className="flex items-center justify-between cursor-pointer">
-                    <CardTitle>{t("detail.advanced_section")}</CardTitle>
-                    <Button variant="outline" size="sm">
-                      {advancedSectionOpen
-                        ? t("detail.close")
-                        : t("detail.open")}
-                    </Button>
-                  </div>
-                </CollapsibleTrigger>
-              </CardHeader>
-              <CollapsibleContent>
-                <CardContent className="space-y-6">
-                  {/* Important Characters */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      {t("modal.important_characters")}
-                    </label>
-                    {isEditing ? (
-                      <>
-                        {characters.filter(
-                          (c) =>
-                            !(editForm.importantCharacters || []).includes(c.id)
-                        ).length > 0 && (
-                          <Select
-                            onValueChange={(characterId) => {
-                              const currentCharacters =
-                                editForm.importantCharacters || [];
-                              if (!currentCharacters.includes(characterId)) {
-                                onEditFormChange("importantCharacters", [
-                                  ...currentCharacters,
-                                  characterId,
-                                ]);
-                              }
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={t("modal.select_character")}
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {characters
-                                .filter(
-                                  (c) =>
-                                    !(
-                                      editForm.importantCharacters || []
-                                    ).includes(c.id)
-                                )
-                                .map((character) => (
-                                  <SelectItem
-                                    key={character.id}
-                                    value={character.id}
-                                    className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Avatar className="w-8 h-8">
-                                        <AvatarImage
-                                          src={character.image}
-                                          alt={character.name}
-                                        />
-                                        <AvatarFallback className="text-xs !text-foreground">
-                                          {getInitials(character.name)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <span>{character.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                        {selectedCharacters.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedCharacters.map((character) => (
-                              <div
-                                key={character.id}
-                                className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                              >
-                                <Avatar className="w-10 h-10">
-                                  <AvatarImage
-                                    src={character.image}
-                                    alt={character.name}
-                                  />
-                                  <AvatarFallback className="text-xs">
-                                    {getInitials(character.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {character.name}
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 ml-1"
-                                  onClick={() => {
-                                    const currentCharacters =
-                                      editForm.importantCharacters || [];
-                                    onEditFormChange(
-                                      "importantCharacters",
-                                      currentCharacters.filter(
-                                        (id) => id !== character.id
-                                      )
-                                    );
-                                  }}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
-                            <p className="text-sm">
-                              {t("modal.no_characters_selected")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {selectedCharacters.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedCharacters.map((character) => (
-                              <div
-                                key={character.id}
-                                className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
-                              >
-                                <Avatar className="w-10 h-10">
-                                  <AvatarImage
-                                    src={character.image}
-                                    alt={character.name}
-                                  />
-                                  <AvatarFallback className="text-xs">
-                                    {getInitials(character.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {character.name}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                            <p>{t("empty_states.no_characters")}</p>
-                            <p className="text-xs mt-1">
-                              {t("empty_states.no_characters_hint")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+            {/* Relationships Section */}
+            <div className="space-y-6">
+              <SectionTitle>{t("plot:detail.relationships_section")}</SectionTitle>
 
-                  {/* Important Factions */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Shield className="w-4 h-4" />
-                      {t("modal.important_factions")}
-                    </label>
-                    {isEditing ? (
-                      <>
-                        {factions.filter(
-                          (f) =>
-                            !(editForm.importantFactions || []).includes(f.id)
-                        ).length > 0 && (
-                          <Select
-                            onValueChange={(factionId) => {
-                              const currentFactions =
-                                editForm.importantFactions || [];
-                              if (!currentFactions.includes(factionId)) {
-                                onEditFormChange("importantFactions", [
-                                  ...currentFactions,
-                                  factionId,
-                                ]);
-                              }
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={t("modal.select_faction")}
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {factions
-                                .filter(
-                                  (f) =>
-                                    !(
-                                      editForm.importantFactions || []
-                                    ).includes(f.id)
-                                )
-                                .map((faction) => (
-                                  <SelectItem
-                                    key={faction.id}
-                                    value={faction.id}
-                                    className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Avatar className="w-8 h-8 rounded-md">
-                                        <AvatarImage
-                                          src={faction.emblem}
-                                          alt={faction.name}
-                                        />
-                                        <AvatarFallback className="text-xs !text-foreground rounded-md">
-                                          {getInitials(faction.name)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <span>{faction.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                        {selectedFactions.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedFactions.map((faction) => (
-                              <div
-                                key={faction.id}
-                                className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                              >
-                                <Avatar className="w-10 h-10 rounded-md">
-                                  <AvatarImage
-                                    src={faction.emblem}
-                                    alt={faction.name}
-                                  />
-                                  <AvatarFallback className="text-xs rounded-md">
-                                    {getInitials(faction.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {faction.name}
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 ml-1"
-                                  onClick={() => {
-                                    const currentFactions =
-                                      editForm.importantFactions || [];
-                                    onEditFormChange(
-                                      "importantFactions",
-                                      currentFactions.filter(
-                                        (id) => id !== faction.id
-                                      )
-                                    );
-                                  }}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
-                            <p className="text-sm">
-                              {t("modal.no_factions_selected")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {selectedFactions.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedFactions.map((faction) => (
-                              <div
-                                key={faction.id}
-                                className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
-                              >
-                                <Avatar className="w-10 h-10 rounded-md">
-                                  <AvatarImage
-                                    src={faction.emblem}
-                                    alt={faction.name}
-                                  />
-                                  <AvatarFallback className="text-xs rounded-md">
-                                    {getInitials(faction.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {faction.name}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                            <p>{t("empty_states.no_factions")}</p>
-                            <p className="text-xs mt-1">
-                              {t("empty_states.no_factions_hint")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+              {/* Important Characters */}
+              {isEditing ? (
+                <FormEntityMultiSelectAuto
+                  entityType="character"
+                  bookId={bookId}
+                  label={t("create-plot-arc:modal.important_characters")}
+                  placeholder={t("create-plot-arc:modal.select_character")}
+                  emptyText={t("create-plot-arc:modal.no_characters_available")}
+                  noSelectionText={t("create-plot-arc:modal.no_characters_selected")}
+                  searchPlaceholder={t("create-plot-arc:modal.search_character")}
+                  value={editForm.importantCharacters || []}
+                  onChange={(value) => onEditFormChange("importantCharacters", value)}
+                  labelClassName="text-sm font-medium text-primary"
+                />
+              ) : (
+                <DisplayEntityList
+                  label={t("plot:fields.important_characters")}
+                  entities={selectedCharacters}
+                />
+              )}
 
-                  {/* Important Items */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Package className="w-4 h-4" />
-                      {t("modal.important_items")}
-                    </label>
-                    {isEditing ? (
-                      <>
-                        {items.filter(
-                          (i) => !(editForm.importantItems || []).includes(i.id)
-                        ).length > 0 && (
-                          <Select
-                            onValueChange={(itemId) => {
-                              const currentItems =
-                                editForm.importantItems || [];
-                              if (!currentItems.includes(itemId)) {
-                                onEditFormChange("importantItems", [
-                                  ...currentItems,
-                                  itemId,
-                                ]);
-                              }
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={t("modal.select_item")}
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {items
-                                .filter(
-                                  (i) =>
-                                    !(editForm.importantItems || []).includes(
-                                      i.id
-                                    )
-                                )
-                                .map((item) => (
-                                  <SelectItem
-                                    key={item.id}
-                                    value={item.id}
-                                    className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Avatar className="w-8 h-8">
-                                        <AvatarImage
-                                          src={item.image}
-                                          alt={item.name}
-                                        />
-                                        <AvatarFallback className="text-xs !text-foreground">
-                                          {getInitials(item.name)}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <span>{item.name}</span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                        {selectedItems.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedItems.map((item) => (
-                              <div
-                                key={item.id}
-                                className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                              >
-                                <Avatar className="w-10 h-10">
-                                  <AvatarImage
-                                    src={item.image}
-                                    alt={item.name}
-                                  />
-                                  <AvatarFallback className="text-xs">
-                                    {getInitials(item.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {item.name}
-                                </span>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 ml-1"
-                                  onClick={() => {
-                                    const currentItems =
-                                      editForm.importantItems || [];
-                                    onEditFormChange(
-                                      "importantItems",
-                                      currentItems.filter(
-                                        (id) => id !== item.id
-                                      )
-                                    );
-                                  }}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-6 text-muted-foreground border border-dashed border-border rounded-lg">
-                            <p className="text-sm">
-                              {t("modal.no_items_selected")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {selectedItems.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {selectedItems.map((item) => (
-                              <div
-                                key={item.id}
-                                className="flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card"
-                              >
-                                <Avatar className="w-10 h-10">
-                                  <AvatarImage
-                                    src={item.image}
-                                    alt={item.name}
-                                  />
-                                  <AvatarFallback className="text-xs">
-                                    {getInitials(item.name)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm font-medium">
-                                  {item.name}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                            <p>{t("empty_states.no_items")}</p>
-                            <p className="text-xs mt-1">
-                              {t("empty_states.no_items_hint")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+              {/* Important Factions */}
+              {isEditing ? (
+                <FormEntityMultiSelectAuto
+                  entityType="faction"
+                  bookId={bookId}
+                  label={t("create-plot-arc:modal.important_factions")}
+                  placeholder={t("create-plot-arc:modal.select_faction")}
+                  emptyText={t("create-plot-arc:modal.no_factions_available")}
+                  noSelectionText={t("create-plot-arc:modal.no_factions_selected")}
+                  searchPlaceholder={t("create-plot-arc:modal.search_faction")}
+                  value={editForm.importantFactions || []}
+                  onChange={(value) => onEditFormChange("importantFactions", value)}
+                  labelClassName="text-sm font-medium text-primary"
+                />
+              ) : (
+                <DisplayEntityList
+                  label={t("plot:fields.important_factions")}
+                  entities={selectedFactions}
+                />
+              )}
 
-                  {/* Arc Message */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      {t("modal.arc_message")}
-                    </label>
-                    {isEditing ? (
-                      <Textarea
-                        value={editForm.arcMessage || ""}
-                        onChange={(e) =>
-                          onEditFormChange("arcMessage", e.target.value)
-                        }
-                        placeholder={t("modal.arc_message")}
-                        rows={3}
-                        maxLength={500}
-                        className="resize-none"
-                      />
-                    ) : (
-                      <>
-                        {arc.arcMessage ? (
-                          <p className="p-4 rounded-lg bg-muted/50 border border-border">
-                            {arc.arcMessage}
-                          </p>
-                        ) : (
-                          <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                            <p>{t("empty_states.no_message")}</p>
-                            <p className="text-xs mt-1">
-                              {t("empty_states.no_message_hint")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+              {/* Important Items */}
+              {isEditing ? (
+                <FormEntityMultiSelectAuto
+                  entityType="item"
+                  bookId={bookId}
+                  label={t("create-plot-arc:modal.important_items")}
+                  placeholder={t("create-plot-arc:modal.select_item")}
+                  emptyText={t("create-plot-arc:modal.no_items_available")}
+                  noSelectionText={t("create-plot-arc:modal.no_items_selected")}
+                  searchPlaceholder={t("create-plot-arc:modal.search_item")}
+                  value={editForm.importantItems || []}
+                  onChange={(value) => onEditFormChange("importantItems", value)}
+                  labelClassName="text-sm font-medium text-primary"
+                />
+              ) : (
+                <DisplayEntityList
+                  label={t("plot:fields.important_items")}
+                  entities={selectedItems}
+                />
+              )}
 
-                  {/* World Impact */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-muted-foreground">
-                      {t("modal.world_impact")}
-                    </label>
-                    {isEditing ? (
-                      <Textarea
-                        value={editForm.worldImpact || ""}
-                        onChange={(e) =>
-                          onEditFormChange("worldImpact", e.target.value)
-                        }
-                        placeholder={t("modal.world_impact")}
-                        rows={3}
-                        maxLength={500}
-                        className="resize-none"
-                      />
-                    ) : (
-                      <>
-                        {arc.worldImpact ? (
-                          <p className="p-4 rounded-lg bg-muted/50 border border-border">
-                            {arc.worldImpact}
-                          </p>
-                        ) : (
-                          <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
-                            <p>{t("empty_states.no_impact")}</p>
-                            <p className="text-xs mt-1">
-                              {t("empty_states.no_impact_hint")}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
+              {/* Important Regions */}
+              {isEditing ? (
+                <FormEntityMultiSelectAuto
+                  entityType="region"
+                  bookId={bookId}
+                  label={t("create-plot-arc:modal.important_regions")}
+                  placeholder={t("create-plot-arc:modal.select_region")}
+                  emptyText={t("create-plot-arc:modal.no_regions_available")}
+                  noSelectionText={t("create-plot-arc:modal.no_regions_selected")}
+                  searchPlaceholder={t("create-plot-arc:modal.search_region")}
+                  value={editForm.importantRegions || []}
+                  onChange={(value) => onEditFormChange("importantRegions", value)}
+                  labelClassName="text-sm font-medium text-primary"
+                />
+              ) : (
+                <DisplayEntityList
+                  label={t("plot:fields.important_regions")}
+                  entities={selectedRegions}
+                />
+              )}
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Narrative Section */}
+            <div className="space-y-6">
+              <SectionTitle>{t("plot:detail.narrative_section")}</SectionTitle>
+
+              {/* Arc Message */}
+              <FieldWithVisibilityToggle
+                fieldName="arcMessage"
+                label={t("plot:fields.arc_message")}
+                isOptional={true}
+                fieldVisibility={{}}
+                isEditing={isEditing}
+                onFieldVisibilityToggle={() => {}}
+              >
+                {isEditing ? (
+                  <FormTextarea
+                    label={t("create-plot-arc:modal.arc_message")}
+                    placeholder={t("create-plot-arc:modal.arc_message_placeholder")}
+                    value={editForm.arcMessage || ""}
+                    onChange={(e) => onEditFormChange("arcMessage", e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    showCharCount
+                    labelClassName="text-sm font-medium text-primary"
+                    className="resize-none"
+                  />
+                ) : (
+                  <DisplayTextarea value={arc.arcMessage} />
+                )}
+              </FieldWithVisibilityToggle>
+
+              {/* World Impact */}
+              <FieldWithVisibilityToggle
+                fieldName="worldImpact"
+                label={t("plot:fields.world_impact")}
+                isOptional={true}
+                fieldVisibility={{}}
+                isEditing={isEditing}
+                onFieldVisibilityToggle={() => {}}
+              >
+                {isEditing ? (
+                  <FormTextarea
+                    label={t("create-plot-arc:modal.world_impact")}
+                    placeholder={t("create-plot-arc:modal.world_impact_placeholder")}
+                    value={editForm.worldImpact || ""}
+                    onChange={(e) => onEditFormChange("worldImpact", e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    showCharCount
+                    labelClassName="text-sm font-medium text-primary"
+                    className="resize-none"
+                  />
+                ) : (
+                  <DisplayTextarea value={arc.worldImpact} />
+                )}
+              </FieldWithVisibilityToggle>
+            </div>
+          </CollapsibleSection>
         </div>
       </div>
 
@@ -1308,21 +875,21 @@ export function PlotArcDetailView({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("detail.confirm_delete_event")}
+              {t("plot:detail.confirm_delete_event")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("detail.confirm_delete_event_description")}
+              {t("plot:detail.confirm_delete_event_description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("button.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel>{t("plot:button.cancel")}</AlertDialogCancel>
             <Button
               onClick={onDeleteEvent}
               variant="destructive"
               size="lg"
               className="animate-glow-red"
             >
-              {t("button.delete")}
+              {t("plot:button.delete")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

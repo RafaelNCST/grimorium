@@ -348,6 +348,7 @@ async function runMigrations(database: Database): Promise<void> {
       important_characters TEXT,
       important_factions TEXT,
       important_items TEXT,
+      important_regions TEXT,
       arc_message TEXT,
       world_impact TEXT,
       created_at INTEGER NOT NULL,
@@ -577,6 +578,20 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists or other error - safe to ignore
       console.log(
         "[db] important_items column already exists or error:",
+        error
+      );
+    }
+
+    // Add important_regions column to plot_arcs if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE plot_arcs ADD COLUMN important_regions TEXT"
+      );
+      console.log("[db] Added important_regions column to plot_arcs table");
+    } catch (error) {
+      // Column already exists or other error - safe to ignore
+      console.log(
+        "[db] important_regions column already exists or error:",
         error
       );
     }

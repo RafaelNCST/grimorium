@@ -34,6 +34,7 @@
   },
   "detail": {
     "title": "Detalhes do Arco",
+    "basic_info": "Informações Básicas",
     "progress": "Progresso",
     "next_events": "Próximos Eventos",
     "status": "Status",
@@ -47,7 +48,38 @@
     "confirm_delete_event": "Confirmar Exclusão do Evento",
     "confirm_delete_event_description": "Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.",
     "open": "Abrir",
-    "close": "Fechar"
+    "close": "Fechar",
+    "back": "Voltar",
+    "relationships_section": "Relacionamentos",
+    "narrative_section": "Narrativa"
+  },
+  "header": {
+    "back": "Voltar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "validation": {
+    "required_field": "Este campo é obrigatório",
+    "select_status": "Selecione um status",
+    "select_size": "Selecione um tamanho",
+    "fill_required_fields": "Preencha todos os campos obrigatórios",
+    "missing_fields": "Campos obrigatórios faltando"
+  },
+  "fields": {
+    "name": "Nome",
+    "summary": "Resumo",
+    "description": "Resumo",
+    "status": "Status",
+    "size": "Tamanho",
+    "focus": "Foco",
+    "arc_message": "Mensagem do Arco",
+    "world_impact": "Impacto no Mundo",
+    "important_characters": "Personagens Importantes",
+    "important_factions": "Facções Importantes",
+    "important_items": "Itens Importantes",
+    "important_regions": "Regiões Importantes"
   },
   "delete": {
     "arc": {

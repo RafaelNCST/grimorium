@@ -25,6 +25,9 @@ function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
     important_items: arc.importantItems
       ? JSON.stringify(arc.importantItems)
       : undefined,
+    important_regions: arc.importantRegions
+      ? JSON.stringify(arc.importantRegions)
+      : undefined,
     arc_message: arc.arcMessage,
     world_impact: arc.worldImpact,
     created_at: Date.now(),
@@ -52,6 +55,9 @@ function dbPlotArcToArc(dbArc: DBPlotArc, events: IPlotEvent[]): IPlotArc {
       : [],
     importantItems: dbArc.important_items
       ? JSON.parse(dbArc.important_items)
+      : [],
+    importantRegions: dbArc.important_regions
+      ? JSON.parse(dbArc.important_regions)
       : [],
     arcMessage: dbArc.arc_message,
     worldImpact: dbArc.world_impact,
@@ -135,8 +141,8 @@ export async function createPlotArc(
     `INSERT INTO plot_arcs (
       id, book_id, name, size, focus, description, progress, status,
       order_index, important_characters, important_factions, important_items,
-      arc_message, world_impact, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+      important_regions, arc_message, world_impact, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
     [
       dbArc.id,
       dbArc.book_id,
@@ -150,6 +156,7 @@ export async function createPlotArc(
       dbArc.important_characters,
       dbArc.important_factions,
       dbArc.important_items,
+      dbArc.important_regions,
       dbArc.arc_message,
       dbArc.world_impact,
       dbArc.created_at,
@@ -184,9 +191,9 @@ export async function updatePlotArc(
   const db = await getDB();
   const now = Date.now();
 
-  // Get current arc to preserve book_id
+  // Get current arc to preserve existing data
   const current = await db.select<DBPlotArc[]>(
-    "SELECT book_id FROM plot_arcs WHERE id = $1",
+    "SELECT * FROM plot_arcs WHERE id = $1",
     [arcId]
   );
 
@@ -194,34 +201,45 @@ export async function updatePlotArc(
     throw new Error("Arc not found");
   }
 
-  // Build a full arc object from updates
+  const currentArc = current[0];
+
+  // Build a full arc object, preserving existing values when not provided in updates
   const fullArc: IPlotArc = {
     id: arcId,
-    name: updates.name || "",
-    size: updates.size || "médio",
-    focus: updates.focus || "",
-    description: updates.description || "",
-    progress: updates.progress || 0,
-    status: updates.status || "planejamento",
-    order: updates.order || 0,
+    name: updates.name !== undefined ? updates.name : currentArc.name,
+    size: updates.size !== undefined ? updates.size : (currentArc.size as IPlotArc["size"]),
+    focus: updates.focus !== undefined ? updates.focus : currentArc.focus,
+    description: updates.description !== undefined ? updates.description : currentArc.description,
+    progress: updates.progress !== undefined ? updates.progress : currentArc.progress,
+    status: updates.status !== undefined ? updates.status : (currentArc.status as IPlotArc["status"]),
+    order: updates.order !== undefined ? updates.order : currentArc.order_index,
     events: updates.events || [],
-    importantCharacters: updates.importantCharacters || [],
-    importantFactions: updates.importantFactions || [],
-    importantItems: updates.importantItems || [],
-    arcMessage: updates.arcMessage,
-    worldImpact: updates.worldImpact,
+    importantCharacters: updates.importantCharacters !== undefined
+      ? updates.importantCharacters
+      : (currentArc.important_characters ? JSON.parse(currentArc.important_characters) : []),
+    importantFactions: updates.importantFactions !== undefined
+      ? updates.importantFactions
+      : (currentArc.important_factions ? JSON.parse(currentArc.important_factions) : []),
+    importantItems: updates.importantItems !== undefined
+      ? updates.importantItems
+      : (currentArc.important_items ? JSON.parse(currentArc.important_items) : []),
+    importantRegions: updates.importantRegions !== undefined
+      ? updates.importantRegions
+      : (currentArc.important_regions ? JSON.parse(currentArc.important_regions) : []),
+    arcMessage: updates.arcMessage !== undefined ? updates.arcMessage : currentArc.arc_message,
+    worldImpact: updates.worldImpact !== undefined ? updates.worldImpact : currentArc.world_impact,
   };
 
-  const dbArc = arcToDBPlotArc(current[0].book_id, fullArc);
+  const dbArc = arcToDBPlotArc(currentArc.book_id, fullArc);
   dbArc.updated_at = now;
 
   await db.execute(
     `UPDATE plot_arcs SET
       name = $1, size = $2, focus = $3, description = $4, progress = $5,
       status = $6, order_index = $7, important_characters = $8,
-      important_factions = $9, important_items = $10, arc_message = $11,
-      world_impact = $12, updated_at = $13
-    WHERE id = $14`,
+      important_factions = $9, important_items = $10, important_regions = $11,
+      arc_message = $12, world_impact = $13, updated_at = $14
+    WHERE id = $15`,
     [
       dbArc.name,
       dbArc.size,
@@ -233,6 +251,7 @@ export async function updatePlotArc(
       dbArc.important_characters,
       dbArc.important_factions,
       dbArc.important_items,
+      dbArc.important_regions,
       dbArc.arc_message,
       dbArc.world_impact,
       dbArc.updated_at,
