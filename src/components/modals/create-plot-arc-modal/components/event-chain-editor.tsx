@@ -53,7 +53,6 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: transition || undefined,
-    opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 1000 : "auto",
   };
 
@@ -63,7 +62,11 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
       style={style}
       {...attributes}
       {...listeners}
-      className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/30 cursor-grab active:cursor-grabbing"
+      className={`flex items-start gap-3 p-3 rounded-lg border border-border cursor-grab active:cursor-grabbing ${
+        isDragging
+          ? "bg-background shadow-lg border-primary/50"
+          : "bg-card hover:bg-muted/30"
+      }`}
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-3">
@@ -71,9 +74,9 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
             {event.order}
           </span>
           <div className="h-5 w-px bg-border" />
-          <h4 className="font-medium truncate">{event.name}</h4>
+          <h4 className="font-medium">{event.name}</h4>
         </div>
-        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+        <p className="text-sm text-muted-foreground mt-1 text-justify">
           {event.description}
         </p>
       </div>
@@ -89,7 +92,6 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
           }}
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
-          className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-500"
         >
           <Edit2 className="w-4 h-4" />
         </Button>
@@ -103,7 +105,6 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
           }}
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
-          className="cursor-pointer"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
