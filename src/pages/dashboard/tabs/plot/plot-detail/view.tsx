@@ -76,6 +76,7 @@ import type {
 } from "@/types/plot-types";
 
 import { DeleteArcConfirmationDialog } from "./components/delete-arc-confirmation-dialog";
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 
 interface PropsPlotArcDetailView {
   arc: IPlotArc;
@@ -83,6 +84,7 @@ interface PropsPlotArcDetailView {
   editForm: Partial<IPlotArc>;
   showDeleteArcDialog: boolean;
   showDeleteEventDialog: boolean;
+  showUnsavedChangesDialog: boolean;
   eventChainSectionOpen: boolean;
   advancedSectionOpen: boolean;
   validationErrors: Record<string, string>;
@@ -95,10 +97,12 @@ interface PropsPlotArcDetailView {
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
+  onConfirmCancel: () => void;
   onDeleteArc: () => void;
   onDeleteEvent: () => void;
   onDeleteArcDialogChange: (open: boolean) => void;
   onDeleteEventDialogChange: (open: boolean) => void;
+  onUnsavedChangesDialogChange: (open: boolean) => void;
   onEditFormChange: <K extends keyof IPlotArc>(
     field: K,
     value: IPlotArc[K]
@@ -236,6 +240,7 @@ export function PlotArcDetailView({
   editForm,
   showDeleteArcDialog,
   showDeleteEventDialog,
+  showUnsavedChangesDialog,
   eventChainSectionOpen,
   advancedSectionOpen,
   validationErrors,
@@ -248,10 +253,12 @@ export function PlotArcDetailView({
   onEdit,
   onSave,
   onCancel,
+  onConfirmCancel,
   onDeleteArc,
   onDeleteEvent,
   onDeleteArcDialogChange,
   onDeleteEventDialogChange,
+  onUnsavedChangesDialogChange,
   onEditFormChange,
   validateField,
   onToggleEventCompletion,
@@ -514,6 +521,22 @@ export function PlotArcDetailView({
                     className="resize-none"
                   />
 
+                  {/* Arc Focus */}
+                  <FormTextarea
+                    label={t("create-plot-arc:modal.arc_focus")}
+                    placeholder={t("create-plot-arc:modal.arc_focus_placeholder")}
+                    value={editForm.focus || ""}
+                    onChange={(e) => onEditFormChange("focus", e.target.value)}
+                    onBlur={(e) => validateField("focus", e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    required
+                    showCharCount
+                    error={validationErrors.focus}
+                    labelClassName="text-primary"
+                    className="resize-none"
+                  />
+
                   {/* Status Selector */}
                   <StatusSelector
                     value={editForm.status as PlotArcStatus | ""}
@@ -532,22 +555,6 @@ export function PlotArcDetailView({
                     options={translatedSizeOptions}
                     error={validationErrors.size}
                     alertText={t("create-plot-arc:modal.arc_size_intro")}
-                  />
-
-                  {/* Arc Focus */}
-                  <FormTextarea
-                    label={t("create-plot-arc:modal.arc_focus")}
-                    placeholder={t("create-plot-arc:modal.arc_focus_placeholder")}
-                    value={editForm.focus || ""}
-                    onChange={(e) => onEditFormChange("focus", e.target.value)}
-                    onBlur={(e) => validateField("focus", e.target.value)}
-                    maxLength={500}
-                    rows={3}
-                    required
-                    showCharCount
-                    error={validationErrors.focus}
-                    labelClassName="text-primary"
-                    className="resize-none"
                   />
                 </div>
               ) : (
@@ -894,6 +901,13 @@ export function PlotArcDetailView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Unsaved Changes Dialog */}
+      <UnsavedChangesDialog
+        open={showUnsavedChangesDialog}
+        onOpenChange={onUnsavedChangesDialogChange}
+        onConfirm={onConfirmCancel}
+      />
     </div>
   );
 }

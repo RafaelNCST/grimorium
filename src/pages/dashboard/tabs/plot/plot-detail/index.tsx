@@ -44,6 +44,7 @@ export function PlotArcDetail() {
   // Dialog state
   const [showDeleteArcDialog, setShowDeleteArcDialog] = useState(false);
   const [showDeleteEventDialog, setShowDeleteEventDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   // Section state
@@ -158,10 +159,30 @@ export function PlotArcDetail() {
 
   const handleCancel = useCallback(() => {
     if (!arc) return;
+
+    // If there are unsaved changes, show confirmation dialog
+    if (hasChanges) {
+      setShowUnsavedChangesDialog(true);
+      return;
+    }
+
+    // If no changes, cancel immediately
     setEditForm({ ...arc });
     setValidationErrors({});
     setIsEditing(false);
+  }, [arc, hasChanges]);
+
+  const handleConfirmCancel = useCallback(() => {
+    if (!arc) return;
+    setEditForm({ ...arc });
+    setValidationErrors({});
+    setIsEditing(false);
+    setShowUnsavedChangesDialog(false);
   }, [arc]);
+
+  const handleUnsavedChangesDialogChange = useCallback((open: boolean) => {
+    setShowUnsavedChangesDialog(open);
+  }, []);
 
   // Field change handler with validation
   const handleEditFormChange = useCallback(
@@ -404,6 +425,7 @@ export function PlotArcDetail() {
       editForm={editForm}
       showDeleteArcDialog={showDeleteArcDialog}
       showDeleteEventDialog={showDeleteEventDialog}
+      showUnsavedChangesDialog={showUnsavedChangesDialog}
       eventChainSectionOpen={eventChainSectionOpen}
       advancedSectionOpen={advancedSectionOpen}
       validationErrors={validationErrors}
@@ -416,10 +438,12 @@ export function PlotArcDetail() {
       onEdit={handleEdit}
       onSave={handleSave}
       onCancel={handleCancel}
+      onConfirmCancel={handleConfirmCancel}
       onDeleteArc={handleDeleteArc}
       onDeleteEvent={handleDeleteEvent}
       onDeleteArcDialogChange={handleDeleteArcDialogChange}
       onDeleteEventDialogChange={handleDeleteEventDialogChange}
+      onUnsavedChangesDialogChange={handleUnsavedChangesDialogChange}
       onEditFormChange={handleEditFormChange}
       validateField={validateField}
       onToggleEventCompletion={handleToggleEventCompletion}

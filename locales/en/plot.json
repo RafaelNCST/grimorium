@@ -81,6 +81,12 @@
     "important_items": "Important Items",
     "important_regions": "Important Regions"
   },
+  "unsaved_changes": {
+    "title": "Discard changes?",
+    "description": "You have unsaved changes. If you leave now, all changes will be lost.",
+    "cancel": "Continue Editing",
+    "confirm": "Discard Changes"
+  },
   "delete": {
     "arc": {
       "title": "Delete Narrative Arc",

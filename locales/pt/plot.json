@@ -81,6 +81,12 @@
     "important_items": "Itens Importantes",
     "important_regions": "Regiões Importantes"
   },
+  "unsaved_changes": {
+    "title": "Descartar alterações?",
+    "description": "Você tem alterações não salvas. Se sair agora, todas as mudanças serão perdidas.",
+    "cancel": "Continuar Editando",
+    "confirm": "Descartar Alterações"
+  },
   "delete": {
     "arc": {
       "title": "Excluir Arco Narrativo",

@@ -104,6 +104,23 @@ export function CreatePlotArcModalView({
                 className="resize-none"
               />
 
+              {/* Arc Focus */}
+              <FormTextarea
+                {...register("focus")}
+                label={t("modal.arc_focus")}
+                placeholder={t("modal.arc_focus_placeholder")}
+                maxLength={500}
+                rows={3}
+                required
+                showCharCount
+                error={
+                  errors.focus ? t(errors.focus.message as string) : undefined
+                }
+                value={watchedValues.focus}
+                labelClassName="text-primary"
+                className="resize-none"
+              />
+
               {/* Status Selector */}
               <StatusSelector
                 value={watchedValues.status as PlotArcStatus | ""}
@@ -122,23 +139,6 @@ export function CreatePlotArcModalView({
                 options={translatedSizeOptions}
                 error={errors.size?.message}
                 alertText={t("modal.arc_size_intro")}
-              />
-
-              {/* Arc Focus */}
-              <FormTextarea
-                {...register("focus")}
-                label={t("modal.arc_focus")}
-                placeholder={t("modal.arc_focus_placeholder")}
-                maxLength={500}
-                rows={3}
-                required
-                showCharCount
-                error={
-                  errors.focus ? t(errors.focus.message as string) : undefined
-                }
-                value={watchedValues.focus}
-                labelClassName="text-primary"
-                className="resize-none"
               />
 
               {/* Event Chain */}
