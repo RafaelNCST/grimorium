@@ -8,7 +8,8 @@
     "total_arcs": "Total Arcs",
     "filter_all_status": "All statuses",
     "filter_all_sizes": "All sizes",
-    "visual_tree": "Visual Tree"
+    "visual_tree": "Visual Tree",
+    "view_details": "View details"
   },
   "empty_state": {
     "no_arcs": "No narrative arcs created",

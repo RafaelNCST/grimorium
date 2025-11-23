@@ -2,53 +2,30 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   getPlotArcsByBookId,
   createPlotArc,
-  reorderPlotArcs,
 } from "@/lib/db/plot.service";
 import type { IPlotArc, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
 
-import { getSizeColor } from "./utils/get-size-color";
-import { getStatusColor } from "./utils/get-status-color";
-import { getStatusPriority } from "./utils/get-status-priority";
-import { getVisibleEvents } from "./utils/get-visible-events";
+import { calculateTotalBySize } from "./utils/calculators/calculate-total-by-size";
+import { calculateTotalByStatus } from "./utils/calculators/calculate-total-by-status";
+import { filterArcs } from "./utils/filters/filter-arcs";
 import { PlotView } from "./view";
 
 interface PropsPlotTab {
   bookId: string;
 }
 
-interface Character {
-  id: string;
-  name: string;
-  image?: string;
-}
-
-interface Faction {
-  id: string;
-  name: string;
-  emblem?: string;
-}
-
-interface Item {
-  id: string;
-  name: string;
-  image?: string;
-}
-
 export function PlotTab({ bookId }: PropsPlotTab) {
   const navigate = useNavigate();
+
   const [arcs, setArcs] = useState<IPlotArc[]>([]);
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [factions, setFactions] = useState<Faction[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<PlotArcStatus[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<PlotArcSize[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Load data from database
   useEffect(() => {
@@ -56,40 +33,18 @@ export function PlotTab({ bookId }: PropsPlotTab) {
 
     const loadData = async () => {
       try {
-        const [loadedArcs, loadedCharacters, loadedFactions, loadedItems] =
-          await Promise.all([
-            getPlotArcsByBookId(bookId),
-            getCharactersByBookId(bookId),
-            getFactionsByBookId(bookId),
-            getItemsByBookId(bookId),
-          ]);
+        setIsLoading(true);
+        const loadedArcs = await getPlotArcsByBookId(bookId);
 
         if (mounted) {
           setArcs(loadedArcs);
-          setCharacters(
-            loadedCharacters.map((c) => ({
-              id: c.id,
-              name: c.name,
-              image: c.image,
-            }))
-          );
-          setFactions(
-            loadedFactions.map((f) => ({
-              id: f.id,
-              name: f.name,
-              emblem: f.image,
-            }))
-          );
-          setItems(
-            loadedItems.map((i) => ({
-              id: i.id,
-              name: i.name,
-              image: i.image,
-            }))
-          );
         }
       } catch (error) {
         console.error("Failed to load plot data:", error);
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -100,7 +55,70 @@ export function PlotTab({ bookId }: PropsPlotTab) {
     };
   }, [bookId]);
 
-  const createArc = useCallback(
+  const filteredArcs = useMemo(
+    () =>
+      filterArcs({
+        arcs,
+        searchTerm,
+        selectedStatuses,
+        selectedSizes,
+      }),
+    [arcs, searchTerm, selectedStatuses, selectedSizes]
+  );
+
+  const statusStats = useMemo(() => calculateTotalByStatus(arcs), [arcs]);
+
+  const sizeStats = useMemo(() => calculateTotalBySize(arcs), [arcs]);
+
+  const handleNavigateToArc = useCallback(
+    (arcId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/plot/$plotId",
+        params: { dashboardId: bookId, plotId: arcId },
+      });
+    },
+    [navigate, bookId]
+  );
+
+  const handleNavigateToTimeline = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
+      params: { dashboardId: bookId },
+    });
+  }, [navigate, bookId]);
+
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleStatusFilterChange = useCallback((status: string) => {
+    setSelectedStatuses((prev) => {
+      if (prev.includes(status as PlotArcStatus)) {
+        return prev.filter((s) => s !== status);
+      }
+      return [...prev, status as PlotArcStatus];
+    });
+  }, []);
+
+  const handleSizeFilterChange = useCallback((size: string) => {
+    setSelectedSizes((prev) => {
+      if (prev.includes(size as PlotArcSize)) {
+        return prev.filter((s) => s !== size);
+      }
+      return [...prev, size as PlotArcSize];
+    });
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedStatuses([]);
+    setSelectedSizes([]);
+  }, []);
+
+  const handleShowCreateModalChange = useCallback((show: boolean) => {
+    setShowCreateModal(show);
+  }, []);
+
+  const handleCreateArc = useCallback(
     async (arcData: Omit<IPlotArc, "id" | "progress" | "order">) => {
       const newArc: IPlotArc = {
         ...arcData,
@@ -112,6 +130,7 @@ export function PlotTab({ bookId }: PropsPlotTab) {
       try {
         await createPlotArc(bookId, newArc);
         setArcs((prev) => [...prev, newArc]);
+        setShowCreateModal(false);
       } catch (error) {
         console.error("Failed to create plot arc:", error);
         throw error;
@@ -120,158 +139,25 @@ export function PlotTab({ bookId }: PropsPlotTab) {
     [arcs.length, bookId]
   );
 
-  const moveArc = useCallback((arcId: string, direction: "up" | "down") => {
-    setArcs((prev) => {
-      const sortedArcs = [...prev].sort((a, b) => a.order - b.order);
-      const arcIndex = sortedArcs.findIndex((arc) => arc.id === arcId);
-
-      if (arcIndex === -1) return prev;
-
-      const targetIndex = direction === "up" ? arcIndex - 1 : arcIndex + 1;
-
-      if (targetIndex < 0 || targetIndex >= sortedArcs.length) return prev;
-
-      const currentArc = sortedArcs[arcIndex];
-      const targetArc = sortedArcs[targetIndex];
-
-      return prev.map((arc) => {
-        if (arc.id === currentArc.id) {
-          return { ...arc, order: targetArc.order };
-        }
-        if (arc.id === targetArc.id) {
-          return { ...arc, order: currentArc.order };
-        }
-        return arc;
-      });
-    });
-  }, []);
-
-  const reorderArcs = useCallback(async (reorderedArcs: IPlotArc[]) => {
-    const updatedArcs = reorderedArcs.map((arc, index) => ({
-      ...arc,
-      order: index + 1,
-    }));
-
-    // Optimistic update - update state immediately
-    setArcs((prev) => {
-      const arcMap = new Map(updatedArcs.map((arc) => [arc.id, arc]));
-      return prev.map((arc) => arcMap.get(arc.id) || arc);
-    });
-
-    // Save to database in background
-    try {
-      await reorderPlotArcs(
-        updatedArcs.map((arc) => ({ id: arc.id, order: arc.order }))
-      );
-    } catch (error) {
-      console.error("Failed to reorder plot arcs:", error);
-      // TODO: Revert state on error if needed
-    }
-  }, []);
-
-  const handleStatusFilterChange = useCallback((status: PlotArcStatus) => {
-    setSelectedStatuses((prev) => {
-      if (prev.includes(status)) {
-        return prev.filter((s) => s !== status);
-      }
-      return [...prev, status];
-    });
-  }, []);
-
-  const handleSizeFilterChange = useCallback((size: PlotArcSize) => {
-    setSelectedSizes((prev) => {
-      if (prev.includes(size)) {
-        return prev.filter((s) => s !== size);
-      }
-      return [...prev, size];
-    });
-  }, []);
-
-  const handleClearFilters = useCallback(() => {
-    setSelectedStatuses([]);
-    setSelectedSizes([]);
-  }, []);
-
-  const filteredAndSortedArcs = useMemo(
-    () =>
-      arcs
-        .filter((arc) => {
-          const hasStatusFilter = selectedStatuses.length > 0;
-          const hasSizeFilter = selectedSizes.length > 0;
-
-          let matchesFilters = true;
-
-          if (hasStatusFilter && hasSizeFilter) {
-            // Both filters active: arc must match at least one status AND at least one size
-            const matchesStatus = selectedStatuses.includes(arc.status);
-            const matchesSize = selectedSizes.includes(arc.size);
-            matchesFilters = matchesStatus && matchesSize;
-          } else if (hasStatusFilter) {
-            // Only status filter active: arc must match at least one status
-            matchesFilters = selectedStatuses.includes(arc.status);
-          } else if (hasSizeFilter) {
-            // Only size filter active: arc must match at least one size
-            matchesFilters = selectedSizes.includes(arc.size);
-          }
-
-          return matchesFilters;
-        })
-        .sort((a, b) => {
-          const statusPriorityA = getStatusPriority(a.status);
-          const statusPriorityB = getStatusPriority(b.status);
-
-          if (statusPriorityA !== statusPriorityB) {
-            return statusPriorityA - statusPriorityB;
-          }
-
-          return a.order - b.order;
-        }),
-    [arcs, selectedStatuses, selectedSizes]
-  );
-
-  const handlePlotTimelineClick = useCallback(
-    (bookId: string) => {
-      navigate({
-        to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
-        params: { dashboardId: bookId },
-      });
-    },
-    [navigate]
-  );
-
-  const handleArcClick = useCallback(
-    (arcId: string, bookId: string) => {
-      navigate({
-        to: "/dashboard/$dashboardId/tabs/plot/$plotId",
-        params: { dashboardId: bookId, plotId: arcId },
-      });
-    },
-    [navigate]
-  );
-
   return (
     <PlotView
       arcs={arcs}
-      characters={characters}
-      factions={factions}
-      items={items}
-      showCreateModal={showCreateModal}
+      filteredArcs={filteredArcs}
+      searchTerm={searchTerm}
       selectedStatuses={selectedStatuses}
       selectedSizes={selectedSizes}
-      filteredAndSortedArcs={filteredAndSortedArcs}
-      bookId={bookId}
-      onSetShowCreateModal={setShowCreateModal}
+      statusStats={statusStats}
+      sizeStats={sizeStats}
+      showCreateModal={showCreateModal}
+      isLoading={isLoading}
+      onSearchTermChange={handleSearchTermChange}
       onStatusFilterChange={handleStatusFilterChange}
       onSizeFilterChange={handleSizeFilterChange}
       onClearFilters={handleClearFilters}
-      onCreateArc={createArc}
-      onMoveArc={moveArc}
-      onReorderArcs={reorderArcs}
-      onPlotTimelineClick={handlePlotTimelineClick}
-      onArcClick={handleArcClick}
-      getSizeColor={getSizeColor}
-      getStatusColor={getStatusColor}
-      getVisibleEvents={getVisibleEvents}
+      onShowCreateModalChange={handleShowCreateModalChange}
+      onNavigateToArc={handleNavigateToArc}
+      onNavigateToTimeline={handleNavigateToTimeline}
+      onCreateArc={handleCreateArc}
     />
   );
 }

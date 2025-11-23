@@ -14,8 +14,8 @@ import {
 } from "@/lib/db/plot.service";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
-import { getSizeColor } from "../utils/get-size-color";
-import { getStatusColor } from "../utils/get-status-color";
+import { getSizeColor } from "../utils/formatters/get-size-color";
+import { getStatusColor } from "../utils/formatters/get-status-color";
 
 import { PlotArcDetailView } from "./view";
 

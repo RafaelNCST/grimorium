@@ -5,8 +5,8 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { getPlotArcsByBookId, reorderPlotArcs } from "@/lib/db/plot.service";
 import type { IPlotArc } from "@/types/plot-types";
 
-import { getSizeColor } from "../utils/get-size-color";
-import { getStatusColor } from "../utils/get-status-color";
+import { getSizeColor } from "../utils/formatters/get-size-color";
+import { getStatusColor } from "../utils/formatters/get-status-color";
 
 import { PlotTimelineView } from "./view";
 
