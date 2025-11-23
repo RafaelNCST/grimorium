@@ -103,6 +103,10 @@ export interface SimpleGridSelectOption<T = string> {
    * Border color for hover and active states (e.g., "blue-500/30")
    */
   borderColor: string;
+  /**
+   * Whether this option is disabled
+   */
+  disabled?: boolean;
 }
 
 interface FormSimpleGridProps<T = string> {
@@ -228,15 +232,18 @@ export function FormSimpleGrid<T extends string = string>({
         {options.map((option) => {
           const Icon = option.icon;
           const selected = isSelected(option.value);
+          const isDisabled = option.disabled === true;
 
           return (
             <button
               key={String(option.value)}
               type="button"
-              onClick={() => handleClick(option.value)}
+              onClick={() => !isDisabled && handleClick(option.value)}
+              disabled={isDisabled}
               className={cn(
                 "relative rounded-lg border-2 p-4 transition-all flex flex-col items-center justify-center gap-2 min-h-[100px]",
-                !selected && "bg-card text-foreground border-border"
+                !selected && "bg-card text-foreground border-border",
+                isDisabled && "opacity-50 cursor-not-allowed"
               )}
               style={
                 selected
@@ -248,13 +255,13 @@ export function FormSimpleGrid<T extends string = string>({
                   : undefined
               }
               onMouseEnter={(e) => {
-                if (!selected) {
+                if (!selected && !isDisabled) {
                   e.currentTarget.style.backgroundColor = getTailwindColor(option.backgroundColor);
                   e.currentTarget.style.borderColor = getTailwindColor(option.borderColor);
                 }
               }}
               onMouseLeave={(e) => {
-                if (!selected) {
+                if (!selected && !isDisabled) {
                   e.currentTarget.style.backgroundColor = '';
                   e.currentTarget.style.borderColor = '';
                 }

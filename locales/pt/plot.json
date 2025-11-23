@@ -71,6 +71,8 @@
     "name": "Nome",
     "summary": "Resumo",
     "description": "Resumo",
+    "arc_summary": "Resumo do Arco",
+    "arc_focus": "Foco do Arco",
     "status": "Status",
     "size": "Tamanho",
     "focus": "Foco",

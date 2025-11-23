@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -85,6 +84,20 @@ function SortableArcCard({
 
   const isCurrentArc = arc.status === "atual";
 
+  // Get icon color based on status
+  const getStatusIconColor = (status: PlotArcStatus) => {
+    switch (status) {
+      case "finalizado":
+        return "text-emerald-500";
+      case "atual":
+        return "text-blue-500";
+      case "planejamento":
+        return "text-amber-500";
+      default:
+        return "text-muted-foreground";
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -113,7 +126,7 @@ function SortableArcCard({
           <CardTitle className="flex items-start gap-2 text-lg">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                {StatusIcon && <StatusIcon className="w-5 h-5 flex-shrink-0" />}
+                {StatusIcon && <StatusIcon className={`w-5 h-5 flex-shrink-0 ${getStatusIconColor(arc.status)}`} />}
                 <span className="line-clamp-2">{arc.name}</span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -135,12 +148,25 @@ function SortableArcCard({
               </div>
             </div>
           </CardTitle>
-          <CardDescription className="line-clamp-3">
-            {arc.description}
-          </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
+          {/* Summary */}
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">
+              {t("fields.arc_summary")}
+            </p>
+            <p className="text-sm line-clamp-3">{arc.description}</p>
+          </div>
+
+          {/* Focus */}
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">
+              {t("fields.arc_focus")}
+            </p>
+            <p className="text-sm line-clamp-2">{arc.focus}</p>
+          </div>
+
           {/* Progress */}
           <div>
             <div className="flex justify-between items-center mb-2">
@@ -166,14 +192,6 @@ function SortableArcCard({
               </span>
             </div>
           )}
-
-          {/* Focus */}
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">
-              {t("detail.focus")}:
-            </p>
-            <p className="text-sm line-clamp-2">{arc.focus}</p>
-          </div>
         </CardContent>
       </Card>
     </div>
@@ -271,12 +289,17 @@ export function PlotTimelineView({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {ARC_STATUSES_CONSTANT.map((status) => {
                   const Icon = status.icon;
+                  const iconColor = status.value === "finalizado"
+                    ? "text-emerald-500"
+                    : status.value === "atual"
+                      ? "text-blue-500"
+                      : "text-amber-500";
                   return (
                     <div key={status.value} className="flex items-center gap-3">
                       <div
-                        className={`p-2 rounded-lg ${status.color} flex items-center justify-center`}
+                        className="p-2 rounded-lg bg-card flex items-center justify-center"
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon className={`w-5 h-5 ${iconColor}`} />
                       </div>
                       <div>
                         <p className="text-sm font-medium">

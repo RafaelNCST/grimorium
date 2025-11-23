@@ -71,6 +71,8 @@
     "name": "Name",
     "summary": "Summary",
     "description": "Summary",
+    "arc_summary": "Arc Summary",
+    "arc_focus": "Arc Focus",
     "status": "Status",
     "size": "Size",
     "focus": "Focus",
