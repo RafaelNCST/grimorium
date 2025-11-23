@@ -16,6 +16,7 @@
     "arc_focus_placeholder": "Protagonist development and discovery of their origins",
     "event_chain": "Event Chain",
     "add_event": "Add Event",
+    "edit_event": "Edit Event",
     "event_name": "Event Name",
     "event_name_placeholder": "Meeting with the mentor",
     "event_description": "Event Description",

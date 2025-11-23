@@ -17,14 +17,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, Edit2, Trash2, X, Check } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import type { IPlotEvent } from "@/types/plot-types";
+
+import { EventModal } from "./event-modal";
 
 interface PropsEventChainEditor {
   events: IPlotEvent[];
@@ -115,10 +115,8 @@ function SortableEvent({ event, onEdit, onDelete }: PropsSortableEvent) {
 
 export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
   const { t } = useTranslation("create-plot-arc");
-  const [isAddingEvent, setIsAddingEvent] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);
-  const [newEventName, setNewEventName] = useState("");
-  const [newEventDescription, setNewEventDescription] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -143,41 +141,41 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
     }
   };
 
-  const handleAddEvent = () => {
-    if (!newEventName.trim() || !newEventDescription.trim()) return;
-
-    const newEvent: IPlotEvent = {
-      id: crypto.randomUUID(),
-      name: newEventName.trim(),
-      description: newEventDescription.trim(),
-      completed: false,
-      order: events.length + 1,
-    };
-
-    onChange([...events, newEvent]);
-    setNewEventName("");
-    setNewEventDescription("");
-    setIsAddingEvent(false);
+  const handleOpenAddModal = () => {
+    setEditingEvent(null);
+    setIsModalOpen(true);
   };
 
-  const handleEditEvent = () => {
-    if (!editingEvent || !newEventName.trim() || !newEventDescription.trim())
-      return;
+  const handleOpenEditModal = (event: IPlotEvent) => {
+    setEditingEvent(event);
+    setIsModalOpen(true);
+  };
 
-    const updatedEvents = events.map((e) =>
-      e.id === editingEvent.id
-        ? {
-            ...e,
-            name: newEventName.trim(),
-            description: newEventDescription.trim(),
-          }
-        : e
-    );
-
-    onChange(updatedEvents);
-    setNewEventName("");
-    setNewEventDescription("");
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
     setEditingEvent(null);
+  };
+
+  const handleConfirmModal = (name: string, description: string) => {
+    if (editingEvent) {
+      // Edit existing event
+      const updatedEvents = events.map((e) =>
+        e.id === editingEvent.id
+          ? { ...e, name, description }
+          : e
+      );
+      onChange(updatedEvents);
+    } else {
+      // Add new event
+      const newEvent: IPlotEvent = {
+        id: crypto.randomUUID(),
+        name,
+        description,
+        completed: false,
+        order: events.length + 1,
+      };
+      onChange([...events, newEvent]);
+    }
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -187,101 +185,22 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
     onChange(newEvents);
   };
 
-  const handleStartEdit = (event: IPlotEvent) => {
-    setEditingEvent(event);
-    setNewEventName(event.name);
-    setNewEventDescription(event.description);
-    setIsAddingEvent(false);
-  };
-
-  const handleCancelEdit = () => {
-    setNewEventName("");
-    setNewEventDescription("");
-    setIsAddingEvent(false);
-    setEditingEvent(null);
-  };
-
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-primary">
           {t("modal.event_chain")} <span className="text-destructive">*</span>
         </Label>
-        {!isAddingEvent && !editingEvent && (
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsAddingEvent(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {t("modal.add_event")}
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="magical"
+          size="sm"
+          onClick={handleOpenAddModal}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {t("modal.add_event")}
+        </Button>
       </div>
-
-      {/* Add/Edit Event Form */}
-      {(isAddingEvent || editingEvent) && (
-        <div className="p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
-          <div className="space-y-2">
-            <Label htmlFor="event-name" className="text-sm">
-              {t("modal.event_name")} *
-            </Label>
-            <Input
-              id="event-name"
-              value={newEventName}
-              onChange={(e) => setNewEventName(e.target.value)}
-              placeholder={t("modal.event_name_placeholder")}
-              maxLength={100}
-            />
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{newEventName.length}/100</span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="event-description" className="text-sm">
-              {t("modal.event_description")} *
-            </Label>
-            <Textarea
-              id="event-description"
-              value={newEventDescription}
-              onChange={(e) => setNewEventDescription(e.target.value)}
-              placeholder={t("modal.event_description_placeholder")}
-              rows={3}
-              maxLength={500}
-              className="resize-none"
-            />
-            <div className="flex justify-end text-xs text-muted-foreground">
-              <span>{newEventDescription.length}/500</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={handleCancelEdit}
-              className="flex-1"
-            >
-              <X className="w-4 h-4 mr-2" />
-              {t("button.cancel")}
-            </Button>
-            <Button
-              type="button"
-              variant="magical"
-              size="sm"
-              onClick={editingEvent ? handleEditEvent : handleAddEvent}
-              disabled={!newEventName.trim() || !newEventDescription.trim()}
-              className="flex-1"
-            >
-              <Check className="w-4 h-4 mr-2" />
-              {editingEvent ? t("button.save") : t("button.add")}
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Events List */}
       {events.length > 0 && (
@@ -299,7 +218,7 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
                 <SortableEvent
                   key={event.id}
                   event={event}
-                  onEdit={handleStartEdit}
+                  onEdit={handleOpenEditModal}
                   onDelete={handleDeleteEvent}
                 />
               ))}
@@ -308,11 +227,19 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
         </DndContext>
       )}
 
-      {events.length === 0 && !isAddingEvent && (
+      {events.length === 0 && (
         <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
           <p className="text-sm">{t("modal.no_events")}</p>
         </div>
       )}
+
+      {/* Event Modal */}
+      <EventModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmModal}
+        event={editingEvent}
+      />
     </div>
   );
 }
