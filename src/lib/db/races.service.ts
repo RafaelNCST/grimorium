@@ -178,9 +178,9 @@ export async function updateRace(
   const db = await getDB();
   const now = Date.now();
 
-  // Get current race to preserve book_id
+  // Get current race to preserve existing data
   const current = await db.select<DBRace[]>(
-    "SELECT book_id FROM races WHERE id = $1",
+    "SELECT * FROM races WHERE id = $1",
     [id]
   );
 
@@ -188,14 +188,14 @@ export async function updateRace(
     throw new Error("Race not found");
   }
 
-  // Build a full race object from updates
+  // Convert current DB race to IRace to preserve existing values
+  const currentRace = dbRaceToRace(current[0]);
+
+  // Merge updates with current race, preserving existing values
   const fullRace: IRace = {
-    id,
-    name: updates.name || "",
-    domain: updates.domain || [],
-    summary: updates.summary || "",
-    speciesId: "",
+    ...currentRace,
     ...updates,
+    id, // Ensure ID is preserved
   };
 
   const dbRace = raceToDBRace(current[0].book_id, fullRace);

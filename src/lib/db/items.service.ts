@@ -154,8 +154,9 @@ export async function updateItem(
   const db = await getDB();
   const now = Date.now();
 
+  // Get current item to preserve existing data
   const current = await db.select<DBItem[]>(
-    "SELECT book_id FROM items WHERE id = $1",
+    "SELECT * FROM items WHERE id = $1",
     [id]
   );
 
@@ -163,10 +164,14 @@ export async function updateItem(
     throw new Error("Item not found");
   }
 
+  // Convert current DB item to IItem to preserve existing values
+  const currentItem = dbItemToItem(current[0]);
+
+  // Merge updates with current item, preserving existing values
   const fullItem: IItem = {
-    id,
-    name: updates.name || "",
+    ...currentItem,
     ...updates,
+    id, // Ensure ID is preserved
   };
 
   const dbItem = itemToDBItem(current[0].book_id, fullItem);

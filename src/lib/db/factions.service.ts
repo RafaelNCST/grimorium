@@ -291,9 +291,9 @@ export async function updateFaction(
 ): Promise<void> {
   const db = await getDB();
 
-  // Get current faction to preserve book_id
+  // Get current faction to preserve existing data
   const current = await db.select<DBFaction[]>(
-    "SELECT book_id FROM factions WHERE id = $1",
+    "SELECT * FROM factions WHERE id = $1",
     [id]
   );
 
@@ -301,16 +301,15 @@ export async function updateFaction(
     throw new Error("Faction not found");
   }
 
-  // Build a full faction object from updates
+  // Convert current DB faction to IFaction to preserve existing values
+  const currentFaction = dbFactionToFaction(current[0]);
+
+  // Merge updates with current faction, preserving existing values
   const fullFaction: IFaction = {
-    id,
-    bookId: current[0].book_id,
-    name: updates.name || "",
-    summary: updates.summary || "",
-    status: updates.status || "active",
-    factionType: updates.factionType || "commercial",
-    createdAt: new Date().toISOString(),
+    ...currentFaction,
     ...updates,
+    id, // Ensure ID is preserved
+    bookId: current[0].book_id, // Ensure bookId is preserved
   };
 
   const dbFaction = factionToDBFaction(current[0].book_id, fullFaction);
