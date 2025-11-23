@@ -9,7 +9,7 @@ Classificação dos 5 principais tipos de botões utilizados no projeto.
 ## 1. Magical Purple
 **Nome:** `variant="magical"`
 **Uso:** Botões de ação principal (Salvar, Criar, Confirmar)
-**Descrição visual:** Gradiente roxo brilhante com efeito de brilho mágico ao hover
+**Descrição visual:** Gradiente roxo brilhante com efeito de brilho mágico ao hover e animação de glow pulsante (animate-glow incluso por padrão)
 
 ---
 

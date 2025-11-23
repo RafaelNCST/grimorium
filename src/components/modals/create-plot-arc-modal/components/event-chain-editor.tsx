@@ -273,7 +273,7 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
               size="sm"
               onClick={editingEvent ? handleEditEvent : handleAddEvent}
               disabled={!newEventName.trim() || !newEventDescription.trim()}
-              className="flex-1 animate-glow"
+              className="flex-1"
             >
               <Check className="w-4 h-4 mr-2" />
               {editingEvent ? t("button.save") : t("button.add")}
