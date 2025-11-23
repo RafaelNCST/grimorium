@@ -89,6 +89,12 @@ export interface IHierarchyTitle {
   characterIds: string[];
 }
 
+export interface IFactionUIState {
+  advancedSectionOpen?: boolean;
+  sectionVisibility?: Record<string, boolean>;
+  activeDiplomacyTab?: DiplomaticStatus;
+}
+
 export interface IFaction {
   id: string;
   bookId: string;
@@ -151,6 +157,9 @@ export interface IFaction {
 
   // Special sections - Hierarchy
   hierarchy?: IHierarchyTitle[];
+
+  // UI State (for persisting UI preferences)
+  uiState?: IFactionUIState;
 
   createdAt: string;
 }

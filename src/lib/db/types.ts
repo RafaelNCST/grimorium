@@ -277,6 +277,14 @@ export interface DBFaction {
   narrative_importance?: string;
   inspirations?: string;
 
+  // Special sections (JSON strings)
+  timeline?: string; // JSON array of IFactionTimelineEra
+  diplomatic_relations?: string; // JSON array of IDiplomaticRelation
+  hierarchy?: string; // JSON array of IHierarchyTitle
+
+  // UI State (JSON object)
+  ui_state?: string; // JSON object for UI state persistence
+
   // Metadata
   created_at: number;
 }

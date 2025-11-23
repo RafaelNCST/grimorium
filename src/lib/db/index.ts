@@ -1114,6 +1114,46 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add timeline column to factions table (JSON array of IFactionTimelineEra)
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN timeline TEXT"
+      );
+      console.log("[db] Added timeline column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add diplomatic_relations column to factions table (JSON array of IDiplomaticRelation)
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN diplomatic_relations TEXT"
+      );
+      console.log("[db] Added diplomatic_relations column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add hierarchy column to factions table (JSON array of IHierarchyTitle)
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN hierarchy TEXT"
+      );
+      console.log("[db] Added hierarchy column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add ui_state column to factions table (JSON object for UI state persistence)
+    try {
+      await database.execute(
+        "ALTER TABLE factions ADD COLUMN ui_state TEXT"
+      );
+      console.log("[db] Added ui_state column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Add territory columns to factions table
     try {
       await database.execute(

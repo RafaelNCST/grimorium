@@ -13,6 +13,7 @@ import {
   createFactionVersion,
   deleteFactionVersion,
   updateFactionVersion,
+  updateFactionVersionData,
 } from "@/lib/db/factions.service";
 import { FactionSchema } from "@/lib/validation/faction-schema";
 import { useCharactersStore } from "@/stores/characters-store";
@@ -23,6 +24,8 @@ import {
   type IFaction,
   type IFactionFormData,
   type IFactionVersion,
+  type IFactionUIState,
+  type DiplomaticStatus,
 } from "@/types/faction-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
@@ -65,7 +68,11 @@ export function FactionDetail() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [uiState, setUiState] = useState<IFactionUIState>({
+    advancedSectionOpen: false,
+    sectionVisibility: { timeline: true, diplomacy: true, hierarchy: true },
+    activeDiplomacyTab: "neutral",
+  });
   const [versions, setVersions] = useState<IFactionVersion[]>([]);
   const [selectedVersion, setSelectedVersion] =
     useState<IFactionVersion | null>(null);
@@ -157,6 +164,15 @@ export function FactionDetail() {
           setFaction(factionFromDB);
           setEditData(factionFromDB);
           setImagePreview(factionFromDB.image || "");
+
+          // Load UI state from database
+          if (factionFromDB.uiState) {
+            setUiState({
+              advancedSectionOpen: factionFromDB.uiState.advancedSectionOpen ?? false,
+              sectionVisibility: factionFromDB.uiState.sectionVisibility ?? { timeline: true, diplomacy: true, hierarchy: true },
+              activeDiplomacyTab: factionFromDB.uiState.activeDiplomacyTab ?? "neutral",
+            });
+          }
 
           // Load versions from database
           const versionsFromDB = await getFactionVersions(factionId);
@@ -275,16 +291,24 @@ export function FactionDetail() {
     async (versionData: {
       name: string;
       description: string;
-      factionData: IFactionFormData;
+      entityData: IFactionFormData;
     }) => {
       try {
+        // Convert IFactionFormData to IFaction by adding required fields
+        const completeFactionData: IFaction = {
+          ...versionData.entityData,
+          id: `faction-version-data-${Date.now()}`,
+          bookId: dashboardId,
+          createdAt: new Date().toISOString(),
+        };
+
         const newVersion: IFactionVersion = {
           id: `version-${Date.now()}`,
           name: versionData.name,
           description: versionData.description,
           createdAt: new Date().toISOString(),
           isMain: false,
-          factionData: versionData.factionData as unknown as IFaction,
+          factionData: completeFactionData,
         };
 
         // Salvar no banco de dados
@@ -296,7 +320,7 @@ export function FactionDetail() {
         console.error("Error creating faction version:", error);
       }
     },
-    [factionId]
+    [factionId, dashboardId]
   );
 
   const handleVersionDelete = useCallback(
@@ -392,8 +416,13 @@ export function FactionDetail() {
     }
 
     try {
-      // Atualizar no store (que também salva no DB)
-      await updateFactionInStore(factionId, updatedFaction);
+      // Só atualizar a facção principal no DB se estiver na versão principal
+      if (selectedVersion?.isMain) {
+        await updateFactionInStore(factionId, updatedFaction);
+      } else if (selectedVersion?.id) {
+        // Para versões alternativas, atualizar apenas os dados da versão no DB
+        await updateFactionVersionData(selectedVersion.id, updatedFaction);
+      }
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving faction:", error);
@@ -417,20 +446,27 @@ export function FactionDetail() {
 
       if (!versionToDeleteObj) return;
 
-      const updatedVersions = versions.filter(
-        (v) => v.id !== selectedVersion.id
-      );
+      try {
+        // Deletar do banco de dados
+        await deleteFactionVersion(selectedVersion.id);
 
-      // Switch to main version after deleting
-      const mainVersion = updatedVersions.find((v) => v.isMain);
-      if (mainVersion) {
-        setSelectedVersion(mainVersion);
-        setFaction(mainVersion.factionData);
-        setEditData(mainVersion.factionData);
-        setImagePreview(mainVersion.factionData.image || "");
+        const updatedVersions = versions.filter(
+          (v) => v.id !== selectedVersion.id
+        );
+
+        // Switch to main version after deleting
+        const mainVersion = updatedVersions.find((v) => v.isMain);
+        if (mainVersion) {
+          setSelectedVersion(mainVersion);
+          setFaction(mainVersion.factionData);
+          setEditData(mainVersion.factionData);
+          setImagePreview(mainVersion.factionData.image || "");
+        }
+
+        setVersions(updatedVersions);
+      } catch (error) {
+        console.error("Error deleting version:", error);
       }
-
-      setVersions(updatedVersions);
     } else {
       // Delete entire faction (main version)
       try {
@@ -538,9 +574,20 @@ export function FactionDetail() {
     []
   );
 
-  const handleAdvancedSectionToggle = useCallback(() => {
-    setAdvancedSectionOpen((prev) => !prev);
-  }, []);
+  const handleAdvancedSectionToggle = useCallback(async () => {
+    const newUiState = {
+      ...uiState,
+      advancedSectionOpen: !uiState.advancedSectionOpen,
+    };
+    setUiState(newUiState);
+
+    // Persist UI state to database
+    try {
+      await updateFactionInStore(factionId, { uiState: newUiState });
+    } catch (error) {
+      console.error("Error saving UI state:", error);
+    }
+  }, [uiState, factionId, updateFactionInStore]);
 
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
     setFieldVisibility((prev) => ({
@@ -548,6 +595,39 @@ export function FactionDetail() {
       [fieldName]: prev[fieldName] === false ? true : false,
     }));
   }, []);
+
+  const handleSectionVisibilityChange = useCallback(async (sectionName: string, isVisible: boolean) => {
+    const newUiState = {
+      ...uiState,
+      sectionVisibility: {
+        ...uiState.sectionVisibility,
+        [sectionName]: isVisible,
+      },
+    };
+    setUiState(newUiState);
+
+    // Persist UI state to database
+    try {
+      await updateFactionInStore(factionId, { uiState: newUiState });
+    } catch (error) {
+      console.error("Error saving UI state:", error);
+    }
+  }, [uiState, factionId, updateFactionInStore]);
+
+  const handleActiveDiplomacyTabChange = useCallback(async (tab: DiplomaticStatus) => {
+    const newUiState = {
+      ...uiState,
+      activeDiplomacyTab: tab,
+    };
+    setUiState(newUiState);
+
+    // Persist UI state to database
+    try {
+      await updateFactionInStore(factionId, { uiState: newUiState });
+    } catch (error) {
+      console.error("Error saving UI state:", error);
+    }
+  }, [uiState, factionId, updateFactionInStore]);
 
   const handleFactionSelect = useCallback(
     (newFactionId: string) => {
@@ -610,7 +690,9 @@ export function FactionDetail() {
       showDeleteModal={showDeleteModal}
       isNavigationSidebarOpen={isNavigationOpen}
       imagePreview={imagePreview}
-      advancedSectionOpen={advancedSectionOpen}
+      advancedSectionOpen={uiState.advancedSectionOpen ?? false}
+      sectionVisibility={uiState.sectionVisibility ?? { timeline: true, diplomacy: true, hierarchy: true }}
+      activeDiplomacyTab={uiState.activeDiplomacyTab ?? "neutral"}
       mockRaces={races}
       mockCharacters={characters}
       mockFactions={factions}
@@ -642,6 +724,8 @@ export function FactionDetail() {
       onImageFileChange={handleImageFileChange}
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
       onFieldVisibilityToggle={handleFieldVisibilityToggle}
+      onSectionVisibilityChange={handleSectionVisibilityChange}
+      onActiveDiplomacyTabChange={handleActiveDiplomacyTabChange}
       onVersionChange={handleVersionChange}
       onVersionCreate={handleVersionCreate}
       onVersionDelete={handleVersionDelete}

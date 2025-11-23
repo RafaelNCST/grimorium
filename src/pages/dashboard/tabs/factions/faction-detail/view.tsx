@@ -44,6 +44,7 @@ import {
   type IFactionVersion,
   type IFactionFormData,
   type IFaction,
+  type DiplomaticStatus,
 } from "@/types/faction-types";
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
@@ -78,6 +79,8 @@ interface FactionDetailViewProps {
   TypeIcon: React.ComponentType<{ className?: string }>;
   fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
+  sectionVisibility: Record<string, boolean>;
+  activeDiplomacyTab: DiplomaticStatus;
   bookId: string;
   errors: Record<string, string>;
   validateField: (field: string, value: unknown) => void;
@@ -97,7 +100,7 @@ interface FactionDetailViewProps {
   onVersionCreate: (versionData: {
     name: string;
     description: string;
-    factionData: IFactionFormData;
+    entityData: IFactionFormData;
   }) => void;
   onVersionDelete: (versionId: string) => void;
   onVersionUpdate: (
@@ -109,6 +112,8 @@ interface FactionDetailViewProps {
   onEditDataChange: (field: string, value: unknown) => void;
   onFieldVisibilityToggle: (field: string) => void;
   onAdvancedSectionToggle: () => void;
+  onSectionVisibilityChange: (sectionName: string, isVisible: boolean) => void;
+  onActiveDiplomacyTabChange: (tab: DiplomaticStatus) => void;
   hasChanges: boolean;
 }
 
@@ -131,6 +136,8 @@ export function FactionDetailView({
   TypeIcon,
   fieldVisibility,
   advancedSectionOpen,
+  sectionVisibility,
+  activeDiplomacyTab,
   bookId,
   errors,
   validateField,
@@ -152,25 +159,11 @@ export function FactionDetailView({
   onEditDataChange,
   onFieldVisibilityToggle,
   onAdvancedSectionToggle,
+  onSectionVisibilityChange,
+  onActiveDiplomacyTabChange,
   hasChanges,
 }: FactionDetailViewProps) {
   const { t } = useTranslation(["faction-detail", "create-faction"]);
-
-  // Section visibility state
-  const [sectionVisibility, setSectionVisibility] = React.useState<
-    Record<string, boolean>
-  >({
-    timeline: true,
-    diplomacy: true,
-    hierarchy: true,
-  });
-
-  const handleSectionVisibilityToggle = (sectionName: string) => {
-    setSectionVisibility((prev) => ({
-      ...prev,
-      [sectionName]: !prev[sectionName],
-    }));
-  };
 
   // ==================
   // BASIC FIELDS
@@ -1154,7 +1147,7 @@ export function FactionDetailView({
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.timeline !== false,
-      onVisibilityToggle: () => handleSectionVisibilityToggle("timeline"),
+      onVisibilityToggle: () => onSectionVisibilityChange("timeline", !sectionVisibility.timeline),
     },
     {
       id: "diplomacy",
@@ -1168,12 +1161,14 @@ export function FactionDetailView({
           onRelationsChange={(relations) =>
             onEditDataChange("diplomaticRelations", relations)
           }
+          activeTab={activeDiplomacyTab}
+          onActiveTabChange={onActiveDiplomacyTabChange}
         />
       ),
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.diplomacy !== false,
-      onVisibilityToggle: () => handleSectionVisibilityToggle("diplomacy"),
+      onVisibilityToggle: () => onSectionVisibilityChange("diplomacy", !sectionVisibility.diplomacy),
     },
     {
       id: "hierarchy",
@@ -1191,7 +1186,7 @@ export function FactionDetailView({
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.hierarchy !== false,
-      onVisibilityToggle: () => handleSectionVisibilityToggle("hierarchy"),
+      onVisibilityToggle: () => onSectionVisibilityChange("hierarchy", !sectionVisibility.hierarchy),
     },
   ];
 

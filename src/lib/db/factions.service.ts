@@ -78,6 +78,18 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
     narrative_importance: faction.narrativeImportance,
     inspirations: faction.inspirations,
 
+    // Special sections
+    timeline: faction.timeline ? JSON.stringify(faction.timeline) : undefined,
+    diplomatic_relations: faction.diplomaticRelations
+      ? JSON.stringify(faction.diplomaticRelations)
+      : undefined,
+    hierarchy: faction.hierarchy
+      ? JSON.stringify(faction.hierarchy)
+      : undefined,
+
+    // UI State
+    ui_state: faction.uiState ? JSON.stringify(faction.uiState) : undefined,
+
     // Metadata
     created_at: faction.createdAt
       ? new Date(faction.createdAt).getTime()
@@ -162,6 +174,22 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     narrativeImportance: dbFaction.narrative_importance,
     inspirations: dbFaction.inspirations,
 
+    // Special sections
+    timeline: dbFaction.timeline
+      ? JSON.parse(dbFaction.timeline)
+      : undefined,
+    diplomaticRelations: dbFaction.diplomatic_relations
+      ? JSON.parse(dbFaction.diplomatic_relations)
+      : undefined,
+    hierarchy: dbFaction.hierarchy
+      ? JSON.parse(dbFaction.hierarchy)
+      : undefined,
+
+    // UI State
+    uiState: dbFaction.ui_state
+      ? JSON.parse(dbFaction.ui_state)
+      : undefined,
+
     // Metadata
     createdAt: new Date(dbFaction.created_at).toISOString(),
   };
@@ -204,11 +232,12 @@ export async function createFaction(
       languages_used, uniform_and_aesthetics, races,
       foundation_date, foundation_history_summary, founders, chronology,
       organization_objectives, narrative_importance, inspirations,
+      timeline, diplomatic_relations, hierarchy, ui_state,
       created_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
       $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,
-      $28, $29, $30, $31, $32, $33, $34, $35, $36, $37
+      $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41
     )`,
     [
       dbFaction.id,
@@ -247,6 +276,10 @@ export async function createFaction(
       dbFaction.organization_objectives,
       dbFaction.narrative_importance,
       dbFaction.inspirations,
+      dbFaction.timeline,
+      dbFaction.diplomatic_relations,
+      dbFaction.hierarchy,
+      dbFaction.ui_state,
       dbFaction.created_at,
     ]
   );
@@ -293,8 +326,9 @@ export async function updateFaction(
       faction_motto = $22, traditions_and_rituals = $23, beliefs_and_values = $24,
       languages_used = $25, uniform_and_aesthetics = $26, races = $27,
       foundation_date = $28, foundation_history_summary = $29, founders = $30, chronology = $31,
-      organization_objectives = $32, narrative_importance = $33, inspirations = $34
-    WHERE id = $35`,
+      organization_objectives = $32, narrative_importance = $33, inspirations = $34,
+      timeline = $35, diplomatic_relations = $36, hierarchy = $37, ui_state = $38
+    WHERE id = $39`,
     [
       dbFaction.name,
       dbFaction.summary,
@@ -330,6 +364,10 @@ export async function updateFaction(
       dbFaction.organization_objectives,
       dbFaction.narrative_importance,
       dbFaction.inspirations,
+      dbFaction.timeline,
+      dbFaction.diplomatic_relations,
+      dbFaction.hierarchy,
+      dbFaction.ui_state,
       id,
     ]
   );
@@ -396,5 +434,16 @@ export async function updateFactionVersion(
   await db.execute(
     "UPDATE faction_versions SET name = $1, description = $2 WHERE id = $3",
     [name, description, versionId]
+  );
+}
+
+export async function updateFactionVersionData(
+  versionId: string,
+  factionData: IFaction
+): Promise<void> {
+  const db = await getDB();
+  await db.execute(
+    "UPDATE faction_versions SET faction_data = $1 WHERE id = $2",
+    [JSON.stringify(factionData), versionId]
   );
 }

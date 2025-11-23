@@ -20,6 +20,8 @@ interface DiplomacySectionProps {
   availableFactions: Array<{ id: string; name: string; image?: string }>;
   isEditing: boolean;
   onRelationsChange: (relations: IDiplomaticRelation[]) => void;
+  activeTab: DiplomaticStatus;
+  onActiveTabChange: (tab: DiplomaticStatus) => void;
 }
 
 export function DiplomacySection({
@@ -28,10 +30,11 @@ export function DiplomacySection({
   availableFactions,
   isEditing,
   onRelationsChange,
+  activeTab,
+  onActiveTabChange,
 }: DiplomacySectionProps) {
   const { t } = useTranslation("faction-detail");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<DiplomaticStatus>("neutral");
 
   // Filter out current faction from available factions
   const otherFactions = availableFactions.filter(
@@ -151,7 +154,7 @@ export function DiplomacySection({
               return (
                 <button
                   key={status.value}
-                  onClick={() => setActiveTab(status.value as DiplomaticStatus)}
+                  onClick={() => onActiveTabChange(status.value as DiplomaticStatus)}
                   className={`
                     flex items-center justify-center gap-1 sm:gap-2 px-2 py-2
                     transition-colors duration-200
