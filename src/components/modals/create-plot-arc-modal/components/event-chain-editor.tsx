@@ -189,7 +189,7 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium text-primary">
-          {t("modal.event_chain")} <span className="text-destructive">*</span>
+          {t("modal.event_chain")}
         </Label>
         <Button
           type="button"

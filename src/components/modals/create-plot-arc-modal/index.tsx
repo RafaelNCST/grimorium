@@ -30,7 +30,6 @@ export function CreatePlotArcModal({
     "status",
     "size",
     "focus",
-    "events",
   ]);
 
   const hasCurrentArc = useMemo(
@@ -39,14 +38,13 @@ export function CreatePlotArcModal({
   );
 
   const isValid = useMemo(() => {
-    const [name, description, status, size, focus, events] = watchedFields;
+    const [name, description, status, size, focus] = watchedFields;
     return Boolean(
       name?.trim() &&
         description?.trim() &&
         status &&
         size &&
-        focus?.trim() &&
-        events?.length > 0
+        focus?.trim()
     );
   }, [watchedFields]);
 

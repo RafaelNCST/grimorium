@@ -18,7 +18,7 @@ export const plotArcFormSchema = z.object({
     .string()
     .min(1, "validation.focus_required")
     .max(500, "validation.focus_max_length"),
-  events: z.array(z.custom<IPlotEvent>()).min(1, "validation.events_required"),
+  events: z.array(z.custom<IPlotEvent>()).optional().default([]),
 
   // Advanced - Relationships
   importantCharacters: z.array(z.string()).optional(),
