@@ -7,33 +7,32 @@ import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVis
 import {
   DisplayText,
   DisplayTextarea,
+  DisplayStringList,
+  DisplayEntityList,
+  DisplaySelectGrid,
+  type DisplayEntityItem,
 } from "@/components/displays";
 import { FactionNavigationSidebar } from "@/components/faction-navigation-sidebar";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormListInput } from "@/components/forms/FormListInput";
+import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateFactionModal } from "@/components/modals/create-faction-modal";
 import { FactionTypePicker } from "@/components/modals/create-faction-modal/components/faction-type-picker";
 import { PowerSlider } from "@/components/modals/create-faction-modal/components/power-slider";
 import { StatusPicker } from "@/components/modals/create-faction-modal/components/status-picker";
-import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
-import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
+import { FACTION_INFLUENCE_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-influence";
+import { FACTION_REPUTATION_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-reputation";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
-import { Badge } from "@/components/ui/badge";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { Button } from "@/components/ui/button";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -73,12 +72,8 @@ interface FactionDetailViewProps {
   mockItems: Array<{ id: string; name: string; image?: string }>;
   statuses: typeof FACTION_STATUS_CONSTANT;
   types: typeof FACTION_TYPES_CONSTANT;
-  influences: typeof FACTION_INFLUENCE_CONSTANT;
-  reputations: typeof FACTION_REPUTATION_CONSTANT;
   currentStatus: (typeof FACTION_STATUS_CONSTANT)[0] | undefined;
   currentType: (typeof FACTION_TYPES_CONSTANT)[0] | undefined;
-  currentInfluence: (typeof FACTION_INFLUENCE_CONSTANT)[0] | undefined;
-  currentReputation: (typeof FACTION_REPUTATION_CONSTANT)[0] | undefined;
   StatusIcon: React.ComponentType<{ className?: string }>;
   TypeIcon: React.ComponentType<{ className?: string }>;
   fieldVisibility: IFieldVisibility;
@@ -130,12 +125,8 @@ export function FactionDetailView({
   mockRaces,
   mockFactions,
   mockItems,
-  influences,
-  reputations,
   currentStatus,
   currentType,
-  currentInfluence,
-  currentReputation,
   StatusIcon,
   TypeIcon,
   fieldVisibility,
@@ -363,6 +354,60 @@ export function FactionDetailView({
           )}
         </FieldWithVisibilityToggle>
 
+        {/* Rules and Laws */}
+        <FieldWithVisibilityToggle
+          fieldName="rulesAndLaws"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.rulesAndLaws || []}
+              onChange={(value) => onEditDataChange("rulesAndLaws", value)}
+              label={t("faction-detail:fields.rules_and_laws")}
+              placeholder={t("create-faction:modal.rules_and_laws_placeholder")}
+              buttonText={t("create-faction:modal.add_rule")}
+              maxLength={200}
+              inputSize="large"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.rules_and_laws")}
+              items={faction.rulesAndLaws}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Main Resources */}
+        <FieldWithVisibilityToggle
+          fieldName="mainResources"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.mainResources || []}
+              onChange={(value) => onEditDataChange("mainResources", value)}
+              label={t("faction-detail:fields.main_resources")}
+              placeholder={t("create-faction:modal.main_resources_placeholder")}
+              buttonText={t("create-faction:modal.add_resource")}
+              maxLength={50}
+              inputSize="small"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.main_resources")}
+              items={faction.mainResources}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
         {/* Economy */}
         <FieldWithVisibilityToggle
           fieldName="economy"
@@ -418,6 +463,148 @@ export function FactionDetailView({
             <DisplayTextarea value={faction.symbolsAndSecrets} />
           )}
         </FieldWithVisibilityToggle>
+
+        {/* Currencies */}
+        <FieldWithVisibilityToggle
+          fieldName="currencies"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.currencies || []}
+              onChange={(value) => onEditDataChange("currencies", value)}
+              label={t("faction-detail:fields.currencies")}
+              placeholder={t("create-faction:modal.currencies_placeholder")}
+              buttonText={t("create-faction:modal.add_currency")}
+              maxLength={50}
+              inputSize="small"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.currencies")}
+              items={faction.currencies}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+      </div>
+
+      <Separator className="my-6" />
+
+      {/* Territory Section */}
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("faction-detail:sections.territory")}
+        </h4>
+
+        {/* Dominated Areas */}
+        <FieldWithVisibilityToggle
+          fieldName="dominatedAreas"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="region"
+              bookId={bookId}
+              label={t("faction-detail:fields.dominated_areas")}
+              placeholder={t("create-faction:modal.dominated_areas_placeholder")}
+              emptyText={t("create-faction:modal.no_regions_warning")}
+              noSelectionText={t("create-faction:modal.no_dominated_areas_selected")}
+              searchPlaceholder={t("create-faction:modal.search_regions")}
+              value={editData.dominatedAreas || []}
+              onChange={(value) => onEditDataChange("dominatedAreas", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("faction-detail:fields.dominated_areas")}
+              entities={(() => {
+                const regions = editData.dominatedAreas || [];
+                return regions.map((regionId: string) => ({
+                  id: regionId,
+                  name: regionId,
+                })) as DisplayEntityItem[];
+              })()}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Main Base */}
+        <FieldWithVisibilityToggle
+          fieldName="mainBase"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="region"
+              bookId={bookId}
+              label={t("faction-detail:fields.main_base")}
+              placeholder={t("create-faction:modal.main_base_placeholder")}
+              emptyText={t("create-faction:modal.no_regions_warning")}
+              noSelectionText={t("create-faction:modal.no_main_base_selected")}
+              searchPlaceholder={t("create-faction:modal.search_regions")}
+              value={editData.mainBase || []}
+              onChange={(value) => onEditDataChange("mainBase", value)}
+              labelClassName="text-sm font-medium text-primary"
+              maxSelections={1}
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("faction-detail:fields.main_base")}
+              entities={(() => {
+                const regions = editData.mainBase || [];
+                return regions.map((regionId: string) => ({
+                  id: regionId,
+                  name: regionId,
+                })) as DisplayEntityItem[];
+              })()}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Areas of Interest */}
+        <FieldWithVisibilityToggle
+          fieldName="areasOfInterest"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="region"
+              bookId={bookId}
+              label={t("faction-detail:fields.areas_of_interest")}
+              placeholder={t("create-faction:modal.areas_of_interest_placeholder")}
+              emptyText={t("create-faction:modal.no_regions_warning")}
+              noSelectionText={t("create-faction:modal.no_areas_of_interest_selected")}
+              searchPlaceholder={t("create-faction:modal.search_regions")}
+              value={editData.areasOfInterest || []}
+              onChange={(value) => onEditDataChange("areasOfInterest", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("faction-detail:fields.areas_of_interest")}
+              entities={(() => {
+                const regions = editData.areasOfInterest || [];
+                return regions.map((regionId: string) => ({
+                  id: regionId,
+                  name: regionId,
+                })) as DisplayEntityItem[];
+              })()}
+            />
+          )}
+        </FieldWithVisibilityToggle>
       </div>
 
       <Separator className="my-6" />
@@ -460,6 +647,87 @@ export function FactionDetailView({
           )}
         </FieldWithVisibilityToggle>
 
+        {/* Traditions and Rituals */}
+        <FieldWithVisibilityToggle
+          fieldName="traditionsAndRituals"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.traditionsAndRituals || []}
+              onChange={(value) => onEditDataChange("traditionsAndRituals", value)}
+              label={t("faction-detail:fields.traditions_and_rituals")}
+              placeholder={t("create-faction:modal.traditions_and_rituals_placeholder")}
+              buttonText={t("create-faction:modal.add_tradition")}
+              maxLength={200}
+              inputSize="large"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.traditions_and_rituals")}
+              items={faction.traditionsAndRituals}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Beliefs and Values */}
+        <FieldWithVisibilityToggle
+          fieldName="beliefsAndValues"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.beliefsAndValues || []}
+              onChange={(value) => onEditDataChange("beliefsAndValues", value)}
+              label={t("faction-detail:fields.beliefs_and_values")}
+              placeholder={t("create-faction:modal.beliefs_and_values_placeholder")}
+              buttonText={t("create-faction:modal.add_belief")}
+              maxLength={200}
+              inputSize="large"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.beliefs_and_values")}
+              items={faction.beliefsAndValues}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Languages Used */}
+        <FieldWithVisibilityToggle
+          fieldName="languagesUsed"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormListInput
+              value={editData.languagesUsed || []}
+              onChange={(value) => onEditDataChange("languagesUsed", value)}
+              label={t("faction-detail:fields.languages_used")}
+              placeholder={t("create-faction:modal.languages_used_placeholder")}
+              buttonText={t("create-faction:modal.add_language")}
+              maxLength={50}
+              inputSize="small"
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayStringList
+              label={t("faction-detail:fields.languages_used")}
+              items={faction.languagesUsed}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
         {/* Uniform and Aesthetics */}
         <FieldWithVisibilityToggle
           fieldName="uniformAndAesthetics"
@@ -485,6 +753,41 @@ export function FactionDetailView({
             </>
           ) : (
             <DisplayTextarea value={faction.uniformAndAesthetics} />
+          )}
+        </FieldWithVisibilityToggle>
+
+        {/* Races */}
+        <FieldWithVisibilityToggle
+          fieldName="races"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="race"
+              bookId={bookId}
+              label={t("faction-detail:fields.races")}
+              placeholder={t("create-faction:modal.races_placeholder")}
+              emptyText={t("create-faction:modal.no_races_warning")}
+              noSelectionText={t("create-faction:modal.no_races_selected")}
+              searchPlaceholder={t("create-faction:modal.search_races")}
+              value={editData.races || []}
+              onChange={(value) => onEditDataChange("races", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("faction-detail:fields.races")}
+              entities={(() => {
+                const raceIds = faction.races || [];
+                return raceIds.map((raceId: string) => {
+                  const race = mockRaces.find((r) => r.id === raceId);
+                  return race ? { id: race.id, name: race.name, image: race.image } : { id: raceId, name: raceId };
+                }) as DisplayEntityItem[];
+              })()}
+            />
           )}
         </FieldWithVisibilityToggle>
       </div>
@@ -551,6 +854,41 @@ export function FactionDetailView({
           )}
         </FieldWithVisibilityToggle>
 
+        {/* Founders */}
+        <FieldWithVisibilityToggle
+          fieldName="founders"
+          isOptional
+          fieldVisibility={fieldVisibility}
+          isEditing={isEditing}
+          onFieldVisibilityToggle={onFieldVisibilityToggle}
+        >
+          {isEditing ? (
+            <FormEntityMultiSelectAuto
+              entityType="character"
+              bookId={bookId}
+              label={t("faction-detail:fields.founders")}
+              placeholder={t("create-faction:modal.founders_placeholder")}
+              emptyText={t("create-faction:modal.no_characters_warning")}
+              noSelectionText={t("create-faction:modal.no_founders_selected")}
+              searchPlaceholder={t("create-faction:modal.search_characters")}
+              value={editData.founders || []}
+              onChange={(value) => onEditDataChange("founders", value)}
+              labelClassName="text-sm font-medium text-primary"
+            />
+          ) : (
+            <DisplayEntityList
+              label={t("faction-detail:fields.founders")}
+              entities={(() => {
+                const founderIds = faction.founders || [];
+                return founderIds.map((founderId: string) => {
+                  const character = mockCharacters.find((c) => c.id === founderId);
+                  return character ? { id: character.id, name: character.name, image: character.image } : { id: founderId, name: founderId };
+                }) as DisplayEntityItem[];
+              })()}
+            />
+          )}
+        </FieldWithVisibilityToggle>
+
         {/* Alignment - in History section like create modal */}
         <FieldWithVisibilityToggle
           fieldName="alignment"
@@ -586,27 +924,27 @@ export function FactionDetailView({
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
           {isEditing ? (
-            <Select
+            <FormSelectGrid
               value={editData.influence || ""}
-              onValueChange={(value) => onEditDataChange("influence", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("create-faction:modal.influence_placeholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {influences.map((influence) => (
-                  <SelectItem key={influence.value} value={influence.value}>
-                    {t(`create-faction:${influence.translationKey}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : faction.influence ? (
-            <Badge className={currentInfluence?.bgColor}>
-              {t(`create-faction:influence.${faction.influence}`)}
-            </Badge>
+              onChange={(value) => onEditDataChange("influence", value)}
+              options={FACTION_INFLUENCE_OPTIONS.map((opt) => ({
+                ...opt,
+                label: t(`create-faction:${opt.label}`),
+                description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+              }))}
+              columns={3}
+            />
           ) : (
-            <DisplayText value={undefined} />
+            <DisplaySelectGrid
+              value={faction.influence}
+              options={FACTION_INFLUENCE_OPTIONS.map((opt) => ({
+                ...opt,
+                label: t(`create-faction:${opt.label}`),
+                description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+              }))}
+              emptyTitle={t("faction-detail:empty_states.no_influence")}
+              emptyDescription={t("faction-detail:empty_states.no_influence_hint")}
+            />
           )}
         </FieldWithVisibilityToggle>
 
@@ -620,57 +958,30 @@ export function FactionDetailView({
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
           {isEditing ? (
-            <Select
+            <FormSelectGrid
               value={editData.publicReputation || ""}
-              onValueChange={(value) => onEditDataChange("publicReputation", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("create-faction:modal.reputation_placeholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {reputations.map((reputation) => (
-                  <SelectItem key={reputation.value} value={reputation.value}>
-                    {t(`create-faction:${reputation.translationKey}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : faction.publicReputation ? (
-            <Badge className={currentReputation?.bgColor}>
-              {t(`create-faction:reputation.${faction.publicReputation}`)}
-            </Badge>
+              onChange={(value) => onEditDataChange("publicReputation", value)}
+              options={FACTION_REPUTATION_OPTIONS.map((opt) => ({
+                ...opt,
+                label: t(`create-faction:${opt.label}`),
+                description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+              }))}
+              columns={3}
+            />
           ) : (
-            <DisplayText value={undefined} />
+            <DisplaySelectGrid
+              value={faction.publicReputation}
+              options={FACTION_REPUTATION_OPTIONS.map((opt) => ({
+                ...opt,
+                label: t(`create-faction:${opt.label}`),
+                description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+              }))}
+              emptyTitle={t("faction-detail:empty_states.no_reputation")}
+              emptyDescription={t("faction-detail:empty_states.no_reputation_hint")}
+            />
           )}
         </FieldWithVisibilityToggle>
 
-        {/* External Influence */}
-        <FieldWithVisibilityToggle
-          fieldName="externalInfluence"
-          label={t("faction-detail:fields.external_influence")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.externalInfluence || ""}
-                onChange={(e) => onEditDataChange("externalInfluence", e.target.value)}
-                placeholder={t("create-faction:modal.external_influence_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.externalInfluence?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea value={faction.externalInfluence} />
-          )}
-        </FieldWithVisibilityToggle>
       </div>
 
       <Separator className="my-6" />

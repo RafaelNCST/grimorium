@@ -121,6 +121,14 @@ interface DisplaySelectGridProps<T = string> {
    * Optional custom className for container
    */
   className?: string;
+  /**
+   * Optional title for empty state
+   */
+  emptyTitle?: string;
+  /**
+   * Optional description for empty state
+   */
+  emptyDescription?: string;
 }
 
 /**
@@ -152,6 +160,8 @@ export function DisplaySelectGrid<T extends string = string>({
   value,
   options,
   className,
+  emptyTitle = "Sem dados",
+  emptyDescription,
 }: DisplaySelectGridProps<T>) {
   // Find the matching option
   const selectedOption = value
@@ -176,8 +186,13 @@ export function DisplaySelectGrid<T extends string = string>({
           <Target className="w-5 h-5 mt-0.5 flex-shrink-0 text-muted-foreground" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm text-muted-foreground">
-              Sem dados
+              {emptyTitle}
             </p>
+            {emptyDescription && (
+              <p className="text-xs mt-1 text-muted-foreground opacity-80">
+                {emptyDescription}
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -5,8 +5,6 @@ import { Shield, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-import { FACTION_INFLUENCE_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-influence";
-import { FACTION_REPUTATION_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-reputation";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import {
@@ -256,17 +254,6 @@ export function FactionDetail() {
   const currentType = useMemo(
     () => FACTION_TYPES_CONSTANT.find((t) => t.value === faction.factionType),
     [faction.factionType]
-  );
-  const currentInfluence = useMemo(
-    () => FACTION_INFLUENCE_CONSTANT.find((i) => i.value === faction.influence),
-    [faction.influence]
-  );
-  const currentReputation = useMemo(
-    () =>
-      FACTION_REPUTATION_CONSTANT.find(
-        (r) => r.value === faction.publicReputation
-      ),
-    [faction.publicReputation]
   );
 
   const handleVersionChange = useCallback(
@@ -630,12 +617,8 @@ export function FactionDetail() {
       mockItems={items}
       statuses={FACTION_STATUS_CONSTANT}
       types={FACTION_TYPES_CONSTANT}
-      influences={FACTION_INFLUENCE_CONSTANT}
-      reputations={FACTION_REPUTATION_CONSTANT}
       currentStatus={currentStatus}
       currentType={currentType}
-      currentInfluence={currentInfluence}
-      currentReputation={currentReputation}
       StatusIcon={StatusIcon}
       TypeIcon={TypeIcon}
       fieldVisibility={fieldVisibility}

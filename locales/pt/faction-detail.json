@@ -32,7 +32,8 @@
     "chronology": "Cronologia",
     "timeline": "Linha do Tempo da Faccao",
     "diplomacy": "Diplomacia",
-    "hierarchy": "Hierarquia"
+    "hierarchy": "Hierarquia",
+    "territory": "Territorio"
   },
   "fields": {
     "image": "Imagem",
@@ -58,7 +59,18 @@
     "narrative_importance": "Importancia Narrativa",
     "inspirations": "Inspiracoes",
     "alignment": "Alinhamento",
-    "power": "Poder"
+    "power": "Poder",
+    "rules_and_laws": "Regras e Leis",
+    "main_resources": "Recursos Principais",
+    "currencies": "Moedas",
+    "dominated_areas": "Areas Dominadas",
+    "main_base": "Base Principal",
+    "areas_of_interest": "Areas de Interesse",
+    "traditions_and_rituals": "Tradicoes e Rituais",
+    "beliefs_and_values": "Crencas e Valores",
+    "languages_used": "Idiomas Utilizados",
+    "races": "Racas",
+    "founders": "Fundadores"
   },
   "actions": {
     "open": "Abrir",
@@ -69,7 +81,11 @@
   },
   "empty_states": {
     "no_data": "Nenhuma informacao fornecida",
-    "no_data_hint": "Edite para adicionar informacoes"
+    "no_data_hint": "Edite para adicionar informacoes",
+    "no_influence": "Nenhuma influencia definida",
+    "no_influence_hint": "Edite para definir o nivel de influencia da faccao",
+    "no_reputation": "Nenhuma reputacao definida",
+    "no_reputation_hint": "Edite para definir a reputacao publica da faccao"
   },
   "upload": {
     "click": "Clique"

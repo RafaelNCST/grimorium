@@ -32,7 +32,8 @@
     "chronology": "Chronology",
     "timeline": "Faction Timeline",
     "diplomacy": "Diplomacy",
-    "hierarchy": "Hierarchy"
+    "hierarchy": "Hierarchy",
+    "territory": "Territory"
   },
   "fields": {
     "image": "Image",
@@ -58,7 +59,18 @@
     "narrative_importance": "Narrative Importance",
     "inspirations": "Inspirations",
     "alignment": "Alignment",
-    "power": "Power"
+    "power": "Power",
+    "rules_and_laws": "Rules and Laws",
+    "main_resources": "Main Resources",
+    "currencies": "Currencies",
+    "dominated_areas": "Dominated Areas",
+    "main_base": "Main Base",
+    "areas_of_interest": "Areas of Interest",
+    "traditions_and_rituals": "Traditions and Rituals",
+    "beliefs_and_values": "Beliefs and Values",
+    "languages_used": "Languages Used",
+    "races": "Races",
+    "founders": "Founders"
   },
   "actions": {
     "open": "Open",
@@ -69,7 +81,11 @@
   },
   "empty_states": {
     "no_data": "No information provided",
-    "no_data_hint": "Edit to add information"
+    "no_data_hint": "Edit to add information",
+    "no_influence": "No influence defined",
+    "no_influence_hint": "Edit to define the faction's influence level",
+    "no_reputation": "No reputation defined",
+    "no_reputation_hint": "Edit to define the faction's public reputation"
   },
   "upload": {
     "click": "Click"
