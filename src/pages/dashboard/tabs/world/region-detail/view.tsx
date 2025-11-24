@@ -432,15 +432,39 @@ export function RegionDetailView({
     );
   };
 
+  // Helper function to check if all fields in a group are hidden
+  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
+    if (isEditing) return false; // Never hide sections in edit mode
+    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+  };
+
+  // Define field groups for each mini-section
+  const environmentFields = [
+    'climate', 'currentSeason', 'generalDescription', 'regionAnomalies'
+  ];
+  const informationFields = [
+    'residentFactions', 'dominantFactions', 'importantCharacters',
+    'racesFound', 'itemsFound'
+  ];
+  const narrativeFields = [
+    'narrativePurpose', 'uniqueCharacteristics', 'politicalImportance',
+    'religiousImportance', 'worldPerception', 'regionMysteries', 'inspirations'
+  ];
+
+  // Check if mini-sections should be hidden
+  const hideEnvironmentSection = areAllFieldsHidden(environmentFields);
+  const hideInformationSection = areAllFieldsHidden(informationFields);
+  const hideNarrativeSection = areAllFieldsHidden(narrativeFields);
+
+  // Check if entire advanced section should be hidden
+  const hideEntireAdvancedSection =
+    hideEnvironmentSection && hideInformationSection && hideNarrativeSection;
+
   // Render advanced fields content
-  const renderAdvancedFields = () => (
+  const renderAdvancedFields = () => hideEntireAdvancedSection ? null : (
     <div className="space-y-6">
       {/* Environment Section */}
-      {(isEditing ||
-        hasVisibleFields(
-          ["climate", "currentSeason", "generalDescription", "regionAnomalies"],
-          fieldVisibility
-        )) && (
+      {!hideEnvironmentSection && (
         <>
           <div className="space-y-4">
             <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
@@ -596,33 +620,13 @@ export function RegionDetailView({
             </FieldWithVisibilityToggle>
           </div>
 
-          {/* Separator - only show if Information section will be visible */}
-          {(isEditing ||
-            hasVisibleFields(
-              [
-                "residentFactions",
-                "dominantFactions",
-                "importantCharacters",
-                "racesFound",
-                "itemsFound",
-              ],
-              fieldVisibility
-            )) && <Separator />}
+          {/* Separator between Environment and Information - only show if both sections are visible */}
+          {!hideInformationSection && <Separator />}
         </>
       )}
 
       {/* Information Section */}
-      {(isEditing ||
-        hasVisibleFields(
-          [
-            "residentFactions",
-            "dominantFactions",
-            "importantCharacters",
-            "racesFound",
-            "itemsFound",
-          ],
-          fieldVisibility
-        )) && (
+      {!hideInformationSection && (
         <>
           <div className="space-y-4">
             <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
@@ -921,37 +925,13 @@ export function RegionDetailView({
             </FieldWithVisibilityToggle>
           </div>
 
-          {/* Separator - only show if Narrative section will be visible */}
-          {(isEditing ||
-            hasVisibleFields(
-              [
-                "narrativePurpose",
-                "uniqueCharacteristics",
-                "politicalImportance",
-                "religiousImportance",
-                "worldPerception",
-                "regionMysteries",
-                "inspirations",
-              ],
-              fieldVisibility
-            )) && <Separator />}
+          {/* Separator between Information and Narrative - only show if both sections are visible */}
+          {!hideNarrativeSection && <Separator />}
         </>
       )}
 
       {/* Narrative Section */}
-      {(isEditing ||
-        hasVisibleFields(
-          [
-            "narrativePurpose",
-            "uniqueCharacteristics",
-            "politicalImportance",
-            "religiousImportance",
-            "worldPerception",
-            "regionMysteries",
-            "inspirations",
-          ],
-          fieldVisibility
-        )) && (
+      {!hideNarrativeSection && (
         <div className="space-y-4">
           <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
             {t("world:create_region.narrative_section")}
@@ -1266,32 +1246,7 @@ export function RegionDetailView({
             validationMessage={validationMessage}
             // Content
             basicFields={renderBasicFields()}
-            advancedFields={
-              isEditing ||
-              hasVisibleFields(
-                [
-                  "climate",
-                  "currentSeason",
-                  "generalDescription",
-                  "regionAnomalies",
-                  "residentFactions",
-                  "dominantFactions",
-                  "importantCharacters",
-                  "racesFound",
-                  "itemsFound",
-                  "narrativePurpose",
-                  "uniqueCharacteristics",
-                  "politicalImportance",
-                  "religiousImportance",
-                  "worldPerception",
-                  "regionMysteries",
-                  "inspirations",
-                ],
-                fieldVisibility
-              )
-                ? renderAdvancedFields()
-                : undefined
-            }
+            advancedFields={renderAdvancedFields()}
             advancedSectionTitle={t("region-detail:sections.advanced_info")}
             advancedSectionOpen={advancedSectionOpen}
             onAdvancedSectionToggle={onAdvancedSectionToggle}
