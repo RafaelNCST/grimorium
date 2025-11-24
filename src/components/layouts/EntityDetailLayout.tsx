@@ -196,7 +196,7 @@ export function EntityDetailLayout({
   return (
     <div className={cn("flex flex-col", className)}>
       {/* Header */}
-      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-4 px-4">
+      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Left side - Back button and Menu */}
           <div className="flex items-center gap-4">
@@ -281,11 +281,9 @@ export function EntityDetailLayout({
         </div>
       </header>
 
-      {/* Spacer to compensate for fixed header */}
-      <div className="h-[72px]" />
 
       {/* Main content */}
-      <div className="flex flex-1 gap-4 py-6">
+      <div className="flex flex-1 gap-4 pt-14 pb-6">
         {/* Central content */}
         <main
           className={cn(
@@ -347,7 +345,7 @@ export function EntityDetailLayout({
 
         {/* Versions sidebar - Only show in view mode */}
         {!isEditMode && versionsPanel && (
-          <aside className="hidden lg:flex lg:flex-[1] lg:min-w-[280px] lg:max-w-[400px]">
+          <aside className="hidden lg:block lg:flex-[1] lg:min-w-[280px] lg:max-w-[400px]">
             {versionsPanel}
           </aside>
         )}

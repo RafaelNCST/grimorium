@@ -23,7 +23,7 @@ export interface VersionsPanelProps {
  */
 export function VersionsPanel({ title, children }: VersionsPanelProps) {
   return (
-    <Card className="card-magical sticky top-24 flex flex-col max-h-[calc(100vh-12.5rem)]">
+    <Card className="card-magical sticky top-[5.5rem] flex flex-col max-h-[calc(100vh-7rem)]">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>

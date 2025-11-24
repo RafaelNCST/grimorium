@@ -1078,7 +1078,7 @@ export function RaceDetailView({
   );
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       {/* Navigation Sidebar */}
       <RaceNavigationSidebar
         isOpen={isNavigationSidebarOpen}

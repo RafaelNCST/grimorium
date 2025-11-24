@@ -414,9 +414,9 @@ export function PlotArcDetailView({
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Fixed Header */}
-      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-4 px-4">
+      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Left side - Back button */}
           <div className="flex items-center gap-4">

@@ -1211,7 +1211,7 @@ export function CharacterDetailView({
   );
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       <CharacterNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={onNavigationSidebarClose}

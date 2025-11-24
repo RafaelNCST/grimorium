@@ -77,7 +77,7 @@ export function EntityDetailVersionPanel({
   const alternativeVersions = versions.filter((v) => !v.isMain);
 
   return (
-    <Card className="card-magical sticky top-24 h-[600px]">
+    <Card className="card-magical sticky top-[5.5rem] flex flex-col max-h-[calc(100vh-7rem)]">
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>

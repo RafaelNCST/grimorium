@@ -712,7 +712,7 @@ export const ItemDetailView = React.memo(function ItemDetailView({
   // RENDER
   // ==================
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       <ItemNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={onNavigationSidebarClose}

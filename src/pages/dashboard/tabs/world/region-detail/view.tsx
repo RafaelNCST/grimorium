@@ -1218,7 +1218,7 @@ export function RegionDetailView({
   ) : undefined;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       {/* Navigation Sidebar */}
       <RegionNavigationSidebar
         isOpen={isNavigationSidebarOpen}

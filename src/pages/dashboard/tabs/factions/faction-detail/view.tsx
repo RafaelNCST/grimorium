@@ -1263,7 +1263,7 @@ export function FactionDetailView({
   // RENDER
   // ==================
   return (
-    <div className="relative min-h-screen">
+    <div className="relative">
       <FactionNavigationSidebar
         isOpen={isNavigationSidebarOpen}
         onClose={onNavigationSidebarClose}
