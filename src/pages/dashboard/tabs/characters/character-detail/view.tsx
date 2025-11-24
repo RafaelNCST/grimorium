@@ -1142,8 +1142,8 @@ export function CharacterDetailView({
         return null;
       })(),
       emptyIcon: Users,
-      emptyTitle: t("character-detail:empty_states.no_relationships"),
-      emptyDescription: t("character-detail:empty_states.no_relationships_hint"),
+      emptyTitle: "Nenhum relacionamento definido",
+      emptyDescription: "Use o modo de edição para adicionar relacionamentos",
       addButtonLabel: t("character-detail:relationships.add_relationship"),
       onAddClick: () => {
         setIsAddRelationshipDialogOpen(true);
@@ -1218,8 +1218,8 @@ export function CharacterDetailView({
         return null;
       })(),
       emptyIcon: Heart,
-      emptyTitle: t("character-detail:empty_states.no_family"),
-      emptyDescription: t("character-detail:empty_states.no_family_hint"),
+      emptyTitle: "Nenhuma relação familiar definida",
+      emptyDescription: "Use o modo de edição para adicionar familiares",
       blockedEntityName: "personagens",
     },
   ];

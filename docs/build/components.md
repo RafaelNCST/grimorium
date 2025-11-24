@@ -171,6 +171,24 @@ Componentes reutilizáveis gerais utilizados no projeto (excluindo formulários 
 3. **blocked-no-data**: Mostra InfoAlert informando falta de dados para adicionar
 4. **blocked-all-used**: Mostra InfoAlert + conteúdo existente (todos os dados disponíveis já foram usados)
 
+**Padronização de Textos:**
+
+Para manter consistência, siga este padrão ao usar estados vazios:
+
+**Estado empty-view (visualização):**
+- **Título**: "Nenhum/Nenhuma {entidade} definido/definida"
+  - Exemplos: "Nenhum relacionamento definido", "Nenhuma linha do tempo definida"
+- **Descrição**: "Use o modo de edição para adicionar {ação}"
+  - Exemplos: "Use o modo de edição para adicionar relacionamentos", "Use o modo de edição para adicionar eras"
+
+**Estado blocked-no-data:**
+- Usa automaticamente: "Não há {blockedEntityName} suficientes"
+- Exemplo: `blockedEntityName: "personagens"` → "Não há personagens suficientes"
+
+**Estado blocked-all-used:**
+- Usa automaticamente: "Todos os {blockedEntityName} disponíveis foram adicionados"
+- Exemplo: `blockedEntityName: "facções"` → "Todos as facções disponíveis foram adicionadas"
+
 ---
 
 ## 8. FieldWithVisibilityToggle

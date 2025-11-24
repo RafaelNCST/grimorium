@@ -83,6 +83,10 @@ interface PropsRegionTimeline {
   factions: Array<{ id: string; name: string; image?: string }>;
   races: Array<{ id: string; name: string; image?: string }>;
   items: Array<{ id: string; name: string; image?: string }>;
+  /** Controlled state for create era dialog - when true, opens the create era dialog */
+  isCreateEraDialogOpen?: boolean;
+  /** Callback when the create era dialog open state changes */
+  onCreateEraDialogOpenChange?: (open: boolean) => void;
 }
 
 export function RegionTimeline({
@@ -93,12 +97,26 @@ export function RegionTimeline({
   factions,
   races,
   items,
+  isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
+  onCreateEraDialogOpenChange,
 }: PropsRegionTimeline) {
   const [selectedEvent, setSelectedEvent] = useState<ITimelineEvent | null>(
     null
   );
   const [showEventModal, setShowEventModal] = useState(false);
-  const [showCreateEraModal, setShowCreateEraModal] = useState(false);
+
+  // Support both controlled and uncontrolled modes for the create era dialog
+  const [internalShowCreateEraModal, setInternalShowCreateEraModal] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const showCreateEraModal = controlledIsCreateEraDialogOpen ?? internalShowCreateEraModal;
+  const setShowCreateEraModal = (open: boolean) => {
+    if (onCreateEraDialogOpenChange) {
+      onCreateEraDialogOpenChange(open);
+    } else {
+      setInternalShowCreateEraModal(open);
+    }
+  };
   const [showEditEraModal, setShowEditEraModal] = useState(false);
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [selectedEraId, setSelectedEraId] = useState<string>("");
@@ -305,29 +323,7 @@ export function RegionTimeline({
 
   return (
     <>
-      {timeline.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Clock className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-xl font-semibold mb-2">
-            Nenhuma Linha do Tempo Definida
-          </h3>
-          <p className="text-muted-foreground text-center mb-6 max-w-md">
-            {isEditing
-              ? "Crie a primeira era para começar a documentar a história desta região."
-              : "Esta região ainda não possui linha do tempo histórica definida."}
-          </p>
-          {isEditing && (
-            <Button
-              onClick={() => setShowCreateEraModal(true)}
-              variant="magical"
-              className="animate-glow"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Primeira Era
-            </Button>
-          )}
-        </div>
-      ) : (
+      {timeline.length > 0 && (
         <div>
           <div className="relative">
             {/* Enhanced Timeline Line with Gradient and Glow */}

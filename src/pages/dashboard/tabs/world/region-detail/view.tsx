@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Map, AlertCircle, Trash2 } from "lucide-react";
+import { Map, AlertCircle, Trash2, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -178,6 +178,9 @@ export function RegionDetailView({
 }: RegionDetailViewProps) {
   const { t } = useTranslation(["region-detail", "world"]);
   const [refreshKey, setRefreshKey] = React.useState(0);
+
+  // State for controlling the create era dialog from the empty state button
+  const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] = useState(false);
 
   // Find scale data
   const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
@@ -1265,12 +1268,23 @@ export function RegionDetailView({
                     factions={factions}
                     races={races}
                     items={items}
+                    isCreateEraDialogOpen={isCreateEraDialogOpen}
+                    onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
                   />
                 ),
                 isCollapsible: true,
                 defaultOpen: timelineSectionOpen,
                 isVisible: isSectionVisible("timeline", sectionVisibility),
                 onVisibilityToggle: () => onSectionVisibilityToggle("timeline"),
+                // Empty states
+                emptyState: timeline.length === 0
+                  ? (isEditing ? "empty-edit" : "empty-view")
+                  : null,
+                emptyIcon: Clock,
+                emptyTitle: "Nenhuma linha do tempo definida",
+                emptyDescription: "Use o modo de edição para adicionar eras",
+                addButtonLabel: "Criar Primeira Era",
+                onAddClick: () => setIsCreateEraDialogOpen(true),
               },
             ]}
             // Versions panel
