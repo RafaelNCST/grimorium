@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 
 import { getPlotArcsByBookId, reorderPlotArcs } from "@/lib/db/plot.service";
 import type { IPlotArc } from "@/types/plot-types";
@@ -14,8 +14,14 @@ export function PlotTimeline() {
   const { dashboardId } = useParams({
     from: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
   });
+  const search = useSearch({
+    from: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
+  });
   const navigate = useNavigate();
   const [arcs, setArcs] = useState<IPlotArc[]>([]);
+
+  // Get lastInteractedId from URL search params
+  const lastInteractedId = (search as { lastArc?: string }).lastArc ?? null;
 
   // Load arcs from database
   useEffect(() => {
@@ -200,9 +206,31 @@ export function PlotTimeline() {
 
   const handleArcClick = useCallback(
     (arcId: string) => {
+      // First update the URL with lastArc param so it persists when coming back
       navigate({
-        to: "/dashboard/$dashboardId/tabs/plot/$plotId",
-        params: { dashboardId: dashboardId!, plotId: arcId },
+        to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
+        params: { dashboardId: dashboardId! },
+        search: { lastArc: arcId },
+        replace: true,
+      });
+      // Then navigate to the arc detail
+      setTimeout(() => {
+        navigate({
+          to: "/dashboard/$dashboardId/tabs/plot/$plotId",
+          params: { dashboardId: dashboardId!, plotId: arcId },
+        });
+      }, 0);
+    },
+    [navigate, dashboardId]
+  );
+
+  const handleCardInteract = useCallback(
+    (arcId: string) => {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/plot/plot-timeline",
+        params: { dashboardId: dashboardId! },
+        search: { lastArc: arcId },
+        replace: true,
       });
     },
     [navigate, dashboardId]
@@ -232,6 +260,8 @@ export function PlotTimeline() {
       onReorderArcs={handleReorderArcs}
       getSizeColor={getSizeColor}
       getStatusColor={getStatusColor}
+      lastInteractedId={lastInteractedId}
+      onCardInteract={handleCardInteract}
     />
   );
 }

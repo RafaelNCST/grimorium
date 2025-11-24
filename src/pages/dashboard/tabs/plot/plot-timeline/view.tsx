@@ -42,6 +42,8 @@ interface PropsPlotTimelineView {
   onReorderArcs: (arcs: IPlotArc[]) => void;
   getSizeColor: (size: PlotArcSize) => string;
   getStatusColor: (status: PlotArcStatus) => string;
+  lastInteractedId: string | null;
+  onCardInteract: (arcId: string) => void;
 }
 
 // Card width (w-80 = 320px) + gap (gap-12 = 48px)
@@ -227,6 +229,8 @@ export function PlotTimelineView({
   onReorderArcs,
   getSizeColor,
   getStatusColor,
+  lastInteractedId,
+  onCardInteract,
 }: PropsPlotTimelineView) {
   const { t } = useTranslation("plot");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -237,8 +241,6 @@ export function PlotTimelineView({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   // Store initial scroll position when drag starts
   const [initialScroll, setInitialScroll] = useState(0);
-  // Track the last interacted card (dragged or clicked)
-  const [lastInteractedId, setLastInteractedId] = useState<string | null>(null);
 
   // Use local state if available, otherwise use props (moved up to be available for callbacks)
   const displayArcs = localArcs ?? sortedArcs;
@@ -297,14 +299,10 @@ export function PlotTimelineView({
     const index = sortedArcs.findIndex((a) => a.id === id);
     setActiveId(id);
     setActiveIndex(index);
-    setLastInteractedId(id);
+    onCardInteract(id);
     // Store the initial scroll position
     setInitialScroll(scrollContainerRef.current?.scrollLeft ?? 0);
   };
-
-  const handleCardInteract = useCallback((arcId: string) => {
-    setLastInteractedId(arcId);
-  }, []);
 
   const handleDragMove = useCallback(
     (_event: DragMoveEvent) => {
@@ -411,7 +409,7 @@ export function PlotTimelineView({
                       getStatusColor={getStatusColor}
                       activeId={activeId}
                       lastInteractedId={lastInteractedId}
-                      onCardInteract={handleCardInteract}
+                      onCardInteract={onCardInteract}
                     />
                   ))}
                 </SortableContext>

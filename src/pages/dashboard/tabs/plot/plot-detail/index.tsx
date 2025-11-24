@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-import { useParams, useNavigate } from "@tanstack/react-router";
+import { useParams, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -18,10 +18,11 @@ export function PlotArcDetail() {
   const { plotId, dashboardId } = useParams({
     from: "/dashboard/$dashboardId/tabs/plot/$plotId",
   });
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Data state
   const [arc, setArc] = useState<IPlotArc | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [characters, setCharacters] = useState<
     Array<{ id: string; name: string; image?: string }>
   >([]);
@@ -75,6 +76,7 @@ export function PlotArcDetail() {
   // Load data
   useEffect(() => {
     let mounted = true;
+    setIsLoading(true);
 
     const loadData = async () => {
       try {
@@ -127,9 +129,13 @@ export function PlotArcDetail() {
             (a) => a.status === "atual" && a.id !== plotId
           );
           setHasCurrentArc(hasOtherCurrentArc);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Failed to load plot arc data:", error);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -142,11 +148,8 @@ export function PlotArcDetail() {
 
   // Navigation handlers
   const handleBack = useCallback(() => {
-    navigate({
-      to: "/dashboard/$dashboardId",
-      params: { dashboardId },
-    });
-  }, [navigate, dashboardId]);
+    router.history.back();
+  }, [router]);
 
   // Edit mode handlers
   const handleEdit = useCallback(() => {
@@ -334,15 +337,12 @@ export function PlotArcDetail() {
     try {
       await deletePlotArc(arc.id);
       toast.success(t("plot:toast.arc_deleted"));
-      navigate({
-        to: "/dashboard/$dashboardId",
-        params: { dashboardId },
-      });
+      router.history.back();
     } catch (error) {
       console.error("Failed to delete plot arc:", error);
       toast.error(t("plot:toast.delete_failed"));
     }
-  }, [arc, navigate, dashboardId, t]);
+  }, [arc, router, t]);
 
   const handleDeleteEvent = useCallback(async () => {
     if (eventToDelete && arc) {
@@ -398,6 +398,11 @@ export function PlotArcDetail() {
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
+
+  // Show nothing while loading to avoid flash
+  if (isLoading) {
+    return null;
+  }
 
   if (!arc) {
     return (
