@@ -13,14 +13,12 @@ interface PropsStatusSelector {
   value: PlotArcStatus | "";
   onChange: (value: PlotArcStatus | "") => void;
   hasCurrentArc: boolean;
-  error?: string;
 }
 
 export function StatusSelector({
   value,
   onChange,
   hasCurrentArc,
-  error,
 }: PropsStatusSelector) {
   const { t } = useTranslation("create-plot-arc");
 
@@ -75,7 +73,6 @@ export function StatusSelector({
         options={availableOptions}
         label=""
         columns={3}
-        error={error}
       />
     </div>
   );

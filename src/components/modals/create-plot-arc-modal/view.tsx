@@ -41,7 +41,6 @@ export function CreatePlotArcModalView({
   const { t } = useTranslation("create-plot-arc");
   const {
     register,
-    formState: { errors },
     setValue,
     watch,
   } = form;
@@ -78,9 +77,6 @@ export function CreatePlotArcModalView({
                 maxLength={200}
                 required
                 showCharCount
-                error={
-                  errors.name ? t(errors.name.message as string) : undefined
-                }
                 value={watchedValues.name}
                 labelClassName="text-primary"
               />
@@ -94,11 +90,6 @@ export function CreatePlotArcModalView({
                 rows={4}
                 required
                 showCharCount
-                error={
-                  errors.description
-                    ? t(errors.description.message as string)
-                    : undefined
-                }
                 value={watchedValues.description}
                 labelClassName="text-primary"
                 className="resize-none"
@@ -113,9 +104,6 @@ export function CreatePlotArcModalView({
                 rows={3}
                 required
                 showCharCount
-                error={
-                  errors.focus ? t(errors.focus.message as string) : undefined
-                }
                 value={watchedValues.focus}
                 labelClassName="text-primary"
                 className="resize-none"
@@ -126,7 +114,6 @@ export function CreatePlotArcModalView({
                 value={watchedValues.status as PlotArcStatus | ""}
                 onChange={(value) => setValue("status", value)}
                 hasCurrentArc={hasCurrentArc}
-                error={errors.status?.message}
               />
 
               {/* Size Selector */}
@@ -137,7 +124,6 @@ export function CreatePlotArcModalView({
                 required
                 columns={2}
                 options={translatedSizeOptions}
-                error={errors.size?.message}
                 alertText={t("modal.arc_size_intro")}
               />
 
