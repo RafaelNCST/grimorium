@@ -311,13 +311,50 @@ export function FactionDetailView({
   // ==================
   // ADVANCED FIELDS
   // ==================
-  const advancedFields = (
+
+  // Helper function to check if all fields in a group are hidden
+  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
+    if (isEditing) return false; // Never hide sections in edit mode
+    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+  };
+
+  // Define field groups for each mini-section
+  const internalStructureFields = [
+    'governmentForm', 'rulesAndLaws', 'mainResources',
+    'economy', 'symbolsAndSecrets', 'currencies'
+  ];
+  const territoryFields = ['dominatedAreas', 'mainBase', 'areasOfInterest'];
+  const cultureFields = [
+    'factionMotto', 'traditionsAndRituals', 'beliefsAndValues',
+    'languagesUsed', 'uniformAndAesthetics', 'races'
+  ];
+  const historyFields = ['foundationDate', 'foundationHistorySummary', 'founders', 'alignment'];
+  const relationshipsFields = ['influence', 'publicReputation'];
+  const narrativeFields = [
+    'organizationObjectives', 'narrativeImportance', 'inspirations', 'power'
+  ];
+
+  // Check if mini-sections should be hidden
+  const hideInternalStructureSection = areAllFieldsHidden(internalStructureFields);
+  const hideTerritorySection = areAllFieldsHidden(territoryFields);
+  const hideCultureSection = areAllFieldsHidden(cultureFields);
+  const hideHistorySection = areAllFieldsHidden(historyFields);
+  const hideRelationshipsSection = areAllFieldsHidden(relationshipsFields);
+  const hideNarrativeSection = areAllFieldsHidden(narrativeFields);
+
+  // Check if entire advanced section should be hidden
+  const hideEntireAdvancedSection =
+    hideInternalStructureSection && hideTerritorySection && hideCultureSection &&
+    hideHistorySection && hideRelationshipsSection && hideNarrativeSection;
+
+  const advancedFields = hideEntireAdvancedSection ? null : (
     <>
       {/* Internal Structure Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.internal_structure")}
-        </h4>
+      {!hideInternalStructureSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.internal_structure")}
+          </h4>
 
         {/* Government Form */}
         <FieldWithVisibilityToggle
@@ -483,15 +520,20 @@ export function FactionDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Internal Structure and Territory - only show if both sections are visible */}
+      {!hideInternalStructureSection && !hideTerritorySection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Territory Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.territory")}
-        </h4>
+      {!hideTerritorySection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.territory")}
+          </h4>
 
         {/* Dominated Areas */}
         <FieldWithVisibilityToggle
@@ -598,15 +640,20 @@ export function FactionDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Territory and Culture - only show if both sections are visible */}
+      {!hideTerritorySection && !hideCultureSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Culture Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.culture")}
-        </h4>
+      {!hideCultureSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.culture")}
+          </h4>
 
         {/* Faction Motto */}
         <FieldWithVisibilityToggle
@@ -783,15 +830,20 @@ export function FactionDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Culture and History - only show if both sections are visible */}
+      {!hideCultureSection && !hideHistorySection && (
+        <Separator className="my-6" />
+      )}
 
       {/* History Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.history")}
-        </h4>
+      {!hideHistorySection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.history")}
+          </h4>
 
         {/* Foundation Date */}
         <FieldWithVisibilityToggle
@@ -897,15 +949,20 @@ export function FactionDetailView({
             isEditable={isEditing}
           />
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between History and Relationships - only show if both sections are visible */}
+      {!hideHistorySection && !hideRelationshipsSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Relationships Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.relationships")}
-        </h4>
+      {!hideRelationshipsSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.relationships")}
+          </h4>
 
         {/* Influence */}
         <FieldWithVisibilityToggle
@@ -974,16 +1031,20 @@ export function FactionDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
+        </div>
+      )}
 
-      </div>
-
-      <Separator className="my-6" />
+      {/* Separator between Relationships and Narrative - only show if both sections are visible */}
+      {!hideRelationshipsSection && !hideNarrativeSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Narrative Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("faction-detail:sections.narrative")}
-        </h4>
+      {!hideNarrativeSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("faction-detail:sections.narrative")}
+          </h4>
 
         {/* Organization Objectives */}
         <FieldWithVisibilityToggle
@@ -1119,7 +1180,8 @@ export function FactionDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
     </>
   );
 
