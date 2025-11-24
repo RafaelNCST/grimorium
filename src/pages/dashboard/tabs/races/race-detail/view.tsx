@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Dna } from "lucide-react";
+import { Dna, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -1051,6 +1051,42 @@ export function RaceDetailView({
       defaultOpen: false,
       isVisible: sectionVisibility.relationships !== false,
       onVisibilityToggle: () => onSectionVisibilityToggle("relationships"),
+      // Empty states
+      emptyState: (() => {
+        const availableRaces = allRaces.filter(
+          (r) =>
+            r.id !== race.id &&
+            !relationships.some((rel) => rel.raceId === r.id)
+        );
+
+        // Estado 3: Bloqueado - não há raças suficientes
+        if (allRaces.length <= 1 && isEditing) {
+          return "blocked-no-data";
+        }
+
+        // Estado 4: Bloqueado - todas as raças disponíveis foram usadas
+        if (isEditing && relationships.length > 0 && availableRaces.length === 0) {
+          return "blocked-all-used";
+        }
+
+        // Estado 1: Vazio em visualização
+        if (relationships.length === 0 && !isEditing) {
+          return "empty-view";
+        }
+
+        // Estado 2: Vazio em edição
+        if (relationships.length === 0 && isEditing) {
+          return "empty-edit";
+        }
+
+        return null;
+      })(),
+      emptyIcon: Users,
+      emptyTitle: "Nenhum relacionamento definido",
+      emptyDescription: "Use o modo de edição para adicionar relacionamentos",
+      addButtonLabel: "Adicionar Relacionamento",
+      onAddClick: () => {}, // TODO: Conectar ao dialog da seção quando implementado
+      blockedEntityName: "raças",
     },
   ];
 

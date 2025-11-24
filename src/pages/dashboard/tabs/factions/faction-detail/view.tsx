@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Shield, Trash2 } from "lucide-react";
+import { Shield, Trash2, Clock, Handshake, Users2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -164,6 +164,11 @@ export function FactionDetailView({
   hasChanges,
 }: FactionDetailViewProps) {
   const { t } = useTranslation(["faction-detail", "create-faction"]);
+
+  // State for controlling dialogs from empty state buttons
+  const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] = React.useState(false);
+  const [isAddDiplomacyDialogOpen, setIsAddDiplomacyDialogOpen] = React.useState(false);
+  const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = React.useState(false);
 
   // ==================
   // BASIC FIELDS
@@ -1204,12 +1209,23 @@ export function FactionDetailView({
           factions={mockFactions}
           races={mockRaces}
           items={mockItems}
+          isCreateEraDialogOpen={isCreateEraDialogOpen}
+          onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
         />
       ),
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.timeline !== false,
       onVisibilityToggle: () => onSectionVisibilityChange("timeline", !sectionVisibility.timeline),
+      // Empty states
+      emptyState: (editData.timeline || []).length === 0
+        ? (isEditing ? "empty-edit" : "empty-view")
+        : null,
+      emptyIcon: Clock,
+      emptyTitle: "Nenhuma linha do tempo definida",
+      emptyDescription: "Use o modo de edição para adicionar eras",
+      addButtonLabel: "Criar Primeira Era",
+      onAddClick: () => setIsCreateEraDialogOpen(true),
     },
     {
       id: "diplomacy",
@@ -1225,12 +1241,47 @@ export function FactionDetailView({
           }
           activeTab={activeDiplomacyTab}
           onActiveTabChange={onActiveDiplomacyTabChange}
+          isAddDialogOpen={isAddDiplomacyDialogOpen}
+          onAddDialogOpenChange={setIsAddDiplomacyDialogOpen}
         />
       ),
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.diplomacy !== false,
       onVisibilityToggle: () => onSectionVisibilityChange("diplomacy", !sectionVisibility.diplomacy),
+      // Empty states
+      emptyState: (() => {
+        const otherFactions = mockFactions.filter((f) => f.id !== faction.id);
+        const relations = editData.diplomaticRelations || [];
+
+        // Estado 3: Bloqueado - não há outras facções
+        if (otherFactions.length === 0 && isEditing) {
+          return "blocked-no-data";
+        }
+
+        // Estado 4: Bloqueado - todas as facções têm relações
+        if (isEditing && relations.length > 0 && relations.length === otherFactions.length) {
+          return "blocked-all-used";
+        }
+
+        // Estado 1: Vazio em visualização
+        if (relations.length === 0 && !isEditing) {
+          return "empty-view";
+        }
+
+        // Estado 2: Vazio em edição
+        if (relations.length === 0 && isEditing) {
+          return "empty-edit";
+        }
+
+        return null;
+      })(),
+      emptyIcon: Handshake,
+      emptyTitle: "Nenhuma relação diplomática definida",
+      emptyDescription: "Use o modo de edição para adicionar relações",
+      addButtonLabel: "Adicionar Relação Diplomática",
+      onAddClick: () => setIsAddDiplomacyDialogOpen(true),
+      blockedEntityName: "facções",
     },
     {
       id: "hierarchy",
@@ -1243,12 +1294,41 @@ export function FactionDetailView({
           onHierarchyChange={(hierarchy) =>
             onEditDataChange("hierarchy", hierarchy)
           }
+          isAddMemberDialogOpen={isAddMemberDialogOpen}
+          onAddMemberDialogOpenChange={setIsAddMemberDialogOpen}
         />
       ),
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.hierarchy !== false,
       onVisibilityToggle: () => onSectionVisibilityChange("hierarchy", !sectionVisibility.hierarchy),
+      // Empty states
+      emptyState: (() => {
+        const hierarchy = editData.hierarchy || [];
+
+        // Estado 3: Bloqueado - não há personagens
+        if (mockCharacters.length === 0 && isEditing) {
+          return "blocked-no-data";
+        }
+
+        // Estado 1: Vazio em visualização
+        if (hierarchy.length === 0 && !isEditing) {
+          return "empty-view";
+        }
+
+        // Estado 2: Vazio em edição
+        if (hierarchy.length === 0 && isEditing) {
+          return "empty-edit";
+        }
+
+        return null;
+      })(),
+      emptyIcon: Users2,
+      emptyTitle: "Nenhuma hierarquia definida",
+      emptyDescription: "Use o modo de edição para adicionar membros",
+      addButtonLabel: "Adicionar Membro",
+      onAddClick: () => setIsAddMemberDialogOpen(true),
+      blockedEntityName: "personagens",
     },
   ];
 

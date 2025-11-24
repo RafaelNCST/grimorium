@@ -22,6 +22,10 @@ interface DiplomacySectionProps {
   onRelationsChange: (relations: IDiplomaticRelation[]) => void;
   activeTab: DiplomaticStatus;
   onActiveTabChange: (tab: DiplomaticStatus) => void;
+  /** Controlled state for add dialog - when true, opens the add diplomacy dialog */
+  isAddDialogOpen?: boolean;
+  /** Callback when the add dialog open state changes */
+  onAddDialogOpenChange?: (open: boolean) => void;
 }
 
 export function DiplomacySection({
@@ -32,9 +36,23 @@ export function DiplomacySection({
   onRelationsChange,
   activeTab,
   onActiveTabChange,
+  isAddDialogOpen: controlledIsAddDialogOpen,
+  onAddDialogOpenChange,
 }: DiplomacySectionProps) {
   const { t } = useTranslation("faction-detail");
-  const [showAddModal, setShowAddModal] = useState(false);
+
+  // Support both controlled and uncontrolled modes for the add dialog
+  const [internalShowAddModal, setInternalShowAddModal] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const showAddModal = controlledIsAddDialogOpen ?? internalShowAddModal;
+  const setShowAddModal = (open: boolean) => {
+    if (onAddDialogOpenChange) {
+      onAddDialogOpenChange(open);
+    } else {
+      setInternalShowAddModal(open);
+    }
+  };
 
   // Filter out current faction from available factions
   const otherFactions = availableFactions.filter(
@@ -112,22 +130,11 @@ export function DiplomacySection({
     );
   };
 
-  if (otherFactions.length === 0) {
-    return (
-      <InfoAlert>
-        <p className="font-semibold">{t("diplomacy.no_factions")}</p>
-        <p className="text-sm mt-1">
-          {t("diplomacy.no_factions_message")}
-        </p>
-      </InfoAlert>
-    );
-  }
-
   return (
     <>
       <div className="space-y-4">
-        {/* Add Relation Button - Only in Edit Mode */}
-        {isEditing && (
+        {/* Add Relation Button - Only in Edit Mode and when there are available factions */}
+        {isEditing && otherFactions.length > 0 && diplomaticRelations.length < otherFactions.length && (
           <Button
             variant="magical"
             size="lg"
