@@ -578,14 +578,41 @@ export function CharacterDetailView({
     </div>
   );
 
+  // Helper function to check if all fields in a group are hidden
+  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
+    if (isEditing) return false; // Never hide sections in edit mode
+    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+  };
+
+  // Define field groups for each mini-section
+  const appearanceFields = [
+    'height', 'weight', 'skinTone', 'hair', 'eyes', 'face',
+    'speciesAndRace', 'physicalType', 'distinguishingFeatures'
+  ];
+  const behaviorFields = [
+    'archetype', 'alignment', 'favoriteFood', 'favoriteMusic',
+    'personality', 'hobbies', 'dreamsAndGoals', 'fearsAndTraumas'
+  ];
+  const historyFields = ['birthPlace', 'nicknames', 'past'];
+
+  // Check if mini-sections should be hidden
+  const hideAppearanceSection = areAllFieldsHidden(appearanceFields);
+  const hideBehaviorSection = areAllFieldsHidden(behaviorFields);
+  const hideHistorySection = areAllFieldsHidden(historyFields);
+
+  // Check if entire advanced section should be hidden
+  const hideEntireAdvancedSection =
+    hideAppearanceSection && hideBehaviorSection && hideHistorySection;
+
   // Advanced Fields
-  const advancedFields = (
+  const advancedFields = hideEntireAdvancedSection ? null : (
     <>
       {/* Appearance Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("character-detail:sections.appearance")}
-        </h4>
+      {!hideAppearanceSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("character-detail:sections.appearance")}
+          </h4>
 
         {/* Height and Weight */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -802,15 +829,20 @@ export function CharacterDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Appearance and Behavior - only show if both sections are visible */}
+      {!hideAppearanceSection && !hideBehaviorSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Behavior Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("character-detail:sections.behavior")}
-        </h4>
+      {!hideBehaviorSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("character-detail:sections.behavior")}
+          </h4>
 
         {/* Archetype */}
         <FieldWithVisibilityToggle
@@ -928,15 +960,20 @@ export function CharacterDetailView({
             </FieldWithVisibilityToggle>
           )
         )}
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Behavior and History - only show if both sections are visible */}
+      {!hideBehaviorSection && !hideHistorySection && (
+        <Separator className="my-6" />
+      )}
 
       {/* History Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("character-detail:sections.locations_orgs")}
-        </h4>
+      {!hideHistorySection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("character-detail:sections.locations_orgs")}
+          </h4>
 
         {/* Birth Place */}
         <FieldWithVisibilityToggle
@@ -1037,7 +1074,8 @@ export function CharacterDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
     </>
   );
 
