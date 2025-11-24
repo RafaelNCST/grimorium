@@ -263,6 +263,24 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/40;
   }
+
+  /* Horizontal scrollbar with left offset */
+  .scrollbar-offset-left::-webkit-scrollbar {
+    @apply h-2;
+  }
+
+  .scrollbar-offset-left::-webkit-scrollbar-track {
+    @apply bg-transparent;
+    margin-left: 4rem;
+  }
+
+  .scrollbar-offset-left::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  .scrollbar-offset-left::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
 }
 
 @layer components {
