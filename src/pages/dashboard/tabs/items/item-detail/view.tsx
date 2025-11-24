@@ -359,13 +359,34 @@ export const ItemDetailView = React.memo(function ItemDetailView({
   // ==================
   // ADVANCED FIELDS (with FieldWithVisibilityToggle)
   // ==================
-  const advancedFields = (
+  // Helper function to check if all fields in a group are hidden
+  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
+    if (isEditing) return false; // Never hide sections in edit mode
+    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+  };
+
+  // Define field groups for each mini-section
+  const detailedDescriptionsFields = ['appearance', 'origin', 'alternativeNames'];
+  const narrativeFields = ['storyRarity', 'narrativePurpose'];
+  const mechanicsFields = ['usageRequirements', 'usageConsequences', 'itemUsage'];
+
+  // Check if mini-sections should be hidden
+  const hideDetailedDescriptionsSection = areAllFieldsHidden(detailedDescriptionsFields);
+  const hideNarrativeSection = areAllFieldsHidden(narrativeFields);
+  const hideMechanicsSection = areAllFieldsHidden(mechanicsFields);
+
+  // Check if entire advanced section should be hidden
+  const hideEntireAdvancedSection =
+    hideDetailedDescriptionsSection && hideNarrativeSection && hideMechanicsSection;
+
+  const advancedFields = hideEntireAdvancedSection ? null : (
     <>
       {/* Detailed Descriptions Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("item-detail:sections.detailed_descriptions")}
-        </h4>
+      {!hideDetailedDescriptionsSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("item-detail:sections.detailed_descriptions")}
+          </h4>
 
         {/* Appearance */}
         <FieldWithVisibilityToggle
@@ -454,15 +475,20 @@ export const ItemDetailView = React.memo(function ItemDetailView({
             <span className="italic text-muted-foreground/60">Sem dados</span>
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Detailed Descriptions and Narrative - only show if both sections are visible */}
+      {!hideDetailedDescriptionsSection && !hideNarrativeSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Narrative Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("item-detail:sections.narrative")}
-        </h4>
+      {!hideNarrativeSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("item-detail:sections.narrative")}
+          </h4>
 
         {/* Story Rarity */}
         <FieldWithVisibilityToggle
@@ -550,15 +576,20 @@ export const ItemDetailView = React.memo(function ItemDetailView({
             <DisplayTextarea value={item.narrativePurpose} />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator className="my-6" />
+      {/* Separator between Narrative and Mechanics - only show if both sections are visible */}
+      {!hideNarrativeSection && !hideMechanicsSection && (
+        <Separator className="my-6" />
+      )}
 
       {/* Mechanics Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("item-detail:sections.mechanics")}
-        </h4>
+      {!hideMechanicsSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("item-detail:sections.mechanics")}
+          </h4>
 
         {/* Usage Requirements */}
         <FieldWithVisibilityToggle
@@ -647,7 +678,8 @@ export const ItemDetailView = React.memo(function ItemDetailView({
             <DisplayTextarea value={item.itemUsage} />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
     </>
   );
 
