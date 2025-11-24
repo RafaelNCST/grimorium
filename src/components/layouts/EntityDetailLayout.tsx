@@ -335,6 +335,14 @@ export function EntityDetailLayout({
                   isVisible={section.isVisible}
                   onVisibilityToggle={section.onVisibilityToggle}
                   isCollapsible={section.isCollapsible}
+                  // Empty state props
+                  emptyState={(section as any).emptyState}
+                  emptyIcon={(section as any).emptyIcon}
+                  emptyTitle={(section as any).emptyTitle}
+                  emptyDescription={(section as any).emptyDescription}
+                  addButtonLabel={(section as any).addButtonLabel}
+                  onAddClick={(section as any).onAddClick}
+                  blockedEntityName={(section as any).blockedEntityName}
                 >
                   {section.content}
                 </CollapsibleSection>

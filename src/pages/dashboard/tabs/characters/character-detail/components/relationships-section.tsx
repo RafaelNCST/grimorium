@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Heart,
@@ -67,6 +67,10 @@ interface RelationshipsSectionProps {
   currentCharacterId: string;
   isEditMode: boolean;
   onRelationshipsChange: (relationships: ICharacterRelationship[]) => void;
+  /** Controlled state for add dialog - when true, opens the add relationship dialog */
+  isAddDialogOpen?: boolean;
+  /** Callback when the add dialog open state changes */
+  onAddDialogOpenChange?: (open: boolean) => void;
 }
 
 interface RelationshipTypeConfig {
@@ -119,10 +123,23 @@ export function RelationshipsSection({
   currentCharacterId,
   isEditMode,
   onRelationshipsChange,
+  isAddDialogOpen: controlledIsAddDialogOpen,
+  onAddDialogOpenChange,
 }: RelationshipsSectionProps) {
   const { t } = useTranslation("character-detail");
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // Support both controlled and uncontrolled modes for the add dialog
+  const [internalIsAddDialogOpen, setInternalIsAddDialogOpen] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isAddDialogOpen = controlledIsAddDialogOpen ?? internalIsAddDialogOpen;
+  const setIsAddDialogOpen = (open: boolean) => {
+    if (onAddDialogOpenChange) {
+      onAddDialogOpenChange(open);
+    } else {
+      setInternalIsAddDialogOpen(open);
+    }
+  };
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingRelationship, setEditingRelationship] =
     useState<ICharacterRelationship | null>(null);
@@ -132,6 +149,17 @@ export function RelationshipsSection({
   const [intensity, setIntensity] = useState<number[]>([5]);
   const [description, setDescription] = useState<string>("");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
+
+  // Reset form when dialog opens (especially important when controlled externally)
+  useEffect(() => {
+    if (isAddDialogOpen) {
+      setSelectedCharacterId("");
+      setSelectedType("");
+      setIntensity([5]);
+      setDescription("");
+      setModalStep(1);
+    }
+  }, [isAddDialogOpen]);
 
   // Filter out current character and already related characters
   const availableCharacters = allCharacters.filter(
@@ -231,48 +259,14 @@ export function RelationshipsSection({
     setDescription("");
   };
 
-  // Empty state when no characters available
-  if (allCharacters.length <= 1 && isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t(
-            "character-detail:empty_states.need_more_characters_relationships"
-          )}
-        </p>
-        <p className="text-xs mt-1">
-          {t(
-            "character-detail:empty_states.need_more_characters_relationships_hint"
-          )}
-        </p>
-      </div>
-    );
-  }
-
-  // Empty state when no relationships in view mode
-  if (relationships.length === 0 && !isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t("character-detail:empty_states.no_relationships")}
-        </p>
-        <p className="text-xs mt-1">
-          {t("character-detail:empty_states.no_relationships_hint")}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      {/* Add Relationship Button - Always visible in Edit Mode */}
-      {isEditMode && (
+      {/* Add Relationship Button - Only visible when there are available characters */}
+      {isEditMode && availableCharacters.length > 0 && (
         <Button
           onClick={handleOpenAddDialog}
           className="w-full"
-          variant="secondary"
+          variant="magical"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           {t("character-detail:relationships.add_relationship")}

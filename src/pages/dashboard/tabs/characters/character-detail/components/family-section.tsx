@@ -306,22 +306,6 @@ export const FamilySection = React.memo(function FamilySection({
     );
   };
 
-
-  // Empty state in view mode
-  if (!hasFamilyMembers && !isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <Heart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t("character-detail:empty_states.no_family")}
-        </p>
-        <p className="text-xs mt-1">
-          {t("character-detail:empty_states.no_family_hint")}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Family Fields - All in vertical sequence, no groupings */}

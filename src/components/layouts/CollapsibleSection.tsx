@@ -1,7 +1,7 @@
 import * as React from "react";
 import { type ReactNode } from "react";
 
-import { ChevronDown, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, EyeOff, Plus, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { InfoAlert } from "@/components/ui/info-alert";
 import {
   Tooltip,
   TooltipContent,
@@ -44,6 +45,28 @@ export interface CollapsibleSectionProps {
 
   /** Se a seção pode ser colapsada (default: true) */
   isCollapsible?: boolean;
+
+  // ========== EMPTY STATE PROPS ==========
+  /** Estado vazio da seção */
+  emptyState?: "empty-view" | "empty-edit" | "blocked-no-data" | "blocked-all-used" | null;
+
+  /** Ícone para o estado vazio (visualização) */
+  emptyIcon?: LucideIcon;
+
+  /** Título do estado vazio (visualização) */
+  emptyTitle?: string;
+
+  /** Descrição do estado vazio (visualização) */
+  emptyDescription?: string;
+
+  /** Label do botão de adicionar (edição) */
+  addButtonLabel?: string;
+
+  /** Callback quando o botão de adicionar é clicado */
+  onAddClick?: () => void;
+
+  /** Nome da entidade bloqueada (ex: "personagens", "facções") */
+  blockedEntityName?: string;
 }
 
 /**
@@ -56,8 +79,9 @@ export interface CollapsibleSectionProps {
  * - Toggle de visibilidade opcional (modo edição)
  * - Padding interno padronizado via CardContent
  * - Estilos automáticos para estado visível/invisível
+ * - Estados vazios padronizados (empty-view, empty-edit, blocked-no-data, blocked-all-used)
  *
- * @example
+ * @example Básico
  * ```tsx
  * <CollapsibleSection
  *   title="Informações Avançadas"
@@ -81,6 +105,62 @@ export interface CollapsibleSectionProps {
  *   <RelationshipsContent />
  * </CollapsibleSection>
  * ```
+ *
+ * @example Estado vazio em visualização
+ * ```tsx
+ * <CollapsibleSection
+ *   title="Relacionamentos"
+ *   isOpen={true}
+ *   onToggle={() => {}}
+ *   emptyState="empty-view"
+ *   emptyIcon={Users}
+ *   emptyTitle="Nenhum relacionamento"
+ *   emptyDescription="Este personagem ainda não tem relacionamentos cadastrados"
+ * />
+ * ```
+ *
+ * @example Estado vazio em edição
+ * ```tsx
+ * <CollapsibleSection
+ *   title="Relacionamentos"
+ *   isOpen={true}
+ *   onToggle={() => {}}
+ *   isEditMode={true}
+ *   emptyState="empty-edit"
+ *   addButtonLabel="Adicionar Relacionamento"
+ *   onAddClick={() => setIsAddDialogOpen(true)}
+ * />
+ * ```
+ *
+ * @example Estado bloqueado sem dados
+ * ```tsx
+ * <CollapsibleSection
+ *   title="Relacionamentos"
+ *   isOpen={true}
+ *   onToggle={() => {}}
+ *   isEditMode={true}
+ *   emptyState="blocked-no-data"
+ *   blockedEntityName="personagens"
+ * />
+ * ```
+ *
+ * @example Estado bloqueado com todos os dados usados
+ * ```tsx
+ * <CollapsibleSection
+ *   title="Relacionamentos"
+ *   isOpen={true}
+ *   onToggle={() => {}}
+ *   isEditMode={true}
+ *   emptyState="blocked-all-used"
+ *   blockedEntityName="personagens"
+ * >
+ *   <div className="space-y-3">
+ *     {relationships.map((rel) => (
+ *       <RelationshipCard key={rel.id} relationship={rel} />
+ *     ))}
+ *   </div>
+ * </CollapsibleSection>
+ * ```
  */
 export function CollapsibleSection({
   title,
@@ -92,7 +172,79 @@ export function CollapsibleSection({
   onVisibilityToggle,
   className,
   isCollapsible = true,
+  // Empty state props
+  emptyState = null,
+  emptyIcon: EmptyIcon,
+  emptyTitle,
+  emptyDescription,
+  addButtonLabel,
+  onAddClick,
+  blockedEntityName,
 }: CollapsibleSectionProps) {
+  // Renderizar conteúdo do estado vazio
+  const renderEmptyState = () => {
+    // Estado 1: Vazio em visualização
+    if (emptyState === "empty-view" && !isEditMode) {
+      return (
+        <div className="text-center text-muted-foreground text-sm py-8">
+          {EmptyIcon && <EmptyIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />}
+          {emptyTitle && <p className="font-medium">{emptyTitle}</p>}
+          {emptyDescription && <p className="text-xs mt-1">{emptyDescription}</p>}
+        </div>
+      );
+    }
+
+    // Estado 2: Vazio em edição - Botão magical + children (for dialogs)
+    if (emptyState === "empty-edit" && isEditMode) {
+      return (
+        <>
+          <Button
+            onClick={onAddClick}
+            className="w-full"
+            variant="magical"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {addButtonLabel}
+          </Button>
+          {/* Render children hidden so dialogs inside them can still work */}
+          {children && <div className="hidden">{children}</div>}
+        </>
+      );
+    }
+
+    // Estado 3: Bloqueado porque não há dados para adicionar
+    if (emptyState === "blocked-no-data" && isEditMode) {
+      return (
+        <InfoAlert>
+          <p className="font-medium">Não há {blockedEntityName} suficientes</p>
+          <p className="text-xs mt-1">
+            Você precisa cadastrar mais {blockedEntityName} antes de adicionar aqui.
+          </p>
+        </InfoAlert>
+      );
+    }
+
+    // Estado 4: Bloqueado porque todos os dados já foram usados
+    if (emptyState === "blocked-all-used" && isEditMode) {
+      return (
+        <div className="space-y-4">
+          <InfoAlert>
+            <p className="font-medium">
+              Todos os {blockedEntityName} disponíveis foram adicionados
+            </p>
+            <p className="text-xs mt-1">
+              Para adicionar mais, primeiro cadastre novos {blockedEntityName}.
+            </p>
+          </InfoAlert>
+          {children && <div>{children}</div>}
+        </div>
+      );
+    }
+
+    // Fallback: renderizar children normalmente
+    return children;
+  };
+
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <Card
@@ -158,10 +310,10 @@ export function CollapsibleSection({
         {/* Content with padding */}
         {isCollapsible ? (
           <CollapsibleContent>
-            <CardContent className="pt-6">{children}</CardContent>
+            <CardContent className="pt-6">{renderEmptyState()}</CardContent>
           </CollapsibleContent>
         ) : (
-          <CardContent>{children}</CardContent>
+          <CardContent>{renderEmptyState()}</CardContent>
         )}
       </Card>
     </Collapsible>

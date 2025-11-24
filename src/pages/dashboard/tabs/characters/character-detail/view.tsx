@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   AlertCircle,
   Calendar,
+  Heart,
   Shield,
   Trash2,
   User,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -274,6 +276,9 @@ export function CharacterDetailView({
   onSavePowerLink,
 }: CharacterDetailViewProps) {
   const { t } = useTranslation(["character-detail", "create-character"]);
+
+  // State for controlling the add relationship dialog from the empty state button
+  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] = useState(false);
 
   // Convert role constants to FormSimpleGrid format with universal pattern
   const roleOptions = roles.map((role) => ({
@@ -1097,12 +1102,53 @@ export function CharacterDetailView({
           onRelationshipsChange={(relationships) =>
             onEditDataChange("relationships", relationships)
           }
+          isAddDialogOpen={isAddRelationshipDialogOpen}
+          onAddDialogOpenChange={setIsAddRelationshipDialogOpen}
         />
       ),
       isCollapsible: true,
       defaultOpen: false,
       isVisible: sectionVisibility.relationships !== false,
       onVisibilityToggle: () => onSectionVisibilityToggle("relationships"),
+      // Empty states
+      emptyState: (() => {
+        const relationships = isEditing ? editData.relationships || [] : character.relationships || [];
+        const availableCharacters = mockCharacters.filter(
+          (char) =>
+            char.id !== character.id &&
+            !relationships.some((rel) => rel.characterId === char.id)
+        );
+
+        // Estado 3: Bloqueado - não há personagens suficientes
+        if (mockCharacters.length <= 1 && isEditing) {
+          return "blocked-no-data";
+        }
+
+        // Estado 4: Bloqueado - todos os personagens disponíveis foram usados
+        if (isEditing && relationships.length > 0 && availableCharacters.length === 0) {
+          return "blocked-all-used";
+        }
+
+        // Estado 1: Vazio em visualização
+        if (relationships.length === 0 && !isEditing) {
+          return "empty-view";
+        }
+
+        // Estado 2: Vazio em edição
+        if (relationships.length === 0 && isEditing) {
+          return "empty-edit";
+        }
+
+        return null;
+      })(),
+      emptyIcon: Users,
+      emptyTitle: t("character-detail:empty_states.no_relationships"),
+      emptyDescription: t("character-detail:empty_states.no_relationships_hint"),
+      addButtonLabel: t("character-detail:relationships.add_relationship"),
+      onAddClick: () => {
+        setIsAddRelationshipDialogOpen(true);
+      },
+      blockedEntityName: "personagens",
     },
     {
       id: "family",
@@ -1134,6 +1180,47 @@ export function CharacterDetailView({
       defaultOpen: false,
       isVisible: sectionVisibility.family !== false,
       onVisibilityToggle: () => onSectionVisibilityToggle("family"),
+      // Empty states
+      emptyState: (() => {
+        const family = (isEditing ? editData.family : character.family) || {
+          grandparents: [],
+          parents: [],
+          spouses: [],
+          unclesAunts: [],
+          cousins: [],
+          children: [],
+          siblings: [],
+          halfSiblings: [],
+        };
+        const hasFamilyMembers =
+          (family.grandparents && family.grandparents.length > 0) ||
+          (family.parents && family.parents.length > 0) ||
+          (family.spouses && family.spouses.length > 0) ||
+          (family.unclesAunts && family.unclesAunts.length > 0) ||
+          (family.cousins && family.cousins.length > 0) ||
+          (family.children && family.children.length > 0) ||
+          (family.siblings && family.siblings.length > 0) ||
+          (family.halfSiblings && family.halfSiblings.length > 0);
+
+        // Estado 3: Bloqueado - não há personagens suficientes
+        if (mockCharacters.length <= 1 && isEditing) {
+          return "blocked-no-data";
+        }
+
+        // Estado 1: Vazio em visualização
+        if (!hasFamilyMembers && !isEditing) {
+          return "empty-view";
+        }
+
+        // Estado 2: Vazio em edição (não usamos porque a FamilySection sempre mostra campos)
+        // A seção de família sempre mostra os campos mesmo vazios
+
+        return null;
+      })(),
+      emptyIcon: Heart,
+      emptyTitle: t("character-detail:empty_states.no_family"),
+      emptyDescription: t("character-detail:empty_states.no_family_hint"),
+      blockedEntityName: "personagens",
     },
   ];
 

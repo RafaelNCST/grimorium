@@ -82,14 +82,13 @@ Componentes reutilizáveis gerais utilizados no projeto (excluindo formulários 
 ---
 
 ## 7. CollapsibleSection
-**Componente:** `CollapsibleSection` (`src/components/detail-page/CollapsibleSection.tsx`)
-**Descrição:** Seção com header clicável que expande/colapsa conteúdo.
+**Componente:** `CollapsibleSection` (`src/components/layouts/CollapsibleSection.tsx`)
+**Descrição:** Seção colapsável padronizada com estados vazios integrados. Usada em páginas de detalhes para seções extras (relacionamentos, família, etc).
 
-**Exemplo:**
+**Exemplo Básico:**
 ```tsx
 <CollapsibleSection
-  title="Seção"
-  icon={<Icon className="h-5 w-5" />}
+  title="Relacionamentos"
   isOpen={isOpen}
   onToggle={() => setIsOpen(!isOpen)}
 >
@@ -97,12 +96,80 @@ Componentes reutilizáveis gerais utilizados no projeto (excluindo formulários 
 </CollapsibleSection>
 ```
 
+**Exemplo com Estado Vazio em Visualização:**
+```tsx
+<CollapsibleSection
+  title="Relacionamentos"
+  isOpen={true}
+  onToggle={() => {}}
+  emptyState="empty-view"
+  emptyIcon={Users}
+  emptyTitle="Nenhum relacionamento"
+  emptyDescription="Este personagem ainda não tem relacionamentos cadastrados"
+/>
+```
+
+**Exemplo com Estado Vazio em Edição:**
+```tsx
+<CollapsibleSection
+  title="Relacionamentos"
+  isOpen={true}
+  onToggle={() => {}}
+  isEditMode={true}
+  emptyState="empty-edit"
+  addButtonLabel="Adicionar Relacionamento"
+  onAddClick={() => setIsAddDialogOpen(true)}
+/>
+```
+
+**Exemplo com Estado Bloqueado (sem dados):**
+```tsx
+<CollapsibleSection
+  title="Relacionamentos"
+  isOpen={true}
+  onToggle={() => {}}
+  isEditMode={true}
+  emptyState="blocked-no-data"
+  blockedEntityName="personagens"
+/>
+```
+
+**Exemplo com Estado Bloqueado (todos usados):**
+```tsx
+<CollapsibleSection
+  title="Relacionamentos"
+  isOpen={true}
+  onToggle={() => {}}
+  isEditMode={true}
+  emptyState="blocked-all-used"
+  blockedEntityName="personagens"
+>
+  {/* Lista de relacionamentos existentes */}
+</CollapsibleSection>
+```
+
 **Propriedades:**
-- `title`: string
-- `icon`: ReactNode (opcional)
-- `isOpen`: boolean
-- `onToggle`: () => void
-- `children`: ReactNode
+- `title`: string - Título da seção
+- `isOpen`: boolean - Se a seção está aberta/expandida
+- `onToggle`: () => void - Callback ao clicar para abrir/fechar
+- `children`: ReactNode - Conteúdo da seção
+- `isEditMode`: boolean (opcional) - Se está em modo de edição
+- `isVisible`: boolean (opcional) - Controla visibilidade da seção
+- `onVisibilityToggle`: () => void (opcional) - Callback para toggle de visibilidade
+- `isCollapsible`: boolean (opcional, default: true) - Se pode ser colapsada
+- `emptyState`: "empty-view" | "empty-edit" | "blocked-no-data" | "blocked-all-used" | null (opcional) - Estado vazio
+- `emptyIcon`: LucideIcon (opcional) - Ícone para estado vazio em visualização
+- `emptyTitle`: string (opcional) - Título do estado vazio
+- `emptyDescription`: string (opcional) - Descrição do estado vazio
+- `addButtonLabel`: string (opcional) - Label do botão de adicionar em edição
+- `onAddClick`: () => void (opcional) - Callback ao clicar no botão de adicionar
+- `blockedEntityName`: string (opcional) - Nome da entidade bloqueada (ex: "personagens")
+
+**Estados Vazios:**
+1. **empty-view**: Mostra ícone + título + descrição (modo visualização sem dados)
+2. **empty-edit**: Mostra botão magical "Adicionar" (modo edição sem dados)
+3. **blocked-no-data**: Mostra InfoAlert informando falta de dados para adicionar
+4. **blocked-all-used**: Mostra InfoAlert + conteúdo existente (todos os dados disponíveis já foram usados)
 
 ---
 
