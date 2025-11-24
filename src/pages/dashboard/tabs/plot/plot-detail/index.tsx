@@ -52,14 +52,20 @@ export function PlotArcDetail() {
   const [eventChainSectionOpen, setEventChainSectionOpen] = useState(true);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
 
+  // Field visibility state
+  const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean>>({});
+  const [originalFieldVisibility, setOriginalFieldVisibility] = useState<Record<string, boolean>>({});
+
   // Validation state
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Check if there are unsaved changes
   const hasChanges = useMemo(() => {
     if (!originalData || !isEditing) return false;
-    return JSON.stringify(editForm) !== JSON.stringify(originalData);
-  }, [editForm, originalData, isEditing]);
+    const formChanged = JSON.stringify(editForm) !== JSON.stringify(originalData);
+    const visibilityChanged = JSON.stringify(fieldVisibility) !== JSON.stringify(originalFieldVisibility);
+    return formChanged || visibilityChanged;
+  }, [editForm, originalData, isEditing, fieldVisibility, originalFieldVisibility]);
 
   // Check required fields
   const requiredFields = ["name", "focus", "description", "size", "status"];
@@ -95,6 +101,8 @@ export function PlotArcDetail() {
             setArc(loadedArc);
             setEditForm(loadedArc);
             setOriginalData(loadedArc);
+            setFieldVisibility(loadedArc.fieldVisibility || {});
+            setOriginalFieldVisibility(loadedArc.fieldVisibility || {});
           }
           setCharacters(
             loadedCharacters.map((c) => ({
@@ -171,17 +179,19 @@ export function PlotArcDetail() {
 
     // If no changes, cancel immediately
     setEditForm({ ...arc });
+    setFieldVisibility(originalFieldVisibility);
     setValidationErrors({});
     setIsEditing(false);
-  }, [arc, hasChanges]);
+  }, [arc, hasChanges, originalFieldVisibility]);
 
   const handleConfirmCancel = useCallback(() => {
     if (!arc) return;
     setEditForm({ ...arc });
+    setFieldVisibility(originalFieldVisibility);
     setValidationErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [arc]);
+  }, [arc, originalFieldVisibility]);
 
   const handleUnsavedChangesDialogChange = useCallback((open: boolean) => {
     setShowUnsavedChangesDialog(open);
@@ -319,9 +329,11 @@ export function PlotArcDetail() {
     }
 
     try {
-      await updatePlotArc(arc.id, editForm);
-      setArc({ ...arc, ...editForm } as IPlotArc);
-      setOriginalData({ ...arc, ...editForm } as IPlotArc);
+      const updatedData = { ...editForm, fieldVisibility };
+      await updatePlotArc(arc.id, updatedData);
+      setArc({ ...arc, ...updatedData } as IPlotArc);
+      setOriginalData({ ...arc, ...updatedData } as IPlotArc);
+      setOriginalFieldVisibility(fieldVisibility);
       setValidationErrors({});
       setIsEditing(false);
       toast.success(t("plot:toast.arc_updated"));
@@ -329,7 +341,7 @@ export function PlotArcDetail() {
       console.error("Failed to update plot arc:", error);
       toast.error(t("plot:toast.update_failed"));
     }
-  }, [arc, editForm, t]);
+  }, [arc, editForm, fieldVisibility, t]);
 
   // Delete handlers
   const handleDeleteArc = useCallback(async () => {
@@ -399,6 +411,14 @@ export function PlotArcDetail() {
     setAdvancedSectionOpen((prev) => !prev);
   }, []);
 
+  // Field visibility toggle handler
+  const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
+    setFieldVisibility((prev) => ({
+      ...prev,
+      [fieldName]: prev[fieldName] === false ? true : false,
+    }));
+  }, []);
+
   // Show nothing while loading to avoid flash
   if (isLoading) {
     return null;
@@ -457,6 +477,8 @@ export function PlotArcDetail() {
       onAddEvent={handleAddEvent}
       onEventChainSectionToggle={handleEventChainSectionToggle}
       onAdvancedSectionToggle={handleAdvancedSectionToggle}
+      fieldVisibility={fieldVisibility}
+      onFieldVisibilityToggle={handleFieldVisibilityToggle}
     />
   );
 }

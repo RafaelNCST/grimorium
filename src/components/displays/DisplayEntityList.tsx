@@ -27,9 +27,9 @@ export interface DisplayEntityItem {
 
 interface DisplayEntityListProps {
   /**
-   * Title/label for the collapsible section
+   * Title/label for the collapsible section (optional - omit when using inside FieldWithVisibilityToggle)
    */
-  label: string;
+  label?: string;
   /**
    * List of entities to display (if empty/null, shows empty state)
    */
@@ -99,6 +99,41 @@ export function DisplayEntityList({
   const hasEntities = entities && entities.length > 0;
   const entityCount = entities?.length || 0;
 
+  // Simple list without collapsible when no label is provided
+  const entityListContent = hasEntities ? (
+    <div className="flex flex-col gap-2">
+      {entities.map((entity) => (
+        <div
+          key={entity.id}
+          className="flex items-center gap-2 p-2 bg-muted rounded-lg"
+        >
+          {entity.image ? (
+            <img
+              src={entity.image}
+              alt={entity.name}
+              className="w-8 h-8 rounded object-cover flex-shrink-0"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs text-muted-foreground font-semibold">
+                {entity.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+          <span className="text-sm font-medium">{entity.name}</span>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <span className="italic text-muted-foreground/60">Sem dados</span>
+  );
+
+  // Without label, render just the list
+  if (!label) {
+    return <div className={className}>{entityListContent}</div>;
+  }
+
+  // With label, render collapsible
   return (
     <Collapsible
       open={open}
@@ -126,33 +161,7 @@ export function DisplayEntityList({
         )}
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-2">
-        {hasEntities ? (
-          <div className="flex flex-col gap-2">
-            {entities.map((entity) => (
-              <div
-                key={entity.id}
-                className="flex items-center gap-2 p-2 bg-muted rounded-lg"
-              >
-                {entity.image ? (
-                  <img
-                    src={entity.image}
-                    alt={entity.name}
-                    className="w-8 h-8 rounded object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs text-muted-foreground font-semibold">
-                      {entity.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                <span className="text-sm font-medium">{entity.name}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <span className="italic text-muted-foreground/60">Sem dados</span>
-        )}
+        {entityListContent}
       </CollapsibleContent>
     </Collapsible>
   );

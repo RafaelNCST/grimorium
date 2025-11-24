@@ -114,6 +114,8 @@ interface PropsPlotArcDetailView {
   onAddEvent: (event: Omit<IPlotEvent, "id" | "order">) => void;
   onEventChainSectionToggle: () => void;
   onAdvancedSectionToggle: () => void;
+  fieldVisibility: Record<string, boolean>;
+  onFieldVisibilityToggle: (fieldName: string) => void;
   characters?: Array<{ id: string; name: string; image?: string }>;
   factions?: Array<{ id: string; name: string; emblem?: string }>;
   items?: Array<{ id: string; name: string; image?: string }>;
@@ -267,6 +269,8 @@ export function PlotArcDetailView({
   onAddEvent,
   onEventChainSectionToggle,
   onAdvancedSectionToggle,
+  fieldVisibility,
+  onFieldVisibilityToggle,
   characters = [],
   factions = [],
   items = [],
@@ -514,8 +518,8 @@ export function PlotArcDetailView({
                     onBlur={(e) => validateField("description", e.target.value)}
                     maxLength={1000}
                     rows={4}
-                    required
                     showCharCount
+                    showOptionalLabel={false}
                     error={validationErrors.description}
                     labelClassName="text-primary"
                     className="resize-none"
@@ -530,8 +534,8 @@ export function PlotArcDetailView({
                     onBlur={(e) => validateField("focus", e.target.value)}
                     maxLength={500}
                     rows={3}
-                    required
                     showCharCount
+                    showOptionalLabel={false}
                     error={validationErrors.focus}
                     labelClassName="text-primary"
                     className="resize-none"
@@ -708,160 +712,218 @@ export function PlotArcDetailView({
             )}
           </CollapsibleSection>
 
-          {/* Advanced Section - Collapsible */}
+          {/* Advanced Section - Collapsible - Hide entirely if all fields are hidden in view mode */}
+          {(isEditing ||
+            fieldVisibility.importantCharacters !== false ||
+            fieldVisibility.importantFactions !== false ||
+            fieldVisibility.importantItems !== false ||
+            fieldVisibility.importantRegions !== false ||
+            fieldVisibility.arcMessage !== false ||
+            fieldVisibility.worldImpact !== false
+          ) && (
           <CollapsibleSection
             title={t("plot:detail.advanced_section")}
             isOpen={advancedSectionOpen}
             onToggle={onAdvancedSectionToggle}
           >
-            {/* Relationships Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("plot:detail.relationships_section")}</SectionTitle>
+            {/* Relationships Section - Only show if editing or at least one field is visible */}
+            {(isEditing ||
+              fieldVisibility.importantCharacters !== false ||
+              fieldVisibility.importantFactions !== false ||
+              fieldVisibility.importantItems !== false ||
+              fieldVisibility.importantRegions !== false
+            ) && (
+              <div className="space-y-6">
+                <SectionTitle>{t("plot:detail.relationships_section")}</SectionTitle>
 
-              {/* Important Characters */}
-              {isEditing ? (
-                <FormEntityMultiSelectAuto
-                  entityType="character"
-                  bookId={bookId}
-                  label={t("create-plot-arc:modal.important_characters")}
-                  placeholder={t("create-plot-arc:modal.select_character")}
-                  emptyText={t("create-plot-arc:modal.no_characters_available")}
-                  noSelectionText={t("create-plot-arc:modal.no_characters_selected")}
-                  searchPlaceholder={t("create-plot-arc:modal.search_character")}
-                  value={editForm.importantCharacters || []}
-                  onChange={(value) => onEditFormChange("importantCharacters", value)}
-                  labelClassName="text-sm font-medium text-primary"
-                />
-              ) : (
-                <DisplayEntityList
-                  label={t("plot:fields.important_characters")}
-                  entities={selectedCharacters}
-                />
-              )}
-
-              {/* Important Factions */}
-              {isEditing ? (
-                <FormEntityMultiSelectAuto
-                  entityType="faction"
-                  bookId={bookId}
-                  label={t("create-plot-arc:modal.important_factions")}
-                  placeholder={t("create-plot-arc:modal.select_faction")}
-                  emptyText={t("create-plot-arc:modal.no_factions_available")}
-                  noSelectionText={t("create-plot-arc:modal.no_factions_selected")}
-                  searchPlaceholder={t("create-plot-arc:modal.search_faction")}
-                  value={editForm.importantFactions || []}
-                  onChange={(value) => onEditFormChange("importantFactions", value)}
-                  labelClassName="text-sm font-medium text-primary"
-                />
-              ) : (
-                <DisplayEntityList
-                  label={t("plot:fields.important_factions")}
-                  entities={selectedFactions}
-                />
-              )}
-
-              {/* Important Items */}
-              {isEditing ? (
-                <FormEntityMultiSelectAuto
-                  entityType="item"
-                  bookId={bookId}
-                  label={t("create-plot-arc:modal.important_items")}
-                  placeholder={t("create-plot-arc:modal.select_item")}
-                  emptyText={t("create-plot-arc:modal.no_items_available")}
-                  noSelectionText={t("create-plot-arc:modal.no_items_selected")}
-                  searchPlaceholder={t("create-plot-arc:modal.search_item")}
-                  value={editForm.importantItems || []}
-                  onChange={(value) => onEditFormChange("importantItems", value)}
-                  labelClassName="text-sm font-medium text-primary"
-                />
-              ) : (
-                <DisplayEntityList
-                  label={t("plot:fields.important_items")}
-                  entities={selectedItems}
-                />
-              )}
-
-              {/* Important Regions */}
-              {isEditing ? (
-                <FormEntityMultiSelectAuto
-                  entityType="region"
-                  bookId={bookId}
-                  label={t("create-plot-arc:modal.important_regions")}
-                  placeholder={t("create-plot-arc:modal.select_region")}
-                  emptyText={t("create-plot-arc:modal.no_regions_available")}
-                  noSelectionText={t("create-plot-arc:modal.no_regions_selected")}
-                  searchPlaceholder={t("create-plot-arc:modal.search_region")}
-                  value={editForm.importantRegions || []}
-                  onChange={(value) => onEditFormChange("importantRegions", value)}
-                  labelClassName="text-sm font-medium text-primary"
-                />
-              ) : (
-                <DisplayEntityList
-                  label={t("plot:fields.important_regions")}
-                  entities={selectedRegions}
-                />
-              )}
-            </div>
-
-            <Separator className="my-6" />
-
-            {/* Narrative Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("plot:detail.narrative_section")}</SectionTitle>
-
-              {/* Arc Message */}
-              <FieldWithVisibilityToggle
-                fieldName="arcMessage"
-                label={t("plot:fields.arc_message")}
-                isOptional={true}
-                fieldVisibility={{}}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={() => {}}
-              >
+                {/* Important Characters */}
                 {isEditing ? (
-                  <FormTextarea
-                    label={t("create-plot-arc:modal.arc_message")}
-                    placeholder={t("create-plot-arc:modal.arc_message_placeholder")}
-                    value={editForm.arcMessage || ""}
-                    onChange={(e) => onEditFormChange("arcMessage", e.target.value)}
-                    maxLength={500}
-                    rows={3}
-                    showCharCount
-                    labelClassName="text-sm font-medium text-primary"
-                    className="resize-none"
-                  />
+                  <FieldWithVisibilityToggle
+                    fieldName="importantCharacters"
+                    label={t("plot:fields.important_characters")}
+                    fieldVisibility={fieldVisibility}
+                    isEditing={isEditing}
+                    onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  >
+                    <FormEntityMultiSelectAuto
+                      entityType="character"
+                      bookId={bookId}
+                      placeholder={t("create-plot-arc:modal.select_character")}
+                      emptyText={t("create-plot-arc:modal.no_characters_available")}
+                      noSelectionText={t("create-plot-arc:modal.no_characters_selected")}
+                      searchPlaceholder={t("create-plot-arc:modal.search_character")}
+                      value={editForm.importantCharacters || []}
+                      onChange={(value) => onEditFormChange("importantCharacters", value)}
+                    />
+                  </FieldWithVisibilityToggle>
                 ) : (
-                  <DisplayTextarea value={arc.arcMessage} />
+                  fieldVisibility.importantCharacters !== false && (
+                    <DisplayEntityList
+                      label={t("plot:fields.important_characters")}
+                      entities={selectedCharacters}
+                    />
+                  )
                 )}
-              </FieldWithVisibilityToggle>
 
-              {/* World Impact */}
-              <FieldWithVisibilityToggle
-                fieldName="worldImpact"
-                label={t("plot:fields.world_impact")}
-                isOptional={true}
-                fieldVisibility={{}}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={() => {}}
-              >
+                {/* Important Factions */}
                 {isEditing ? (
-                  <FormTextarea
-                    label={t("create-plot-arc:modal.world_impact")}
-                    placeholder={t("create-plot-arc:modal.world_impact_placeholder")}
-                    value={editForm.worldImpact || ""}
-                    onChange={(e) => onEditFormChange("worldImpact", e.target.value)}
-                    maxLength={500}
-                    rows={3}
-                    showCharCount
-                    labelClassName="text-sm font-medium text-primary"
-                    className="resize-none"
-                  />
+                  <FieldWithVisibilityToggle
+                    fieldName="importantFactions"
+                    label={t("plot:fields.important_factions")}
+                    fieldVisibility={fieldVisibility}
+                    isEditing={isEditing}
+                    onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  >
+                    <FormEntityMultiSelectAuto
+                      entityType="faction"
+                      bookId={bookId}
+                      placeholder={t("create-plot-arc:modal.select_faction")}
+                      emptyText={t("create-plot-arc:modal.no_factions_available")}
+                      noSelectionText={t("create-plot-arc:modal.no_factions_selected")}
+                      searchPlaceholder={t("create-plot-arc:modal.search_faction")}
+                      value={editForm.importantFactions || []}
+                      onChange={(value) => onEditFormChange("importantFactions", value)}
+                    />
+                  </FieldWithVisibilityToggle>
                 ) : (
-                  <DisplayTextarea value={arc.worldImpact} />
+                  fieldVisibility.importantFactions !== false && (
+                    <DisplayEntityList
+                      label={t("plot:fields.important_factions")}
+                      entities={selectedFactions}
+                    />
+                  )
                 )}
-              </FieldWithVisibilityToggle>
-            </div>
+
+                {/* Important Items */}
+                {isEditing ? (
+                  <FieldWithVisibilityToggle
+                    fieldName="importantItems"
+                    label={t("plot:fields.important_items")}
+                    fieldVisibility={fieldVisibility}
+                    isEditing={isEditing}
+                    onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  >
+                    <FormEntityMultiSelectAuto
+                      entityType="item"
+                      bookId={bookId}
+                      placeholder={t("create-plot-arc:modal.select_item")}
+                      emptyText={t("create-plot-arc:modal.no_items_available")}
+                      noSelectionText={t("create-plot-arc:modal.no_items_selected")}
+                      searchPlaceholder={t("create-plot-arc:modal.search_item")}
+                      value={editForm.importantItems || []}
+                      onChange={(value) => onEditFormChange("importantItems", value)}
+                    />
+                  </FieldWithVisibilityToggle>
+                ) : (
+                  fieldVisibility.importantItems !== false && (
+                    <DisplayEntityList
+                      label={t("plot:fields.important_items")}
+                      entities={selectedItems}
+                    />
+                  )
+                )}
+
+                {/* Important Regions */}
+                {isEditing ? (
+                  <FieldWithVisibilityToggle
+                    fieldName="importantRegions"
+                    label={t("plot:fields.important_regions")}
+                    fieldVisibility={fieldVisibility}
+                    isEditing={isEditing}
+                    onFieldVisibilityToggle={onFieldVisibilityToggle}
+                  >
+                    <FormEntityMultiSelectAuto
+                      entityType="region"
+                      bookId={bookId}
+                      placeholder={t("create-plot-arc:modal.select_region")}
+                      emptyText={t("create-plot-arc:modal.no_regions_available")}
+                      noSelectionText={t("create-plot-arc:modal.no_regions_selected")}
+                      searchPlaceholder={t("create-plot-arc:modal.search_region")}
+                      value={editForm.importantRegions || []}
+                      onChange={(value) => onEditFormChange("importantRegions", value)}
+                    />
+                  </FieldWithVisibilityToggle>
+                ) : (
+                  fieldVisibility.importantRegions !== false && (
+                    <DisplayEntityList
+                      label={t("plot:fields.important_regions")}
+                      entities={selectedRegions}
+                    />
+                  )
+                )}
+              </div>
+            )}
+
+            {/* Separator - Only show if both sections are visible */}
+            {(isEditing ||
+              fieldVisibility.importantCharacters !== false ||
+              fieldVisibility.importantFactions !== false ||
+              fieldVisibility.importantItems !== false ||
+              fieldVisibility.importantRegions !== false
+            ) && (isEditing ||
+              fieldVisibility.arcMessage !== false ||
+              fieldVisibility.worldImpact !== false
+            ) && (
+              <Separator className="my-6" />
+            )}
+
+            {/* Narrative Section - Only show if editing or at least one field is visible */}
+            {(isEditing ||
+              fieldVisibility.arcMessage !== false ||
+              fieldVisibility.worldImpact !== false
+            ) && (
+              <div className="space-y-6">
+                <SectionTitle>{t("plot:detail.narrative_section")}</SectionTitle>
+
+                {/* Arc Message */}
+                <FieldWithVisibilityToggle
+                  fieldName="arcMessage"
+                  label={t("plot:fields.arc_message")}
+                  fieldVisibility={fieldVisibility}
+                  isEditing={isEditing}
+                  onFieldVisibilityToggle={onFieldVisibilityToggle}
+                >
+                  {isEditing ? (
+                    <FormTextarea
+                      placeholder={t("create-plot-arc:modal.arc_message_placeholder")}
+                      value={editForm.arcMessage || ""}
+                      onChange={(e) => onEditFormChange("arcMessage", e.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      showCharCount
+                      className="resize-none"
+                    />
+                  ) : (
+                    <DisplayTextarea value={arc.arcMessage} />
+                  )}
+                </FieldWithVisibilityToggle>
+
+                {/* World Impact */}
+                <FieldWithVisibilityToggle
+                  fieldName="worldImpact"
+                  label={t("plot:fields.world_impact")}
+                  fieldVisibility={fieldVisibility}
+                  isEditing={isEditing}
+                  onFieldVisibilityToggle={onFieldVisibilityToggle}
+                >
+                  {isEditing ? (
+                    <FormTextarea
+                      placeholder={t("create-plot-arc:modal.world_impact_placeholder")}
+                      value={editForm.worldImpact || ""}
+                      onChange={(e) => onEditFormChange("worldImpact", e.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      showCharCount
+                      className="resize-none"
+                    />
+                  ) : (
+                    <DisplayTextarea value={arc.worldImpact} />
+                  )}
+                </FieldWithVisibilityToggle>
+              </div>
+            )}
           </CollapsibleSection>
+          )}
         </div>
       </div>
 

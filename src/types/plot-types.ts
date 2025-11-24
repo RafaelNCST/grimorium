@@ -26,6 +26,7 @@ export interface IPlotArc {
   importantRegions: string[];
   arcMessage?: string;
   worldImpact?: string;
+  fieldVisibility?: Record<string, boolean>;
 }
 
 export interface IPlotArcFormData {

@@ -39,9 +39,9 @@ interface FormEntityMultiSelectAutoProps {
    */
   bookId: string;
   /**
-   * Label for the field
+   * Label for the field (optional - omit when using inside FieldWithVisibilityToggle)
    */
-  label: string;
+  label?: string;
   /**
    * Placeholder text for the select
    */
@@ -269,10 +269,12 @@ export function FormEntityMultiSelectAuto({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <Label className={labelClassName}>
-          {label}
-          {required && <span className="text-destructive ml-1">*</span>}
-        </Label>
+        {label && (
+          <Label className={labelClassName}>
+            {label}
+            {required && <span className="text-destructive ml-1">*</span>}
+          </Label>
+        )}
         <div className="text-center py-6 text-muted-foreground border border-border rounded-lg">
           <p className="text-sm">Loading...</p>
         </div>
@@ -283,24 +285,26 @@ export function FormEntityMultiSelectAuto({
   return (
     <div className="space-y-3">
       {/* Header with label and counter */}
-      <div className="flex items-center justify-between min-h-[20px]">
-        <Label className={labelClassName}>
-          {label}
-          {required && <span className="text-destructive ml-1">*</span>}
-        </Label>
-        <span className="text-xs text-muted-foreground">
-          {selectedOptions.length > 0 ? (
-            <>
-              {selectedOptions.length}
-              {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
-            </>
-          ) : (
-            <span className="opacity-0">
-              0{maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
-            </span>
-          )}
-        </span>
-      </div>
+      {label && (
+        <div className="flex items-center justify-between min-h-[20px]">
+          <Label className={labelClassName}>
+            {label}
+            {required && <span className="text-destructive ml-1">*</span>}
+          </Label>
+          <span className="text-xs text-muted-foreground">
+            {selectedOptions.length > 0 ? (
+              <>
+                {selectedOptions.length}
+                {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+              </>
+            ) : (
+              <span className="opacity-0">
+                0{maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+              </span>
+            )}
+          </span>
+        </div>
+      )}
 
       {/* No options available */}
       {options.length === 0 ? (
