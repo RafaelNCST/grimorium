@@ -347,13 +347,45 @@ export function RaceDetailView({
   // ==================
   // ADVANCED FIELDS
   // ==================
-  const advancedFields = (
+  // Helper function to check if all fields in a group are hidden
+  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
+    if (isEditing) return false; // Never hide sections in edit mode
+    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+  };
+
+  // Define field groups for each mini-section
+  const cultureFields = ['alternativeNames', 'culturalNotes'];
+  const appearanceFields = [
+    'generalAppearance', 'lifeExpectancy', 'averageHeight',
+    'averageWeight', 'specialPhysicalCharacteristics'
+  ];
+  const behaviorsFields = [
+    'habits', 'reproductiveCycle', 'diet', 'communication',
+    'moralTendency', 'socialOrganization', 'habitat'
+  ];
+  const powerFields = ['physicalCapacity', 'specialCharacteristics', 'weaknesses'];
+  const narrativeFields = ['storyMotivation', 'inspirations'];
+
+  // Check if mini-sections should be hidden
+  const hideCultureSection = areAllFieldsHidden(cultureFields);
+  const hideAppearanceSection = areAllFieldsHidden(appearanceFields);
+  const hideBehaviorsSection = areAllFieldsHidden(behaviorsFields);
+  const hidePowerSection = areAllFieldsHidden(powerFields);
+  const hideNarrativeSection = areAllFieldsHidden(narrativeFields);
+
+  // Check if entire advanced section should be hidden
+  const hideEntireAdvancedSection =
+    hideCultureSection && hideAppearanceSection && hideBehaviorsSection &&
+    hidePowerSection && hideNarrativeSection;
+
+  const advancedFields = hideEntireAdvancedSection ? null : (
     <div className="space-y-6">
       {/* CULTURA Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("race-detail:sections.culture")}
-        </h4>
+      {!hideCultureSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("race-detail:sections.culture")}
+          </h4>
 
         {/* Alternative Names */}
         <FieldWithVisibilityToggle
@@ -411,15 +443,18 @@ export function RaceDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator />
+      {/* Separator between Culture and Appearance - only show if both sections are visible */}
+      {!hideCultureSection && !hideAppearanceSection && <Separator />}
 
       {/* APARÊNCIA Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("race-detail:sections.appearance")}
-        </h4>
+      {!hideAppearanceSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("race-detail:sections.appearance")}
+          </h4>
 
         {/* General Appearance */}
         <FieldWithVisibilityToggle
@@ -570,15 +605,18 @@ export function RaceDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator />
+      {/* Separator between Appearance and Behaviors - only show if both sections are visible */}
+      {!hideAppearanceSection && !hideBehaviorsSection && <Separator />}
 
       {/* COMPORTAMENTOS Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("race-detail:sections.behaviors")}
-        </h4>
+      {!hideBehaviorsSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("race-detail:sections.behaviors")}
+          </h4>
 
         {/* Habits */}
         <FieldWithVisibilityToggle
@@ -819,15 +857,18 @@ export function RaceDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator />
+      {/* Separator between Behaviors and Power - only show if both sections are visible */}
+      {!hideBehaviorsSection && !hidePowerSection && <Separator />}
 
       {/* PODER Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("race-detail:sections.power")}
-        </h4>
+      {!hidePowerSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("race-detail:sections.power")}
+          </h4>
 
         {/* Physical Capacity */}
         <FieldWithVisibilityToggle
@@ -913,15 +954,18 @@ export function RaceDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
 
-      <Separator />
+      {/* Separator between Power and Narrative - only show if both sections are visible */}
+      {!hidePowerSection && !hideNarrativeSection && <Separator />}
 
       {/* NARRATIVA Section */}
-      <div className="space-y-4">
-        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-          {t("race-detail:sections.narrative")}
-        </h4>
+      {!hideNarrativeSection && (
+        <div className="space-y-4">
+          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+            {t("race-detail:sections.narrative")}
+          </h4>
 
         {/* Story Motivation */}
         <FieldWithVisibilityToggle
@@ -982,7 +1026,8 @@ export function RaceDetailView({
             />
           )}
         </FieldWithVisibilityToggle>
-      </div>
+        </div>
+      )}
     </div>
   );
 
