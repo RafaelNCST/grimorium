@@ -111,7 +111,7 @@
     "relationship_type": "Tipo de Relacionamento",
     "intensity": "Intensidade",
     "current_relationships": "Relacionamentos Atuais",
-    "description_label": "Descrição do Relacionamento (Opcional)",
+    "description_label": "Descrição do Relacionamento",
     "description_placeholder": "Se conheceram durante a batalha de Valdoria e desde então mantêm uma rivalidade respeitosa",
     "intensity_labels": {
       "weak": "Fraco",
@@ -122,6 +122,7 @@
     "add": "Adicionar",
     "save": "Salvar",
     "back": "Voltar",
+    "optional": "opcional",
     "edit_title": "Editar Relacionamento",
     "editing_with": "Editando relacionamento com",
     "no_characters_available": "Nenhum personagem disponível",

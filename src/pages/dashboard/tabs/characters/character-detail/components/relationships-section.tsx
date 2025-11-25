@@ -482,6 +482,7 @@ export function RelationshipsSection({
                     onChange={setSelectedType}
                     label={t("character-detail:relationships.relationship_type")}
                     columns={4}
+                    required
                     options={RELATIONSHIP_TYPES.map((type) => ({
                       value: type.value,
                       label: t(
@@ -494,63 +495,62 @@ export function RelationshipsSection({
                   />
 
                   {/* Intensity Slider */}
-                  {selectedType && (
-                    <>
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold">
-                          {t("character-detail:relationships.intensity")}:{" "}
-                          {intensity[0]}/10
-                        </Label>
-                        <Slider
-                          value={intensity}
-                          onValueChange={setIntensity}
-                          max={10}
-                          min={1}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>
-                            {t(
-                              "character-detail:relationships.intensity_labels.weak"
-                            )}
-                          </span>
-                          <span>
-                            {t(
-                              "character-detail:relationships.intensity_labels.moderate"
-                            )}
-                          </span>
-                          <span>
-                            {t(
-                              "character-detail:relationships.intensity_labels.strong"
-                            )}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t("character-detail:relationships.intensity")}:{" "}
+                      {intensity[0]}/10
+                    </Label>
+                    <Slider
+                      value={intensity}
+                      onValueChange={setIntensity}
+                      max={10}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.weak"
+                        )}
+                      </span>
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.moderate"
+                        )}
+                      </span>
+                      <span>
+                        {t(
+                          "character-detail:relationships.intensity_labels.strong"
+                        )}
+                      </span>
+                    </div>
+                  </div>
 
-                      {/* Description Field */}
-                      <div className="space-y-3">
-                        <Label className="text-sm font-semibold">
-                          {t(
-                            "character-detail:relationships.description_label"
-                          )}
-                        </Label>
-                        <Textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder={t(
-                            "character-detail:relationships.description_placeholder"
-                          )}
-                          rows={3}
-                          maxLength={200}
-                          className="resize-none w-full"
-                        />
-                        <div className="flex justify-end text-xs text-muted-foreground">
-                          <span>{description.length}/200</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  {/* Description Field */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t(
+                        "character-detail:relationships.description_label"
+                      )}
+                      <span className="text-muted-foreground font-normal ml-1">
+                        ({t("character-detail:relationships.optional")})
+                      </span>
+                    </Label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={t(
+                        "character-detail:relationships.description_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={200}
+                      className="resize-none w-full"
+                    />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{description.length}/200</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -606,6 +606,7 @@ export function RelationshipsSection({
                 onChange={setSelectedType}
                 label={t("character-detail:relationships.relationship_type")}
                 columns={4}
+                required
                 options={RELATIONSHIP_TYPES.map((type) => ({
                   value: type.value,
                   label: t(
@@ -619,7 +620,7 @@ export function RelationshipsSection({
 
               {/* Intensity Slider */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">
+                <Label className="text-sm font-medium text-primary">
                   {t("character-detail:relationships.intensity")}:{" "}
                   {intensity[0]}
                   /10
@@ -651,8 +652,11 @@ export function RelationshipsSection({
 
               {/* Description Field */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">
+                <Label className="text-sm font-medium text-primary">
                   {t("character-detail:relationships.description_label")}
+                  <span className="text-muted-foreground font-normal ml-1">
+                    ({t("character-detail:relationships.optional")})
+                  </span>
                 </Label>
                 <Textarea
                   value={description}
