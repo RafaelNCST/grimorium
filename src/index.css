@@ -477,11 +477,14 @@
   }
 
   /* Prevent modal content from jumping on hover */
-  [data-radix-dialog-content] {
+  [data-radix-dialog-content],
+  [role="dialog"] {
     position: fixed !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    width: fit-content !important;
+    max-width: 90vw !important;
   }
 
   /* Ensure Select trigger has proper styling */
