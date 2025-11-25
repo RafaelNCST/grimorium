@@ -102,6 +102,7 @@ export function FactionTimeline({
     null
   );
   const [editingEvent, setEditingEvent] = useState<boolean>(false);
+  const [openEras, setOpenEras] = useState<string[]>([]);
 
   const [newEra, setNewEra] = useState({
     name: "",
@@ -166,6 +167,11 @@ export function FactionTimeline({
           : era
       )
     );
+
+    // Abre a era automaticamente se estiver fechada
+    if (!openEras.includes(selectedEraId)) {
+      setOpenEras((prev) => [...prev, selectedEraId]);
+    }
 
     setNewEvent({
       name: "",
@@ -325,11 +331,11 @@ export function FactionTimeline({
 
           <div className="relative">
             {/* Enhanced Timeline Line with Gradient and Glow */}
-            <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
+            <div className="absolute left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
               <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
             </div>
 
-            <Accordion type="multiple" className="space-y-6">
+            <Accordion type="multiple" className="space-y-6" value={openEras} onValueChange={setOpenEras}>
               {timeline.map((era) => (
                 <AccordionItem
                   key={era.id}
@@ -338,7 +344,7 @@ export function FactionTimeline({
                 >
                   <div className="relative">
                     {/* Era Marker with Enhanced Design */}
-                    <div className="absolute left-8 top-6 z-20">
+                    <div className="absolute -left-1 top-6 z-20">
                       <div className="relative">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 border-4 border-background shadow-xl flex items-center justify-center">
                           <Sparkles className="w-3 h-3 text-primary-foreground" />
@@ -348,7 +354,7 @@ export function FactionTimeline({
                     </div>
 
                     {/* Era Card with Enhanced Styling */}
-                    <div className="ml-20 relative">
+                    <div className="ml-10 relative">
                       <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden [&[data-state=open]_.chevron-icon]:rotate-0 [&[data-state=closed]_.chevron-icon]:-rotate-90">
                         <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 pr-10 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20 relative">
                           <div className="text-left flex-1">
@@ -600,23 +606,9 @@ export function FactionTimeline({
                                 </div>
                                 <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
                                   <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
-                                  <p className="text-sm text-muted-foreground mb-4">
+                                  <p className="text-sm text-muted-foreground">
                                     {t("timeline.era_no_events")}
                                   </p>
-                                  {isEditing && (
-                                    <Button
-                                      onClick={() => {
-                                        setSelectedEraId(era.id);
-                                        setShowCreateEventModal(true);
-                                      }}
-                                      size="sm"
-                                      variant="magical"
-                                      className="animate-glow"
-                                    >
-                                      <Plus className="w-4 h-4 mr-2" />
-                                      {t("timeline.create_first_event")}
-                                    </Button>
-                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1020,7 +1012,7 @@ export function FactionTimeline({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="era-name">{t("timeline.era_name")} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-name" className="text-primary">{t("timeline.era_name")} <span className="text-destructive">*</span></Label>
               <Input
                 id="era-name"
                 value={newEra.name}
@@ -1036,7 +1028,7 @@ export function FactionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="era-description">
+              <Label htmlFor="era-description" className="text-primary">
                 {t("timeline.description")} <span className="text-destructive">*</span>
               </Label>
               <Textarea
@@ -1060,7 +1052,7 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start">{t("timeline.start")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-start" className="text-primary">{t("timeline.start")} <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1078,7 +1070,7 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end">{t("timeline.end")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-end" className="text-primary">{t("timeline.end")} <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1143,7 +1135,7 @@ export function FactionTimeline({
           }
         }}
       >
-        <DialogContent className="sm:min-w-[750px] max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:min-w-[750px] max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
           <DialogHeader>
             <DialogTitle>{t("timeline.new_event")}</DialogTitle>
             <DialogDescription>
@@ -1151,9 +1143,9 @@ export function FactionTimeline({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto space-y-4 px-3 -mb-4 pb-4">
             <div className="space-y-2">
-              <Label htmlFor="event-name">{t("timeline.event_name")} *</Label>
+              <Label htmlFor="event-name" className="text-primary">{t("timeline.event_name")} <span className="text-destructive">*</span></Label>
               <Input
                 id="event-name"
                 value={newEvent.name}
@@ -1169,7 +1161,7 @@ export function FactionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="event-desc">{t("timeline.description")} *</Label>
+              <Label htmlFor="event-desc" className="text-primary">{t("timeline.description")} <span className="text-destructive">*</span></Label>
               <Textarea
                 id="event-desc"
                 value={newEvent.description}
@@ -1191,7 +1183,7 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-reason">{t("timeline.reason")} *</Label>
+                <Label htmlFor="event-reason" className="text-primary">{t("timeline.reason")} <span className="text-destructive">*</span></Label>
                 <Textarea
                   id="event-reason"
                   value={newEvent.reason}
@@ -1208,7 +1200,7 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-outcome">{t("timeline.outcome")} *</Label>
+                <Label htmlFor="event-outcome" className="text-primary">{t("timeline.outcome")} <span className="text-destructive">*</span></Label>
                 <Textarea
                   id="event-outcome"
                   value={newEvent.outcome}
@@ -1231,7 +1223,7 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-start">{t("timeline.start_date")} *</Label>
+                <Label htmlFor="event-start" className="text-primary">{t("timeline.start_date")} <span className="text-destructive">*</span></Label>
                 <Input
                   id="event-start"
                   value={newEvent.startDate}
@@ -1249,7 +1241,7 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-end">{t("timeline.end_date")} *</Label>
+                <Label htmlFor="event-end" className="text-primary">{t("timeline.end_date")} <span className="text-destructive">*</span></Label>
                 <Input
                   id="event-end"
                   value={newEvent.endDate}
@@ -1282,6 +1274,7 @@ export function FactionTimeline({
                   charactersInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1298,6 +1291,7 @@ export function FactionTimeline({
                   factionsInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1314,6 +1308,7 @@ export function FactionTimeline({
                   racesInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1330,10 +1325,11 @@ export function FactionTimeline({
                   itemsInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 pt-4 border-t shrink-0">
             <Button
               variant="secondary"
               onClick={() => setShowCreateEventModal(false)}

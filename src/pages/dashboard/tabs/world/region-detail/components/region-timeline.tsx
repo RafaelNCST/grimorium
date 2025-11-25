@@ -122,6 +122,7 @@ export function RegionTimeline({
   const [selectedEraId, setSelectedEraId] = useState<string>("");
   const [editingEra, setEditingEra] = useState<ITimelineEra | null>(null);
   const [editingEvent, setEditingEvent] = useState<boolean>(false);
+  const [openEras, setOpenEras] = useState<string[]>([]);
 
   const [newEra, setNewEra] = useState({
     name: "",
@@ -186,6 +187,11 @@ export function RegionTimeline({
           : era
       )
     );
+
+    // Abre a era automaticamente se estiver fechada
+    if (!openEras.includes(selectedEraId)) {
+      setOpenEras((prev) => [...prev, selectedEraId]);
+    }
 
     setNewEvent({
       name: "",
@@ -341,11 +347,11 @@ export function RegionTimeline({
 
           <div className="relative">
             {/* Enhanced Timeline Line with Gradient and Glow */}
-            <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
+            <div className="absolute left-3 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
               <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
             </div>
 
-            <Accordion type="multiple" className="space-y-6">
+            <Accordion type="multiple" className="space-y-6" value={openEras} onValueChange={setOpenEras}>
               {timeline.map((era) => (
                 <AccordionItem
                   key={era.id}
@@ -354,7 +360,7 @@ export function RegionTimeline({
                 >
                   <div className="relative">
                     {/* Era Marker with Enhanced Design */}
-                    <div className="absolute left-8 top-6 z-20">
+                    <div className="absolute -left-1 top-6 z-20">
                       <div className="relative">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 border-4 border-background shadow-xl flex items-center justify-center">
                           <Sparkles className="w-3 h-3 text-primary-foreground" />
@@ -364,7 +370,7 @@ export function RegionTimeline({
                     </div>
 
                     {/* Era Card with Enhanced Styling */}
-                    <div className="ml-20 relative">
+                    <div className="ml-10 relative">
                       <AccordionTrigger className="hover:no-underline p-0 [&[data-state=open]>div]:shadow-lg [&>svg]:hidden [&[data-state=open]_.chevron-icon]:rotate-0 [&[data-state=closed]_.chevron-icon]:-rotate-90">
                         <div className="w-full bg-gradient-to-r from-card/80 to-card/60 backdrop-blur-sm rounded-xl p-6 pr-10 border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 hover:border-primary/20 relative">
                           <div className="text-left flex-1">
@@ -610,23 +616,9 @@ export function RegionTimeline({
                                 </div>
                                 <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
                                   <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
-                                  <p className="text-sm text-muted-foreground mb-4">
+                                  <p className="text-sm text-muted-foreground">
                                     Esta era ainda não possui eventos
                                   </p>
-                                  {isEditing && (
-                                    <Button
-                                      onClick={() => {
-                                        setSelectedEraId(era.id);
-                                        setShowCreateEventModal(true);
-                                      }}
-                                      size="sm"
-                                      variant="magical"
-                                      className="animate-glow"
-                                    >
-                                      <Plus className="w-4 h-4 mr-2" />
-                                      Criar Primeiro Evento
-                                    </Button>
-                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1010,7 +1002,7 @@ export function RegionTimeline({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="era-name">Nome da Era <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-name" className="text-primary">Nome da Era <span className="text-destructive">*</span></Label>
               <Input
                 id="era-name"
                 value={newEra.name}
@@ -1026,7 +1018,7 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="era-description">Descrição <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-description" className="text-primary">Descrição <span className="text-destructive">*</span></Label>
               <Textarea
                 id="era-description"
                 value={newEra.description}
@@ -1048,7 +1040,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start">Início <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-start" className="text-primary">Início <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1066,7 +1058,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end">Fim <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-end" className="text-primary">Fim <span className="text-destructive">*</span></Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1131,7 +1123,7 @@ export function RegionTimeline({
           }
         }}
       >
-        <DialogContent className="sm:min-w-[750px] max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:min-w-[750px] max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
           <DialogHeader>
             <DialogTitle>Novo Evento</DialogTitle>
             <DialogDescription>
@@ -1139,9 +1131,9 @@ export function RegionTimeline({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto space-y-4 px-3 -mb-4 pb-4">
             <div className="space-y-2">
-              <Label htmlFor="event-name">Nome do Evento *</Label>
+              <Label htmlFor="event-name" className="text-primary">Nome do Evento <span className="text-destructive">*</span></Label>
               <Input
                 id="event-name"
                 value={newEvent.name}
@@ -1157,7 +1149,7 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="event-desc">Descrição *</Label>
+              <Label htmlFor="event-desc" className="text-primary">Descrição <span className="text-destructive">*</span></Label>
               <Textarea
                 id="event-desc"
                 value={newEvent.description}
@@ -1179,7 +1171,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-reason">Motivo *</Label>
+                <Label htmlFor="event-reason" className="text-primary">Motivo <span className="text-destructive">*</span></Label>
                 <Textarea
                   id="event-reason"
                   value={newEvent.reason}
@@ -1196,7 +1188,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-outcome">Como Terminou *</Label>
+                <Label htmlFor="event-outcome" className="text-primary">Como Terminou <span className="text-destructive">*</span></Label>
                 <Textarea
                   id="event-outcome"
                   value={newEvent.outcome}
@@ -1219,7 +1211,7 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-start">Data Início *</Label>
+                <Label htmlFor="event-start" className="text-primary">Data Início <span className="text-destructive">*</span></Label>
                 <Input
                   id="event-start"
                   value={newEvent.startDate}
@@ -1237,7 +1229,7 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-end">Data Fim *</Label>
+                <Label htmlFor="event-end" className="text-primary">Data Fim <span className="text-destructive">*</span></Label>
                 <Input
                   id="event-end"
                   value={newEvent.endDate}
@@ -1270,6 +1262,7 @@ export function RegionTimeline({
                   charactersInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1286,6 +1279,7 @@ export function RegionTimeline({
                   factionsInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1302,6 +1296,7 @@ export function RegionTimeline({
                   racesInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
 
             <MultiSelect
@@ -1318,10 +1313,11 @@ export function RegionTimeline({
                   itemsInvolved: value,
                 }))
               }
+              labelClassName="text-primary text-sm font-medium"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 pt-4 border-t shrink-0">
             <Button
               variant="secondary"
               onClick={() => setShowCreateEventModal(false)}
