@@ -325,6 +325,20 @@ export function RegionTimeline({
     <>
       {timeline.length > 0 && (
         <div>
+          {/* Botão Nova Era no topo */}
+          {isEditing && (
+            <div className="flex justify-start mb-6">
+              <Button
+                onClick={() => setShowCreateEraModal(true)}
+                size="sm"
+                variant="magical"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Era
+              </Button>
+            </div>
+          )}
+
           <div className="relative">
             {/* Enhanced Timeline Line with Gradient and Glow */}
             <div className="absolute left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/80 via-primary/60 to-primary/40 rounded-full shadow-lg">
@@ -625,20 +639,6 @@ export function RegionTimeline({
               ))}
             </Accordion>
           </div>
-
-          {isEditing && (
-            <div className="flex justify-end mt-6">
-              <Button
-                onClick={() => setShowCreateEraModal(true)}
-                size="sm"
-                variant="magical"
-                className="animate-glow"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nova Era
-              </Button>
-            </div>
-          )}
         </div>
       )}
 
@@ -1000,7 +1000,7 @@ export function RegionTimeline({
           }
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:min-w-[600px]">
           <DialogHeader>
             <DialogTitle>Nova Era</DialogTitle>
             <DialogDescription>
@@ -1131,7 +1131,7 @@ export function RegionTimeline({
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:min-w-[750px] max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Novo Evento</DialogTitle>
             <DialogDescription>
