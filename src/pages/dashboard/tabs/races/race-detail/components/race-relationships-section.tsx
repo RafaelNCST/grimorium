@@ -412,6 +412,7 @@ export function RaceRelationshipsSection({
                       onChange={setSelectedType}
                       label={t("race-detail:relationships.relationship_type")}
                       columns={2}
+                      required
                       options={RACE_RELATIONSHIP_TYPES.map((type) => ({
                         value: type.value,
                         label: t(
@@ -428,26 +429,27 @@ export function RaceRelationshipsSection({
                   </div>
 
                   {/* Description Field */}
-                  {selectedType && (
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold">
-                        {t("race-detail:relationships.description_label")}
-                      </Label>
-                      <Textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder={t(
-                          "race-detail:relationships.description_placeholder"
-                        )}
-                        rows={3}
-                        maxLength={200}
-                        className="resize-none w-full"
-                      />
-                      <div className="flex justify-end text-xs text-muted-foreground">
-                        <span>{description.length}/200</span>
-                      </div>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t("race-detail:relationships.description_label")}
+                      <span className="text-muted-foreground font-normal ml-1">
+                        ({t("race-detail:relationships.optional")})
+                      </span>
+                    </Label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={t(
+                        "race-detail:relationships.description_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={200}
+                      className="resize-none w-full"
+                    />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{description.length}/200</span>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
@@ -504,6 +506,7 @@ export function RaceRelationshipsSection({
                   onChange={setSelectedType}
                   label={t("race-detail:relationships.relationship_type")}
                   columns={2}
+                  required
                   options={RACE_RELATIONSHIP_TYPES.map((type) => ({
                     value: type.value,
                     label: t(
@@ -519,8 +522,11 @@ export function RaceRelationshipsSection({
 
               {/* Description Field */}
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">
+                <Label className="text-sm font-medium text-primary">
                   {t("race-detail:relationships.description_label")}
+                  <span className="text-muted-foreground font-normal ml-1">
+                    ({t("race-detail:relationships.optional")})
+                  </span>
                 </Label>
                 <Textarea
                   value={description}

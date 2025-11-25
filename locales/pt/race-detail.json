@@ -124,7 +124,8 @@
       "moderate": "Moderado",
       "strong": "Forte"
     },
-    "description_label": "Descrição (Opcional)",
+    "description_label": "Descrição do Relacionamento",
+    "optional": "opcional",
     "description_placeholder": "Os Dragões de Fogo caçam Grifos por sua carne rica em energia mágica, que fortalece suas chamas internas. Esta predação ocorre principalmente durante o verão, quando ambas as espécies compartilham territórios montanhosos.",
     "cancel": "Cancelar",
     "back": "Voltar",
