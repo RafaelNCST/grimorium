@@ -4,5 +4,26 @@
     "selected_plural": "selected",
     "max_selections_reached": "Maximum of {{max}} selection(s) reached",
     "all_options_selected": "All options have been selected"
+  },
+  "empty_field": "Not specified",
+  "title_bar": {
+    "home": "Home",
+    "dashboard": "Work Panel",
+    "chapters": "Chapters",
+    "notes": "Notes",
+    "character_detail": "Character Details",
+    "character_power": "Character Powers",
+    "item_detail": "Item Details",
+    "item_timeline": "Item Timeline",
+    "race_detail": "Race Details",
+    "faction_detail": "Faction Details",
+    "organization_detail": "Organization Details",
+    "plot_detail": "Arc Details",
+    "plot_timeline": "Plot Timeline",
+    "region_detail": "Region Details",
+    "region_map": "Region Map",
+    "power_system_detail": "Power System Details",
+    "note_detail": "Note Details",
+    "fallback": "Grimorium"
   }
 }

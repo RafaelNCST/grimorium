@@ -22,22 +22,80 @@ import {
 import { cn } from "@/lib/utils";
 import { useInboxStore } from "@/stores/inbox-store";
 
-const getPageTitle = (pathname: string): string => {
-  if (pathname === "/") return "Home";
+type TitleKey =
+  | "home"
+  | "dashboard"
+  | "chapters"
+  | "notes"
+  | "character_detail"
+  | "character_power"
+  | "item_detail"
+  | "item_timeline"
+  | "race_detail"
+  | "faction_detail"
+  | "organization_detail"
+  | "plot_detail"
+  | "plot_timeline"
+  | "region_detail"
+  | "region_map"
+  | "power_system_detail"
+  | "note_detail"
+  | "fallback";
+
+const getPageTitleKey = (pathname: string): TitleKey => {
+  if (pathname === "/") return "home";
+
+  // Notes standalone pages
+  if (pathname.startsWith("/notes/")) return "note_detail";
+  if (pathname === "/notes") return "notes";
 
   if (pathname.includes("/dashboard/")) {
-    if (pathname.includes("/chapters")) return "Chapters";
-    if (pathname.includes("/notes")) return "Notes";
-    if (pathname.includes("/character/")) return "Character";
-    if (pathname.includes("/item/")) return "Item";
-    if (pathname.includes("/organization/")) return "Organization";
-    if (pathname.includes("/plot/")) return "Plot";
-    if (pathname.includes("/race/")) return "Race";
-    if (pathname.includes("/world/")) return "World";
-    return "Dashboard";
+    // Chapters
+    if (pathname.includes("/chapters")) return "chapters";
+
+    // Notes within dashboard
+    if (pathname.includes("/notes")) return "notes";
+
+    // Character pages
+    if (pathname.includes("/character/")) {
+      if (pathname.includes("/power.")) return "character_power";
+      return "character_detail";
+    }
+
+    // Item pages
+    if (pathname.includes("/item/")) {
+      if (pathname.endsWith("/timeline")) return "item_timeline";
+      return "item_detail";
+    }
+
+    // Race pages
+    if (pathname.includes("/race/")) return "race_detail";
+
+    // Faction pages
+    if (pathname.includes("/faction/")) return "faction_detail";
+
+    // Organization pages
+    if (pathname.includes("/organization/")) return "organization_detail";
+
+    // Plot pages
+    if (pathname.includes("/plot/")) {
+      if (pathname.includes("/plot-timeline")) return "plot_timeline";
+      return "plot_detail";
+    }
+
+    // World/Region pages
+    if (pathname.includes("/world/")) {
+      if (pathname.endsWith("/map")) return "region_map";
+      return "region_detail";
+    }
+
+    // Power System pages
+    if (pathname.includes("/power-system/")) return "power_system_detail";
+
+    return "dashboard";
   }
 
-  return "Grimorium";
+  return "fallback";
 };
 
 export const TitleBar = () => {
@@ -49,12 +107,14 @@ export const TitleBar = () => {
     top: 0,
     right: 0,
   });
-  const { t } = useTranslation("inbox");
+  const { t: tInbox } = useTranslation("inbox");
+  const { t: tCommon } = useTranslation("common");
   const messages = useInboxStore((state) => state.messages);
   const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
 
   const { pathname } = routerState.location;
-  const pageTitle = getPageTitle(pathname);
+  const pageTitleKey = getPageTitleKey(pathname);
+  const pageTitle = tCommon(`title_bar.${pageTitleKey}`);
   const unreadCount = messages.filter(
     (msg) => !msg.isDeleted && !msg.isRead
   ).length;
@@ -256,7 +316,7 @@ export const TitleBar = () => {
                   </PopoverTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>{t("tooltip")}</p>
+                  <p>{tInbox("tooltip")}</p>
                 </TooltipContent>
               </Tooltip>
               <PopoverContent

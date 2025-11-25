@@ -5,5 +5,25 @@
     "max_selections_reached": "Máximo de {{max}} seleção(ões) atingido",
     "all_options_selected": "Todas as opções foram selecionadas"
   },
-  "empty_field": "Não especificado"
+  "empty_field": "Não especificado",
+  "title_bar": {
+    "home": "Página Principal",
+    "dashboard": "Painel da Obra",
+    "chapters": "Capítulos",
+    "notes": "Anotações",
+    "character_detail": "Detalhes do Personagem",
+    "character_power": "Poderes do Personagem",
+    "item_detail": "Detalhes do Item",
+    "item_timeline": "Linha do Tempo do Item",
+    "race_detail": "Detalhes da Raça",
+    "faction_detail": "Detalhes da Facção",
+    "organization_detail": "Detalhes da Organização",
+    "plot_detail": "Detalhes do Arco",
+    "plot_timeline": "Linha do Tempo do Enredo",
+    "region_detail": "Detalhes da Região",
+    "region_map": "Mapa da Região",
+    "power_system_detail": "Detalhes do Sistema de Poder",
+    "note_detail": "Detalhes da Anotação",
+    "fallback": "Grimorium"
+  }
 }
