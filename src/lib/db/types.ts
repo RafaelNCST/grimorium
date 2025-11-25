@@ -386,6 +386,25 @@ export interface DBPowerCharacterLink {
   created_at: number;
 }
 
+// Notes
+export interface DBNote {
+  id: string;
+  name: string;
+  content?: string; // JSON string do TipTap
+  paper_mode: string; // 'light' ou 'dark'
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBNoteLink {
+  id: string;
+  note_id: string;
+  entity_id: string;
+  entity_type: string; // 'character', 'region', 'faction', 'race', 'item'
+  book_id: string;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

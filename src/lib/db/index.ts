@@ -563,6 +563,32 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id);
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id);
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id);
+
+    -- NOTAS/ANOTAÇÕES
+    CREATE TABLE IF NOT EXISTS notes (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      content TEXT,
+      paper_mode TEXT DEFAULT 'light',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- LINKS DE NOTAS PARA ENTIDADES
+    CREATE TABLE IF NOT EXISTS note_links (
+      id TEXT PRIMARY KEY,
+      note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+      entity_id TEXT NOT NULL,
+      entity_type TEXT NOT NULL,
+      entity_name TEXT,
+      book_id TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      UNIQUE(note_id, entity_id, entity_type)
+    );
+
+    -- ÍNDICES PARA NOTAS
+    CREATE INDEX IF NOT EXISTS idx_note_links_note ON note_links(note_id);
+    CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
   `;
 
     await database.execute(schema);

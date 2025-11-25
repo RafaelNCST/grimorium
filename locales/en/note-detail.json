@@ -1,0 +1,68 @@
+{
+  "header": {
+    "back": "Back",
+    "untitled": "Untitled"
+  },
+  "dates": {
+    "created": "Created at",
+    "updated": "Last edited"
+  },
+  "paper_mode": {
+    "label": "Paper mode",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "toolbar": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "heading1": "Heading 1",
+    "heading2": "Heading 2",
+    "heading3": "Heading 3",
+    "paragraph": "Paragraph",
+    "bullet_list": "Bullet list",
+    "ordered_list": "Numbered list",
+    "undo": "Undo",
+    "redo": "Redo"
+  },
+  "links": {
+    "title": "Links",
+    "manage": "Manage Links",
+    "add": "Add Link",
+    "remove": "Remove",
+    "no_links": "No links",
+    "no_links_description": "Connect this note to entities",
+    "entity_types": {
+      "character": "Character",
+      "region": "Region",
+      "faction": "Faction",
+      "race": "Race",
+      "item": "Item"
+    }
+  },
+  "delete": {
+    "button": "Delete Note",
+    "step1": {
+      "title": "Delete Note",
+      "message": "This action will permanently delete the note '{{noteName}}'.",
+      "input_label": "Type the full note name to confirm:",
+      "input_placeholder": "Type the note name",
+      "name_mismatch": "The typed name doesn't match",
+      "cancel": "Cancel",
+      "continue": "Continue"
+    },
+    "step2": {
+      "title": "Final Confirmation",
+      "message": "You are about to permanently delete the note '{{noteName}}'. This action cannot be undone.",
+      "cancel": "No, cancel",
+      "confirm": "Yes, delete permanently"
+    }
+  },
+  "editor": {
+    "placeholder": "Start writing your notes"
+  },
+  "autosave": {
+    "saving": "Saving",
+    "saved": "Saved"
+  }
+}

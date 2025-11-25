@@ -369,10 +369,9 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
 
   const handleNavigateToNotes = useCallback(() => {
     navigate({
-      to: "/dashboard/$dashboardId/notes",
-      params: { dashboardId: bookId },
+      to: "/notes",
     });
-  }, [navigate, bookId]);
+  }, [navigate]);
 
   const handleShowDeleteDialog = useCallback((show: boolean) => {
     setShowDeleteDialog(show);

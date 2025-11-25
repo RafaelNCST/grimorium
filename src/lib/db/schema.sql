@@ -138,3 +138,30 @@ CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
 CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
 CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
 CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
+
+-- ANOTAÇÕES (GLOBAIS - NÃO VINCULADAS A LIVROS)
+CREATE TABLE IF NOT EXISTS notes (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  content TEXT, -- JSON do TipTap
+  paper_mode TEXT DEFAULT 'light', -- 'light' ou 'dark'
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- LINKS DE ANOTAÇÕES COM ENTIDADES
+CREATE TABLE IF NOT EXISTS note_links (
+  id TEXT PRIMARY KEY,
+  note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+  entity_id TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'character', 'region', 'faction', 'race', 'item'
+  book_id TEXT NOT NULL, -- Para saber de qual livro a entidade pertence
+  created_at INTEGER NOT NULL,
+  UNIQUE(note_id, entity_id, entity_type)
+);
+
+-- ÍNDICES PARA ANOTAÇÕES
+CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_note_links_note_id ON note_links(note_id);
+CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
+CREATE INDEX IF NOT EXISTS idx_note_links_entity_type ON note_links(entity_type);

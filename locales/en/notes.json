@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Notes",
+    "back": "Back",
+    "search_placeholder": "Search notes",
+    "new_note": "New Note",
+    "delete_mode": "Delete Mode",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "clear_filters": "Clear"
+  },
+  "sort": {
+    "label": "Sort",
+    "alphabetical": "A-Z",
+    "recent": "Recent",
+    "toggle_to": "Switch to {{order}}"
+  },
+  "filters": {
+    "characters": "Characters",
+    "regions": "Regions",
+    "factions": "Factions",
+    "races": "Races",
+    "items": "Items"
+  },
+  "list": {
+    "last_edited": "Last edited",
+    "linked_entities": "Linked entities",
+    "more_entities": "+{{count}} more"
+  },
+  "empty_state": {
+    "no_notes": "No notes here yet",
+    "no_notes_description": "Create your first note and it will appear here!",
+    "no_results": "No notes found",
+    "no_results_description": "Try adjusting the filters or search term."
+  },
+  "tabs": {
+    "characters": "Characters",
+    "regions": "Regions",
+    "factions": "Factions",
+    "races": "Races",
+    "items": "Items"
+  },
+  "create_modal": {
+    "title": "New Note",
+    "name_label": "Name",
+    "name_placeholder": "Note name",
+    "links_label": "Links",
+    "links_description": "Connect your note to characters, regions, factions, races or items",
+    "select_entities": "Select entities",
+    "manage_links": "Manage links",
+    "search_entities": "Search entities",
+    "no_entities": "No entities selected",
+    "no_entities_available": "No entities available",
+    "no_results": "No entities found",
+    "loading": "Loading",
+    "selected": "selected",
+    "selected_count": "{{count}} selected",
+    "done": "Done",
+    "optional": "optional",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "delete_modal": {
+    "title": "Delete Notes",
+    "message": "Are you sure you want to delete {{count}} note(s)? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "validation": {
+    "name_required": "Name is required",
+    "name_max_length": "Name must be at most 200 characters"
+  }
+}

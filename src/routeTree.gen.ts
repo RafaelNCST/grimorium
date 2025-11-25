@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NotesIndexRouteImport } from './routes/notes/index'
+import { Route as NotesNoteIdRouteImport } from './routes/notes/$noteId'
 import { Route as DashboardDashboardIdIndexRouteImport } from './routes/dashboard/$dashboardId/index'
 import { Route as DashboardDashboardIdNotesIndexRouteImport } from './routes/dashboard/$dashboardId/notes/index'
 import { Route as DashboardDashboardIdChaptersIndexRouteImport } from './routes/dashboard/$dashboardId/chapters/index'
@@ -38,6 +40,16 @@ const SplatRoute = SplatRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/notes/',
+  path: '/notes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
+  id: '/notes/$noteId',
+  path: '/notes/$noteId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardDashboardIdIndexRoute =
@@ -152,6 +164,8 @@ const DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
+  '/notes': typeof NotesIndexRoute
   '/dashboard/$dashboardId': typeof DashboardDashboardIdIndexRoute
   '/dashboard/$dashboardId/chapters/$editor-chapters-id': typeof DashboardDashboardIdChaptersEditorChaptersIdRoute
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
@@ -174,6 +188,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
+  '/notes': typeof NotesIndexRoute
   '/dashboard/$dashboardId': typeof DashboardDashboardIdIndexRoute
   '/dashboard/$dashboardId/chapters/$editor-chapters-id': typeof DashboardDashboardIdChaptersEditorChaptersIdRoute
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
@@ -197,6 +213,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
+  '/notes/': typeof NotesIndexRoute
   '/dashboard/$dashboardId/': typeof DashboardDashboardIdIndexRoute
   '/dashboard/$dashboardId/chapters/$editor-chapters-id': typeof DashboardDashboardIdChaptersEditorChaptersIdRoute
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
@@ -221,6 +239,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$'
+    | '/notes/$noteId'
+    | '/notes'
     | '/dashboard/$dashboardId'
     | '/dashboard/$dashboardId/chapters/$editor-chapters-id'
     | '/dashboard/$dashboardId/notes/$editorNotesId'
@@ -243,6 +263,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/notes/$noteId'
+    | '/notes'
     | '/dashboard/$dashboardId'
     | '/dashboard/$dashboardId/chapters/$editor-chapters-id'
     | '/dashboard/$dashboardId/notes/$editorNotesId'
@@ -265,6 +287,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$'
+    | '/notes/$noteId'
+    | '/notes/'
     | '/dashboard/$dashboardId/'
     | '/dashboard/$dashboardId/chapters/$editor-chapters-id'
     | '/dashboard/$dashboardId/notes/$editorNotesId'
@@ -288,6 +312,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  NotesNoteIdRoute: typeof NotesNoteIdRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   DashboardDashboardIdIndexRoute: typeof DashboardDashboardIdIndexRoute
   DashboardDashboardIdChaptersEditorChaptersIdRoute: typeof DashboardDashboardIdChaptersEditorChaptersIdRoute
   DashboardDashboardIdNotesEditorNotesIdRoute: typeof DashboardDashboardIdNotesEditorNotesIdRoute
@@ -322,6 +348,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes/$noteId': {
+      id: '/notes/$noteId'
+      path: '/notes/$noteId'
+      fullPath: '/notes/$noteId'
+      preLoaderRoute: typeof NotesNoteIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/$dashboardId/': {
@@ -456,6 +496,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  NotesNoteIdRoute: NotesNoteIdRoute,
+  NotesIndexRoute: NotesIndexRoute,
   DashboardDashboardIdIndexRoute: DashboardDashboardIdIndexRoute,
   DashboardDashboardIdChaptersEditorChaptersIdRoute:
     DashboardDashboardIdChaptersEditorChaptersIdRoute,

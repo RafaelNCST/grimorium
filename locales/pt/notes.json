@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Anotações",
+    "back": "Voltar",
+    "search_placeholder": "Buscar anotações",
+    "new_note": "Nova Anotação",
+    "delete_mode": "Modo Exclusão",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "clear_filters": "Limpar"
+  },
+  "sort": {
+    "label": "Ordenar",
+    "alphabetical": "A-Z",
+    "recent": "Recente",
+    "toggle_to": "Alternar para {{order}}"
+  },
+  "filters": {
+    "characters": "Personagens",
+    "regions": "Regiões",
+    "factions": "Facções",
+    "races": "Raças",
+    "items": "Itens"
+  },
+  "list": {
+    "last_edited": "Última edição",
+    "linked_entities": "Entidades linkadas",
+    "more_entities": "+{{count}} mais"
+  },
+  "empty_state": {
+    "no_notes": "Sem anotações por aqui",
+    "no_notes_description": "Crie sua primeira anotação e ela aparecerá aqui!",
+    "no_results": "Nenhuma anotação encontrada",
+    "no_results_description": "Tente ajustar os filtros ou o termo de busca."
+  },
+  "tabs": {
+    "characters": "Personagens",
+    "regions": "Regiões",
+    "factions": "Facções",
+    "races": "Raças",
+    "items": "Itens"
+  },
+  "create_modal": {
+    "title": "Nova Anotação",
+    "name_label": "Nome",
+    "name_placeholder": "Nome da anotação",
+    "links_label": "Links",
+    "links_description": "Conecte sua anotação a personagens, regiões, facções, raças ou itens",
+    "select_entities": "Selecionar entidades",
+    "manage_links": "Gerenciar links",
+    "search_entities": "Buscar entidades",
+    "no_entities": "Nenhuma entidade selecionada",
+    "no_entities_available": "Nenhuma entidade disponível",
+    "no_results": "Nenhuma entidade encontrada",
+    "loading": "Carregando",
+    "selected": "selecionado",
+    "selected_count": "{{count}} selecionado(s)",
+    "done": "Concluir",
+    "optional": "opcional",
+    "cancel": "Cancelar",
+    "create": "Criar"
+  },
+  "delete_modal": {
+    "title": "Excluir Anotações",
+    "message": "Tem certeza que deseja excluir {{count}} anotação(ões)? Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  },
+  "validation": {
+    "name_required": "Nome é obrigatório",
+    "name_max_length": "Nome deve ter no máximo 200 caracteres"
+  }
+}
