@@ -19,7 +19,6 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
@@ -52,6 +51,10 @@ interface RaceRelationshipsSectionProps {
   currentRaceId: string;
   isEditMode: boolean;
   onRelationshipsChange: (relationships: IRaceRelationship[]) => void;
+  /** Controlled state for add dialog - when true, opens the add relationship dialog */
+  isAddDialogOpen?: boolean;
+  /** Callback when the add dialog open state changes */
+  onAddDialogOpenChange?: (open: boolean) => void;
 }
 
 interface RelationshipTypeConfig {
@@ -91,10 +94,23 @@ export function RaceRelationshipsSection({
   currentRaceId,
   isEditMode,
   onRelationshipsChange,
+  isAddDialogOpen: controlledIsAddDialogOpen,
+  onAddDialogOpenChange,
 }: RaceRelationshipsSectionProps) {
   const { t } = useTranslation("race-detail");
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // Support both controlled and uncontrolled modes for the add dialog
+  const [internalIsAddDialogOpen, setInternalIsAddDialogOpen] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isAddDialogOpen = controlledIsAddDialogOpen ?? internalIsAddDialogOpen;
+  const setIsAddDialogOpen = (open: boolean) => {
+    if (onAddDialogOpenChange) {
+      onAddDialogOpenChange(open);
+    } else {
+      setInternalIsAddDialogOpen(open);
+    }
+  };
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingRelationship, setEditingRelationship] =
     useState<IRaceRelationship | null>(null);
@@ -205,52 +221,10 @@ export function RaceRelationshipsSection({
     setDescription("");
   };
 
-  // Empty state when no races available
-  if (allRaces.length <= 1 && isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <Handshake className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t("race-detail:empty_states.need_more_races_relationships")}
-        </p>
-        <p className="text-xs mt-1">
-          {t("race-detail:empty_states.need_more_races_relationships_hint")}
-        </p>
-      </div>
-    );
-  }
-
-  // Empty state when no relationships in view mode
-  if (relationships.length === 0 && !isEditMode) {
-    return (
-      <div className="text-center text-muted-foreground text-sm py-8">
-        <Swords className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="font-medium">
-          {t("race-detail:empty_states.no_relationships")}
-        </p>
-        <p className="text-xs mt-1">
-          {t("race-detail:empty_states.no_relationships_hint")}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      {/* Add Relationship Button - Always visible in Edit Mode */}
-      {isEditMode && (
-        <Button
-          onClick={handleOpenAddDialog}
-          className="w-full"
-          variant="secondary"
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          {t("race-detail:relationships.add_relationship")}
-        </Button>
-      )}
-
       {/* Relationships List */}
-      {relationships.length > 0 && (
+      {relationships.length > 0 ? (
         <div className="space-y-3">
           {relationships.map((relationship) => {
             const race = getRaceById(relationship.raceId);
@@ -336,7 +310,7 @@ export function RaceRelationshipsSection({
             );
           })}
         </div>
-      )}
+      ) : null}
 
       {/* Add Relationship Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

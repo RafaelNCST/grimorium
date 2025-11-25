@@ -333,11 +333,12 @@ export function RegionTimeline({
         <div>
           {/* Botão Nova Era no topo */}
           {isEditing && (
-            <div className="flex justify-start mb-6">
+            <div className="mb-6">
               <Button
                 onClick={() => setShowCreateEraModal(true)}
                 size="sm"
                 variant="magical"
+                className="w-full"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Era

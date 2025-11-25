@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Dna, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -149,6 +149,9 @@ export function RaceDetailView({
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
+
+  // State for controlled dialog in RaceRelationshipsSection
+  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] = useState(false);
 
   // ==================
   // BASIC FIELDS
@@ -1034,17 +1037,26 @@ export function RaceDetailView({
   // ==================
   // EXTRA SECTIONS
   // ==================
+  // Calculate available races for relationships
+  const availableRacesForRelationships = allRaces.filter(
+    (r) =>
+      r.id !== race.id &&
+      !relationships.some((rel) => rel.raceId === r.id)
+  );
+
   const extraSections = [
     {
       id: "relationships",
       title: t("race-detail:sections.relationships"),
       content: (
         <RaceRelationshipsSection
-          relationships={isEditing ? relationships : relationships}
+          relationships={relationships}
           allRaces={allRaces}
           currentRaceId={race.id}
           isEditMode={isEditing}
           onRelationshipsChange={onRelationshipsChange}
+          isAddDialogOpen={isAddRelationshipDialogOpen}
+          onAddDialogOpenChange={setIsAddRelationshipDialogOpen}
         />
       ),
       isCollapsible: true,
@@ -1053,19 +1065,13 @@ export function RaceDetailView({
       onVisibilityToggle: () => onSectionVisibilityToggle("relationships"),
       // Empty states
       emptyState: (() => {
-        const availableRaces = allRaces.filter(
-          (r) =>
-            r.id !== race.id &&
-            !relationships.some((rel) => rel.raceId === r.id)
-        );
-
         // Estado 3: Bloqueado - não há raças suficientes
         if (allRaces.length <= 1 && isEditing) {
           return "blocked-no-data";
         }
 
         // Estado 4: Bloqueado - todas as raças disponíveis foram usadas
-        if (isEditing && relationships.length > 0 && availableRaces.length === 0) {
+        if (isEditing && relationships.length > 0 && availableRacesForRelationships.length === 0) {
           return "blocked-all-used";
         }
 
@@ -1082,10 +1088,10 @@ export function RaceDetailView({
         return null;
       })(),
       emptyIcon: Users,
-      emptyTitle: "Nenhum relacionamento definido",
-      emptyDescription: "Use o modo de edição para adicionar relacionamentos",
-      addButtonLabel: "Adicionar Relacionamento",
-      onAddClick: () => {}, // TODO: Conectar ao dialog da seção quando implementado
+      emptyTitle: t("race-detail:empty_states.no_relationships"),
+      emptyDescription: t("race-detail:empty_states.no_relationships_hint"),
+      addButtonLabel: t("race-detail:relationships.add_relationship"),
+      onAddClick: () => setIsAddRelationshipDialogOpen(true),
       blockedEntityName: "raças",
     },
   ];

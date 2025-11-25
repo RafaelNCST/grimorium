@@ -116,6 +116,7 @@ export function HierarchySection({
             <Button
               variant="magical"
               size="sm"
+              className="flex-1"
               onClick={() => onOpenAddMemberModal(null)}
               disabled={hasNoTitles}
             >
@@ -125,6 +126,7 @@ export function HierarchySection({
             <Button
               variant="secondary"
               size="sm"
+              className="flex-1"
               onClick={onOpenManageTitlesModal}
             >
               <Settings className="w-4 h-4 mr-2" />
@@ -142,10 +144,12 @@ export function HierarchySection({
 
         {/* Lista de membros */}
         {sortedMembers.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <UsersIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">{t("hierarchy.empty_state.description")}</p>
-          </div>
+          !isEditing && (
+            <div className="text-center py-8 text-muted-foreground">
+              <UsersIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">{t("hierarchy.empty_state.description")}</p>
+            </div>
+          )
         ) : (
           <ScrollArea className={sortedMembers.length > 6 ? "max-h-[420px] pr-3" : ""}>
             <div className="space-y-2">
