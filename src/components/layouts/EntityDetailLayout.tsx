@@ -342,6 +342,9 @@ export function EntityDetailLayout({
                   emptyDescription={(section as any).emptyDescription}
                   addButtonLabel={(section as any).addButtonLabel}
                   onAddClick={(section as any).onAddClick}
+                  secondaryButtonLabel={(section as any).secondaryButtonLabel}
+                  SecondaryButtonIcon={(section as any).SecondaryButtonIcon}
+                  onSecondaryClick={(section as any).onSecondaryClick}
                   blockedEntityName={(section as any).blockedEntityName}
                 >
                   {section.content}

@@ -258,6 +258,7 @@
     "no_characters_message": "Crie personagens para adicioná-los à hierarquia da facção",
     "no_titles_hint": "Crie títulos primeiro para poder adicionar membros",
     "no_titles_yet": "Nenhum título criado ainda",
+    "no_titles_available": "Nenhum título disponível. Crie títulos primeiro usando o botão 'Gerenciar Títulos'.",
     "members_title": "Membros",
     "members_default_name": "Membros",
     "save": "Salvar",

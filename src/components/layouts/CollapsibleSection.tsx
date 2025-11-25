@@ -65,6 +65,15 @@ export interface CollapsibleSectionProps {
   /** Callback quando o botão de adicionar é clicado */
   onAddClick?: () => void;
 
+  /** Label do botão secundário (edição) */
+  secondaryButtonLabel?: string;
+
+  /** Ícone do botão secundário */
+  SecondaryButtonIcon?: LucideIcon;
+
+  /** Callback quando o botão secundário é clicado */
+  onSecondaryClick?: () => void;
+
   /** Nome da entidade bloqueada (ex: "personagens", "facções") */
   blockedEntityName?: string;
 }
@@ -179,6 +188,9 @@ export function CollapsibleSection({
   emptyDescription,
   addButtonLabel,
   onAddClick,
+  secondaryButtonLabel,
+  SecondaryButtonIcon,
+  onSecondaryClick,
   blockedEntityName,
 }: CollapsibleSectionProps) {
   // Renderizar conteúdo do estado vazio
@@ -194,18 +206,30 @@ export function CollapsibleSection({
       );
     }
 
-    // Estado 2: Vazio em edição - Botão magical + children (for dialogs)
+    // Estado 2: Vazio em edição - Botão magical + botão secundário opcional + children (for dialogs)
     if (emptyState === "empty-edit" && isEditMode) {
       return (
         <>
-          <Button
-            onClick={onAddClick}
-            className="w-full"
-            variant="magical"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {addButtonLabel}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={onAddClick}
+              className="flex-1"
+              variant="magical"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {addButtonLabel}
+            </Button>
+            {secondaryButtonLabel && onSecondaryClick && (
+              <Button
+                onClick={onSecondaryClick}
+                className="flex-1"
+                variant="secondary"
+              >
+                {SecondaryButtonIcon && <SecondaryButtonIcon className="w-4 h-4 mr-2" />}
+                {secondaryButtonLabel}
+              </Button>
+            )}
+          </div>
           {/* Render children hidden so dialogs inside them can still work */}
           {children && <div className="hidden">{children}</div>}
         </>

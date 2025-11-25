@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Plus, Edit2, Trash2, ChevronUp, ChevronDown, Check } from "lucide-react";
+import { Plus, Edit2, Trash2, ChevronUp, ChevronDown, Check, Crown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -159,8 +159,10 @@ export function ManageTitlesModal({
             {/* Lista de Títulos */}
             <ScrollArea className="h-[300px] pr-3">
               {customTitles.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p className="text-sm">{t("hierarchy.no_titles_yet")}</p>
+                <div className="flex flex-col items-center justify-center h-full py-12 text-muted-foreground">
+                  <Crown className="w-12 h-12 mb-3 opacity-50" />
+                  <p className="text-sm font-medium">{t("hierarchy.no_titles_yet")}</p>
+                  <p className="text-xs mt-1 opacity-70">{t("hierarchy.no_titles_hint")}</p>
                 </div>
               ) : (
                 <div className="space-y-2">

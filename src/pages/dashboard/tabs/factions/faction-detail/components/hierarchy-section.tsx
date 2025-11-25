@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import { Settings, UserPlus, Edit2, Trash2, Users as UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -9,14 +7,13 @@ import { InfoAlert } from "@/components/ui/info-alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type IHierarchyTitle } from "@/types/faction-types";
 
-import { AddMemberModal } from "./add-member-modal";
-import { ManageTitlesModal } from "./manage-titles-modal";
-
 interface HierarchySectionProps {
   hierarchy: IHierarchyTitle[];
   availableCharacters: Array<{ id: string; name: string; image?: string }>;
   isEditing: boolean;
   onHierarchyChange: (hierarchy: IHierarchyTitle[]) => void;
+  onOpenAddMemberModal: (editingMember: { titleId: string; characterId: string } | null) => void;
+  onOpenManageTitlesModal: () => void;
 }
 
 // 12 cores predefinidas para títulos (tons suaves com opacidade)
@@ -45,11 +42,10 @@ export function HierarchySection({
   availableCharacters,
   isEditing,
   onHierarchyChange,
+  onOpenAddMemberModal,
+  onOpenManageTitlesModal,
 }: HierarchySectionProps) {
   const { t } = useTranslation("faction-detail");
-  const [showManageTitlesModal, setShowManageTitlesModal] = useState(false);
-  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-  const [editingMember, setEditingMember] = useState<{ titleId: string; characterId: string } | null>(null);
 
   // Ordenar membros: primeiro por ordem do título (menor = mais importante), depois agrupa por título
   const getSortedMembers = () => {
@@ -92,47 +88,7 @@ export function HierarchySection({
   };
 
   const handleEditMember = (titleId: string, characterId: string) => {
-    setEditingMember({ titleId, characterId });
-    setShowAddMemberModal(true);
-  };
-
-  const handleSaveMember = (characterId: string, newTitleId: string) => {
-    let updated = [...hierarchy];
-
-    // Se estiver editando, remover do título antigo
-    if (editingMember) {
-      updated = updated.map(title => {
-        if (title.id === editingMember.titleId) {
-          return {
-            ...title,
-            characterIds: title.characterIds.filter(id => id !== editingMember.characterId)
-          };
-        }
-        return title;
-      });
-    }
-
-    // Adicionar ao novo título
-    updated = updated.map(title => {
-      if (title.id === newTitleId) {
-        // Verificar se já não está nesse título
-        if (!title.characterIds.includes(characterId)) {
-          return {
-            ...title,
-            characterIds: [...title.characterIds, characterId]
-          };
-        }
-      }
-      return title;
-    });
-
-    onHierarchyChange(updated);
-    setShowAddMemberModal(false);
-    setEditingMember(null);
-  };
-
-  const handleSaveTitles = (titles: IHierarchyTitle[]) => {
-    onHierarchyChange(titles);
+    onOpenAddMemberModal({ titleId, characterId });
   };
 
   const sortedMembers = getSortedMembers();
@@ -156,27 +112,23 @@ export function HierarchySection({
       <div className="space-y-4">
         {/* Botões de ação - só aparecem no modo edição */}
         {isEditing && (
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setShowManageTitlesModal(true)}
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              {t("hierarchy.manage_titles")}
-            </Button>
+          <div className="flex gap-2">
             <Button
               variant="magical"
               size="sm"
-              className="animate-glow"
-              onClick={() => {
-                setEditingMember(null);
-                setShowAddMemberModal(true);
-              }}
+              onClick={() => onOpenAddMemberModal(null)}
               disabled={hasNoTitles}
             >
               <UserPlus className="w-4 h-4 mr-2" />
               {t("hierarchy.add_member")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onOpenManageTitlesModal}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {t("hierarchy.manage_titles")}
             </Button>
           </div>
         )}
@@ -252,28 +204,6 @@ export function HierarchySection({
           </ScrollArea>
         )}
       </div>
-
-      {/* Modal de Gerenciar Títulos */}
-      <ManageTitlesModal
-        isOpen={showManageTitlesModal}
-        onClose={() => setShowManageTitlesModal(false)}
-        titles={hierarchy}
-        onSave={handleSaveTitles}
-      />
-
-      {/* Modal de Adicionar/Editar Membro */}
-      <AddMemberModal
-        isOpen={showAddMemberModal}
-        onClose={() => {
-          setShowAddMemberModal(false);
-          setEditingMember(null);
-        }}
-        titles={hierarchy.filter(t => !t.isMembersTitle)}
-        availableCharacters={availableCharacters}
-        existingMemberIds={hierarchy.flatMap(t => t.characterIds)}
-        editingMember={editingMember}
-        onSave={handleSaveMember}
-      />
     </>
   );
 }

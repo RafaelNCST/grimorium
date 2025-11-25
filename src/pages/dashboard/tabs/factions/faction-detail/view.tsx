@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Shield, Trash2, Clock, Handshake, Users2 } from "lucide-react";
+import { Shield, Trash2, Clock, Handshake, Users2, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -47,10 +47,12 @@ import {
   type DiplomaticStatus,
 } from "@/types/faction-types";
 
+import { AddMemberModal } from "./components/add-member-modal";
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DiplomacySection } from "./components/diplomacy-section";
 import { FactionTimeline } from "./components/faction-timeline";
 import { HierarchySection } from "./components/hierarchy-section";
+import { ManageTitlesModal } from "./components/manage-titles-modal";
 import { VersionCard } from "./components/version-card";
 
 interface IFieldVisibility {
@@ -169,6 +171,47 @@ export function FactionDetailView({
   const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] = React.useState(false);
   const [isAddDiplomacyDialogOpen, setIsAddDiplomacyDialogOpen] = React.useState(false);
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = React.useState(false);
+  const [isManageTitlesDialogOpen, setIsManageTitlesDialogOpen] = React.useState(false);
+  const [editingMember, setEditingMember] = React.useState<{ titleId: string; characterId: string } | null>(null);
+
+  // Handlers for hierarchy modals
+  const handleSaveTitles = (titles: typeof editData.hierarchy) => {
+    onEditDataChange("hierarchy", titles);
+  };
+
+  const handleSaveMember = (characterId: string, newTitleId: string) => {
+    let updated = [...(editData.hierarchy || [])];
+
+    // Se estiver editando, remover do título antigo
+    if (editingMember) {
+      updated = updated.map(title => {
+        if (title.id === editingMember.titleId) {
+          return {
+            ...title,
+            characterIds: title.characterIds.filter((id: string) => id !== editingMember.characterId)
+          };
+        }
+        return title;
+      });
+    }
+
+    // Adicionar ao novo título
+    updated = updated.map(title => {
+      if (title.id === newTitleId) {
+        if (!title.characterIds.includes(characterId)) {
+          return {
+            ...title,
+            characterIds: [...title.characterIds, characterId]
+          };
+        }
+      }
+      return title;
+    });
+
+    onEditDataChange("hierarchy", updated);
+    setIsAddMemberDialogOpen(false);
+    setEditingMember(null);
+  };
 
   // ==================
   // BASIC FIELDS
@@ -1294,8 +1337,11 @@ export function FactionDetailView({
           onHierarchyChange={(hierarchy) =>
             onEditDataChange("hierarchy", hierarchy)
           }
-          isAddMemberDialogOpen={isAddMemberDialogOpen}
-          onAddMemberDialogOpenChange={setIsAddMemberDialogOpen}
+          onOpenAddMemberModal={(member) => {
+            setEditingMember(member);
+            setIsAddMemberDialogOpen(true);
+          }}
+          onOpenManageTitlesModal={() => setIsManageTitlesDialogOpen(true)}
         />
       ),
       isCollapsible: true,
@@ -1328,6 +1374,9 @@ export function FactionDetailView({
       emptyDescription: "Use o modo de edição para adicionar membros",
       addButtonLabel: "Adicionar Membro",
       onAddClick: () => setIsAddMemberDialogOpen(true),
+      secondaryButtonLabel: "Gerenciar Títulos",
+      SecondaryButtonIcon: Settings,
+      onSecondaryClick: () => setIsManageTitlesDialogOpen(true),
       blockedEntityName: "personagens",
     },
   ];
@@ -1489,6 +1538,27 @@ export function FactionDetailView({
         totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
         i18nNamespace="faction-detail"
+      />
+
+      {/* Hierarchy Modals - Rendered at root level to prevent flickering */}
+      <ManageTitlesModal
+        isOpen={isManageTitlesDialogOpen}
+        onClose={() => setIsManageTitlesDialogOpen(false)}
+        titles={editData.hierarchy || []}
+        onSave={handleSaveTitles}
+      />
+
+      <AddMemberModal
+        isOpen={isAddMemberDialogOpen}
+        onClose={() => {
+          setIsAddMemberDialogOpen(false);
+          setEditingMember(null);
+        }}
+        titles={(editData.hierarchy || []).filter(t => !t.isMembersTitle)}
+        availableCharacters={mockCharacters}
+        existingMemberIds={(editData.hierarchy || []).flatMap(t => t.characterIds)}
+        editingMember={editingMember}
+        onSave={handleSaveMember}
       />
     </div>
   );

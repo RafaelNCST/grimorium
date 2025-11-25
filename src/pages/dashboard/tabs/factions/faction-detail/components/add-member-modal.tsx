@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { InfoAlert } from "@/components/ui/info-alert";
 import {
   Dialog,
   DialogContent,
@@ -201,31 +202,37 @@ export function AddMemberModal({
                   <Label className="text-sm font-semibold">
                     {t("hierarchy.select_title")}
                   </Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {sortedTitles.map((title) => {
-                      const colorClasses = getColorClasses(title.color);
-                      const isSelected = selectedTitleId === title.id;
+                  {sortedTitles.length === 0 ? (
+                    <InfoAlert>
+                      {t("hierarchy.no_titles_available")}
+                    </InfoAlert>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      {sortedTitles.map((title) => {
+                        const colorClasses = getColorClasses(title.color);
+                        const isSelected = selectedTitleId === title.id;
 
-                      return (
-                        <Card
-                          key={title.id}
-                          className={`p-4 cursor-pointer transition-all ${colorClasses.bg} ${colorClasses.text} ${
-                            isSelected
-                              ? "ring-2 ring-primary"
-                              : "hover:opacity-80"
-                          }`}
-                          onClick={() => setSelectedTitleId(title.id)}
-                        >
-                          <div className="text-center">
-                            <p className="font-semibold truncate">{title.name}</p>
-                            <p className="text-xs opacity-80">
-                              {t("hierarchy.order")}: #{title.order}
-                            </p>
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
+                        return (
+                          <Card
+                            key={title.id}
+                            className={`p-4 cursor-pointer transition-all ${colorClasses.bg} ${colorClasses.text} ${
+                              isSelected
+                                ? "ring-2 ring-primary"
+                                : "hover:opacity-80"
+                            }`}
+                            onClick={() => setSelectedTitleId(title.id)}
+                          >
+                            <div className="text-center">
+                              <p className="font-semibold truncate">{title.name}</p>
+                              <p className="text-xs opacity-80">
+                                {t("hierarchy.order")}: #{title.order}
+                              </p>
+                            </div>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
