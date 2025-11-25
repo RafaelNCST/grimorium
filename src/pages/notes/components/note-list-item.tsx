@@ -70,8 +70,8 @@ function NoteListItemComponent({
         }
       }}
       className={cn(
-        "flex items-center gap-4 px-4 py-3 rounded-lg border cursor-pointer transition-colors",
-        "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        "flex items-center gap-4 px-4 py-3 rounded-lg border cursor-pointer transition-colors duration-200",
+        "hover:bg-white/5 dark:hover:bg-white/10 focus:outline-none",
         isSelected && "bg-primary/10 border-primary"
       )}
     >
@@ -80,8 +80,7 @@ function NoteListItemComponent({
         {isDeletionMode ? (
           <Checkbox
             checked={isSelected}
-            className="h-5 w-5"
-            onClick={(e) => e.stopPropagation()}
+            className="h-5 w-5 pointer-events-none"
           />
         ) : (
           <FileText className="h-5 w-5 text-muted-foreground" />

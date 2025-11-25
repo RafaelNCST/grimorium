@@ -15,7 +15,7 @@ const buttonVariants = cva(
         magical:
           "relative overflow-visible bg-gradient-primary text-primary-foreground transition-all duration-300 hover:shadow-magical-glow hover:brightness-125 hover:saturate-150 animate-glow",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-red-500 hover:brightness-125 transition-colors duration-200",
+          "bg-destructive text-destructive-foreground hover:bg-red-500 hover:brightness-125 transition-colors duration-200 animate-glow-red",
         secondary:
           "border border-border bg-card text-card-foreground hover:bg-primary-glow hover:text-white hover:border-primary-glow hover:shadow-glow transition-all duration-300",
         ghost:

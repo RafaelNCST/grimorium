@@ -13,7 +13,6 @@ import { useTranslation } from "react-i18next";
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -184,7 +183,7 @@ function NotesViewComponent({
           {/* Action Buttons */}
           {isDeletionMode ? (
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={onCancelDeletionMode}>
+              <Button variant="secondary" onClick={onCancelDeletionMode}>
                 {t("page.cancel")}
               </Button>
               <Button
@@ -207,7 +206,7 @@ function NotesViewComponent({
                 {t("page.new_note")}
               </Button>
               <Button
-                variant="outline"
+                variant="destructive"
                 onClick={onToggleDeletionMode}
                 disabled={notes.length === 0}
               >
@@ -302,12 +301,12 @@ function NotesViewComponent({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("delete_modal.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              variant="destructive"
               onClick={onConfirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t("delete_modal.confirm")}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
