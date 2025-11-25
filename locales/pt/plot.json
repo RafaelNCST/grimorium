@@ -3,7 +3,7 @@
     "title": "Arcos Narrativos",
     "description": "Gerencie a estrutura da sua história",
     "new_arc": "Novo Arco",
-    "search_placeholder": "Buscar arcos por nome...",
+    "search_placeholder": "Buscar arcos por nome",
     "total_badge": "Total",
     "total_arcs": "Total de Arcos",
     "filter_all_status": "Todos os status",
@@ -46,7 +46,7 @@
     "advanced_section": "Informações Avançadas",
     "arc_not_found": "Arco não encontrado",
     "confirm_delete_event": "Confirmar Exclusão do Evento",
-    "confirm_delete_event_description": "Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.",
+    "confirm_delete_event_description": "Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita",
     "open": "Abrir",
     "close": "Fechar",
     "back": "Voltar",
@@ -93,7 +93,7 @@
     "arc": {
       "title": "Excluir Arco Narrativo",
       "step1": {
-        "message": "Você está prestes a excluir o arco \"{{arcName}}\". Esta ação é permanente e não pode ser desfeita.",
+        "message": "Você está prestes a excluir o arco \"{{arcName}}\". Esta ação é permanente e não pode ser desfeita",
         "input_label": "Digite o nome do arco para confirmar:",
         "input_placeholder": "Nome do arco",
         "name_mismatch": "O nome não corresponde ao arco",
@@ -102,8 +102,8 @@
       },
       "step2": {
         "title": "Confirmação Final",
-        "message": "Isso excluirá permanentemente o arco \"{{arcName}}\" e todos os seus {{eventCount}} eventos. Esta ação não pode ser desfeita.",
-        "message_no_events": "Isso excluirá permanentemente o arco \"{{arcName}}\". Esta ação não pode ser desfeita.",
+        "message": "Isso excluirá permanentemente o arco \"{{arcName}}\" e todos os seus {{eventCount}} eventos. Esta ação não pode ser desfeita",
+        "message_no_events": "Isso excluirá permanentemente o arco \"{{arcName}}\". Esta ação não pode ser desfeita",
         "cancel": "Cancelar",
         "confirm": "Excluir Definitivamente"
       }

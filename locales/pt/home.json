@@ -16,7 +16,7 @@
   },
   "filter": {
     "placeholder": "Buscar livros",
-    "text_empty": "Tente ajustar sua busca ou criar um novo livro.",
+    "text_empty": "Tente ajustar sua busca ou criar um novo livro",
     "text_create_book": "Comece criando seu primeiro livro!"
   },
   "list_books": {

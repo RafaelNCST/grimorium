@@ -6,10 +6,10 @@
     "upload_image": "Enviar Imagem",
     "upload_formats": "PNG, JPG, WEBP ou GIF",
     "book_title": "Título do Livro",
-    "title_placeholder": "Digite o título do livro",
+    "title_placeholder": "As Crônicas do Reino Perdido",
     "title_required": "Título é obrigatório",
     "book_synopsis": "Sinopse do Livro",
-    "synopsis_placeholder": "Uma breve descrição da história para apresentação aos leitores...",
+    "synopsis_placeholder": "Em um mundo onde a magia foi proibida há séculos, uma jovem descobre que possui poderes ancestrais. Agora ela deve fugir do império que caça os últimos magos enquanto busca a verdade sobre seu passado",
     "optional": "Opcional",
     "book_genre": "Gênero do Livro",
     "genre_required": "Pelo menos um gênero é obrigatório",
@@ -17,7 +17,7 @@
     "style_placeholder": "Selecione um estilo visual",
     "style_required": "Estilo visual é obrigatório",
     "author_summary": "Resumo do Autor",
-    "summary_placeholder": "Resumo interno para controle e organização do autor..."
+    "summary_placeholder": "História de vingança com elementos de romance. Protagonista feminina forte. Twist no capítulo 15: mentor é o vilão. Inspiração: Avatar + Game of Thrones"
   },
   "genre": {
     "urban": "Urbano",

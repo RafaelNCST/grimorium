@@ -27,9 +27,9 @@
   },
   "confirm": {
     "delete_all_title": "Limpar todas as mensagens",
-    "delete_all_description": "Tem certeza que deseja apagar todas as mensagens? Esta ação não pode ser desfeita.",
+    "delete_all_description": "Tem certeza que deseja apagar todas as mensagens? Esta ação não pode ser desfeita",
     "delete_forever_title": "Apagar para sempre",
-    "delete_forever_description": "Tem certeza que deseja apagar permanentemente essas mensagens? Esta ação não pode ser desfeita.",
+    "delete_forever_description": "Tem certeza que deseja apagar permanentemente essas mensagens? Esta ação não pode ser desfeita",
     "cancel": "Cancelar",
     "confirm": "Confirmar"
   }

@@ -7,7 +7,7 @@
     "title": "Nenhuma região criada",
     "description": "Comece criando sua primeira região para construir seu mundo"
   },
-  "search_placeholder": "Buscar regiões...",
+  "search_placeholder": "Buscar regiões",
   "not_found": "Nenhuma região encontrada",
   "filters": {
     "all": "Todas",
@@ -40,7 +40,7 @@
     "scale_label": "Escala da Região",
     "scale_placeholder": "Selecione a escala",
     "summary_label": "Resumo",
-    "summary_placeholder": "Descreva brevemente esta região...",
+    "summary_placeholder": "Um reino próspero cercado por montanhas nevadas, conhecido por sua academia de magos e os festivais de inverno",
     "image_label": "Imagem",
     "image_recommended": "Recomendado: 1200x448px",
     "upload_image": "Carregar Imagem",
@@ -48,8 +48,8 @@
     "create_button": "Criar Região",
     "save_button": "Salvar",
     "cancel_button": "Cancelar",
-    "creating": "Criando...",
-    "updating": "Atualizando...",
+    "creating": "Criando",
+    "updating": "Atualizando",
 
     "advanced_items": "Informações Avançadas",
     "basic_fields": "Informações Básicas",
@@ -77,18 +77,18 @@
     "races_found_placeholder": "Selecione raças encontradas nesta região",
     "items_found_label": "Itens Encontrados",
     "items_found_placeholder": "Selecione itens encontrados nesta região",
-    "no_factions_warning": "Nenhuma facção registrada. Vá para a aba Facções para criar uma.",
-    "no_characters_warning": "Nenhum personagem registrado. Vá para a aba Personagens para criar um.",
-    "no_races_warning": "Nenhuma raça registrada. Vá para a aba Raças para criar uma.",
-    "no_items_warning": "Nenhum item registrado. Vá para a aba Itens para criar um.",
+    "no_factions_warning": "Nenhuma facção registrada. Vá para a aba Facções para criar uma",
+    "no_characters_warning": "Nenhum personagem registrado. Vá para a aba Personagens para criar um",
+    "no_races_warning": "Nenhuma raça registrada. Vá para a aba Raças para criar uma",
+    "no_items_warning": "Nenhum item registrado. Vá para a aba Itens para criar um",
     "no_factions_selected": "Nenhuma facção selecionada",
     "no_characters_selected": "Nenhum personagem selecionado",
     "no_races_selected": "Nenhuma raça selecionada",
     "no_items_selected": "Nenhum item selecionado",
-    "search_faction": "Buscar facção...",
-    "search_character": "Buscar personagem...",
-    "search_race": "Buscar raça...",
-    "search_item": "Buscar item...",
+    "search_faction": "Buscar facção",
+    "search_character": "Buscar personagem",
+    "search_race": "Buscar raça",
+    "search_item": "Buscar item",
 
     "narrative_section": "Narrativa",
     "narrative_purpose_label": "Propósito Narrativo",
@@ -117,7 +117,7 @@
   },
   "hierarchy_manager": {
     "title": "Gerenciar Hierarquia de Regiões",
-    "description": "Reorganize as regiões arrastando e soltando. Você pode mover regiões entre diferentes pais ou torná-las neutras.",
+    "description": "Reorganize as regiões arrastando e soltando. Você pode mover regiões entre diferentes pais ou torná-las neutras",
     "neutral_regions": "Regiões Neutras",
     "neutral_description": "Regiões sem pai (nível raiz)",
     "close_button": "Fechar",
@@ -144,14 +144,14 @@
   "delete": {
     "version": {
       "title": "Excluir Versão",
-      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita",
       "cancel": "Cancelar",
       "confirm": "Excluir Versão"
     },
     "region": {
       "title": "Excluir Região",
       "step1": {
-        "message": "Esta ação excluirá a região '{{regionName}}' e todas as suas versões permanentemente.",
+        "message": "Esta ação excluirá a região '{{regionName}}' e todas as suas versões permanentemente",
         "input_label": "Digite o nome completo da região para confirmar:",
         "input_placeholder": "Digite o nome da região",
         "name_mismatch": "O nome digitado não corresponde ao nome da região",
@@ -160,8 +160,8 @@
       },
       "step2": {
         "title": "Confirmação Final",
-        "message": "Você está prestes a excluir permanentemente a região '{{regionName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita.",
-        "message_single": "Você está prestes a excluir permanentemente a região '{{regionName}}' e sua versão. Esta ação não pode ser desfeita.",
+        "message": "Você está prestes a excluir permanentemente a região '{{regionName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita",
+        "message_single": "Você está prestes a excluir permanentemente a região '{{regionName}}' e sua versão. Esta ação não pode ser desfeita",
         "cancel": "Não, cancelar",
         "confirm": "Sim, excluir permanentemente"
       }

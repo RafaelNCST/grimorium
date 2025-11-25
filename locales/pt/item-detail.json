@@ -40,13 +40,13 @@
     "item_usage": "Uso do Item"
   },
   "placeholders": {
-    "alternative_name": "Digite um nome alternativo...",
-    "appearance": "Descreva a aparência física...",
-    "origin": "Descreva a origem ou história...",
-    "narrative_purpose": "Qual o papel deste item na história?",
-    "usage_requirements": "O que é necessário para usar este item?",
-    "usage_consequences": "O que acontece quando este item é usado?",
-    "item_usage": "Como este item é usado? Quais técnicas são necessárias?"
+    "alternative_name": "A Lâmina do Crepúsculo, Espada dos Reis",
+    "appearance": "Lâmina prateada com runas douradas que brilham quando próxima ao perigo",
+    "origin": "Forjada há mil anos pelo ferreiro lendário Thorgrim nas Montanhas Eternas",
+    "narrative_purpose": "Símbolo de poder que será disputado pelos reinos, chave para romper a maldição ancestral",
+    "usage_requirements": "Apenas pode ser empunhada por alguém de sangue real, requer grande força física",
+    "usage_consequences": "Drena a energia vital do usuário, atrai criaturas das sombras quando desembainhada",
+    "item_usage": "Para ativar o poder da espada, o usuário deve recitar as palavras ancestrais enquanto a banha em luz da lua cheia"
   },
   "buttons": {
     "add_alternative_name": "Adicionar Nome Alternativo"
@@ -80,12 +80,12 @@
     },
     "create_dialog": {
       "title": "Criar Nova Versão",
-      "info_message": "Primeiro, defina o nome e descrição da versão. Depois você poderá personalizar os dados do item.",
+      "info_message": "Primeiro, defina o nome e descrição da versão. Depois você poderá personalizar os dados do item",
       "name_label": "Nome da Versão",
-      "name_placeholder": "Ex: Versão Original, Melhorada, Quebrada...",
+      "name_placeholder": "Forma Original, Versão Corrompida, Após Restauração",
       "name_required": "Nome é obrigatório",
       "description_label": "Descrição",
-      "description_placeholder": "Descreva as diferenças desta versão...",
+      "description_placeholder": "O item antes de ser quebrado na batalha final, ainda com todos os seus poderes intactos",
       "description_required": "Descrição é obrigatória",
       "chars_remaining": "caracteres restantes",
       "cancel": "Cancelar",
@@ -97,7 +97,7 @@
   "delete": {
     "version": {
       "title": "Excluir Versão",
-      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita.",
+      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita",
       "cancel": "Cancelar",
       "confirm": "Excluir Versão",
       "success": "Versão excluída com sucesso"
@@ -105,7 +105,7 @@
     "item": {
       "title": "Excluir Item",
       "step1": {
-        "message": "Esta ação excluirá o item '{{itemName}}' e todas as suas versões permanentemente.",
+        "message": "Esta ação excluirá o item '{{itemName}}' e todas as suas versões permanentemente",
         "input_label": "Digite o nome completo do item para confirmar:",
         "input_placeholder": "Digite o nome do item",
         "name_mismatch": "O nome digitado não corresponde ao nome do item",
@@ -114,8 +114,8 @@
       },
       "step2": {
         "title": "Confirmação Final",
-        "message": "Você está prestes a excluir permanentemente o item '{{itemName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita.",
-        "message_single": "Você está prestes a excluir permanentemente o item '{{itemName}}' e sua versão. Esta ação não pode ser desfeita.",
+        "message": "Você está prestes a excluir permanentemente o item '{{itemName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita",
+        "message_single": "Você está prestes a excluir permanentemente o item '{{itemName}}' e sua versão. Esta ação não pode ser desfeita",
         "cancel": "Não, cancelar",
         "confirm": "Sim, excluir permanentemente",
         "success": "Item excluído com sucesso"
@@ -123,7 +123,7 @@
     }
   },
   "navigation": {
-    "search_placeholder": "Buscar item...",
+    "search_placeholder": "Buscar item",
     "current_item": "Item atual"
   },
   "upload": {

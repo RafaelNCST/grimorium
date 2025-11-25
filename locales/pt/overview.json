@@ -30,23 +30,23 @@
   "author_summary": {
     "title": "Resumo do Autor",
     "description": "Para controle interno",
-    "empty_message": "Nenhum resumo do autor adicionado ainda. Clique no ícone de edição para adicionar.",
-    "placeholder": "Resumo interno para controle e organização do autor. Este resumo é só seu e permite escrever suas ideias do jeito que quiser",
+    "empty_message": "Nenhum resumo do autor adicionado ainda. Clique no ícone de edição para adicionar",
+    "placeholder": "História de vingança com elementos de romance. Protagonista feminina forte. Twist no capítulo 15: mentor é o vilão. Inspiração: Avatar + Game of Thrones",
     "save": "Salvar",
     "cancel": "Cancelar"
   },
   "story_summary": {
     "title": "Resumo da História",
     "description": "Para apresentação",
-    "empty_message": "Nenhum resumo da história adicionado ainda. Clique no ícone de edição para adicionar.",
-    "placeholder": "Resumo da história para apresentar aos leitores. Descreva os eventos principais, conflitos e o que torna sua história única!",
+    "empty_message": "Nenhum resumo da história adicionado ainda. Clique no ícone de edição para adicionar",
+    "placeholder": "Em um mundo onde a magia foi proibida há séculos, uma jovem descobre que possui poderes ancestrais. Agora ela deve fugir do império que caça os últimos magos enquanto busca a verdade sobre seu passado",
     "save": "Salvar",
     "cancel": "Cancelar"
   },
   "notes_board": {
     "title": "Quadro de Lembretes",
     "description": "Arraste as notas para organizá-las",
-    "add_note_placeholder": "Adicionar nova nota...",
+    "add_note_placeholder": "Adicionar nova nota",
     "add": "Adicionar",
     "default_note": "Olá, eu sou seu primeiro lembrete",
     "empty_state": "Nenhum lembrete adicionado ainda",
@@ -61,7 +61,7 @@
   },
   "customize_mode": {
     "title": "Modo Personalizar Ativo",
-    "description": "Arraste as seções para reordená-las e use os botões de visibilidade para mostrar/esconder seções. A edição de conteúdo está desabilitada neste modo.",
+    "description": "Arraste as seções para reordená-las e use os botões de visibilidade para mostrar/esconder seções. A edição de conteúdo está desabilitada neste modo",
     "hidden_sections": "Seções Ocultas",
     "all_sections_visible": "Todas as seções estão visíveis"
   },
@@ -69,7 +69,7 @@
     "title": "Lista de Tarefas",
     "description": "Organize suas tarefas e acompanhe o progresso",
     "empty_state": "Nenhuma tarefa adicionada ainda",
-    "add_item_placeholder": "Adicionar nova tarefa...",
+    "add_item_placeholder": "Adicionar nova tarefa",
     "save": "Salvar",
     "cancel": "Cancelar"
   }

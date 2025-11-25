@@ -12,7 +12,7 @@
     "title": "Sistemas de Poder",
     "description": "Gerencie seus sistemas de poder e selecione um para visualizar",
     "new_system": "Novo Sistema",
-    "search_placeholder": "Buscar sistemas...",
+    "search_placeholder": "Buscar sistemas",
     "no_results": "Nenhum sistema encontrado",
     "edit_tooltip": "Editar sistema"
   },
@@ -22,7 +22,7 @@
     "create_first_page": "Criar Primeira Página"
   },
   "loading": {
-    "systems": "Carregando sistemas de poder..."
+    "systems": "Carregando sistemas de poder"
   },
   "header": {
     "select_system": "Selecione um sistema",
@@ -63,7 +63,7 @@
     "empty_sections_edit": "Nenhuma seção ainda. Adicione sua primeira seção para começar a organizar conteúdo.",
     "add_section": "Adicionar Seção",
     "add_first_section": "Adicionar Primeira Seção",
-    "filter_sections": "Filtrar seções...",
+    "filter_sections": "Filtrar seções",
     "name_placeholder": "Nome da página"
   },
   "sections": {
@@ -74,7 +74,7 @@
     "confirm_delete": "Tem certeza que deseja excluir esta seção? Todos os blocos dentro serão perdidos.",
     "default_title": "Seção",
     "add_block": "Adicionar Bloco",
-    "filter_placeholder": "Filtrar seções...",
+    "filter_placeholder": "Filtrar seções",
     "title_placeholder": "Título da seção",
     "empty_blocks": "Nenhum bloco nesta seção ainda",
     "move_up": "Mover seção para cima",
@@ -92,7 +92,7 @@
     "heading": {
       "name": "Título",
       "description": "Título com níveis hierárquicos (aparece na estrutura)",
-      "text_placeholder": "Texto do título...",
+      "text_placeholder": "Texto do título",
       "level_label": "Nível",
       "alignment_label": "Alinhamento",
       "alignment_left": "Esquerda",
@@ -102,55 +102,55 @@
     "paragraph": {
       "name": "Parágrafo",
       "description": "Bloco de conteúdo de texto",
-      "text_placeholder": "Digite seu texto aqui...",
+      "text_placeholder": "Digite seu texto aqui",
       "lock_height": "Travar altura",
       "unlock_height": "Destravar altura"
     },
     "unordered_list": {
       "name": "Lista Não Ordenada",
       "description": "Lista com marcadores e itens arrastáveis",
-      "item_placeholder": "Adicionar item...",
+      "item_placeholder": "Adicionar item",
       "add_item": "Adicionar item",
       "add_button": "Adicionar"
     },
     "numbered_list": {
       "name": "Lista Numerada",
       "description": "Lista ordenada com itens arrastáveis",
-      "item_placeholder": "Adicionar item...",
+      "item_placeholder": "Adicionar item",
       "add_item": "Adicionar item",
       "add_button": "Adicionar"
     },
     "tag_list": {
       "name": "Lista de Tags",
       "description": "Lista horizontal de tags",
-      "tag_placeholder": "Adicionar tag...",
+      "tag_placeholder": "Adicionar tag",
       "add_tag": "Adicionar",
       "add_button": "Adicionar"
     },
     "dropdown": {
       "name": "Dropdown",
       "description": "Dropdown de seleção única",
-      "option_placeholder": "Adicionar opção...",
+      "option_placeholder": "Adicionar opção",
       "add_option": "Adicionar opção",
       "add_option_button": "Adicionar",
-      "select_placeholder": "Selecione uma opção...",
+      "select_placeholder": "Selecione uma opção",
       "data_source_label": "Fonte de Dados",
       "data_source_manual": "Manual",
       "data_source_characters": "Personagens",
       "data_source_factions": "Facções",
       "data_source_items": "Itens",
       "data_source_races": "Raças",
-      "select_entity": "Selecione uma entidade...",
-      "loading_entities": "Carregando entidades...",
+      "select_entity": "Selecione uma entidade",
+      "loading_entities": "Carregando entidades",
       "no_entities": "Nenhuma entidade disponível"
     },
     "multi_dropdown": {
       "name": "Dropdown Múltiplo",
       "description": "Dropdown de múltipla seleção com tags",
-      "option_placeholder": "Adicionar opção...",
+      "option_placeholder": "Adicionar opção",
       "add_option": "Adicionar opção",
       "add_option_button": "Adicionar",
-      "select_placeholder": "Selecione opções...",
+      "select_placeholder": "Selecione opções",
       "no_options_available": "Não há opções disponíveis"
     },
     "image": {
@@ -196,7 +196,7 @@
     "informative": {
       "name": "Bloco Informativo",
       "description": "Ícone com texto multilinha",
-      "text_placeholder": "Digite a informação...",
+      "text_placeholder": "Digite a informação",
       "icons": {
         "alert": "Alerta",
         "info": "Informação",
@@ -283,7 +283,7 @@
     "edit_system": {
       "title": "Editar Sistema",
       "name_label": "Nome do Sistema",
-      "name_placeholder": "Digite o nome do sistema",
+      "name_placeholder": "Sistema de Magia Elemental",
       "icon_label": "Ícone do Sistema (opcional)",
       "icon_placeholder": "Enviar uma imagem de ícone",
       "cancel": "Cancelar",
@@ -292,14 +292,14 @@
     "create_group": {
       "title": "Criar Grupo",
       "name_label": "Nome do Grupo",
-      "name_placeholder": "ex: Poderes Básicos, Técnicas Avançadas",
+      "name_placeholder": "Poderes Básicos, Técnicas Avançadas",
       "submit": "Criar",
       "cancel": "Cancelar"
     },
     "create_page": {
       "title": "Criar Página",
       "name_label": "Nome da Página",
-      "name_placeholder": "ex: Magia de Fogo, Habilidades de Cura",
+      "name_placeholder": "Magia de Fogo, Habilidades de Cura",
       "group_label": "Grupo (opcional)",
       "submit": "Criar",
       "cancel": "Cancelar",
@@ -401,10 +401,10 @@
   },
   "actions": {
     "save": "Salvar",
-    "saving": "Salvando...",
+    "saving": "Salvando",
     "cancel": "Cancelar",
     "delete": "Excluir",
-    "deleting": "Excluindo...",
+    "deleting": "Excluindo",
     "edit": "Editar",
     "move_up": "Mover para cima",
     "move_down": "Mover para baixo",
