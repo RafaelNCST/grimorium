@@ -477,10 +477,11 @@
   }
 
   /* Prevent modal content from jumping on hover */
+  /* Title bar has h-8 (32px), so we offset by 16px to center in the area below it */
   [data-radix-dialog-content],
   [role="dialog"] {
     position: fixed !important;
-    top: 50% !important;
+    top: calc(50% + 16px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     width: fit-content !important;
