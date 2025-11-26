@@ -125,7 +125,7 @@ export function HomePage() {
         title: bookData.title,
         genre: bookData.genre,
         visualStyle: bookData.visualStyle,
-        coverImage: bookData.cover || "/placeholder.svg",
+        coverImage: bookData.cover || "",
         chapters: 0,
         lastModified: now,
         createdAt: now,

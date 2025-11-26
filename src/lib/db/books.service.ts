@@ -45,7 +45,7 @@ function dbBookToBook(dbBook: DBBook): Book {
     title: dbBook.title,
     genre: dbBook.genre ? JSON.parse(dbBook.genre) : [],
     visualStyle: dbBook.visual_style || "",
-    coverImage: dbBook.cover_image_path || "/placeholder.svg",
+    coverImage: dbBook.cover_image_path || "",
     chapters: dbBook.chapters,
     lastModified: dbBook.updated_at,
     createdAt: dbBook.created_at,

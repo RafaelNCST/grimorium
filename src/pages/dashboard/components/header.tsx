@@ -1,24 +1,27 @@
-import { useState, useRef } from "react";
+import { useState, useMemo } from "react";
 
 import {
   Edit2,
   X,
   Check,
-  Upload,
   BookOpen,
   Rocket,
   Pause,
   CheckCircle2,
   Tag,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
 import {
   EntityTagBadge,
   IEntityTagConfig,
 } from "@/components/ui/entity-tag-badge";
-import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -26,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Book as BookType, BookStatus } from "@/stores/book-store";
 
 import { GENRES_CONSTANT } from "../constants/dashboard-constants";
@@ -96,10 +98,9 @@ export function Header({
   onSave,
   onCancel,
 }: PropsHeader) {
+  const { t } = useTranslation("create-book");
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const synopsisRef = useRef<HTMLParagraphElement>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Check if synopsis is longer than 3 lines
   const isSynopsisLong = (text: string) => {
@@ -108,17 +109,38 @@ export function Header({
     return lines > 3 || text.length > 200;
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreviewImage(result);
-        onDraftBookChange({ coverImage: result });
-      };
-      reader.readAsDataURL(file);
+  // Check if form is valid
+  const isFormValid = useMemo(() => {
+    const title = draftBook?.title?.trim() || "";
+    const genres = draftBook?.genre || [];
+    return title.length > 0 && genres.length > 0;
+  }, [draftBook?.title, draftBook?.genre]);
+
+  // Check if there are changes compared to original book
+  const hasChanges = useMemo(() => {
+    if (!draftBook) return false;
+    return (
+      draftBook.title !== book.title ||
+      draftBook.status !== book.status ||
+      draftBook.storySummary !== book.storySummary ||
+      draftBook.coverImage !== book.coverImage ||
+      JSON.stringify(draftBook.genre) !== JSON.stringify(book.genre)
+    );
+  }, [draftBook, book]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!draftBook?.title?.trim()) {
+      newErrors.title = t("modal.title_required");
     }
+
+    if (!draftBook?.genre || draftBook.genre.length === 0) {
+      newErrors.genre = t("modal.genre_required");
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleGenreToggle = (genre: string) => {
@@ -127,15 +149,34 @@ export function Header({
       ? currentGenres.filter((g) => g !== genre)
       : [...currentGenres, genre];
     onDraftBookChange({ genre: newGenres });
+    // Clear genre error when user selects a genre
+    if (newGenres.length > 0 && errors.genre) {
+      setErrors((prev) => ({ ...prev, genre: "" }));
+    }
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onDraftBookChange({ title: e.target.value });
+    // Clear title error when user types
+    if (e.target.value.trim() && errors.title) {
+      setErrors((prev) => ({ ...prev, title: "" }));
+    }
+  };
+
+  const handleSave = () => {
+    if (validateForm()) {
+      onSave();
+      setErrors({});
+    }
   };
 
   const handleEditClick = () => {
-    setPreviewImage("");
     onEditingHeaderChange(true);
+    setErrors({});
   };
 
   const handleCancelClick = () => {
-    setPreviewImage("");
+    setErrors({});
     onCancel();
   };
 
@@ -143,66 +184,65 @@ export function Header({
     return (
       <div className="flex items-start gap-6">
         {/* Cover Image - Edit Mode */}
-        <div className="space-y-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-            onChange={handleImageChange}
-            className="hidden"
-          />
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="w-32 h-48 rounded-lg overflow-hidden shadow-lg cursor-pointer relative group"
-          >
-            <img
-              src={previewImage || draftBook?.coverImage || book.coverImage}
-              alt={draftBook?.title || book.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="text-center text-white">
-                <Upload className="w-8 h-8 mx-auto mb-2" />
-                <p className="text-xs">Alterar capa</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FormImageUpload
+          value={draftBook?.coverImage || book.coverImage}
+          onChange={(value) => onDraftBookChange({ coverImage: value })}
+          label=""
+          showLabel={false}
+          height="h-48"
+          width="w-32"
+          shape="rounded"
+          imageFit="cover"
+          placeholderIcon={BookOpen}
+          id="header-cover-upload"
+          compact
+        />
 
         {/* Edit Form */}
         <div className="flex-1 space-y-4">
           {/* Title and Status */}
-          <div className="flex items-center gap-3">
-            <Input
-              value={draftBook?.title || ""}
-              onChange={(e) => onDraftBookChange({ title: e.target.value })}
-              placeholder="Título do livro"
-              className="text-2xl font-bold h-12 max-w-2xl"
-            />
-            <Select
-              value={draftBook?.status || "Em planejamento"}
-              onValueChange={(v) =>
-                onDraftBookChange({ status: v as BookStatus })
-              }
-            >
-              <SelectTrigger className="w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {BOOK_STATUS_OPTIONS.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-start gap-3">
+            <div className="flex-1 max-w-2xl">
+              <FormInput
+                label={t("modal.book_title")}
+                name="title"
+                value={draftBook?.title || ""}
+                onChange={handleTitleChange}
+                placeholder={t("modal.title_placeholder")}
+                required
+                showOptionalLabel={false}
+                error={errors.title}
+                labelClassName="text-primary"
+                className="text-xl font-bold h-11"
+              />
+            </div>
+            <div className="pt-7">
+              <Select
+                value={draftBook?.status || "Em planejamento"}
+                onValueChange={(v) =>
+                  onDraftBookChange({ status: v as BookStatus })
+                }
+              >
+                <SelectTrigger className="w-56">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BOOK_STATUS_OPTIONS.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Genres */}
-          <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Gêneros
-            </label>
+          <div className="space-y-2">
+            <Label className="text-primary">
+              {t("modal.book_genre")}
+              <span className="text-destructive ml-1">*</span>
+            </Label>
             <div className="flex flex-wrap gap-2">
               {GENRES_CONSTANT.map((genre) => {
                 const isSelected = draftBook?.genre?.includes(genre) || false;
@@ -222,35 +262,43 @@ export function Header({
                 );
               })}
             </div>
+            {errors.genre && (
+              <p className="text-sm text-destructive">{errors.genre}</p>
+            )}
           </div>
 
           {/* Synopsis */}
-          <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Sinopse
-            </label>
-            <Textarea
-              value={draftBook?.storySummary || ""}
-              onChange={(e) =>
-                onDraftBookChange({
-                  storySummary: e.target.value,
-                })
-              }
-              placeholder="Sinopse da história"
-              rows={4}
-              className="resize-none max-w-4xl"
-            />
-          </div>
+          <FormTextarea
+            label={t("modal.book_synopsis")}
+            name="synopsis"
+            value={draftBook?.storySummary || ""}
+            onChange={(e) =>
+              onDraftBookChange({
+                storySummary: e.target.value,
+              })
+            }
+            placeholder={t("modal.synopsis_placeholder")}
+            rows={4}
+            maxLength={1000}
+            showCharCount
+            className="resize-none max-w-4xl"
+            labelClassName="text-primary"
+          />
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
             <Button variant="secondary" onClick={handleCancelClick}>
               <X className="w-4 h-4 mr-2" />
-              Cancelar
+              {t("button.cancel")}
             </Button>
-            <Button variant="magical" onClick={onSave}>
+            <Button
+              variant="magical"
+              onClick={handleSave}
+              disabled={!hasChanges || !isFormValid}
+              className="animate-glow"
+            >
               <Check className="w-4 h-4 mr-2" />
-              Salvar
+              {t("button.save")}
             </Button>
           </div>
         </div>
@@ -303,7 +351,6 @@ export function Header({
             {book.storySummary ? (
               <div className="mb-3">
                 <p
-                  ref={synopsisRef}
                   className={`text-muted-foreground leading-relaxed select-text ${
                     !showFullSynopsis && isSynopsisLong(book.storySummary)
                       ? "line-clamp-3"

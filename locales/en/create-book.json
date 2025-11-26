@@ -44,6 +44,7 @@
   },
   "button": {
     "cancel": "Cancel",
-    "create": "Create"
+    "create": "Create",
+    "save": "Save"
   }
 }
