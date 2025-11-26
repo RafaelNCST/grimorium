@@ -5,6 +5,9 @@
     "max_selections_reached": "Máximo de {{max}} seleção(ões) atingido",
     "all_options_selected": "Todas as opções foram selecionadas"
   },
+  "form_image": {
+    "add_image": "Adicionar Imagem"
+  },
   "empty_field": "Não especificado",
   "title_bar": {
     "home": "Página Principal",

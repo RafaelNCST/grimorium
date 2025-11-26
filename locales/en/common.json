@@ -5,6 +5,9 @@
     "max_selections_reached": "Maximum of {{max}} selection(s) reached",
     "all_options_selected": "All options have been selected"
   },
+  "form_image": {
+    "add_image": "Add Image"
+  },
   "empty_field": "Not specified",
   "title_bar": {
     "home": "Home",

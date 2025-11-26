@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ImagePlus, X, LucideIcon } from "lucide-react";
 
@@ -153,8 +154,10 @@ export function FormImageUpload({
   labelClassName = "text-primary",
   compact = false,
 }: FormImageUploadProps) {
+  const { t } = useTranslation("common");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(value);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -238,9 +241,14 @@ export function FormImageUpload({
             </Button>
           </div>
         ) : (
-          <label htmlFor={id} className="cursor-pointer block">
+          <label
+            htmlFor={id}
+            className="cursor-pointer block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
             <div
-              className={`${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40`}
+              className={`relative ${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40 overflow-hidden`}
             >
               <PlaceholderIcon className="h-12 w-12 text-muted-foreground/60" />
               {placeholderText && !compact && (
@@ -250,6 +258,17 @@ export function FormImageUpload({
                   {placeholderText}
                 </span>
               )}
+
+              {/* Hover overlay */}
+              <div
+                className={`absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 ${shapeClass} p-2 ${
+                  isHovered ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <span className="text-white text-sm font-semibold text-center">
+                  {t("form_image.add_image")}
+                </span>
+              </div>
             </div>
           </label>
         )}
