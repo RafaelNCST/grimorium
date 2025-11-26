@@ -160,8 +160,8 @@ export function CreateBookModal({
               {/* Title + Status + Genre */}
               <div className="flex-1 space-y-4">
                 {/* Title and Status */}
-                <div className="flex items-start gap-3">
-                  <div className="flex-1">
+                <div className="flex flex-wrap items-start gap-3">
+                  <div className="flex-1 min-w-48">
                     <FormInput
                       label={t("modal.book_title")}
                       name="title"
@@ -176,7 +176,7 @@ export function CreateBookModal({
                       labelClassName="text-primary"
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-44">
                     <Label className="flex items-center gap-1 text-primary">
                       {t("modal.book_status")}
                       <span className="text-destructive">*</span>
@@ -187,7 +187,7 @@ export function CreateBookModal({
                         setFormData({ ...formData, status: v as BookStatus })
                       }
                     >
-                      <SelectTrigger className="w-44">
+                      <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
