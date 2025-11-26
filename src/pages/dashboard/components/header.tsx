@@ -31,7 +31,10 @@ import {
 } from "@/components/ui/select";
 import { Book as BookType, BookStatus } from "@/stores/book-store";
 
-import { GENRES_CONSTANT } from "../constants/dashboard-constants";
+import {
+  GENRES_CONSTANT,
+  getGenreTranslationKey,
+} from "../constants/dashboard-constants";
 
 const BOOK_STATUS_OPTIONS: BookStatus[] = [
   "Em planejamento",
@@ -148,11 +151,11 @@ export function Header({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleGenreToggle = (genre: string) => {
+  const handleGenreToggle = (genreId: string) => {
     const currentGenres = draftBook?.genre || [];
-    const newGenres = currentGenres.includes(genre)
-      ? currentGenres.filter((g) => g !== genre)
-      : [...currentGenres, genre];
+    const newGenres = currentGenres.includes(genreId)
+      ? currentGenres.filter((g) => g !== genreId)
+      : [...currentGenres, genreId];
     onDraftBookChange({ genre: newGenres });
     // Clear genre error when user selects a genre
     if (newGenres.length > 0 && errors.genre) {
@@ -254,19 +257,19 @@ export function Header({
             </Label>
             <div className="flex flex-wrap gap-2">
               {GENRES_CONSTANT.map((genre) => {
-                const isSelected = draftBook?.genre?.includes(genre) || false;
+                const isSelected = draftBook?.genre?.includes(genre.id) || false;
                 return (
                   <button
-                    key={genre}
+                    key={genre.id}
                     type="button"
-                    onClick={() => handleGenreToggle(genre)}
+                    onClick={() => handleGenreToggle(genre.id)}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                       isSelected
                         ? "bg-primary text-primary-foreground shadow-md scale-105"
                         : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {genre}
+                    {t(genre.translationKey)}
                   </button>
                 );
               })}
@@ -352,7 +355,11 @@ export function Header({
             {/* Genre Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {book.genre.map((g, index) => (
-                <EntityTagBadge key={index} config={GENRE_TAG_CONFIG} label={g} />
+                <EntityTagBadge
+                  key={index}
+                  config={GENRE_TAG_CONFIG}
+                  label={t(getGenreTranslationKey(g))}
+                />
               ))}
             </div>
 

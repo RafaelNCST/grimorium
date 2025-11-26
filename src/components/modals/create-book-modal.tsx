@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { GENRES_CONSTANT } from "@/pages/dashboard/constants/dashboard-constants";
 import { BookStatus } from "@/stores/book-store";
 
 interface PropsCreateBookModal {
@@ -48,23 +49,6 @@ const STATUS_KEYS: { key: string; value: BookStatus }[] = [
   { key: "status.complete", value: "Completo" },
 ];
 
-const GENRE_KEYS = [
-  "genre.urban",
-  "genre.fantasy",
-  "genre.futuristic",
-  "genre.cyberpunk",
-  "genre.high_fantasy",
-  "genre.romance",
-  "genre.mystery",
-  "genre.horror",
-  "genre.suspense",
-  "genre.drama",
-  "genre.sci_fi",
-  "genre.historical",
-  "genre.action",
-  "genre.adventure",
-  "genre.litrpg",
-] as const;
 
 export function CreateBookModal({
   open,
@@ -99,13 +83,12 @@ export function CreateBookModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleGenreToggle = (genreKey: (typeof GENRE_KEYS)[number]) => {
-    const genreValue = t(genreKey) as string;
+  const handleGenreToggle = (genreId: string) => {
     setFormData((prev) => ({
       ...prev,
-      genre: prev.genre.includes(genreValue)
-        ? prev.genre.filter((g) => g !== genreValue)
-        : [...prev.genre, genreValue],
+      genre: prev.genre.includes(genreId)
+        ? prev.genre.filter((g) => g !== genreId)
+        : [...prev.genre, genreId],
     }));
   };
 
@@ -225,21 +208,20 @@ export function CreateBookModal({
                     <span className="text-destructive ml-1">*</span>
                   </Label>
                   <div className="flex flex-wrap gap-2">
-                    {GENRE_KEYS.map((genreKey) => {
-                      const genreValue = t(genreKey) as string;
-                      const isSelected = formData.genre.includes(genreValue);
+                    {GENRES_CONSTANT.map((genre) => {
+                      const isSelected = formData.genre.includes(genre.id);
                       return (
                         <button
-                          key={genreKey}
+                          key={genre.id}
                           type="button"
-                          onClick={() => handleGenreToggle(genreKey)}
+                          onClick={() => handleGenreToggle(genre.id)}
                           className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                             isSelected
                               ? "bg-primary text-primary-foreground shadow-md scale-105"
                               : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
                           }`}
                         >
-                          {genreValue}
+                          {t(genre.translationKey)}
                         </button>
                       );
                     })}

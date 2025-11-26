@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/entity-tag-badge";
 import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import { formatRelativeTime } from "@/lib/utils";
+import { getGenreTranslationKey } from "@/pages/dashboard/constants/dashboard-constants";
 
 const GENRE_TAG_CONFIG: IEntityTagConfig = {
   value: "genre",
@@ -38,7 +39,7 @@ export function BookCard({
   lastModified,
   onClick,
 }: PropsBookCard) {
-  const { i18n, t } = useTranslation("home");
+  const { i18n, t } = useTranslation(["home", "create-book"]);
 
   const formattedLastModified = lastModified
     ? formatRelativeTime(lastModified, i18n.language)
@@ -73,7 +74,7 @@ export function BookCard({
             <EntityTagBadge
               key={index}
               config={GENRE_TAG_CONFIG}
-              label={g}
+              label={t(getGenreTranslationKey(g), { ns: "create-book" })}
               className="text-xs"
             />
           ))}

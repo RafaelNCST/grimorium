@@ -1231,9 +1231,114 @@ async function runMigrations(database: Database): Promise<void> {
       "[db] Books table verified. Current row count:",
       result[0]?.count || 0
     );
+
+    // Migrate book genres to new format (english lowercase)
+    await migrateBookGenres(database);
   } catch (error) {
     console.error("[db] Error during migrations:", error);
     throw error;
+  }
+}
+
+// Migration: Convert old genre formats to new standardized format (english, lowercase)
+async function migrateBookGenres(database: Database): Promise<void> {
+  // Mapping of old genre values to new standardized IDs
+  const genreMapping: Record<string, string> = {
+    // Portuguese translations
+    "urbano": "urban",
+    "fantasia": "fantasy",
+    "futurístico": "futuristic",
+    "futuristico": "futuristic",
+    "cyberpunk": "cyberpunk",
+    "alta fantasia": "high_fantasy",
+    "romance": "romance",
+    "mistério": "mystery",
+    "misterio": "mystery",
+    "terror": "horror",
+    "suspense": "suspense",
+    "drama": "drama",
+    "ficção científica": "sci_fi",
+    "ficcao cientifica": "sci_fi",
+    "ficção cientifica": "sci_fi",
+    "histórico": "historical",
+    "historico": "historical",
+    "ação": "action",
+    "acao": "action",
+    "aventura": "adventure",
+    "litrpg": "litrpg",
+    // English translations (various capitalizations)
+    "urban": "urban",
+    "fantasy": "fantasy",
+    "futuristic": "futuristic",
+    "high fantasy": "high_fantasy",
+    "high_fantasy": "high_fantasy",
+    "mystery": "mystery",
+    "horror": "horror",
+    "sci-fi": "sci_fi",
+    "sci_fi": "sci_fi",
+    "scifi": "sci_fi",
+    "historical": "historical",
+    "action": "action",
+    "adventure": "adventure",
+  };
+
+  try {
+    // Get all books with their genres
+    const books = await database.select<Array<{ id: string; genre: string }>>(
+      "SELECT id, genre FROM books WHERE genre IS NOT NULL"
+    );
+
+    let migratedCount = 0;
+
+    for (const book of books) {
+      if (!book.genre) continue;
+
+      try {
+        const genres: string[] = JSON.parse(book.genre);
+        let needsMigration = false;
+        const newGenres: string[] = [];
+
+        for (const genre of genres) {
+          const normalizedGenre = genre.toLowerCase().trim();
+          const mappedGenre = genreMapping[normalizedGenre];
+
+          if (mappedGenre) {
+            // Genre needs migration
+            if (mappedGenre !== genre) {
+              needsMigration = true;
+            }
+            newGenres.push(mappedGenre);
+          } else {
+            // Unknown genre, keep as-is but lowercase
+            const lowercaseGenre = normalizedGenre.replace(/\s+/g, "_");
+            if (lowercaseGenre !== genre) {
+              needsMigration = true;
+            }
+            newGenres.push(lowercaseGenre);
+          }
+        }
+
+        if (needsMigration) {
+          await database.execute(
+            "UPDATE books SET genre = $1 WHERE id = $2",
+            [JSON.stringify(newGenres), book.id]
+          );
+          migratedCount++;
+          console.log(`[db] Migrated genres for book ${book.id}: ${genres.join(", ")} -> ${newGenres.join(", ")}`);
+        }
+      } catch (parseError) {
+        console.warn(`[db] Could not parse genres for book ${book.id}:`, parseError);
+      }
+    }
+
+    if (migratedCount > 0) {
+      console.log(`[db] Genre migration completed. Migrated ${migratedCount} books.`);
+    } else {
+      console.log("[db] No books needed genre migration.");
+    }
+  } catch (error) {
+    console.error("[db] Error during genre migration:", error);
+    // Don't throw - this is a non-critical migration
   }
 }
 
