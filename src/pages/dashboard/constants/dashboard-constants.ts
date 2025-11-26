@@ -4,7 +4,7 @@ import {
   MapPin,
   Building,
   Target,
-  Sparkles,
+  Zap,
   Dna,
   Package,
 } from "lucide-react";
@@ -62,7 +62,7 @@ export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   { id: "world", label: "Mundo", icon: MapPin, visible: true },
   { id: "factions", label: "Facções", icon: Building, visible: true },
   { id: "plot", label: "Enredo", icon: Target, visible: true },
-  { id: "magic", label: "Sistema de Poder", icon: Sparkles, visible: true },
+  { id: "magic", label: "Sistema de Poder", icon: Zap, visible: true },
   { id: "species", label: "Raças", icon: Dna, visible: true },
   { id: "items", label: "Itens", icon: Package, visible: true },
 ];

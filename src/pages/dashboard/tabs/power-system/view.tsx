@@ -1,8 +1,4 @@
-import { Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-import { EmptyState } from "@/components/empty-state";
-import { Button } from "@/components/ui/button";
 
 import { CreateSystemModal } from "./components/create-system-modal";
 import { DeleteSystemModal } from "./components/delete-system-modal";
@@ -72,80 +68,12 @@ export function PowerSystemView({
 }: PowerSystemViewProps) {
   const { t } = useTranslation("power-system");
 
-  // ============================================================================
-  // LOADING STATE
-  // ============================================================================
-
-  if (isLoadingSystems) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">
-            {t("loading.systems")}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ============================================================================
-  // EMPTY STATE - NO SYSTEMS
-  // ============================================================================
-
-  if (systems.length === 0) {
-    return (
-      <div className="flex-1 h-full flex flex-col space-y-6 px-6 py-6">
-        {/* Header with Create System button */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">{t("page.title")}</h2>
-            <p className="text-muted-foreground">{t("page.description")}</p>
-          </div>
-          <Button
-            variant="magical"
-            size="lg"
-            className="animate-glow"
-            onClick={onOpenCreateSystemModal}
-          >
-            <Zap className="w-5 h-5 mr-2" />
-            {t("empty_state.action")}
-          </Button>
-        </div>
-
-        {/* Empty State */}
-        <EmptyState
-          icon={Zap}
-          title={t("empty_state.title")}
-          description={t("empty_state.description")}
-        />
-
-        {/* Modals */}
-        <CreateSystemModal
-          isOpen={isCreateSystemModalOpen}
-          onClose={onCloseCreateSystemModal}
-          onSubmit={onCreateSystem}
-          existingSystems={systems}
-        />
-        <EditSystemModal
-          isOpen={isEditSystemModalOpen}
-          system={systemToEdit}
-          onClose={onCloseEditSystemModal}
-          onSubmit={onUpdateSystem}
-        />
-      </div>
-    );
-  }
-
-  // ============================================================================
-  // SYSTEM LIST VIEW
-  // ============================================================================
-
   return (
-    <div className="flex flex-col h-full">
+    <>
       <SystemListView
         systems={systems}
         isEditMode={isEditMode}
+        isLoading={isLoadingSystems}
         onEditSystem={onEditSystemClick}
         onCreateSystem={onOpenCreateSystemModal}
       />
@@ -173,6 +101,6 @@ export function PowerSystemView({
         }}
         systemName={systemToEdit?.name}
       />
-    </div>
+    </>
   );
 }

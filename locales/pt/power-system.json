@@ -12,8 +12,10 @@
     "title": "Sistemas de Poder",
     "description": "Gerencie seus sistemas de poder e selecione um para visualizar",
     "new_system": "Novo Sistema",
-    "search_placeholder": "Buscar sistemas",
+    "search_placeholder": "Buscar sistemas...",
     "no_results": "Nenhum sistema encontrado",
+    "no_results_description": "Tente ajustar sua busca",
+    "view_details": "Ver detalhes",
     "edit_tooltip": "Editar sistema"
   },
   "empty": {

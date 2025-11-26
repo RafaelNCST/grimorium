@@ -4,10 +4,11 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { Pencil, Plus, Search, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DisplayImage } from "@/components/displays";
+import { EntityListLayout, EntityCardList } from "@/components/layouts";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import {
   Tooltip,
   TooltipContent,
@@ -19,6 +20,7 @@ import { type IPowerSystem } from "../types/power-system-types";
 interface SystemListViewProps {
   systems: IPowerSystem[];
   isEditMode: boolean;
+  isLoading?: boolean;
   onEditSystem: (system: IPowerSystem) => void;
   onCreateSystem: () => void;
 }
@@ -26,6 +28,7 @@ interface SystemListViewProps {
 export function SystemListView({
   systems,
   isEditMode,
+  isLoading = false,
   onEditSystem,
   onCreateSystem,
 }: SystemListViewProps) {
@@ -46,54 +49,47 @@ export function SystemListView({
     system.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const hasNoResults = filteredSystems.length === 0 && systems.length > 0;
+
   return (
-    <div className="flex-1 h-full flex flex-col space-y-6 px-6 py-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">{t("system_list.title")}</h2>
-          <p className="text-muted-foreground">
-            {t("system_list.description")}
-          </p>
-        </div>
-
-        <Button
-          variant="magical"
-          size="lg"
-          onClick={onCreateSystem}
-          className="animate-glow"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          {t("system_list.new_system")}
-        </Button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder={t("system_list.search_placeholder")}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Empty state when no filtered results */}
-      {filteredSystems.length === 0 && (
-        <div className="flex items-center justify-center flex-1">
-          <div className="text-center">
-            <p className="text-lg text-muted-foreground">
-              {t("system_list.no_results")}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Systems Grid */}
-      {filteredSystems.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 pb-6">
-          {filteredSystems.map((system) => (
+    <div className="h-full overflow-y-auto px-6 py-6">
+      <EntityListLayout
+        isLoading={isLoading}
+        loadingText={t("loading.systems")}
+        isEmpty={systems.length === 0}
+        emptyState={{
+          icon: Zap,
+          title: t("empty_state.title"),
+          description: t("empty_state.description"),
+        }}
+        header={{
+          title: t("system_list.title"),
+          description: t("system_list.description"),
+          primaryAction: {
+            label: t("system_list.new_system"),
+            onClick: onCreateSystem,
+            variant: "magical",
+            icon: Plus,
+            className: "animate-glow",
+          },
+        }}
+        search={{
+          value: searchQuery,
+          onChange: setSearchQuery,
+          placeholder: t("system_list.search_placeholder"),
+          maxWidth: "max-w-[50%]",
+        }}
+        showNoResultsState={hasNoResults}
+        noResultsState={{
+          icon: Search,
+          title: t("system_list.no_results"),
+          description: t("system_list.no_results_description"),
+        }}
+      >
+        <EntityCardList
+          layout="vertical"
+          items={filteredSystems}
+          renderCard={(system) => (
             <SystemCard
               key={system.id}
               system={system}
@@ -101,9 +97,9 @@ export function SystemListView({
               onSelect={() => handleSystemSelect(system.id)}
               onEdit={() => onEditSystem(system)}
             />
-          ))}
-        </div>
-      )}
+          )}
+        />
+      </EntityListLayout>
     </div>
   );
 }
@@ -119,51 +115,56 @@ function SystemCard({ system, isEditMode, onSelect, onEdit }: SystemCardProps) {
   const { t } = useTranslation("power-system");
 
   return (
-    <Card
-      className="group cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:border-primary/50 hover:shadow-[0_8px_32px_hsl(240_10%_3.9%_/_0.3),0_0_20px_hsl(263_70%_50%_/_0.3)] hover:bg-card/80"
+    <EntityCardWrapper
       onClick={onSelect}
+      overlayText={t("system_list.view_details")}
+      contentClassName="p-5"
     >
-      <CardContent className="p-5">
-        <div className="flex gap-4">
-          {/* System Icon */}
+      <div className="flex gap-4">
+        {/* System Icon */}
+        {system.iconImage ? (
           <Avatar className="w-24 h-24 rounded-lg flex-shrink-0">
             <AvatarImage src={system.iconImage} className="object-cover" />
-            <AvatarFallback className="text-xl rounded-lg bg-gradient-to-br from-purple-500/10 to-blue-500/10">
-              <Zap className="w-12 h-12 text-purple-500/50" />
-            </AvatarFallback>
           </Avatar>
+        ) : (
+          <DisplayImage
+            icon={Zap}
+            height="h-24"
+            width="w-24"
+            shape="square"
+          />
+        )}
 
-          {/* Right side content */}
-          <div className="flex-1 min-w-0 flex items-center justify-between">
-            {/* Name */}
-            <h3 className="font-semibold text-lg leading-tight line-clamp-1">
-              {system.name}
-            </h3>
+        {/* Right side content */}
+        <div className="flex-1 min-w-0 flex items-center justify-between">
+          {/* Name */}
+          <h3 className="font-semibold text-lg leading-tight line-clamp-1">
+            {system.name}
+          </h3>
 
-            {/* Edit Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="flex-shrink-0 ml-4"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                  }}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm font-medium">
-                  {t("system_list.edit_tooltip")}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          {/* Edit Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="flex-shrink-0 ml-4 relative z-20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-sm font-medium">
+                {t("system_list.edit_tooltip")}
+              </p>
+            </TooltipContent>
+          </Tooltip>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </EntityCardWrapper>
   );
 }
