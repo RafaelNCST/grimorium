@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-import { BookPlus, ImageIcon, X } from "lucide-react";
+import { BookPlus, BookOpen, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,6 @@ export function CreateBookModal({
   onConfirm,
 }: PropsCreateBookModal) {
   const { t } = useTranslation("create-book");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<IBookFormData>({
     title: "",
@@ -65,7 +65,6 @@ export function CreateBookModal({
     synopsis: "",
     authorSummary: "",
   });
-  const [previewImage, setPreviewImage] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
@@ -81,19 +80,6 @@ export function CreateBookModal({
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreviewImage(result);
-        setFormData({ ...formData, cover: result });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleGenreToggle = (genreKey: (typeof GENRE_KEYS)[number]) => {
@@ -125,7 +111,6 @@ export function CreateBookModal({
       synopsis: "",
       authorSummary: "",
     });
-    setPreviewImage("");
     setErrors({});
   };
 
@@ -154,71 +139,72 @@ export function CreateBookModal({
             onSubmit={handleSubmit}
             className="space-y-6"
           >
-            {/* Book Cover */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("modal.book_cover")}
-                <span className="text-xs text-muted-foreground ml-2">
-                  (opcional)
-                </span>
-              </Label>
-              <div className="relative">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                  onChange={handleImageChange}
-                  className="hidden"
+            {/* Cover + Title + Genre Row */}
+            <div className="flex gap-6">
+              {/* Book Cover */}
+              <FormImageUpload
+                value={formData.cover}
+                onChange={(value) => setFormData({ ...formData, cover: value })}
+                label=""
+                showLabel={false}
+                height="h-48"
+                width="w-32"
+                shape="rounded"
+                imageFit="cover"
+                placeholderIcon={BookOpen}
+                id="book-cover-upload"
+                compact
+              />
+
+              {/* Title + Genre */}
+              <div className="flex-1 space-y-4">
+                {/* Title */}
+                <FormInput
+                  label={t("modal.book_title")}
+                  name="title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  placeholder={t("modal.title_placeholder")}
+                  required
+                  showOptionalLabel={false}
+                  error={errors.title}
+                  labelClassName="text-primary"
                 />
-                <div
-                  role="button"
-                  tabIndex={0}
-                  aria-label={t("modal.upload_image")}
-                  onClick={() => fileInputRef.current?.click()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      fileInputRef.current?.click();
-                    }
-                  }}
-                  className="w-32 h-48 rounded-lg overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
-                >
-                  {previewImage ? (
-                    <div className="relative w-full h-full group">
-                      <img
-                        src={previewImage}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-xs text-center px-2">
-                          {t("modal.change_image")}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-white p-3">
-                      <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
-                    </div>
+
+                {/* Genre Selection */}
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("modal.book_genre")}
+                    <span className="text-destructive ml-1">*</span>
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {GENRE_KEYS.map((genreKey) => {
+                      const genreValue = t(genreKey) as string;
+                      const isSelected = formData.genre.includes(genreValue);
+                      return (
+                        <button
+                          key={genreKey}
+                          type="button"
+                          onClick={() => handleGenreToggle(genreKey)}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground shadow-md scale-105"
+                              : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {genreValue}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.genre && (
+                    <p className="text-sm text-destructive">{errors.genre}</p>
                   )}
                 </div>
               </div>
             </div>
-
-            {/* Title */}
-            <FormInput
-              label={t("modal.book_title")}
-              name="title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
-              placeholder={t("modal.title_placeholder")}
-              required
-              showOptionalLabel={false}
-              error={errors.title}
-              labelClassName="text-primary"
-            />
 
             {/* Synopsis */}
             <FormTextarea
@@ -235,37 +221,6 @@ export function CreateBookModal({
               className="resize-none"
               labelClassName="text-primary"
             />
-
-            {/* Genre Selection */}
-            <div className="space-y-2">
-              <Label className="text-primary">
-                {t("modal.book_genre")}
-                <span className="text-destructive ml-1">*</span>
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {GENRE_KEYS.map((genreKey) => {
-                  const genreValue = t(genreKey) as string;
-                  const isSelected = formData.genre.includes(genreValue);
-                  return (
-                    <button
-                      key={genreKey}
-                      type="button"
-                      onClick={() => handleGenreToggle(genreKey)}
-                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground shadow-md scale-105"
-                          : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {genreValue}
-                    </button>
-                  );
-                })}
-              </div>
-              {errors.genre && (
-                <p className="text-sm text-destructive">{errors.genre}</p>
-              )}
-            </div>
 
             {/* Author Summary */}
             <FormTextarea

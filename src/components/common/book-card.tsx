@@ -1,11 +1,21 @@
-import { useState } from "react";
-
-import { ImageIcon, Eye, Edit2 } from "lucide-react";
+import { BookOpen, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import {
+  EntityTagBadge,
+  IEntityTagConfig,
+} from "@/components/ui/entity-tag-badge";
+import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import { formatRelativeTime } from "@/lib/utils";
+
+const GENRE_TAG_CONFIG: IEntityTagConfig = {
+  value: "genre",
+  icon: Tag,
+  translationKey: "genre",
+  colorClass: "text-white",
+  bgColorClass: "bg-black/60 border-white/20 backdrop-blur-sm",
+};
 
 interface PropsBookCard {
   id: string;
@@ -27,88 +37,52 @@ export function BookCard({
   chapters = 0,
   lastModified,
   onClick,
-  onEdit,
 }: PropsBookCard) {
-  const [isHovered, setIsHovered] = useState(false);
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation("home");
 
   const formattedLastModified = lastModified
     ? formatRelativeTime(lastModified, i18n.language)
     : undefined;
 
   return (
-    <div
-      className="group relative bg-card rounded-xl border border-border overflow-hidden card-magical cursor-pointer animate-stagger"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <EntityCardWrapper
       onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick?.();
-        }
-      }}
+      overlayText={t("book_card.view_details")}
+      contentClassName="p-0"
     >
       {/* Book Cover */}
-      <div className="aspect-[3/4] relative overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+      <div className="aspect-[3/4] relative overflow-hidden rounded-t-lg">
         {coverImage ? (
           <img
             src={coverImage}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-white">
-            <ImageIcon className="w-16 h-16 text-muted-foreground/40" />
-          </div>
+          <FormImageDisplay
+            icon={BookOpen}
+            height="h-full"
+            width="w-full"
+            shape="square"
+          />
         )}
 
-        {/* Overlay with actions */}
-        <div
-          className={`absolute inset-0 bg-black/60 flex items-center justify-center gap-2 transition-opacity duration-300 ${
-            isHovered ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick?.();
-            }}
-            className="backdrop-blur-sm"
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            Abrir
-          </Button>
-          {onEdit && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit?.();
-              }}
-              className="backdrop-blur-sm"
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-
         {/* Genre Badges */}
-        <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)]">
-          {genre.slice(0, 2).map((g, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {g}
-            </Badge>
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)] pointer-events-none">
+          {genre.slice(0, 6).map((g, index) => (
+            <EntityTagBadge
+              key={index}
+              config={GENRE_TAG_CONFIG}
+              label={g}
+              className="text-xs"
+            />
           ))}
-          {genre.length > 2 && (
-            <Badge variant="secondary" className="text-xs">
-              +{genre.length - 2}
-            </Badge>
+          {genre.length > 6 && (
+            <EntityTagBadge
+              config={GENRE_TAG_CONFIG}
+              label={`+${genre.length - 6}`}
+              className="text-xs"
+            />
           )}
         </div>
       </div>
@@ -130,6 +104,6 @@ export function BookCard({
           </p>
         )}
       </div>
-    </div>
+    </EntityCardWrapper>
   );
 }

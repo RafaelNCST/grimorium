@@ -10,9 +10,9 @@ import {
   Pause,
   CheckCircle2,
   Tag,
-  ImageIcon,
 } from "lucide-react";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { Button } from "@/components/ui/button";
 import {
   EntityTagBadge,
@@ -270,9 +270,12 @@ export function Header({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-white">
-            <ImageIcon className="w-16 h-16 text-muted-foreground/40" />
-          </div>
+          <FormImageDisplay
+            icon={BookOpen}
+            height="h-full"
+            width="w-full"
+            shape="square"
+          />
         )}
       </div>
 

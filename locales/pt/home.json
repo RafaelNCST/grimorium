@@ -22,5 +22,8 @@
   "list_books": {
     "title": "Biblioteca",
     "text_empty": "Nenhum livro encontrado"
+  },
+  "book_card": {
+    "view_details": "Ver detalhes"
   }
 }
