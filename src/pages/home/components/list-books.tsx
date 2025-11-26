@@ -1,10 +1,37 @@
-import { Book, Search } from "lucide-react";
+import { Book as BookIcon, Search, Library, Users, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { BookCard } from "@/components/common/book-card";
-import { Badge } from "@/components/ui/badge";
+import {
+  EntityTagBadge,
+  IEntityTagConfig,
+} from "@/components/ui/entity-tag-badge";
 import { Input } from "@/components/ui/input";
 import { Book as BookType } from "@/stores/book-store";
+
+const METRICS_CONFIG: Record<string, IEntityTagConfig> = {
+  books: {
+    value: "books",
+    icon: Library,
+    translationKey: "metrics.total_books",
+    colorClass: "text-blue-700 dark:text-blue-400",
+    bgColorClass: "bg-blue-500/10 border-blue-500/20",
+  },
+  characters: {
+    value: "characters",
+    icon: Users,
+    translationKey: "metrics.total_characters",
+    colorClass: "text-green-700 dark:text-green-400",
+    bgColorClass: "bg-green-500/10 border-green-500/20",
+  },
+  words: {
+    value: "words",
+    icon: FileText,
+    translationKey: "metrics.total_words",
+    colorClass: "text-purple-700 dark:text-purple-400",
+    bgColorClass: "bg-purple-500/10 border-purple-500/20",
+  },
+};
 
 interface ListBooksProps {
   filteredBooks: BookType[];
@@ -35,38 +62,39 @@ export function ListBooks({
   if (isEmpty) {
     return (
       <div className="px-6 pb-6 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">{t("list_books.title")}</h2>
-
-          <div className="relative">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold mb-3">{t("list_books.title")}</h2>
+          <div className="relative w-1/2">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={t("filter.placeholder")}
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
-              className="pl-10 w-[30rem]"
+              className="pl-10"
             />
           </div>
         </div>
 
         {shouldShowMetrics && (
           <div className="flex gap-3 mb-6">
-            <Badge variant="secondary" className="px-3 py-1">
-              {t("metrics.total_books")}: {totalBooks}
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1">
-              {t("metrics.total_characters")}:{" "}
-              {totalCharacters.toLocaleString()}
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1">
-              {t("metrics.total_words")}: {totalWords.toLocaleString()}
-            </Badge>
+            <EntityTagBadge
+              config={METRICS_CONFIG.books}
+              label={`${t("metrics.total_books")}: ${totalBooks}`}
+            />
+            <EntityTagBadge
+              config={METRICS_CONFIG.characters}
+              label={`${t("metrics.total_characters")}: ${totalCharacters.toLocaleString()}`}
+            />
+            <EntityTagBadge
+              config={METRICS_CONFIG.words}
+              label={`${t("metrics.total_words")}: ${totalWords.toLocaleString()}`}
+            />
           </div>
         )}
 
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Book className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <BookIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
               {t("list_books.text_empty")}
             </h3>
@@ -83,31 +111,33 @@ export function ListBooks({
 
   return (
     <div className="px-6 pb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">{t("list_books.title")}</h2>
-
-        <div className="relative">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold mb-3">{t("list_books.title")}</h2>
+        <div className="relative w-1/2">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={t("filter.placeholder")}
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
-            className="pl-10 w-[30rem]"
+            className="pl-10"
           />
         </div>
       </div>
 
       {shouldShowMetrics && (
         <div className="flex gap-3 mb-6">
-          <Badge variant="secondary" className="px-3 py-1">
-            {t("metrics.total_books")}: {totalBooks}
-          </Badge>
-          <Badge variant="secondary" className="px-3 py-1">
-            {t("metrics.total_characters")}: {totalCharacters.toLocaleString()}
-          </Badge>
-          <Badge variant="secondary" className="px-3 py-1">
-            {t("metrics.total_words")}: {totalWords.toLocaleString()}
-          </Badge>
+          <EntityTagBadge
+            config={METRICS_CONFIG.books}
+            label={`${t("metrics.total_books")}: ${totalBooks}`}
+          />
+          <EntityTagBadge
+            config={METRICS_CONFIG.characters}
+            label={`${t("metrics.total_characters")}: ${totalCharacters.toLocaleString()}`}
+          />
+          <EntityTagBadge
+            config={METRICS_CONFIG.words}
+            label={`${t("metrics.total_words")}: ${totalWords.toLocaleString()}`}
+          />
         </div>
       )}
 

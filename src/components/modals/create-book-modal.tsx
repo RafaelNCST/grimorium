@@ -1,25 +1,20 @@
 import { useState, useRef } from "react";
 
-import { Book, BookPlus } from "lucide-react";
+import { BookPlus, ImageIcon, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 interface PropsCreateBookModal {
   open: boolean;
@@ -54,12 +49,6 @@ const GENRE_KEYS = [
   "genre.litrpg",
 ] as const;
 
-const VISUAL_STYLE_KEYS = [
-  "style.realistic",
-  "style.cartoon",
-  "style.anime",
-] as const;
-
 export function CreateBookModal({
   open,
   onClose,
@@ -88,10 +77,6 @@ export function CreateBookModal({
 
     if (formData.genre.length === 0) {
       newErrors.genre = t("modal.genre_required");
-    }
-
-    if (!formData.visualStyle) {
-      newErrors.visualStyle = t("modal.style_required");
     }
 
     setErrors(newErrors);
@@ -149,26 +134,33 @@ export function CreateBookModal({
     onClose();
   };
 
-  const isValid =
-    formData.title.trim() && formData.genre.length > 0 && formData.visualStyle;
+  const isValid = formData.title.trim() && formData.genre.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col gap-0">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <BookPlus className="w-5 h-5 text-primary" />
             {t("modal.create_book")}
           </DialogTitle>
+          <DialogDescription>{t("modal.description")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Cover and Title Section */}
-          <div className="flex gap-4">
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto pl-1 pr-4 pb-6 mt-4">
+          <form
+            id="create-book-form"
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
             {/* Book Cover */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">
+              <Label className="text-primary">
                 {t("modal.book_cover")}
+                <span className="text-xs text-muted-foreground ml-2">
+                  (opcional)
+                </span>
               </Label>
               <div className="relative">
                 <input
@@ -205,134 +197,80 @@ export function CreateBookModal({
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-muted to-muted/50 p-3">
-                      <Book className="w-12 h-12 text-muted-foreground mb-2" />
-                      <p className="text-xs text-muted-foreground text-center">
-                        {t("modal.upload_image")}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground/70 mt-1 text-center">
-                        {t("modal.upload_formats")}
-                      </p>
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-white p-3">
+                      <ImageIcon className="w-12 h-12 text-muted-foreground/40" />
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Title and Synopsis */}
-            <div className="flex-1 space-y-4">
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm font-medium">
-                  {t("modal.book_title")} *
-                </Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  placeholder={t("modal.title_placeholder")}
-                  className={`h-12 ${errors.title ? "border-destructive" : ""}`}
-                />
-                {errors.title && (
-                  <p className="text-sm text-destructive">{errors.title}</p>
-                )}
-              </div>
-
-              {/* Synopsis */}
-              <div className="space-y-2">
-                <Label htmlFor="synopsis" className="text-sm font-medium">
-                  {t("modal.book_synopsis")}
-                </Label>
-                <Textarea
-                  id="synopsis"
-                  value={formData.synopsis}
-                  onChange={(e) =>
-                    setFormData({ ...formData, synopsis: e.target.value })
-                  }
-                  placeholder={t("modal.synopsis_placeholder")}
-                  rows={6}
-                  maxLength={1000}
-                  className="resize-none"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{t("modal.optional")}</span>
-                  <span>{formData.synopsis?.length || 0}/1000</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Genre Selection */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">
-              {t("modal.book_genre")} *
-            </Label>
-            <div className="flex flex-wrap gap-2">
-              {GENRE_KEYS.map((genreKey) => {
-                const genreValue = t(genreKey) as string;
-                const isSelected = formData.genre.includes(genreValue);
-                return (
-                  <button
-                    key={genreKey}
-                    type="button"
-                    onClick={() => handleGenreToggle(genreKey)}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                      isSelected
-                        ? "bg-primary text-primary-foreground shadow-md scale-105"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {genreValue}
-                  </button>
-                );
-              })}
-            </div>
-            {errors.genre && (
-              <p className="text-sm text-destructive">{errors.genre}</p>
-            )}
-          </div>
-
-          {/* Visual Style */}
-          <div className="space-y-2">
-            <Label htmlFor="style" className="text-sm font-medium">
-              {t("modal.book_style")} *
-            </Label>
-            <Select
-              value={formData.visualStyle}
-              onValueChange={(value) =>
-                setFormData({ ...formData, visualStyle: value })
+            {/* Title */}
+            <FormInput
+              label={t("modal.book_title")}
+              name="title"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
               }
-            >
-              <SelectTrigger
-                className={errors.visualStyle ? "border-destructive" : ""}
-              >
-                <SelectValue placeholder={t("modal.style_placeholder")} />
-              </SelectTrigger>
-              <SelectContent side="bottom">
-                {VISUAL_STYLE_KEYS.map((styleKey) => {
-                  const styleValue = t(styleKey) as string;
+              placeholder={t("modal.title_placeholder")}
+              required
+              showOptionalLabel={false}
+              error={errors.title}
+              labelClassName="text-primary"
+            />
+
+            {/* Synopsis */}
+            <FormTextarea
+              label={t("modal.book_synopsis")}
+              name="synopsis"
+              value={formData.synopsis}
+              onChange={(e) =>
+                setFormData({ ...formData, synopsis: e.target.value })
+              }
+              placeholder={t("modal.synopsis_placeholder")}
+              rows={4}
+              maxLength={1000}
+              showCharCount
+              className="resize-none"
+              labelClassName="text-primary"
+            />
+
+            {/* Genre Selection */}
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("modal.book_genre")}
+                <span className="text-destructive ml-1">*</span>
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {GENRE_KEYS.map((genreKey) => {
+                  const genreValue = t(genreKey) as string;
+                  const isSelected = formData.genre.includes(genreValue);
                   return (
-                    <SelectItem key={styleKey} value={styleValue}>
-                      {styleValue}
-                    </SelectItem>
+                    <button
+                      key={genreKey}
+                      type="button"
+                      onClick={() => handleGenreToggle(genreKey)}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground shadow-md scale-105"
+                          : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {genreValue}
+                    </button>
                   );
                 })}
-              </SelectContent>
-            </Select>
-            {errors.visualStyle && (
-              <p className="text-sm text-destructive">{errors.visualStyle}</p>
-            )}
-          </div>
+              </div>
+              {errors.genre && (
+                <p className="text-sm text-destructive">{errors.genre}</p>
+              )}
+            </div>
 
-          {/* Author Summary */}
-          <div className="space-y-2">
-            <Label htmlFor="authorSummary" className="text-sm font-medium">
-              {t("modal.author_summary")}
-            </Label>
-            <Textarea
-              id="authorSummary"
+            {/* Author Summary */}
+            <FormTextarea
+              label={t("modal.author_summary")}
+              name="authorSummary"
               value={formData.authorSummary}
               onChange={(e) =>
                 setFormData({ ...formData, authorSummary: e.target.value })
@@ -340,35 +278,30 @@ export function CreateBookModal({
               placeholder={t("modal.summary_placeholder")}
               rows={4}
               maxLength={1000}
+              showCharCount
               className="resize-none"
+              labelClassName="text-primary"
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{t("modal.optional")}</span>
-              <span>{formData.authorSummary?.length || 0}/1000</span>
-            </div>
-          </div>
+          </form>
+        </div>
 
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1"
-            >
-              {t("button.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              disabled={!isValid}
-              variant="magical"
-              size="lg"
-              className="flex-1 animate-glow"
-            >
-              {t("button.create")}
-            </Button>
-          </div>
-        </form>
+        {/* Fixed Footer */}
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
+          <Button type="button" variant="secondary" onClick={handleClose}>
+            <X className="w-4 h-4 mr-2" />
+            {t("button.cancel")}
+          </Button>
+          <Button
+            type="submit"
+            form="create-book-form"
+            disabled={!isValid}
+            variant="magical"
+            className="animate-glow"
+          >
+            <BookPlus className="w-4 h-4 mr-2" />
+            {t("button.create")}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

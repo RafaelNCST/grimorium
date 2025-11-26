@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Book, Eye, Edit2 } from "lucide-react";
+import { ImageIcon, Eye, Edit2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
@@ -60,8 +60,8 @@ export function BookCard({
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-secondary">
-            <Book className="w-16 h-16 text-muted-foreground" />
+          <div className="w-full h-full flex items-center justify-center bg-white">
+            <ImageIcon className="w-16 h-16 text-muted-foreground/40" />
           </div>
         )}
 

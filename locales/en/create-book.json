@@ -1,6 +1,7 @@
 {
   "modal": {
     "create_book": "Create New Book",
+    "description": "Add the basic information for your new book. You can edit everything later.",
     "book_cover": "Book Cover",
     "change_image": "Change Image",
     "upload_image": "Upload Image",

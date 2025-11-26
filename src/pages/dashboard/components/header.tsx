@@ -9,10 +9,15 @@ import {
   Rocket,
   Pause,
   CheckCircle2,
+  Tag,
+  ImageIcon,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  EntityTagBadge,
+  IEntityTagConfig,
+} from "@/components/ui/entity-tag-badge";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,10 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Book as BookType, BookStatus } from "@/stores/book-store";
 
-import {
-  GENRES_CONSTANT,
-  VISUAL_STYLES_CONSTANT,
-} from "../constants/dashboard-constants";
+import { GENRES_CONSTANT } from "../constants/dashboard-constants";
 
 const BOOK_STATUS_OPTIONS: BookStatus[] = [
   "Em planejamento",
@@ -36,27 +38,44 @@ const BOOK_STATUS_OPTIONS: BookStatus[] = [
   "Completo",
 ];
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<BookStatus, IEntityTagConfig> = {
   "Em planejamento": {
+    value: "Em planejamento",
     icon: BookOpen,
-    color: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+    translationKey: "status.planning",
+    colorClass: "text-blue-700 dark:text-blue-400",
+    bgColorClass: "bg-blue-500/10 border-blue-500/20",
   },
   "Em lançamento": {
+    value: "Em lançamento",
     icon: Rocket,
-    color:
-      "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    translationKey: "status.releasing",
+    colorClass: "text-green-700 dark:text-green-400",
+    bgColorClass: "bg-green-500/10 border-green-500/20",
   },
   Hiato: {
+    value: "Hiato",
     icon: Pause,
-    color:
-      "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
+    translationKey: "status.hiatus",
+    colorClass: "text-amber-700 dark:text-amber-400",
+    bgColorClass: "bg-amber-500/10 border-amber-500/20",
   },
   Completo: {
+    value: "Completo",
     icon: CheckCircle2,
-    color:
-      "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+    translationKey: "status.complete",
+    colorClass: "text-purple-700 dark:text-purple-400",
+    bgColorClass: "bg-purple-500/10 border-purple-500/20",
   },
-} as const;
+};
+
+const GENRE_TAG_CONFIG: IEntityTagConfig = {
+  value: "genre",
+  icon: Tag,
+  translationKey: "genre",
+  colorClass: "text-slate-700 dark:text-slate-300",
+  bgColorClass: "bg-slate-500/10 border-slate-500/20",
+};
 
 interface PropsHeader {
   book: BookType;
@@ -179,28 +198,6 @@ export function Header({
             </Select>
           </div>
 
-          {/* Visual Style */}
-          <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Tipo de História
-            </label>
-            <Select
-              value={draftBook?.visualStyle || ""}
-              onValueChange={(v) => onDraftBookChange({ visualStyle: v })}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                {VISUAL_STYLES_CONSTANT.map((style) => (
-                  <SelectItem key={style} value={style}>
-                    {style}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Genres */}
           <div>
             <label className="text-sm font-medium text-muted-foreground mb-2 block">
@@ -247,11 +244,11 @@ export function Header({
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" onClick={handleCancelClick}>
+            <Button variant="secondary" onClick={handleCancelClick}>
               <X className="w-4 h-4 mr-2" />
               Cancelar
             </Button>
-            <Button onClick={onSave} className="btn-magical">
+            <Button variant="magical" onClick={onSave}>
               <Check className="w-4 h-4 mr-2" />
               Salvar
             </Button>
@@ -266,11 +263,17 @@ export function Header({
     <div className="flex items-start gap-6">
       {/* Cover Image - View Mode */}
       <div className="w-32 h-48 rounded-lg overflow-hidden shadow-lg flex-shrink-0">
-        <img
-          src={book.coverImage}
-          alt={book.title}
-          className="w-full h-full object-cover"
-        />
+        {book.coverImage ? (
+          <img
+            src={book.coverImage}
+            alt={book.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-white">
+            <ImageIcon className="w-16 h-16 text-muted-foreground/40" />
+          </div>
+        )}
       </div>
 
       {/* Book Info */}
@@ -280,40 +283,16 @@ export function Header({
             {/* Title and Status */}
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-3xl font-bold">{book.title}</h2>
-              {(() => {
-                const StatusIcon = STATUS_CONFIG[book.status].icon;
-                return (
-                  <Badge
-                    variant="outline"
-                    className={`${STATUS_CONFIG[book.status].color} px-3 py-1.5 text-sm font-medium flex items-center gap-2 pointer-events-none`}
-                  >
-                    <StatusIcon className="w-4 h-4" />
-                    {book.status}
-                  </Badge>
-                );
-              })()}
-            </div>
-
-            {/* Visual Style Badge (destacado) */}
-            <div className="mb-2">
-              <Badge
-                variant="default"
-                className="text-sm px-3 py-1 pointer-events-none"
-              >
-                {book.visualStyle}
-              </Badge>
+              <EntityTagBadge
+                config={STATUS_CONFIG[book.status]}
+                label={book.status}
+              />
             </div>
 
             {/* Genre Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {book.genre.map((g, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="pointer-events-none"
-                >
-                  {g}
-                </Badge>
+                <EntityTagBadge key={index} config={GENRE_TAG_CONFIG} label={g} />
               ))}
             </div>
 
@@ -348,7 +327,7 @@ export function Header({
 
           {/* Edit Button */}
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleEditClick}>
+            <Button variant="secondary" size="sm" onClick={handleEditClick}>
               <Edit2 className="w-4 h-4 mr-2" />
               Editar
             </Button>

@@ -1,6 +1,7 @@
 {
   "modal": {
     "create_book": "Criar Novo Livro",
+    "description": "Adicione as informações básicas do seu novo livro. Você poderá editar tudo posteriormente.",
     "book_cover": "Capa do Livro",
     "change_image": "Alterar Imagem",
     "upload_image": "Enviar Imagem",

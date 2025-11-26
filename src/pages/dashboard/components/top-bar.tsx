@@ -1,8 +1,8 @@
 import {
   ArrowLeft,
   Trash2,
-  Book,
-  NotebookTabs,
+  FileText,
+  StickyNote,
   Palette,
   EyeOff,
   Eye,
@@ -87,7 +87,7 @@ export function TopBar({
               onClick={onNavigateToChapters}
               className="hover:bg-accent hover:text-accent-foreground"
             >
-              <Book className="w-5 h-5" />
+              <FileText className="w-5 h-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -103,7 +103,7 @@ export function TopBar({
               onClick={onNavigateToNotes}
               className="hover:bg-accent hover:text-accent-foreground"
             >
-              <NotebookTabs className="w-5 h-5" />
+              <StickyNote className="w-5 h-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
