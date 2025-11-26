@@ -18,7 +18,14 @@
     "style_placeholder": "Selecione um estilo visual",
     "style_required": "Estilo visual é obrigatório",
     "author_summary": "Resumo do Autor",
-    "summary_placeholder": "História de vingança com elementos de romance. Protagonista feminina forte. Twist no capítulo 15: mentor é o vilão. Inspiração: Avatar + Game of Thrones"
+    "summary_placeholder": "História de vingança com elementos de romance. Protagonista feminina forte. Twist no capítulo 15: mentor é o vilão. Inspiração: Avatar + Game of Thrones",
+    "book_status": "Status do Livro"
+  },
+  "status": {
+    "planning": "Em planejamento",
+    "releasing": "Em lançamento",
+    "hiatus": "Hiato",
+    "complete": "Completo"
   },
   "genre": {
     "urban": "Urbano",

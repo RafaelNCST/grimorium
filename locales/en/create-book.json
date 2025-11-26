@@ -18,7 +18,14 @@
     "style_placeholder": "Select a visual style",
     "style_required": "Visual style is required",
     "author_summary": "Author Summary",
-    "summary_placeholder": "Internal summary for author control and organization..."
+    "summary_placeholder": "Internal summary for author control and organization...",
+    "book_status": "Book Status"
+  },
+  "status": {
+    "planning": "Planning",
+    "releasing": "Releasing",
+    "hiatus": "Hiatus",
+    "complete": "Complete"
   },
   "genre": {
     "urban": "Urban",

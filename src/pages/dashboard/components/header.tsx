@@ -119,12 +119,17 @@ export function Header({
   // Check if there are changes compared to original book
   const hasChanges = useMemo(() => {
     if (!draftBook) return false;
+
+    // Sort genres to compare regardless of order
+    const sortedDraftGenres = [...(draftBook.genre || [])].sort();
+    const sortedBookGenres = [...(book.genre || [])].sort();
+
     return (
       draftBook.title !== book.title ||
       draftBook.status !== book.status ||
       draftBook.storySummary !== book.storySummary ||
       draftBook.coverImage !== book.coverImage ||
-      JSON.stringify(draftBook.genre) !== JSON.stringify(book.genre)
+      JSON.stringify(sortedDraftGenres) !== JSON.stringify(sortedBookGenres)
     );
   }, [draftBook, book]);
 
@@ -216,14 +221,18 @@ export function Header({
                 className="text-xl font-bold h-11"
               />
             </div>
-            <div className="pt-7">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1 text-primary">
+                {t("modal.book_status")}
+                <span className="text-destructive">*</span>
+              </Label>
               <Select
                 value={draftBook?.status || "Em planejamento"}
                 onValueChange={(v) =>
                   onDraftBookChange({ status: v as BookStatus })
                 }
               >
-                <SelectTrigger className="w-56">
+                <SelectTrigger className="w-56 h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
