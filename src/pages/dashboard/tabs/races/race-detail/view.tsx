@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
-import { Dna, Users } from "lucide-react";
+import { Dna, Users, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
@@ -152,6 +153,9 @@ export function RaceDetailView({
   // State for controlled dialog in RaceRelationshipsSection
   const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
     useState(false);
+
+  // Navigation for entity notes
+  const navigate = useNavigate();
 
   // ==================
   // BASIC FIELDS
@@ -1250,6 +1254,23 @@ export function RaceDetailView({
             backLabel={t("race-detail:buttons.back")}
             showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
+            extraActions={[
+              {
+                label: t("race-detail:buttons.notes"),
+                icon: StickyNote,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "race",
+                      entityId: race.id,
+                    },
+                    search: { entityName: race.name },
+                  }),
+                tooltip: t("race-detail:buttons.notes"),
+              },
+            ]}
             // Mode
             isEditMode={isEditing}
             // Actions

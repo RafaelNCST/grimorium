@@ -1,7 +1,8 @@
 import React from "react";
 
-import { AlertCircle, Info, Package } from "lucide-react";
+import { AlertCircle, Info, Package, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
@@ -159,6 +160,9 @@ export const ItemDetailView = React.memo(
     toggleSection,
   }: ItemDetailViewProps) => {
     const { t } = useTranslation(["item-detail", "create-item"]);
+
+    // Navigation for entity notes
+    const navigate = useNavigate();
 
     // Get current status icon for badge display
     const statusData = ITEM_STATUSES_CONSTANT.find(
@@ -825,6 +829,23 @@ export const ItemDetailView = React.memo(
               onSave={onSave}
               onCancel={onCancel}
               onDelete={onDeleteModalOpen}
+              extraActions={[
+                {
+                  label: t("item-detail:header.notes"),
+                  icon: StickyNote,
+                  onClick: () =>
+                    navigate({
+                      to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
+                      params: {
+                        dashboardId: item.bookId,
+                        entityType: "item",
+                        entityId: item.id,
+                      },
+                      search: { entityName: item.name },
+                    }),
+                  tooltip: t("item-detail:header.notes"),
+                },
+              ]}
               hasRequiredFieldsEmpty={!isValid}
               validationMessage={
                 !isValid ? (

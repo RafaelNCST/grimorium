@@ -7,8 +7,10 @@ import {
   Handshake,
   Users2,
   Settings,
+  StickyNote,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
@@ -187,6 +189,9 @@ export function FactionDetailView({
     titleId: string;
     characterId: string;
   } | null>(null);
+
+  // Navigation for entity notes
+  const navigate = useNavigate();
 
   // Handlers for hierarchy modals
   const handleSaveTitles = (titles: typeof editData.hierarchy) => {
@@ -1634,6 +1639,23 @@ export function FactionDetailView({
             backLabel={t("faction-detail:header.back")}
             showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
+            extraActions={[
+              {
+                label: t("faction-detail:header.notes"),
+                icon: StickyNote,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "faction",
+                      entityId: faction.id,
+                    },
+                    search: { entityName: faction.name },
+                  }),
+                tooltip: t("faction-detail:header.notes"),
+              },
+            ]}
             // Mode
             isEditMode={isEditing}
             // Actions

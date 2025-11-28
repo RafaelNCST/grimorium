@@ -5,6 +5,7 @@ import {
   Calendar,
   Heart,
   Shield,
+  StickyNote,
   Trash2,
   User,
   Users,
@@ -14,6 +15,7 @@ import { useTranslation } from "react-i18next";
 
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
+import { useNavigate } from "@tanstack/react-router";
 import {
   DisplayEntityList,
   DisplaySelectGrid,
@@ -280,6 +282,9 @@ export function CharacterDetailView({
   // State for controlling the add relationship dialog from the empty state button
   const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
     useState(false);
+
+  // Navigation for entity notes
+  const navigate = useNavigate();
 
   // Convert role constants to FormSimpleGrid format with universal pattern
   const roleOptions = roles.map((role) => ({
@@ -1403,6 +1408,23 @@ export function CharacterDetailView({
             onSave={onSave}
             onCancel={onCancel}
             onDelete={onDeleteModalOpen}
+            extraActions={[
+              {
+                label: t("character-detail:header.notes"),
+                icon: StickyNote,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "character",
+                      entityId: character.id,
+                    },
+                    search: { entityName: character.name },
+                  }),
+                tooltip: t("character-detail:header.notes"),
+              },
+            ]}
             editLabel={t("character-detail:header.edit")}
             deleteLabel={t("character-detail:header.delete")}
             saveLabel={t("character-detail:header.save")}

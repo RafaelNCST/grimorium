@@ -6,7 +6,8 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
-    "quick_navigation": "Quick Navigation"
+    "quick_navigation": "Quick Navigation",
+    "notes": "Notes"
   },
   "sections": {
     "basic_info": "Basic Information",

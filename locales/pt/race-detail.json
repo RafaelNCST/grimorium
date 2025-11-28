@@ -10,7 +10,8 @@
     "hide_advanced": "Esconder informações avançadas",
     "upload_image": "Clique para adicionar uma imagem",
     "change_image": "Clique para alterar a imagem",
-    "add_note": "Adicionar Nota"
+    "add_note": "Adicionar Nota",
+    "notes": "Anotações"
   },
   "sections": {
     "basic_info": "Informações Básicas",

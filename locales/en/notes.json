@@ -123,5 +123,14 @@
   },
   "drag": {
     "drop_here": "Drop here to swap"
+  },
+  "entity_notes": {
+    "title": "{{entityName}} Notes",
+    "subtitle": "{{count}} note(s) linked",
+    "new_note": "New Note",
+    "empty_state": {
+      "title": "No linked notes",
+      "description": "Create your first note for {{entityName}} and it will be automatically linked to this entity."
+    }
   }
 }

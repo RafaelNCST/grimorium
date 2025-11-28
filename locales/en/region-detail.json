@@ -6,7 +6,8 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
-    "quick_navigation": "Quick Navigation"
+    "quick_navigation": "Quick Navigation",
+    "notes": "Notes"
   },
   "fill_required_fields": "Fill all required fields to save",
   "missing_fields": "Missing required fields",

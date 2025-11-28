@@ -100,12 +100,14 @@ interface CreateNoteModalProps {
     color: NoteColor;
     links: INoteLink[];
   }) => void;
+  showManageLinks?: boolean; // Default true - show manage links button
 }
 
 export function CreateNoteModal({
   open,
   onOpenChange,
   onCreateNote,
+  showManageLinks = true, // Default to true for backwards compatibility
 }: CreateNoteModalProps) {
   const { t } = useTranslation("notes");
   const currentBook = useBookStore((state) => state.currentBook);
@@ -113,7 +115,7 @@ export function CreateNoteModal({
   const [content, setContent] = useState<JSONContent | undefined>(undefined);
   const [color, setColor] = useState<NoteColor>(DEFAULT_NOTE_COLOR);
   const [links, setLinks] = useState<INoteLink[]>([]);
-  const [showManageLinks, setShowManageLinks] = useState(false);
+  const [showManageLinksModal, setShowManageLinksModal] = useState(false);
 
   // Link management states
   const [entities, setEntities] = useState<EntityOption[]>([]);
@@ -133,7 +135,7 @@ export function CreateNoteModal({
       setContent(undefined);
       setColor(DEFAULT_NOTE_COLOR);
       setLinks([]);
-      setShowManageLinks(false);
+      setShowManageLinksModal(false);
       setSearchTerm("");
       setEntities([]);
     }
@@ -141,14 +143,14 @@ export function CreateNoteModal({
 
   // Reset search when manage links modal closes
   useEffect(() => {
-    if (!showManageLinks) {
+    if (!showManageLinksModal) {
       setSearchTerm("");
     }
-  }, [showManageLinks]);
+  }, [showManageLinksModal]);
 
   // Fetch entities when manage links modal opens
   useEffect(() => {
-    if (!showManageLinks || !currentBook) return;
+    if (!showManageLinksModal || !currentBook) return;
 
     async function fetchEntities() {
       setIsLoadingEntities(true);
@@ -232,7 +234,7 @@ export function CreateNoteModal({
     }
 
     fetchEntities();
-  }, [showManageLinks, currentBook]);
+  }, [showManageLinksModal, currentBook]);
 
   const handleContentChange = useCallback((newContent: JSONContent) => {
     setContent(newContent);
@@ -365,7 +367,9 @@ export function CreateNoteModal({
               content={content}
               onChange={handleContentChange}
               placeholder={t("create_modal.content_placeholder")}
-              onManageLinks={() => setShowManageLinks(true)}
+              onManageLinks={
+                showManageLinks ? () => setShowManageLinksModal(true) : undefined
+              }
             />
           </div>
 
@@ -387,7 +391,7 @@ export function CreateNoteModal({
       </Dialog>
 
       {/* Manage Links Modal */}
-      <Dialog open={showManageLinks} onOpenChange={setShowManageLinks}>
+      <Dialog open={showManageLinksModal} onOpenChange={setShowManageLinksModal}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>{t("create_modal.manage_links")}</DialogTitle>
@@ -516,7 +520,7 @@ export function CreateNoteModal({
             </div>
             <Button
               variant="secondary"
-              onClick={() => setShowManageLinks(false)}
+              onClick={() => setShowManageLinksModal(false)}
             >
               {t("create_modal.done")}
             </Button>

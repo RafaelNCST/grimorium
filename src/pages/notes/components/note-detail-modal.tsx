@@ -113,6 +113,7 @@ interface NoteDetailModalProps {
   onOpenChange: (open: boolean) => void;
   onUpdate: (noteId: string, updates: Partial<INote>) => void;
   onDelete: (noteId: string) => void;
+  showManageLinks?: boolean; // Default true - show manage links button
 }
 
 function NoteDetailModalComponent({
@@ -121,6 +122,7 @@ function NoteDetailModalComponent({
   onOpenChange,
   onUpdate,
   onDelete,
+  showManageLinks = true, // Default to true for backwards compatibility
 }: NoteDetailModalProps) {
   const { t } = useTranslation("notes");
   const currentBook = useBookStore((state) => state.currentBook);
@@ -133,7 +135,7 @@ function NoteDetailModalComponent({
   );
   const [links, setLinks] = useState<INoteLink[]>(note?.links || []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showManageLinks, setShowManageLinks] = useState(false);
+  const [showManageLinksModal, setShowManageLinksModal] = useState(false);
 
   // Link management states
   const [entities, setEntities] = useState<EntityOption[]>([]);
@@ -208,7 +210,7 @@ function NoteDetailModalComponent({
       setColor(DEFAULT_NOTE_COLOR);
       setLinks([]);
       setShowDeleteConfirm(false);
-      setShowManageLinks(false);
+      setShowManageLinksModal(false);
       setSearchTerm("");
       setEntities([]);
       editorRef.current = null;
@@ -217,14 +219,14 @@ function NoteDetailModalComponent({
 
   // Reset search when manage links modal closes
   useEffect(() => {
-    if (!showManageLinks) {
+    if (!showManageLinksModal) {
       setSearchTerm("");
     }
-  }, [showManageLinks]);
+  }, [showManageLinksModal]);
 
   // Fetch entities when manage links modal opens
   useEffect(() => {
-    if (!showManageLinks || !currentBook) return;
+    if (!showManageLinksModal || !currentBook) return;
 
     async function fetchEntities() {
       if (!currentBook) return;
@@ -310,7 +312,7 @@ function NoteDetailModalComponent({
     }
 
     fetchEntities();
-  }, [showManageLinks, currentBook]);
+  }, [showManageLinksModal, currentBook]);
 
   // Debounced save for content
   const handleContentChange = useCallback(
@@ -485,7 +487,9 @@ function NoteDetailModalComponent({
               content={note.content}
               onChange={handleContentChange}
               placeholder={t("detail_modal.content_placeholder")}
-              onManageLinks={() => setShowManageLinks(true)}
+              onManageLinks={
+                showManageLinks ? () => setShowManageLinksModal(true) : undefined
+              }
               onDelete={() => setShowDeleteConfirm(true)}
               onEditorReady={(editor) => {
                 editorRef.current = editor;
@@ -525,7 +529,7 @@ function NoteDetailModalComponent({
       </AlertDialog>
 
       {/* Manage Links Modal */}
-      <Dialog open={showManageLinks} onOpenChange={setShowManageLinks}>
+      <Dialog open={showManageLinksModal} onOpenChange={setShowManageLinksModal}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>{t("create_modal.manage_links")}</DialogTitle>
@@ -654,7 +658,7 @@ function NoteDetailModalComponent({
             </div>
             <Button
               variant="secondary"
-              onClick={() => setShowManageLinks(false)}
+              onClick={() => setShowManageLinksModal(false)}
             >
               {t("create_modal.done")}
             </Button>

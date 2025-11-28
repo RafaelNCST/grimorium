@@ -123,5 +123,14 @@
   },
   "drag": {
     "drop_here": "Solte aqui para trocar"
+  },
+  "entity_notes": {
+    "title": "Anotações de {{entityName}}",
+    "subtitle": "{{count}} anotação(ões) linkada(s)",
+    "new_note": "Nova Anotação",
+    "empty_state": {
+      "title": "Sem anotações linkadas",
+      "description": "Crie sua primeira anotação para {{entityName}} e ela será automaticamente linkada a esta entidade."
+    }
   }
 }

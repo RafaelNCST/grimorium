@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Map, AlertCircle, Trash2, Clock } from "lucide-react";
+import { Map, AlertCircle, Trash2, Clock, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 
 import {
   type IFieldVisibility,
@@ -182,6 +183,9 @@ export function RegionDetailView({
 
   // State for controlling the create era dialog from the empty state button
   const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] = useState(false);
+
+  // Navigation for entity notes
+  const navigate = useNavigate();
 
   // Find scale data
   const scaleData = REGION_SCALES_CONSTANT.find(
@@ -1293,6 +1297,21 @@ export function RegionDetailView({
             onEdit={onEdit}
             onDelete={onDeleteModalOpen}
             extraActions={[
+              {
+                label: t("region-detail:header.notes"),
+                icon: StickyNote,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "region",
+                      entityId: region.id,
+                    },
+                    search: { entityName: region.name },
+                  }),
+                tooltip: t("region-detail:header.notes"),
+              },
               {
                 label: t("region-detail:header.view_map"),
                 icon: Map,

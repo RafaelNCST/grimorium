@@ -10,7 +10,8 @@
     "hide_advanced": "Hide advanced fields",
     "upload_image": "Click to add an image",
     "change_image": "Click to change image",
-    "add_note": "Add Note"
+    "add_note": "Add Note",
+    "notes": "Notes"
   },
   "sections": {
     "basic_info": "Basic Information",
