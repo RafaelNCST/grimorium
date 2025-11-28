@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import {
   getAllNotes,
+  getNotesByBookId,
   getNoteById,
   createNote,
   updateNote,
@@ -23,9 +24,10 @@ interface NotesState {
   isLoading: boolean;
   lastFetched: number;
   hasAnimated: boolean;
+  currentBookId: string | null;
 
   // Fetch
-  fetchNotes: (forceRefresh?: boolean) => Promise<void>;
+  fetchNotes: (forceRefresh?: boolean, bookId?: string) => Promise<void>;
   getNoteById: (noteId: string) => Promise<INote | null>;
 
   // CRUD
@@ -65,8 +67,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
   isLoading: false,
   lastFetched: 0,
   hasAnimated: false,
+  currentBookId: null,
 
-  fetchNotes: async (forceRefresh = false) => {
+  fetchNotes: async (forceRefresh = false, bookId?: string) => {
     // Se já está fetchando e não é force refresh, retornar a promise existente
     if (fetchingPromise && !forceRefresh) {
       return fetchingPromise;
@@ -75,16 +78,22 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     const promise = (async () => {
       const state = get();
 
-      // Verificar cache se não for forceRefresh
-      if (!forceRefresh && state.notes.length > 0) {
+      // Se o bookId mudou, forçar refresh
+      const bookIdChanged = bookId !== state.currentBookId;
+      const shouldRefresh = forceRefresh || bookIdChanged;
+
+      // Verificar cache se não for shouldRefresh
+      if (!shouldRefresh && state.notes.length > 0) {
         return;
       }
 
       // Marcar como loading
-      set({ isLoading: true });
+      set({ isLoading: true, currentBookId: bookId ?? null });
 
       try {
-        const fetchedNotes = await getAllNotes();
+        const fetchedNotes = bookId
+          ? await getNotesByBookId(bookId)
+          : await getAllNotes();
         const now = Date.now();
 
         // Apply migration for notes without color or order

@@ -10,6 +10,7 @@ import type { JSONContent } from "@tiptap/react";
 function noteToDBNote(note: INote): DBNote {
   return {
     id: note.id,
+    book_id: note.bookId,
     name: note.name,
     content: note.content ? JSON.stringify(note.content) : undefined,
     paper_mode: note.paperMode,
@@ -26,6 +27,7 @@ function noteToDBNote(note: INote): DBNote {
 function dbNoteToNote(dbNote: DBNote): Omit<INote, "links"> {
   return {
     id: dbNote.id,
+    bookId: dbNote.book_id,
     name: dbNote.name,
     content: dbNote.content ? JSON.parse(dbNote.content) : undefined,
     paperMode: dbNote.paper_mode as PaperMode,
@@ -79,6 +81,27 @@ export async function getAllNotes(): Promise<INote[]> {
   return notesWithLinks;
 }
 
+// Get notes by book ID
+export async function getNotesByBookId(bookId: string): Promise<INote[]> {
+  const db = await getDB();
+  const notes = await db.select<DBNote[]>(
+    "SELECT * FROM notes WHERE book_id = $1 ORDER BY updated_at DESC",
+    [bookId]
+  );
+
+  const notesWithLinks: INote[] = [];
+
+  for (const dbNote of notes) {
+    const links = await getNoteLinks(dbNote.id);
+    notesWithLinks.push({
+      ...dbNoteToNote(dbNote),
+      links,
+    });
+  }
+
+  return notesWithLinks;
+}
+
 // Get note by ID
 export async function getNoteById(id: string): Promise<INote | null> {
   const db = await getDB();
@@ -116,10 +139,11 @@ export async function createNote(note: INote): Promise<void> {
   const dbNote = noteToDBNote(note);
 
   await db.execute(
-    `INSERT INTO notes (id, name, content, paper_mode, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
+    `INSERT INTO notes (id, book_id, name, content, paper_mode, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
     [
       dbNote.id,
+      dbNote.book_id,
       dbNote.name,
       dbNote.content,
       dbNote.paper_mode,

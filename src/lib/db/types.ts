@@ -389,6 +389,7 @@ export interface DBPowerCharacterLink {
 // Notes
 export interface DBNote {
   id: string;
+  book_id: string;
   name: string;
   content?: string; // JSON string do TipTap
   paper_mode: string; // 'light' ou 'dark'

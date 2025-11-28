@@ -1223,6 +1223,47 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add book_id column to notes table
+    try {
+      // Check if column already exists
+      const notesTableInfo = await database.select<Array<{ name: string }>>(
+        "PRAGMA table_info(notes)"
+      );
+      const hasBookId = notesTableInfo.some((col) => col.name === "book_id");
+
+      if (!hasBookId) {
+        console.log("[db] Adding book_id column to notes table...");
+
+        // Get all books
+        const books = await database.select<{ id: string }[]>("SELECT id FROM books");
+
+        // Add book_id column (allowing NULL temporarily)
+        await database.execute("ALTER TABLE notes ADD COLUMN book_id TEXT");
+        console.log("[db] Added book_id column");
+
+        if (books.length > 0) {
+          // Assign all existing notes to the first book
+          const firstBookId = books[0].id;
+          await database.execute("UPDATE notes SET book_id = ? WHERE book_id IS NULL", [
+            firstBookId,
+          ]);
+          console.log(
+            `[db] Assigned all existing notes to book: ${firstBookId}`
+          );
+        } else {
+          // No books found - delete orphan notes
+          await database.execute("DELETE FROM notes WHERE book_id IS NULL");
+          console.log("[db] Deleted orphan notes (no books available)");
+        }
+
+        console.log("[db] book_id column migration completed");
+      } else {
+        console.log("[db] book_id column already exists in notes table");
+      }
+    } catch (error) {
+      console.log("[db] book_id column migration error:", error);
+    }
+
     // Verify books table exists and log count
     const result = await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"

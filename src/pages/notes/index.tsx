@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import type { JSONContent } from "@tiptap/react";
 
+import { useBookStore } from "@/stores/book-store";
 import { useNotesStore } from "@/stores/notes-store";
 import type { INote, INoteLink, NoteColor } from "@/types/note-types";
 
@@ -12,7 +13,12 @@ import { NotesView } from "./view";
 export function NotesPage() {
   const navigate = useNavigate();
 
-  // Store
+  // Book Store
+  const currentBook = useBookStore((state) => state.currentBook);
+  const books = useBookStore((state) => state.books);
+  const setCurrentBook = useBookStore((state) => state.setCurrentBook);
+
+  // Notes Store
   const notes = useNotesStore((state) => state.notes);
   const isLoading = useNotesStore((state) => state.isLoading);
   const fetchNotes = useNotesStore((state) => state.fetchNotes);
@@ -24,10 +30,19 @@ export function NotesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
-  // Fetch notes on mount
+  // Auto-select first book if no current book
   useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+    if (!currentBook && books.length > 0) {
+      setCurrentBook(books[0]);
+    }
+  }, [currentBook, books, setCurrentBook]);
+
+  // Fetch notes on mount or when book changes
+  useEffect(() => {
+    if (currentBook?.id) {
+      fetchNotes(false, currentBook.id);
+    }
+  }, [fetchNotes, currentBook?.id]);
 
   // Handlers
   const handleBackToDashboard = useCallback(() => {
@@ -44,6 +59,11 @@ export function NotesPage() {
       color: NoteColor;
       links: INoteLink[];
     }) => {
+      if (!currentBook?.id) {
+        console.error("No book selected");
+        return;
+      }
+
       const now = new Date().toISOString();
 
       // Calculate max order
@@ -54,6 +74,7 @@ export function NotesPage() {
 
       const newNote: INote = {
         id: crypto.randomUUID(),
+        bookId: currentBook.id,
         name: "", // DEPRECATED - keeping for backwards compatibility
         content: formData.content,
         color: formData.color,
@@ -75,7 +96,7 @@ export function NotesPage() {
         console.error("Error creating note:", error);
       }
     },
-    [notes, addNote]
+    [notes, addNote, currentBook?.id]
   );
 
   const handleReorder = useCallback(

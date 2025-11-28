@@ -139,9 +139,10 @@ CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
 CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
 CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
 
--- ANOTAÇÕES (GLOBAIS - NÃO VINCULADAS A LIVROS)
+-- ANOTAÇÕES (VINCULADAS A LIVROS)
 CREATE TABLE IF NOT EXISTS notes (
   id TEXT PRIMARY KEY,
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   content TEXT, -- JSON do TipTap
   paper_mode TEXT DEFAULT 'light', -- 'light' ou 'dark'
@@ -161,6 +162,7 @@ CREATE TABLE IF NOT EXISTS note_links (
 );
 
 -- ÍNDICES PARA ANOTAÇÕES
+CREATE INDEX IF NOT EXISTS idx_notes_book_id ON notes(book_id);
 CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_note_links_note_id ON note_links(note_id);
 CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);

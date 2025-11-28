@@ -28,11 +28,11 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
     >
       {/* Image covering the top with full width */}
       {region.image ? (
-        <div className="w-full h-[28rem]">
+        <div className="w-full h-[28rem] overflow-hidden rounded-t-lg">
           <img
             src={region.image}
             alt={region.name || "Region"}
-            className="w-full h-full object-fill rounded-t-lg"
+            className="w-full h-full object-fill"
           />
         </div>
       ) : (
@@ -40,7 +40,8 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
           icon={Map}
           height="h-[28rem]"
           width="w-full"
-          shape="square"
+          shape="rounded"
+          className="rounded-t-lg rounded-b-none"
         />
       )}
 

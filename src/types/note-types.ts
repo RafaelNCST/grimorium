@@ -21,6 +21,7 @@ export interface INoteLink {
 
 export interface INote {
   id: string;
+  bookId: string;
   name: string; // DEPRECATED - kept for migration
   content?: JSONContent; // TipTap JSON content
   color?: NoteColor; // Color for post-it display
