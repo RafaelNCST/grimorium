@@ -129,7 +129,7 @@ function NoteDetailModalComponent({
   onDelete,
 }: NoteDetailModalProps) {
   const { t } = useTranslation("notes");
-  const books = useBookStore((state) => state.books);
+  const currentBook = useBookStore((state) => state.currentBook);
 
   const [content, setContent] = useState<JSONContent | undefined>(note?.content);
   const [color, setColor] = useState<NoteColor>(note?.color || DEFAULT_NOTE_COLOR);
@@ -226,82 +226,82 @@ function NoteDetailModalComponent({
 
   // Fetch entities when manage links modal opens
   useEffect(() => {
-    if (!showManageLinks || books.length === 0) return;
+    if (!showManageLinks || !currentBook) return;
 
     async function fetchEntities() {
+      if (!currentBook) return;
+
       setIsLoadingEntities(true);
       const allEntities: EntityOption[] = [];
 
-      for (const book of books) {
-        try {
-          const characters = await getCharactersByBookId(book.id);
-          characters.forEach((c) => {
-            allEntities.push({
-              id: c.id,
-              name: c.name,
-              entityType: "character",
-              bookId: book.id,
-              bookName: book.title,
-            });
+      try {
+        const characters = await getCharactersByBookId(currentBook.id);
+        characters.forEach((c) => {
+          allEntities.push({
+            id: c.id,
+            name: c.name,
+            entityType: "character",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
+        });
 
-          const regions = await getRegionsByBookId(book.id);
-          regions.forEach((r) => {
-            allEntities.push({
-              id: r.id,
-              name: r.name,
-              entityType: "region",
-              bookId: book.id,
-              bookName: book.title,
-            });
+        const regions = await getRegionsByBookId(currentBook.id);
+        regions.forEach((r) => {
+          allEntities.push({
+            id: r.id,
+            name: r.name,
+            entityType: "region",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
+        });
 
-          const factions = await getFactionsByBookId(book.id);
-          factions.forEach((f) => {
-            allEntities.push({
-              id: f.id,
-              name: f.name,
-              entityType: "faction",
-              bookId: book.id,
-              bookName: book.title,
-            });
+        const factions = await getFactionsByBookId(currentBook.id);
+        factions.forEach((f) => {
+          allEntities.push({
+            id: f.id,
+            name: f.name,
+            entityType: "faction",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
+        });
 
-          const races = await getRacesByBookId(book.id);
-          races.forEach((r) => {
-            allEntities.push({
-              id: r.id,
-              name: r.name,
-              entityType: "race",
-              bookId: book.id,
-              bookName: book.title,
-            });
+        const races = await getRacesByBookId(currentBook.id);
+        races.forEach((r) => {
+          allEntities.push({
+            id: r.id,
+            name: r.name,
+            entityType: "race",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
+        });
 
-          const items = await getItemsByBookId(book.id);
-          items.forEach((i) => {
-            allEntities.push({
-              id: i.id,
-              name: i.name,
-              entityType: "item",
-              bookId: book.id,
-              bookName: book.title,
-            });
+        const items = await getItemsByBookId(currentBook.id);
+        items.forEach((i) => {
+          allEntities.push({
+            id: i.id,
+            name: i.name,
+            entityType: "item",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
+        });
 
-          const arcs = await getPlotArcsByBookId(book.id);
-          arcs.forEach((a) => {
-            allEntities.push({
-              id: a.id,
-              name: a.name,
-              entityType: "arc",
-              bookId: book.id,
-              bookName: book.title,
-            });
+        const arcs = await getPlotArcsByBookId(currentBook.id);
+        arcs.forEach((a) => {
+          allEntities.push({
+            id: a.id,
+            name: a.name,
+            entityType: "arc",
+            bookId: currentBook.id,
+            bookName: currentBook.title,
           });
-        } catch (error) {
-          console.error(`Error fetching entities for book ${book.id}:`, error);
-        }
+        });
+      } catch (error) {
+        console.error(`Error fetching entities for book ${currentBook.id}:`, error);
       }
 
       setEntities(allEntities);
@@ -309,7 +309,7 @@ function NoteDetailModalComponent({
     }
 
     fetchEntities();
-  }, [showManageLinks, books]);
+  }, [showManageLinks, currentBook]);
 
   // Debounced save for content
   const handleContentChange = useCallback(
