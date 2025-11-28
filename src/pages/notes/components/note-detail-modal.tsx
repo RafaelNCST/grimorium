@@ -43,7 +43,12 @@ import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
-import type { INote, INoteLink, NoteColor, EntityType } from "@/types/note-types";
+import type {
+  INote,
+  INoteLink,
+  NoteColor,
+  EntityType,
+} from "@/types/note-types";
 
 import { DEFAULT_NOTE_COLOR } from "../constants";
 
@@ -101,18 +106,6 @@ const ENTITY_TABS: {
   },
 ];
 
-const ENTITY_TYPE_CONFIG: Record<
-  EntityType,
-  { icon: typeof Users; color: string }
-> = {
-  character: { icon: Users, color: "text-blue-500" },
-  region: { icon: Globe, color: "text-green-500" },
-  faction: { icon: Building2, color: "text-purple-500" },
-  race: { icon: Dna, color: "text-orange-500" },
-  item: { icon: Package, color: "text-yellow-500" },
-  arc: { icon: BookOpen, color: "text-pink-500" },
-};
-
 interface NoteDetailModalProps {
   note: INote | null;
   open: boolean;
@@ -131,8 +124,12 @@ function NoteDetailModalComponent({
   const { t } = useTranslation("notes");
   const currentBook = useBookStore((state) => state.currentBook);
 
-  const [content, setContent] = useState<JSONContent | undefined>(note?.content);
-  const [color, setColor] = useState<NoteColor>(note?.color || DEFAULT_NOTE_COLOR);
+  const [content, setContent] = useState<JSONContent | undefined>(
+    note?.content
+  );
+  const [color, setColor] = useState<NoteColor>(
+    note?.color || DEFAULT_NOTE_COLOR
+  );
   const [links, setLinks] = useState<INoteLink[]>(note?.links || []);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showManageLinks, setShowManageLinks] = useState(false);
@@ -301,7 +298,10 @@ function NoteDetailModalComponent({
           });
         });
       } catch (error) {
-        console.error(`Error fetching entities for book ${currentBook.id}:`, error);
+        console.error(
+          `Error fetching entities for book ${currentBook.id}:`,
+          error
+        );
       }
 
       setEntities(allEntities);
@@ -388,7 +388,9 @@ function NoteDetailModalComponent({
   useEffect(() => {
     const checkScrollbar = () => {
       if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        const viewport = scrollAreaRef.current.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
         if (viewport) {
           const hasScroll = viewport.scrollHeight > viewport.clientHeight;
           setHasScrollbar(hasScroll);
@@ -401,7 +403,9 @@ function NoteDetailModalComponent({
 
     // Use ResizeObserver to detect changes in content size
     if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const viewport = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
       if (viewport) {
         const resizeObserver = new ResizeObserver(checkScrollbar);
         resizeObserver.observe(viewport);
@@ -458,13 +462,17 @@ function NoteDetailModalComponent({
 
   return (
     <>
-      <Dialog key={note.id} open={open} onOpenChange={async (isOpen) => {
-        if (!isOpen) {
-          await handleClose();
-        } else {
-          onOpenChange(isOpen);
-        }
-      }}>
+      <Dialog
+        key={note.id}
+        open={open}
+        onOpenChange={async (isOpen) => {
+          if (!isOpen) {
+            await handleClose();
+          } else {
+            onOpenChange(isOpen);
+          }
+        }}
+      >
         <DialogContent className="!w-[95vw] !max-w-[900px] !h-[90vh] !max-h-[900px] p-0 gap-0 flex flex-col">
           <DialogHeader className="px-6 py-4 border-b">
             <DialogTitle>{t("detail_modal.title")}</DialogTitle>
@@ -581,7 +589,9 @@ function NoteDetailModalComponent({
                     ) : (
                       <div className={cn(hasScrollbar && "pr-2")}>
                         {filteredEntities.map((entity) => {
-                          const isSelected = links.some((l) => l.entityId === entity.id);
+                          const isSelected = links.some(
+                            (l) => l.entityId === entity.id
+                          );
 
                           return (
                             <button
@@ -637,10 +647,14 @@ function NoteDetailModalComponent({
                 })}
               </span>
               <span className="text-xs text-muted-foreground">
-                {selectedCounts[activeTab]} {t("create_modal.of")} {entityCounts[activeTab]} {t("create_modal.in_tab")}
+                {selectedCounts[activeTab]} {t("create_modal.of")}{" "}
+                {entityCounts[activeTab]} {t("create_modal.in_tab")}
               </span>
             </div>
-            <Button variant="secondary" onClick={() => setShowManageLinks(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowManageLinks(false)}
+            >
               {t("create_modal.done")}
             </Button>
           </div>

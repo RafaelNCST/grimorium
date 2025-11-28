@@ -46,8 +46,12 @@ export function NotesPage() {
 
   // Handlers
   const handleBackToDashboard = useCallback(() => {
-    navigate({ to: "/" });
-  }, [navigate]);
+    if (currentBook?.id) {
+      navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: currentBook.id } });
+    } else {
+      navigate({ to: "/" });
+    }
+  }, [navigate, currentBook?.id]);
 
   const handleNoteClick = useCallback((noteId: string) => {
     setSelectedNoteId(noteId || null);
