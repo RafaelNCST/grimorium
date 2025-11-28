@@ -52,8 +52,11 @@ export function PlotArcCard({ arc, onClick }: PropsPlotArcCard) {
                     value: statusData.value,
                     icon: statusData.icon,
                     translationKey: statusData.translationKey,
-                    colorClass: statusData.activeColor.split(" ")[1] || "text-muted-foreground",
-                    bgColorClass: statusData.activeColor.split(" ")[0] || "bg-muted",
+                    colorClass:
+                      statusData.activeColor.split(" ")[1] ||
+                      "text-muted-foreground",
+                    bgColorClass:
+                      statusData.activeColor.split(" ")[0] || "bg-muted",
                   }}
                   label={t(statusData.translationKey)}
                 />
@@ -64,8 +67,11 @@ export function PlotArcCard({ arc, onClick }: PropsPlotArcCard) {
                     value: sizeData.value,
                     icon: sizeData.icon,
                     translationKey: sizeData.translationKey,
-                    colorClass: sizeData.activeColor.split(" ")[1] || "text-muted-foreground",
-                    bgColorClass: sizeData.activeColor.split(" ")[0] || "bg-muted",
+                    colorClass:
+                      sizeData.activeColor.split(" ")[1] ||
+                      "text-muted-foreground",
+                    bgColorClass:
+                      sizeData.activeColor.split(" ")[0] || "bg-muted",
                   }}
                   label={t(sizeData.translationKey)}
                 />
@@ -99,10 +105,7 @@ export function PlotArcCard({ arc, onClick }: PropsPlotArcCard) {
             </h4>
             <div className="space-y-2">
               {visibleEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-center gap-2 text-sm"
-                >
+                <div key={event.id} className="flex items-center gap-2 text-sm">
                   {event.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-success" />
                   ) : (

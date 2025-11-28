@@ -64,7 +64,8 @@ export function FactionDetail() {
   const [faction, setFaction] = useState<IFaction>(emptyFaction);
   const [editData, setEditData] = useState<IFaction>(emptyFaction);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -92,33 +93,39 @@ export function FactionDetail() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Função de validação de campo individual (onBlur)
-  const validateField = useCallback((field: string, value: unknown) => {
-    try {
-      // Validar apenas este campo
-      const fieldSchema = FactionSchema.pick({ [field]: true } as Record<string, true>);
-      fieldSchema.parse({ [field]: value });
+  const validateField = useCallback(
+    (field: string, value: unknown) => {
+      try {
+        // Validar apenas este campo
+        const fieldSchema = FactionSchema.pick({ [field]: true } as Record<
+          string,
+          true
+        >);
+        fieldSchema.parse({ [field]: value });
 
-      // Se passou, limpar erro deste campo
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Traduzir a mensagem de erro
-        const errorMessage = error.errors[0].message;
-        const translatedMessage = errorMessage.startsWith("faction-detail:")
-          ? t(errorMessage)
-          : errorMessage;
+        // Se passou, limpar erro deste campo
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          // Traduzir a mensagem de erro
+          const errorMessage = error.errors[0].message;
+          const translatedMessage = errorMessage.startsWith("faction-detail:")
+            ? t(errorMessage)
+            : errorMessage;
 
-        setErrors((prev) => ({
-          ...prev,
-          [field]: translatedMessage,
-        }));
+          setErrors((prev) => ({
+            ...prev,
+            [field]: translatedMessage,
+          }));
+        }
       }
-    }
-  }, [t]);
+    },
+    [t]
+  );
 
   // Verificar se tem campos obrigatórios vazios e quais são
   const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
@@ -168,9 +175,15 @@ export function FactionDetail() {
           // Load UI state from database
           if (factionFromDB.uiState) {
             setUiState({
-              advancedSectionOpen: factionFromDB.uiState.advancedSectionOpen ?? false,
-              sectionVisibility: factionFromDB.uiState.sectionVisibility ?? { timeline: true, diplomacy: true, hierarchy: true },
-              activeDiplomacyTab: factionFromDB.uiState.activeDiplomacyTab ?? "neutral",
+              advancedSectionOpen:
+                factionFromDB.uiState.advancedSectionOpen ?? false,
+              sectionVisibility: factionFromDB.uiState.sectionVisibility ?? {
+                timeline: true,
+                diplomacy: true,
+                hierarchy: true,
+              },
+              activeDiplomacyTab:
+                factionFromDB.uiState.activeDiplomacyTab ?? "neutral",
             });
           }
 
@@ -532,26 +545,32 @@ export function FactionDetail() {
     setIsNavigationOpen(false);
   }, []);
 
-  const handleEditDataChange = useCallback((field: string, value: unknown) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
+  const handleEditDataChange = useCallback(
+    (field: string, value: unknown) => {
+      setEditData((prev) => ({ ...prev, [field]: value }));
 
-    // Clear error for this field when user starts typing (for required fields)
-    if (errors[field]) {
-      // Re-validate the field to clear error if value is now valid
-      try {
-        const fieldSchema = FactionSchema.pick({ [field]: true } as Record<string, true>);
-        fieldSchema.parse({ [field]: value });
-        // If validation passes, clear the error
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[field];
-          return newErrors;
-        });
-      } catch {
-        // Keep the error if still invalid (will be shown properly on blur)
+      // Clear error for this field when user starts typing (for required fields)
+      if (errors[field]) {
+        // Re-validate the field to clear error if value is now valid
+        try {
+          const fieldSchema = FactionSchema.pick({ [field]: true } as Record<
+            string,
+            true
+          >);
+          fieldSchema.parse({ [field]: value });
+          // If validation passes, clear the error
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[field];
+            return newErrors;
+          });
+        } catch {
+          // Keep the error if still invalid (will be shown properly on blur)
+        }
       }
-    }
-  }, [errors]);
+    },
+    [errors]
+  );
 
   const handleImageChange = useCallback((image: string) => {
     setImagePreview(image);
@@ -596,38 +615,44 @@ export function FactionDetail() {
     }));
   }, []);
 
-  const handleSectionVisibilityChange = useCallback(async (sectionName: string, isVisible: boolean) => {
-    const newUiState = {
-      ...uiState,
-      sectionVisibility: {
-        ...uiState.sectionVisibility,
-        [sectionName]: isVisible,
-      },
-    };
-    setUiState(newUiState);
+  const handleSectionVisibilityChange = useCallback(
+    async (sectionName: string, isVisible: boolean) => {
+      const newUiState = {
+        ...uiState,
+        sectionVisibility: {
+          ...uiState.sectionVisibility,
+          [sectionName]: isVisible,
+        },
+      };
+      setUiState(newUiState);
 
-    // Persist UI state to database
-    try {
-      await updateFactionInStore(factionId, { uiState: newUiState });
-    } catch (error) {
-      console.error("Error saving UI state:", error);
-    }
-  }, [uiState, factionId, updateFactionInStore]);
+      // Persist UI state to database
+      try {
+        await updateFactionInStore(factionId, { uiState: newUiState });
+      } catch (error) {
+        console.error("Error saving UI state:", error);
+      }
+    },
+    [uiState, factionId, updateFactionInStore]
+  );
 
-  const handleActiveDiplomacyTabChange = useCallback(async (tab: DiplomaticStatus) => {
-    const newUiState = {
-      ...uiState,
-      activeDiplomacyTab: tab,
-    };
-    setUiState(newUiState);
+  const handleActiveDiplomacyTabChange = useCallback(
+    async (tab: DiplomaticStatus) => {
+      const newUiState = {
+        ...uiState,
+        activeDiplomacyTab: tab,
+      };
+      setUiState(newUiState);
 
-    // Persist UI state to database
-    try {
-      await updateFactionInStore(factionId, { uiState: newUiState });
-    } catch (error) {
-      console.error("Error saving UI state:", error);
-    }
-  }, [uiState, factionId, updateFactionInStore]);
+      // Persist UI state to database
+      try {
+        await updateFactionInStore(factionId, { uiState: newUiState });
+      } catch (error) {
+        console.error("Error saving UI state:", error);
+      }
+    },
+    [uiState, factionId, updateFactionInStore]
+  );
 
   const handleFactionSelect = useCallback(
     (newFactionId: string) => {
@@ -682,56 +707,62 @@ export function FactionDetail() {
       />
 
       <FactionDetailView
-      faction={faction}
-      editData={editData}
-      isEditing={isEditing}
-      versions={versions}
-      currentVersion={selectedVersion}
-      showDeleteModal={showDeleteModal}
-      isNavigationSidebarOpen={isNavigationOpen}
-      imagePreview={imagePreview}
-      advancedSectionOpen={uiState.advancedSectionOpen ?? false}
-      sectionVisibility={uiState.sectionVisibility ?? { timeline: true, diplomacy: true, hierarchy: true }}
-      activeDiplomacyTab={uiState.activeDiplomacyTab ?? "neutral"}
-      mockRaces={races}
-      mockCharacters={characters}
-      mockFactions={factions}
-      mockItems={items}
-      statuses={FACTION_STATUS_CONSTANT}
-      types={FACTION_TYPES_CONSTANT}
-      currentStatus={currentStatus}
-      currentType={currentType}
-      StatusIcon={StatusIcon}
-      TypeIcon={TypeIcon}
-      fieldVisibility={fieldVisibility}
-      fileInputRef={fileInputRef}
-      bookId={dashboardId}
-      errors={errors}
-      validateField={validateField}
-      hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
-      missingFields={missingFields}
-      onBack={handleBack}
-      onEdit={handleEdit}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      onDeleteModalOpen={handleDeleteModalOpen}
-      onDeleteModalClose={handleDeleteModalClose}
-      onConfirmDelete={handleConfirmDelete}
-      onNavigationSidebarToggle={handleNavigationToggle}
-      onNavigationSidebarClose={handleNavigationClose}
-      onFactionSelect={handleFactionSelect}
-      onEditDataChange={handleEditDataChange}
-      onImageFileChange={handleImageFileChange}
-      onAdvancedSectionToggle={handleAdvancedSectionToggle}
-      onFieldVisibilityToggle={handleFieldVisibilityToggle}
-      onSectionVisibilityChange={handleSectionVisibilityChange}
-      onActiveDiplomacyTabChange={handleActiveDiplomacyTabChange}
-      onVersionChange={handleVersionChange}
-      onVersionCreate={handleVersionCreate}
-      onVersionDelete={handleVersionDelete}
-      onVersionUpdate={handleVersionUpdate}
-      hasChanges={hasChanges}
-    />
+        faction={faction}
+        editData={editData}
+        isEditing={isEditing}
+        versions={versions}
+        currentVersion={selectedVersion}
+        showDeleteModal={showDeleteModal}
+        isNavigationSidebarOpen={isNavigationOpen}
+        imagePreview={imagePreview}
+        advancedSectionOpen={uiState.advancedSectionOpen ?? false}
+        sectionVisibility={
+          uiState.sectionVisibility ?? {
+            timeline: true,
+            diplomacy: true,
+            hierarchy: true,
+          }
+        }
+        activeDiplomacyTab={uiState.activeDiplomacyTab ?? "neutral"}
+        mockRaces={races}
+        mockCharacters={characters}
+        mockFactions={factions}
+        mockItems={items}
+        statuses={FACTION_STATUS_CONSTANT}
+        types={FACTION_TYPES_CONSTANT}
+        currentStatus={currentStatus}
+        currentType={currentType}
+        StatusIcon={StatusIcon}
+        TypeIcon={TypeIcon}
+        fieldVisibility={fieldVisibility}
+        fileInputRef={fileInputRef}
+        bookId={dashboardId}
+        errors={errors}
+        validateField={validateField}
+        hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+        missingFields={missingFields}
+        onBack={handleBack}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDeleteModalOpen={handleDeleteModalOpen}
+        onDeleteModalClose={handleDeleteModalClose}
+        onConfirmDelete={handleConfirmDelete}
+        onNavigationSidebarToggle={handleNavigationToggle}
+        onNavigationSidebarClose={handleNavigationClose}
+        onFactionSelect={handleFactionSelect}
+        onEditDataChange={handleEditDataChange}
+        onImageFileChange={handleImageFileChange}
+        onAdvancedSectionToggle={handleAdvancedSectionToggle}
+        onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        onSectionVisibilityChange={handleSectionVisibilityChange}
+        onActiveDiplomacyTabChange={handleActiveDiplomacyTabChange}
+        onVersionChange={handleVersionChange}
+        onVersionCreate={handleVersionCreate}
+        onVersionDelete={handleVersionDelete}
+        onVersionUpdate={handleVersionUpdate}
+        hasChanges={hasChanges}
+      />
     </>
   );
 }

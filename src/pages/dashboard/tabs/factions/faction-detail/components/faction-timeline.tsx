@@ -27,10 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -84,10 +81,12 @@ export function FactionTimeline({
   const [showEventModal, setShowEventModal] = useState(false);
 
   // Support both controlled and uncontrolled modes for the create era dialog
-  const [internalShowCreateEraModal, setInternalShowCreateEraModal] = useState(false);
+  const [internalShowCreateEraModal, setInternalShowCreateEraModal] =
+    useState(false);
 
   // Use controlled state if provided, otherwise use internal state
-  const showCreateEraModal = controlledIsCreateEraDialogOpen ?? internalShowCreateEraModal;
+  const showCreateEraModal =
+    controlledIsCreateEraDialogOpen ?? internalShowCreateEraModal;
   const setShowCreateEraModal = (open: boolean) => {
     if (onCreateEraDialogOpenChange) {
       onCreateEraDialogOpenChange(open);
@@ -336,7 +335,12 @@ export function FactionTimeline({
               <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
             </div>
 
-            <Accordion type="multiple" className="space-y-6" value={openEras} onValueChange={setOpenEras}>
+            <Accordion
+              type="multiple"
+              className="space-y-6"
+              value={openEras}
+              onValueChange={setOpenEras}
+            >
               {timeline.map((era) => (
                 <AccordionItem
                   key={era.id}
@@ -652,9 +656,7 @@ export function FactionTimeline({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              {editingEvent
-                ? t("timeline.edit_event")
-                : selectedEvent?.name}
+              {editingEvent ? t("timeline.edit_event") : selectedEvent?.name}
             </DialogTitle>
             <DialogDescription>
               {editingEvent
@@ -999,7 +1001,12 @@ export function FactionTimeline({
         onOpenChange={(open) => {
           setShowCreateEraModal(open);
           if (!open) {
-            setNewEra({ name: "", description: "", startDate: "", endDate: "" });
+            setNewEra({
+              name: "",
+              description: "",
+              startDate: "",
+              endDate: "",
+            });
           }
         }}
       >
@@ -1013,7 +1020,10 @@ export function FactionTimeline({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="era-name" className="text-primary">{t("timeline.era_name")} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-name" className="text-primary">
+                {t("timeline.era_name")}{" "}
+                <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="era-name"
                 value={newEra.name}
@@ -1030,7 +1040,8 @@ export function FactionTimeline({
 
             <div className="space-y-2">
               <Label htmlFor="era-description" className="text-primary">
-                {t("timeline.description")} <span className="text-destructive">*</span>
+                {t("timeline.description")}{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="era-description"
@@ -1053,7 +1064,10 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start" className="text-primary">{t("timeline.start")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-start" className="text-primary">
+                  {t("timeline.start")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1071,7 +1085,10 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end" className="text-primary">{t("timeline.end")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-end" className="text-primary">
+                  {t("timeline.end")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1146,7 +1163,10 @@ export function FactionTimeline({
 
           <div className="flex-1 overflow-y-auto space-y-4 px-3 -mb-4 pb-4">
             <div className="space-y-2">
-              <Label htmlFor="event-name" className="text-primary">{t("timeline.event_name")} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="event-name" className="text-primary">
+                {t("timeline.event_name")}{" "}
+                <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="event-name"
                 value={newEvent.name}
@@ -1162,7 +1182,10 @@ export function FactionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="event-desc" className="text-primary">{t("timeline.description")} <span className="text-destructive">*</span></Label>
+              <Label htmlFor="event-desc" className="text-primary">
+                {t("timeline.description")}{" "}
+                <span className="text-destructive">*</span>
+              </Label>
               <Textarea
                 id="event-desc"
                 value={newEvent.description}
@@ -1184,7 +1207,10 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-reason" className="text-primary">{t("timeline.reason")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-reason" className="text-primary">
+                  {t("timeline.reason")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="event-reason"
                   value={newEvent.reason}
@@ -1201,7 +1227,10 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-outcome" className="text-primary">{t("timeline.outcome")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-outcome" className="text-primary">
+                  {t("timeline.outcome")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="event-outcome"
                   value={newEvent.outcome}
@@ -1224,7 +1253,10 @@ export function FactionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-start" className="text-primary">{t("timeline.start_date")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-start" className="text-primary">
+                  {t("timeline.start_date")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="event-start"
                   value={newEvent.startDate}
@@ -1242,7 +1274,10 @@ export function FactionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-end" className="text-primary">{t("timeline.end_date")} <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-end" className="text-primary">
+                  {t("timeline.end_date")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="event-end"
                   value={newEvent.endDate}
@@ -1364,7 +1399,12 @@ export function FactionTimeline({
         onOpenChange={(open) => {
           setShowEditEraModal(open);
           if (!open) {
-            setEditEra({ name: "", description: "", startDate: "", endDate: "" });
+            setEditEra({
+              name: "",
+              description: "",
+              startDate: "",
+              endDate: "",
+            });
             setEditingEra(null);
           }
         }}

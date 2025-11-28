@@ -106,10 +106,12 @@ export function RegionTimeline({
   const [showEventModal, setShowEventModal] = useState(false);
 
   // Support both controlled and uncontrolled modes for the create era dialog
-  const [internalShowCreateEraModal, setInternalShowCreateEraModal] = useState(false);
+  const [internalShowCreateEraModal, setInternalShowCreateEraModal] =
+    useState(false);
 
   // Use controlled state if provided, otherwise use internal state
-  const showCreateEraModal = controlledIsCreateEraDialogOpen ?? internalShowCreateEraModal;
+  const showCreateEraModal =
+    controlledIsCreateEraDialogOpen ?? internalShowCreateEraModal;
   const setShowCreateEraModal = (open: boolean) => {
     if (onCreateEraDialogOpenChange) {
       onCreateEraDialogOpenChange(open);
@@ -352,7 +354,12 @@ export function RegionTimeline({
               <div className="absolute inset-0 w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full blur-sm" />
             </div>
 
-            <Accordion type="multiple" className="space-y-6" value={openEras} onValueChange={setOpenEras}>
+            <Accordion
+              type="multiple"
+              className="space-y-6"
+              value={openEras}
+              onValueChange={setOpenEras}
+            >
               {timeline.map((era) => (
                 <AccordionItem
                   key={era.id}
@@ -989,7 +996,12 @@ export function RegionTimeline({
         onOpenChange={(open) => {
           setShowCreateEraModal(open);
           if (!open) {
-            setNewEra({ name: "", description: "", startDate: "", endDate: "" });
+            setNewEra({
+              name: "",
+              description: "",
+              startDate: "",
+              endDate: "",
+            });
           }
         }}
       >
@@ -1003,7 +1015,9 @@ export function RegionTimeline({
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="era-name" className="text-primary">Nome da Era <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-name" className="text-primary">
+                Nome da Era <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="era-name"
                 value={newEra.name}
@@ -1019,7 +1033,9 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="era-description" className="text-primary">Descrição <span className="text-destructive">*</span></Label>
+              <Label htmlFor="era-description" className="text-primary">
+                Descrição <span className="text-destructive">*</span>
+              </Label>
               <Textarea
                 id="era-description"
                 value={newEra.description}
@@ -1041,7 +1057,9 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start" className="text-primary">Início <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-start" className="text-primary">
+                  Início <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="era-start"
                   value={newEra.startDate}
@@ -1059,7 +1077,9 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="era-end" className="text-primary">Fim <span className="text-destructive">*</span></Label>
+                <Label htmlFor="era-end" className="text-primary">
+                  Fim <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="era-end"
                   value={newEra.endDate}
@@ -1134,7 +1154,9 @@ export function RegionTimeline({
 
           <div className="flex-1 overflow-y-auto space-y-4 px-3 -mb-4 pb-4">
             <div className="space-y-2">
-              <Label htmlFor="event-name" className="text-primary">Nome do Evento <span className="text-destructive">*</span></Label>
+              <Label htmlFor="event-name" className="text-primary">
+                Nome do Evento <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="event-name"
                 value={newEvent.name}
@@ -1150,7 +1172,9 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="event-desc" className="text-primary">Descrição <span className="text-destructive">*</span></Label>
+              <Label htmlFor="event-desc" className="text-primary">
+                Descrição <span className="text-destructive">*</span>
+              </Label>
               <Textarea
                 id="event-desc"
                 value={newEvent.description}
@@ -1172,7 +1196,9 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-reason" className="text-primary">Motivo <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-reason" className="text-primary">
+                  Motivo <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="event-reason"
                   value={newEvent.reason}
@@ -1189,7 +1215,9 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-outcome" className="text-primary">Como Terminou <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-outcome" className="text-primary">
+                  Como Terminou <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="event-outcome"
                   value={newEvent.outcome}
@@ -1212,7 +1240,9 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="event-start" className="text-primary">Data Início <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-start" className="text-primary">
+                  Data Início <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="event-start"
                   value={newEvent.startDate}
@@ -1230,7 +1260,9 @@ export function RegionTimeline({
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="event-end" className="text-primary">Data Fim <span className="text-destructive">*</span></Label>
+                <Label htmlFor="event-end" className="text-primary">
+                  Data Fim <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="event-end"
                   value={newEvent.endDate}
@@ -1352,7 +1384,12 @@ export function RegionTimeline({
         onOpenChange={(open) => {
           setShowEditEraModal(open);
           if (!open) {
-            setEditEra({ name: "", description: "", startDate: "", endDate: "" });
+            setEditEra({
+              name: "",
+              description: "",
+              startDate: "",
+              endDate: "",
+            });
             setEditingEra(null);
           }
         }}

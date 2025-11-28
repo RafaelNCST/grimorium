@@ -94,9 +94,9 @@ export function CharactersView({
           totalCount: roleStats.total,
           totalLabel: t("characters:page.total_badge"),
           selectedFilters: selectedRoles,
-          filterRows: filterRows,
+          filterRows,
           onFilterToggle: onRoleFilterChange,
-          onClearFilters: onClearFilters,
+          onClearFilters,
         }}
         search={{
           value: searchTerm,

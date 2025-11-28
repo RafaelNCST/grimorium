@@ -4,6 +4,10 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
+import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
+import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import {
   getItemById,
   getItemsByBookId,
@@ -20,10 +24,6 @@ import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
 import { useItemsStore } from "@/stores/items-store";
 import { type IFieldVisibility } from "@/types/character-types";
 
-import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
-import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
-import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
-import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ItemDetailView } from "./view";
 
@@ -63,7 +63,8 @@ export default function ItemDetail() {
   const [editData, setEditData] = useState<IItem>(emptyItem);
   const [imagePreview, setImagePreview] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
@@ -176,47 +177,56 @@ export default function ItemDetail() {
   );
 
   // Função de validação de campo individual (onBlur)
-  const validateField = useCallback((field: string, value: unknown) => {
-    try {
-      // Validar apenas este campo usando safeParse
-      const result = ItemSchemaBase.shape[field as keyof typeof ItemSchemaBase.shape]?.safeParse(value);
+  const validateField = useCallback(
+    (field: string, value: unknown) => {
+      try {
+        // Validar apenas este campo usando safeParse
+        const result =
+          ItemSchemaBase.shape[
+            field as keyof typeof ItemSchemaBase.shape
+          ]?.safeParse(value);
 
-      if (!result) {
-        // Campo não tem validação específica
-        return true;
+        if (!result) {
+          // Campo não tem validação específica
+          return true;
+        }
+
+        if (result.success) {
+          // Se passou, remover erro
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[field];
+            return newErrors;
+          });
+          return true;
+        }
+
+        // Traduzir a mensagem de erro
+        const errorMessage = result.error.errors[0].message;
+        const translatedMessage = errorMessage.startsWith("item-detail:")
+          ? t(errorMessage)
+          : errorMessage;
+
+        setErrors((prev) => ({
+          ...prev,
+          [field]: translatedMessage,
+        }));
+        return false;
+      } catch (error) {
+        console.error("Error validating field:", field, error);
+        return false;
       }
-
-      if (result.success) {
-        // Se passou, remover erro
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[field];
-          return newErrors;
-        });
-        return true;
-      }
-
-      // Traduzir a mensagem de erro
-      const errorMessage = result.error.errors[0].message;
-      const translatedMessage = errorMessage.startsWith("item-detail:")
-        ? t(errorMessage)
-        : errorMessage;
-
-      setErrors((prev) => ({
-        ...prev,
-        [field]: translatedMessage,
-      }));
-      return false;
-    } catch (error) {
-      console.error("Error validating field:", field, error);
-      return false;
-    }
-  }, [t]);
+    },
+    [t]
+  );
 
   // Verificar se customCategory está inválida
   const isCustomCategoryInvalid = useMemo(() => {
     if (!editData) return false;
-    return editData.category === "other" && (!editData.customCategory || editData.customCategory.trim().length === 0);
+    return (
+      editData.category === "other" &&
+      (!editData.customCategory || editData.customCategory.trim().length === 0)
+    );
   }, [editData]);
 
   // Verificar se tem campos obrigatórios vazios e quais são
@@ -314,13 +324,7 @@ export default function ItemDetail() {
       return true;
 
     return false;
-  }, [
-    item,
-    editData,
-    isEditing,
-    fieldVisibility,
-    originalFieldVisibility,
-  ]);
+  }, [item, editData, isEditing, fieldVisibility, originalFieldVisibility]);
 
   const handleVersionChange = useCallback(
     (versionId: string | null) => {
@@ -371,7 +375,7 @@ export default function ItemDetail() {
           description: versionData.description,
           createdAt: new Date().toISOString(),
           isMain: false,
-          itemData: itemData, // Use the complete converted object
+          itemData, // Use the complete converted object
         };
 
         // Salvar no banco de dados
@@ -512,14 +516,7 @@ export default function ItemDetail() {
         console.error("Error saving item:", error);
       }
     }
-  }, [
-    editData,
-    fieldVisibility,
-    versions,
-    currentVersion,
-    itemId,
-    t,
-  ]);
+  }, [editData, fieldVisibility, versions, currentVersion, itemId, t]);
 
   const navigateToItemsTab = useCallback(() => {
     if (!dashboardId) return;
@@ -588,7 +585,6 @@ export default function ItemDetail() {
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
   }, [item, originalFieldVisibility]);
-
 
   const handleBack = useCallback(() => {
     navigateToItemsTab();
@@ -682,7 +678,11 @@ export default function ItemDetail() {
         fieldVisibility={fieldVisibility}
         advancedSectionOpen={advancedSectionOpen}
         openSections={openSections}
-        customCategoryError={isCustomCategoryInvalid ? t("item-detail:validation.custom_category_required") : undefined}
+        customCategoryError={
+          isCustomCategoryInvalid
+            ? t("item-detail:validation.custom_category_required")
+            : undefined
+        }
         isValid={!hasRequiredFieldsEmpty && !isCustomCategoryInvalid}
         onBack={handleBack}
         onNavigationSidebarToggle={handleNavigationSidebarToggle}

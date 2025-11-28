@@ -26,9 +26,7 @@ export function EntityCardWrapper({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CardContent className={contentClassName}>
-        {children}
-      </CardContent>
+      <CardContent className={contentClassName}>{children}</CardContent>
 
       {/* Overlay covering entire card */}
       <div
@@ -36,9 +34,7 @@ export function EntityCardWrapper({
           isHovered ? "opacity-100" : "opacity-0"
         }`}
       >
-        <span className="text-white text-lg font-semibold">
-          {overlayText}
-        </span>
+        <span className="text-white text-lg font-semibold">{overlayText}</span>
       </div>
     </Card>
   );

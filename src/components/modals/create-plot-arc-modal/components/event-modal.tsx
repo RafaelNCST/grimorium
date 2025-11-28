@@ -66,8 +66,12 @@ export function EventModal({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="event-name" className="text-sm font-medium text-primary">
-              {t("modal.event_name")} <span className="text-destructive">*</span>
+            <Label
+              htmlFor="event-name"
+              className="text-sm font-medium text-primary"
+            >
+              {t("modal.event_name")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Input
               id="event-name"
@@ -82,8 +86,12 @@ export function EventModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="event-description" className="text-sm font-medium text-primary">
-              {t("modal.event_description")} <span className="text-destructive">*</span>
+            <Label
+              htmlFor="event-description"
+              className="text-sm font-medium text-primary"
+            >
+              {t("modal.event_description")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <Textarea
               id="event-description"

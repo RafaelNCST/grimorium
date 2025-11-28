@@ -79,8 +79,7 @@ const FactionsViewComponent = function FactionsView({
   };
 
   // Determine which empty state to show
-  const hasNoResults =
-    filteredFactions.length === 0 && factions.length > 0;
+  const hasNoResults = filteredFactions.length === 0 && factions.length > 0;
   const hasSearch = searchTerm.trim().length > 0;
   const hasFilters = selectedStatuses.length > 0 || selectedTypes.length > 0;
 

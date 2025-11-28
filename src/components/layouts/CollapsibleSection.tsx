@@ -1,7 +1,14 @@
 import * as React from "react";
 import { type ReactNode } from "react";
 
-import { ChevronDown, ChevronRight, Eye, EyeOff, Plus, type LucideIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Plus,
+  type LucideIcon,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,7 +55,12 @@ export interface CollapsibleSectionProps {
 
   // ========== EMPTY STATE PROPS ==========
   /** Estado vazio da seção */
-  emptyState?: "empty-view" | "empty-edit" | "blocked-no-data" | "blocked-all-used" | null;
+  emptyState?:
+    | "empty-view"
+    | "empty-edit"
+    | "blocked-no-data"
+    | "blocked-all-used"
+    | null;
 
   /** Ícone para o estado vazio (visualização) */
   emptyIcon?: LucideIcon;
@@ -199,9 +211,13 @@ export function CollapsibleSection({
     if (emptyState === "empty-view" && !isEditMode) {
       return (
         <div className="text-center text-muted-foreground text-sm py-8">
-          {EmptyIcon && <EmptyIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />}
+          {EmptyIcon && (
+            <EmptyIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          )}
           {emptyTitle && <p className="font-medium">{emptyTitle}</p>}
-          {emptyDescription && <p className="text-xs mt-1">{emptyDescription}</p>}
+          {emptyDescription && (
+            <p className="text-xs mt-1">{emptyDescription}</p>
+          )}
         </div>
       );
     }
@@ -211,11 +227,7 @@ export function CollapsibleSection({
       return (
         <>
           <div className="flex gap-2">
-            <Button
-              onClick={onAddClick}
-              className="flex-1"
-              variant="magical"
-            >
+            <Button onClick={onAddClick} className="flex-1" variant="magical">
               <Plus className="w-4 h-4 mr-2" />
               {addButtonLabel}
             </Button>
@@ -225,7 +237,9 @@ export function CollapsibleSection({
                 className="flex-1"
                 variant="secondary"
               >
-                {SecondaryButtonIcon && <SecondaryButtonIcon className="w-4 h-4 mr-2" />}
+                {SecondaryButtonIcon && (
+                  <SecondaryButtonIcon className="w-4 h-4 mr-2" />
+                )}
                 {secondaryButtonLabel}
               </Button>
             )}
@@ -242,7 +256,8 @@ export function CollapsibleSection({
         <InfoAlert>
           <p className="font-medium">Não há {blockedEntityName} suficientes</p>
           <p className="text-xs mt-1">
-            Você precisa cadastrar mais {blockedEntityName} antes de adicionar aqui.
+            Você precisa cadastrar mais {blockedEntityName} antes de adicionar
+            aqui.
           </p>
         </InfoAlert>
       );

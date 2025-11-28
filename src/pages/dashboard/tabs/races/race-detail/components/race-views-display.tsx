@@ -1,14 +1,14 @@
 import { Eye, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { RaceViewsManager } from "@/components/modals/create-race-modal/components/race-views-manager";
+import type { RaceView } from "@/components/modals/create-race-modal/components/race-views-manager";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { RaceViewsManager } from "@/components/modals/create-race-modal/components/race-views-manager";
-import type { RaceView } from "@/components/modals/create-race-modal/components/race-views-manager";
 
 interface IRace {
   id: string;
@@ -62,26 +62,20 @@ export function RaceViewsDisplay({
   const viewCount = views?.length || 0;
 
   // Helper to get race image from allRaces
-  const getRaceImage = (raceId: string): string | undefined => {
-    return allRaces.find((r) => r.id === raceId)?.image;
-  };
+  const getRaceImage = (raceId: string): string | undefined =>
+    allRaces.find((r) => r.id === raceId)?.image;
 
   // Helper to get initials for avatar fallback
-  const getInitials = (name: string): string => {
-    return name
+  const getInitials = (name: string): string =>
+    name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
 
   return (
-    <Collapsible
-      open={open}
-      onOpenChange={onOpenChange}
-      defaultOpen={false}
-    >
+    <Collapsible open={open} onOpenChange={onOpenChange} defaultOpen={false}>
       <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-muted transition-colors">
         <p className="text-sm font-semibold text-primary">
           {t("fields.race_views")}
@@ -143,9 +137,7 @@ export function RaceViewsDisplay({
             })}
           </div>
         ) : (
-          <span className="italic text-muted-foreground/60">
-            Sem dados
-          </span>
+          <span className="italic text-muted-foreground/60">Sem dados</span>
         )}
       </CollapsibleContent>
     </Collapsible>

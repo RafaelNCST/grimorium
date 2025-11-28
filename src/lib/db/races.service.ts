@@ -30,7 +30,8 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     special_physical_characteristics: race.specialPhysicalCharacteristics,
     habits: race.habits,
     reproductive_cycle: race.reproductiveCycle,
-    other_reproductive_cycle_description: race.otherReproductiveCycleDescription,
+    other_reproductive_cycle_description:
+      race.otherReproductiveCycleDescription,
     diet: race.diet,
     elemental_diet: race.elementalDiet,
     communication: race.communication
@@ -73,7 +74,8 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     specialPhysicalCharacteristics: dbRace.special_physical_characteristics,
     habits: dbRace.habits,
     reproductiveCycle: dbRace.reproductive_cycle,
-    otherReproductiveCycleDescription: dbRace.other_reproductive_cycle_description,
+    otherReproductiveCycleDescription:
+      dbRace.other_reproductive_cycle_description,
     diet: dbRace.diet,
     elementalDiet: dbRace.elemental_diet,
     communication: dbRace.communication
@@ -334,10 +336,10 @@ export async function updateRaceVersionData(
     ...raceData,
     _relationships: relationships || [],
   };
-  await db.execute(
-    "UPDATE race_versions SET race_data = $1 WHERE id = $2",
-    [JSON.stringify(dataToStore), versionId]
-  );
+  await db.execute("UPDATE race_versions SET race_data = $1 WHERE id = $2", [
+    JSON.stringify(dataToStore),
+    versionId,
+  ]);
 }
 
 // Race Relationships
@@ -375,14 +377,7 @@ export async function saveRaceRelationships(
     await db.execute(
       `INSERT INTO race_relationships (id, race_id, related_race_id, type, description, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [
-        relId,
-        raceId,
-        rel.raceId,
-        rel.type,
-        rel.description || null,
-        Date.now(),
-      ]
+      [relId, raceId, rel.raceId, rel.type, rel.description || null, Date.now()]
     );
   }
 }

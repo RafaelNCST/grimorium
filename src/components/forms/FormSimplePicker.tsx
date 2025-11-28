@@ -92,7 +92,9 @@ const getColorFromTailwindClass = (className: string | undefined): string => {
 };
 
 // Helper to get dark mode color
-const getDarkColorFromTailwindClass = (className: string | undefined): string => {
+const getDarkColorFromTailwindClass = (
+  className: string | undefined
+): string => {
   // Guard against undefined or null className
   if (!className) return "currentColor";
 

@@ -39,11 +39,7 @@ export function CreatePlotArcModalView({
   hasCurrentArc,
 }: PropsCreatePlotArcModalView) {
   const { t } = useTranslation("create-plot-arc");
-  const {
-    register,
-    setValue,
-    watch,
-  } = form;
+  const { register, setValue, watch } = form;
 
   const watchedValues = watch();
 

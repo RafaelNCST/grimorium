@@ -110,7 +110,9 @@ export function CategorySelector({
       )}
 
       {error && <p className="text-sm text-destructive">{t(error)}</p>}
-      {customCategoryError && <p className="text-sm text-destructive">{customCategoryError}</p>}
+      {customCategoryError && (
+        <p className="text-sm text-destructive">{customCategoryError}</p>
+      )}
     </div>
   );
 }

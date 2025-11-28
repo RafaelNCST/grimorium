@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 interface DisplayImageProps {
@@ -58,9 +59,7 @@ export function DisplayImage({
       )}
     >
       <Icon className="w-12 h-12 text-purple-400" />
-      {text && (
-        <span className="text-sm text-purple-300">{text}</span>
-      )}
+      {text && <span className="text-sm text-purple-300">{text}</span>}
     </div>
   );
 }

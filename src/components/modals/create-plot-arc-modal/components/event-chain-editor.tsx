@@ -160,9 +160,7 @@ export function EventChainEditor({ events, onChange }: PropsEventChainEditor) {
     if (editingEvent) {
       // Edit existing event
       const updatedEvents = events.map((e) =>
-        e.id === editingEvent.id
-          ? { ...e, name, description }
-          : e
+        e.id === editingEvent.id ? { ...e, name, description } : e
       );
       onChange(updatedEvents);
     } else {

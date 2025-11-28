@@ -101,14 +101,10 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     fearsAndTraumas: dbChar.fears_and_traumas,
     favoriteFood: dbChar.favorite_food,
     favoriteMusic: dbChar.favorite_music,
-    birthPlace: dbChar.birth_place
-      ? JSON.parse(dbChar.birth_place)
-      : [],
+    birthPlace: dbChar.birth_place ? JSON.parse(dbChar.birth_place) : [],
     affiliatedPlace: dbChar.affiliated_place,
     organization: dbChar.organization,
-    nicknames: dbChar.nicknames
-      ? JSON.parse(dbChar.nicknames)
-      : [],
+    nicknames: dbChar.nicknames ? JSON.parse(dbChar.nicknames) : [],
     past: dbChar.past,
     fieldVisibility: dbChar.field_visibility
       ? JSON.parse(dbChar.field_visibility)
@@ -315,7 +311,14 @@ export async function saveCharacterRelationships(
       await db.execute(
         `INSERT INTO relationships (id, character_id, related_character_id, type, intensity, created_at)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [relId, characterId, rel.characterId, rel.type, rel.intensity, Date.now()]
+        [
+          relId,
+          characterId,
+          rel.characterId,
+          rel.type,
+          rel.intensity,
+          Date.now(),
+        ]
       );
     }
   } catch (error) {

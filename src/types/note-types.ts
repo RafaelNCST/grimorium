@@ -1,12 +1,27 @@
 import type { JSONContent } from "@tiptap/react";
 
-export type EntityType = "character" | "region" | "faction" | "race" | "item" | "arc";
+export type EntityType =
+  | "character"
+  | "region"
+  | "faction"
+  | "race"
+  | "item"
+  | "arc";
 
 export type PaperMode = "light" | "dark";
 
 export type NoteSortOrder = "alphabetical" | "recent";
 
-export type NoteColor = "sepia" | "purple" | "green" | "blue" | "red" | "gold" | "cyan" | "indigo" | "lime";
+export type NoteColor =
+  | "sepia"
+  | "purple"
+  | "green"
+  | "blue"
+  | "red"
+  | "gold"
+  | "cyan"
+  | "indigo"
+  | "lime";
 
 export type NoteTextColor = "black" | "white";
 

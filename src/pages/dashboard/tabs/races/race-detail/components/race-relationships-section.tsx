@@ -18,11 +18,10 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import {
   Dialog,
   DialogContent,
@@ -31,11 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
 
+import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
 import { type IRaceRelationship } from "../types/race-detail-types";
 
 interface IRace {
@@ -401,7 +401,10 @@ export function RaceRelationshipsSection({
                     </Card>
                     <p className="text-sm text-muted-foreground text-center pt-1">
                       {t("race-detail:relationships.is_to_the")}{" "}
-                      <span className="font-semibold text-primary">{currentRaceName}</span>:
+                      <span className="font-semibold text-primary">
+                        {currentRaceName}
+                      </span>
+                      :
                     </p>
                   </div>
 
@@ -418,12 +421,14 @@ export function RaceRelationshipsSection({
                         label: t(
                           `race-detail:relationship_types.${type.translationKey}`
                         ),
-                        description: t(`race-detail:relationship_types.${type.translationKey}_desc`),
+                        description: t(
+                          `race-detail:relationship_types.${type.translationKey}_desc`
+                        ),
                         icon: type.icon,
                         backgroundColor:
                           RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                        borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value]
-                          .border,
+                        borderColor:
+                          RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
                       }))}
                     />
                   </div>
@@ -512,7 +517,9 @@ export function RaceRelationshipsSection({
                     label: t(
                       `race-detail:relationship_types.${type.translationKey}`
                     ),
-                    description: t(`race-detail:relationship_types.${type.translationKey}_desc`),
+                    description: t(
+                      `race-detail:relationship_types.${type.translationKey}_desc`
+                    ),
                     icon: type.icon,
                     backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
                     borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,

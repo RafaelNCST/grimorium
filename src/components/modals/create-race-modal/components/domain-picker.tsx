@@ -52,28 +52,33 @@ const colorMap: Record<string, { bg: string; border: string }> = {
 
 // Map para converter entre português (DomainType - usado no DB) e inglês (RaceDomain - usado no picker)
 const domainPtToEn: Record<string, RaceDomain> = {
-  "Aquático": "aquatic",
-  "Terrestre": "terrestrial",
-  "Aéreo": "aerial",
-  "Subterrâneo": "underground",
-  "Elevado": "elevated",
-  "Dimensional": "dimensional",
-  "Espiritual": "spiritual",
-  "Cósmico": "cosmic",
+  Aquático: "aquatic",
+  Terrestre: "terrestrial",
+  Aéreo: "aerial",
+  Subterrâneo: "underground",
+  Elevado: "elevated",
+  Dimensional: "dimensional",
+  Espiritual: "spiritual",
+  Cósmico: "cosmic",
 };
 
 const domainEnToPt: Record<RaceDomain, string> = {
-  "aquatic": "Aquático",
-  "terrestrial": "Terrestre",
-  "aerial": "Aéreo",
-  "underground": "Subterrâneo",
-  "elevated": "Elevado",
-  "dimensional": "Dimensional",
-  "spiritual": "Espiritual",
-  "cosmic": "Cósmico",
+  aquatic: "Aquático",
+  terrestrial: "Terrestre",
+  aerial: "Aéreo",
+  underground: "Subterrâneo",
+  elevated: "Elevado",
+  dimensional: "Dimensional",
+  spiritual: "Espiritual",
+  cosmic: "Cósmico",
 };
 
-export function DomainPicker({ value, onChange, error, hideLabel }: PropsDomainPicker) {
+export function DomainPicker({
+  value,
+  onChange,
+  error,
+  hideLabel,
+}: PropsDomainPicker) {
   const { t } = useTranslation("create-race");
 
   // Converter valores do DB (português) para o picker (inglês)

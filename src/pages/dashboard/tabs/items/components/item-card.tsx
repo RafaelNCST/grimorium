@@ -78,9 +78,7 @@ export function ItemCard({ item, onClick }: PropsItemCard) {
 
       <div className="p-4 space-y-3">
         {/* Name */}
-        <h3 className="font-semibold text-lg leading-tight">
-          {item.name}
-        </h3>
+        <h3 className="font-semibold text-lg leading-tight">{item.name}</h3>
 
         {/* Category and Status side by side */}
         <div className="flex items-center gap-2 flex-wrap">

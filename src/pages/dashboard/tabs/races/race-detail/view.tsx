@@ -14,6 +14,7 @@ import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
+import { CreateRaceModal } from "@/components/modals/create-race-modal";
 import { DietPicker } from "@/components/modals/create-race-modal/components/diet-picker";
 import { DomainPicker } from "@/components/modals/create-race-modal/components/domain-picker";
 import { HabitsPicker } from "@/components/modals/create-race-modal/components/habits-picker";
@@ -27,7 +28,6 @@ import { HABITS_OPTIONS } from "@/components/modals/create-race-modal/constants/
 import { MORAL_TENDENCY_OPTIONS } from "@/components/modals/create-race-modal/constants/moral-tendencies";
 import { PHYSICAL_CAPACITY_OPTIONS } from "@/components/modals/create-race-modal/constants/physical-capacities";
 import { REPRODUCTIVE_CYCLE_OPTIONS } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
-import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,9 +39,8 @@ import {
   CreateVersionWithEntityDialog,
 } from "@/components/version-system";
 
-import { CreateRaceModal } from "@/components/modals/create-race-modal";
-
 import { CommunicationDisplay } from "./components/communication-display";
+import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
 import { RaceVersionCard } from "./components/race-version-card";
@@ -151,7 +150,8 @@ export function RaceDetailView({
   const { t } = useTranslation(["race-detail", "create-race"] as any);
 
   // State for controlled dialog in RaceRelationshipsSection
-  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] = useState(false);
+  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
+    useState(false);
 
   // ==================
   // BASIC FIELDS
@@ -204,11 +204,15 @@ export function RaceDetailView({
             <div className="space-y-2">
               <Label className="text-primary">
                 {t("race-detail:fields.scientific_name")}
-                <span className="text-xs text-muted-foreground ml-1">(opcional)</span>
+                <span className="text-xs text-muted-foreground ml-1">
+                  (opcional)
+                </span>
               </Label>
               <Input
                 value={editData.scientificName || ""}
-                onChange={(e) => onEditDataChange("scientificName", e.target.value)}
+                onChange={(e) =>
+                  onEditDataChange("scientificName", e.target.value)
+                }
                 placeholder={t("create-race:modal.scientific_name_placeholder")}
                 maxLength={150}
               />
@@ -250,7 +254,11 @@ export function RaceDetailView({
               placeholder={t("create-race:modal.summary_placeholder")}
               rows={4}
               maxLength={500}
-              className={errors.summary ? "resize-none border-destructive" : "resize-none"}
+              className={
+                errors.summary
+                  ? "resize-none border-destructive"
+                  : "resize-none"
+              }
               required
             />
             {errors.summary && (
@@ -353,21 +361,35 @@ export function RaceDetailView({
   // Helper function to check if all fields in a group are hidden
   const areAllFieldsHidden = (fieldNames: string[]): boolean => {
     if (isEditing) return false; // Never hide sections in edit mode
-    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+    return fieldNames.every(
+      (fieldName) => fieldVisibility[fieldName] === false
+    );
   };
 
   // Define field groups for each mini-section
-  const cultureFields = ['alternativeNames', 'culturalNotes'];
+  const cultureFields = ["alternativeNames", "culturalNotes"];
   const appearanceFields = [
-    'generalAppearance', 'lifeExpectancy', 'averageHeight',
-    'averageWeight', 'specialPhysicalCharacteristics'
+    "generalAppearance",
+    "lifeExpectancy",
+    "averageHeight",
+    "averageWeight",
+    "specialPhysicalCharacteristics",
   ];
   const behaviorsFields = [
-    'habits', 'reproductiveCycle', 'diet', 'communication',
-    'moralTendency', 'socialOrganization', 'habitat'
+    "habits",
+    "reproductiveCycle",
+    "diet",
+    "communication",
+    "moralTendency",
+    "socialOrganization",
+    "habitat",
   ];
-  const powerFields = ['physicalCapacity', 'specialCharacteristics', 'weaknesses'];
-  const narrativeFields = ['storyMotivation', 'inspirations'];
+  const powerFields = [
+    "physicalCapacity",
+    "specialCharacteristics",
+    "weaknesses",
+  ];
+  const narrativeFields = ["storyMotivation", "inspirations"];
 
   // Check if mini-sections should be hidden
   const hideCultureSection = areAllFieldsHidden(cultureFields);
@@ -378,8 +400,11 @@ export function RaceDetailView({
 
   // Check if entire advanced section should be hidden
   const hideEntireAdvancedSection =
-    hideCultureSection && hideAppearanceSection && hideBehaviorsSection &&
-    hidePowerSection && hideNarrativeSection;
+    hideCultureSection &&
+    hideAppearanceSection &&
+    hideBehaviorsSection &&
+    hidePowerSection &&
+    hideNarrativeSection;
 
   const advancedFields = hideEntireAdvancedSection ? null : (
     <div className="space-y-6">
@@ -390,62 +415,68 @@ export function RaceDetailView({
             {t("race-detail:sections.culture")}
           </h4>
 
-        {/* Alternative Names */}
-        <FieldWithVisibilityToggle
-          fieldName="alternativeNames"
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormListInput
-              value={editData.alternativeNames || []}
-              onChange={(value) => onEditDataChange("alternativeNames", value)}
-              label={t("race-detail:fields.alternative_names")}
-              placeholder={t("create-race:modal.alternative_names_placeholder")}
-              buttonText={t("create-race:modal.add_name")}
-              maxLength={100}
-              inputSize="small"
-              labelClassName="text-sm font-medium text-primary"
-            />
-          ) : (
-            <DisplayStringList
-              label={t("race-detail:fields.alternative_names")}
-              items={race.alternativeNames}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Cultural Notes */}
-        <FieldWithVisibilityToggle
-          fieldName="culturalNotes"
-          label={t("race-detail:fields.cultural_notes")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.culturalNotes || ""}
-                onChange={(e) => onEditDataChange("culturalNotes", e.target.value)}
-                placeholder={t("create-race:modal.cultural_notes_placeholder")}
-                rows={6}
-                maxLength={1500}
-                className="resize-none"
+          {/* Alternative Names */}
+          <FieldWithVisibilityToggle
+            fieldName="alternativeNames"
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormListInput
+                value={editData.alternativeNames || []}
+                onChange={(value) =>
+                  onEditDataChange("alternativeNames", value)
+                }
+                label={t("race-detail:fields.alternative_names")}
+                placeholder={t(
+                  "create-race:modal.alternative_names_placeholder"
+                )}
+                buttonText={t("create-race:modal.add_name")}
+                maxLength={100}
+                inputSize="small"
+                labelClassName="text-sm font-medium text-primary"
               />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.culturalNotes?.length || 0}/1500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.culturalNotes}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+            ) : (
+              <DisplayStringList
+                label={t("race-detail:fields.alternative_names")}
+                items={race.alternativeNames}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Cultural Notes */}
+          <FieldWithVisibilityToggle
+            fieldName="culturalNotes"
+            label={t("race-detail:fields.cultural_notes")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.culturalNotes || ""}
+                  onChange={(e) =>
+                    onEditDataChange("culturalNotes", e.target.value)
+                  }
+                  placeholder={t(
+                    "create-race:modal.cultural_notes_placeholder"
+                  )}
+                  rows={6}
+                  maxLength={1500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.culturalNotes?.length || 0}/1500</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.culturalNotes} />
+            )}
+          </FieldWithVisibilityToggle>
         </div>
       )}
 
@@ -459,41 +490,10 @@ export function RaceDetailView({
             {t("race-detail:sections.appearance")}
           </h4>
 
-        {/* General Appearance */}
-        <FieldWithVisibilityToggle
-          fieldName="generalAppearance"
-          label={t("race-detail:fields.general_appearance")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.generalAppearance || ""}
-                onChange={(e) => onEditDataChange("generalAppearance", e.target.value)}
-                placeholder={t("create-race:modal.general_appearance_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.generalAppearance?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.generalAppearance}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Life Expectancy, Height, Weight */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* General Appearance */}
           <FieldWithVisibilityToggle
-            fieldName="lifeExpectancy"
-            label={t("race-detail:fields.life_expectancy")}
+            fieldName="generalAppearance"
+            label={t("race-detail:fields.general_appearance")}
             isOptional
             fieldVisibility={fieldVisibility}
             isEditing={isEditing}
@@ -501,26 +501,121 @@ export function RaceDetailView({
           >
             {isEditing ? (
               <>
-                <Input
-                  value={editData.lifeExpectancy || ""}
-                  onChange={(e) => onEditDataChange("lifeExpectancy", e.target.value)}
-                  placeholder={t("create-race:modal.life_expectancy_placeholder")}
-                  maxLength={100}
+                <Textarea
+                  value={editData.generalAppearance || ""}
+                  onChange={(e) =>
+                    onEditDataChange("generalAppearance", e.target.value)
+                  }
+                  placeholder={t(
+                    "create-race:modal.general_appearance_placeholder"
+                  )}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.lifeExpectancy?.length || 0}/100</span>
+                  <span>{editData.generalAppearance?.length || 0}/500</span>
                 </div>
               </>
             ) : (
-              <DisplayText
-                value={race.lifeExpectancy}
-                />
+              <DisplayTextarea value={race.generalAppearance} />
             )}
           </FieldWithVisibilityToggle>
 
+          {/* Life Expectancy, Height, Weight */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FieldWithVisibilityToggle
+              fieldName="lifeExpectancy"
+              label={t("race-detail:fields.life_expectancy")}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={editData.lifeExpectancy || ""}
+                    onChange={(e) =>
+                      onEditDataChange("lifeExpectancy", e.target.value)
+                    }
+                    placeholder={t(
+                      "create-race:modal.life_expectancy_placeholder"
+                    )}
+                    maxLength={100}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editData.lifeExpectancy?.length || 0}/100</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={race.lifeExpectancy} />
+              )}
+            </FieldWithVisibilityToggle>
+
+            <FieldWithVisibilityToggle
+              fieldName="averageHeight"
+              label={t("race-detail:fields.average_height")}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={editData.averageHeight || ""}
+                    onChange={(e) =>
+                      onEditDataChange("averageHeight", e.target.value)
+                    }
+                    placeholder={t(
+                      "create-race:modal.average_height_placeholder"
+                    )}
+                    maxLength={100}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editData.averageHeight?.length || 0}/100</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={race.averageHeight} />
+              )}
+            </FieldWithVisibilityToggle>
+
+            <FieldWithVisibilityToggle
+              fieldName="averageWeight"
+              label={t("race-detail:fields.average_weight")}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={editData.averageWeight || ""}
+                    onChange={(e) =>
+                      onEditDataChange("averageWeight", e.target.value)
+                    }
+                    placeholder={t(
+                      "create-race:modal.average_weight_placeholder"
+                    )}
+                    maxLength={100}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editData.averageWeight?.length || 0}/100</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={race.averageWeight} />
+              )}
+            </FieldWithVisibilityToggle>
+          </div>
+
+          {/* Special Physical Characteristics */}
           <FieldWithVisibilityToggle
-            fieldName="averageHeight"
-            label={t("race-detail:fields.average_height")}
+            fieldName="specialPhysicalCharacteristics"
+            label={t("race-detail:fields.special_physical_characteristics")}
             isOptional
             fieldVisibility={fieldVisibility}
             isEditing={isEditing}
@@ -528,86 +623,31 @@ export function RaceDetailView({
           >
             {isEditing ? (
               <>
-                <Input
-                  value={editData.averageHeight || ""}
-                  onChange={(e) => onEditDataChange("averageHeight", e.target.value)}
-                  placeholder={t("create-race:modal.average_height_placeholder")}
-                  maxLength={100}
+                <Textarea
+                  value={editData.specialPhysicalCharacteristics || ""}
+                  onChange={(e) =>
+                    onEditDataChange(
+                      "specialPhysicalCharacteristics",
+                      e.target.value
+                    )
+                  }
+                  placeholder={t(
+                    "create-race:modal.special_physical_characteristics_placeholder"
+                  )}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.averageHeight?.length || 0}/100</span>
+                  <span>
+                    {editData.specialPhysicalCharacteristics?.length || 0}/500
+                  </span>
                 </div>
               </>
             ) : (
-              <DisplayText
-                value={race.averageHeight}
-                />
+              <DisplayTextarea value={race.specialPhysicalCharacteristics} />
             )}
           </FieldWithVisibilityToggle>
-
-          <FieldWithVisibilityToggle
-            fieldName="averageWeight"
-            label={t("race-detail:fields.average_weight")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
-            {isEditing ? (
-              <>
-                <Input
-                  value={editData.averageWeight || ""}
-                  onChange={(e) => onEditDataChange("averageWeight", e.target.value)}
-                  placeholder={t("create-race:modal.average_weight_placeholder")}
-                  maxLength={100}
-                />
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.averageWeight?.length || 0}/100</span>
-                </div>
-              </>
-            ) : (
-              <DisplayText
-                value={race.averageWeight}
-                />
-            )}
-          </FieldWithVisibilityToggle>
-        </div>
-
-        {/* Special Physical Characteristics */}
-        <FieldWithVisibilityToggle
-          fieldName="specialPhysicalCharacteristics"
-          label={t("race-detail:fields.special_physical_characteristics")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.specialPhysicalCharacteristics || ""}
-                onChange={(e) =>
-                  onEditDataChange("specialPhysicalCharacteristics", e.target.value)
-                }
-                placeholder={t(
-                  "create-race:modal.special_physical_characteristics_placeholder"
-                )}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>
-                  {editData.specialPhysicalCharacteristics?.length || 0}/500
-                </span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.specialPhysicalCharacteristics}
-            />
-          )}
-        </FieldWithVisibilityToggle>
         </div>
       )}
 
@@ -621,245 +661,263 @@ export function RaceDetailView({
             {t("race-detail:sections.behaviors")}
           </h4>
 
-        {/* Habits */}
-        <FieldWithVisibilityToggle
-          fieldName="habits"
-          label={t("race-detail:fields.habits")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <HabitsPicker
-              value={editData.habits || ""}
-              onChange={(value) => onEditDataChange("habits", value)}
-              hideLabel
-            />
-          ) : (
-            <DisplaySelectGrid
-              value={race.habits}
-              options={HABITS_OPTIONS}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Reproductive Cycle */}
-        <FieldWithVisibilityToggle
-          fieldName="reproductiveCycle"
-          label={t("race-detail:fields.reproductive_cycle")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <ReproductiveCyclePicker
-              value={editData.reproductiveCycle || ""}
-              onChange={(value) => onEditDataChange("reproductiveCycle", value)}
-              otherCycleDescription={editData.otherCycleDescription || ""}
-              onOtherCycleDescriptionChange={(value) =>
-                onEditDataChange("otherCycleDescription", value)
-              }
-              hideLabel
-            />
-          ) : (
-            <DisplaySelectGrid
-              value={race.reproductiveCycle}
-              options={REPRODUCTIVE_CYCLE_OPTIONS}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Diet */}
-        <FieldWithVisibilityToggle
-          fieldName="diet"
-          label={t("race-detail:fields.diet")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <DietPicker
-              value={editData.diet || ""}
-              onChange={(value) => onEditDataChange("diet", value)}
-              elementalDiet={editData.elementalDiet || ""}
-              onElementalDietChange={(value) =>
-                onEditDataChange("elementalDiet", value)
-              }
-              hideLabel
-            />
-          ) : (
-            <DisplaySelectGrid
-              value={race.diet}
-              options={DIET_OPTIONS}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Communication */}
-        <FieldWithVisibilityToggle
-          fieldName="communication"
-          label={t("race-detail:fields.communication")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <CommunicationDisplay
-              communications={editData.communication || []}
-              isEditing={isEditing}
-              otherCommunication={editData.otherCommunication || ""}
-              onCommunicationsChange={(communications) =>
-                onEditDataChange("communication", communications)
-              }
-              onOtherCommunicationChange={(value) =>
-                onEditDataChange("otherCommunication", value)
-              }
-            />
-          ) : race.communication && race.communication.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {race.communication.map((commValue) => {
-                const commOption = RACE_COMMUNICATIONS.find((c) => c.value === commValue);
-                if (!commOption) return null;
-
-                // Convert to DisplaySelectGrid format
-                const displayOption = {
-                  value: commOption.value,
-                  label: commOption.label,
-                  description: commOption.description,
-                  icon: commOption.icon,
-                  backgroundColor: commOption.color.includes("blue") ? "blue-500/10" :
-                                 commOption.color.includes("purple") ? "purple-500/10" :
-                                 commOption.color.includes("green") ? "green-500/10" :
-                                 commOption.color.includes("amber") ? "amber-500/10" :
-                                 commOption.color.includes("violet") ? "violet-500/10" :
-                                 "gray-500/10",
-                  borderColor: commOption.color.includes("blue") ? "blue-500/30" :
-                              commOption.color.includes("purple") ? "purple-500/30" :
-                              commOption.color.includes("green") ? "green-500/30" :
-                              commOption.color.includes("amber") ? "amber-500/30" :
-                              commOption.color.includes("violet") ? "violet-500/30" :
-                              "gray-500/30",
-                };
-
-                return (
-                  <DisplaySelectGrid
-                    key={commValue}
-                    value={commValue}
-                    options={[displayOption]}
-                        />
-                );
-              })}
-            </div>
-          ) : (
-            <DisplaySelectGrid
-              value={null}
-              options={RACE_COMMUNICATIONS.map(c => ({
-                value: c.value,
-                label: c.label,
-                description: c.description,
-                icon: c.icon,
-                backgroundColor: c.color.includes("blue") ? "blue-500/10" :
-                               c.color.includes("purple") ? "purple-500/10" :
-                               c.color.includes("green") ? "green-500/10" :
-                               c.color.includes("amber") ? "amber-500/10" :
-                               c.color.includes("violet") ? "violet-500/10" :
-                               "gray-500/10",
-                borderColor: c.color.includes("blue") ? "blue-500/30" :
-                            c.color.includes("purple") ? "purple-500/30" :
-                            c.color.includes("green") ? "green-500/30" :
-                            c.color.includes("amber") ? "amber-500/30" :
-                            c.color.includes("violet") ? "violet-500/30" :
-                            "gray-500/30",
-              }))}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Moral Tendency */}
-        <FieldWithVisibilityToggle
-          fieldName="moralTendency"
-          label={t("race-detail:fields.moral_tendency")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <MoralTendencyPicker
-              value={editData.moralTendency || ""}
-              onChange={(value) => onEditDataChange("moralTendency", value)}
-              hideLabel
-            />
-          ) : (
-            <DisplaySelectGrid
-              value={race.moralTendency}
-              options={MORAL_TENDENCY_OPTIONS}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Social Organization */}
-        <FieldWithVisibilityToggle
-          fieldName="socialOrganization"
-          label={t("race-detail:fields.social_organization")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.socialOrganization || ""}
-                onChange={(e) =>
-                  onEditDataChange("socialOrganization", e.target.value)
-                }
-                placeholder={t("create-race:modal.social_organization_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
+          {/* Habits */}
+          <FieldWithVisibilityToggle
+            fieldName="habits"
+            label={t("race-detail:fields.habits")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <HabitsPicker
+                value={editData.habits || ""}
+                onChange={(value) => onEditDataChange("habits", value)}
+                hideLabel
               />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.socialOrganization?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.socialOrganization}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+            ) : (
+              <DisplaySelectGrid value={race.habits} options={HABITS_OPTIONS} />
+            )}
+          </FieldWithVisibilityToggle>
 
-        {/* Habitat */}
-        <FieldWithVisibilityToggle
-          fieldName="habitat"
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormListInput
-              value={editData.habitat || []}
-              onChange={(value) => onEditDataChange("habitat", value)}
-              label={t("race-detail:fields.habitat")}
-              placeholder={t("create-race:modal.habitat_placeholder")}
-              buttonText={t("create-race:modal.add_habitat")}
-              maxLength={50}
-              inputSize="small"
-              labelClassName="text-sm font-medium text-primary"
-            />
-          ) : (
-            <DisplayStringList
-              label={t("race-detail:fields.habitat")}
-              items={race.habitat}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+          {/* Reproductive Cycle */}
+          <FieldWithVisibilityToggle
+            fieldName="reproductiveCycle"
+            label={t("race-detail:fields.reproductive_cycle")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <ReproductiveCyclePicker
+                value={editData.reproductiveCycle || ""}
+                onChange={(value) =>
+                  onEditDataChange("reproductiveCycle", value)
+                }
+                otherCycleDescription={editData.otherCycleDescription || ""}
+                onOtherCycleDescriptionChange={(value) =>
+                  onEditDataChange("otherCycleDescription", value)
+                }
+                hideLabel
+              />
+            ) : (
+              <DisplaySelectGrid
+                value={race.reproductiveCycle}
+                options={REPRODUCTIVE_CYCLE_OPTIONS}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Diet */}
+          <FieldWithVisibilityToggle
+            fieldName="diet"
+            label={t("race-detail:fields.diet")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <DietPicker
+                value={editData.diet || ""}
+                onChange={(value) => onEditDataChange("diet", value)}
+                elementalDiet={editData.elementalDiet || ""}
+                onElementalDietChange={(value) =>
+                  onEditDataChange("elementalDiet", value)
+                }
+                hideLabel
+              />
+            ) : (
+              <DisplaySelectGrid value={race.diet} options={DIET_OPTIONS} />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Communication */}
+          <FieldWithVisibilityToggle
+            fieldName="communication"
+            label={t("race-detail:fields.communication")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <CommunicationDisplay
+                communications={editData.communication || []}
+                isEditing={isEditing}
+                otherCommunication={editData.otherCommunication || ""}
+                onCommunicationsChange={(communications) =>
+                  onEditDataChange("communication", communications)
+                }
+                onOtherCommunicationChange={(value) =>
+                  onEditDataChange("otherCommunication", value)
+                }
+              />
+            ) : race.communication && race.communication.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {race.communication.map((commValue) => {
+                  const commOption = RACE_COMMUNICATIONS.find(
+                    (c) => c.value === commValue
+                  );
+                  if (!commOption) return null;
+
+                  // Convert to DisplaySelectGrid format
+                  const displayOption = {
+                    value: commOption.value,
+                    label: commOption.label,
+                    description: commOption.description,
+                    icon: commOption.icon,
+                    backgroundColor: commOption.color.includes("blue")
+                      ? "blue-500/10"
+                      : commOption.color.includes("purple")
+                        ? "purple-500/10"
+                        : commOption.color.includes("green")
+                          ? "green-500/10"
+                          : commOption.color.includes("amber")
+                            ? "amber-500/10"
+                            : commOption.color.includes("violet")
+                              ? "violet-500/10"
+                              : "gray-500/10",
+                    borderColor: commOption.color.includes("blue")
+                      ? "blue-500/30"
+                      : commOption.color.includes("purple")
+                        ? "purple-500/30"
+                        : commOption.color.includes("green")
+                          ? "green-500/30"
+                          : commOption.color.includes("amber")
+                            ? "amber-500/30"
+                            : commOption.color.includes("violet")
+                              ? "violet-500/30"
+                              : "gray-500/30",
+                  };
+
+                  return (
+                    <DisplaySelectGrid
+                      key={commValue}
+                      value={commValue}
+                      options={[displayOption]}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <DisplaySelectGrid
+                value={null}
+                options={RACE_COMMUNICATIONS.map((c) => ({
+                  value: c.value,
+                  label: c.label,
+                  description: c.description,
+                  icon: c.icon,
+                  backgroundColor: c.color.includes("blue")
+                    ? "blue-500/10"
+                    : c.color.includes("purple")
+                      ? "purple-500/10"
+                      : c.color.includes("green")
+                        ? "green-500/10"
+                        : c.color.includes("amber")
+                          ? "amber-500/10"
+                          : c.color.includes("violet")
+                            ? "violet-500/10"
+                            : "gray-500/10",
+                  borderColor: c.color.includes("blue")
+                    ? "blue-500/30"
+                    : c.color.includes("purple")
+                      ? "purple-500/30"
+                      : c.color.includes("green")
+                        ? "green-500/30"
+                        : c.color.includes("amber")
+                          ? "amber-500/30"
+                          : c.color.includes("violet")
+                            ? "violet-500/30"
+                            : "gray-500/30",
+                }))}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Moral Tendency */}
+          <FieldWithVisibilityToggle
+            fieldName="moralTendency"
+            label={t("race-detail:fields.moral_tendency")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <MoralTendencyPicker
+                value={editData.moralTendency || ""}
+                onChange={(value) => onEditDataChange("moralTendency", value)}
+                hideLabel
+              />
+            ) : (
+              <DisplaySelectGrid
+                value={race.moralTendency}
+                options={MORAL_TENDENCY_OPTIONS}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Social Organization */}
+          <FieldWithVisibilityToggle
+            fieldName="socialOrganization"
+            label={t("race-detail:fields.social_organization")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.socialOrganization || ""}
+                  onChange={(e) =>
+                    onEditDataChange("socialOrganization", e.target.value)
+                  }
+                  placeholder={t(
+                    "create-race:modal.social_organization_placeholder"
+                  )}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.socialOrganization?.length || 0}/500</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.socialOrganization} />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Habitat */}
+          <FieldWithVisibilityToggle
+            fieldName="habitat"
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormListInput
+                value={editData.habitat || []}
+                onChange={(value) => onEditDataChange("habitat", value)}
+                label={t("race-detail:fields.habitat")}
+                placeholder={t("create-race:modal.habitat_placeholder")}
+                buttonText={t("create-race:modal.add_habitat")}
+                maxLength={50}
+                inputSize="small"
+                labelClassName="text-sm font-medium text-primary"
+              />
+            ) : (
+              <DisplayStringList
+                label={t("race-detail:fields.habitat")}
+                items={race.habitat}
+              />
+            )}
+          </FieldWithVisibilityToggle>
         </div>
       )}
 
@@ -873,90 +931,94 @@ export function RaceDetailView({
             {t("race-detail:sections.power")}
           </h4>
 
-        {/* Physical Capacity */}
-        <FieldWithVisibilityToggle
-          fieldName="physicalCapacity"
-          label={t("race-detail:fields.physical_capacity")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <PhysicalCapacityPicker
-              value={editData.physicalCapacity || ""}
-              onChange={(value) => onEditDataChange("physicalCapacity", value)}
-              hideLabel
-            />
-          ) : (
-            <DisplaySelectGrid
-              value={race.physicalCapacity}
-              options={PHYSICAL_CAPACITY_OPTIONS}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Special Characteristics */}
-        <FieldWithVisibilityToggle
-          fieldName="specialCharacteristics"
-          label={t("race-detail:fields.special_characteristics")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.specialCharacteristics || ""}
-                onChange={(e) =>
-                  onEditDataChange("specialCharacteristics", e.target.value)
+          {/* Physical Capacity */}
+          <FieldWithVisibilityToggle
+            fieldName="physicalCapacity"
+            label={t("race-detail:fields.physical_capacity")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <PhysicalCapacityPicker
+                value={editData.physicalCapacity || ""}
+                onChange={(value) =>
+                  onEditDataChange("physicalCapacity", value)
                 }
-                placeholder={t("create-race:modal.special_characteristics_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
+                hideLabel
               />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.specialCharacteristics?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.specialCharacteristics}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+            ) : (
+              <DisplaySelectGrid
+                value={race.physicalCapacity}
+                options={PHYSICAL_CAPACITY_OPTIONS}
+              />
+            )}
+          </FieldWithVisibilityToggle>
 
-        {/* Weaknesses */}
-        <FieldWithVisibilityToggle
-          fieldName="weaknesses"
-          label={t("race-detail:fields.weaknesses")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.weaknesses || ""}
-                onChange={(e) => onEditDataChange("weaknesses", e.target.value)}
-                placeholder={t("create-race:modal.weaknesses_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.weaknesses?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.weaknesses}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+          {/* Special Characteristics */}
+          <FieldWithVisibilityToggle
+            fieldName="specialCharacteristics"
+            label={t("race-detail:fields.special_characteristics")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.specialCharacteristics || ""}
+                  onChange={(e) =>
+                    onEditDataChange("specialCharacteristics", e.target.value)
+                  }
+                  placeholder={t(
+                    "create-race:modal.special_characteristics_placeholder"
+                  )}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>
+                    {editData.specialCharacteristics?.length || 0}/500
+                  </span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.specialCharacteristics} />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Weaknesses */}
+          <FieldWithVisibilityToggle
+            fieldName="weaknesses"
+            label={t("race-detail:fields.weaknesses")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.weaknesses || ""}
+                  onChange={(e) =>
+                    onEditDataChange("weaknesses", e.target.value)
+                  }
+                  placeholder={t("create-race:modal.weaknesses_placeholder")}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.weaknesses?.length || 0}/500</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.weaknesses} />
+            )}
+          </FieldWithVisibilityToggle>
         </div>
       )}
 
@@ -970,65 +1032,67 @@ export function RaceDetailView({
             {t("race-detail:sections.narrative")}
           </h4>
 
-        {/* Story Motivation */}
-        <FieldWithVisibilityToggle
-          fieldName="storyMotivation"
-          label={t("race-detail:fields.story_motivation")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.storyMotivation || ""}
-                onChange={(e) => onEditDataChange("storyMotivation", e.target.value)}
-                placeholder={t("create-race:modal.story_motivation_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.storyMotivation?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.storyMotivation}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+          {/* Story Motivation */}
+          <FieldWithVisibilityToggle
+            fieldName="storyMotivation"
+            label={t("race-detail:fields.story_motivation")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.storyMotivation || ""}
+                  onChange={(e) =>
+                    onEditDataChange("storyMotivation", e.target.value)
+                  }
+                  placeholder={t(
+                    "create-race:modal.story_motivation_placeholder"
+                  )}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.storyMotivation?.length || 0}/500</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.storyMotivation} />
+            )}
+          </FieldWithVisibilityToggle>
 
-        {/* Inspirations */}
-        <FieldWithVisibilityToggle
-          fieldName="inspirations"
-          label={t("race-detail:fields.inspirations")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.inspirations || ""}
-                onChange={(e) => onEditDataChange("inspirations", e.target.value)}
-                placeholder={t("create-race:modal.inspirations_placeholder")}
-                rows={4}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.inspirations?.length || 0}/500</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={race.inspirations}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+          {/* Inspirations */}
+          <FieldWithVisibilityToggle
+            fieldName="inspirations"
+            label={t("race-detail:fields.inspirations")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.inspirations || ""}
+                  onChange={(e) =>
+                    onEditDataChange("inspirations", e.target.value)
+                  }
+                  placeholder={t("create-race:modal.inspirations_placeholder")}
+                  rows={4}
+                  maxLength={500}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.inspirations?.length || 0}/500</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={race.inspirations} />
+            )}
+          </FieldWithVisibilityToggle>
         </div>
       )}
     </div>
@@ -1039,9 +1103,7 @@ export function RaceDetailView({
   // ==================
   // Calculate available races for relationships
   const availableRacesForRelationships = allRaces.filter(
-    (r) =>
-      r.id !== race.id &&
-      !relationships.some((rel) => rel.raceId === r.id)
+    (r) => r.id !== race.id && !relationships.some((rel) => rel.raceId === r.id)
   );
 
   const extraSections = [
@@ -1071,7 +1133,11 @@ export function RaceDetailView({
         }
 
         // Estado 4: Bloqueado - todas as raças disponíveis foram usadas
-        if (isEditing && relationships.length > 0 && availableRacesForRelationships.length === 0) {
+        if (
+          isEditing &&
+          relationships.length > 0 &&
+          availableRacesForRelationships.length === 0
+        ) {
           return "blocked-all-used";
         }
 

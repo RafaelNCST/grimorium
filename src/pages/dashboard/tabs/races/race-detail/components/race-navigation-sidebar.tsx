@@ -7,9 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  type IRace,
-} from "@/pages/dashboard/tabs/races/types/race-types";
+import { type IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
 interface RaceNavigationSidebarProps {
   isOpen: boolean;
@@ -90,9 +88,7 @@ export function RaceNavigationSidebar({
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">
-                {currentRace.name}
-              </p>
+              <p className="font-medium text-sm truncate">{currentRace.name}</p>
               <p className="text-xs text-primary font-medium">
                 {t("sidebar.viewing_currently")}
               </p>
@@ -131,9 +127,7 @@ export function RaceNavigationSidebar({
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">
-                      {race.name}
-                    </p>
+                    <p className="font-medium text-sm truncate">{race.name}</p>
                     {race.scientificName && (
                       <p className="text-xs text-muted-foreground italic truncate">
                         {race.scientificName}

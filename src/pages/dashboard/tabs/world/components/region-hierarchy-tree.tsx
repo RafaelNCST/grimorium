@@ -82,7 +82,9 @@ const RegionItem = memo(
     const hasChildren = region.children.length > 0;
 
     // Find scale data
-    const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
+    const scaleData = REGION_SCALES_CONSTANT.find(
+      (s) => s.value === region.scale
+    );
 
     return (
       <div

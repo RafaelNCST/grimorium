@@ -106,14 +106,15 @@ export function WorldTab({ bookId }: WorldTabProps) {
 
   // Calculate scale statistics
   const scaleStats = useMemo(
-    () => calculateEntityStats(regions, "scale", [
-      "local",
-      "continental",
-      "planetary",
-      "galactic",
-      "universal",
-      "multiversal",
-    ]),
+    () =>
+      calculateEntityStats(regions, "scale", [
+        "local",
+        "continental",
+        "planetary",
+        "galactic",
+        "universal",
+        "multiversal",
+      ]),
     [regions]
   );
 
@@ -125,9 +126,12 @@ export function WorldTab({ bookId }: WorldTabProps) {
   }, [regions]);
 
   // Handle search query change
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, [setSearchQuery]);
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+    },
+    [setSearchQuery]
+  );
 
   // Handle scale filter toggle
   const handleScaleToggle = useCallback(

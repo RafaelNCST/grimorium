@@ -132,7 +132,9 @@ export function DeleteConfirmationDialog({
                 <AlertDialogTitle>{t("delete.race.title")}</AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-4 space-y-4">
-                <p>{t("delete.race.step1.message", { entityName: raceName })}</p>
+                <p>
+                  {t("delete.race.step1.message", { entityName: raceName })}
+                </p>
                 <div className="space-y-2">
                   <Label
                     htmlFor="race-name-input"

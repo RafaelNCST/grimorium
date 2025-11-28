@@ -32,17 +32,23 @@ interface TextColorButtonProps {
   isSmall: boolean;
 }
 
-function TextColorButton({ option, isSelected, onClick, isSmall }: TextColorButtonProps) {
+function TextColorButton({
+  option,
+  isSelected,
+  onClick,
+  isSmall,
+}: TextColorButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   const handlePointerEnter = () => {
     setShowTooltip(true);
@@ -72,17 +78,17 @@ function TextColorButton({ option, isSelected, onClick, isSmall }: TextColorButt
           className={cn(
             "w-full aspect-square rounded border transition-all hover:opacity-60 flex items-center justify-center",
             isSmall ? "rounded-sm" : "rounded-lg",
-            isSelected
-              ? "opacity-60 border-foreground"
-              : "border-border"
+            isSelected ? "opacity-60 border-foreground" : "border-border"
           )}
           style={{ backgroundColor: option.hex }}
         >
           {isSelected && (
-            <Check className={cn(
-              option.color === "black" ? "text-white" : "text-black",
-              isSmall ? "w-3 h-3" : "w-4 h-4"
-            )} />
+            <Check
+              className={cn(
+                option.color === "black" ? "text-white" : "text-black",
+                isSmall ? "w-3 h-3" : "w-4 h-4"
+              )}
+            />
           )}
         </button>
       </TooltipTrigger>
@@ -93,14 +99,17 @@ function TextColorButton({ option, isSelected, onClick, isSmall }: TextColorButt
   );
 }
 
-function TextColorPickerComponent({ value, onChange, size = "md" }: TextColorPickerProps) {
+function TextColorPickerComponent({
+  value,
+  onChange,
+  size = "md",
+}: TextColorPickerProps) {
   const isSmall = size === "sm";
 
   return (
-    <div className={cn(
-      "grid grid-cols-2",
-      isSmall ? "gap-1.5 w-[44px]" : "gap-2"
-    )}>
+    <div
+      className={cn("grid grid-cols-2", isSmall ? "gap-1.5 w-[44px]" : "gap-2")}
+    >
       {TEXT_COLOR_OPTIONS.map((option) => (
         <TextColorButton
           key={option.color}

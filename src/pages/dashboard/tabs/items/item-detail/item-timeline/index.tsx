@@ -77,12 +77,9 @@ export default function ItemTimeline() {
     setShowCreateModal(false);
   }, [editingEvent, newEvent]);
 
-  const handleDeleteEvent = useCallback(
-    (eventId: string) => {
-      setEvents((prev) => prev.filter((e) => e.id !== eventId));
-    },
-    []
-  );
+  const handleDeleteEvent = useCallback((eventId: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== eventId));
+  }, []);
 
   const handleNewEventChange = useCallback((field: string, value: any) => {
     setNewEvent((prev) => ({ ...prev, [field]: value }));

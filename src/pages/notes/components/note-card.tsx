@@ -1,10 +1,10 @@
 import { memo, useMemo, useState, useRef, useEffect } from "react";
 
-import { Link2, Palette, Trash2, Type } from "lucide-react";
+import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
+import { Link2, Palette, Trash2, Type } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
@@ -17,16 +17,16 @@ import {
 import { cn } from "@/lib/utils";
 import type { INote, NoteColor, NoteTextColor } from "@/types/note-types";
 
-import { ColorPicker } from "./color-picker";
-import { TextColorPicker } from "./text-color-picker";
-import { extractTextFromContent } from "../utils/extract-text";
-
 import {
   DEFAULT_NOTE_COLOR,
   DEFAULT_TEXT_COLOR,
   NOTE_COLORS,
   POST_IT_SIZE,
 } from "../constants";
+import { extractTextFromContent } from "../utils/extract-text";
+
+import { ColorPicker } from "./color-picker";
+import { TextColorPicker } from "./text-color-picker";
 
 interface NoteCardProps {
   note: INote;
@@ -37,7 +37,14 @@ interface NoteCardProps {
   isDragging?: boolean;
 }
 
-function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, onDelete, isDragging = false }: NoteCardProps) {
+function NoteCardComponent({
+  note,
+  onClick,
+  onColorChange,
+  onTextColorChange,
+  onDelete,
+  isDragging = false,
+}: NoteCardProps) {
   const { t } = useTranslation("notes");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showTextColorPicker, setShowTextColorPicker] = useState(false);
@@ -56,8 +63,8 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
       }),
       Underline,
       TextAlign.configure({
-        types: ['paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
+        types: ["paragraph"],
+        alignments: ["left", "center", "right", "justify"],
       }),
     ],
     content: note.content,
@@ -75,7 +82,9 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
 
   // Subtle random rotation for organic feel (deterministic based on note ID)
   const rotation = useMemo(() => {
-    const hash = note.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = note.id
+      .split("")
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return ((hash % 5) - 2) * 0.5; // Range: -1deg to +1deg
   }, [note.id]);
 
@@ -169,7 +178,11 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
               <Palette className="h-3.5 w-3.5" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-3" align="end" onClick={handleColorClick}>
+          <PopoverContent
+            className="w-auto p-3"
+            align="end"
+            onClick={handleColorClick}
+          >
             <ColorPicker
               value={color}
               onChange={(newColor) => {
@@ -181,7 +194,10 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
           </PopoverContent>
         </Popover>
 
-        <Popover open={showTextColorPicker} onOpenChange={setShowTextColorPicker}>
+        <Popover
+          open={showTextColorPicker}
+          onOpenChange={setShowTextColorPicker}
+        >
           <PopoverTrigger asChild>
             <Button
               variant="ghost-bright"
@@ -192,7 +208,11 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
               <Type className="h-3.5 w-3.5" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-3" align="end" onClick={handleTextColorClick}>
+          <PopoverContent
+            className="w-auto p-3"
+            align="end"
+            onClick={handleTextColorClick}
+          >
             <TextColorPicker
               value={textColor}
               onChange={(newTextColor) => {
@@ -243,10 +263,12 @@ function NoteCardComponent({ note, onClick, onColorChange, onTextColorChange, on
           }}
         >
           {!hasContent && (
-            <div className={cn(
-              "text-sm italic",
-              textColor === "white" ? "text-white/40" : "text-gray-900/40"
-            )}>
+            <div
+              className={cn(
+                "text-sm italic",
+                textColor === "white" ? "text-white/40" : "text-gray-900/40"
+              )}
+            >
               {t("card.empty_placeholder")}
             </div>
           )}

@@ -257,7 +257,8 @@ export function Header({
             </Label>
             <div className="flex flex-wrap gap-2">
               {GENRES_CONSTANT.map((genre) => {
-                const isSelected = draftBook?.genre?.includes(genre.id) || false;
+                const isSelected =
+                  draftBook?.genre?.includes(genre.id) || false;
                 return (
                   <button
                     key={genre.id}

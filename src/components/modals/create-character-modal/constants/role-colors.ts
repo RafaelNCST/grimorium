@@ -20,7 +20,8 @@ export const ROLE_HOVER_COLOR: Record<CharacterRole, string> = {
  * Active colors for role picker cards (with ring)
  */
 export const ROLE_ACTIVE_COLOR: Record<CharacterRole, string> = {
-  protagonist: "bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50",
+  protagonist:
+    "bg-yellow-500/20 border-yellow-500/30 ring-2 ring-yellow-500/50",
   antagonist: "bg-orange-500/20 border-orange-500/30 ring-2 ring-orange-500/50",
   villain: "bg-red-500/20 border-red-500/30 ring-2 ring-red-500/50",
   secondary: "bg-blue-500/20 border-blue-500/30 ring-2 ring-blue-500/50",

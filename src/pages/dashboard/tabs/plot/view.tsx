@@ -11,7 +11,12 @@ import { useTranslation } from "react-i18next";
 
 import { EntityListLayout, EntityCardList } from "@/components/layouts";
 import { CreatePlotArcModal } from "@/components/modals/create-plot-arc-modal";
-import type { IPlotArc, IPlotArcFormData, PlotArcSize, PlotArcStatus } from "@/types/plot-types";
+import type {
+  IPlotArc,
+  IPlotArcFormData,
+  PlotArcSize,
+  PlotArcStatus,
+} from "@/types/plot-types";
 
 import { PlotArcCard } from "./components/plot-arc-card";
 import { createPlotFilterRows } from "./helpers/filter-config";

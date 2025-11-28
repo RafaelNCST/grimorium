@@ -26,12 +26,11 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import {
   Dialog,
   DialogContent,
@@ -40,10 +39,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+
 import { RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/relationship-types-badge-constant";
 
 interface ICharacterRelationship {
@@ -110,7 +111,11 @@ const RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
   { value: "leader", translationKey: "leader", icon: Crown },
   { value: "subordinate", translationKey: "subordinate", icon: UserMinus },
   { value: "family_love", translationKey: "family_love", icon: Home },
-  { value: "romantic_relationship", translationKey: "romantic_relationship", icon: HeartHandshake },
+  {
+    value: "romantic_relationship",
+    translationKey: "romantic_relationship",
+    icon: HeartHandshake,
+  },
   { value: "best_friend", translationKey: "best_friend", icon: UserCheck },
   { value: "hatred", translationKey: "hatred", icon: Flame },
   { value: "neutral", translationKey: "neutral", icon: Minus },
@@ -198,7 +203,12 @@ export function RelationshipsSection({
 
     const updatedRelationships = relationships.map((rel) =>
       rel.id === editingRelationship.id
-        ? { ...rel, type: selectedType, intensity: intensity[0], description: description.trim() || undefined }
+        ? {
+            ...rel,
+            type: selectedType,
+            intensity: intensity[0],
+            description: description.trim() || undefined,
+          }
         : rel
     );
 
@@ -312,9 +322,10 @@ export function RelationshipsSection({
                         {character.name}
                       </h4>
                       {(() => {
-                        const badgeConfig = RELATIONSHIP_TYPES_BADGE_CONSTANT.find(
-                          (r) => r.value === relationship.type
-                        );
+                        const badgeConfig =
+                          RELATIONSHIP_TYPES_BADGE_CONSTANT.find(
+                            (r) => r.value === relationship.type
+                          );
                         return badgeConfig ? (
                           <EntityTagBadge
                             config={badgeConfig}
@@ -480,7 +491,9 @@ export function RelationshipsSection({
                   <FormSimpleGrid
                     value={selectedType}
                     onChange={setSelectedType}
-                    label={t("character-detail:relationships.relationship_type")}
+                    label={t(
+                      "character-detail:relationships.relationship_type"
+                    )}
                     columns={4}
                     required
                     options={RELATIONSHIP_TYPES.map((type) => ({
@@ -530,9 +543,7 @@ export function RelationshipsSection({
                   {/* Description Field */}
                   <div className="space-y-3">
                     <Label className="text-sm font-medium text-primary">
-                      {t(
-                        "character-detail:relationships.description_label"
-                      )}
+                      {t("character-detail:relationships.description_label")}
                       <span className="text-muted-foreground font-normal ml-1">
                         ({t("character-detail:relationships.optional")})
                       </span>

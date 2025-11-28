@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 
-import { Plus, Edit2, Trash2, ChevronUp, ChevronDown, Check, Crown } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  Check,
+  Crown,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +44,9 @@ export function ManageTitlesModal({
 }: ManageTitlesModalProps) {
   const { t } = useTranslation("faction-detail");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [editingTitle, setEditingTitle] = useState<IHierarchyTitle | null>(null);
+  const [editingTitle, setEditingTitle] = useState<IHierarchyTitle | null>(
+    null
+  );
 
   // Formulário para adicionar/editar
   const [formName, setFormName] = useState("");
@@ -85,7 +95,7 @@ export function ManageTitlesModal({
       };
       updatedTitles = [...titles, newTitle];
     } else if (viewMode === "edit" && editingTitle) {
-      updatedTitles = titles.map(t =>
+      updatedTitles = titles.map((t) =>
         t.id === editingTitle.id
           ? { ...t, name: formName.trim(), order: formOrder, color: formColor }
           : t
@@ -100,7 +110,7 @@ export function ManageTitlesModal({
   };
 
   const handleDeleteTitle = (titleId: string) => {
-    const updatedTitles = titles.filter(t => t.id !== titleId);
+    const updatedTitles = titles.filter((t) => t.id !== titleId);
     onSave(updatedTitles);
   };
 
@@ -122,7 +132,7 @@ export function ManageTitlesModal({
 
   // Filtrar apenas títulos customizados (não "Membros")
   const customTitles = titles
-    .filter(t => !t.isMembersTitle)
+    .filter((t) => !t.isMembersTitle)
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   const isFormValid = formName.trim().length > 0;
@@ -161,12 +171,16 @@ export function ManageTitlesModal({
               {customTitles.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-12 text-muted-foreground">
                   <Crown className="w-12 h-12 mb-3 opacity-50" />
-                  <p className="text-sm font-medium">{t("hierarchy.no_titles_yet")}</p>
-                  <p className="text-xs mt-1 opacity-70">{t("hierarchy.no_titles_hint")}</p>
+                  <p className="text-sm font-medium">
+                    {t("hierarchy.no_titles_yet")}
+                  </p>
+                  <p className="text-xs mt-1 opacity-70">
+                    {t("hierarchy.no_titles_hint")}
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {customTitles.map(title => {
+                  {customTitles.map((title) => {
                     const colorClasses = getColorClasses(title.color);
                     return (
                       <div
@@ -174,7 +188,9 @@ export function ManageTitlesModal({
                         className={`flex items-center gap-3 p-3 rounded-lg ${colorClasses.bg}`}
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate text-foreground">{title.name}</p>
+                          <p className="font-medium truncate text-foreground">
+                            {title.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {t("hierarchy.order")}: #{title.order}
                           </p>
@@ -205,11 +221,7 @@ export function ManageTitlesModal({
             </ScrollArea>
 
             {/* Botão Fechar */}
-            <Button
-              variant="secondary"
-              className="w-full"
-              onClick={onClose}
-            >
+            <Button variant="secondary" className="w-full" onClick={onClose}>
               {t("hierarchy.close")}
             </Button>
           </div>
@@ -270,7 +282,7 @@ export function ManageTitlesModal({
             <div className="space-y-2">
               <Label>{t("hierarchy.title_color")}</Label>
               <div className="grid grid-cols-6 gap-2">
-                {HIERARCHY_TITLE_COLORS.map(color => (
+                {HIERARCHY_TITLE_COLORS.map((color) => (
                   <button
                     key={color.value}
                     type="button"
@@ -309,7 +321,9 @@ export function ManageTitlesModal({
                 onClick={handleSaveTitle}
                 disabled={!isFormValid}
               >
-                {viewMode === "add" ? t("hierarchy.create_title") : t("hierarchy.save_title")}
+                {viewMode === "add"
+                  ? t("hierarchy.create_title")
+                  : t("hierarchy.save_title")}
               </Button>
             </div>
           </div>

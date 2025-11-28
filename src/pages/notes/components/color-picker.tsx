@@ -39,17 +39,23 @@ interface ColorButtonProps {
   isSmall: boolean;
 }
 
-function ColorButton({ option, isSelected, onClick, isSmall }: ColorButtonProps) {
+function ColorButton({
+  option,
+  isSelected,
+  onClick,
+  isSmall,
+}: ColorButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   const handlePointerEnter = () => {
     setShowTooltip(true);
@@ -79,14 +85,14 @@ function ColorButton({ option, isSelected, onClick, isSmall }: ColorButtonProps)
           className={cn(
             "w-full aspect-square rounded border transition-all hover:opacity-60 flex items-center justify-center",
             isSmall ? "rounded-sm" : "rounded-lg",
-            isSelected
-              ? "opacity-60 border-foreground"
-              : "border-border"
+            isSelected ? "opacity-60 border-foreground" : "border-border"
           )}
           style={{ backgroundColor: option.hex }}
         >
           {isSelected && (
-            <Check className={cn("text-white", isSmall ? "w-3 h-3" : "w-4 h-4")} />
+            <Check
+              className={cn("text-white", isSmall ? "w-3 h-3" : "w-4 h-4")}
+            />
           )}
         </button>
       </TooltipTrigger>
@@ -97,14 +103,20 @@ function ColorButton({ option, isSelected, onClick, isSmall }: ColorButtonProps)
   );
 }
 
-function ColorPickerComponent({ value, onChange, size = "md" }: ColorPickerProps) {
+function ColorPickerComponent({
+  value,
+  onChange,
+  size = "md",
+}: ColorPickerProps) {
   const isSmall = size === "sm";
 
   return (
-    <div className={cn(
-      "grid grid-cols-9",
-      isSmall ? "gap-1.5 w-[220px]" : "gap-2"
-    )}>
+    <div
+      className={cn(
+        "grid grid-cols-9",
+        isSmall ? "gap-1.5 w-[220px]" : "gap-2"
+      )}
+    >
       {COLOR_OPTIONS.map((option) => (
         <ColorButton
           key={option.color}

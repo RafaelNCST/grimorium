@@ -46,7 +46,9 @@ export async function migrateFamilyStructure() {
     console.log("[Migration] Starting family structure migration...");
 
     // Get all characters
-    const characters = await db.select<ICharacter[]>("SELECT * FROM characters");
+    const characters = await db.select<ICharacter[]>(
+      "SELECT * FROM characters"
+    );
 
     console.log(`[Migration] Found ${characters.length} characters to migrate`);
 
@@ -58,8 +60,10 @@ export async function migrateFamilyStructure() {
       const oldFamily = character.family as unknown as OldICharacterFamily;
 
       // Check if already migrated (has parents array instead of father/mother)
-      if ('parents' in oldFamily) {
-        console.log(`[Migration] Character ${character.id} already migrated, skipping...`);
+      if ("parents" in oldFamily) {
+        console.log(
+          `[Migration] Character ${character.id} already migrated, skipping...`
+        );
         continue;
       }
 
@@ -89,16 +93,20 @@ export async function migrateFamilyStructure() {
       }
 
       // Update character in database
-      await db.execute(
-        "UPDATE characters SET family = ? WHERE id = ?",
-        [JSON.stringify(newFamily), character.id]
-      );
+      await db.execute("UPDATE characters SET family = ? WHERE id = ?", [
+        JSON.stringify(newFamily),
+        character.id,
+      ]);
 
       migratedCount++;
-      console.log(`[Migration] Migrated character ${character.id} (${character.name})`);
+      console.log(
+        `[Migration] Migrated character ${character.id} (${character.name})`
+      );
     }
 
-    console.log(`[Migration] Migration completed! Migrated ${migratedCount} characters`);
+    console.log(
+      `[Migration] Migration completed! Migrated ${migratedCount} characters`
+    );
 
     return {
       success: true,
@@ -121,9 +129,13 @@ export async function rollbackFamilyStructure() {
 
     console.log("[Migration] Starting family structure rollback...");
 
-    const characters = await db.select<ICharacter[]>("SELECT * FROM characters");
+    const characters = await db.select<ICharacter[]>(
+      "SELECT * FROM characters"
+    );
 
-    console.log(`[Migration] Found ${characters.length} characters to rollback`);
+    console.log(
+      `[Migration] Found ${characters.length} characters to rollback`
+    );
 
     let rolledBackCount = 0;
 
@@ -131,8 +143,10 @@ export async function rollbackFamilyStructure() {
       if (!character.family) continue;
 
       // Check if needs rollback (has parents array)
-      if (!('parents' in character.family)) {
-        console.log(`[Migration] Character ${character.id} already in old structure, skipping...`);
+      if (!("parents" in character.family)) {
+        console.log(
+          `[Migration] Character ${character.id} already in old structure, skipping...`
+        );
         continue;
       }
 
@@ -140,9 +154,18 @@ export async function rollbackFamilyStructure() {
 
       // Build old family structure
       const oldFamily: OldICharacterFamily = {
-        father: newFamily.parents && newFamily.parents.length > 0 ? newFamily.parents[0] : null,
-        mother: newFamily.parents && newFamily.parents.length > 1 ? newFamily.parents[1] : null,
-        spouse: newFamily.spouses && newFamily.spouses.length > 0 ? newFamily.spouses[0] : null,
+        father:
+          newFamily.parents && newFamily.parents.length > 0
+            ? newFamily.parents[0]
+            : null,
+        mother:
+          newFamily.parents && newFamily.parents.length > 1
+            ? newFamily.parents[1]
+            : null,
+        spouse:
+          newFamily.spouses && newFamily.spouses.length > 0
+            ? newFamily.spouses[0]
+            : null,
         children: newFamily.children || [],
         siblings: newFamily.siblings || [],
         halfSiblings: newFamily.halfSiblings || [],
@@ -152,16 +175,20 @@ export async function rollbackFamilyStructure() {
       };
 
       // Update character in database
-      await db.execute(
-        "UPDATE characters SET family = ? WHERE id = ?",
-        [JSON.stringify(oldFamily), character.id]
-      );
+      await db.execute("UPDATE characters SET family = ? WHERE id = ?", [
+        JSON.stringify(oldFamily),
+        character.id,
+      ]);
 
       rolledBackCount++;
-      console.log(`[Migration] Rolled back character ${character.id} (${character.name})`);
+      console.log(
+        `[Migration] Rolled back character ${character.id} (${character.name})`
+      );
     }
 
-    console.log(`[Migration] Rollback completed! Rolled back ${rolledBackCount} characters`);
+    console.log(
+      `[Migration] Rollback completed! Rolled back ${rolledBackCount} characters`
+    );
 
     return {
       success: true,

@@ -1,7 +1,5 @@
 import { memo, useState, useCallback, useEffect, useMemo, useRef } from "react";
 
-import type { JSONContent } from "@tiptap/react";
-import { useTranslation } from "react-i18next";
 import {
   Users,
   Globe,
@@ -13,6 +11,7 @@ import {
   Check,
   BookOpen,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   AlertDialog,
@@ -38,9 +37,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
+import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
 import type {
@@ -53,6 +52,8 @@ import type {
 import { DEFAULT_NOTE_COLOR } from "../constants";
 
 import { NoteEditor } from "./note-editor";
+
+import type { JSONContent } from "@tiptap/react";
 
 interface EntityOption {
   id: string;

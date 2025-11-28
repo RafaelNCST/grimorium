@@ -46,8 +46,8 @@ const ItemsViewComponent = function ItemsView({
   const { t } = useTranslation(["items", "create-item"]);
 
   // Calculate stats for filters
-  const stats = useMemo(() => {
-    return {
+  const stats = useMemo(
+    () => ({
       total: items.length,
       weapon: items.filter((i) => i.category === "weapon").length,
       armor: items.filter((i) => i.category === "armor").length,
@@ -65,8 +65,9 @@ const ItemsViewComponent = function ItemsView({
       weakened: items.filter((i) => i.status === "weakened").length,
       strengthened: items.filter((i) => i.status === "strengthened").length,
       apex: items.filter((i) => i.status === "apex").length,
-    };
-  }, [items]);
+    }),
+    [items]
+  );
 
   // Create filter rows with unified colors
   const { categoryRows, statusRows } = useMemo(
@@ -83,7 +84,9 @@ const ItemsViewComponent = function ItemsView({
   // Handle filter toggle (works for both categories and statuses)
   const handleFilterToggle = (value: string) => {
     // Check if value is in category filters
-    const isCategory = categoryRows[0]?.items.some(item => item.value === value);
+    const isCategory = categoryRows[0]?.items.some(
+      (item) => item.value === value
+    );
 
     if (isCategory) {
       onCategoryFilterChange(value);
@@ -132,7 +135,8 @@ const ItemsViewComponent = function ItemsView({
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
           }}
         >
           {filteredItems.map((item) => (

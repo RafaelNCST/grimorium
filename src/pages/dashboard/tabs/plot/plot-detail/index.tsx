@@ -7,8 +7,13 @@ import { toast } from "sonner";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
+import {
+  getPlotArcsByBookId,
+  getPlotArcById,
+  updatePlotArc,
+  deletePlotArc,
+} from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
-import { getPlotArcsByBookId, getPlotArcById, updatePlotArc, deletePlotArc } from "@/lib/db/plot.service";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { PlotArcDetailView } from "./view";
@@ -45,7 +50,8 @@ export function PlotArcDetail() {
   // Dialog state
   const [showDeleteArcDialog, setShowDeleteArcDialog] = useState(false);
   const [showDeleteEventDialog, setShowDeleteEventDialog] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   // Section state
@@ -53,19 +59,34 @@ export function PlotArcDetail() {
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
 
   // Field visibility state
-  const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean>>({});
-  const [originalFieldVisibility, setOriginalFieldVisibility] = useState<Record<string, boolean>>({});
+  const [fieldVisibility, setFieldVisibility] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalFieldVisibility, setOriginalFieldVisibility] = useState<
+    Record<string, boolean>
+  >({});
 
   // Validation state
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   // Check if there are unsaved changes
   const hasChanges = useMemo(() => {
     if (!originalData || !isEditing) return false;
-    const formChanged = JSON.stringify(editForm) !== JSON.stringify(originalData);
-    const visibilityChanged = JSON.stringify(fieldVisibility) !== JSON.stringify(originalFieldVisibility);
+    const formChanged =
+      JSON.stringify(editForm) !== JSON.stringify(originalData);
+    const visibilityChanged =
+      JSON.stringify(fieldVisibility) !==
+      JSON.stringify(originalFieldVisibility);
     return formChanged || visibilityChanged;
-  }, [editForm, originalData, isEditing, fieldVisibility, originalFieldVisibility]);
+  }, [
+    editForm,
+    originalData,
+    isEditing,
+    fieldVisibility,
+    originalFieldVisibility,
+  ]);
 
   // Check required fields
   const requiredFields = ["name", "focus", "description", "size", "status"];
@@ -86,15 +107,21 @@ export function PlotArcDetail() {
 
     const loadData = async () => {
       try {
-        const [loadedArc, loadedCharacters, loadedFactions, loadedItems, loadedRegions, allArcs] =
-          await Promise.all([
-            getPlotArcById(plotId),
-            getCharactersByBookId(dashboardId),
-            getFactionsByBookId(dashboardId),
-            getItemsByBookId(dashboardId),
-            getRegionsByBookId(dashboardId),
-            getPlotArcsByBookId(dashboardId),
-          ]);
+        const [
+          loadedArc,
+          loadedCharacters,
+          loadedFactions,
+          loadedItems,
+          loadedRegions,
+          allArcs,
+        ] = await Promise.all([
+          getPlotArcById(plotId),
+          getCharactersByBookId(dashboardId),
+          getFactionsByBookId(dashboardId),
+          getItemsByBookId(dashboardId),
+          getRegionsByBookId(dashboardId),
+          getPlotArcsByBookId(dashboardId),
+        ]);
 
         if (mounted) {
           if (loadedArc) {
@@ -252,7 +279,7 @@ export function PlotArcDetail() {
   const handleAddEvent = useCallback(
     async (eventData: Omit<IPlotEvent, "id" | "order">) => {
       if (!arc) return;
-      const currentEvents = isEditing ? (editForm.events || []) : arc.events;
+      const currentEvents = isEditing ? editForm.events || [] : arc.events;
       const newEvent = {
         ...eventData,
         id: crypto.randomUUID(),
@@ -284,7 +311,9 @@ export function PlotArcDetail() {
   const handleToggleEventCompletion = useCallback(
     async (eventId: string) => {
       if (!arc) return;
-      const currentEvents = isEditing ? (editForm.events || arc.events) : arc.events;
+      const currentEvents = isEditing
+        ? editForm.events || arc.events
+        : arc.events;
       const updatedEvents = currentEvents.map((event) =>
         event.id === eventId ? { ...event, completed: !event.completed } : event
       );
@@ -316,9 +345,12 @@ export function PlotArcDetail() {
 
     // Validate required fields
     const errors: Record<string, string> = {};
-    if (!editForm.name?.trim()) errors.name = t("plot:validation.required_field");
-    if (!editForm.focus?.trim()) errors.focus = t("plot:validation.required_field");
-    if (!editForm.description?.trim()) errors.description = t("plot:validation.required_field");
+    if (!editForm.name?.trim())
+      errors.name = t("plot:validation.required_field");
+    if (!editForm.focus?.trim())
+      errors.focus = t("plot:validation.required_field");
+    if (!editForm.description?.trim())
+      errors.description = t("plot:validation.required_field");
     if (!editForm.size) errors.size = t("plot:validation.select_size");
     if (!editForm.status) errors.status = t("plot:validation.select_status");
 
@@ -358,7 +390,9 @@ export function PlotArcDetail() {
 
   const handleDeleteEvent = useCallback(async () => {
     if (eventToDelete && arc) {
-      const currentEvents = isEditing ? (editForm.events || arc.events) : arc.events;
+      const currentEvents = isEditing
+        ? editForm.events || arc.events
+        : arc.events;
       const updatedEvents = currentEvents.filter((e) => e.id !== eventToDelete);
       const completedCount = updatedEvents.filter((e) => e.completed).length;
       const progress =

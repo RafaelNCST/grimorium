@@ -70,9 +70,7 @@ export const FormTextarea = React.forwardRef<
             {label}
             {required && <span className="text-destructive">*</span>}
             {!required && showOptionalLabel && (
-              <span className="text-xs text-muted-foreground">
-                (opcional)
-              </span>
+              <span className="text-xs text-muted-foreground">(opcional)</span>
             )}
           </Label>
         )}

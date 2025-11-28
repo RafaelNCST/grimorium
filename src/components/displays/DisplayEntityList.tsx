@@ -1,11 +1,11 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 /**
  * Entity item configuration for display

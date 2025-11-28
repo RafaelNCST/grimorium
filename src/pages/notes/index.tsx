@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import type { JSONContent } from "@tiptap/react";
 
 import { useBookStore } from "@/stores/book-store";
 import { useNotesStore } from "@/stores/notes-store";
@@ -9,6 +8,8 @@ import type { INote, INoteLink, NoteColor } from "@/types/note-types";
 
 import { DEFAULT_NOTE_COLOR } from "./constants";
 import { NotesView } from "./view";
+
+import type { JSONContent } from "@tiptap/react";
 
 export function NotesPage() {
   const navigate = useNavigate();
@@ -24,7 +25,9 @@ export function NotesPage() {
   const fetchNotes = useNotesStore((state) => state.fetchNotes);
   const addNote = useNotesStore((state) => state.addNote);
   const updateNoteInCache = useNotesStore((state) => state.updateNoteInCache);
-  const deleteNoteFromCache = useNotesStore((state) => state.deleteNoteFromCache);
+  const deleteNoteFromCache = useNotesStore(
+    (state) => state.deleteNoteFromCache
+  );
 
   // UI State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -47,7 +50,10 @@ export function NotesPage() {
   // Handlers
   const handleBackToDashboard = useCallback(() => {
     if (currentBook?.id) {
-      navigate({ to: "/dashboard/$dashboardId", params: { dashboardId: currentBook.id } });
+      navigate({
+        to: "/dashboard/$dashboardId",
+        params: { dashboardId: currentBook.id },
+      });
     } else {
       navigate({ to: "/" });
     }

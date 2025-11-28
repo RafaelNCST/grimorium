@@ -85,7 +85,9 @@ export function RaceViewsManager({
       return;
     }
 
-    const selectedRace = availableRaces.find((r) => r.id === selectedRaceIds[0]);
+    const selectedRace = availableRaces.find(
+      (r) => r.id === selectedRaceIds[0]
+    );
     if (!selectedRace) return;
 
     const newView: RaceView = {
@@ -148,7 +150,9 @@ export function RaceViewsManager({
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1 min-w-0">
-                    <span className="text-sm font-medium block">{view.raceName}</span>
+                    <span className="text-sm font-medium block">
+                      {view.raceName}
+                    </span>
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {view.description}
                     </p>

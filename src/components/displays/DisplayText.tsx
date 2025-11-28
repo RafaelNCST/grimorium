@@ -27,10 +27,7 @@ interface DisplayTextProps {
  * <DisplayText value={null} />
  * ```
  */
-export function DisplayText({
-  value,
-  className,
-}: DisplayTextProps) {
+export function DisplayText({ value, className }: DisplayTextProps) {
   // If no value, show empty state
   if (!value || value.trim() === "") {
     return (

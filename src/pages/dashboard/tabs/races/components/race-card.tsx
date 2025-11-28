@@ -117,9 +117,7 @@ export function RaceCard({
           isHovered && !isDragging ? "opacity-100" : "opacity-0"
         }`}
       >
-        <span className="text-white text-lg font-semibold">
-          Ver detalhes
-        </span>
+        <span className="text-white text-lg font-semibold">Ver detalhes</span>
       </div>
     </Card>
   );

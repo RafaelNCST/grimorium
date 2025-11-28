@@ -49,7 +49,6 @@ const STATUS_KEYS: { key: string; value: BookStatus }[] = [
   { key: "status.complete", value: "Completo" },
 ];
 
-
 export function CreateBookModal({
   open,
   onClose,

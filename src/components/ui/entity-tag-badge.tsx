@@ -16,7 +16,11 @@ interface EntityTagBadgeProps {
   className?: string;
 }
 
-export function EntityTagBadge({ config, label, className = "" }: EntityTagBadgeProps) {
+export function EntityTagBadge({
+  config,
+  label,
+  className = "",
+}: EntityTagBadgeProps) {
   const Icon = config.icon;
 
   return (

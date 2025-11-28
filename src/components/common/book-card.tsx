@@ -2,11 +2,11 @@ import { BookOpen, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import {
   EntityTagBadge,
   IEntityTagConfig,
 } from "@/components/ui/entity-tag-badge";
-import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import { formatRelativeTime } from "@/lib/utils";
 import { getGenreTranslationKey } from "@/pages/dashboard/constants/dashboard-constants";
 

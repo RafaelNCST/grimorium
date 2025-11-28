@@ -40,11 +40,7 @@ export function CreatePlotArcModal({
   const isValid = useMemo(() => {
     const [name, description, status, size, focus] = watchedFields;
     return Boolean(
-      name?.trim() &&
-        description?.trim() &&
-        status &&
-        size &&
-        focus?.trim()
+      name?.trim() && description?.trim() && status && size && focus?.trim()
     );
   }, [watchedFields]);
 

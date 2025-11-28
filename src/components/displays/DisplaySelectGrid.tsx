@@ -172,14 +172,11 @@ export function DisplaySelectGrid<T extends string = string>({
   if (!selectedOption) {
     return (
       <div
-        className={cn(
-          "p-4 rounded-lg border-2 transition-all",
-          className
-        )}
+        className={cn("p-4 rounded-lg border-2 transition-all", className)}
         style={{
           backgroundColor: getTailwindColor("gray-500/10"),
           borderColor: getTailwindColor("gray-500/30"),
-          boxShadow: `0 0 0 4px ${getTailwindColor("gray-500/30").replace(/[0-9.]+\)$/, '0.5)')}`,
+          boxShadow: `0 0 0 4px ${getTailwindColor("gray-500/30").replace(/[0-9.]+\)$/, "0.5)")}`,
         }}
       >
         <div className="flex items-start gap-3">
@@ -204,20 +201,17 @@ export function DisplaySelectGrid<T extends string = string>({
 
   return (
     <div
-      className={cn(
-        "p-4 rounded-lg border-2 transition-all",
-        className
-      )}
+      className={cn("p-4 rounded-lg border-2 transition-all", className)}
       style={{
         backgroundColor: selectedOption.backgroundColor
           ? getTailwindColor(selectedOption.backgroundColor)
-          : 'rgb(var(--primary) / 0.2)',
+          : "rgb(var(--primary) / 0.2)",
         borderColor: selectedOption.borderColor
           ? getTailwindColor(selectedOption.borderColor)
-          : 'rgb(var(--primary) / 0.3)',
+          : "rgb(var(--primary) / 0.3)",
         boxShadow: selectedOption.borderColor
-          ? `0 0 0 4px ${getTailwindColor(selectedOption.borderColor).replace(/[0-9.]+\)$/, '0.5)')}`
-          : '0 0 0 4px rgb(var(--primary) / 0.5)',
+          ? `0 0 0 4px ${getTailwindColor(selectedOption.borderColor).replace(/[0-9.]+\)$/, "0.5)")}`
+          : "0 0 0 4px rgb(var(--primary) / 0.5)",
       }}
     >
       <div className="flex items-start gap-3">

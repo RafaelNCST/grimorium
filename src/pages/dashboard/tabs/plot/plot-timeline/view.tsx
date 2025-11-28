@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+
 import {
   DndContext,
   closestCenter,
@@ -24,12 +25,7 @@ import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ARC_SIZES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-sizes-constant";
 import { ARC_STATUSES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-statuses-constant";
@@ -73,22 +69,18 @@ function SortableArcCard({
   onCardInteract,
 }: PropsSortableArcCard) {
   const { t } = useTranslation("plot");
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useSortable({
-    id: arc.id,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useSortable({
+      id: arc.id,
+    });
 
   // Check if any drag is happening
   const isAnyDragging = activeId !== null;
   // Check if this card is being displaced by the dragged item
   const isDisplaced = isAnyDragging && !isDragging && transform;
   // Check if this card is highlighted (being dragged or was last interacted)
-  const isHighlighted = isDragging || (!isAnyDragging && lastInteractedId === arc.id);
+  const isHighlighted =
+    isDragging || (!isAnyDragging && lastInteractedId === arc.id);
 
   const style = {
     // Only apply transform, no transition to avoid flash
@@ -152,8 +144,14 @@ function SortableArcCard({
           <CardTitle className="flex items-start gap-2 text-lg">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                {StatusIcon && <StatusIcon className={`w-5 h-5 flex-shrink-0 ${getStatusIconColor(arc.status)}`} />}
-                <span className="truncate" title={arc.name}>{arc.name}</span>
+                {StatusIcon && (
+                  <StatusIcon
+                    className={`w-5 h-5 flex-shrink-0 ${getStatusIconColor(arc.status)}`}
+                  />
+                )}
+                <span className="truncate" title={arc.name}>
+                  {arc.name}
+                </span>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Badge
@@ -182,7 +180,9 @@ function SortableArcCard({
             <p className="text-xs text-muted-foreground mb-1">
               {t("fields.arc_summary")}
             </p>
-            <p className="text-sm line-clamp-2" title={arc.description}>{arc.description}</p>
+            <p className="text-sm line-clamp-2" title={arc.description}>
+              {arc.description}
+            </p>
           </div>
 
           {/* Focus */}
@@ -190,7 +190,9 @@ function SortableArcCard({
             <p className="text-xs text-muted-foreground mb-1">
               {t("fields.arc_focus")}
             </p>
-            <p className="text-sm line-clamp-2" title={arc.focus}>{arc.focus}</p>
+            <p className="text-sm line-clamp-2" title={arc.focus}>
+              {arc.focus}
+            </p>
           </div>
 
           {/* Progress */}
@@ -208,9 +210,7 @@ function SortableArcCard({
 
           {/* Event Count */}
           <div className="flex items-center justify-between text-xs flex-shrink-0">
-            <span className="text-muted-foreground">
-              {t("detail.events")}
-            </span>
+            <span className="text-muted-foreground">{t("detail.events")}</span>
             <span className="font-medium">
               {arc.events.filter((e) => e.completed).length} /{" "}
               {arc.events.length}
@@ -258,7 +258,12 @@ export function PlotTimelineView({
 
   // Modifier that restricts to horizontal axis and limits drag distance
   const createBoundedModifier = useCallback(
-    (totalItems: number, currentIndex: number, scrollStart: number, containerRef: React.RefObject<HTMLDivElement>): Modifier =>
+    (
+      totalItems: number,
+      currentIndex: number,
+      scrollStart: number,
+      containerRef: React.RefObject<HTMLDivElement>
+    ): Modifier =>
       ({ transform }) => {
         if (currentIndex < 0 || totalItems <= 1) {
           return { ...transform, y: 0 };
@@ -266,7 +271,8 @@ export function PlotTimelineView({
 
         // Calculate max distances based on index positions
         const maxLeftDistance = currentIndex * CARD_TOTAL_WIDTH;
-        const maxRightDistance = (totalItems - 1 - currentIndex) * CARD_TOTAL_WIDTH;
+        const maxRightDistance =
+          (totalItems - 1 - currentIndex) * CARD_TOTAL_WIDTH;
 
         // Get current scroll position
         const currentScroll = containerRef.current?.scrollLeft ?? 0;
@@ -351,17 +357,18 @@ export function PlotTimelineView({
   };
 
   // Create the bounded modifier based on current drag state
-  const boundedModifier = createBoundedModifier(displayArcs.length, activeIndex, initialScroll, scrollContainerRef);
+  const boundedModifier = createBoundedModifier(
+    displayArcs.length,
+    activeIndex,
+    initialScroll,
+    scrollContainerRef
+  );
 
   return (
     <div className="flex-1 h-full flex flex-col space-y-6 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-4 px-6 pt-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onBack}
-        >
+        <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
@@ -428,16 +435,15 @@ export function PlotTimelineView({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {ARC_STATUSES_CONSTANT.map((status) => {
                   const Icon = status.icon;
-                  const iconColor = status.value === "finalizado"
-                    ? "text-emerald-500"
-                    : status.value === "atual"
-                      ? "text-blue-500"
-                      : "text-amber-500";
+                  const iconColor =
+                    status.value === "finalizado"
+                      ? "text-emerald-500"
+                      : status.value === "atual"
+                        ? "text-blue-500"
+                        : "text-amber-500";
                   return (
                     <div key={status.value} className="flex items-center gap-3">
-                      <div
-                        className="p-2 rounded-lg bg-card flex items-center justify-center"
-                      >
+                      <div className="p-2 rounded-lg bg-card flex items-center justify-center">
                         <Icon className={`w-5 h-5 ${iconColor}`} />
                       </div>
                       <div>

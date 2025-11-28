@@ -62,7 +62,11 @@ const ALIGNMENT_RING: Record<string, string> = {
   "chaotic-evil": "ring-4 ring-red-500/50",
 };
 
-export function AlignmentMatrix({ value, onChange, label }: PropsAlignmentMatrix) {
+export function AlignmentMatrix({
+  value,
+  onChange,
+  label,
+}: PropsAlignmentMatrix) {
   const { t } = useTranslation("create-faction");
 
   const alignmentOrder = [
@@ -83,45 +87,45 @@ export function AlignmentMatrix({ value, onChange, label }: PropsAlignmentMatrix
         <label className="text-sm font-medium text-primary">{label}</label>
       )}
       <div className="grid grid-cols-3 gap-3">
-      {alignmentOrder.map((alignmentValue) => {
-        const alignment = FACTION_ALIGNMENTS_CONSTANT.find(
-          (a) => a.value === alignmentValue
-        );
-        if (!alignment) return null;
+        {alignmentOrder.map((alignmentValue) => {
+          const alignment = FACTION_ALIGNMENTS_CONSTANT.find(
+            (a) => a.value === alignmentValue
+          );
+          if (!alignment) return null;
 
-        const Icon = alignment.icon;
-        const isSelected = value === alignment.value;
-        const gradientClass = ALIGNMENT_GRADIENTS[alignment.value] || "";
-        const hoverClass = ALIGNMENT_HOVER[alignment.value] || "";
-        const ringClass = ALIGNMENT_RING[alignment.value] || "";
+          const Icon = alignment.icon;
+          const isSelected = value === alignment.value;
+          const gradientClass = ALIGNMENT_GRADIENTS[alignment.value] || "";
+          const hoverClass = ALIGNMENT_HOVER[alignment.value] || "";
+          const ringClass = ALIGNMENT_RING[alignment.value] || "";
 
-        return (
-          <button
-            key={alignment.value}
-            type="button"
-            onClick={() => onChange(isSelected ? "" : alignment.value)}
-            className={`flex flex-col items-center justify-center gap-3 p-5 rounded-lg border-2 transition-all min-h-[140px] cursor-pointer ${
-              isSelected
-                ? `${gradientClass} ${ringClass}`
-                : `bg-card border-border ${hoverClass}`
-            }`}
-          >
-            <Icon
-              className={`w-7 h-7 ${isSelected ? "" : "text-muted-foreground"}`}
-            />
-            <span
-              className={`text-xs font-medium text-center leading-tight ${isSelected ? "" : "text-muted-foreground"}`}
+          return (
+            <button
+              key={alignment.value}
+              type="button"
+              onClick={() => onChange(isSelected ? "" : alignment.value)}
+              className={`flex flex-col items-center justify-center gap-3 p-5 rounded-lg border-2 transition-all min-h-[140px] cursor-pointer ${
+                isSelected
+                  ? `${gradientClass} ${ringClass}`
+                  : `bg-card border-border ${hoverClass}`
+              }`}
             >
-              {t(alignment.translationKey)}
-            </span>
-            <p
-              className={`text-xs text-center line-clamp-2 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}
-            >
-              {t(alignment.descriptionKey)}
-            </p>
-          </button>
-        );
-      })}
+              <Icon
+                className={`w-7 h-7 ${isSelected ? "" : "text-muted-foreground"}`}
+              />
+              <span
+                className={`text-xs font-medium text-center leading-tight ${isSelected ? "" : "text-muted-foreground"}`}
+              >
+                {t(alignment.translationKey)}
+              </span>
+              <p
+                className={`text-xs text-center line-clamp-2 ${isSelected ? "text-muted-foreground" : "text-muted-foreground/70"}`}
+              >
+                {t(alignment.descriptionKey)}
+              </p>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

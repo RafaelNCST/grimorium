@@ -15,7 +15,13 @@ interface PropsCharactersTab {
 
 const EMPTY_ARRAY: ICharacter[] = [];
 
-const ROLE_VALUES = ["protagonist", "antagonist", "secondary", "villain", "extra"];
+const ROLE_VALUES = [
+  "protagonist",
+  "antagonist",
+  "secondary",
+  "villain",
+  "extra",
+];
 
 export function CharactersTab({ bookId }: PropsCharactersTab) {
   const navigate = useNavigate();

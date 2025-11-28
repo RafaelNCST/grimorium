@@ -212,7 +212,11 @@ export function FormListInput({
 
   return (
     <div className="space-y-3">
-      {label && <Label className={labelClassName || "text-sm font-medium text-primary"}>{label}</Label>}
+      {label && (
+        <Label className={labelClassName || "text-sm font-medium text-primary"}>
+          {label}
+        </Label>
+      )}
 
       <div className="flex items-start gap-2">
         {inputSize === "small" ? (

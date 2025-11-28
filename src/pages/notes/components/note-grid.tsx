@@ -1,5 +1,4 @@
 import { memo, useMemo, useState, useLayoutEffect, useRef } from "react";
-import { flushSync } from "react-dom";
 
 import {
   DndContext,
@@ -14,6 +13,7 @@ import {
   useDroppable,
 } from "@dnd-kit/core";
 import { FileText } from "lucide-react";
+import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
@@ -38,70 +38,88 @@ interface DraggableNoteProps {
   isDraggingAny: boolean;
 }
 
-const DraggableNote = memo(function DraggableNote({
-  note,
-  onClick,
-  onColorChange,
-  onTextColorChange,
-  onDelete,
-  isDraggingAny,
-}: DraggableNoteProps) {
-  const { t } = useTranslation("notes");
-  const { attributes, listeners, setNodeRef: setDraggableRef, isDragging } = useDraggable({
-    id: note.id,
-  });
+const DraggableNote = memo(
+  ({
+    note,
+    onClick,
+    onColorChange,
+    onTextColorChange,
+    onDelete,
+    isDraggingAny,
+  }: DraggableNoteProps) => {
+    const { t } = useTranslation("notes");
+    const {
+      attributes,
+      listeners,
+      setNodeRef: setDraggableRef,
+      isDragging,
+    } = useDraggable({
+      id: note.id,
+    });
 
-  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
-    id: note.id,
-  });
+    const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+      id: note.id,
+    });
 
-  const setRefs = (element: HTMLDivElement | null) => {
-    setDraggableRef(element);
-    setDroppableRef(element);
-  };
+    const setRefs = (element: HTMLDivElement | null) => {
+      setDraggableRef(element);
+      setDroppableRef(element);
+    };
 
-  const showDropZone = isOver && !isDragging && isDraggingAny;
+    const showDropZone = isOver && !isDragging && isDraggingAny;
 
-  return (
-    <div
-      ref={setRefs}
-      {...attributes}
-      {...listeners}
-      className="relative"
-      style={{
-        opacity: isDragging ? 0.4 : 1,
-        transition: "opacity 200ms ease",
-      }}
-    >
-      {/* Card original - fica opaco quando é área de drop */}
-      <div style={{ opacity: showDropZone ? 0.3 : 1, transition: "opacity 200ms ease" }}>
-        <NoteCard
-          note={note}
-          onClick={onClick}
-          onColorChange={onColorChange}
-          onTextColorChange={onTextColorChange}
-          onDelete={onDelete}
-          isDragging={isDragging}
-        />
-      </div>
-
-      {/* Overlay de drop zone - aparece quando hovering */}
-      {showDropZone && (
-        <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center">
-          {/* Borda tracejada animada imitando a nota */}
-          <div className="absolute inset-0 border-4 border-dashed border-white rounded-lg animate-pulse" />
-
-          {/* Mensagem centralizada */}
-          <div className="relative text-white font-bold text-base drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-            {t("drag.drop_here")}
-          </div>
+    return (
+      <div
+        ref={setRefs}
+        {...attributes}
+        {...listeners}
+        className="relative"
+        style={{
+          opacity: isDragging ? 0.4 : 1,
+          transition: "opacity 200ms ease",
+        }}
+      >
+        {/* Card original - fica opaco quando é área de drop */}
+        <div
+          style={{
+            opacity: showDropZone ? 0.3 : 1,
+            transition: "opacity 200ms ease",
+          }}
+        >
+          <NoteCard
+            note={note}
+            onClick={onClick}
+            onColorChange={onColorChange}
+            onTextColorChange={onTextColorChange}
+            onDelete={onDelete}
+            isDragging={isDragging}
+          />
         </div>
-      )}
-    </div>
-  );
-});
 
-function NoteGridComponent({ notes, onNoteClick, onReorder, onUpdateNote, onDeleteNote }: NoteGridProps) {
+        {/* Overlay de drop zone - aparece quando hovering */}
+        {showDropZone && (
+          <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center">
+            {/* Borda tracejada animada imitando a nota */}
+            <div className="absolute inset-0 border-4 border-dashed border-white rounded-lg animate-pulse" />
+
+            {/* Mensagem centralizada */}
+            <div className="relative text-white font-bold text-base drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+              {t("drag.drop_here")}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+function NoteGridComponent({
+  notes,
+  onNoteClick,
+  onReorder,
+  onUpdateNote,
+  onDeleteNote,
+}: NoteGridProps) {
   const { t } = useTranslation("notes");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [optimisticNotes, setOptimisticNotes] = useState<INote[] | null>(null);
@@ -121,13 +139,15 @@ function NoteGridComponent({ notes, onNoteClick, onReorder, onUpdateNote, onDele
   const displayNotes = optimisticNotes ?? notes;
 
   // Sort notes by order (ascending)
-  const sortedNotes = useMemo(() => {
-    return [...displayNotes].sort((a, b) => {
-      const orderA = a.order ?? new Date(a.createdAt).getTime();
-      const orderB = b.order ?? new Date(b.createdAt).getTime();
-      return orderA - orderB;
-    });
-  }, [displayNotes]);
+  const sortedNotes = useMemo(
+    () =>
+      [...displayNotes].sort((a, b) => {
+        const orderA = a.order ?? new Date(a.createdAt).getTime();
+        const orderB = b.order ?? new Date(b.createdAt).getTime();
+        return orderA - orderB;
+      }),
+    [displayNotes]
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -137,9 +157,10 @@ function NoteGridComponent({ notes, onNoteClick, onReorder, onUpdateNote, onDele
     })
   );
 
-  const activeNote = useMemo(() => {
-    return sortedNotes.find((note) => note.id === activeId);
-  }, [activeId, sortedNotes]);
+  const activeNote = useMemo(
+    () => sortedNotes.find((note) => note.id === activeId),
+    [activeId, sortedNotes]
+  );
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -229,7 +250,9 @@ function NoteGridComponent({ notes, onNoteClick, onReorder, onUpdateNote, onDele
             note={note}
             onClick={() => onNoteClick(note.id)}
             onColorChange={(color) => onUpdateNote(note.id, { color })}
-            onTextColorChange={(textColor) => onUpdateNote(note.id, { textColor })}
+            onTextColorChange={(textColor) =>
+              onUpdateNote(note.id, { textColor })
+            }
             onDelete={() => onDeleteNote(note.id)}
             isDraggingAny={activeId !== null}
           />
@@ -244,7 +267,7 @@ function NoteGridComponent({ notes, onNoteClick, onReorder, onUpdateNote, onDele
               onColorChange={() => {}}
               onTextColorChange={() => {}}
               onDelete={() => {}}
-              isDragging={true}
+              isDragging
             />
           </div>
         ) : null}

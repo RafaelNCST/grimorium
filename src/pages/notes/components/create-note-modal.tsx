@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
-import type { JSONContent } from "@tiptap/react";
-import { useTranslation } from "react-i18next";
 import {
   Users,
   Globe,
@@ -13,6 +11,7 @@ import {
   Plus,
   BookOpen,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,9 +27,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
+import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
 import type { INoteLink, NoteColor, EntityType } from "@/types/note-types";
@@ -38,6 +37,8 @@ import type { INoteLink, NoteColor, EntityType } from "@/types/note-types";
 import { DEFAULT_NOTE_COLOR } from "../constants";
 
 import { NoteEditor } from "./note-editor";
+
+import type { JSONContent } from "@tiptap/react";
 
 interface EntityOption {
   id: string;
@@ -220,7 +221,10 @@ export function CreateNoteModal({
           });
         });
       } catch (error) {
-        console.error(`Error fetching entities for book ${currentBook.id}:`, error);
+        console.error(
+          `Error fetching entities for book ${currentBook.id}:`,
+          error
+        );
       }
 
       setEntities(allEntities);
@@ -312,7 +316,9 @@ export function CreateNoteModal({
   useEffect(() => {
     const checkScrollbar = () => {
       if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        const viewport = scrollAreaRef.current.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
         if (viewport) {
           const hasScroll = viewport.scrollHeight > viewport.clientHeight;
           setHasScrollbar(hasScroll);
@@ -325,7 +331,9 @@ export function CreateNoteModal({
 
     // Use ResizeObserver to detect changes in content size
     if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const viewport = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
       if (viewport) {
         const resizeObserver = new ResizeObserver(checkScrollbar);
         resizeObserver.observe(viewport);
@@ -365,7 +373,12 @@ export function CreateNoteModal({
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               {t("create_modal.cancel")}
             </Button>
-            <Button variant="magical" onClick={handleCreate} disabled={!hasContent} className="gap-2">
+            <Button
+              variant="magical"
+              onClick={handleCreate}
+              disabled={!hasContent}
+              className="gap-2"
+            >
               <Plus className="h-4 w-4" />
               {t("create_modal.create")}
             </Button>
@@ -439,7 +452,9 @@ export function CreateNoteModal({
                     ) : (
                       <div className={cn(hasScrollbar && "pr-2")}>
                         {filteredEntities.map((entity) => {
-                          const isSelected = links.some((l) => l.entityId === entity.id);
+                          const isSelected = links.some(
+                            (l) => l.entityId === entity.id
+                          );
 
                           return (
                             <button
@@ -495,10 +510,14 @@ export function CreateNoteModal({
                 })}
               </span>
               <span className="text-xs text-muted-foreground">
-                {selectedCounts[activeTab]} {t("create_modal.of")} {entityCounts[activeTab]} {t("create_modal.in_tab")}
+                {selectedCounts[activeTab]} {t("create_modal.of")}{" "}
+                {entityCounts[activeTab]} {t("create_modal.in_tab")}
               </span>
             </div>
-            <Button variant="secondary" onClick={() => setShowManageLinks(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowManageLinks(false)}
+            >
               {t("create_modal.done")}
             </Button>
           </div>

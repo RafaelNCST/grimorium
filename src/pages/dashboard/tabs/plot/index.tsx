@@ -2,11 +2,13 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import {
-  getPlotArcsByBookId,
-  createPlotArc,
-} from "@/lib/db/plot.service";
-import type { IPlotArc, IPlotArcFormData, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
+import { getPlotArcsByBookId, createPlotArc } from "@/lib/db/plot.service";
+import type {
+  IPlotArc,
+  IPlotArcFormData,
+  PlotArcStatus,
+  PlotArcSize,
+} from "@/types/plot-types";
 
 import { calculateTotalBySize } from "./utils/calculators/calculate-total-by-size";
 import { calculateTotalByStatus } from "./utils/calculators/calculate-total-by-status";

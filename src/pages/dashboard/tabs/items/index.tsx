@@ -31,7 +31,14 @@ const CATEGORY_VALUES = [
   "other",
 ];
 
-const STATUS_VALUES = ["common", "rare", "epic", "legendary", "mythical", "unique"];
+const STATUS_VALUES = [
+  "common",
+  "rare",
+  "epic",
+  "legendary",
+  "mythical",
+  "unique",
+];
 
 export function ItemsTab({ bookId }: PropsItemsTab) {
   const navigate = useNavigate();

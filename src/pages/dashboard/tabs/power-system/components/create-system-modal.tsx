@@ -188,9 +188,8 @@ export function CreateSystemModal({
   const iconImage = form.watch("iconImage");
   const systemName = form.watch("name");
 
-  const isSelected = (templateId: string | null): boolean => {
-    return selectedTemplate === templateId;
-  };
+  const isSelected = (templateId: string | null): boolean =>
+    selectedTemplate === templateId;
 
   return (
     <>
@@ -375,11 +374,7 @@ export function CreateSystemModal({
 
           {/* Footer with buttons */}
           <DialogFooter className="flex-shrink-0 pt-4 border-t">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={handleCancel}
-            >
+            <Button type="button" variant="secondary" onClick={handleCancel}>
               <X className="w-4 h-4 mr-2" />
               {t("modals.create_system.cancel")}
             </Button>

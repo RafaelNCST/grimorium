@@ -4,17 +4,11 @@ import { useNavigate } from "@tanstack/react-router";
 
 import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
 import { useEntityFilters } from "@/hooks/use-entity-filters";
-import {
-  createRace,
-  getRacesByBookId,
-} from "@/lib/db/races.service";
+import { createRace, getRacesByBookId } from "@/lib/db/races.service";
 import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
 import { createDomainFilterRows } from "./helpers/domain-filter-config";
-import {
-  IRace,
-  DomainType,
-} from "./types/race-types";
+import { IRace, DomainType } from "./types/race-types";
 import { SpeciesView } from "./view";
 
 interface PropsSpeciesTab {
@@ -131,7 +125,8 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           specialPhysicalCharacteristics: data.specialPhysicalCharacteristics,
           habits: data.habits,
           reproductiveCycle: data.reproductiveCycle,
-          otherReproductiveCycleDescription: data.otherReproductiveCycleDescription,
+          otherReproductiveCycleDescription:
+            data.otherReproductiveCycleDescription,
           diet: data.diet,
           elementalDiet: data.elementalDiet,
           communication: data.communication,

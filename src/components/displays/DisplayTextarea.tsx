@@ -27,10 +27,7 @@ interface DisplayTextareaProps {
  * <DisplayTextarea value={null} />
  * ```
  */
-export function DisplayTextarea({
-  value,
-  className,
-}: DisplayTextareaProps) {
+export function DisplayTextarea({ value, className }: DisplayTextareaProps) {
   // If no value, show empty state
   if (!value || value.trim() === "") {
     return (

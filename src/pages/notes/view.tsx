@@ -2,7 +2,6 @@ import { memo } from "react";
 
 import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { JSONContent } from "@tiptap/react";
 
 import { Button } from "@/components/ui/button";
 import type { INote, INoteLink, NoteColor } from "@/types/note-types";
@@ -11,6 +10,8 @@ import { CreateNoteModal } from "./components/create-note-modal";
 import { NoteDetailModal } from "./components/note-detail-modal";
 import { NoteGrid } from "./components/note-grid";
 import { NotesEmptyState } from "./components/notes-empty-state";
+
+import type { JSONContent } from "@tiptap/react";
 
 interface NotesViewProps {
   notes: INote[];

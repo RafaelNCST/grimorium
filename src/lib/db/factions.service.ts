@@ -120,9 +120,7 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     dominatedAreas: dbFaction.dominated_areas
       ? JSON.parse(dbFaction.dominated_areas)
       : undefined,
-    mainBase: dbFaction.main_base
-      ? JSON.parse(dbFaction.main_base)
-      : undefined,
+    mainBase: dbFaction.main_base ? JSON.parse(dbFaction.main_base) : undefined,
     areasOfInterest: dbFaction.areas_of_interest
       ? JSON.parse(dbFaction.areas_of_interest)
       : undefined,
@@ -175,9 +173,7 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     inspirations: dbFaction.inspirations,
 
     // Special sections
-    timeline: dbFaction.timeline
-      ? JSON.parse(dbFaction.timeline)
-      : undefined,
+    timeline: dbFaction.timeline ? JSON.parse(dbFaction.timeline) : undefined,
     diplomaticRelations: dbFaction.diplomatic_relations
       ? JSON.parse(dbFaction.diplomatic_relations)
       : undefined,
@@ -186,9 +182,7 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
       : undefined,
 
     // UI State
-    uiState: dbFaction.ui_state
-      ? JSON.parse(dbFaction.ui_state)
-      : undefined,
+    uiState: dbFaction.ui_state ? JSON.parse(dbFaction.ui_state) : undefined,
 
     // Metadata
     createdAt: new Date(dbFaction.created_at).toISOString(),

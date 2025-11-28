@@ -15,8 +15,8 @@ import {
 } from "@/lib/db/races.service";
 import { useRacesStore } from "@/stores/races-store";
 
-import { RaceDetailView } from "./view";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
+import { RaceDetailView } from "./view";
 
 import type { IRace } from "../types/race-types";
 import type {
@@ -48,11 +48,14 @@ export function RaceDetail() {
   const [race, setRace] = useState<IRace>(emptyRace);
   const [editData, setEditData] = useState<IRace>(emptyRace);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
-  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
+  const [sectionVisibility, setSectionVisibility] = useState<
+    Record<string, boolean>
+  >({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("raceDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -62,12 +65,19 @@ export function RaceDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [versions, setVersions] = useState<IRaceVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IRaceVersion | null>(null);
+  const [currentVersion, setCurrentVersion] = useState<IRaceVersion | null>(
+    null
+  );
 
   // Original states for comparison
-  const [originalFieldVisibility, setOriginalFieldVisibility] = useState<IFieldVisibility>({});
-  const [originalSectionVisibility, setOriginalSectionVisibility] = useState<Record<string, boolean>>({});
-  const [originalRelationships, setOriginalRelationships] = useState<IRaceRelationship[]>([]);
+  const [originalFieldVisibility, setOriginalFieldVisibility] =
+    useState<IFieldVisibility>({});
+  const [originalSectionVisibility, setOriginalSectionVisibility] = useState<
+    Record<string, boolean>
+  >({});
+  const [originalRelationships, setOriginalRelationships] = useState<
+    IRaceRelationship[]
+  >([]);
 
   useEffect(() => {
     const loadRace = async () => {
@@ -210,7 +220,8 @@ export function RaceDetail() {
     if (race.image !== editData.image) return true;
 
     // Compare culture fields
-    if (!arraysEqual(race.alternativeNames, editData.alternativeNames)) return true;
+    if (!arraysEqual(race.alternativeNames, editData.alternativeNames))
+      return true;
     if (race.culturalNotes !== editData.culturalNotes) return true;
 
     // Compare appearance fields
@@ -218,12 +229,17 @@ export function RaceDetail() {
     if (race.lifeExpectancy !== editData.lifeExpectancy) return true;
     if (race.averageHeight !== editData.averageHeight) return true;
     if (race.averageWeight !== editData.averageWeight) return true;
-    if (race.specialPhysicalCharacteristics !== editData.specialPhysicalCharacteristics) return true;
+    if (
+      race.specialPhysicalCharacteristics !==
+      editData.specialPhysicalCharacteristics
+    )
+      return true;
 
     // Compare behavior fields
     if (race.habits !== editData.habits) return true;
     if (race.reproductiveCycle !== editData.reproductiveCycle) return true;
-    if (race.otherCycleDescription !== editData.otherCycleDescription) return true;
+    if (race.otherCycleDescription !== editData.otherCycleDescription)
+      return true;
     if (race.diet !== editData.diet) return true;
     if (race.elementalDiet !== editData.elementalDiet) return true;
     if (!arraysEqual(race.communication, editData.communication)) return true;
@@ -234,7 +250,8 @@ export function RaceDetail() {
 
     // Compare power fields
     if (race.physicalCapacity !== editData.physicalCapacity) return true;
-    if (race.specialCharacteristics !== editData.specialCharacteristics) return true;
+    if (race.specialCharacteristics !== editData.specialCharacteristics)
+      return true;
     if (race.weaknesses !== editData.weaknesses) return true;
 
     // Compare narrative fields
@@ -280,7 +297,11 @@ export function RaceDetail() {
 
       // Atualizar os dados na versão atual (incluindo relacionamentos)
       if (currentVersion) {
-        await updateRaceVersionData(currentVersion.id, updatedRace, relationships);
+        await updateRaceVersionData(
+          currentVersion.id,
+          updatedRace,
+          relationships
+        );
 
         // Atualizar a versão no estado
         setVersions((prev) =>
@@ -292,7 +313,11 @@ export function RaceDetail() {
         );
 
         // Atualizar a versão atual
-        setCurrentVersion({ ...currentVersion, raceData: updatedRace, relationships });
+        setCurrentVersion({
+          ...currentVersion,
+          raceData: updatedRace,
+          relationships,
+        });
       }
 
       setRace(updatedRace);
@@ -334,7 +359,13 @@ export function RaceDetail() {
     setRelationships(originalRelationships);
     setErrors({});
     setIsEditing(false);
-  }, [race, hasChanges, originalFieldVisibility, originalSectionVisibility, originalRelationships]);
+  }, [
+    race,
+    hasChanges,
+    originalFieldVisibility,
+    originalSectionVisibility,
+    originalRelationships,
+  ]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(race);
@@ -345,7 +376,12 @@ export function RaceDetail() {
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [race, originalFieldVisibility, originalSectionVisibility, originalRelationships]);
+  }, [
+    race,
+    originalFieldVisibility,
+    originalSectionVisibility,
+    originalRelationships,
+  ]);
 
   const handleConfirmDelete = useCallback(async () => {
     // Se estiver em uma versão não-principal, deletar apenas a versão
@@ -353,7 +389,9 @@ export function RaceDetail() {
       try {
         await deleteRaceVersion(currentVersion.id);
 
-        const updatedVersions = versions.filter((v) => v.id !== currentVersion.id);
+        const updatedVersions = versions.filter(
+          (v) => v.id !== currentVersion.id
+        );
 
         // Voltar para a versão principal
         const mainVer = updatedVersions.find((v) => v.isMain);
@@ -387,7 +425,14 @@ export function RaceDetail() {
     } catch (error) {
       console.error("Error deleting race:", error);
     }
-  }, [raceId, dashboardId, deleteRaceFromCache, navigate, currentVersion, versions]);
+  }, [
+    raceId,
+    dashboardId,
+    deleteRaceFromCache,
+    navigate,
+    currentVersion,
+    versions,
+  ]);
 
   const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
     setFieldVisibility((prev) => ({
@@ -406,7 +451,10 @@ export function RaceDetail() {
   const handleAdvancedSectionToggle = useCallback(() => {
     setAdvancedSectionOpen((prev) => {
       const newValue = !prev;
-      localStorage.setItem("raceDetailAdvancedSectionOpen", JSON.stringify(newValue));
+      localStorage.setItem(
+        "raceDetailAdvancedSectionOpen",
+        JSON.stringify(newValue)
+      );
       return newValue;
     });
   }, []);
@@ -455,39 +503,42 @@ export function RaceDetail() {
   }, []);
 
   // Version handlers
-  const handleVersionChange = useCallback((versionId: string | null) => {
-    if (!versionId) {
-      const mainVer = versions.find((v) => v.isMain);
-      if (mainVer) {
-        setCurrentVersion(mainVer);
-        // Manter o id da raça original
-        const raceDataWithId = { ...mainVer.raceData, id: raceId };
+  const handleVersionChange = useCallback(
+    (versionId: string | null) => {
+      if (!versionId) {
+        const mainVer = versions.find((v) => v.isMain);
+        if (mainVer) {
+          setCurrentVersion(mainVer);
+          // Manter o id da raça original
+          const raceDataWithId = { ...mainVer.raceData, id: raceId };
+          setRace(raceDataWithId);
+          setEditData(raceDataWithId);
+          setImagePreview(mainVer.raceData.image || "");
+          setFieldVisibility(mainVer.raceData.fieldVisibility || {});
+          // Carregar relacionamentos da versão
+          const versionRels = mainVer.relationships || [];
+          setRelationships(versionRels);
+          setOriginalRelationships(versionRels);
+        }
+        return;
+      }
+      const version = versions.find((v) => v.id === versionId);
+      if (version) {
+        setCurrentVersion(version);
+        // Carregar os dados da versão selecionada, mantendo o id da raça original
+        const raceDataWithId = { ...version.raceData, id: raceId };
         setRace(raceDataWithId);
         setEditData(raceDataWithId);
-        setImagePreview(mainVer.raceData.image || "");
-        setFieldVisibility(mainVer.raceData.fieldVisibility || {});
+        setImagePreview(version.raceData.image || "");
+        setFieldVisibility(version.raceData.fieldVisibility || {});
         // Carregar relacionamentos da versão
-        const versionRels = mainVer.relationships || [];
+        const versionRels = version.relationships || [];
         setRelationships(versionRels);
         setOriginalRelationships(versionRels);
       }
-      return;
-    }
-    const version = versions.find((v) => v.id === versionId);
-    if (version) {
-      setCurrentVersion(version);
-      // Carregar os dados da versão selecionada, mantendo o id da raça original
-      const raceDataWithId = { ...version.raceData, id: raceId };
-      setRace(raceDataWithId);
-      setEditData(raceDataWithId);
-      setImagePreview(version.raceData.image || "");
-      setFieldVisibility(version.raceData.fieldVisibility || {});
-      // Carregar relacionamentos da versão
-      const versionRels = version.relationships || [];
-      setRelationships(versionRels);
-      setOriginalRelationships(versionRels);
-    }
-  }, [versions, raceId]);
+    },
+    [versions, raceId]
+  );
 
   const handleVersionCreate = useCallback(
     async (data: { name: string; description: string; raceData: IRace }) => {
@@ -550,30 +601,38 @@ export function RaceDetail() {
     [currentVersion, versions, raceId]
   );
 
-  const validateField = useCallback((field: string, value: any) => {
-    const requiredFields = ['name', 'domain', 'summary'];
+  const validateField = useCallback(
+    (field: string, value: any) => {
+      const requiredFields = ["name", "domain", "summary"];
 
-    if (requiredFields.includes(field)) {
-      if (!value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())) {
-        setErrors(prev => ({
-          ...prev,
-          [field]: t('race-detail:validation.required')
-        }));
-      } else {
-        setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors[field];
-          return newErrors;
-        });
+      if (requiredFields.includes(field)) {
+        if (
+          !value ||
+          (Array.isArray(value) && value.length === 0) ||
+          (typeof value === "string" && !value.trim())
+        ) {
+          setErrors((prev) => ({
+            ...prev,
+            [field]: t("race-detail:validation.required"),
+          }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[field];
+            return newErrors;
+          });
+        }
       }
-    }
-  }, [t]);
+    },
+    [t]
+  );
 
   // Computed values
   const missingFields = [];
-  if (!editData.name?.trim()) missingFields.push('name');
-  if (!editData.domain || editData.domain.length === 0) missingFields.push('domain');
-  if (!editData.summary?.trim()) missingFields.push('summary');
+  if (!editData.name?.trim()) missingFields.push("name");
+  if (!editData.domain || editData.domain.length === 0)
+    missingFields.push("domain");
+  if (!editData.summary?.trim()) missingFields.push("summary");
 
   const hasRequiredFieldsEmpty = missingFields.length > 0;
 

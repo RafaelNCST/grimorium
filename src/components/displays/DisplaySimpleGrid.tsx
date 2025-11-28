@@ -163,7 +163,7 @@ export function DisplaySimpleGrid<T extends string = string>({
         style={{
           backgroundColor: getTailwindColor("gray-500/10"),
           borderColor: getTailwindColor("gray-500/30"),
-          boxShadow: `0 0 0 4px ${getTailwindColor("gray-500/30").replace(/[0-9.]+\)$/, '0.5)')}`,
+          boxShadow: `0 0 0 4px ${getTailwindColor("gray-500/30").replace(/[0-9.]+\)$/, "0.5)")}`,
         }}
       >
         <Target className="w-8 h-8 text-muted-foreground flex-shrink-0" />
@@ -186,13 +186,13 @@ export function DisplaySimpleGrid<T extends string = string>({
       style={{
         backgroundColor: selectedOption.backgroundColor
           ? getTailwindColor(selectedOption.backgroundColor)
-          : 'rgb(var(--primary) / 0.2)',
+          : "rgb(var(--primary) / 0.2)",
         borderColor: selectedOption.borderColor
           ? getTailwindColor(selectedOption.borderColor)
-          : 'rgb(var(--primary) / 0.3)',
+          : "rgb(var(--primary) / 0.3)",
         boxShadow: selectedOption.borderColor
-          ? `0 0 0 4px ${getTailwindColor(selectedOption.borderColor).replace(/[0-9.]+\)$/, '0.5)')}`
-          : '0 0 0 4px rgb(var(--primary) / 0.5)',
+          ? `0 0 0 4px ${getTailwindColor(selectedOption.borderColor).replace(/[0-9.]+\)$/, "0.5)")}`
+          : "0 0 0 4px rgb(var(--primary) / 0.5)",
       }}
     >
       {Icon && <Icon className="w-8 h-8 flex-shrink-0" />}

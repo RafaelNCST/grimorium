@@ -231,7 +231,8 @@ export function FormEntityMultiSelectAuto({
   }, [options, filter, value]);
 
   // Check if max selections is reached
-  const isMaxReached = maxSelections !== undefined && value.length >= maxSelections;
+  const isMaxReached =
+    maxSelections !== undefined && value.length >= maxSelections;
 
   // Filter available options by search query
   const searchFilteredOptions = useMemo(
@@ -295,11 +296,13 @@ export function FormEntityMultiSelectAuto({
             {selectedOptions.length > 0 ? (
               <>
                 {selectedOptions.length}
-                {maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+                {maxSelections !== undefined && ` / ${maxSelections}`}{" "}
+                {displayCounterText}
               </>
             ) : (
               <span className="opacity-0">
-                0{maxSelections !== undefined && ` / ${maxSelections}`} {displayCounterText}
+                0{maxSelections !== undefined && ` / ${maxSelections}`}{" "}
+                {displayCounterText}
               </span>
             )}
           </span>
@@ -357,7 +360,10 @@ export function FormEntityMultiSelectAuto({
                         >
                           <div className="flex items-center gap-3">
                             <Avatar className="w-8 h-8 rounded-md">
-                              <AvatarImage src={option.image} alt={option.name} />
+                              <AvatarImage
+                                src={option.image}
+                                alt={option.name}
+                              />
                               <AvatarFallback className="text-xs rounded-md !text-foreground">
                                 {getInitials(option.name)}
                               </AvatarFallback>

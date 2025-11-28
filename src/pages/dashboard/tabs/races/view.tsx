@@ -88,7 +88,8 @@ export function SpeciesView({
         <div
           className="grid gap-4"
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(max(320px, calc((100% - 4rem) / 5)), 1fr))",
           }}
         >
           {races.map((race) => (

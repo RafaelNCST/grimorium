@@ -278,21 +278,34 @@ export function CharacterDetailView({
   const { t } = useTranslation(["character-detail", "create-character"]);
 
   // State for controlling the add relationship dialog from the empty state button
-  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] = useState(false);
+  const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
+    useState(false);
 
   // Convert role constants to FormSimpleGrid format with universal pattern
   const roleOptions = roles.map((role) => ({
     value: role.value,
     label: t(`create-character:${role.translationKey}`),
     icon: role.icon,
-    backgroundColor: role.value === 'protagonist' ? 'yellow-500/10' :
-                     role.value === 'antagonist' ? 'orange-500/10' :
-                     role.value === 'villain' ? 'red-500/10' :
-                     role.value === 'secondary' ? 'blue-500/10' : 'gray-500/10',
-    borderColor: role.value === 'protagonist' ? 'yellow-500/20' :
-                 role.value === 'antagonist' ? 'orange-500/20' :
-                 role.value === 'villain' ? 'red-500/20' :
-                 role.value === 'secondary' ? 'blue-500/20' : 'gray-500/20',
+    backgroundColor:
+      role.value === "protagonist"
+        ? "yellow-500/10"
+        : role.value === "antagonist"
+          ? "orange-500/10"
+          : role.value === "villain"
+            ? "red-500/10"
+            : role.value === "secondary"
+              ? "blue-500/10"
+              : "gray-500/10",
+    borderColor:
+      role.value === "protagonist"
+        ? "yellow-500/20"
+        : role.value === "antagonist"
+          ? "orange-500/20"
+          : role.value === "villain"
+            ? "red-500/20"
+            : role.value === "secondary"
+              ? "blue-500/20"
+              : "gray-500/20",
   }));
 
   // Convert archetype constants to FormSelectGrid format
@@ -310,16 +323,30 @@ export function CharacterDetailView({
     value: type.value,
     label: t(`create-character:${type.translationKey}`),
     icon: type.icon,
-    backgroundColor: type.value === 'malnourished' ? 'orange-500/10' :
-                     type.value === 'thin' ? 'sky-500/10' :
-                     type.value === 'athletic' ? 'emerald-500/10' :
-                     type.value === 'robust' ? 'blue-500/10' :
-                     type.value === 'corpulent' ? 'purple-500/10' : 'red-500/10',
-    borderColor: type.value === 'malnourished' ? 'orange-500/20' :
-                 type.value === 'thin' ? 'sky-500/20' :
-                 type.value === 'athletic' ? 'emerald-500/20' :
-                 type.value === 'robust' ? 'blue-500/20' :
-                 type.value === 'corpulent' ? 'purple-500/20' : 'red-500/20',
+    backgroundColor:
+      type.value === "malnourished"
+        ? "orange-500/10"
+        : type.value === "thin"
+          ? "sky-500/10"
+          : type.value === "athletic"
+            ? "emerald-500/10"
+            : type.value === "robust"
+              ? "blue-500/10"
+              : type.value === "corpulent"
+                ? "purple-500/10"
+                : "red-500/10",
+    borderColor:
+      type.value === "malnourished"
+        ? "orange-500/20"
+        : type.value === "thin"
+          ? "sky-500/20"
+          : type.value === "athletic"
+            ? "emerald-500/20"
+            : type.value === "robust"
+              ? "blue-500/20"
+              : type.value === "corpulent"
+                ? "purple-500/20"
+                : "red-500/20",
   }));
 
   // Convert status constants to FormSimplePicker format
@@ -560,17 +587,20 @@ export function CharacterDetailView({
                     label={t(`create-character:role.${character.role}`)}
                   />
                 )}
-                {character.status && (() => {
-                  const currentStatus = CHARACTER_STATUS_CONSTANT.find(
-                    (s) => s.value === character.status
-                  );
-                  return currentStatus ? (
-                    <EntityTagBadge
-                      config={currentStatus}
-                      label={t(`create-character:${currentStatus.translationKey}`)}
-                    />
-                  ) : null;
-                })()}
+                {character.status &&
+                  (() => {
+                    const currentStatus = CHARACTER_STATUS_CONSTANT.find(
+                      (s) => s.value === character.status
+                    );
+                    return currentStatus ? (
+                      <EntityTagBadge
+                        config={currentStatus}
+                        label={t(
+                          `create-character:${currentStatus.translationKey}`
+                        )}
+                      />
+                    ) : null;
+                  })()}
               </div>
 
               <p className="text-foreground text-base">
@@ -586,19 +616,34 @@ export function CharacterDetailView({
   // Helper function to check if all fields in a group are hidden
   const areAllFieldsHidden = (fieldNames: string[]): boolean => {
     if (isEditing) return false; // Never hide sections in edit mode
-    return fieldNames.every(fieldName => fieldVisibility[fieldName] === false);
+    return fieldNames.every(
+      (fieldName) => fieldVisibility[fieldName] === false
+    );
   };
 
   // Define field groups for each mini-section
   const appearanceFields = [
-    'height', 'weight', 'skinTone', 'hair', 'eyes', 'face',
-    'speciesAndRace', 'physicalType', 'distinguishingFeatures'
+    "height",
+    "weight",
+    "skinTone",
+    "hair",
+    "eyes",
+    "face",
+    "speciesAndRace",
+    "physicalType",
+    "distinguishingFeatures",
   ];
   const behaviorFields = [
-    'archetype', 'alignment', 'favoriteFood', 'favoriteMusic',
-    'personality', 'hobbies', 'dreamsAndGoals', 'fearsAndTraumas'
+    "archetype",
+    "alignment",
+    "favoriteFood",
+    "favoriteMusic",
+    "personality",
+    "hobbies",
+    "dreamsAndGoals",
+    "fearsAndTraumas",
   ];
-  const historyFields = ['birthPlace', 'nicknames', 'past'];
+  const historyFields = ["birthPlace", "nicknames", "past"];
 
   // Check if mini-sections should be hidden
   const hideAppearanceSection = areAllFieldsHidden(appearanceFields);
@@ -619,11 +664,63 @@ export function CharacterDetailView({
             {t("character-detail:sections.appearance")}
           </h4>
 
-        {/* Height and Weight */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Height and Weight */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FieldWithVisibilityToggle
+              fieldName="height"
+              label={t("character-detail:fields.height")}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={editData.height || ""}
+                    onChange={(e) => onEditDataChange("height", e.target.value)}
+                    placeholder={t("create-character:modal.height_placeholder")}
+                    maxLength={50}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editData.height?.length || 0}/50</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={character.height} />
+              )}
+            </FieldWithVisibilityToggle>
+
+            <FieldWithVisibilityToggle
+              fieldName="weight"
+              label={t("character-detail:fields.weight")}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={editData.weight || ""}
+                    onChange={(e) => onEditDataChange("weight", e.target.value)}
+                    placeholder={t("create-character:modal.weight_placeholder")}
+                    maxLength={50}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editData.weight?.length || 0}/50</span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={character.weight} />
+              )}
+            </FieldWithVisibilityToggle>
+          </div>
+
+          {/* Skin Tone */}
           <FieldWithVisibilityToggle
-            fieldName="height"
-            label={t("character-detail:fields.height")}
+            fieldName="skinTone"
+            label={t("character-detail:fields.skin_tone")}
             isOptional
             fieldVisibility={fieldVisibility}
             isEditing={isEditing}
@@ -632,84 +729,129 @@ export function CharacterDetailView({
             {isEditing ? (
               <>
                 <Input
-                  value={editData.height || ""}
-                  onChange={(e) => onEditDataChange("height", e.target.value)}
-                  placeholder={t("create-character:modal.height_placeholder")}
-                  maxLength={50}
+                  value={editData.skinTone || ""}
+                  onChange={(e) => onEditDataChange("skinTone", e.target.value)}
+                  placeholder={t("character-detail:fields.skin_tone")}
+                  maxLength={100}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.height?.length || 0}/50</span>
+                  <span>{editData.skinTone?.length || 0}/100</span>
                 </div>
               </>
             ) : (
-              <DisplayText
-                value={character.height}
+              <DisplayText value={character.skinTone} />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Hair, Eyes, Face */}
+          {["hair", "eyes", "face"].map((field) => (
+            <FieldWithVisibilityToggle
+              key={field}
+              fieldName={field}
+              label={t(`character-detail:fields.${field}`)}
+              isOptional
+              fieldVisibility={fieldVisibility}
+              isEditing={isEditing}
+              onFieldVisibilityToggle={onFieldVisibilityToggle}
+            >
+              {isEditing ? (
+                <>
+                  <Input
+                    value={(editData as any)[field] || ""}
+                    onChange={(e) => onEditDataChange(field, e.target.value)}
+                    placeholder={t(`character-detail:fields.${field}`)}
+                    maxLength={field === "hair" ? 100 : 200}
+                  />
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>
+                      {(editData as any)[field]?.length || 0}/
+                      {field === "hair" ? 100 : 200}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <DisplayText value={(character as any)[field]} />
+              )}
+            </FieldWithVisibilityToggle>
+          ))}
+
+          {/* Species and Race */}
+          <FieldWithVisibilityToggle
+            fieldName="speciesAndRace"
+            label={
+              isEditing ? t("create-character:modal.species_and_race") : ""
+            }
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormEntityMultiSelectAuto
+                entityType="race"
+                bookId={bookId}
+                label=""
+                placeholder={t("create-character:modal.species_placeholder")}
+                noSelectionText={t(
+                  "create-character:modal.no_species_selected"
+                )}
+                searchPlaceholder={t("create-character:modal.search_species")}
+                value={editData.speciesAndRace || []}
+                onChange={(value) => onEditDataChange("speciesAndRace", value)}
+                labelClassName="text-sm font-medium text-primary"
+              />
+            ) : (
+              <DisplayEntityList
+                label={t("create-character:modal.species_and_race")}
+                entities={
+                  character.speciesAndRace
+                    ?.map((raceId) => {
+                      const race = races.find((r) => r.id === raceId);
+                      return race
+                        ? { id: race.id, name: race.name, image: race.image }
+                        : null;
+                    })
+                    .filter(Boolean) as Array<{
+                    id: string;
+                    name: string;
+                    image?: string;
+                  }>
+                }
+                open={openSections.speciesAndRace}
+                onOpenChange={() => toggleSection("speciesAndRace")}
               />
             )}
           </FieldWithVisibilityToggle>
 
+          {/* Physical Type */}
           <FieldWithVisibilityToggle
-            fieldName="weight"
-            label={t("character-detail:fields.weight")}
+            fieldName="physicalType"
+            label={t("character-detail:fields.physical_type")}
             isOptional
             fieldVisibility={fieldVisibility}
             isEditing={isEditing}
             onFieldVisibilityToggle={onFieldVisibilityToggle}
           >
             {isEditing ? (
-              <>
-                <Input
-                  value={editData.weight || ""}
-                  onChange={(e) => onEditDataChange("weight", e.target.value)}
-                  placeholder={t("create-character:modal.weight_placeholder")}
-                  maxLength={50}
-                />
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editData.weight?.length || 0}/50</span>
-                </div>
-              </>
+              <FormSimpleGrid
+                value={editData.physicalType || ""}
+                onChange={(value) => onEditDataChange("physicalType", value)}
+                label=""
+                columns={6}
+                options={physicalTypeOptions}
+              />
             ) : (
-              <DisplayText
-                value={character.weight}
+              <DisplaySimpleGrid
+                value={character.physicalType}
+                options={physicalTypeOptions}
               />
             )}
           </FieldWithVisibilityToggle>
-        </div>
 
-        {/* Skin Tone */}
-        <FieldWithVisibilityToggle
-          fieldName="skinTone"
-          label={t("character-detail:fields.skin_tone")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Input
-                value={editData.skinTone || ""}
-                onChange={(e) => onEditDataChange("skinTone", e.target.value)}
-                placeholder={t("character-detail:fields.skin_tone")}
-                maxLength={100}
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.skinTone?.length || 0}/100</span>
-              </div>
-            </>
-          ) : (
-            <DisplayText
-              value={character.skinTone}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Hair, Eyes, Face */}
-        {["hair", "eyes", "face"].map((field) => (
+          {/* Distinguishing Features */}
           <FieldWithVisibilityToggle
-            key={field}
-            fieldName={field}
-            label={t(`character-detail:fields.${field}`)}
+            fieldName="distinguishingFeatures"
+            label={t("character-detail:fields.distinguishing_features")}
             isOptional
             fieldVisibility={fieldVisibility}
             isEditing={isEditing}
@@ -717,123 +859,28 @@ export function CharacterDetailView({
           >
             {isEditing ? (
               <>
-                <Input
-                  value={(editData as any)[field] || ""}
-                  onChange={(e) => onEditDataChange(field, e.target.value)}
-                  placeholder={t(`character-detail:fields.${field}`)}
-                  maxLength={field === "hair" ? 100 : 200}
+                <Textarea
+                  value={editData.distinguishingFeatures || ""}
+                  onChange={(e) =>
+                    onEditDataChange("distinguishingFeatures", e.target.value)
+                  }
+                  placeholder={t(
+                    "character-detail:fields.distinguishing_features"
+                  )}
+                  rows={3}
+                  maxLength={400}
+                  className="resize-none"
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
                   <span>
-                    {(editData as any)[field]?.length || 0}/
-                    {field === "hair" ? 100 : 200}
+                    {editData.distinguishingFeatures?.length || 0}/400
                   </span>
                 </div>
               </>
             ) : (
-              <DisplayText
-                value={(character as any)[field]}
-              />
+              <DisplayTextarea value={character.distinguishingFeatures} />
             )}
           </FieldWithVisibilityToggle>
-        ))}
-
-        {/* Species and Race */}
-        <FieldWithVisibilityToggle
-          fieldName="speciesAndRace"
-          label={isEditing ? t("create-character:modal.species_and_race") : ""}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormEntityMultiSelectAuto
-              entityType="race"
-              bookId={bookId}
-              label=""
-              placeholder={t("create-character:modal.species_placeholder")}
-              noSelectionText={t("create-character:modal.no_species_selected")}
-              searchPlaceholder={t("create-character:modal.search_species")}
-              value={editData.speciesAndRace || []}
-              onChange={(value) => onEditDataChange("speciesAndRace", value)}
-              labelClassName="text-sm font-medium text-primary"
-            />
-          ) : (
-            <DisplayEntityList
-              label={t("create-character:modal.species_and_race")}
-              entities={
-                character.speciesAndRace?.map((raceId) => {
-                  const race = races.find((r) => r.id === raceId);
-                  return race
-                    ? { id: race.id, name: race.name, image: race.image }
-                    : null;
-                }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
-              }
-              open={openSections.speciesAndRace}
-              onOpenChange={() => toggleSection("speciesAndRace")}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Physical Type */}
-        <FieldWithVisibilityToggle
-          fieldName="physicalType"
-          label={t("character-detail:fields.physical_type")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormSimpleGrid
-              value={editData.physicalType || ""}
-              onChange={(value) => onEditDataChange("physicalType", value)}
-              label=""
-              columns={6}
-              options={physicalTypeOptions}
-            />
-          ) : (
-            <DisplaySimpleGrid
-              value={character.physicalType}
-              options={physicalTypeOptions}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Distinguishing Features */}
-        <FieldWithVisibilityToggle
-          fieldName="distinguishingFeatures"
-          label={t("character-detail:fields.distinguishing_features")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.distinguishingFeatures || ""}
-                onChange={(e) =>
-                  onEditDataChange("distinguishingFeatures", e.target.value)
-                }
-                placeholder={t(
-                  "character-detail:fields.distinguishing_features"
-                )}
-                rows={3}
-                maxLength={400}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.distinguishingFeatures?.length || 0}/400</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={character.distinguishingFeatures}
-            />
-          )}
-        </FieldWithVisibilityToggle>
         </div>
       )}
 
@@ -849,122 +896,118 @@ export function CharacterDetailView({
             {t("character-detail:sections.behavior")}
           </h4>
 
-        {/* Archetype */}
-        <FieldWithVisibilityToggle
-          fieldName="archetype"
-          label={t("character-detail:fields.archetype")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormSelectGrid
-              value={editData.archetype || ""}
-              onChange={(value) => onEditDataChange("archetype", value)}
-              label=""
-              columns={4}
-              options={archetypeOptions}
+          {/* Archetype */}
+          <FieldWithVisibilityToggle
+            fieldName="archetype"
+            label={t("character-detail:fields.archetype")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormSelectGrid
+                value={editData.archetype || ""}
+                onChange={(value) => onEditDataChange("archetype", value)}
+                label=""
+                columns={4}
+                options={archetypeOptions}
+              />
+            ) : (
+              <DisplaySelectGrid
+                value={character.archetype}
+                options={archetypeOptions}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Alignment */}
+          <FieldWithVisibilityToggle
+            fieldName="alignment"
+            label={t("character-detail:fields.alignment")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            <AlignmentMatrix
+              value={isEditing ? editData.alignment : character.alignment}
+              onChange={(value) => onEditDataChange("alignment", value)}
+              isEditable={isEditing}
             />
-          ) : (
-            <DisplaySelectGrid
-              value={character.archetype}
-              options={archetypeOptions}
-            />
+          </FieldWithVisibilityToggle>
+
+          {/* Favorite Food and Music */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {["favoriteFood", "favoriteMusic"].map((field) => (
+              <FieldWithVisibilityToggle
+                key={field}
+                fieldName={field}
+                label={t(
+                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                )}
+                isOptional
+                fieldVisibility={fieldVisibility}
+                isEditing={isEditing}
+                onFieldVisibilityToggle={onFieldVisibilityToggle}
+              >
+                {isEditing ? (
+                  <>
+                    <Input
+                      value={(editData as any)[field] || ""}
+                      onChange={(e) => onEditDataChange(field, e.target.value)}
+                      placeholder={t(
+                        `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                      )}
+                      maxLength={100}
+                    />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{(editData as any)[field]?.length || 0}/100</span>
+                    </div>
+                  </>
+                ) : (
+                  <DisplayText value={(character as any)[field]} />
+                )}
+              </FieldWithVisibilityToggle>
+            ))}
+          </div>
+
+          {/* Personality, Hobbies, Dreams, Fears */}
+          {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
+            (field) => (
+              <FieldWithVisibilityToggle
+                key={field}
+                fieldName={field}
+                label={t(
+                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                )}
+                isOptional
+                fieldVisibility={fieldVisibility}
+                isEditing={isEditing}
+                onFieldVisibilityToggle={onFieldVisibilityToggle}
+              >
+                {isEditing ? (
+                  <>
+                    <Textarea
+                      value={(editData as any)[field] || ""}
+                      onChange={(e) => onEditDataChange(field, e.target.value)}
+                      placeholder={t(
+                        `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                      )}
+                      rows={3}
+                      maxLength={500}
+                      className="resize-none"
+                    />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{(editData as any)[field]?.length || 0}/500</span>
+                    </div>
+                  </>
+                ) : (
+                  <DisplayTextarea value={(character as any)[field]} />
+                )}
+              </FieldWithVisibilityToggle>
+            )
           )}
-        </FieldWithVisibilityToggle>
-
-        {/* Alignment */}
-        <FieldWithVisibilityToggle
-          fieldName="alignment"
-          label={t("character-detail:fields.alignment")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          <AlignmentMatrix
-            value={isEditing ? editData.alignment : character.alignment}
-            onChange={(value) => onEditDataChange("alignment", value)}
-            isEditable={isEditing}
-          />
-        </FieldWithVisibilityToggle>
-
-        {/* Favorite Food and Music */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {["favoriteFood", "favoriteMusic"].map((field) => (
-            <FieldWithVisibilityToggle
-              key={field}
-              fieldName={field}
-              label={t(
-                `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-              )}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
-              {isEditing ? (
-                <>
-                  <Input
-                    value={(editData as any)[field] || ""}
-                    onChange={(e) => onEditDataChange(field, e.target.value)}
-                    placeholder={t(
-                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                    )}
-                    maxLength={100}
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{(editData as any)[field]?.length || 0}/100</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayText
-                  value={(character as any)[field]}
-                  />
-              )}
-            </FieldWithVisibilityToggle>
-          ))}
-        </div>
-
-        {/* Personality, Hobbies, Dreams, Fears */}
-        {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
-          (field) => (
-            <FieldWithVisibilityToggle
-              key={field}
-              fieldName={field}
-              label={t(
-                `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-              )}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
-              {isEditing ? (
-                <>
-                  <Textarea
-                    value={(editData as any)[field] || ""}
-                    onChange={(e) => onEditDataChange(field, e.target.value)}
-                    placeholder={t(
-                      `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end text-xs text-muted-foreground">
-                    <span>{(editData as any)[field]?.length || 0}/500</span>
-                  </div>
-                </>
-              ) : (
-                <DisplayTextarea
-                  value={(character as any)[field]}
-                  />
-              )}
-            </FieldWithVisibilityToggle>
-          )
-        )}
         </div>
       )}
 
@@ -980,105 +1023,115 @@ export function CharacterDetailView({
             {t("character-detail:sections.locations_orgs")}
           </h4>
 
-        {/* Birth Place */}
-        <FieldWithVisibilityToggle
-          fieldName="birthPlace"
-          label={isEditing ? t("character-detail:fields.birth_place") : ""}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormEntityMultiSelectAuto
-              entityType="region"
-              bookId={bookId}
-              label=""
-              placeholder={t("create-character:modal.birth_place_placeholder")}
-              noSelectionText={t(
-                "create-character:modal.no_birth_place_selected"
-              )}
-              searchPlaceholder={t("create-character:modal.search_location")}
-              value={editData.birthPlace || []}
-              onChange={(value) => onEditDataChange("birthPlace", value)}
-              labelClassName="text-sm font-medium text-primary"
-              maxSelections={1}
-            />
-          ) : (
-            <DisplayEntityList
-              label={t("character-detail:fields.birth_place")}
-              entities={
-                character.birthPlace?.map((regionId) => {
-                  const region = regions.find((r) => r.id === regionId);
-                  return region
-                    ? { id: region.id, name: region.name, image: region.image }
-                    : null;
-                }).filter(Boolean) as Array<{ id: string; name: string; image?: string }>
-              }
-              open={openSections.birthPlace}
-              onOpenChange={() => toggleSection("birthPlace")}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Nicknames */}
-        <FieldWithVisibilityToggle
-          fieldName="nicknames"
-          label={isEditing ? t("character-detail:fields.nicknames") : ""}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <FormListInput
-              value={editData.nicknames || []}
-              onChange={(value) => onEditDataChange("nicknames", value)}
-              label=""
-              placeholder={t("create-character:modal.nickname_placeholder")}
-              buttonText={t("create-character:modal.add_nickname")}
-              inputSize="small"
-              maxLength={100}
-            />
-          ) : (
-            <DisplayStringList
-              label={t("character-detail:fields.nicknames")}
-              items={character.nicknames}
-              open={openSections.nicknames}
-              onOpenChange={() => toggleSection("nicknames")}
-            />
-          )}
-        </FieldWithVisibilityToggle>
-
-        {/* Past */}
-        <FieldWithVisibilityToggle
-          fieldName="past"
-          label={t("character-detail:fields.past")}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditing}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
-          {isEditing ? (
-            <>
-              <Textarea
-                value={editData.past || ""}
-                onChange={(e) => onEditDataChange("past", e.target.value)}
-                placeholder={t("create-character:modal.past_placeholder")}
-                rows={5}
-                maxLength={1000}
-                className="resize-none"
+          {/* Birth Place */}
+          <FieldWithVisibilityToggle
+            fieldName="birthPlace"
+            label={isEditing ? t("character-detail:fields.birth_place") : ""}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormEntityMultiSelectAuto
+                entityType="region"
+                bookId={bookId}
+                label=""
+                placeholder={t(
+                  "create-character:modal.birth_place_placeholder"
+                )}
+                noSelectionText={t(
+                  "create-character:modal.no_birth_place_selected"
+                )}
+                searchPlaceholder={t("create-character:modal.search_location")}
+                value={editData.birthPlace || []}
+                onChange={(value) => onEditDataChange("birthPlace", value)}
+                labelClassName="text-sm font-medium text-primary"
+                maxSelections={1}
               />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editData.past?.length || 0}/1000</span>
-              </div>
-            </>
-          ) : (
-            <DisplayTextarea
-              value={character.past}
-            />
-          )}
-        </FieldWithVisibilityToggle>
+            ) : (
+              <DisplayEntityList
+                label={t("character-detail:fields.birth_place")}
+                entities={
+                  character.birthPlace
+                    ?.map((regionId) => {
+                      const region = regions.find((r) => r.id === regionId);
+                      return region
+                        ? {
+                            id: region.id,
+                            name: region.name,
+                            image: region.image,
+                          }
+                        : null;
+                    })
+                    .filter(Boolean) as Array<{
+                    id: string;
+                    name: string;
+                    image?: string;
+                  }>
+                }
+                open={openSections.birthPlace}
+                onOpenChange={() => toggleSection("birthPlace")}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Nicknames */}
+          <FieldWithVisibilityToggle
+            fieldName="nicknames"
+            label={isEditing ? t("character-detail:fields.nicknames") : ""}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <FormListInput
+                value={editData.nicknames || []}
+                onChange={(value) => onEditDataChange("nicknames", value)}
+                label=""
+                placeholder={t("create-character:modal.nickname_placeholder")}
+                buttonText={t("create-character:modal.add_nickname")}
+                inputSize="small"
+                maxLength={100}
+              />
+            ) : (
+              <DisplayStringList
+                label={t("character-detail:fields.nicknames")}
+                items={character.nicknames}
+                open={openSections.nicknames}
+                onOpenChange={() => toggleSection("nicknames")}
+              />
+            )}
+          </FieldWithVisibilityToggle>
+
+          {/* Past */}
+          <FieldWithVisibilityToggle
+            fieldName="past"
+            label={t("character-detail:fields.past")}
+            isOptional
+            fieldVisibility={fieldVisibility}
+            isEditing={isEditing}
+            onFieldVisibilityToggle={onFieldVisibilityToggle}
+          >
+            {isEditing ? (
+              <>
+                <Textarea
+                  value={editData.past || ""}
+                  onChange={(e) => onEditDataChange("past", e.target.value)}
+                  placeholder={t("create-character:modal.past_placeholder")}
+                  rows={5}
+                  maxLength={1000}
+                  className="resize-none"
+                />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  <span>{editData.past?.length || 0}/1000</span>
+                </div>
+              </>
+            ) : (
+              <DisplayTextarea value={character.past} />
+            )}
+          </FieldWithVisibilityToggle>
         </div>
       )}
     </>
@@ -1112,7 +1165,9 @@ export function CharacterDetailView({
       onVisibilityToggle: () => onSectionVisibilityToggle("relationships"),
       // Empty states
       emptyState: (() => {
-        const relationships = isEditing ? editData.relationships || [] : character.relationships || [];
+        const relationships = isEditing
+          ? editData.relationships || []
+          : character.relationships || [];
         const availableCharacters = mockCharacters.filter(
           (char) =>
             char.id !== character.id &&
@@ -1125,7 +1180,11 @@ export function CharacterDetailView({
         }
 
         // Estado 4: Bloqueado - todos os personagens disponíveis foram usados
-        if (isEditing && relationships.length > 0 && availableCharacters.length === 0) {
+        if (
+          isEditing &&
+          relationships.length > 0 &&
+          availableCharacters.length === 0
+        ) {
           return "blocked-all-used";
         }
 
@@ -1253,11 +1312,7 @@ export function CharacterDetailView({
   // Versions Panel
   const versionsPanel = (
     <VersionsPanel title={t("character-detail:sections.versions")}>
-      <EntityVersionManager<
-        ICharacterVersion,
-        ICharacter,
-        ICharacterFormData
-      >
+      <EntityVersionManager<ICharacterVersion, ICharacter, ICharacterFormData>
         versions={versions}
         currentVersion={currentVersion}
         onVersionChange={onVersionChange}
@@ -1271,11 +1326,7 @@ export function CharacterDetailView({
           return (
             <div className="relative">
               <div
-                className={
-                  !hasValidData
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }
+                className={!hasValidData ? "opacity-50 cursor-not-allowed" : ""}
               >
                 <VersionCard
                   version={version}
@@ -1305,23 +1356,14 @@ export function CharacterDetailView({
             </div>
           );
         }}
-        renderCreateDialog={({
-          open,
-          onClose,
-          onConfirm,
-          baseEntity,
-        }) => (
+        renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
           <CreateVersionWithEntityDialog<ICharacter, ICharacterFormData>
             open={open}
             onClose={onClose}
             onConfirm={onConfirm}
             baseEntity={baseEntity}
             i18nNamespace="character-detail"
-            renderEntityModal={({
-              open,
-              onOpenChange,
-              onConfirm,
-            }) => (
+            renderEntityModal={({ open, onOpenChange, onConfirm }) => (
               <CreateCharacterModal
                 open={open}
                 onClose={() => onOpenChange(false)}
@@ -1380,7 +1422,9 @@ export function CharacterDetailView({
                             age: t("character-detail:fields.age"),
                             role: t("character-detail:fields.role"),
                             gender: t("character-detail:fields.gender"),
-                            description: t("character-detail:fields.description"),
+                            description: t(
+                              "character-detail:fields.description"
+                            ),
                           };
                           return fieldNames[field] || field;
                         })

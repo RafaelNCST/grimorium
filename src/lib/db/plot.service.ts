@@ -207,27 +207,55 @@ export async function updatePlotArc(
   const fullArc: IPlotArc = {
     id: arcId,
     name: updates.name !== undefined ? updates.name : currentArc.name,
-    size: updates.size !== undefined ? updates.size : (currentArc.size as IPlotArc["size"]),
+    size:
+      updates.size !== undefined
+        ? updates.size
+        : (currentArc.size as IPlotArc["size"]),
     focus: updates.focus !== undefined ? updates.focus : currentArc.focus,
-    description: updates.description !== undefined ? updates.description : currentArc.description,
-    progress: updates.progress !== undefined ? updates.progress : currentArc.progress,
-    status: updates.status !== undefined ? updates.status : (currentArc.status as IPlotArc["status"]),
+    description:
+      updates.description !== undefined
+        ? updates.description
+        : currentArc.description,
+    progress:
+      updates.progress !== undefined ? updates.progress : currentArc.progress,
+    status:
+      updates.status !== undefined
+        ? updates.status
+        : (currentArc.status as IPlotArc["status"]),
     order: updates.order !== undefined ? updates.order : currentArc.order_index,
     events: updates.events || [],
-    importantCharacters: updates.importantCharacters !== undefined
-      ? updates.importantCharacters
-      : (currentArc.important_characters ? JSON.parse(currentArc.important_characters) : []),
-    importantFactions: updates.importantFactions !== undefined
-      ? updates.importantFactions
-      : (currentArc.important_factions ? JSON.parse(currentArc.important_factions) : []),
-    importantItems: updates.importantItems !== undefined
-      ? updates.importantItems
-      : (currentArc.important_items ? JSON.parse(currentArc.important_items) : []),
-    importantRegions: updates.importantRegions !== undefined
-      ? updates.importantRegions
-      : (currentArc.important_regions ? JSON.parse(currentArc.important_regions) : []),
-    arcMessage: updates.arcMessage !== undefined ? updates.arcMessage : currentArc.arc_message,
-    worldImpact: updates.worldImpact !== undefined ? updates.worldImpact : currentArc.world_impact,
+    importantCharacters:
+      updates.importantCharacters !== undefined
+        ? updates.importantCharacters
+        : currentArc.important_characters
+          ? JSON.parse(currentArc.important_characters)
+          : [],
+    importantFactions:
+      updates.importantFactions !== undefined
+        ? updates.importantFactions
+        : currentArc.important_factions
+          ? JSON.parse(currentArc.important_factions)
+          : [],
+    importantItems:
+      updates.importantItems !== undefined
+        ? updates.importantItems
+        : currentArc.important_items
+          ? JSON.parse(currentArc.important_items)
+          : [],
+    importantRegions:
+      updates.importantRegions !== undefined
+        ? updates.importantRegions
+        : currentArc.important_regions
+          ? JSON.parse(currentArc.important_regions)
+          : [],
+    arcMessage:
+      updates.arcMessage !== undefined
+        ? updates.arcMessage
+        : currentArc.arc_message,
+    worldImpact:
+      updates.worldImpact !== undefined
+        ? updates.worldImpact
+        : currentArc.world_impact,
   };
 
   const dbArc = arcToDBPlotArc(currentArc.book_id, fullArc);

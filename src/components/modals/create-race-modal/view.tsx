@@ -67,327 +67,343 @@ export function CreateRaceModalView({
           advancedFieldsTitle={t("sections.advanced_fields")}
           basicFields={
             <div className="space-y-6">
-            {/* Race Image */}
-            <div className="max-w-[534px] mx-auto">
-              <FormImageUpload
-                value={watchedValues.image || ""}
-                onChange={(value) => setValue("image", value)}
-                label={t("modal.image")}
-                helperText="opcional"
-                height="h-96"
-                shape="rounded"
-                imageFit="cover"
-                placeholderIcon={Dna}
-                id="race-image-upload"
-              />
-            </div>
+              {/* Race Image */}
+              <div className="max-w-[534px] mx-auto">
+                <FormImageUpload
+                  value={watchedValues.image || ""}
+                  onChange={(value) => setValue("image", value)}
+                  label={t("modal.image")}
+                  helperText="opcional"
+                  height="h-96"
+                  shape="rounded"
+                  imageFit="cover"
+                  placeholderIcon={Dna}
+                  id="race-image-upload"
+                />
+              </div>
 
-            {/* Race Name and Scientific Name */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <FormInput
-                {...register("name")}
-                label={t("modal.race_name")}
-                placeholder={t("modal.name_placeholder")}
-                maxLength={150}
+              {/* Race Name and Scientific Name */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <FormInput
+                  {...register("name")}
+                  label={t("modal.race_name")}
+                  placeholder={t("modal.name_placeholder")}
+                  maxLength={150}
+                  required
+                  showCharCount
+                  error={
+                    errors.name ? t(errors.name.message as string) : undefined
+                  }
+                  value={watchedValues.name}
+                  labelClassName="text-primary"
+                />
+
+                <FormInput
+                  {...register("scientificName")}
+                  label={t("modal.scientific_name")}
+                  placeholder={t("modal.scientific_name_placeholder")}
+                  maxLength={150}
+                  showCharCount
+                  error={
+                    errors.scientificName
+                      ? t(errors.scientificName.message as string)
+                      : undefined
+                  }
+                  value={watchedValues.scientificName}
+                  labelClassName="text-primary"
+                />
+              </div>
+
+              {/* Domain */}
+              <DomainPicker
+                value={watchedValues.domain || []}
+                onChange={(value) => setValue("domain", value)}
+                error={errors.domain?.message}
+              />
+
+              {/* Summary */}
+              <FormTextarea
+                {...register("summary")}
+                label={t("modal.summary")}
+                placeholder={t("modal.summary_placeholder")}
+                maxLength={500}
+                rows={4}
                 required
                 showCharCount
-                error={errors.name ? t(errors.name.message as string) : undefined}
-                value={watchedValues.name}
+                error={
+                  errors.summary
+                    ? t(errors.summary.message as string)
+                    : undefined
+                }
+                value={watchedValues.summary}
                 labelClassName="text-primary"
+                className="resize-none"
               />
-
-              <FormInput
-                {...register("scientificName")}
-                label={t("modal.scientific_name")}
-                placeholder={t("modal.scientific_name_placeholder")}
-                maxLength={150}
-                showCharCount
-                error={errors.scientificName ? t(errors.scientificName.message as string) : undefined}
-                value={watchedValues.scientificName}
-                labelClassName="text-primary"
-              />
-            </div>
-
-            {/* Domain */}
-            <DomainPicker
-              value={watchedValues.domain || []}
-              onChange={(value) => setValue("domain", value)}
-              error={errors.domain?.message}
-            />
-
-            {/* Summary */}
-            <FormTextarea
-              {...register("summary")}
-              label={t("modal.summary")}
-              placeholder={t("modal.summary_placeholder")}
-              maxLength={500}
-              rows={4}
-              required
-              showCharCount
-              error={errors.summary ? t(errors.summary.message as string) : undefined}
-              value={watchedValues.summary}
-              labelClassName="text-primary"
-              className="resize-none"
-            />
             </div>
           }
           advancedFields={
             <>
-            <div className="space-y-6">
-              <SectionTitle>{t("sections.culture_myths")}</SectionTitle>
+              <div className="space-y-6">
+                <SectionTitle>{t("sections.culture_myths")}</SectionTitle>
 
-              {/* Alternative Names */}
-              <FormListInput
-                value={watchedValues.alternativeNames || []}
-                onChange={(value) => setValue("alternativeNames", value)}
-                label={t("modal.alternative_names")}
-                placeholder={t("modal.alternative_names_placeholder")}
-                buttonText={t("modal.add_name")}
-                maxLength={100}
-                inputSize="small"
-                labelClassName="text-sm font-medium text-primary"
-              />
-
-              {/* Cultural Notes (Rites, Taboos, Curiosities) */}
-              <FormTextarea
-                {...register("culturalNotes")}
-                label={t("modal.cultural_notes")}
-                placeholder={t("modal.cultural_notes_placeholder")}
-                maxLength={1500}
-                rows={6}
-                showCharCount
-                showOptionalLabel={false}
-                error={errors.culturalNotes?.message}
-                value={watchedValues.culturalNotes}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-            </div>
-
-            <Separator />
-
-            {/* Appearance Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("sections.appearance")}</SectionTitle>
-
-              {/* General Appearance */}
-              <FormTextarea
-                {...register("generalAppearance")}
-                label={t("modal.general_appearance")}
-                placeholder={t("modal.general_appearance_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.generalAppearance}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-
-              {/* Life Expectancy, Height, Weight */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormInput
-                  {...register("lifeExpectancy")}
-                  label={t("modal.life_expectancy")}
-                  placeholder={t("modal.life_expectancy_placeholder")}
+                {/* Alternative Names */}
+                <FormListInput
+                  value={watchedValues.alternativeNames || []}
+                  onChange={(value) => setValue("alternativeNames", value)}
+                  label={t("modal.alternative_names")}
+                  placeholder={t("modal.alternative_names_placeholder")}
+                  buttonText={t("modal.add_name")}
                   maxLength={100}
-                  showCharCount
-                  showOptionalLabel={false}
-                  value={watchedValues.lifeExpectancy}
+                  inputSize="small"
                   labelClassName="text-sm font-medium text-primary"
                 />
 
-                <FormInput
-                  {...register("averageHeight")}
-                  label={t("modal.average_height")}
-                  placeholder={t("modal.average_height_placeholder")}
-                  maxLength={100}
+                {/* Cultural Notes (Rites, Taboos, Curiosities) */}
+                <FormTextarea
+                  {...register("culturalNotes")}
+                  label={t("modal.cultural_notes")}
+                  placeholder={t("modal.cultural_notes_placeholder")}
+                  maxLength={1500}
+                  rows={6}
                   showCharCount
                   showOptionalLabel={false}
-                  value={watchedValues.averageHeight}
+                  error={errors.culturalNotes?.message}
+                  value={watchedValues.culturalNotes}
                   labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
+              </div>
+
+              <Separator />
+
+              {/* Appearance Section */}
+              <div className="space-y-6">
+                <SectionTitle>{t("sections.appearance")}</SectionTitle>
+
+                {/* General Appearance */}
+                <FormTextarea
+                  {...register("generalAppearance")}
+                  label={t("modal.general_appearance")}
+                  placeholder={t("modal.general_appearance_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.generalAppearance}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
                 />
 
-                <FormInput
-                  {...register("averageWeight")}
-                  label={t("modal.average_weight")}
-                  placeholder={t("modal.average_weight_placeholder")}
-                  maxLength={100}
+                {/* Life Expectancy, Height, Weight */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormInput
+                    {...register("lifeExpectancy")}
+                    label={t("modal.life_expectancy")}
+                    placeholder={t("modal.life_expectancy_placeholder")}
+                    maxLength={100}
+                    showCharCount
+                    showOptionalLabel={false}
+                    value={watchedValues.lifeExpectancy}
+                    labelClassName="text-sm font-medium text-primary"
+                  />
+
+                  <FormInput
+                    {...register("averageHeight")}
+                    label={t("modal.average_height")}
+                    placeholder={t("modal.average_height_placeholder")}
+                    maxLength={100}
+                    showCharCount
+                    showOptionalLabel={false}
+                    value={watchedValues.averageHeight}
+                    labelClassName="text-sm font-medium text-primary"
+                  />
+
+                  <FormInput
+                    {...register("averageWeight")}
+                    label={t("modal.average_weight")}
+                    placeholder={t("modal.average_weight_placeholder")}
+                    maxLength={100}
+                    showCharCount
+                    showOptionalLabel={false}
+                    value={watchedValues.averageWeight}
+                    labelClassName="text-sm font-medium text-primary"
+                  />
+                </div>
+
+                {/* Special Physical Characteristics */}
+                <FormTextarea
+                  {...register("specialPhysicalCharacteristics")}
+                  label={t("modal.special_physical_characteristics")}
+                  placeholder={t(
+                    "modal.special_physical_characteristics_placeholder"
+                  )}
+                  maxLength={500}
+                  rows={4}
                   showCharCount
                   showOptionalLabel={false}
-                  value={watchedValues.averageWeight}
+                  value={watchedValues.specialPhysicalCharacteristics}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
+              </div>
+
+              <Separator />
+
+              {/* Behaviors Section */}
+              <div className="space-y-6">
+                <SectionTitle>{t("sections.behaviors")}</SectionTitle>
+
+                {/* Habits */}
+                <HabitsPicker
+                  value={watchedValues.habits || ""}
+                  onChange={(value) => setValue("habits", value)}
+                />
+
+                {/* Reproductive Cycle */}
+                <ReproductiveCyclePicker
+                  value={watchedValues.reproductiveCycle || ""}
+                  onChange={(value) => setValue("reproductiveCycle", value)}
+                  otherCycleDescription={
+                    watchedValues.otherReproductiveCycleDescription || ""
+                  }
+                  onOtherCycleDescriptionChange={(value) =>
+                    setValue("otherReproductiveCycleDescription", value)
+                  }
+                  otherCycleError={
+                    errors.otherReproductiveCycleDescription?.message
+                  }
+                />
+
+                {/* Diet */}
+                <DietPicker
+                  value={watchedValues.diet || ""}
+                  onChange={(value) => setValue("diet", value)}
+                  elementalDiet={watchedValues.elementalDiet || ""}
+                  onElementalDietChange={(value) =>
+                    setValue("elementalDiet", value)
+                  }
+                  elementalDietError={errors.elementalDiet?.message}
+                />
+
+                {/* Communication */}
+                <CommunicationPicker
+                  values={watchedValues.communication || []}
+                  onChange={(values) => setValue("communication", values)}
+                  otherCommunication={watchedValues.otherCommunication || ""}
+                  onOtherCommunicationChange={(value) =>
+                    setValue("otherCommunication", value)
+                  }
+                  otherCommunicationError={errors.otherCommunication?.message}
+                />
+
+                {/* Moral Tendency */}
+                <MoralTendencyPicker
+                  value={watchedValues.moralTendency || ""}
+                  onChange={(value) => setValue("moralTendency", value)}
+                />
+
+                {/* Social Organization and Behavioral Tendency */}
+                <FormTextarea
+                  {...register("socialOrganization")}
+                  label={t("modal.social_organization")}
+                  placeholder={t("modal.social_organization_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.socialOrganization}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
+
+                {/* Habitat */}
+                <FormListInput
+                  value={watchedValues.habitat || []}
+                  onChange={(value) => setValue("habitat", value)}
+                  label={t("modal.habitat")}
+                  placeholder={t("modal.habitat_placeholder")}
+                  buttonText={t("modal.add_habitat")}
+                  maxLength={50}
+                  inputSize="small"
                   labelClassName="text-sm font-medium text-primary"
                 />
               </div>
 
-              {/* Special Physical Characteristics */}
-              <FormTextarea
-                {...register("specialPhysicalCharacteristics")}
-                label={t("modal.special_physical_characteristics")}
-                placeholder={t("modal.special_physical_characteristics_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.specialPhysicalCharacteristics}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-            </div>
+              <Separator />
 
-            <Separator />
+              {/* Power Section */}
+              <div className="space-y-6">
+                <SectionTitle>{t("sections.power")}</SectionTitle>
 
-            {/* Behaviors Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("sections.behaviors")}</SectionTitle>
+                {/* Physical Capacity */}
+                <PhysicalCapacityPicker
+                  value={watchedValues.physicalCapacity || ""}
+                  onChange={(value) => setValue("physicalCapacity", value)}
+                />
 
-              {/* Habits */}
-              <HabitsPicker
-                value={watchedValues.habits || ""}
-                onChange={(value) => setValue("habits", value)}
-              />
+                {/* Special Characteristics */}
+                <FormTextarea
+                  {...register("specialCharacteristics")}
+                  label={t("modal.special_characteristics")}
+                  placeholder={t("modal.special_characteristics_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.specialCharacteristics}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
 
-              {/* Reproductive Cycle */}
-              <ReproductiveCyclePicker
-                value={watchedValues.reproductiveCycle || ""}
-                onChange={(value) => setValue("reproductiveCycle", value)}
-                otherCycleDescription={watchedValues.otherReproductiveCycleDescription || ""}
-                onOtherCycleDescriptionChange={(value) =>
-                  setValue("otherReproductiveCycleDescription", value)
-                }
-                otherCycleError={errors.otherReproductiveCycleDescription?.message}
-              />
+                {/* Weaknesses */}
+                <FormTextarea
+                  {...register("weaknesses")}
+                  label={t("modal.weaknesses")}
+                  placeholder={t("modal.weaknesses_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.weaknesses}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
+              </div>
 
-              {/* Diet */}
-              <DietPicker
-                value={watchedValues.diet || ""}
-                onChange={(value) => setValue("diet", value)}
-                elementalDiet={watchedValues.elementalDiet || ""}
-                onElementalDietChange={(value) =>
-                  setValue("elementalDiet", value)
-                }
-                elementalDietError={errors.elementalDiet?.message}
-              />
+              <Separator />
 
-              {/* Communication */}
-              <CommunicationPicker
-                values={watchedValues.communication || []}
-                onChange={(values) => setValue("communication", values)}
-                otherCommunication={watchedValues.otherCommunication || ""}
-                onOtherCommunicationChange={(value) =>
-                  setValue("otherCommunication", value)
-                }
-                otherCommunicationError={errors.otherCommunication?.message}
-              />
+              {/* Narrative Section */}
+              <div className="space-y-6">
+                <SectionTitle>{t("sections.narrative")}</SectionTitle>
 
-              {/* Moral Tendency */}
-              <MoralTendencyPicker
-                value={watchedValues.moralTendency || ""}
-                onChange={(value) => setValue("moralTendency", value)}
-              />
+                {/* Story Motivation */}
+                <FormTextarea
+                  {...register("storyMotivation")}
+                  label={t("modal.story_motivation")}
+                  placeholder={t("modal.story_motivation_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.storyMotivation}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
 
-              {/* Social Organization and Behavioral Tendency */}
-              <FormTextarea
-                {...register("socialOrganization")}
-                label={t("modal.social_organization")}
-                placeholder={t("modal.social_organization_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.socialOrganization}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-
-              {/* Habitat */}
-              <FormListInput
-                value={watchedValues.habitat || []}
-                onChange={(value) => setValue("habitat", value)}
-                label={t("modal.habitat")}
-                placeholder={t("modal.habitat_placeholder")}
-                buttonText={t("modal.add_habitat")}
-                maxLength={50}
-                inputSize="small"
-                labelClassName="text-sm font-medium text-primary"
-              />
-            </div>
-
-            <Separator />
-
-            {/* Power Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("sections.power")}</SectionTitle>
-
-              {/* Physical Capacity */}
-              <PhysicalCapacityPicker
-                value={watchedValues.physicalCapacity || ""}
-                onChange={(value) => setValue("physicalCapacity", value)}
-              />
-
-              {/* Special Characteristics */}
-              <FormTextarea
-                {...register("specialCharacteristics")}
-                label={t("modal.special_characteristics")}
-                placeholder={t("modal.special_characteristics_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.specialCharacteristics}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-
-              {/* Weaknesses */}
-              <FormTextarea
-                {...register("weaknesses")}
-                label={t("modal.weaknesses")}
-                placeholder={t("modal.weaknesses_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.weaknesses}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-            </div>
-
-            <Separator />
-
-            {/* Narrative Section */}
-            <div className="space-y-6">
-              <SectionTitle>{t("sections.narrative")}</SectionTitle>
-
-              {/* Story Motivation */}
-              <FormTextarea
-                {...register("storyMotivation")}
-                label={t("modal.story_motivation")}
-                placeholder={t("modal.story_motivation_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.storyMotivation}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-
-              {/* Inspirations */}
-              <FormTextarea
-                {...register("inspirations")}
-                label={t("modal.inspirations")}
-                placeholder={t("modal.inspirations_placeholder")}
-                maxLength={500}
-                rows={4}
-                showCharCount
-                showOptionalLabel={false}
-                value={watchedValues.inspirations}
-                labelClassName="text-sm font-medium text-primary"
-                className="resize-none"
-              />
-            </div>
+                {/* Inspirations */}
+                <FormTextarea
+                  {...register("inspirations")}
+                  label={t("modal.inspirations")}
+                  placeholder={t("modal.inspirations_placeholder")}
+                  maxLength={500}
+                  rows={4}
+                  showCharCount
+                  showOptionalLabel={false}
+                  value={watchedValues.inspirations}
+                  labelClassName="text-sm font-medium text-primary"
+                  className="resize-none"
+                />
+              </div>
             </>
           }
           footer={{

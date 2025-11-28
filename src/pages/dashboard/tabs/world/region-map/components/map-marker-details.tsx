@@ -31,7 +31,6 @@ import { cn } from "@/lib/utils";
 
 import { IRegion } from "../../types/region-types";
 
-
 interface MapMarkerDetailsProps {
   region: IRegion;
   markerColor: string;

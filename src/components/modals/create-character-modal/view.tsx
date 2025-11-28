@@ -2,17 +2,17 @@ import { UserPlus, User } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
-import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
-import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityModal } from "@/components/modals/entity-modal";
-import { AlignmentMatrix } from "@/pages/dashboard/tabs/characters/character-detail/components/alignment-matrix";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SectionTitle } from "@/components/ui/section-title";
 import {
   Select,
   SelectContent,
@@ -20,9 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { AlignmentMatrix } from "@/pages/dashboard/tabs/characters/character-detail/components/alignment-matrix";
 
 import { CHARACTER_ARCHETYPES_CONSTANT } from "./constants/character-archetypes";
 import { CHARACTER_ROLES_CONSTANT } from "./constants/character-roles";
@@ -71,14 +71,26 @@ export function CreateCharacterModalView({
     value: role.value,
     label: t(role.translationKey),
     icon: role.icon,
-    backgroundColor: role.value === 'protagonist' ? 'yellow-500/10' :
-                     role.value === 'antagonist' ? 'orange-500/10' :
-                     role.value === 'villain' ? 'red-500/10' :
-                     role.value === 'secondary' ? 'blue-500/10' : 'gray-500/10',
-    borderColor: role.value === 'protagonist' ? 'yellow-500/20' :
-                 role.value === 'antagonist' ? 'orange-500/20' :
-                 role.value === 'villain' ? 'red-500/20' :
-                 role.value === 'secondary' ? 'blue-500/20' : 'gray-500/20',
+    backgroundColor:
+      role.value === "protagonist"
+        ? "yellow-500/10"
+        : role.value === "antagonist"
+          ? "orange-500/10"
+          : role.value === "villain"
+            ? "red-500/10"
+            : role.value === "secondary"
+              ? "blue-500/10"
+              : "gray-500/10",
+    borderColor:
+      role.value === "protagonist"
+        ? "yellow-500/20"
+        : role.value === "antagonist"
+          ? "orange-500/20"
+          : role.value === "villain"
+            ? "red-500/20"
+            : role.value === "secondary"
+              ? "blue-500/20"
+              : "gray-500/20",
   }));
 
   // Convert physical type constants to FormSimpleGrid format
@@ -86,16 +98,30 @@ export function CreateCharacterModalView({
     value: type.value,
     label: t(type.translationKey),
     icon: type.icon,
-    backgroundColor: type.value === 'malnourished' ? 'orange-500/10' :
-                     type.value === 'thin' ? 'sky-500/10' :
-                     type.value === 'athletic' ? 'emerald-500/10' :
-                     type.value === 'robust' ? 'blue-500/10' :
-                     type.value === 'corpulent' ? 'purple-500/10' : 'red-500/10',
-    borderColor: type.value === 'malnourished' ? 'orange-500/20' :
-                 type.value === 'thin' ? 'sky-500/20' :
-                 type.value === 'athletic' ? 'emerald-500/20' :
-                 type.value === 'robust' ? 'blue-500/20' :
-                 type.value === 'corpulent' ? 'purple-500/20' : 'red-500/20',
+    backgroundColor:
+      type.value === "malnourished"
+        ? "orange-500/10"
+        : type.value === "thin"
+          ? "sky-500/10"
+          : type.value === "athletic"
+            ? "emerald-500/10"
+            : type.value === "robust"
+              ? "blue-500/10"
+              : type.value === "corpulent"
+                ? "purple-500/10"
+                : "red-500/10",
+    borderColor:
+      type.value === "malnourished"
+        ? "orange-500/20"
+        : type.value === "thin"
+          ? "sky-500/20"
+          : type.value === "athletic"
+            ? "emerald-500/20"
+            : type.value === "robust"
+              ? "blue-500/20"
+              : type.value === "corpulent"
+                ? "purple-500/20"
+                : "red-500/20",
   }));
 
   // Convert archetype constants to FormSelectGrid format
@@ -175,7 +201,10 @@ export function CreateCharacterModalView({
 
             {/* Gender */}
             <div className="space-y-2">
-              <Label htmlFor="gender" className="text-sm font-medium text-primary">
+              <Label
+                htmlFor="gender"
+                className="text-sm font-medium text-primary"
+              >
                 {t("modal.gender")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
@@ -186,9 +215,7 @@ export function CreateCharacterModalView({
                 <SelectTrigger
                   className={errors.gender ? "border-destructive" : ""}
                 >
-                  <SelectValue
-                    placeholder={t("modal.gender_placeholder")}
-                  />
+                  <SelectValue placeholder={t("modal.gender_placeholder")} />
                 </SelectTrigger>
                 <SelectContent side="bottom">
                   {GENDERS_CONSTANT.map((gender) => {
@@ -211,7 +238,10 @@ export function CreateCharacterModalView({
 
       {/* Simple Description */}
       <div className="space-y-2">
-        <Label htmlFor="description" className="text-sm font-medium text-primary">
+        <Label
+          htmlFor="description"
+          className="text-sm font-medium text-primary"
+        >
           {t("modal.simple_description")}
           <span className="text-destructive ml-1">*</span>
         </Label>
@@ -260,7 +290,10 @@ export function CreateCharacterModalView({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Height */}
           <div className="space-y-2">
-            <Label htmlFor="height" className="text-sm font-medium text-primary">
+            <Label
+              htmlFor="height"
+              className="text-sm font-medium text-primary"
+            >
               {t("modal.height")}
             </Label>
             <Input
@@ -276,7 +309,10 @@ export function CreateCharacterModalView({
 
           {/* Weight */}
           <div className="space-y-2">
-            <Label htmlFor="weight" className="text-sm font-medium text-primary">
+            <Label
+              htmlFor="weight"
+              className="text-sm font-medium text-primary"
+            >
               {t("modal.weight")}
             </Label>
             <Input
@@ -293,7 +329,10 @@ export function CreateCharacterModalView({
 
         {/* Skin Tone - Full width */}
         <div className="space-y-2">
-          <Label htmlFor="skinTone" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="skinTone"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.skin_tone")}
           </Label>
           <Input
@@ -395,9 +434,7 @@ export function CreateCharacterModalView({
             className="resize-none"
           />
           <div className="flex justify-end text-xs text-muted-foreground">
-            <span>
-              {watchedValues.distinguishingFeatures?.length || 0}/400
-            </span>
+            <span>{watchedValues.distinguishingFeatures?.length || 0}/400</span>
           </div>
         </div>
       </div>
@@ -425,13 +462,16 @@ export function CreateCharacterModalView({
           <AlignmentMatrix
             value={watchedValues.alignment || ""}
             onChange={(value) => setValue("alignment", value)}
-            isEditable={true}
+            isEditable
           />
         </div>
 
         {/* Personality */}
         <div className="space-y-2">
-          <Label htmlFor="personality" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="personality"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.personality")}
           </Label>
           <Textarea
@@ -467,7 +507,10 @@ export function CreateCharacterModalView({
 
         {/* Dreams and Goals */}
         <div className="space-y-2">
-          <Label htmlFor="dreamsAndGoals" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="dreamsAndGoals"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.dreams_and_goals")}
           </Label>
           <Textarea
@@ -506,7 +549,10 @@ export function CreateCharacterModalView({
 
         {/* Favorite Food */}
         <div className="space-y-2">
-          <Label htmlFor="favoriteFood" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="favoriteFood"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.favorite_food")}
           </Label>
           <Input
@@ -522,7 +568,10 @@ export function CreateCharacterModalView({
 
         {/* Favorite Music */}
         <div className="space-y-2">
-          <Label htmlFor="favoriteMusic" className="text-sm font-medium text-primary">
+          <Label
+            htmlFor="favoriteMusic"
+            className="text-sm font-medium text-primary"
+          >
             {t("modal.favorite_music")}
           </Label>
           <Input
@@ -603,8 +652,8 @@ export function CreateCharacterModalView({
       advancedFields={advancedFields}
       footer={{
         isSubmitting: false,
-        isValid: isValid,
-        onSubmit: onSubmit,
+        isValid,
+        onSubmit,
         onCancel: onClose,
         submitLabel: t("button.create"),
         cancelLabel: t("button.cancel"),

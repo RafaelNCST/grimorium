@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { InfoAlert } from "@/components/ui/info-alert";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { InfoAlert } from "@/components/ui/info-alert";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type IHierarchyTitle } from "@/types/faction-types";
@@ -42,7 +42,9 @@ export function AddMemberModal({
 }: AddMemberModalProps) {
   const { t } = useTranslation("faction-detail");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
+    null
+  );
   const [selectedTitleId, setSelectedTitleId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -86,17 +88,21 @@ export function AddMemberModal({
   };
 
   // Filtrar personagens disponíveis (que ainda não são membros, exceto se estiver editando)
-  const filteredCharacters = availableCharacters.filter(char => {
+  const filteredCharacters = availableCharacters.filter((char) => {
     const isAvailable = editingMember
-      ? char.id === editingMember.characterId || !existingMemberIds.includes(char.id)
+      ? char.id === editingMember.characterId ||
+        !existingMemberIds.includes(char.id)
       : !existingMemberIds.includes(char.id);
     return isAvailable;
   });
 
   // Ordenar títulos por ordem
-  const sortedTitles = [...titles].sort((a, b) => (a.order || 0) - (b.order || 0));
+  const sortedTitles = [...titles].sort(
+    (a, b) => (a.order || 0) - (b.order || 0)
+  );
 
-  const getCharacterById = (id: string) => availableCharacters.find(c => c.id === id);
+  const getCharacterById = (id: string) =>
+    availableCharacters.find((c) => c.id === id);
 
   const isEditMode = !!editingMember;
 
@@ -129,7 +135,9 @@ export function AddMemberModal({
                 <div className="grid grid-cols-1 gap-3 p-1">
                   {filteredCharacters.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
-                      <p className="text-sm">{t("hierarchy.no_available_characters")}</p>
+                      <p className="text-sm">
+                        {t("hierarchy.no_available_characters")}
+                      </p>
                     </div>
                   ) : (
                     filteredCharacters.map((character) => (
@@ -203,9 +211,7 @@ export function AddMemberModal({
                     {t("hierarchy.select_title")}
                   </Label>
                   {sortedTitles.length === 0 ? (
-                    <InfoAlert>
-                      {t("hierarchy.no_titles_available")}
-                    </InfoAlert>
+                    <InfoAlert>{t("hierarchy.no_titles_available")}</InfoAlert>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
                       {sortedTitles.map((title) => {
@@ -223,7 +229,9 @@ export function AddMemberModal({
                             onClick={() => setSelectedTitleId(title.id)}
                           >
                             <div className="text-center">
-                              <p className="font-semibold truncate">{title.name}</p>
+                              <p className="font-semibold truncate">
+                                {title.name}
+                              </p>
                               <p className="text-xs opacity-80">
                                 {t("hierarchy.order")}: #{title.order}
                               </p>
@@ -266,7 +274,9 @@ export function AddMemberModal({
                 className="animate-glow"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
-                {isEditMode ? t("hierarchy.save_member") : t("hierarchy.add_member_btn")}
+                {isEditMode
+                  ? t("hierarchy.save_member")
+                  : t("hierarchy.add_member_btn")}
               </Button>
             </>
           )}

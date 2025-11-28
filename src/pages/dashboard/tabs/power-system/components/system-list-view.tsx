@@ -127,12 +127,7 @@ function SystemCard({ system, isEditMode, onSelect, onEdit }: SystemCardProps) {
             <AvatarImage src={system.iconImage} className="object-cover" />
           </Avatar>
         ) : (
-          <DisplayImage
-            icon={Zap}
-            height="h-24"
-            width="w-24"
-            shape="square"
-          />
+          <DisplayImage icon={Zap} height="h-24" width="w-24" shape="square" />
         )}
 
         {/* Right side content */}

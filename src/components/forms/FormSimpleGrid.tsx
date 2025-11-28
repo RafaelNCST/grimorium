@@ -250,20 +250,24 @@ export function FormSimpleGrid<T extends string = string>({
                   ? {
                       backgroundColor: getTailwindColor(option.backgroundColor),
                       borderColor: getTailwindColor(option.borderColor),
-                      boxShadow: `0 0 0 4px ${getTailwindColor(option.borderColor).replace(/[0-9.]+\)$/, '0.5)')}`,
+                      boxShadow: `0 0 0 4px ${getTailwindColor(option.borderColor).replace(/[0-9.]+\)$/, "0.5)")}`,
                     }
                   : undefined
               }
               onMouseEnter={(e) => {
                 if (!selected && !isDisabled) {
-                  e.currentTarget.style.backgroundColor = getTailwindColor(option.backgroundColor);
-                  e.currentTarget.style.borderColor = getTailwindColor(option.borderColor);
+                  e.currentTarget.style.backgroundColor = getTailwindColor(
+                    option.backgroundColor
+                  );
+                  e.currentTarget.style.borderColor = getTailwindColor(
+                    option.borderColor
+                  );
                 }
               }}
               onMouseLeave={(e) => {
                 if (!selected && !isDisabled) {
-                  e.currentTarget.style.backgroundColor = '';
-                  e.currentTarget.style.borderColor = '';
+                  e.currentTarget.style.backgroundColor = "";
+                  e.currentTarget.style.borderColor = "";
                 }
               }}
             >

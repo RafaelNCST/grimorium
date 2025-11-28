@@ -115,7 +115,9 @@ export function DiplomacySection({
             <Shield className="w-4 h-4 text-muted-foreground" />
           </div>
         )}
-        <span className="text-sm font-medium flex-1 truncate">{faction.name}</span>
+        <span className="text-sm font-medium flex-1 truncate">
+          {faction.name}
+        </span>
         {isEditing && relation && status !== "neutral" && (
           <Button
             variant="ghost-destructive"
@@ -134,17 +136,19 @@ export function DiplomacySection({
     <>
       <div className="space-y-4">
         {/* Add Relation Button - Only in Edit Mode and when there are available factions */}
-        {isEditing && otherFactions.length > 0 && diplomaticRelations.length < otherFactions.length && (
-          <Button
-            variant="magical"
-            size="lg"
-            className="w-full animate-glow"
-            onClick={handleAddRelation}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {t("diplomacy.add_relation")}
-          </Button>
-        )}
+        {isEditing &&
+          otherFactions.length > 0 &&
+          diplomaticRelations.length < otherFactions.length && (
+            <Button
+              variant="magical"
+              size="lg"
+              className="w-full animate-glow"
+              onClick={handleAddRelation}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {t("diplomacy.add_relation")}
+            </Button>
+          )}
 
         {/* Tabs Container */}
         <div className="w-full">
@@ -161,15 +165,18 @@ export function DiplomacySection({
               return (
                 <button
                   key={status.value}
-                  onClick={() => onActiveTabChange(status.value as DiplomaticStatus)}
+                  onClick={() =>
+                    onActiveTabChange(status.value as DiplomaticStatus)
+                  }
                   className={`
                     flex items-center justify-center gap-1 sm:gap-2 px-2 py-2
                     transition-colors duration-200
                     ${isFirst ? "rounded-l-lg" : ""}
                     ${isLast ? "rounded-r-lg" : ""}
-                    ${isActive
-                      ? "bg-purple-600 text-white"
-                      : "hover:bg-white/5 dark:hover:bg-white/10"
+                    ${
+                      isActive
+                        ? "bg-purple-600 text-white"
+                        : "hover:bg-white/5 dark:hover:bg-white/10"
                     }
                   `}
                 >
@@ -179,7 +186,9 @@ export function DiplomacySection({
                   <span className="hidden md:inline truncate text-sm">
                     {t(`diplomatic_status.${status.value}`)}
                   </span>
-                  <span className={`ml-auto text-xs ${isActive ? "text-white" : "text-muted-foreground"}`}>
+                  <span
+                    className={`ml-auto text-xs ${isActive ? "text-white" : "text-muted-foreground"}`}
+                  >
                     {count}
                   </span>
                 </button>

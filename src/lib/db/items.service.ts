@@ -273,8 +273,8 @@ export async function updateItemVersionData(
   itemData: IItem
 ): Promise<void> {
   const db = await getDB();
-  await db.execute(
-    "UPDATE item_versions SET item_data = $1 WHERE id = $2",
-    [JSON.stringify(itemData), versionId]
-  );
+  await db.execute("UPDATE item_versions SET item_data = $1 WHERE id = $2", [
+    JSON.stringify(itemData),
+    versionId,
+  ]);
 }

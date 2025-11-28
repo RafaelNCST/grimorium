@@ -817,9 +817,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add status column to characters table
     try {
-      await database.execute(
-        "ALTER TABLE characters ADD COLUMN status TEXT"
-      );
+      await database.execute("ALTER TABLE characters ADD COLUMN status TEXT");
       console.log("[db] Added status column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -837,9 +835,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add past column to characters table
     try {
-      await database.execute(
-        "ALTER TABLE characters ADD COLUMN past TEXT"
-      );
+      await database.execute("ALTER TABLE characters ADD COLUMN past TEXT");
       console.log("[db] Added past column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -850,7 +846,9 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE races ADD COLUMN other_reproductive_cycle_description TEXT"
       );
-      console.log("[db] Added other_reproductive_cycle_description column to races table");
+      console.log(
+        "[db] Added other_reproductive_cycle_description column to races table"
+      );
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -867,9 +865,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add item_usage column to items table
     try {
-      await database.execute(
-        "ALTER TABLE items ADD COLUMN item_usage TEXT"
-      );
+      await database.execute("ALTER TABLE items ADD COLUMN item_usage TEXT");
       console.log("[db] Added item_usage column to items table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -1134,8 +1130,12 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute("DROP TABLE races_backup");
 
         // Recreate indexes
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id)");
-        await database.execute("CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)");
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)"
+        );
 
         console.log("[db] Removed race_views column from races table");
       } else {
@@ -1157,9 +1157,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add timeline column to factions table (JSON array of IFactionTimelineEra)
     try {
-      await database.execute(
-        "ALTER TABLE factions ADD COLUMN timeline TEXT"
-      );
+      await database.execute("ALTER TABLE factions ADD COLUMN timeline TEXT");
       console.log("[db] Added timeline column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -1177,9 +1175,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add hierarchy column to factions table (JSON array of IHierarchyTitle)
     try {
-      await database.execute(
-        "ALTER TABLE factions ADD COLUMN hierarchy TEXT"
-      );
+      await database.execute("ALTER TABLE factions ADD COLUMN hierarchy TEXT");
       console.log("[db] Added hierarchy column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -1187,9 +1183,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Add ui_state column to factions table (JSON object for UI state persistence)
     try {
-      await database.execute(
-        "ALTER TABLE factions ADD COLUMN ui_state TEXT"
-      );
+      await database.execute("ALTER TABLE factions ADD COLUMN ui_state TEXT");
       console.log("[db] Added ui_state column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -1206,9 +1200,7 @@ async function runMigrations(database: Database): Promise<void> {
     }
 
     try {
-      await database.execute(
-        "ALTER TABLE factions ADD COLUMN main_base TEXT"
-      );
+      await database.execute("ALTER TABLE factions ADD COLUMN main_base TEXT");
       console.log("[db] Added main_base column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
@@ -1235,7 +1227,9 @@ async function runMigrations(database: Database): Promise<void> {
         console.log("[db] Adding book_id column to notes table...");
 
         // Get all books
-        const books = await database.select<{ id: string }[]>("SELECT id FROM books");
+        const books = await database.select<{ id: string }[]>(
+          "SELECT id FROM books"
+        );
 
         // Add book_id column (allowing NULL temporarily)
         await database.execute("ALTER TABLE notes ADD COLUMN book_id TEXT");
@@ -1244,9 +1238,10 @@ async function runMigrations(database: Database): Promise<void> {
         if (books.length > 0) {
           // Assign all existing notes to the first book
           const firstBookId = books[0].id;
-          await database.execute("UPDATE notes SET book_id = ? WHERE book_id IS NULL", [
-            firstBookId,
-          ]);
+          await database.execute(
+            "UPDATE notes SET book_id = ? WHERE book_id IS NULL",
+            [firstBookId]
+          );
           console.log(
             `[db] Assigned all existing notes to book: ${firstBookId}`
           );
@@ -1286,41 +1281,41 @@ async function migrateBookGenres(database: Database): Promise<void> {
   // Mapping of old genre values to new standardized IDs
   const genreMapping: Record<string, string> = {
     // Portuguese translations
-    "urbano": "urban",
-    "fantasia": "fantasy",
-    "futurístico": "futuristic",
-    "futuristico": "futuristic",
-    "cyberpunk": "cyberpunk",
+    urbano: "urban",
+    fantasia: "fantasy",
+    futurístico: "futuristic",
+    futuristico: "futuristic",
+    cyberpunk: "cyberpunk",
     "alta fantasia": "high_fantasy",
-    "romance": "romance",
-    "mistério": "mystery",
-    "misterio": "mystery",
-    "terror": "horror",
-    "suspense": "suspense",
-    "drama": "drama",
+    romance: "romance",
+    mistério: "mystery",
+    misterio: "mystery",
+    terror: "horror",
+    suspense: "suspense",
+    drama: "drama",
     "ficção científica": "sci_fi",
     "ficcao cientifica": "sci_fi",
     "ficção cientifica": "sci_fi",
-    "histórico": "historical",
-    "historico": "historical",
-    "ação": "action",
-    "acao": "action",
-    "aventura": "adventure",
-    "litrpg": "litrpg",
+    histórico: "historical",
+    historico: "historical",
+    ação: "action",
+    acao: "action",
+    aventura: "adventure",
+    litrpg: "litrpg",
     // English translations (various capitalizations)
-    "urban": "urban",
-    "fantasy": "fantasy",
-    "futuristic": "futuristic",
+    urban: "urban",
+    fantasy: "fantasy",
+    futuristic: "futuristic",
     "high fantasy": "high_fantasy",
-    "high_fantasy": "high_fantasy",
-    "mystery": "mystery",
-    "horror": "horror",
+    high_fantasy: "high_fantasy",
+    mystery: "mystery",
+    horror: "horror",
     "sci-fi": "sci_fi",
-    "sci_fi": "sci_fi",
-    "scifi": "sci_fi",
-    "historical": "historical",
-    "action": "action",
-    "adventure": "adventure",
+    sci_fi: "sci_fi",
+    scifi: "sci_fi",
+    historical: "historical",
+    action: "action",
+    adventure: "adventure",
   };
 
   try {
@@ -1360,20 +1355,27 @@ async function migrateBookGenres(database: Database): Promise<void> {
         }
 
         if (needsMigration) {
-          await database.execute(
-            "UPDATE books SET genre = $1 WHERE id = $2",
-            [JSON.stringify(newGenres), book.id]
-          );
+          await database.execute("UPDATE books SET genre = $1 WHERE id = $2", [
+            JSON.stringify(newGenres),
+            book.id,
+          ]);
           migratedCount++;
-          console.log(`[db] Migrated genres for book ${book.id}: ${genres.join(", ")} -> ${newGenres.join(", ")}`);
+          console.log(
+            `[db] Migrated genres for book ${book.id}: ${genres.join(", ")} -> ${newGenres.join(", ")}`
+          );
         }
       } catch (parseError) {
-        console.warn(`[db] Could not parse genres for book ${book.id}:`, parseError);
+        console.warn(
+          `[db] Could not parse genres for book ${book.id}:`,
+          parseError
+        );
       }
     }
 
     if (migratedCount > 0) {
-      console.log(`[db] Genre migration completed. Migrated ${migratedCount} books.`);
+      console.log(
+        `[db] Genre migration completed. Migrated ${migratedCount} books.`
+      );
     } else {
       console.log("[db] No books needed genre migration.");
     }

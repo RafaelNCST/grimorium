@@ -28,9 +28,11 @@ export function useEntityFilters<T extends Record<string, any>>({
   filterGroups = [],
 }: UseEntityFiltersParams<T>): UseEntityFiltersReturn<T> {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => {
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >(() => {
     const initial: Record<string, string[]> = {};
-    filterGroups.forEach(group => {
+    filterGroups.forEach((group) => {
       initial[group.key] = [];
     });
     return initial;
@@ -56,7 +58,7 @@ export function useEntityFilters<T extends Record<string, any>>({
   // Clear all filters
   const clearFilters = useCallback(() => {
     const resetFilters: Record<string, string[]> = {};
-    filterGroups.forEach(group => {
+    filterGroups.forEach((group) => {
       resetFilters[group.key] = [];
     });
     setSelectedFilters(resetFilters);
@@ -71,36 +73,39 @@ export function useEntityFilters<T extends Record<string, any>>({
   }, []);
 
   // Check if any filters are active
-  const hasActiveFilters = useMemo(() => {
-    return Object.values(selectedFilters).some((values) => values.length > 0);
-  }, [selectedFilters]);
+  const hasActiveFilters = useMemo(
+    () => Object.values(selectedFilters).some((values) => values.length > 0),
+    [selectedFilters]
+  );
 
   // Filter entities
-  const filteredEntities = useMemo(() => {
-    return entities.filter((entity) => {
-      // Search filter (OR between fields)
-      if (searchTerm.trim()) {
-        const searchLower = searchTerm.toLowerCase();
-        const matchesSearch = searchFields.some((field) => {
-          const value = entity[field];
-          if (value == null) return false;
-          return String(value).toLowerCase().includes(searchLower);
-        });
-        if (!matchesSearch) return false;
-      }
-
-      // Filter groups (AND between groups, OR within group)
-      for (const group of filterGroups) {
-        const selectedValues = selectedFilters[group.key] || [];
-        if (selectedValues.length > 0) {
-          const matchesGroup = group.filterFn(entity, selectedValues);
-          if (!matchesGroup) return false;
+  const filteredEntities = useMemo(
+    () =>
+      entities.filter((entity) => {
+        // Search filter (OR between fields)
+        if (searchTerm.trim()) {
+          const searchLower = searchTerm.toLowerCase();
+          const matchesSearch = searchFields.some((field) => {
+            const value = entity[field];
+            if (value == null) return false;
+            return String(value).toLowerCase().includes(searchLower);
+          });
+          if (!matchesSearch) return false;
         }
-      }
 
-      return true;
-    });
-  }, [entities, searchTerm, searchFields, filterGroups, selectedFilters]);
+        // Filter groups (AND between groups, OR within group)
+        for (const group of filterGroups) {
+          const selectedValues = selectedFilters[group.key] || [];
+          if (selectedValues.length > 0) {
+            const matchesGroup = group.filterFn(entity, selectedValues);
+            if (!matchesGroup) return false;
+          }
+        }
+
+        return true;
+      }),
+    [entities, searchTerm, searchFields, filterGroups, selectedFilters]
+  );
 
   return {
     filteredEntities,

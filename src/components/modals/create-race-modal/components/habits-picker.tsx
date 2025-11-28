@@ -10,7 +10,11 @@ interface PropsHabitsPicker {
   hideLabel?: boolean;
 }
 
-export function HabitsPicker({ value, onChange, hideLabel }: PropsHabitsPicker) {
+export function HabitsPicker({
+  value,
+  onChange,
+  hideLabel,
+}: PropsHabitsPicker) {
   const { t } = useTranslation("create-race");
 
   return (

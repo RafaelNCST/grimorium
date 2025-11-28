@@ -146,9 +146,11 @@ export function EntityDetailLayout({
   className,
 }: EntityDetailLayoutProps) {
   // State to track which extra sections are open - persisted in localStorage
-  const [extraSectionsOpenState, setExtraSectionsOpenState] = React.useState<Record<string, boolean>>(() => {
+  const [extraSectionsOpenState, setExtraSectionsOpenState] = React.useState<
+    Record<string, boolean>
+  >(() => {
     // Try to load from localStorage first
-    const stored = localStorage.getItem('entityDetailExtraSectionsState');
+    const stored = localStorage.getItem("entityDetailExtraSectionsState");
     if (stored) {
       try {
         return JSON.parse(stored);
@@ -159,7 +161,7 @@ export function EntityDetailLayout({
 
     // Use defaults from section config
     const initialState: Record<string, boolean> = {};
-    extraSections.forEach(section => {
+    extraSections.forEach((section) => {
       initialState[section.id] = section.defaultOpen || false;
     });
     return initialState;
@@ -167,7 +169,10 @@ export function EntityDetailLayout({
 
   // Save to localStorage whenever state changes
   React.useEffect(() => {
-    localStorage.setItem('entityDetailExtraSectionsState', JSON.stringify(extraSectionsOpenState));
+    localStorage.setItem(
+      "entityDetailExtraSectionsState",
+      JSON.stringify(extraSectionsOpenState)
+    );
   }, [extraSectionsOpenState]);
   // Loading state
   if (isLoading) {
@@ -281,7 +286,6 @@ export function EntityDetailLayout({
         </div>
       </header>
 
-
       {/* Main content */}
       <div className="flex flex-1 gap-4 pt-14 pb-6">
         {/* Central content */}
@@ -318,7 +322,10 @@ export function EntityDetailLayout({
                 return null;
               }
 
-              const isOpen = extraSectionsOpenState[section.id] ?? section.defaultOpen ?? false;
+              const isOpen =
+                extraSectionsOpenState[section.id] ??
+                section.defaultOpen ??
+                false;
 
               return (
                 <CollapsibleSection
@@ -326,9 +333,9 @@ export function EntityDetailLayout({
                   title={section.title}
                   isOpen={isOpen}
                   onToggle={() => {
-                    setExtraSectionsOpenState(prev => ({
+                    setExtraSectionsOpenState((prev) => ({
                       ...prev,
-                      [section.id]: !isOpen
+                      [section.id]: !isOpen,
                     }));
                   }}
                   isEditMode={isEditMode}

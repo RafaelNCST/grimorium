@@ -1,6 +1,4 @@
-import {
-  WarningDialog,
-} from "@/components/dialogs/WarningDialog";
+import { WarningDialog } from "@/components/dialogs/WarningDialog";
 
 interface UnsavedChangesDialogProps {
   open: boolean;

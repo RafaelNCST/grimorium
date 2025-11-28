@@ -835,15 +835,21 @@ export async function getPowerLinksByCharacterId(
  */
 export async function getPowerLinksWithTitlesByCharacterId(
   characterId: string
-): Promise<Array<IPowerCharacterLink & { pageTitle?: string; sectionTitle?: string }>> {
+): Promise<
+  Array<IPowerCharacterLink & { pageTitle?: string; sectionTitle?: string }>
+> {
   try {
     const db = await getDB();
 
     // Single query with LEFT JOINs to get all data at once
-    const result = await db.select<Array<DBPowerCharacterLink & {
-      page_name?: string;
-      section_title?: string;
-    }>>(
+    const result = await db.select<
+      Array<
+        DBPowerCharacterLink & {
+          page_name?: string;
+          section_title?: string;
+        }
+      >
+    >(
       `SELECT
         pcl.id,
         pcl.character_id,
@@ -862,7 +868,7 @@ export async function getPowerLinksWithTitlesByCharacterId(
     );
 
     // Transform to the expected format
-    return result.map(row => ({
+    return result.map((row) => ({
       id: row.id,
       characterId: row.character_id,
       pageId: row.page_id,
@@ -873,7 +879,10 @@ export async function getPowerLinksWithTitlesByCharacterId(
       sectionTitle: row.section_title,
     }));
   } catch (error) {
-    console.error("Error fetching power links with titles by character:", error);
+    console.error(
+      "Error fetching power links with titles by character:",
+      error
+    );
     throw error;
   }
 }

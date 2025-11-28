@@ -23,11 +23,7 @@ export function CreateRaceModal({
   const { handleSubmit, reset } = form;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const watchedFields = form.watch([
-    "name",
-    "domain",
-    "summary",
-  ]);
+  const watchedFields = form.watch(["name", "domain", "summary"]);
 
   const isValid = useMemo(() => {
     const [name, domain, summary] = watchedFields;

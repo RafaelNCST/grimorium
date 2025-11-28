@@ -30,7 +30,8 @@ export function createRoleFilterRows(
           count: stats.protagonist,
           colorConfig: {
             color: "yellow",
-            inactiveClasses: "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400",
+            inactiveClasses:
+              "bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 hover:!bg-yellow-500 hover:!text-black hover:!border-yellow-400",
             activeClasses: "!bg-yellow-500 !text-black !border-yellow-500",
           },
         },
@@ -40,7 +41,8 @@ export function createRoleFilterRows(
           count: stats.antagonist,
           colorConfig: {
             color: "orange",
-            inactiveClasses: "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500",
+            inactiveClasses:
+              "bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400 hover:!bg-orange-500 hover:!text-black hover:!border-orange-500",
             activeClasses: "!bg-orange-500 !text-black !border-orange-500",
           },
         },
@@ -50,7 +52,8 @@ export function createRoleFilterRows(
           count: stats.villain,
           colorConfig: {
             color: "red",
-            inactiveClasses: "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500",
+            inactiveClasses:
+              "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400 hover:!bg-red-500 hover:!text-black hover:!border-red-500",
             activeClasses: "!bg-red-500 !text-black !border-red-500",
           },
         },
@@ -60,7 +63,8 @@ export function createRoleFilterRows(
           count: stats.secondary,
           colorConfig: {
             color: "blue",
-            inactiveClasses: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
+            inactiveClasses:
+              "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
             activeClasses: "!bg-blue-500 !text-black !border-blue-500",
           },
         },
@@ -70,7 +74,8 @@ export function createRoleFilterRows(
           count: stats.extra,
           colorConfig: {
             color: "gray",
-            inactiveClasses: "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500",
+            inactiveClasses:
+              "bg-gray-500/10 border-gray-500/30 text-gray-600 dark:text-gray-400 hover:!bg-gray-500 hover:!text-black hover:!border-gray-500",
             activeClasses: "!bg-gray-500 !text-black !border-gray-500",
           },
         },

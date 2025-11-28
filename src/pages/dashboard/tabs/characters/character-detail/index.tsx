@@ -5,6 +5,7 @@ import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { type ISectionVisibility } from "@/components/detail-page/visibility-helpers";
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { GENDERS_CONSTANT as GENDERS_CONSTANT_MODAL } from "@/components/modals/create-character-modal/constants/genders";
 import {
@@ -24,12 +25,13 @@ import {
   updatePowerCharacterLinkLabel,
   deletePowerCharacterLink,
 } from "@/lib/db/power-system.service";
-import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
+import { getRegionsByBookId } from "@/lib/db/regions.service";
+import { CharacterSchema } from "@/lib/validation/character-schema";
 import { mockFactions } from "@/mocks/global";
-import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
-import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
+import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
 import {
   type ICharacterVersion,
@@ -37,16 +39,14 @@ import {
   type ICharacter,
   type IFieldVisibility,
 } from "@/types/character-types";
-import { type ISectionVisibility } from "@/components/detail-page/visibility-helpers";
 
+import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
 import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
 import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
-import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
-import { CharacterSchema } from "@/lib/validation/character-schema";
 
 // Extended type to include page/section titles
 interface IPowerLinkWithTitles extends IPowerCharacterLink {
@@ -104,7 +104,8 @@ export function CharacterDetail() {
     relationships: [],
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
+    useState(false);
   const [newQuality, setNewQuality] = useState("");
   const [_imageFile, _setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -128,7 +129,8 @@ export function CharacterDetail() {
   const [currentVersion, setCurrentVersion] =
     useState<ICharacterVersion | null>(versions[0]);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
-  const [sectionVisibility, setSectionVisibility] = useState<ISectionVisibility>({});
+  const [sectionVisibility, setSectionVisibility] =
+    useState<ISectionVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -165,36 +167,39 @@ export function CharacterDetail() {
   }, [advancedSectionOpen]);
 
   // Função de validação de campo individual (onBlur)
-  const validateField = useCallback((field: string, value: any) => {
-    try {
-      // Validar apenas este campo
-      const fieldSchema = CharacterSchema.pick({ [field]: true } as any);
-      fieldSchema.parse({ [field]: value });
+  const validateField = useCallback(
+    (field: string, value: any) => {
+      try {
+        // Validar apenas este campo
+        const fieldSchema = CharacterSchema.pick({ [field]: true } as any);
+        fieldSchema.parse({ [field]: value });
 
-      // Se passou, remover erro
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+        // Se passou, remover erro
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
 
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Traduzir a mensagem de erro
-        const errorMessage = error.errors[0].message;
-        const translatedMessage = errorMessage.startsWith("character-detail:")
-          ? t(errorMessage)
-          : errorMessage;
+        return true;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          // Traduzir a mensagem de erro
+          const errorMessage = error.errors[0].message;
+          const translatedMessage = errorMessage.startsWith("character-detail:")
+            ? t(errorMessage)
+            : errorMessage;
 
-        setErrors((prev) => ({
-          ...prev,
-          [field]: translatedMessage,
-        }));
-        return false;
+          setErrors((prev) => ({
+            ...prev,
+            [field]: translatedMessage,
+          }));
+          return false;
+        }
       }
-    }
-  }, [t]);
+    },
+    [t]
+  );
 
   // Verificar se tem campos obrigatórios vazios e quais são
   const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
@@ -378,7 +383,9 @@ export function CharacterDetail() {
           getCharacterRelationships(characterId),
           getCharacterFamily(characterId),
           getCharacterVersions(characterId),
-          dashboardId ? getCharactersByBookId(dashboardId) : Promise.resolve([]),
+          dashboardId
+            ? getCharactersByBookId(dashboardId)
+            : Promise.resolve([]),
           getPowerLinksWithTitlesByCharacterId(characterId),
           dashboardId ? getRegionsByBookId(dashboardId) : Promise.resolve([]),
           dashboardId ? getRacesByBookId(dashboardId) : Promise.resolve([]),
@@ -483,7 +490,8 @@ export function CharacterDetail() {
   async function loadPowerLinks() {
     try {
       // Optimized: Single query with JOINs instead of N+1 queries
-      const linksWithTitles = await getPowerLinksWithTitlesByCharacterId(characterId);
+      const linksWithTitles =
+        await getPowerLinksWithTitlesByCharacterId(characterId);
       setCharacterPowerLinks(linksWithTitles);
     } catch (error) {
       console.error("Error loading power links:", error);
@@ -612,7 +620,10 @@ export function CharacterDetail() {
 
   const handleSave = useCallback(async () => {
     try {
-      console.log("[handleSave] Starting save...", { currentVersion, editData });
+      console.log("[handleSave] Starting save...", {
+        currentVersion,
+        editData,
+      });
 
       // Validar TUDO com Zod
       const validatedData = CharacterSchema.parse({
@@ -790,7 +801,12 @@ export function CharacterDetail() {
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
-  }, [character, originalFieldVisibility, originalSectionVisibility, hasChanges]);
+  }, [
+    character,
+    originalFieldVisibility,
+    originalSectionVisibility,
+    hasChanges,
+  ]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });

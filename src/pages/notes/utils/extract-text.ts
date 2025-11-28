@@ -33,7 +33,10 @@ export function extractTextFromContent(content?: JSONContent): string {
 /**
  * Truncates text to a maximum number of lines
  */
-export function truncateToLines(text: string, maxLines: number): {
+export function truncateToLines(
+  text: string,
+  maxLines: number
+): {
   text: string;
   isTruncated: boolean;
 } {

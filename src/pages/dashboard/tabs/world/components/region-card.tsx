@@ -1,9 +1,9 @@
 import { Map, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 
 import { REGION_SCALES_CONSTANT } from "../constants/scale-colors";
 import { IRegion } from "../types/region-types";
@@ -18,7 +18,9 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
   const { t } = useTranslation("world");
 
   // Find scale data
-  const scaleData = REGION_SCALES_CONSTANT.find((s) => s.value === region.scale);
+  const scaleData = REGION_SCALES_CONSTANT.find(
+    (s) => s.value === region.scale
+  );
 
   return (
     <EntityCardWrapper
@@ -48,9 +50,7 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
       <div className="p-4 space-y-3">
         {/* Region Name with Scale Badge */}
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-semibold text-lg leading-tight">
-            {region.name}
-          </h3>
+          <h3 className="font-semibold text-lg leading-tight">{region.name}</h3>
           {scaleData && (
             <EntityTagBadge
               config={scaleData}
@@ -69,7 +69,9 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
         ) : (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin className="w-3.5 h-3.5" />
-            <span className="font-medium">{t("region_card.neutral_region")}</span>
+            <span className="font-medium">
+              {t("region_card.neutral_region")}
+            </span>
           </div>
         )}
 

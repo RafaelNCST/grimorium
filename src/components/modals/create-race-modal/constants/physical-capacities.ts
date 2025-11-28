@@ -78,7 +78,9 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
 // Helper para converter para o formato do FormSelectGrid
 const convertToTailwindAlpha = (bgColor: string): string => {
   // Converte "bg-red-50 dark:bg-red-950" para "red-500/10"
-  const colorMatch = bgColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  const colorMatch = bgColor.match(
+    /(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/
+  );
   if (colorMatch) {
     return `${colorMatch[1]}-500/10`;
   }
@@ -87,7 +89,9 @@ const convertToTailwindAlpha = (bgColor: string): string => {
 
 const convertBorderToTailwindAlpha = (borderColor: string): string => {
   // Converte "border-red-200 dark:border-red-800" para "red-500/30"
-  const colorMatch = borderColor.match(/(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/);
+  const colorMatch = borderColor.match(
+    /(red|orange|blue|green|purple|yellow|indigo|pink|violet|amber|slate|cyan|teal)-/
+  );
   if (colorMatch) {
     return `${colorMatch[1]}-500/30`;
   }

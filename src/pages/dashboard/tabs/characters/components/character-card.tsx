@@ -6,9 +6,9 @@ import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-m
 import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
-import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
 import { CardTitle } from "@/components/ui/card";
+import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { ICharacter } from "@/types/character-types";
 
 interface CharacterCardProps {
@@ -20,10 +20,14 @@ export function CharacterCard({ character, onClick }: CharacterCardProps) {
   const { t } = useTranslation(["characters", "create-character"]);
 
   // Find role data
-  const roleData = CHARACTER_ROLES_CONSTANT.find((r) => r.value === character.role);
+  const roleData = CHARACTER_ROLES_CONSTANT.find(
+    (r) => r.value === character.role
+  );
 
   // Find status data
-  const statusData = CHARACTER_STATUS_CONSTANT.find((s) => s.value === character.status);
+  const statusData = CHARACTER_STATUS_CONSTANT.find(
+    (s) => s.value === character.status
+  );
 
   // Find gender data
   const genderData = GENDERS_CONSTANT.find((g) => g.value === character.gender);
