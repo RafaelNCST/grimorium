@@ -120,5 +120,8 @@
       "manage_links": "Manage links",
       "delete_note": "Delete note"
     }
+  },
+  "drag": {
+    "drop_here": "Drop here to swap"
   }
 }

@@ -120,5 +120,8 @@
       "manage_links": "Gerenciar links",
       "delete_note": "Excluir anotação"
     }
+  },
+  "drag": {
+    "drop_here": "Solte aqui para trocar"
   }
 }
