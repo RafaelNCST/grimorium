@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { JSONContent } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
@@ -8,12 +8,22 @@ import {
   Building2,
   Dna,
   Package,
+  X,
   Search,
   Check,
-  Plus,
   BookOpen,
 } from "lucide-react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +43,7 @@ import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
-import type { INoteLink, NoteColor, EntityType } from "@/types/note-types";
+import type { INote, INoteLink, NoteColor, EntityType } from "@/types/note-types";
 
 import { DEFAULT_NOTE_COLOR } from "../constants";
 
@@ -91,27 +101,40 @@ const ENTITY_TABS: {
   },
 ];
 
-interface CreateNoteModalProps {
+const ENTITY_TYPE_CONFIG: Record<
+  EntityType,
+  { icon: typeof Users; color: string }
+> = {
+  character: { icon: Users, color: "text-blue-500" },
+  region: { icon: Globe, color: "text-green-500" },
+  faction: { icon: Building2, color: "text-purple-500" },
+  race: { icon: Dna, color: "text-orange-500" },
+  item: { icon: Package, color: "text-yellow-500" },
+  arc: { icon: BookOpen, color: "text-pink-500" },
+};
+
+interface NoteDetailModalProps {
+  note: INote | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateNote: (formData: {
-    content: JSONContent;
-    color: NoteColor;
-    links: INoteLink[];
-  }) => void;
+  onUpdate: (noteId: string, updates: Partial<INote>) => void;
+  onDelete: (noteId: string) => void;
 }
 
-export function CreateNoteModal({
+function NoteDetailModalComponent({
+  note,
   open,
   onOpenChange,
-  onCreateNote,
-}: CreateNoteModalProps) {
+  onUpdate,
+  onDelete,
+}: NoteDetailModalProps) {
   const { t } = useTranslation("notes");
   const books = useBookStore((state) => state.books);
 
-  const [content, setContent] = useState<JSONContent | undefined>(undefined);
-  const [color, setColor] = useState<NoteColor>(DEFAULT_NOTE_COLOR);
-  const [links, setLinks] = useState<INoteLink[]>([]);
+  const [content, setContent] = useState<JSONContent | undefined>(note?.content);
+  const [color, setColor] = useState<NoteColor>(note?.color || DEFAULT_NOTE_COLOR);
+  const [links, setLinks] = useState<INoteLink[]>(note?.links || []);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showManageLinks, setShowManageLinks] = useState(false);
 
   // Link management states
@@ -121,20 +144,76 @@ export function CreateNoteModal({
   const [activeTab, setActiveTab] = useState<EntityType>("character");
   const [hasScrollbar, setHasScrollbar] = useState(false);
 
+  // Debounce timer for auto-save
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingContentRef = useRef<JSONContent | null>(null);
+  const editorRef = useRef<any>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Check if content has any text
-  const hasContent = content && content.content && content.content.length > 0;
+  // Sync local state when note changes
+  useEffect(() => {
+    if (note) {
+      setContent(note.content);
+      setColor(note.color || DEFAULT_NOTE_COLOR);
+      setLinks(note.links || []);
+      pendingContentRef.current = null;
+    }
+  }, [note?.id]); // Only depend on note ID to sync when note changes
+
+  // Save pending changes before closing
+  const flushPendingChanges = useCallback(async () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
+    if (!note) return;
+
+    // Get the latest content from the editor if available
+    let contentToSave: JSONContent | null = null;
+
+    if (editorRef.current) {
+      try {
+        contentToSave = editorRef.current.getJSON();
+      } catch (error) {
+        console.error("Error getting content from editor:", error);
+      }
+    }
+
+    // Fallback to pending content if we couldn't get it from editor
+    if (!contentToSave && pendingContentRef.current) {
+      contentToSave = pendingContentRef.current;
+    }
+
+    // Save if we have content
+    if (contentToSave) {
+      setContent(contentToSave);
+      await onUpdate(note.id, { content: contentToSave });
+      pendingContentRef.current = null;
+    }
+  }, [note, onUpdate]);
+
+  // Handle modal close with save
+  const handleClose = useCallback(async () => {
+    // Flush any pending changes and wait for completion
+    await flushPendingChanges();
+
+    // Close modal after saving
+    onOpenChange(false);
+  }, [flushPendingChanges, onOpenChange]);
 
   // Reset state when modal closes
   useEffect(() => {
     if (!open) {
+      // Reset all state when modal closes
       setContent(undefined);
       setColor(DEFAULT_NOTE_COLOR);
       setLinks([]);
+      setShowDeleteConfirm(false);
       setShowManageLinks(false);
       setSearchTerm("");
       setEntities([]);
+      editorRef.current = null;
     }
   }, [open]);
 
@@ -232,17 +311,46 @@ export function CreateNoteModal({
     fetchEntities();
   }, [showManageLinks, books]);
 
-  const handleContentChange = useCallback((newContent: JSONContent) => {
-    setContent(newContent);
-  }, []);
+  // Debounced save for content
+  const handleContentChange = useCallback(
+    (newContent: JSONContent) => {
+      if (note) {
+        // Store pending content
+        pendingContentRef.current = newContent;
 
-  const handleColorChange = useCallback((newColor: NoteColor) => {
-    setColor(newColor);
-  }, []);
+        // Clear existing timeout
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+        }
 
-  const handleLinksChange = useCallback((newLinks: INoteLink[]) => {
-    setLinks(newLinks);
-  }, []);
+        // Set new timeout to save after 500ms of inactivity
+        saveTimeoutRef.current = setTimeout(() => {
+          onUpdate(note.id, { content: newContent });
+          pendingContentRef.current = null;
+        }, 500);
+      }
+    },
+    [note?.id, onUpdate]
+  );
+
+  const handleColorChange = useCallback(
+    (newColor: NoteColor) => {
+      if (note) {
+        onUpdate(note.id, { color: newColor });
+      }
+    },
+    [note?.id, onUpdate]
+  );
+
+  const handleLinksChange = useCallback(
+    (newLinks: INoteLink[]) => {
+      setLinks(newLinks);
+      if (note) {
+        onUpdate(note.id, { links: newLinks });
+      }
+    },
+    [note, onUpdate]
+  );
 
   const handleToggleLink = useCallback(
     (entity: EntityOption) => {
@@ -275,6 +383,32 @@ export function CreateNoteModal({
     // Sort only alphabetically, don't move selected items to top
     return result.sort((a, b) => a.name.localeCompare(b.name));
   }, [entities, searchTerm, activeTab]);
+
+  // Detect if scrollbar is present
+  useEffect(() => {
+    const checkScrollbar = () => {
+      if (scrollAreaRef.current) {
+        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          const hasScroll = viewport.scrollHeight > viewport.clientHeight;
+          setHasScrollbar(hasScroll);
+        }
+      }
+    };
+
+    // Check on mount and when filtered entities change
+    checkScrollbar();
+
+    // Use ResizeObserver to detect changes in content size
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        const resizeObserver = new ResizeObserver(checkScrollbar);
+        resizeObserver.observe(viewport);
+        return () => resizeObserver.disconnect();
+      }
+    }
+  }, [filteredEntities]);
 
   const entityCounts = useMemo(() => {
     const counts: Record<EntityType, number> = {
@@ -310,70 +444,76 @@ export function CreateNoteModal({
     return counts;
   }, [links]);
 
-  // Detect if scrollbar is present
-  useEffect(() => {
-    const checkScrollbar = () => {
-      if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (viewport) {
-          const hasScroll = viewport.scrollHeight > viewport.clientHeight;
-          setHasScrollbar(hasScroll);
-        }
-      }
-    };
-
-    // Check on mount and when filtered entities change
-    checkScrollbar();
-
-    // Use ResizeObserver to detect changes in content size
-    if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (viewport) {
-        const resizeObserver = new ResizeObserver(checkScrollbar);
-        resizeObserver.observe(viewport);
-        return () => resizeObserver.disconnect();
-      }
+  const handleDelete = useCallback(() => {
+    if (note) {
+      onDelete(note.id);
+      setShowDeleteConfirm(false);
+      onOpenChange(false);
     }
-  }, [filteredEntities]);
+  }, [note, onDelete, onOpenChange]);
 
-  const handleCreate = useCallback(() => {
-    if (!hasContent || !content) return;
-
-    onCreateNote({
-      content,
-      color,
-      links,
-    });
-  }, [content, color, links, hasContent, onCreateNote]);
+  if (!note) {
+    return null;
+  }
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog key={note.id} open={open} onOpenChange={async (isOpen) => {
+        if (!isOpen) {
+          await handleClose();
+        } else {
+          onOpenChange(isOpen);
+        }
+      }}>
         <DialogContent className="!w-[95vw] !max-w-[900px] !h-[90vh] !max-h-[900px] p-0 gap-0 flex flex-col">
           <DialogHeader className="px-6 py-4 border-b">
-            <DialogTitle>{t("create_modal.title")}</DialogTitle>
+            <DialogTitle>{t("detail_modal.title")}</DialogTitle>
           </DialogHeader>
 
           <div className="flex-1 px-6 py-6 overflow-hidden">
             <NoteEditor
-              content={content}
+              key={note.id}
+              content={note.content}
               onChange={handleContentChange}
-              placeholder={t("create_modal.content_placeholder")}
+              placeholder={t("detail_modal.content_placeholder")}
               onManageLinks={() => setShowManageLinks(true)}
+              onDelete={() => setShowDeleteConfirm(true)}
+              onEditorReady={(editor) => {
+                editorRef.current = editor;
+              }}
+              linksCount={links.length}
             />
           </div>
 
-          <div className="px-6 py-4 border-t flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => onOpenChange(false)}>
-              {t("create_modal.cancel")}
-            </Button>
-            <Button variant="magical" onClick={handleCreate} disabled={!hasContent} className="gap-2">
-              <Plus className="h-4 w-4" />
-              {t("create_modal.create")}
+          <div className="px-6 py-4 border-t flex justify-end">
+            <Button variant="secondary" onClick={handleClose}>
+              {t("detail_modal.close_button")}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("detail_modal.delete_confirm_title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("detail_modal.delete_confirm_message")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("detail_modal.delete_confirm_cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} variant="destructive">
+              {t("detail_modal.delete_confirm_action")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Manage Links Modal */}
       <Dialog open={showManageLinks} onOpenChange={setShowManageLinks}>
@@ -509,3 +649,5 @@ export function CreateNoteModal({
     </>
   );
 }
+
+export const NoteDetailModal = memo(NoteDetailModalComponent);

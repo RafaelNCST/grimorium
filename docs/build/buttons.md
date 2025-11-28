@@ -1,6 +1,6 @@
 # Tipos de Botões
 
-Classificação dos 5 principais tipos de botões utilizados no projeto.
+Classificação dos 6 principais tipos de botões utilizados no projeto.
 
 **Componente:** `src/components/ui/button.tsx`
 
@@ -34,7 +34,14 @@ Classificação dos 5 principais tipos de botões utilizados no projeto.
 
 ---
 
-## 5. Ghost Red
+## 5. Ghost Brilhante
+**Nome:** `variant="ghost-bright"`
+**Uso:** Botões de ação secundária em cards/notas (Mudar cor, Alterar tipo)
+**Descrição visual:** Fundo transparente com hover brilhante escuro (efeito sutil de escurecimento - preto/10% no light mode, preto/20% no dark mode)
+
+---
+
+## 6. Ghost Red
 **Nome:** `variant="ghost-destructive"`
-**Uso:** Botões de fechar com destaque destrutivo
+**Uso:** Botões de fechar/deletar com destaque destrutivo
 **Descrição visual:** Fundo transparente com hover em vermelho claro

@@ -1,10 +1,14 @@
 import type { JSONContent } from "@tiptap/react";
 
-export type EntityType = "character" | "region" | "faction" | "race" | "item";
+export type EntityType = "character" | "region" | "faction" | "race" | "item" | "arc";
 
 export type PaperMode = "light" | "dark";
 
 export type NoteSortOrder = "alphabetical" | "recent";
+
+export type NoteColor = "sepia" | "purple" | "green" | "blue" | "red" | "gold" | "cyan" | "indigo" | "lime";
+
+export type NoteTextColor = "black" | "white";
 
 export interface INoteLink {
   id: string;
@@ -17,8 +21,11 @@ export interface INoteLink {
 
 export interface INote {
   id: string;
-  name: string;
+  name: string; // DEPRECATED - kept for migration
   content?: JSONContent; // TipTap JSON content
+  color?: NoteColor; // Color for post-it display
+  textColor?: NoteTextColor; // Text color (black or white)
+  order?: number; // Manual ordering (lower = earlier)
   paperMode: PaperMode;
   links: INoteLink[];
   createdAt: string;

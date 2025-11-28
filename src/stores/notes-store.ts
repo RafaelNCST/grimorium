@@ -84,8 +84,23 @@ export const useNotesStore = create<NotesState>((set, get) => ({
       set({ isLoading: true });
 
       try {
-        const notes = await getAllNotes();
+        const fetchedNotes = await getAllNotes();
         const now = Date.now();
+
+        // Apply migration for notes without color or order
+        const notes = fetchedNotes.map((note) => {
+          const needsMigration = !note.color || note.order === undefined;
+
+          if (needsMigration) {
+            return {
+              ...note,
+              color: note.color || ("sepia" as const),
+              order: note.order ?? new Date(note.createdAt).getTime(),
+            };
+          }
+
+          return note;
+        });
 
         set({
           notes,

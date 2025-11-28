@@ -28,6 +28,8 @@
     "more_entities": "+{{count}} mais"
   },
   "empty_state": {
+    "title": "Sem anotações por aqui",
+    "description": "Crie sua primeira anotação e ela aparecerá aqui!",
     "no_notes": "Sem anotações por aqui",
     "no_notes_description": "Crie sua primeira anotação e ela aparecerá aqui!",
     "no_results": "Nenhuma anotação encontrada",
@@ -38,12 +40,16 @@
     "regions": "Regiões",
     "factions": "Facções",
     "races": "Raças",
-    "items": "Itens"
+    "items": "Itens",
+    "arcs": "Arcos"
   },
   "create_modal": {
     "title": "Nova Anotação",
     "name_label": "Nome",
     "name_placeholder": "Nome da anotação",
+    "content_label": "Conteúdo",
+    "content_placeholder": "Escreva seus pensamentos...",
+    "color_label": "Cor",
     "links_label": "Links",
     "links_description": "Conecte sua anotação a personagens, regiões, facções, raças ou itens",
     "select_entities": "Selecionar entidades",
@@ -53,12 +59,39 @@
     "no_entities_available": "Nenhuma entidade disponível",
     "no_results": "Nenhuma entidade encontrada",
     "loading": "Carregando",
-    "selected": "selecionado",
+    "selected": "selecionado(s)",
     "selected_count": "{{count}} selecionado(s)",
+    "of": "de",
+    "in_tab": "nesta aba",
     "done": "Concluir",
     "optional": "opcional",
     "cancel": "Cancelar",
     "create": "Criar"
+  },
+  "detail_modal": {
+    "title": "Detalhes da Anotação",
+    "content_label": "Conteúdo",
+    "content_placeholder": "Escreva seus pensamentos...",
+    "color_label": "Cor",
+    "links_label": "Entidades Linkadas",
+    "manage_links_button": "Gerenciar links",
+    "delete_button": "Excluir Anotação",
+    "close_button": "Fechar",
+    "delete_confirm_title": "Excluir Anotação?",
+    "delete_confirm_message": "Tem certeza que deseja excluir esta anotação? Esta ação não pode ser desfeita.",
+    "delete_confirm_cancel": "Cancelar",
+    "delete_confirm_action": "Excluir"
+  },
+  "colors": {
+    "sepia": "Amarelo",
+    "purple": "Roxo",
+    "green": "Verde",
+    "blue": "Azul",
+    "red": "Rosa",
+    "gold": "Laranja",
+    "cyan": "Ciano",
+    "indigo": "Índigo",
+    "lime": "Lima"
   },
   "delete_modal": {
     "title": "Excluir Anotações",
@@ -69,5 +102,23 @@
   "validation": {
     "name_required": "Nome é obrigatório",
     "name_max_length": "Nome deve ter no máximo 200 caracteres"
+  },
+  "card": {
+    "empty_placeholder": "Clique para adicionar conteúdo..."
+  },
+  "editor": {
+    "toolbar": {
+      "bold": "Negrito",
+      "italic": "Itálico",
+      "underline": "Sublinhado",
+      "strikethrough": "Tachado",
+      "align_left": "Alinhar à Esquerda",
+      "align_center": "Centralizar",
+      "align_right": "Alinhar à Direita",
+      "align_justify": "Justificar",
+      "change_color": "Mudar cor",
+      "manage_links": "Gerenciar links",
+      "delete_note": "Excluir anotação"
+    }
   }
 }

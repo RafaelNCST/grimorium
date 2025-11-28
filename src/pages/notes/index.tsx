@@ -1,15 +1,12 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
+import type { JSONContent } from "@tiptap/react";
 
 import { useNotesStore } from "@/stores/notes-store";
-import {
-  EntityType,
-  INote,
-  INoteFormData,
-  NoteSortOrder,
-} from "@/types/note-types";
+import type { INote, INoteLink, NoteColor } from "@/types/note-types";
 
+import { DEFAULT_NOTE_COLOR } from "./constants";
 import { NotesView } from "./view";
 
 export function NotesPage() {
@@ -20,87 +17,47 @@ export function NotesPage() {
   const isLoading = useNotesStore((state) => state.isLoading);
   const fetchNotes = useNotesStore((state) => state.fetchNotes);
   const addNote = useNotesStore((state) => state.addNote);
-  const deleteNotesFromCache = useNotesStore(
-    (state) => state.deleteNotesFromCache
-  );
+  const updateNoteInCache = useNotesStore((state) => state.updateNoteInCache);
+  const deleteNoteFromCache = useNotesStore((state) => state.deleteNoteFromCache);
 
   // UI State
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [isDeletionMode, setIsDeletionMode] = useState(false);
-  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
-  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
-
-  // Filters
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState<NoteSortOrder>("recent");
-  const [entityTypeFilters, setEntityTypeFilters] = useState<EntityType[]>([]);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
   // Fetch notes on mount
   useEffect(() => {
     fetchNotes();
   }, [fetchNotes]);
 
-  // Filter and sort notes
-  const filteredNotes = useMemo(() => {
-    let result = [...notes];
-
-    // Filter by search term (name only)
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase().trim();
-      result = result.filter((note) => note.name.toLowerCase().includes(term));
-    }
-
-    // Filter by entity type
-    if (entityTypeFilters.length > 0) {
-      result = result.filter((note) =>
-        note.links.some((link) => entityTypeFilters.includes(link.entityType))
-      );
-    }
-
-    // Sort
-    if (sortOrder === "alphabetical") {
-      result.sort((a, b) => a.name.localeCompare(b.name));
-    } else {
-      // recent - by updatedAt DESC
-      result.sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
-    }
-
-    return result;
-  }, [notes, searchTerm, sortOrder, entityTypeFilters]);
-
   // Handlers
   const handleBackToDashboard = useCallback(() => {
     navigate({ to: "/" });
   }, [navigate]);
 
-  const handleNoteClick = useCallback(
-    (noteId: string) => {
-      if (isDeletionMode) {
-        setSelectedNoteIds((prev) =>
-          prev.includes(noteId)
-            ? prev.filter((id) => id !== noteId)
-            : [...prev, noteId]
-        );
-      } else {
-        navigate({
-          to: "/notes/$noteId",
-          params: { noteId },
-        });
-      }
-    },
-    [isDeletionMode, navigate]
-  );
+  const handleNoteClick = useCallback((noteId: string) => {
+    setSelectedNoteId(noteId || null);
+  }, []);
 
   const handleCreateNote = useCallback(
-    async (formData: INoteFormData) => {
+    async (formData: {
+      content: JSONContent;
+      color: NoteColor;
+      links: INoteLink[];
+    }) => {
       const now = new Date().toISOString();
+
+      // Calculate max order
+      const maxOrder = notes.reduce((max, note) => {
+        const noteOrder = note.order ?? new Date(note.createdAt).getTime();
+        return Math.max(max, noteOrder);
+      }, 0);
+
       const newNote: INote = {
         id: crypto.randomUUID(),
-        name: formData.name,
-        content: undefined,
+        name: "", // DEPRECATED - keeping for backwards compatibility
+        content: formData.content,
+        color: formData.color,
+        order: maxOrder + 1000, // Add with gap
         paperMode: "light",
         links: formData.links.map((link) => ({
           ...link,
@@ -114,87 +71,63 @@ export function NotesPage() {
       try {
         await addNote(newNote);
         setShowCreateModal(false);
-        // Navigate to the new note
-        navigate({
-          to: "/notes/$noteId",
-          params: { noteId: newNote.id },
-        });
       } catch (error) {
         console.error("Error creating note:", error);
       }
     },
-    [addNote, navigate]
+    [notes, addNote]
   );
 
-  const handleToggleDeletionMode = useCallback(() => {
-    if (isDeletionMode) {
-      // Exiting deletion mode
-      setSelectedNoteIds([]);
-    }
-    setIsDeletionMode(!isDeletionMode);
-  }, [isDeletionMode]);
+  const handleReorder = useCallback(
+    async (reorderedNotes: INote[]) => {
+      // Update all reordered notes
+      for (const note of reorderedNotes) {
+        try {
+          await updateNoteInCache(note.id, { order: note.order });
+        } catch (error) {
+          console.error(`Error updating note ${note.id}:`, error);
+        }
+      }
+    },
+    [updateNoteInCache]
+  );
 
-  const handleCancelDeletionMode = useCallback(() => {
-    setIsDeletionMode(false);
-    setSelectedNoteIds([]);
-  }, []);
+  const handleUpdateNote = useCallback(
+    async (noteId: string, updates: Partial<INote>) => {
+      try {
+        await updateNoteInCache(noteId, updates);
+      } catch (error) {
+        console.error("Error updating note:", error);
+      }
+    },
+    [updateNoteInCache]
+  );
 
-  const handleDeleteSelectedNotes = useCallback(() => {
-    if (selectedNoteIds.length > 0) {
-      setShowDeleteConfirmModal(true);
-    }
-  }, [selectedNoteIds]);
-
-  const handleConfirmDelete = useCallback(async () => {
-    try {
-      await deleteNotesFromCache(selectedNoteIds);
-      setShowDeleteConfirmModal(false);
-      setSelectedNoteIds([]);
-      setIsDeletionMode(false);
-    } catch (error) {
-      console.error("Error deleting notes:", error);
-    }
-  }, [selectedNoteIds, deleteNotesFromCache]);
-
-  const handleEntityTypeFilterToggle = useCallback((entityType: EntityType) => {
-    setEntityTypeFilters((prev) =>
-      prev.includes(entityType)
-        ? prev.filter((t) => t !== entityType)
-        : [...prev, entityType]
-    );
-  }, []);
-
-  const handleClearFilters = useCallback(() => {
-    setSearchTerm("");
-    setEntityTypeFilters([]);
-    setSortOrder("recent");
-  }, []);
+  const handleDeleteNote = useCallback(
+    async (noteId: string) => {
+      try {
+        await deleteNoteFromCache(noteId);
+        setSelectedNoteId(null);
+      } catch (error) {
+        console.error("Error deleting note:", error);
+      }
+    },
+    [deleteNoteFromCache]
+  );
 
   return (
     <NotesView
       notes={notes}
-      filteredNotes={filteredNotes}
       isLoading={isLoading}
-      searchTerm={searchTerm}
-      sortOrder={sortOrder}
-      entityTypeFilters={entityTypeFilters}
       showCreateModal={showCreateModal}
-      isDeletionMode={isDeletionMode}
-      selectedNoteIds={selectedNoteIds}
-      showDeleteConfirmModal={showDeleteConfirmModal}
+      selectedNoteId={selectedNoteId}
       onBackToDashboard={handleBackToDashboard}
-      onSearchTermChange={setSearchTerm}
-      onSortOrderChange={setSortOrder}
-      onEntityTypeFilterToggle={handleEntityTypeFilterToggle}
-      onClearFilters={handleClearFilters}
       onNoteClick={handleNoteClick}
       onShowCreateModalChange={setShowCreateModal}
       onCreateNote={handleCreateNote}
-      onToggleDeletionMode={handleToggleDeletionMode}
-      onCancelDeletionMode={handleCancelDeletionMode}
-      onDeleteSelectedNotes={handleDeleteSelectedNotes}
-      onConfirmDelete={handleConfirmDelete}
-      onShowDeleteConfirmModalChange={setShowDeleteConfirmModal}
+      onReorder={handleReorder}
+      onUpdateNote={handleUpdateNote}
+      onDeleteNote={handleDeleteNote}
     />
   );
 }

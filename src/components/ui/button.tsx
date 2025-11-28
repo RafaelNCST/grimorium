@@ -20,6 +20,8 @@ const buttonVariants = cva(
           "border border-border bg-card text-card-foreground hover:bg-primary-glow hover:text-white hover:border-primary-glow hover:shadow-glow transition-all duration-300",
         ghost:
           "hover:bg-accent hover:text-accent-foreground transition-colors duration-200",
+        "ghost-bright":
+          "hover:bg-black/10 dark:hover:bg-black/20 transition-colors duration-200",
         "ghost-destructive":
           "hover:bg-destructive/10 hover:text-destructive transition-colors duration-200",
         link: "text-primary underline-offset-4 hover:underline",
