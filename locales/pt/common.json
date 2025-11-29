@@ -9,6 +9,11 @@
     "add_image": "Adicionar Imagem"
   },
   "empty_field": "Não especificado",
+  "tooltips": {
+    "quick_navigation": "Navegação Rápida",
+    "edit": "Editar",
+    "delete": "Excluir"
+  },
   "title_bar": {
     "home": "Página Principal",
     "dashboard": "Painel da Obra",

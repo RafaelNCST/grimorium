@@ -54,6 +54,7 @@ export interface EntityDetailLayoutProps {
   backLabel?: string;
   showMenuButton?: boolean;
   onMenuToggle?: () => void;
+  menuTooltip?: string;
 
   // Mode
   isEditMode: boolean;
@@ -64,6 +65,8 @@ export interface EntityDetailLayoutProps {
   extraActions?: ActionButton[];
   editLabel?: string;
   deleteLabel?: string;
+  editTooltip?: string;
+  deleteTooltip?: string;
 
   // Edit mode actions
   onSave?: () => void;
@@ -107,6 +110,7 @@ export function EntityDetailLayout({
   backLabel = "Voltar",
   showMenuButton = false,
   onMenuToggle,
+  menuTooltip,
 
   // Mode
   isEditMode,
@@ -117,6 +121,8 @@ export function EntityDetailLayout({
   extraActions = [],
   editLabel = "Editar",
   deleteLabel = "Excluir",
+  editTooltip,
+  deleteTooltip,
 
   // Edit mode actions
   onSave,
@@ -211,9 +217,18 @@ export function EntityDetailLayout({
                 {backLabel}
               </Button>
               {showMenuButton && onMenuToggle && (
-                <Button variant="ghost" size="icon" onClick={onMenuToggle}>
-                  <Menu className="w-5 h-5" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={onMenuToggle}>
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  {menuTooltip && (
+                    <TooltipContent>
+                      <p>{menuTooltip}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
               )}
             </div>
           )}
@@ -265,18 +280,36 @@ export function EntityDetailLayout({
                   </Tooltip>
                 ))}
                 {onEdit && (
-                  <Button variant="ghost" size="icon" onClick={onEdit}>
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={onEdit}>
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    {editTooltip && (
+                      <TooltipContent>
+                        <p>{editTooltip}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 )}
                 {onDelete && (
-                  <Button
-                    variant="ghost-destructive"
-                    size="icon"
-                    onClick={onDelete}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost-destructive"
+                        size="icon"
+                        onClick={onDelete}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    {deleteTooltip && (
+                      <TooltipContent>
+                        <p>{deleteTooltip}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 )}
               </div>
             )}

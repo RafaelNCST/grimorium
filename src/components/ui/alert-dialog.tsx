@@ -16,17 +16,28 @@ const AlertDialogOverlay = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay> & {
     onOverlayClick?: () => void;
   }
->(({ className, onOverlayClick, ...props }, ref) => (
-  <AlertDialogPrimitive.Overlay
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className
-    )}
-    {...props}
-    ref={ref}
-    onClick={onOverlayClick}
-  />
-));
+>(({ className, onOverlayClick, ...props }, ref) => {
+  React.useEffect(() => {
+    // Add a class to body when alert dialog opens to block interactions behind it
+    document.body.setAttribute("data-dialog-open", "true");
+    return () => {
+      document.body.removeAttribute("data-dialog-open");
+    };
+  }, []);
+
+  return (
+    <AlertDialogPrimitive.Overlay
+      data-modal-overlay="true"
+      className={cn(
+        "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+        className
+      )}
+      {...props}
+      ref={ref}
+      onClick={onOverlayClick}
+    />
+  );
+});
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
 const AlertDialogContent = React.forwardRef<

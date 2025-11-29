@@ -1403,11 +1403,14 @@ export function CharacterDetailView({
             backLabel={t("character-detail:header.back")}
             showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
+            menuTooltip={t("common:tooltips.quick_navigation")}
             isEditMode={isEditing}
             onEdit={onEdit}
+            editTooltip={t("common:tooltips.edit")}
             onSave={onSave}
             onCancel={onCancel}
             onDelete={onDeleteModalOpen}
+            deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
               {
                 label: t("character-detail:header.notes"),

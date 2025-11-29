@@ -9,6 +9,11 @@
     "add_image": "Add Image"
   },
   "empty_field": "Not specified",
+  "tooltips": {
+    "quick_navigation": "Quick Navigation",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
   "title_bar": {
     "home": "Home",
     "dashboard": "Work Panel",

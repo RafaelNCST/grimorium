@@ -883,9 +883,12 @@ export const ItemDetailView = React.memo(
               versionsPanel={versionsPanel}
               showMenuButton
               onMenuToggle={onNavigationSidebarToggle}
+              menuTooltip={t("common:tooltips.quick_navigation")}
               backLabel={t("item-detail:header.back")}
               editLabel={t("item-detail:header.edit")}
               deleteLabel={t("item-detail:header.delete")}
+              editTooltip={t("common:tooltips.edit")}
+              deleteTooltip={t("common:tooltips.delete")}
               saveLabel={t("item-detail:header.save")}
               cancelLabel={t("item-detail:header.cancel")}
             />

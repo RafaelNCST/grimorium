@@ -7,7 +7,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "quick_navigation": "Quick Navigation",
-    "notes": "Notes"
+    "notes": "Notes",
+    "view_map": "View Map"
   },
   "fill_required_fields": "Fill all required fields to save",
   "missing_fields": "Missing required fields",

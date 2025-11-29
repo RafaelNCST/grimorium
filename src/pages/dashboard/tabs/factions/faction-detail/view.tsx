@@ -1639,6 +1639,9 @@ export function FactionDetailView({
             backLabel={t("faction-detail:header.back")}
             showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
+            menuTooltip={t("common:tooltips.quick_navigation")}
+            editTooltip={t("common:tooltips.edit")}
+            deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
               {
                 label: t("faction-detail:header.notes"),

@@ -1291,11 +1291,14 @@ export function RegionDetailView({
             backLabel={t("region-detail:header.back")}
             showMenuButton
             onMenuToggle={onNavigationSidebarToggle}
+            menuTooltip={t("common:tooltips.quick_navigation")}
             // Mode
             isEditMode={isEditing}
             // Actions
             onEdit={onEdit}
             onDelete={onDeleteModalOpen}
+            editTooltip={t("common:tooltips.edit")}
+            deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
               {
                 label: t("region-detail:header.notes"),
