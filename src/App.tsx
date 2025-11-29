@@ -2,7 +2,6 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import { InboxInitializer } from "@/components/inbox-initializer";
-import { ThemeInitializer } from "@/components/theme-initializer";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,7 +21,6 @@ declare module "@tanstack/react-router" {
 
 const App = () => (
   <TooltipProvider>
-    <ThemeInitializer />
     <InboxInitializer />
     <Toaster />
     <Sonner />

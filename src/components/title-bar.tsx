@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Inbox, Minus, Square, X } from "lucide-react";
+import { Inbox, Minus, Settings, Square, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { InboxNotificationModal } from "@/components/modals/inbox-notification-modal";
+import { SettingsModal } from "@/components/modals/settings-modal";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -97,6 +98,7 @@ export const TitleBar = () => {
   const routerState = useRouterState();
   const [isMaximized, setIsMaximized] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [controlsPosition, setControlsPosition] = useState({
     top: 0,
@@ -104,6 +106,7 @@ export const TitleBar = () => {
   });
   const { t: tInbox } = useTranslation("inbox");
   const { t: tCommon } = useTranslation("common");
+  const { t: tSettings } = useTranslation("settings");
   const messages = useInboxStore((state) => state.messages);
   const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
 
@@ -282,9 +285,34 @@ export const TitleBar = () => {
           </span>
         </div>
 
-        {/* Right section - Inbox and placeholder for window controls */}
+        {/* Right section - Settings, Inbox and placeholder for window controls */}
         <div data-tauri-drag-region className="flex items-center">
           <TooltipProvider>
+            <Tooltip open={isSettingsOpen ? false : undefined}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isModalOpen}
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className={cn(
+                    "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary",
+                    "transition-colors duration-200",
+                    isSettingsOpen && "bg-gray-50 text-secondary",
+                    isModalOpen && "opacity-50 cursor-not-allowed"
+                  )}
+                  aria-label="Settings"
+                >
+                  <Settings
+                    className={cn("h-4 w-4 transition-colors duration-200")}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{tSettings("title")}</p>
+              </TooltipContent>
+            </Tooltip>
+
             <Tooltip open={isInboxOpen ? false : undefined}>
               <TooltipTrigger asChild>
                 <Button
@@ -340,6 +368,12 @@ export const TitleBar = () => {
       <InboxNotificationModal
         isOpen={isInboxOpen}
         onClose={() => setIsInboxOpen(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
       />
     </>
   );

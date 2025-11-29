@@ -25,7 +25,6 @@ export function HomePage() {
   } = useBookStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [_isLoading, setIsLoading] = useState(true);
 
   // Load books from database on mount
@@ -105,14 +104,6 @@ export function HomePage() {
 
   const handleCloseCreateModal = useCallback(() => {
     setShowCreateModal(false);
-  }, []);
-
-  const handleOpenSettingsModal = useCallback(() => {
-    setShowSettingsModal(true);
-  }, []);
-
-  const handleCloseSettingsModal = useCallback(() => {
-    setShowSettingsModal(false);
   }, []);
 
   const handleCreateBook = useCallback(
@@ -197,14 +188,11 @@ export function HomePage() {
       lastChapter={lastChapter}
       daysSinceLastChapter={daysSinceLastChapter}
       showCreateModal={showCreateModal}
-      showSettingsModal={showSettingsModal}
       onSearchTermChange={setSearchTerm}
       onBookSelect={handleBookSelect}
       onCreateBook={handleCreateBook}
       onOpenCreateModal={handleOpenCreateModal}
       onCloseCreateModal={handleCloseCreateModal}
-      onOpenSettingsModal={handleOpenSettingsModal}
-      onCloseSettingsModal={handleCloseSettingsModal}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { Plus, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ interface HeaderProps {
     date?: Date;
   };
   onOpenCreateModal: () => void;
-  onOpenSettingsModal: () => void;
 }
 
 function formatDate(date: Date | undefined, locale: string): string {
@@ -41,7 +40,6 @@ export function Header({
   lastEditedDate,
   lastChapter,
   onOpenCreateModal,
-  onOpenSettingsModal,
 }: HeaderProps) {
   const { t, i18n } = useTranslation("home");
 
@@ -106,9 +104,6 @@ export function Header({
           >
             <Plus className="w-5 h-5 mr-2" />
             {t("header.button_create_book")}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onOpenSettingsModal}>
-            <Settings className="w-5 h-5" />
           </Button>
         </div>
       </div>

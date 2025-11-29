@@ -1,4 +1,5 @@
-import { Settings, Moon, Sun, Globe, Shield, FileText } from "lucide-react";
+import { Settings, Globe, Shield, FileText } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,6 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useLanguageStore } from "@/stores/language-store";
-import { useThemeStore } from "@/stores/theme-store";
 
 interface PropsSettingsModal {
   open: boolean;
@@ -25,8 +25,8 @@ interface PropsSettingsModal {
 }
 
 export function SettingsModal({ open, onClose }: PropsSettingsModal) {
-  const { language, setLanguage, t } = useLanguageStore();
-  const { theme, setTheme } = useThemeStore();
+  const { language, setLanguage } = useLanguageStore();
+  const { t } = useTranslation("settings");
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -34,47 +34,16 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
         <DialogHeader>
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Settings className="w-5 h-5 text-primary" />
-            {t("settings.title")}
+            {t("title")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Theme Settings */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium flex items-center gap-2">
-              {theme === "dark" ? (
-                <Moon className="w-4 h-4" />
-              ) : (
-                <Sun className="w-4 h-4" />
-              )}
-              {t("settings.theme")}
-            </Label>
-            <Select value={theme} onValueChange={setTheme}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent side="bottom">
-                <SelectItem value="dark" className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <Moon className="w-4 h-4" />
-                    {t("settings.dark_mode")}
-                  </div>
-                </SelectItem>
-                <SelectItem value="light" className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4" />
-                    {t("settings.light_mode")}
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Language Settings */}
           <div className="space-y-3">
             <Label className="text-sm font-medium flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              {t("settings.language")}
+              {t("language")}
             </Label>
             <Select value={language} onValueChange={setLanguage}>
               <SelectTrigger>
@@ -91,7 +60,9 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
 
           {/* Legal Links */}
           <div className="space-y-3">
-            <h3 className="font-medium text-sm text-muted-foreground">Legal</h3>
+            <h3 className="font-medium text-sm text-muted-foreground">
+              {t("legal")}
+            </h3>
             <div className="space-y-2">
               <Button
                 variant="ghost"
@@ -103,11 +74,9 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
               >
                 <Shield className="w-4 h-4 mr-3 text-muted-foreground" />
                 <div>
-                  <div className="font-medium">
-                    {t("settings.privacy_policy")}
-                  </div>
+                  <div className="font-medium">{t("privacy_policy")}</div>
                   <div className="text-xs text-muted-foreground">
-                    Como seus dados são tratados
+                    {t("privacy_policy_description")}
                   </div>
                 </div>
               </Button>
@@ -122,11 +91,9 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
               >
                 <FileText className="w-4 h-4 mr-3 text-muted-foreground" />
                 <div>
-                  <div className="font-medium">
-                    {t("settings.terms_of_use")}
-                  </div>
+                  <div className="font-medium">{t("terms_of_use")}</div>
                   <div className="text-xs text-muted-foreground">
-                    Termos e condições de uso
+                    {t("terms_of_use_description")}
                   </div>
                 </div>
               </Button>
@@ -136,8 +103,8 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
           {/* App Info */}
           <Separator />
           <div className="text-center text-xs text-muted-foreground">
-            <p>Grimorium v1.0.0</p>
-            <p className="mt-1">Feito com ✨ para escritores de fantasia</p>
+            <p>{t("app_version")}</p>
+            <p className="mt-1">{t("app_tagline")}</p>
           </div>
         </div>
       </DialogContent>

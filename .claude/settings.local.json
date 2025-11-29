@@ -58,7 +58,8 @@
       "Bash(Stop-Process -Force)",
       "Bash(pkill:*)",
       "Bash(Stop-Process -Force -Name node)",
-      "Bash(Stop-Process -Force -Id 11564)"
+      "Bash(Stop-Process -Force -Id 11564)",
+      "Bash(Stop-Process -Force -Id 27004)"
     ],
     "deny": [
       "Bash(git push --force:*)",
