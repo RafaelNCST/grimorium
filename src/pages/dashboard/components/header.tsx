@@ -78,7 +78,7 @@ const GENRE_TAG_CONFIG: IEntityTagConfig = {
   value: "genre",
   icon: Tag,
   translationKey: "genre",
-  colorClass: "text-slate-700 dark:text-slate-300",
+  colorClass: "text-white",
   bgColorClass: "bg-slate-500/10 border-slate-500/20",
 };
 
