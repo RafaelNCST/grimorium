@@ -184,7 +184,7 @@ export function PageContent({
     <div className="flex-1 flex flex-col h-full bg-background">
       {/* Page Header */}
       <div className="border-b bg-card px-6 py-4 space-y-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-4">
           {/* Page Name */}
           <div className="flex-1">
             {isEditMode ? (
@@ -199,43 +199,46 @@ export function PageContent({
             )}
           </div>
 
-          {/* Manage Links Button (Edit Mode Only) */}
-          {isEditMode && onManagePageLinks && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onManagePageLinks(page.id)}
-                  className="cursor-pointer"
-                >
-                  <Link className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm font-medium">{t("links.manage")}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Manage Links Button (Edit Mode Only) */}
+            {isEditMode && onManagePageLinks && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onManagePageLinks(page.id)}
+                    className="cursor-pointer"
+                  >
+                    <Link className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium">{t("links.manage")}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
-          {/* Add Section Button (Edit Mode Only) */}
-          {isEditMode && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="magical"
-                  size="icon"
-                  onClick={onAddSection}
-                  className="animate-glow cursor-pointer"
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm font-medium">{t("pages.add_section")}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+            {/* Add Section Button (Edit Mode Only) */}
+            {isEditMode && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="magical"
+                    size="icon"
+                    onClick={onAddSection}
+                    className="animate-glow cursor-pointer"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm font-medium">{t("pages.add_section")}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
 
         {/* Section Filter */}

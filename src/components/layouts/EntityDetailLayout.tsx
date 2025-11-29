@@ -202,26 +202,24 @@ export function EntityDetailLayout({
     <div className={cn("flex flex-col", className)}>
       {/* Header */}
       <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <div className="flex items-center justify-between gap-4">
           {/* Left side - Back button and Menu */}
-          <div className="flex items-center gap-4">
-            {!isEditMode && (
-              <>
-                <Button variant="ghost" onClick={onBack}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  {backLabel}
+          {!isEditMode && (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={onBack}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {backLabel}
+              </Button>
+              {showMenuButton && onMenuToggle && (
+                <Button variant="ghost" size="icon" onClick={onMenuToggle}>
+                  <Menu className="w-5 h-5" />
                 </Button>
-                {showMenuButton && onMenuToggle && (
-                  <Button variant="ghost" size="icon" onClick={onMenuToggle}>
-                    <Menu className="w-5 h-5" />
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Right side - Action buttons */}
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
             {isEditMode ? (
               <>
                 <div className="flex gap-2">

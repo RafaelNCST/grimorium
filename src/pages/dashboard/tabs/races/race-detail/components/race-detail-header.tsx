@@ -118,32 +118,30 @@ export function RaceDetailHeader({
       </div>
 
       {/* Action Buttons - Fixed at top */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-        <div className="flex gap-2">
-          {!isEditing && (
-            <>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onBack}
-                className="bg-background/80 backdrop-blur-sm"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t("buttons.back")}
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onNavigationSidebarToggle}
-                className="bg-background/80 backdrop-blur-sm"
-              >
-                <Menu className="w-4 h-4" />
-              </Button>
-            </>
-          )}
-        </div>
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-4 z-10">
+        {!isEditing && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onBack}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t("buttons.back")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onNavigationSidebarToggle}
+              className="bg-background/80 backdrop-blur-sm"
+            >
+              <Menu className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 shrink-0 ml-auto">
           {isEditing ? (
             <>
               <Button

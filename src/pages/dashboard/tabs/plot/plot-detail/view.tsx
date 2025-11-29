@@ -422,19 +422,19 @@ export function PlotArcDetailView({
     <div className="bg-background">
       {/* Fixed Header */}
       <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <div className="flex items-center justify-between gap-4">
           {/* Left side - Back button */}
-          <div className="flex items-center gap-4">
-            {!isEditing && (
+          {!isEditing && (
+            <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={onBack}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 {t("plot:header.back")}
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Right side - Action buttons */}
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
             {isEditing ? (
               <>
                 <div className="flex gap-2">

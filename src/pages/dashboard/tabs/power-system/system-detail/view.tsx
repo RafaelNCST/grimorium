@@ -295,8 +295,8 @@ export function PowerSystemDetailView({
         {/* Main Content */}
         <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
           {/* Header */}
-          <div className="border-b bg-card px-6 py-3 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
+          <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+            <div className="flex items-center gap-2">
               {/* Back Button */}
               <Button
                 variant="ghost"
@@ -348,7 +348,7 @@ export function PowerSystemDetailView({
               </Tooltip>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 shrink-0">
               {/* Edit Mode Toggle Switch */}
               <div className="flex items-center gap-2">
                 <Label
@@ -542,8 +542,8 @@ export function PowerSystemDetailView({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
         {/* Header */}
-        <div className="border-b bg-card px-6 py-3 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
+        <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+          <div className="flex items-center gap-2">
             {/* Back Button */}
             <Button
               variant="ghost"
@@ -595,7 +595,7 @@ export function PowerSystemDetailView({
             </Tooltip>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Undo/Redo Buttons - Only visible in edit mode */}
             {isEditMode && (
               <div className="flex items-center gap-1">

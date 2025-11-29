@@ -163,12 +163,12 @@ export function MapMarkerDetails({
   return (
     <div className="bg-background border rounded-lg shadow-lg w-80 flex flex-col h-[calc(100vh-96px)] overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
+      <div className="p-4 border-b flex items-center justify-between gap-4 flex-shrink-0">
         <h3 className="font-semibold text-sm truncate flex-1">{region.name}</h3>
         <Button
           variant="ghost-destructive"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 shrink-0"
           onClick={onClose}
         >
           <X className="w-4 h-4" />
