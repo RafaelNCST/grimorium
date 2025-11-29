@@ -6,13 +6,8 @@ import { Inbox, Minus, Square, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
-import { InboxModal } from "@/components/modals/inbox-modal";
+import { InboxNotificationModal } from "@/components/modals/inbox-notification-modal";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
@@ -290,52 +285,33 @@ export const TitleBar = () => {
         {/* Right section - Inbox and placeholder for window controls */}
         <div data-tauri-drag-region className="flex items-center">
           <TooltipProvider>
-            <Popover open={isInboxOpen} onOpenChange={setIsInboxOpen}>
-              <Tooltip open={isInboxOpen ? false : undefined}>
-                <TooltipTrigger asChild>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={isModalOpen}
-                      className={cn(
-                        "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
-                        "transition-colors duration-200",
-                        isInboxOpen && "bg-gray-50 text-secondary",
-                        isModalOpen && "opacity-50 cursor-not-allowed"
-                      )}
-                      aria-label="Inbox"
-                    >
-                      <Inbox
-                        className={cn("h-4 w-4 transition-colors duration-200")}
-                      />
-                      {unreadCount > 0 && !isInboxOpen && (
-                        <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>{tInbox("tooltip")}</p>
-                </TooltipContent>
-              </Tooltip>
-              <PopoverContent
-                className="p-0 border shadow-lg w-[560px] max-w-[90vw]"
-                align="end"
-                side="bottom"
-                sideOffset={4}
-                alignOffset={0}
-                onInteractOutside={(e) => {
-                  // Prevent closing when clicking on title bar
-                  const target = e.target as HTMLElement;
-                  if (target.closest("[data-title-bar]")) {
-                    e.preventDefault();
-                  }
-                }}
-              >
-                <InboxModal />
-              </PopoverContent>
-            </Popover>
+            <Tooltip open={isInboxOpen ? false : undefined}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isModalOpen}
+                  onClick={() => setIsInboxOpen(!isInboxOpen)}
+                  className={cn(
+                    "h-8 w-12 rounded-none hover:bg-gray-50 hover:text-secondary relative",
+                    "transition-colors duration-200",
+                    isInboxOpen && "bg-gray-50 text-secondary",
+                    isModalOpen && "opacity-50 cursor-not-allowed"
+                  )}
+                  aria-label="Inbox"
+                >
+                  <Inbox
+                    className={cn("h-4 w-4 transition-colors duration-200")}
+                  />
+                  {unreadCount > 0 && !isInboxOpen && (
+                    <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{tInbox("tooltip")}</p>
+              </TooltipContent>
+            </Tooltip>
           </TooltipProvider>
           {/* Placeholder to maintain spacing - invisible but takes up space */}
           <div
@@ -359,6 +335,12 @@ export const TitleBar = () => {
         </div>,
         document.body
       )}
+
+      {/* Inbox Notification Modal - Custom modal, não usa Popover */}
+      <InboxNotificationModal
+        isOpen={isInboxOpen}
+        onClose={() => setIsInboxOpen(false)}
+      />
     </>
   );
 };
