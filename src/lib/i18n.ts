@@ -5,6 +5,7 @@ import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
 import enCommon from "../../locales/en/common.json";
 import enCreateBook from "../../locales/en/create-book.json";
+import enCreateChapter from "../../locales/en/create-chapter.json";
 import enCreateCharacter from "../../locales/en/create-character.json";
 import enCreateFaction from "../../locales/en/create-faction.json";
 import enCreateItem from "../../locales/en/create-item.json";
@@ -30,6 +31,7 @@ import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
 import ptCommon from "../../locales/pt/common.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
+import ptCreateChapter from "../../locales/pt/create-chapter.json";
 import ptCreateCharacter from "../../locales/pt/create-character.json";
 import ptCreateFaction from "../../locales/pt/create-faction.json";
 import ptCreateItem from "../../locales/pt/create-item.json";
@@ -60,6 +62,7 @@ const resources = {
     characters: enCharacters,
     "character-detail": enCharacterDetail,
     "create-book": enCreateBook,
+    "create-chapter": enCreateChapter,
     "create-character": enCreateCharacter,
     "create-faction": enCreateFaction,
     "create-item": enCreateItem,
@@ -87,6 +90,7 @@ const resources = {
     characters: ptCharacters,
     "character-detail": ptCharacterDetail,
     "create-book": ptCreateBook,
+    "create-chapter": ptCreateChapter,
     "create-character": ptCreateCharacter,
     "create-faction": ptCreateFaction,
     "create-item": ptCreateItem,

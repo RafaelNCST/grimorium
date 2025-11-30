@@ -5,6 +5,18 @@ export type { FormInputProps } from "./FormInput";
 export { FormTextarea } from "./FormTextarea";
 export type { FormTextareaProps } from "./FormTextarea";
 
+export { FormChapterNumber } from "./FormChapterNumber";
+export type { FormChapterNumberProps } from "./FormChapterNumber";
+
+export { FormChapterNameWithNumber } from "./FormChapterNameWithNumber";
+export type { FormChapterNameWithNumberProps } from "./FormChapterNameWithNumber";
+
+export { FormPlotArcSelector } from "./FormPlotArcSelector";
+export type { FormPlotArcSelectorProps } from "./FormPlotArcSelector";
+
+export { FormPlotArcButton } from "./FormPlotArcButton";
+export type { FormPlotArcButtonProps } from "./FormPlotArcButton";
+
 // Select components
 export { FormSelect } from "./FormSelect";
 export type { FormSelectProps, SelectOption } from "./FormSelect";

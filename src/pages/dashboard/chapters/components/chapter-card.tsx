@@ -7,6 +7,9 @@ import {
   ChevronUp,
   Download,
   Trash2,
+  BookOpen,
+  Type,
+  Hash,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -24,8 +27,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { EntityMention } from "@/components/modals/create-chapter-modal";
 
-type ChapterStatus = "draft" | "in-progress" | "review" | "finished";
+type ChapterStatus = "draft" | "in-progress" | "review" | "finished" | "published";
 
 interface Chapter {
   id: string;
@@ -36,9 +41,12 @@ interface Chapter {
   characterCount: number;
   lastEdited: Date;
   summary?: string;
-  characters?: string[];
-  items?: string[];
-  locations?: string[];
+  plotArc?: { id: string; name: string };
+  mentionedCharacters?: EntityMention[];
+  mentionedRegions?: EntityMention[];
+  mentionedItems?: EntityMention[];
+  mentionedFactions?: EntityMention[];
+  mentionedRaces?: EntityMention[];
 }
 
 interface ChapterCardProps {
@@ -59,74 +67,93 @@ export function ChapterCard({
 }: ChapterCardProps) {
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
-  const hasDetails =
-    chapter.summary ||
-    (chapter.characters && chapter.characters.length > 0) ||
-    (chapter.items && chapter.items.length > 0) ||
-    (chapter.locations && chapter.locations.length > 0);
-
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3">
-              <Badge
-                variant="secondary"
-                className="px-3 py-1 text-sm font-semibold bg-primary/10 text-primary border-primary/20"
-              >
-                Cap. {chapter.number}
-              </Badge>
-              <CardTitle
-                className="text-xl font-bold cursor-pointer hover:text-primary transition-colors"
-                onClick={() => onClick?.(chapter.id)}
-              >
+    <Card className="hover:shadow-md transition-shadow relative overflow-hidden">
+      {/* Status Badge - Large identifier at top left */}
+      <div className="absolute top-0 left-0 z-10">
+        <Badge
+          variant="secondary"
+          className={`${statusConfig[chapter.status].color} text-white pointer-events-none rounded-none rounded-br-lg px-4 py-2 text-sm font-semibold shadow-md`}
+        >
+          {statusConfig[chapter.status].label}
+        </Badge>
+      </div>
+
+      <CardHeader
+        className="pb-4 pt-14 cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+        onClick={() => onClick?.(chapter.id)}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 space-y-3">
+            {/* Header: Number + Title */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-lg font-semibold text-amber-500 shrink-0">
+                Capítulo {chapter.number}:
+              </span>
+              <CardTitle className="text-lg font-semibold line-clamp-1">
                 {chapter.title}
               </CardTitle>
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
-              <Badge className={statusConfig[chapter.status].color}>
-                {statusConfig[chapter.status].label}
-              </Badge>
+            {/* Tags: Arc */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {chapter.plotArc ? (
+                <Badge
+                  variant="secondary"
+                  className="gap-1.5 bg-purple-500 text-white border-purple-600 pointer-events-none"
+                >
+                  <BookOpen className="w-3 h-3" />
+                  <span className="font-medium">Arco:</span>
+                  {chapter.plotArc.name}
+                </Badge>
+              ) : (
+                <Badge
+                  variant="secondary"
+                  className="gap-1.5 bg-gray-500 text-white border-gray-600 pointer-events-none"
+                >
+                  <BookOpen className="w-3 h-3" />
+                  Sem arco definido
+                </Badge>
+              )}
+            </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
-                  <FileText className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">
-                    {chapter.wordCount.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    palavras
-                  </span>
-                </div>
+            {/* Stats: Compact and clean */}
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Type className="w-3.5 h-3.5" />
+                <span className="text-xs">Palavras:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {chapter.wordCount.toLocaleString()}
+                </span>
+              </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
-                  <span className="text-sm font-mono font-medium">
-                    {chapter.characterCount.toLocaleString()}
-                  </span>
-                  <span className="text-xs text-muted-foreground">chars</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <Hash className="w-3.5 h-3.5" />
+                <span className="text-xs">Caracteres:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {chapter.characterCount.toLocaleString()}
+                </span>
+              </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-md">
-                  <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">
-                    {chapter.lastEdited.toLocaleDateString()}
-                  </span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                <span className="text-xs">Última edição:</span>
+                <span className="text-xs font-medium text-foreground">
+                  {chapter.lastEdited.toLocaleDateString()}
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Actions */}
+          <div className="flex items-start gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Download className="w-4 h-4 mr-2" />
-                  Exportar
+                <Button variant="ghost" size="icon">
+                  <Download className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                   <FileText className="w-4 h-4 mr-2" />
                   Exportar como Word
@@ -139,9 +166,12 @@ export function ChapterCard({
             </DropdownMenu>
 
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete?.(chapter.id)}
+              variant="ghost-destructive"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(chapter.id);
+              }}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -149,96 +179,195 @@ export function ChapterCard({
         </div>
       </CardHeader>
 
-      {hasDetails && (
-        <>
-          <Separator />
-          <CardContent className="pt-3 pb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
-              className="w-full justify-between hover:bg-muted/50"
-            >
-              <span className="text-sm font-medium">
-                {isDetailsExpanded ? "Ocultar" : "Mostrar"} Detalhes
-              </span>
-              {isDetailsExpanded ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </Button>
+      <>
+        <Separator />
+        <CardContent className="p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDetailsExpanded(!isDetailsExpanded);
+            }}
+            className="w-full justify-between rounded-none hover:bg-white/5 dark:hover:bg-white/10 hover:text-foreground transition-colors duration-200 px-6 py-3"
+          >
+            <span className="text-sm font-medium">
+              {isDetailsExpanded ? "Ocultar" : "Mostrar"} Detalhes
+            </span>
+            {isDetailsExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
 
-            {isDetailsExpanded && (
-              <div className="mt-4 space-y-4">
-                {chapter.summary && (
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Resumo</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {chapter.summary}
-                    </p>
-                  </div>
+          {isDetailsExpanded && (
+            <div className="px-6 py-4 space-y-4">
+              {/* Summary Section */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">Resumo</h4>
+                {chapter.summary ? (
+                  <p className="text-sm text-muted-foreground">
+                    {chapter.summary}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    Nenhum resumo adicionado.
+                  </p>
                 )}
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {chapter.characters && chapter.characters.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Personagens</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {chapter.characters.map((char) => (
-                          <Badge
-                            key={char}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {char}
-                          </Badge>
-                        ))}
-                      </div>
+              {/* Entities Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Personagens */}
+                <div>
+                  <h5 className="text-xs font-medium mb-1.5 text-foreground">
+                    Personagens
+                  </h5>
+                  {chapter.mentionedCharacters && chapter.mentionedCharacters.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {chapter.mentionedCharacters.map((char) => (
+                        <div
+                          key={char.id}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md border"
+                        >
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={char.image} />
+                            <AvatarFallback className="text-[10px]">
+                              {char.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs">{char.name}</span>
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      Nenhum personagem mencionado.
+                    </p>
                   )}
+                </div>
 
-                  {chapter.items && chapter.items.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">Itens</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {chapter.items.map((item) => (
-                          <Badge
-                            key={item}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {item}
-                          </Badge>
-                        ))}
-                      </div>
+                {/* Regiões */}
+                <div>
+                  <h5 className="text-xs font-medium mb-1.5 text-foreground">
+                    Regiões
+                  </h5>
+                  {chapter.mentionedRegions && chapter.mentionedRegions.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {chapter.mentionedRegions.map((region) => (
+                        <div
+                          key={region.id}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md border"
+                        >
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={region.image} />
+                            <AvatarFallback className="text-[10px]">
+                              {region.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs">{region.name}</span>
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      Nenhuma região mencionada.
+                    </p>
                   )}
+                </div>
 
-                  {chapter.locations && chapter.locations.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        Localizações
-                      </h4>
-                      <div className="flex flex-wrap gap-1">
-                        {chapter.locations.map((location) => (
-                          <Badge
-                            key={location}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {location}
-                          </Badge>
-                        ))}
-                      </div>
+                {/* Itens */}
+                <div>
+                  <h5 className="text-xs font-medium mb-1.5 text-foreground">
+                    Itens
+                  </h5>
+                  {chapter.mentionedItems && chapter.mentionedItems.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {chapter.mentionedItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md border"
+                        >
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={item.image} />
+                            <AvatarFallback className="text-[10px]">
+                              {item.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs">{item.name}</span>
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      Nenhum item mencionado.
+                    </p>
+                  )}
+                </div>
+
+                {/* Facções */}
+                <div>
+                  <h5 className="text-xs font-medium mb-1.5 text-foreground">
+                    Facções
+                  </h5>
+                  {chapter.mentionedFactions && chapter.mentionedFactions.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {chapter.mentionedFactions.map((faction) => (
+                        <div
+                          key={faction.id}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md border"
+                        >
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={faction.image} />
+                            <AvatarFallback className="text-[10px]">
+                              {faction.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs">{faction.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      Nenhuma facção mencionada.
+                    </p>
+                  )}
+                </div>
+
+                {/* Raças */}
+                <div>
+                  <h5 className="text-xs font-medium mb-1.5 text-foreground">
+                    Raças
+                  </h5>
+                  {chapter.mentionedRaces && chapter.mentionedRaces.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {chapter.mentionedRaces.map((race) => (
+                        <div
+                          key={race.id}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-md border"
+                        >
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={race.image} />
+                            <AvatarFallback className="text-[10px]">
+                              {race.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs">{race.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      Nenhuma raça mencionada.
+                    </p>
                   )}
                 </div>
               </div>
-            )}
-          </CardContent>
-        </>
-      )}
+            </div>
+          )}
+        </CardContent>
+      </>
     </Card>
   );
 }
