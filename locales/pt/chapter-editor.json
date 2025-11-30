@@ -1,0 +1,65 @@
+{
+  "header": {
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "view_mode": "Modo Visualizar",
+    "view_mode_on": "Modo Visualizar Ativo",
+    "view_mode_off": "Modo Visualizar Desativado",
+    "all_annotations": "Todas as Anotações"
+  },
+  "chapter": {
+    "number_label": "Capítulo",
+    "title_placeholder": "Título do capítulo...",
+    "edit_title_hint": "Clique duas vezes para editar"
+  },
+  "status": {
+    "label": "Status",
+    "in-progress": "Em Andamento",
+    "draft": "Rascunho",
+    "review": "Em Revisão",
+    "finished": "Finalizado",
+    "published": "Publicado"
+  },
+  "arc": {
+    "label": "Arco Narrativo",
+    "select": "Selecionar Arco",
+    "no_arc": "Nenhum arco",
+    "dialog_title": "Selecionar Arco Narrativo",
+    "dialog_description": "Escolha o arco narrativo para este capítulo"
+  },
+  "collapsible": {
+    "summary_title": "Resumo & Entidades Mencionadas",
+    "summary_label": "Resumo do Capítulo",
+    "summary_placeholder": "Escreva um resumo do que acontece neste capítulo...",
+    "mentioned_characters": "Personagens Mencionados",
+    "mentioned_regions": "Regiões Mencionadas",
+    "mentioned_items": "Itens Mencionados",
+    "mentioned_factions": "Facções Mencionadas",
+    "mentioned_races": "Raças Mencionadas",
+    "no_entities_selected": "Nenhuma entidade selecionada"
+  },
+  "editor": {
+    "placeholder": "Comece a escrever seu capítulo...",
+    "read_only": "Este capítulo está em modo somente leitura"
+  },
+  "annotations": {
+    "create": "Anotar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "important": "Importante",
+    "mark_important": "Marcar como importante",
+    "add_annotation": "Adicionar Anotação",
+    "annotation_text": "Texto da anotação...",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "all_annotations_title": "Todas as Anotações",
+    "no_annotations": "Nenhuma anotação ainda",
+    "navigate_to_text": "Navegar para o texto",
+    "selected_text": "Texto selecionado"
+  },
+  "stats": {
+    "words": "palavras",
+    "characters": "caracteres",
+    "pages": "páginas"
+  }
+}

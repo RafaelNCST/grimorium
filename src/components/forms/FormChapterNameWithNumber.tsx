@@ -20,6 +20,7 @@ export interface FormChapterNameWithNumberProps {
   containerClassName?: string;
   maxLength?: number;
   namePlaceholder?: string;
+  showCharCount?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
       containerClassName,
       maxLength = 200,
       namePlaceholder = "Nome do Capítulo",
+      showCharCount = true,
     },
     ref
   ) => {
@@ -146,7 +148,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
         </div>
 
         {/* Character count */}
-        {maxLength && (
+        {maxLength && showCharCount && (
           <div className="flex justify-end">
             <p className="text-xs text-muted-foreground">
               {currentLength}/{maxLength}

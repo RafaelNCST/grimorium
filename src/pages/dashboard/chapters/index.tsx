@@ -22,6 +22,7 @@ import {
   type IChapterFormData,
   type EntityMention,
 } from "@/components/modals/create-chapter-modal";
+import { useChaptersStore, type ChapterData } from "@/stores/chapters-store";
 
 import { ChapterCard } from "./components/chapter-card";
 
@@ -55,21 +56,47 @@ const statusConfig: Record<
   published: { label: "Lançado", color: "bg-purple-500", icon: null },
 };
 
-const mockChapters: Chapter[] = [];
-
 export function ChaptersPage() {
   const { dashboardId } = useParams({
     from: "/dashboard/$dashboardId/chapters/",
   });
   const navigate = useNavigate();
 
-  const [chapters, setChapters] = useState<Chapter[]>(mockChapters);
+  const { getAllChapters, addChapter, deleteChapter: deleteChapterFromStore } = useChaptersStore();
+
+  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeTab, setActiveTab] = useState<ChapterStatus | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
+
+  // Load chapters from store
+  useEffect(() => {
+    const storedChapters = getAllChapters();
+    const mappedChapters: Chapter[] = storedChapters.map((ch) => ({
+      id: ch.id,
+      number: parseFloat(ch.chapterNumber),
+      title: ch.title,
+      status: ch.status,
+      wordCount: ch.wordCount,
+      characterCount: ch.characterCount,
+      lastEdited: ch.lastEdited ? new Date(ch.lastEdited) : new Date(),
+      summary: ch.summary,
+      plotArc: ch.plotArcId
+        ? plotArcs.find((arc) => arc.id === ch.plotArcId)
+          ? { id: ch.plotArcId, name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name }
+          : undefined
+        : undefined,
+      mentionedCharacters: ch.mentionedCharacters,
+      mentionedRegions: ch.mentionedRegions,
+      mentionedItems: ch.mentionedItems,
+      mentionedFactions: ch.mentionedFactions,
+      mentionedRaces: ch.mentionedRaces,
+    }));
+    setChapters(mappedChapters);
+  }, [getAllChapters, plotArcs]);
 
   // Load plot arcs
   useEffect(() => {
@@ -97,19 +124,44 @@ export function ChaptersPage() {
   };
 
   const handleDeleteChapter = (chapterId: string) => {
+    deleteChapterFromStore(chapterId);
     setChapters((prev) => prev.filter((ch) => ch.id !== chapterId));
     setChapterToDelete(null);
     setShowDeleteDialog(false);
   };
 
   const handleCreateChapter = (data: IChapterFormData) => {
-    // Find plot arc by ID
+    const newChapterId = String(Date.now());
+
+    const newChapterData: ChapterData = {
+      id: newChapterId,
+      chapterNumber: data.chapterNumber,
+      title: data.name,
+      status: data.status,
+      plotArcId: data.plotArcId,
+      summary: data.summary || "",
+      content: "",
+      wordCount: 0,
+      characterCount: 0,
+      lastEdited: new Date().toISOString(),
+      mentionedCharacters: data.mentionedCharacters || [],
+      mentionedRegions: data.mentionedRegions || [],
+      mentionedItems: data.mentionedItems || [],
+      mentionedFactions: data.mentionedFactions || [],
+      mentionedRaces: data.mentionedRaces || [],
+      annotations: [],
+    };
+
+    // Add to store
+    addChapter(newChapterData);
+
+    // Find plot arc for display
     const plotArc = data.plotArcId
       ? plotArcs.find((arc) => arc.id === data.plotArcId)
       : undefined;
 
     const newChapter: Chapter = {
-      id: String(Date.now()),
+      id: newChapterId,
       number: parseFloat(data.chapterNumber),
       title: data.name,
       status: data.status,
@@ -124,6 +176,7 @@ export function ChaptersPage() {
       mentionedFactions: data.mentionedFactions,
       mentionedRaces: data.mentionedRaces,
     };
+
     setChapters((prev) => [...prev, newChapter]);
     setShowCreateModal(false);
   };

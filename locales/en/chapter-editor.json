@@ -1,0 +1,65 @@
+{
+  "header": {
+    "save": "Save",
+    "saving": "Saving...",
+    "view_mode": "View Mode",
+    "view_mode_on": "View Mode On",
+    "view_mode_off": "View Mode Off",
+    "all_annotations": "All Annotations"
+  },
+  "chapter": {
+    "number_label": "Chapter",
+    "title_placeholder": "Chapter title...",
+    "edit_title_hint": "Double-click to edit"
+  },
+  "status": {
+    "label": "Status",
+    "in-progress": "In Progress",
+    "draft": "Draft",
+    "review": "In Review",
+    "finished": "Finished",
+    "published": "Published"
+  },
+  "arc": {
+    "label": "Story Arc",
+    "select": "Select Arc",
+    "no_arc": "No arc",
+    "dialog_title": "Select Story Arc",
+    "dialog_description": "Choose the narrative arc for this chapter"
+  },
+  "collapsible": {
+    "summary_title": "Summary & Mentioned Entities",
+    "summary_label": "Chapter Summary",
+    "summary_placeholder": "Write a summary of what happens in this chapter...",
+    "mentioned_characters": "Mentioned Characters",
+    "mentioned_regions": "Mentioned Regions",
+    "mentioned_items": "Mentioned Items",
+    "mentioned_factions": "Mentioned Factions",
+    "mentioned_races": "Mentioned Races",
+    "no_entities_selected": "No entities selected"
+  },
+  "editor": {
+    "placeholder": "Start writing your chapter...",
+    "read_only": "This chapter is in read-only mode"
+  },
+  "annotations": {
+    "create": "Annotate",
+    "edit": "Edit",
+    "delete": "Delete",
+    "important": "Important",
+    "mark_important": "Mark as important",
+    "add_annotation": "Add Annotation",
+    "annotation_text": "Annotation text...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "all_annotations_title": "All Annotations",
+    "no_annotations": "No annotations yet",
+    "navigate_to_text": "Navigate to text",
+    "selected_text": "Selected text"
+  },
+  "stats": {
+    "words": "words",
+    "characters": "characters",
+    "pages": "pages"
+  }
+}
