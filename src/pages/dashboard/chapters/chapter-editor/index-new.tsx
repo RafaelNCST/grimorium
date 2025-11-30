@@ -301,10 +301,10 @@ export function ChapterEditorNew() {
   const hasSidebarOpen = showAnnotationsSidebar || showAllAnnotationsSidebar;
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-full bg-background flex">
       {/* Main Content - Adjust width when sidebar is open */}
       <div
-        className="flex-1 transition-all duration-300"
+        className="flex-1 transition-all duration-300 flex flex-col overflow-hidden"
         style={{ marginRight: hasSidebarOpen ? '384px' : '0' }}
       >
         {/* Header */}
@@ -342,45 +342,45 @@ export function ChapterEditorNew() {
           onPlotArcChange={(arcId) => setChapter((prev) => ({ ...prev, plotArcId: arcId }))}
         />
 
-        {/* Summary Section */}
-        <div className="px-8 py-6">
-          <SummarySection
-            bookId={dashboardId!}
-            summary={chapter.summary}
-            mentionedCharacters={chapter.mentionedCharacters}
-            mentionedRegions={chapter.mentionedRegions}
-            mentionedItems={chapter.mentionedItems}
-            mentionedFactions={chapter.mentionedFactions}
-            mentionedRaces={chapter.mentionedRaces}
-            onSummaryChange={(value) => setChapter((prev) => ({ ...prev, summary: value }))}
-            onMentionedCharactersChange={(value) =>
-              setChapter((prev) => ({ ...prev, mentionedCharacters: value }))
+        {/* Text Editor */}
+        <div className="flex-1 overflow-hidden">
+          <TextEditor
+            content={chapter.content}
+            viewMode={viewMode}
+            annotations={chapter.annotations}
+            selectedAnnotationId={selectedAnnotationId || undefined}
+            summarySection={
+              <SummarySection
+                bookId={dashboardId!}
+                summary={chapter.summary}
+                mentionedCharacters={chapter.mentionedCharacters}
+                mentionedRegions={chapter.mentionedRegions}
+                mentionedItems={chapter.mentionedItems}
+                mentionedFactions={chapter.mentionedFactions}
+                mentionedRaces={chapter.mentionedRaces}
+                onSummaryChange={(value) => setChapter((prev) => ({ ...prev, summary: value }))}
+                onMentionedCharactersChange={(value) =>
+                  setChapter((prev) => ({ ...prev, mentionedCharacters: value }))
+                }
+                onMentionedRegionsChange={(value) =>
+                  setChapter((prev) => ({ ...prev, mentionedRegions: value }))
+                }
+                onMentionedItemsChange={(value) =>
+                  setChapter((prev) => ({ ...prev, mentionedItems: value }))
+                }
+                onMentionedFactionsChange={(value) =>
+                  setChapter((prev) => ({ ...prev, mentionedFactions: value }))
+                }
+                onMentionedRacesChange={(value) =>
+                  setChapter((prev) => ({ ...prev, mentionedRaces: value }))
+                }
+              />
             }
-            onMentionedRegionsChange={(value) =>
-              setChapter((prev) => ({ ...prev, mentionedRegions: value }))
-            }
-            onMentionedItemsChange={(value) =>
-              setChapter((prev) => ({ ...prev, mentionedItems: value }))
-            }
-            onMentionedFactionsChange={(value) =>
-              setChapter((prev) => ({ ...prev, mentionedFactions: value }))
-            }
-            onMentionedRacesChange={(value) =>
-              setChapter((prev) => ({ ...prev, mentionedRaces: value }))
-            }
+            onContentChange={(content) => setChapter((prev) => ({ ...prev, content }))}
+            onTextSelect={handleTextSelect}
+            onAnnotationClick={handleAnnotationClick}
           />
         </div>
-
-        {/* Text Editor */}
-        <TextEditor
-          content={chapter.content}
-          viewMode={viewMode}
-          annotations={chapter.annotations}
-          selectedAnnotationId={selectedAnnotationId || undefined}
-          onContentChange={(content) => setChapter((prev) => ({ ...prev, content }))}
-          onTextSelect={handleTextSelect}
-          onAnnotationClick={handleAnnotationClick}
-        />
       </div>
 
       {/* Annotations Sidebar */}

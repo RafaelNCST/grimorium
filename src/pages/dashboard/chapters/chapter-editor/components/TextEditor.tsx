@@ -9,6 +9,7 @@ interface TextEditorProps {
   viewMode: boolean;
   annotations: Annotation[];
   selectedAnnotationId?: string;
+  summarySection?: React.ReactNode;
   onContentChange: (content: string) => void;
   onTextSelect: (text: string, startOffset: number, endOffset: number) => void;
   onAnnotationClick: (annotationId: string) => void;
@@ -25,6 +26,7 @@ export function TextEditor({
   viewMode,
   annotations,
   selectedAnnotationId,
+  summarySection,
   onContentChange,
   onTextSelect,
   onAnnotationClick,
@@ -42,6 +44,51 @@ export function TextEditor({
     if (editorRef.current) {
       const newContent = editorRef.current.innerText;
       onContentChange(newContent);
+
+      // Auto-scroll only if cursor is at or near the end of the text
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+
+        // Calculate cursor position in text
+        const preSelectionRange = range.cloneRange();
+        preSelectionRange.selectNodeContents(editorRef.current);
+        preSelectionRange.setEnd(range.endContainer, range.endOffset);
+        const cursorPosition = preSelectionRange.toString().length;
+        const textLength = newContent.length;
+
+        // Only auto-scroll if cursor is at the very end (within 1 character tolerance)
+        const isAtEnd = cursorPosition >= textLength - 1;
+
+        if (isAtEnd && containerRef.current) {
+          // Small delay to ensure cursor position is updated
+          setTimeout(() => {
+            if (!containerRef.current) return;
+
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // StatsBar height + some buffer
+            const STATS_BAR_HEIGHT = 38;
+            const BUFFER = 50;
+            const reservedSpace = STATS_BAR_HEIGHT + BUFFER;
+
+            // Check if cursor is too close to bottom (would be behind StatsBar)
+            if (rect.bottom > viewportHeight - reservedSpace) {
+              // Scroll just enough to keep cursor visible above StatsBar
+              const scrollAmount = rect.bottom - (viewportHeight - reservedSpace);
+              containerRef.current.scrollBy({
+                top: scrollAmount,
+                behavior: 'smooth'
+              });
+            }
+          }, 10);
+        }
+      }
     }
   };
 
@@ -60,6 +107,53 @@ export function TextEditor({
 
       onTextSelect(selectedText, startOffset, endOffset);
     }
+  };
+
+  const handlePaste = () => {
+    // Use setTimeout to wait for paste content to be inserted
+    setTimeout(() => {
+      if (editorRef.current) {
+        const newContent = editorRef.current.innerText;
+        onContentChange(newContent);
+
+        // Auto-scroll after paste if cursor is at end
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+
+          // Calculate cursor position in text
+          const preSelectionRange = range.cloneRange();
+          preSelectionRange.selectNodeContents(editorRef.current);
+          preSelectionRange.setEnd(range.endContainer, range.endOffset);
+          const cursorPosition = preSelectionRange.toString().length;
+          const textLength = newContent.length;
+
+          // Only auto-scroll if cursor is at or near the end
+          const isAtEnd = cursorPosition >= textLength - 1;
+
+          if (isAtEnd && containerRef.current) {
+            // Calculate if cursor is hidden behind StatsBar
+            const rect = range.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // StatsBar height + some buffer
+            const STATS_BAR_HEIGHT = 38;
+            const BUFFER = 50;
+            const reservedSpace = STATS_BAR_HEIGHT + BUFFER;
+
+            // Check if cursor is too close to bottom (would be behind StatsBar)
+            if (rect.bottom > viewportHeight - reservedSpace) {
+              // Scroll just enough to keep cursor visible above StatsBar
+              const scrollAmount = rect.bottom - (viewportHeight - reservedSpace);
+              containerRef.current.scrollBy({
+                top: scrollAmount,
+                behavior: 'smooth'
+              });
+            }
+          }
+        }
+      }
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -183,18 +277,34 @@ export function TextEditor({
   }
 
   // Normal editing mode - Word-like
+  // StatsBar is 36px height (fixed at bottom)
+  // Create a scrollable container that accounts for the StatsBar
+  const STATS_BAR_HEIGHT = 36;
+  const containerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="bg-muted/30 min-h-screen">
+    <div
+      ref={containerRef}
+      className="bg-muted/30 overflow-y-auto h-full"
+    >
+      {/* Summary Section - scrolls with content */}
+      {summarySection && (
+        <div className="px-8 py-6">
+          {summarySection}
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto py-8 px-6">
         <div
           ref={editorRef}
           contentEditable
           suppressContentEditableWarning
           onInput={handleInput}
+          onPaste={handlePaste}
           onMouseUp={handleMouseUp}
           onKeyDown={handleKeyDown}
           className={cn(
-            "min-h-[calc(100vh-300px)] p-16 bg-white dark:bg-gray-900",
+            "p-16 bg-white dark:bg-gray-900",
             "shadow-lg border border-gray-200 dark:border-gray-800",
             "focus:outline-none focus:ring-2 focus:ring-primary/20",
             "prose prose-lg max-w-none dark:prose-invert"
@@ -204,6 +314,7 @@ export function TextEditor({
             lineHeight: "1.6",
             fontFamily: "Inter, sans-serif",
             color: "#000000",
+            minHeight: "calc(100vh - 200px)",
           }}
           spellCheck="true"
         />
