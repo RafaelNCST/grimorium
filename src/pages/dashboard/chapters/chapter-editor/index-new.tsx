@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
@@ -65,6 +65,68 @@ export function ChapterEditorNew() {
   const [showAllAnnotationsSidebar, setShowAllAnnotationsSidebar] = useState(false);
   const [scrollToAnnotation, setScrollToAnnotation] = useState<string | null>(null);
 
+  // Keep a ref to the latest chapter to avoid re-creating save functions
+  const chapterRef = useRef(chapter);
+  useEffect(() => {
+    chapterRef.current = chapter;
+  }, [chapter]);
+
+  // Immediate/synchronous save (no setTimeout) - used when user is leaving
+  const handleImmediateSave = useCallback(() => {
+    const currentChapter = chapterRef.current;
+
+    // Calculate stats
+    const trimmed = currentChapter.content.trim();
+    const words = trimmed
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
+    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
+
+    const now = new Date().toISOString();
+
+    // Update chapter in store immediately (synchronous)
+    updateChapter(currentChapter.id, {
+      ...currentChapter,
+      wordCount: words,
+      characterCount: chars,
+      lastEdited: now,
+    });
+  }, [updateChapter]);
+
+  // Auto-save with UI feedback (async with setTimeout)
+  const handleAutoSave = useCallback(() => {
+    const currentChapter = chapterRef.current;
+
+    setIsSaving(true);
+
+    // Calculate stats
+    const trimmed = currentChapter.content.trim();
+    const words = trimmed
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length;
+    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
+
+    const now = new Date().toISOString();
+
+    // Update chapter in store
+    updateChapter(currentChapter.id, {
+      ...currentChapter,
+      wordCount: words,
+      characterCount: chars,
+      lastEdited: now,
+    });
+
+    setTimeout(() => {
+      setChapter((prev) => ({
+        ...prev,
+        wordCount: words,
+        characterCount: chars,
+        lastEdited: now
+      }));
+      setIsSaving(false);
+    }, 500);
+  }, [updateChapter]);
+
   // Load plot arcs
   useEffect(() => {
     const loadArcs = async () => {
@@ -80,51 +142,51 @@ export function ChapterEditorNew() {
     loadArcs();
   }, [dashboardId]);
 
-  // Auto-save
+  // Debounced auto-save (primary strategy - saves 2 seconds after user stops typing)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleAutoSave();
+    }, 2000); // 2 seconds after last change
+
+    return () => clearTimeout(timeoutId);
+  }, [chapter.content, chapter.summary, chapter.title, chapter.chapterNumber, chapter.status, chapter.plotArcId, chapter.annotations, chapter.mentionedCharacters, chapter.mentionedRegions, chapter.mentionedItems, chapter.mentionedFactions, chapter.mentionedRaces, handleAutoSave]);
+
+  // Backup interval auto-save (saves every 3 minutes as backup)
   useEffect(() => {
     const interval = setInterval(() => {
       handleAutoSave();
-    }, 30000); // Every 30 seconds
+    }, 180000); // Every 3 minutes
 
     return () => clearInterval(interval);
-  }, [chapter]);
+  }, [handleAutoSave]);
 
-  const handleAutoSave = () => {
-    setIsSaving(true);
+  // Save on window blur/beforeunload (protection against data loss)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Always save immediately before unload (synchronous, no delay)
+      handleImmediateSave();
+    };
 
-    // Calculate stats
-    const trimmed = chapter.content.trim();
-    const words = trimmed
-      .split(/\s+/)
-      .filter((word) => word.length > 0).length;
-    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
+    const handleVisibilityChange = () => {
+      // Save immediately when tab becomes hidden
+      if (document.hidden) {
+        handleImmediateSave();
+      }
+    };
 
-    const now = new Date().toISOString();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Update chapter in store
-    updateChapter(chapter.id, {
-      ...chapter,
-      wordCount: words,
-      characterCount: chars,
-      lastEdited: now,
-    });
-
-    setTimeout(() => {
-      setChapter((prev) => ({
-        ...prev,
-        wordCount: words,
-        characterCount: chars,
-        lastEdited: now
-      }));
-      setIsSaving(false);
-    }, 500);
-  };
-
-  const handleSave = () => {
-    handleAutoSave();
-  };
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [handleImmediateSave]);
 
   const handleBack = () => {
+    // Save immediately before navigating away
+    handleImmediateSave();
+
     navigate({
       to: "/dashboard/$dashboardId/chapters",
       params: { dashboardId: dashboardId! },
@@ -345,10 +407,8 @@ export function ChapterEditorNew() {
         <EditorHeader
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
-          isSaving={isSaving}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
           onBack={handleBack}
-          onSave={handleSave}
           onChapterNumberChange={(value) =>
             setChapter((prev) => ({ ...prev, chapterNumber: value }))
           }
@@ -455,6 +515,7 @@ export function ChapterEditorNew() {
         wordCount={wordCount}
         characterCount={characterCount}
         characterCountWithSpaces={characterCountWithSpaces}
+        isSaving={isSaving}
       />
     </div>
   );

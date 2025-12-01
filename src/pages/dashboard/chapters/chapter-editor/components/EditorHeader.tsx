@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { ArrowLeft, Save, MessageSquare } from "lucide-react";
+import { ArrowLeft, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
@@ -10,10 +10,8 @@ import { cn } from "@/lib/utils";
 interface EditorHeaderProps {
   chapterNumber: string;
   title: string;
-  isSaving: boolean;
   showAllAnnotationsSidebar?: boolean;
   onBack: () => void;
-  onSave: () => void;
   onChapterNumberChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
@@ -22,10 +20,8 @@ interface EditorHeaderProps {
 export function EditorHeader({
   chapterNumber,
   title,
-  isSaving,
   showAllAnnotationsSidebar = false,
   onBack,
-  onSave,
   onChapterNumberChange,
   onTitleChange,
   onShowAllAnnotations,
@@ -118,16 +114,6 @@ export function EditorHeader({
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Anotações
-            </Button>
-
-            <Button
-              onClick={onSave}
-              disabled={isSaving}
-              size="sm"
-              variant="magical"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? "Salvando..." : "Salvar"}
             </Button>
           </div>
         </div>

@@ -62,5 +62,9 @@
     "characters": "caracteres (sem espaços)",
     "characters_with_spaces": "caracteres (com espaços)",
     "pages": "páginas"
+  },
+  "save": {
+    "saving": "Salvando...",
+    "saved": "Salvo"
   }
 }
