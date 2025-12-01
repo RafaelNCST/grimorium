@@ -34,6 +34,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { IPlotArc } from "@/types/plot-types";
 
@@ -140,9 +146,10 @@ export function FormattingToolbar({
   };
 
   return (
-    <div className="border-b border-border bg-card sticky top-0 z-40">
-      <div className="flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto">
-        <div className="flex items-center gap-1">
+    <TooltipProvider delayDuration={300}>
+      <div className="border-b border-border bg-card sticky top-0 z-40">
+        <div className="flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto">
+          <div className="flex items-center gap-1">
         {/* Font Size */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground font-medium">Tamanho do texto:</span>
@@ -161,95 +168,149 @@ export function FormattingToolbar({
         <Separator orientation="vertical" className="h-6 mx-1" />
 
         {/* Text Formatting */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("bold")}
-          className="h-8 w-8 p-0"
-          title="Negrito (Ctrl+B)"
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("italic")}
-          className="h-8 w-8 p-0"
-          title="Itálico (Ctrl+I)"
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("underline")}
-          className="h-8 w-8 p-0"
-          title="Sublinhado (Ctrl+U)"
-        >
-          <Underline className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("bold")}
+              className="h-8 w-8 p-0"
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Negrito (Ctrl+B)</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("italic")}
+              className="h-8 w-8 p-0"
+            >
+              <Italic className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Itálico (Ctrl+I)</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("underline")}
+              className="h-8 w-8 p-0"
+            >
+              <Underline className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Sublinhado (Ctrl+U)</p>
+          </TooltipContent>
+        </Tooltip>
 
         <Separator orientation="vertical" className="h-6 mx-1" />
 
         {/* Alignment */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("justifyLeft")}
-          className="h-8 w-8 p-0"
-          title="Alinhar à esquerda"
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("justifyCenter")}
-          className="h-8 w-8 p-0"
-          title="Centralizar"
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("justifyRight")}
-          className="h-8 w-8 p-0"
-          title="Alinhar à direita"
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("justifyFull")}
-          className="h-8 w-8 p-0"
-          title="Justificar"
-        >
-          <AlignJustify className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("justifyLeft")}
+              className="h-8 w-8 p-0"
+            >
+              <AlignLeft className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Alinhar à esquerda</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("justifyCenter")}
+              className="h-8 w-8 p-0"
+            >
+              <AlignCenter className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Centralizar</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("justifyRight")}
+              className="h-8 w-8 p-0"
+            >
+              <AlignRight className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Alinhar à direita</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("justifyFull")}
+              className="h-8 w-8 p-0"
+            >
+              <AlignJustify className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Justificar</p>
+          </TooltipContent>
+        </Tooltip>
 
         <Separator orientation="vertical" className="h-6 mx-1" />
 
         {/* Undo/Redo */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("undo")}
-          className="h-8 w-8 p-0"
-          title="Desfazer (Ctrl+Z)"
-        >
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onFormat("redo")}
-          className="h-8 w-8 p-0"
-          title="Refazer (Ctrl+Y)"
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("undo")}
+              className="h-8 w-8 p-0"
+            >
+              <Undo className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Desfazer (Ctrl+Z)</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onFormat("redo")}
+              className="h-8 w-8 p-0"
+            >
+              <Redo className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Refazer (Ctrl+Y)</p>
+          </TooltipContent>
+        </Tooltip>
 
         {/* Annotation */}
         {hasSelection && onAnnotate && (
@@ -314,6 +375,7 @@ export function FormattingToolbar({
               </div>
             </button>
           </div>
+        </div>
         </div>
       </div>
 
@@ -449,6 +511,6 @@ export function FormattingToolbar({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </TooltipProvider>
   );
 }

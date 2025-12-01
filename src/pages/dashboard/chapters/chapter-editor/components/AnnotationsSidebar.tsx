@@ -6,6 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import type { Annotation, AnnotationNote } from "../types";
@@ -60,7 +66,8 @@ export function AnnotationsSidebar({
   };
 
   return (
-    <div className="fixed right-0 top-8 bottom-0 w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col overflow-hidden">
+    <TooltipProvider delayDuration={300}>
+      <div className="fixed right-0 top-8 bottom-0 w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h3 className="font-semibold text-lg">{t("annotations.create")}</h3>
@@ -113,36 +120,56 @@ export function AnnotationsSidebar({
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <p className="text-sm flex-1">{note.text}</p>
                     <div className="flex gap-1 shrink-0">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className={cn(
-                          "h-7 w-7",
-                          note.isImportant && "text-amber-500 hover:text-amber-600"
-                        )}
-                        onClick={() => onToggleImportant(note.id)}
-                        title={t("annotations.mark_important")}
-                      >
-                        <Star
-                          className={cn("w-4 h-4", note.isImportant && "fill-current")}
-                        />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost-bright"
-                        className="h-7 w-7"
-                        onClick={() => handleStartEdit(note)}
-                      >
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost-destructive"
-                        className="h-7 w-7"
-                        onClick={() => onDeleteNote(note.id)}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className={cn(
+                              "h-7 w-7",
+                              note.isImportant && "text-amber-500 hover:text-amber-600"
+                            )}
+                            onClick={() => onToggleImportant(note.id)}
+                          >
+                            <Star
+                              className={cn("w-4 h-4", note.isImportant && "fill-current")}
+                            />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t("annotations.mark_important")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost-bright"
+                            className="h-7 w-7"
+                            onClick={() => handleStartEdit(note)}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t("annotations.edit")}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost-destructive"
+                            className="h-7 w-7"
+                            onClick={() => onDeleteNote(note.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t("annotations.delete")}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -174,6 +201,7 @@ export function AnnotationsSidebar({
           {t("annotations.add_annotation")}
         </Button>
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
