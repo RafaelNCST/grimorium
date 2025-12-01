@@ -79,9 +79,9 @@ export function FormattingToolbar({
       large: "22px",
     };
 
-    const editor = document.querySelector('[contenteditable="true"]') as HTMLElement;
-    if (editor) {
-      editor.style.fontSize = fontSizeMap[size];
+    const editorElement = document.querySelector('[contenteditable="true"]') as HTMLElement;
+    if (editorElement) {
+      editorElement.style.fontSize = fontSizeMap[size];
     }
   };
 

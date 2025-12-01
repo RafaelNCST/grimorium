@@ -16,7 +16,6 @@ import { SummarySection } from "./components/SummarySection";
 import { TextEditor } from "./components/TextEditor";
 import type { ChapterData, Annotation, AnnotationNote, EntityMention } from "./types";
 
-const CHARS_PER_PAGE = 1800;
 
 export function ChapterEditorNew() {
   const params = useParams({
@@ -52,7 +51,6 @@ export function ChapterEditorNew() {
   const [chapter, setChapter] = useState<ChapterData>(initialChapter);
 
   // UI state
-  const [viewMode, setViewMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
 
@@ -94,11 +92,11 @@ export function ChapterEditorNew() {
     setIsSaving(true);
 
     // Calculate stats
-    const words = chapter.content
-      .trim()
+    const trimmed = chapter.content.trim();
+    const words = trimmed
       .split(/\s+/)
       .filter((word) => word.length > 0).length;
-    const chars = chapter.content.length;
+    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
 
     const now = new Date().toISOString();
 
@@ -287,14 +285,14 @@ export function ChapterEditorNew() {
   };
 
   // Calculate stats
-  const wordCount = chapter.content
-    .trim()
+  const trimmedContent = chapter.content.trim();
+  const wordCount = trimmedContent
     .split(/\s+/)
     .filter((word) => word.length > 0).length;
 
-  const characterCount = chapter.content.length;
-
-  const pageCount = Math.ceil(chapter.content.length / CHARS_PER_PAGE);
+  const characterCount = trimmedContent.replace(/\s+/g, '').length; // Without spaces
+  // With spaces - counts ALL spaces, even if only spaces are typed. Only ignores the initial newline from contentEditable
+  const characterCountWithSpaces = chapter.content === '' || chapter.content === '\n' ? 0 : chapter.content.length;
 
   const selectedAnnotation = chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
 
@@ -311,7 +309,6 @@ export function ChapterEditorNew() {
         <EditorHeader
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
-          viewMode={viewMode}
           isSaving={isSaving}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
           onBack={handleBack}
@@ -320,7 +317,6 @@ export function ChapterEditorNew() {
             setChapter((prev) => ({ ...prev, chapterNumber: value }))
           }
           onTitleChange={(value) => setChapter((prev) => ({ ...prev, title: value }))}
-          onToggleViewMode={() => setViewMode(!viewMode)}
           onShowAllAnnotations={() => {
             // Close specific annotation sidebar if open
             setShowAnnotationsSidebar(false);
@@ -346,7 +342,6 @@ export function ChapterEditorNew() {
         <div className="flex-1 overflow-hidden">
           <TextEditor
             content={chapter.content}
-            viewMode={viewMode}
             annotations={chapter.annotations}
             selectedAnnotationId={selectedAnnotationId || undefined}
             summarySection={
@@ -408,7 +403,11 @@ export function ChapterEditorNew() {
       )}
 
       {/* Stats Bar */}
-      <StatsBar wordCount={wordCount} characterCount={characterCount} pageCount={pageCount} />
+      <StatsBar
+        wordCount={wordCount}
+        characterCount={characterCount}
+        characterCountWithSpaces={characterCountWithSpaces}
+      />
     </div>
   );
 }

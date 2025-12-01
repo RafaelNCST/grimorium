@@ -57,6 +57,7 @@
     "@tauri-apps/plugin-dialog": "^2.4.2",
     "@tauri-apps/plugin-fs": "^2.4.4",
     "@tauri-apps/plugin-sql": "^2.3.0",
+    "@tiptap/core": "^3.11.1",
     "@tiptap/extension-bubble-menu": "^3.11.1",
     "@tiptap/extension-character-count": "^3.11.1",
     "@tiptap/extension-color": "^3.11.1",

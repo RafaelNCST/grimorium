@@ -59,7 +59,8 @@
   },
   "stats": {
     "words": "words",
-    "characters": "characters",
+    "characters": "characters (no spaces)",
+    "characters_with_spaces": "characters (with spaces)",
     "pages": "pages"
   }
 }

@@ -6,7 +6,6 @@ import type { Annotation } from "../types";
 
 interface TextEditorProps {
   content: string;
-  viewMode: boolean;
   annotations: Annotation[];
   selectedAnnotationId?: string;
   summarySection?: React.ReactNode;
@@ -15,15 +14,8 @@ interface TextEditorProps {
   onAnnotationClick: (annotationId: string) => void;
 }
 
-// A4 dimensions in pixels at 96 DPI
-const A4_WIDTH = 794;
-const A4_HEIGHT = 1123;
-const A4_PADDING = 96;
-const CHARS_PER_PAGE = 1800;
-
 export function TextEditor({
   content,
-  viewMode,
   annotations,
   selectedAnnotationId,
   summarySection,
@@ -32,6 +24,7 @@ export function TextEditor({
   onAnnotationClick,
 }: TextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Update editor content when content changes
   useEffect(() => {
@@ -228,59 +221,6 @@ export function TextEditor({
       }
     }
   };
-
-  // Calculate pages for A4 view
-  const pages = viewMode ? Math.ceil(content.length / CHARS_PER_PAGE) : 1;
-
-  if (viewMode) {
-    // A4 View Mode - Show pages
-    const pagesArray = Array.from({ length: Math.max(1, pages) }, (_, i) => {
-      const startChar = i * CHARS_PER_PAGE;
-      const endChar = Math.min((i + 1) * CHARS_PER_PAGE, content.length);
-      const pageContent = content.substring(startChar, endChar);
-
-      return (
-        <div
-          key={i}
-          className="bg-white dark:bg-gray-900 shadow-2xl mx-auto mb-8 relative border border-gray-300 dark:border-gray-700"
-          style={{
-            width: `${A4_WIDTH}px`,
-            minHeight: `${A4_HEIGHT}px`,
-            padding: `${A4_PADDING}px`,
-          }}
-        >
-          <div
-            className="prose prose-sm max-w-none dark:prose-invert"
-            style={{
-              fontSize: "12pt",
-              lineHeight: "1.5",
-              fontFamily: "'Times New Roman', Times, serif",
-              textAlign: "justify",
-            }}
-          >
-            {pageContent}
-          </div>
-
-          {/* Page number */}
-          <div className="absolute bottom-8 right-12 text-sm text-gray-500 dark:text-gray-400">
-            {i + 1}
-          </div>
-        </div>
-      );
-    });
-
-    return (
-      <div className="py-12 bg-gray-100 dark:bg-gray-950 min-h-screen">
-        {pagesArray}
-      </div>
-    );
-  }
-
-  // Normal editing mode - Word-like
-  // StatsBar is 36px height (fixed at bottom)
-  // Create a scrollable container that accounts for the StatsBar
-  const STATS_BAR_HEIGHT = 36;
-  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div

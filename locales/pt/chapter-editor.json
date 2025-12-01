@@ -59,7 +59,8 @@
   },
   "stats": {
     "words": "palavras",
-    "characters": "caracteres",
+    "characters": "caracteres (sem espaços)",
+    "characters_with_spaces": "caracteres (com espaços)",
     "pages": "páginas"
   }
 }

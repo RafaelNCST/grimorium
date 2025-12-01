@@ -1,14 +1,14 @@
 import { useTranslation } from "react-i18next";
 
-import { FileText, Type, BookOpen } from "lucide-react";
+import { FileText, Type } from "lucide-react";
 
 interface StatsBarProps {
   wordCount: number;
   characterCount: number;
-  pageCount: number;
+  characterCountWithSpaces: number;
 }
 
-export function StatsBar({ wordCount, characterCount, pageCount }: StatsBarProps) {
+export function StatsBar({ wordCount, characterCount, characterCountWithSpaces }: StatsBarProps) {
   const { t } = useTranslation("chapter-editor");
 
   return (
@@ -29,9 +29,9 @@ export function StatsBar({ wordCount, characterCount, pageCount }: StatsBarProps
         </div>
 
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4" />
+          <FileText className="w-4 h-4" />
           <span>
-            <strong className="text-foreground">{pageCount}</strong> {t("stats.pages")}
+            <strong className="text-foreground">{characterCountWithSpaces}</strong> {t("stats.characters_with_spaces")}
           </span>
         </div>
       </div>

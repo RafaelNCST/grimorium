@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { ArrowLeft, Save, Eye, EyeOff, MessageSquare } from "lucide-react";
+import { ArrowLeft, Save, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
@@ -10,28 +10,24 @@ import { cn } from "@/lib/utils";
 interface EditorHeaderProps {
   chapterNumber: string;
   title: string;
-  viewMode: boolean;
   isSaving: boolean;
   showAllAnnotationsSidebar?: boolean;
   onBack: () => void;
   onSave: () => void;
   onChapterNumberChange: (value: string) => void;
   onTitleChange: (value: string) => void;
-  onToggleViewMode: () => void;
   onShowAllAnnotations: () => void;
 }
 
 export function EditorHeader({
   chapterNumber,
   title,
-  viewMode,
   isSaving,
   showAllAnnotationsSidebar = false,
   onBack,
   onSave,
   onChapterNumberChange,
   onTitleChange,
-  onToggleViewMode,
   onShowAllAnnotations,
 }: EditorHeaderProps) {
   const { t } = useTranslation("chapter-editor");
@@ -122,30 +118,6 @@ export function EditorHeader({
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Anotações
-            </Button>
-
-            <Button
-              variant="ghost-bright"
-              size="sm"
-              onClick={onToggleViewMode}
-              className={cn(
-                "border border-transparent transition-all duration-200",
-                viewMode
-                  ? "bg-primary/10 border-primary text-primary"
-                  : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
-              )}
-            >
-              {viewMode ? (
-                <>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Modo A4
-                </>
-              ) : (
-                <>
-                  <EyeOff className="w-4 h-4 mr-2" />
-                  Editor
-                </>
-              )}
             </Button>
 
             <Button
