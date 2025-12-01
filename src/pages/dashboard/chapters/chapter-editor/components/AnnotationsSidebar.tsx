@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { X, Star, Trash2, Edit, Save, Plus } from "lucide-react";
+import { X, Star, Trash2, Edit, Save, Plus, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ interface AnnotationsSidebarProps {
   onEditNote: (noteId: string, text: string) => void;
   onDeleteNote: (noteId: string) => void;
   onToggleImportant: (noteId: string) => void;
+  onNavigateToAnnotation?: (annotationId: string) => void;
 }
 
 export function AnnotationsSidebar({
@@ -32,6 +33,7 @@ export function AnnotationsSidebar({
   onEditNote,
   onDeleteNote,
   onToggleImportant,
+  onNavigateToAnnotation,
 }: AnnotationsSidebarProps) {
   const { t } = useTranslation("chapter-editor");
   const [newNoteText, setNewNoteText] = useState("");
@@ -65,6 +67,13 @@ export function AnnotationsSidebar({
     setEditingNoteText("");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAddNote();
+    }
+  };
+
   return (
     <TooltipProvider delayDuration={300}>
       <div className="fixed right-0 top-8 bottom-0 w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col overflow-hidden">
@@ -79,7 +88,13 @@ export function AnnotationsSidebar({
       {/* Selected Text */}
       <div className="p-4 bg-muted/30 border-b border-border">
         <p className="text-sm text-muted-foreground mb-1">{t("annotations.selected_text")}:</p>
-        <p className="text-sm font-medium italic">"{annotation.text}"</p>
+        <button
+          onClick={() => onNavigateToAnnotation?.(annotation.id)}
+          className="text-sm font-medium italic text-left w-full hover:text-primary transition-colors cursor-pointer flex items-start gap-2 group"
+        >
+          <MapPin className="w-4 h-4 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
+          <span className="flex-1">"{annotation.text}"</span>
+        </button>
       </div>
 
       {/* Notes List */}
@@ -144,7 +159,7 @@ export function AnnotationsSidebar({
                         <TooltipTrigger asChild>
                           <Button
                             size="icon"
-                            variant="ghost-bright"
+                            variant="ghost"
                             className="h-7 w-7"
                             onClick={() => handleStartEdit(note)}
                           >
@@ -187,6 +202,7 @@ export function AnnotationsSidebar({
         <Textarea
           value={newNoteText}
           onChange={(e) => setNewNoteText(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={t("annotations.annotation_text")}
           rows={3}
           className="resize-none"

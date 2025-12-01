@@ -63,6 +63,7 @@ export function ChapterEditorNew() {
   const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | null>(null);
   const [showAnnotationsSidebar, setShowAnnotationsSidebar] = useState(false);
   const [showAllAnnotationsSidebar, setShowAllAnnotationsSidebar] = useState(false);
+  const [scrollToAnnotation, setScrollToAnnotation] = useState<string | null>(null);
 
   // Load plot arcs
   useEffect(() => {
@@ -140,18 +141,42 @@ export function ChapterEditorNew() {
   const handleCreateAnnotation = () => {
     if (!selectedText || !selectedRange) return;
 
+    // Check for overlapping annotations
+    const overlappingAnnotations = chapter.annotations.filter((ann) => {
+      // Check if annotation overlaps with selected range
+      return (
+        (ann.startOffset >= selectedRange.start && ann.startOffset < selectedRange.end) ||
+        (ann.endOffset > selectedRange.start && ann.endOffset <= selectedRange.end) ||
+        (ann.startOffset <= selectedRange.start && ann.endOffset >= selectedRange.end)
+      );
+    });
+
+    let mergedNotes: AnnotationNote[] = [];
+    let annotationsToRemove: string[] = [];
+
+    if (overlappingAnnotations.length > 0) {
+      // Merge notes from all overlapping annotations
+      overlappingAnnotations.forEach((ann) => {
+        mergedNotes = [...mergedNotes, ...ann.notes];
+        annotationsToRemove.push(ann.id);
+      });
+    }
+
     const newAnnotation: Annotation = {
       id: `annotation-${Date.now()}`,
       startOffset: selectedRange.start,
       endOffset: selectedRange.end,
       text: selectedText,
-      notes: [],
+      notes: mergedNotes,
       createdAt: new Date().toISOString(),
     };
 
     setChapter((prev) => ({
       ...prev,
-      annotations: [...prev.annotations, newAnnotation],
+      annotations: [
+        ...prev.annotations.filter((a) => !annotationsToRemove.includes(a.id)),
+        newAnnotation,
+      ],
     }));
 
     setSelectedAnnotationId(newAnnotation.id);
@@ -171,6 +196,14 @@ export function ChapterEditorNew() {
     setSelectedRange(null);
   };
 
+  // Update annotations (called when text is modified)
+  const handleUpdateAnnotations = (updatedAnnotations: Annotation[]) => {
+    setChapter((prev) => ({
+      ...prev,
+      annotations: updatedAnnotations,
+    }));
+  };
+
   // Annotation click
   const handleAnnotationClick = (annotationId: string) => {
     // Close all annotations sidebar if open
@@ -187,7 +220,10 @@ export function ChapterEditorNew() {
     // Open specific annotation sidebar
     setSelectedAnnotationId(annotationId);
     setShowAnnotationsSidebar(true);
-    // TODO: Scroll to annotation in editor
+    // Scroll to annotation in editor
+    setScrollToAnnotation(annotationId);
+    // Clear scroll trigger after a short delay
+    setTimeout(() => setScrollToAnnotation(null), 100);
   };
 
   // Add note to annotation
@@ -329,8 +365,6 @@ export function ChapterEditorNew() {
         {/* Formatting Toolbar */}
         <FormattingToolbar
           onFormat={handleFormat}
-          onAnnotate={handleCreateAnnotation}
-          hasSelection={!!selectedText}
           status={chapter.status}
           onStatusChange={(status) => setChapter((prev) => ({ ...prev, status }))}
           plotArcId={chapter.plotArcId}
@@ -374,6 +408,9 @@ export function ChapterEditorNew() {
             onContentChange={(content) => setChapter((prev) => ({ ...prev, content }))}
             onTextSelect={handleTextSelect}
             onAnnotationClick={handleAnnotationClick}
+            onCreateAnnotation={handleCreateAnnotation}
+            onUpdateAnnotations={handleUpdateAnnotations}
+            scrollToAnnotation={scrollToAnnotation}
           />
         </div>
       </div>
@@ -383,6 +420,16 @@ export function ChapterEditorNew() {
         <AnnotationsSidebar
           annotation={selectedAnnotation}
           onClose={() => {
+            // Delete annotation if it has no notes
+            if (selectedAnnotationId) {
+              const annotation = chapter.annotations.find((a) => a.id === selectedAnnotationId);
+              if (annotation && annotation.notes.length === 0) {
+                setChapter((prev) => ({
+                  ...prev,
+                  annotations: prev.annotations.filter((a) => a.id !== selectedAnnotationId),
+                }));
+              }
+            }
             setShowAnnotationsSidebar(false);
             setSelectedAnnotationId(null);
           }}
@@ -390,6 +437,7 @@ export function ChapterEditorNew() {
           onEditNote={handleEditNote}
           onDeleteNote={handleDeleteNote}
           onToggleImportant={handleToggleImportant}
+          onNavigateToAnnotation={handleNavigateToAnnotation}
         />
       )}
 

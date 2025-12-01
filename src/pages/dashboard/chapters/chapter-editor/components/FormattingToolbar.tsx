@@ -47,8 +47,6 @@ import type { ChapterStatus } from "../types";
 
 interface FormattingToolbarProps {
   onFormat: (command: string, value?: string) => void;
-  onAnnotate?: () => void;
-  hasSelection: boolean;
   status: ChapterStatus;
   onStatusChange: (status: ChapterStatus) => void;
   plotArcId?: string;
@@ -66,8 +64,6 @@ const STATUS_COLORS: Record<ChapterStatus, string> = {
 
 export function FormattingToolbar({
   onFormat,
-  onAnnotate,
-  hasSelection,
   status,
   onStatusChange,
   plotArcId,
@@ -311,22 +307,6 @@ export function FormattingToolbar({
             <p>Refazer (Ctrl+Y)</p>
           </TooltipContent>
         </Tooltip>
-
-        {/* Annotation */}
-        {hasSelection && onAnnotate && (
-          <>
-            <Separator orientation="vertical" className="h-6 mx-1" />
-            <Button
-              variant="magical"
-              size="sm"
-              onClick={onAnnotate}
-              className="h-8 gap-1.5"
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-              Anotar
-            </Button>
-          </>
-        )}
         </div>
 
         {/* Right side: Status and Arc */}
