@@ -52,7 +52,7 @@ export function EditorHeader({
     };
   }, [isEditingTitle]);
 
-  const handleTitleDoubleClick = () => {
+  const handleTitleClick = () => {
     setIsEditingTitle(true);
   };
 
@@ -78,7 +78,7 @@ export function EditorHeader({
           <div
             ref={titleContainerRef}
             className="flex justify-center items-center min-h-[44px]"
-            onDoubleClick={handleTitleDoubleClick}
+            onClick={handleTitleClick}
           >
             {isEditingTitle ? (
               <div className="max-w-3xl w-full">

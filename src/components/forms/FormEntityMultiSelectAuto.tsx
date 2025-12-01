@@ -73,7 +73,7 @@ interface FormEntityMultiSelectAutoProps {
   /**
    * Callback when selection changes
    */
-  onChange: (value: string[]) => void;
+  onChange: (value: string[], entities: EntityOption[]) => void;
   /**
    * Whether the field is disabled
    */
@@ -250,13 +250,17 @@ export function FormEntityMultiSelectAuto({
     }
 
     if (!value.includes(optionId)) {
-      onChange([...value, optionId]);
+      const newIds = [...value, optionId];
+      const newEntities = options.filter((opt) => newIds.includes(opt.id));
+      onChange(newIds, newEntities);
       setSearchQuery(""); // Clear search after selection
     }
   };
 
   const handleRemove = (optionId: string) => {
-    onChange(value.filter((id) => id !== optionId));
+    const newIds = value.filter((id) => id !== optionId);
+    const newEntities = options.filter((opt) => newIds.includes(opt.id));
+    onChange(newIds, newEntities);
   };
 
   const getInitials = (name: string) =>
