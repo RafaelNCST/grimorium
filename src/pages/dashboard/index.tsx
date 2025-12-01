@@ -103,6 +103,13 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     }
   }, [activeTab, isCustomizing, setIsCustomizing]);
 
+  // Reset header editing state when leaving dashboard
+  useEffect(() => {
+    return () => {
+      setIsEditingHeader(false);
+    };
+  }, [setIsEditingHeader]);
+
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     if (active) {
