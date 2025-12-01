@@ -2,7 +2,7 @@ import {
   ArrowLeft,
   Trash2,
   FileText,
-  StickyNote,
+  NotebookPen,
   Palette,
   EyeOff,
   Eye,
@@ -103,7 +103,7 @@ export function TopBar({
               onClick={onNavigateToNotes}
               className="hover:bg-accent hover:text-accent-foreground"
             >
-              <StickyNote className="w-5 h-5" />
+              <NotebookPen className="w-5 h-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>

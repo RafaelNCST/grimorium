@@ -2,7 +2,7 @@ import {
   Book as BookIcon,
   Search,
   Library,
-  Users,
+  Type,
   FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -20,22 +20,22 @@ const METRICS_CONFIG: Record<string, IEntityTagConfig> = {
     value: "books",
     icon: Library,
     translationKey: "metrics.total_books",
-    colorClass: "text-blue-700 dark:text-blue-400",
-    bgColorClass: "bg-blue-500/10 border-blue-500/20",
+    colorClass: "text-blue-600 dark:text-blue-400",
+    bgColorClass: "bg-blue-500/20 border-blue-500/30",
   },
   characters: {
     value: "characters",
-    icon: Users,
+    icon: Type,
     translationKey: "metrics.total_characters",
-    colorClass: "text-green-700 dark:text-green-400",
-    bgColorClass: "bg-green-500/10 border-green-500/20",
+    colorClass: "text-green-600 dark:text-green-400",
+    bgColorClass: "bg-green-500/20 border-green-500/30",
   },
   words: {
     value: "words",
     icon: FileText,
     translationKey: "metrics.total_words",
-    colorClass: "text-purple-700 dark:text-purple-400",
-    bgColorClass: "bg-purple-500/10 border-purple-500/20",
+    colorClass: "text-purple-600 dark:text-purple-400",
+    bgColorClass: "bg-purple-500/20 border-purple-500/30",
   },
 };
 

@@ -48,29 +48,29 @@ const STATUS_CONFIG: Record<BookStatus, IEntityTagConfig> = {
     value: "Em planejamento",
     icon: BookOpen,
     translationKey: "status.planning",
-    colorClass: "text-blue-700 dark:text-blue-400",
-    bgColorClass: "bg-blue-500/10 border-blue-500/20",
+    colorClass: "text-blue-600 dark:text-blue-400",
+    bgColorClass: "bg-blue-500/20 border-blue-500/30",
   },
   "Em lançamento": {
     value: "Em lançamento",
     icon: Rocket,
     translationKey: "status.releasing",
-    colorClass: "text-green-700 dark:text-green-400",
-    bgColorClass: "bg-green-500/10 border-green-500/20",
+    colorClass: "text-yellow-600 dark:text-yellow-400",
+    bgColorClass: "bg-yellow-500/20 border-yellow-500/30",
   },
   Hiato: {
     value: "Hiato",
     icon: Pause,
     translationKey: "status.hiatus",
-    colorClass: "text-amber-700 dark:text-amber-400",
-    bgColorClass: "bg-amber-500/10 border-amber-500/20",
+    colorClass: "text-orange-600 dark:text-orange-400",
+    bgColorClass: "bg-orange-500/20 border-orange-500/30",
   },
   Completo: {
     value: "Completo",
     icon: CheckCircle2,
     translationKey: "status.complete",
-    colorClass: "text-purple-700 dark:text-purple-400",
-    bgColorClass: "bg-purple-500/10 border-purple-500/20",
+    colorClass: "text-green-600 dark:text-green-400",
+    bgColorClass: "bg-green-500/20 border-green-500/30",
   },
 };
 
@@ -79,7 +79,7 @@ const GENRE_TAG_CONFIG: IEntityTagConfig = {
   icon: Tag,
   translationKey: "genre",
   colorClass: "text-white",
-  bgColorClass: "bg-slate-500/10 border-slate-500/20",
+  bgColorClass: "bg-slate-500/20 border-slate-500/30",
 };
 
 interface PropsHeader {
