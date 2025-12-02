@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { useRouterState } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useInboxStore } from "@/stores/inbox-store";
+import { useBookStore } from "@/stores/book-store";
 
 type TitleKey =
   | "home"
@@ -109,6 +110,7 @@ export const TitleBar = () => {
   const { t: tSettings } = useTranslation("settings");
   const messages = useInboxStore((state) => state.messages);
   const markAllAsRead = useInboxStore((state) => state.markAllAsRead);
+  const { books } = useBookStore();
 
   const { pathname } = routerState.location;
   const pageTitleKey = getPageTitleKey(pathname);
@@ -116,6 +118,25 @@ export const TitleBar = () => {
   const unreadCount = messages.filter(
     (msg) => !msg.isDeleted && !msg.isRead
   ).length;
+
+  // Extract book ID from pathname and get book name
+  const bookInfo = useMemo(() => {
+    const dashboardMatch = pathname.match(/\/dashboard\/([^/]+)/);
+    if (dashboardMatch && dashboardMatch[1]) {
+      const bookId = dashboardMatch[1];
+      const book = books.find(b => b.id === bookId);
+      return book ? { id: bookId, name: book.title } : null;
+    }
+    return null;
+  }, [pathname, books]);
+
+  // Construct final title with book name if available
+  const finalTitle = useMemo(() => {
+    if (bookInfo) {
+      return `${bookInfo.name}: ${pageTitle}`;
+    }
+    return pageTitle;
+  }, [bookInfo, pageTitle]);
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;
@@ -281,7 +302,7 @@ export const TitleBar = () => {
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         >
           <span className="text-sm font-medium text-foreground pointer-events-none">
-            {pageTitle}
+            {finalTitle}
           </span>
         </div>
 
