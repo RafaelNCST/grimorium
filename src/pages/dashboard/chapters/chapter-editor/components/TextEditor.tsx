@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { CreateAnnotationPopup } from "./CreateAnnotationPopup";
+import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
 import { useTextSearch } from "../hooks/useTextSearch";
 import type { Annotation } from "../types";
@@ -38,18 +38,20 @@ export function TextEditor({
 }: TextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [selectionPopup, setSelectionPopup] = useState<{
-    text: string;
-    position: { x: number; y: number };
-  } | null>(null);
   const [selectedSearchText, setSelectedSearchText] = useState('');
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    hasSelection: boolean;
+  } | null>(null);
 
   // Search functionality
   const search = useTextSearch({ content, initialSearchTerm: selectedSearchText });
 
-  // Handle Ctrl+F / Cmd+F to open search
+  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+F / Cmd+F to open search
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault();
 
@@ -60,11 +62,24 @@ export function TextEditor({
 
         search.openSearch();
       }
+
+      // Ctrl+M / Cmd+M to create annotation
+      if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+        e.preventDefault();
+
+        // Get selected text
+        const selection = window.getSelection();
+        const selectedText = selection?.toString().trim() || '';
+
+        if (selectedText) {
+          onCreateAnnotation();
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [search]);
+  }, [search, onCreateAnnotation]);
 
   // Clear selected search text when search closes
   useEffect(() => {
@@ -220,32 +235,6 @@ export function TextEditor({
     }
   }, [content, annotations, selectedAnnotationId, search.results, search.currentIndex]);
 
-  // Close popup when clicking outside or pressing Escape
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // Don't close if clicking on the popup itself
-      if (selectionPopup && !target.closest('[data-annotation-popup]')) {
-        setSelectionPopup(null);
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && selectionPopup) {
-        setSelectionPopup(null);
-      }
-    };
-
-    if (selectionPopup) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [selectionPopup]);
 
   // Scroll to annotation when requested
   useEffect(() => {
@@ -280,8 +269,8 @@ export function TextEditor({
   }, [search.currentResult, search.currentIndex]);
 
   const handleInput = () => {
-    // Clear selection popup when typing
-    setSelectionPopup(null);
+    // Clear context menu when typing
+    setContextMenu(null);
 
     if (editorRef.current) {
       // Extract plain text content (removes HTML tags)
@@ -391,19 +380,6 @@ export function TextEditor({
       const endOffset = startOffset + selectedText.length;
 
       onTextSelect(selectedText, startOffset, endOffset);
-
-      // Get position for popup
-      const rect = range.getBoundingClientRect();
-      setSelectionPopup({
-        text: selectedText,
-        position: {
-          x: rect.left + rect.width / 2,
-          y: rect.top,
-        },
-      });
-    } else {
-      // Clear popup if no selection
-      setSelectionPopup(null);
     }
   };
 
@@ -527,11 +503,6 @@ export function TextEditor({
     }
   };
 
-  const handleCreateAnnotationFromPopup = () => {
-    onCreateAnnotation();
-    setSelectionPopup(null);
-  };
-
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
 
@@ -544,6 +515,84 @@ export function TextEditor({
         onAnnotationClick(annotationId);
       }
     }
+  };
+
+  // Handle context menu (right-click)
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim() || '';
+    const hasSelection = selectedText.length > 0;
+
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      hasSelection,
+    });
+  };
+
+  // Context menu actions
+  const handleCopy = async () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || '';
+
+    try {
+      await navigator.clipboard.writeText(selectedText);
+    } catch (err) {
+      // Fallback to execCommand
+      document.execCommand('copy');
+    }
+  };
+
+  const handleCut = async () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || '';
+
+    try {
+      await navigator.clipboard.writeText(selectedText);
+      document.execCommand('delete');
+      handleInput();
+    } catch (err) {
+      // Fallback to execCommand
+      document.execCommand('cut');
+      handleInput();
+    }
+  };
+
+  const handlePasteFromContextMenu = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      document.execCommand('insertText', false, text);
+      handleInput();
+    } catch (err) {
+      // Fallback to execCommand
+      document.execCommand('paste');
+      handleInput();
+    }
+  };
+
+  const handleAnnotateFromContextMenu = () => {
+    onCreateAnnotation();
+  };
+
+  const handleSearchFromContextMenu = () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim() || '';
+    setSelectedSearchText(selectedText);
+    search.openSearch();
+  };
+
+  const handleBold = () => {
+    document.execCommand('bold', false);
+  };
+
+  const handleItalic = () => {
+    document.execCommand('italic', false);
+  };
+
+  const handleUnderline = () => {
+    document.execCommand('underline', false);
   };
 
   return (
@@ -569,6 +618,7 @@ export function TextEditor({
             onMouseUp={handleMouseUp}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
+            onContextMenu={handleContextMenu}
             className={cn(
               "p-16 bg-white dark:bg-gray-900",
               "shadow-lg border border-gray-200 dark:border-gray-800",
@@ -603,15 +653,6 @@ export function TextEditor({
         </div>
       </div>
 
-      {/* Selection Popup */}
-      {selectionPopup && (
-        <CreateAnnotationPopup
-          selectedText={selectionPopup.text}
-          position={selectionPopup.position}
-          onCreateAnnotation={handleCreateAnnotationFromPopup}
-        />
-      )}
-
       {/* Search Bar */}
       {search.isSearchOpen && (
         <SearchBar
@@ -631,6 +672,24 @@ export function TextEditor({
           onDialogueFormatsChange={search.setDialogueFormats}
           onReplaceCurrent={handleReplaceCurrent}
           onReplaceAll={handleReplaceAll}
+        />
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          hasSelection={contextMenu.hasSelection}
+          onClose={() => setContextMenu(null)}
+          onCopy={handleCopy}
+          onCut={handleCut}
+          onPaste={handlePasteFromContextMenu}
+          onAnnotate={handleAnnotateFromContextMenu}
+          onSearch={handleSearchFromContextMenu}
+          onBold={handleBold}
+          onItalic={handleItalic}
+          onUnderline={handleUnderline}
         />
       )}
     </>
