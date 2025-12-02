@@ -3,6 +3,8 @@ import { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import { CreateAnnotationPopup } from "./CreateAnnotationPopup";
+import { SearchBar } from "./SearchBar";
+import { useTextSearch } from "../hooks/useTextSearch";
 import type { Annotation } from "../types";
 
 interface TextEditorProps {
@@ -40,6 +42,51 @@ export function TextEditor({
     text: string;
     position: { x: number; y: number };
   } | null>(null);
+  const [selectedSearchText, setSelectedSearchText] = useState('');
+
+  // Search functionality
+  const search = useTextSearch({ content, initialSearchTerm: selectedSearchText });
+
+  // Handle Ctrl+F / Cmd+F to open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+
+        // Get selected text
+        const selection = window.getSelection();
+        const selectedText = selection?.toString().trim() || '';
+        setSelectedSearchText(selectedText);
+
+        search.openSearch();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [search]);
+
+  // Clear selected search text when search closes
+  useEffect(() => {
+    if (!search.isSearchOpen) {
+      setSelectedSearchText('');
+    }
+  }, [search.isSearchOpen]);
+
+  // Handle replace and update content
+  const handleReplaceCurrent = () => {
+    const newContent = search.replaceCurrent();
+    if (newContent) {
+      onContentChange(newContent);
+    }
+  };
+
+  const handleReplaceAll = () => {
+    const newContent = search.replaceAll();
+    if (newContent) {
+      onContentChange(newContent);
+    }
+  };
 
   // Escape HTML to prevent XSS
   const escapeHtml = (text: string) => {
@@ -48,32 +95,65 @@ export function TextEditor({
     return div.innerHTML;
   };
 
-  // Render content with annotations highlighted
+  // Render content with annotations and search highlights
   const renderContentWithAnnotations = () => {
     if (!content) return '';
 
-    // Sort annotations by start offset (ascending) to process from start to end
-    const sortedAnnotations = [...annotations].sort((a, b) => a.startOffset - b.startOffset);
+    // Combine annotations and search results
+    const allHighlights: Array<{
+      start: number;
+      end: number;
+      type: 'annotation' | 'search' | 'search-current';
+      id?: string;
+    }> = [];
+
+    // Add annotations
+    annotations.forEach((annotation) => {
+      allHighlights.push({
+        start: annotation.startOffset,
+        end: annotation.endOffset,
+        type: 'annotation',
+        id: annotation.id,
+      });
+    });
+
+    // Add search results
+    search.results.forEach((result, index) => {
+      allHighlights.push({
+        start: result.start,
+        end: result.end,
+        type: index === search.currentIndex ? 'search-current' : 'search',
+      });
+    });
+
+    // Sort by start position
+    allHighlights.sort((a, b) => a.start - b.start);
 
     let result = '';
     let lastIndex = 0;
 
-    sortedAnnotations.forEach((annotation) => {
-      // Add text before annotation
-      const beforeText = content.substring(lastIndex, annotation.startOffset);
+    allHighlights.forEach((highlight) => {
+      // Add text before highlight
+      const beforeText = content.substring(lastIndex, highlight.start);
       result += escapeHtml(beforeText);
 
-      // Add annotated text with span
-      const annotatedText = content.substring(annotation.startOffset, annotation.endOffset);
-      const isSelected = annotation.id === selectedAnnotationId;
-      const className = isSelected ? 'annotation-highlight annotation-selected' : 'annotation-highlight';
+      // Add highlighted text with appropriate class
+      const highlightedText = content.substring(highlight.start, highlight.end);
 
-      result += `<span class="${className}" data-annotation-id="${annotation.id}">${escapeHtml(annotatedText)}</span>`;
+      if (highlight.type === 'annotation') {
+        const isSelected = highlight.id === selectedAnnotationId;
+        const className = isSelected ? 'annotation-highlight annotation-selected' : 'annotation-highlight';
+        result += `<span class="${className}" data-annotation-id="${highlight.id}">${escapeHtml(highlightedText)}</span>`;
+      } else if (highlight.type === 'search-current') {
+        result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
+      } else {
+        result += `<span class="search-highlight" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
+      }
 
-      lastIndex = annotation.endOffset;
+      lastIndex = highlight.end;
     });
 
-    // Add remaining text after last annotation
+    // Add remaining text after last highlight
     if (lastIndex < content.length) {
       result += escapeHtml(content.substring(lastIndex));
     }
@@ -84,7 +164,7 @@ export function TextEditor({
     return result;
   };
 
-  // Update editor content when content or annotations change
+  // Update editor content when content, annotations, or search results change
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -138,7 +218,7 @@ export function TextEditor({
         }
       }
     }
-  }, [content, annotations, selectedAnnotationId]);
+  }, [content, annotations, selectedAnnotationId, search.results, search.currentIndex]);
 
   // Close popup when clicking outside or pressing Escape
   useEffect(() => {
@@ -183,6 +263,21 @@ export function TextEditor({
       }
     }
   }, [scrollToAnnotation]);
+
+  // Scroll to current search result
+  useEffect(() => {
+    if (search.currentResult && editorRef.current && containerRef.current) {
+      const searchSpans = editorRef.current.querySelectorAll('[data-search-result="true"]');
+      const currentSpan = searchSpans[search.currentIndex];
+
+      if (currentSpan) {
+        currentSpan.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }
+  }, [search.currentResult, search.currentIndex]);
 
   const handleInput = () => {
     // Clear selection popup when typing
@@ -486,7 +581,15 @@ export function TextEditor({
               // Selected annotation styles - darker background
               "[&_.annotation-selected]:bg-primary/35 [&_.annotation-selected]:dark:bg-primary/40",
               "[&_.annotation-selected]:font-medium",
-              "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45"
+              "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45",
+              // Search highlight styles
+              "[&_.search-highlight]:bg-yellow-200 [&_.search-highlight]:dark:bg-yellow-500/30",
+              "[&_.search-highlight]:rounded-sm",
+              "[&_.search-highlight]:transition-colors",
+              // Current search result styles - darker/brighter yellow
+              "[&_.search-current]:bg-yellow-400 [&_.search-current]:dark:bg-yellow-400/60",
+              "[&_.search-current]:font-medium",
+              "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50"
             )}
             style={{
               fontSize: `${fontSize}pt`,
@@ -506,6 +609,28 @@ export function TextEditor({
           selectedText={selectionPopup.text}
           position={selectionPopup.position}
           onCreateAnnotation={handleCreateAnnotationFromPopup}
+        />
+      )}
+
+      {/* Search Bar */}
+      {search.isSearchOpen && (
+        <SearchBar
+          searchTerm={search.searchTerm}
+          replaceTerm={search.replaceTerm}
+          currentIndex={search.currentIndex}
+          totalResults={search.totalResults}
+          searchOptions={search.searchOptions}
+          onSearchTermChange={search.setSearchTerm}
+          onReplaceTermChange={search.setReplaceTerm}
+          onNext={search.goToNext}
+          onPrevious={search.goToPrevious}
+          onClose={search.closeSearch}
+          onToggleCaseSensitive={search.toggleCaseSensitive}
+          onToggleWholeWord={search.toggleWholeWord}
+          onSearchModeChange={search.setSearchMode}
+          onDialogueFormatsChange={search.setDialogueFormats}
+          onReplaceCurrent={handleReplaceCurrent}
+          onReplaceAll={handleReplaceAll}
         />
       )}
     </>
