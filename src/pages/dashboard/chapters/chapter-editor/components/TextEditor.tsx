@@ -63,7 +63,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
   const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
 
   // Undo/Redo functionality
-  const undoRedo = useUndoRedo(content, {
+  // Initialize with empty state (will be populated on first edit)
+  const undoRedo = useUndoRedo('', {
     maxHistorySize: 100,
     debounceMs: 300,
   });
@@ -324,7 +325,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     const previousState = undoRedo.undo();
     if (previousState && editorRef.current) {
       setIsUndoRedoAction(true);
-      onContentChange(previousState.content);
+
+      // Restore HTML with formatting directly to the editor
+      editorRef.current.innerHTML = previousState.content;
+
+      // Extract plain text and notify parent
+      const plainText = editorRef.current.innerText;
+      onContentChange(plainText);
 
       // Restore cursor position after content updates
       setTimeout(() => {
@@ -343,7 +350,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     const nextState = undoRedo.redo();
     if (nextState && editorRef.current) {
       setIsUndoRedoAction(true);
-      onContentChange(nextState.content);
+
+      // Restore HTML with formatting directly to the editor
+      editorRef.current.innerHTML = nextState.content;
+
+      // Extract plain text and notify parent
+      const plainText = editorRef.current.innerText;
+      onContentChange(plainText);
 
       // Restore cursor position after content updates
       setTimeout(() => {
@@ -410,13 +423,39 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     }
   };
 
+  // Get HTML content with formatting but without annotation/search highlights
+  const getCleanHtmlContent = (): string => {
+    if (!editorRef.current) return '';
+
+    const clone = editorRef.current.cloneNode(true) as HTMLElement;
+
+    // Remove annotation highlights
+    const annotationSpans = clone.querySelectorAll('.annotation-highlight');
+    annotationSpans.forEach((span) => {
+      const textNode = document.createTextNode(span.textContent || '');
+      span.parentNode?.replaceChild(textNode, span);
+    });
+
+    // Remove search highlights
+    const searchSpans = clone.querySelectorAll('.search-highlight');
+    searchSpans.forEach((span) => {
+      const textNode = document.createTextNode(span.textContent || '');
+      span.parentNode?.replaceChild(textNode, span);
+    });
+
+    return clone.innerHTML;
+  };
+
   const handleInput = () => {
     // Clear context menu when typing
     setContextMenu(null);
 
     if (editorRef.current) {
-      // Extract plain text content (removes HTML tags)
+      // Extract plain text content (removes HTML tags) for onChange
       const newContent = editorRef.current.innerText;
+
+      // Get HTML with formatting (for undo/redo) but remove annotation spans
+      const contentForHistory = getCleanHtmlContent();
 
       // Find all annotation spans and recalculate their offsets
       const annotationSpans = editorRef.current.querySelectorAll('.annotation-highlight');
@@ -462,9 +501,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
       onContentChange(newContent);
 
       // Add to undo/redo history (if not currently doing undo/redo)
+      // Save HTML with formatting, not just plain text
       if (!isUndoRedoAction) {
         const cursorPos = getCurrentCursorPosition();
-        undoRedo.pushState(newContent, cursorPos);
+        undoRedo.pushState(contentForHistory, cursorPos);
       }
 
       // Auto-scroll only if cursor is at or near the end of the text
