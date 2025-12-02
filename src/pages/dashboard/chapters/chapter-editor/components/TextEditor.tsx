@@ -16,6 +16,8 @@ interface TextEditorProps {
   onCreateAnnotation: () => void;
   onUpdateAnnotations: (annotations: Annotation[]) => void;
   scrollToAnnotation?: string | null;
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 export function TextEditor({
@@ -29,6 +31,8 @@ export function TextEditor({
   onCreateAnnotation,
   onUpdateAnnotations,
   scrollToAnnotation,
+  fontSize = 12,
+  fontFamily = "Inter",
 }: TextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -485,9 +489,9 @@ export function TextEditor({
               "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45"
             )}
             style={{
-              fontSize: "18px",
+              fontSize: `${fontSize}pt`,
               lineHeight: "1.6",
-              fontFamily: "Inter, sans-serif",
+              fontFamily: fontFamily,
               color: "#000000",
               minHeight: "calc(100vh - 200px)",
             }}

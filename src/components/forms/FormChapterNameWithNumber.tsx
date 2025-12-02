@@ -5,6 +5,12 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export interface FormChapterNameWithNumberProps {
@@ -77,55 +83,68 @@ export const FormChapterNameWithNumber = React.forwardRef<
     const currentLength = chapterName.length;
 
     return (
-      <div className={cn("space-y-2", containerClassName)}>
-        <div className="flex items-start gap-3 px-0.5">
-          {/* Counter Section */}
-          <div className="flex flex-col gap-2 shrink-0">
-            {numberLabel && (
-              <Label className={cn("flex items-center gap-1", labelClassName)}>
-                {numberLabel}
-                {required && <span className="text-destructive">*</span>}
-              </Label>
-            )}
-            <div className="flex items-center gap-1">
-              {/* Number Display */}
-              <Input
-                type="text"
-                value={chapterNumber}
-                onChange={handleNumberChange}
-                className={cn(
-                  "w-16 h-10 text-center font-mono font-semibold text-sm",
-                  hasError && "border-destructive"
-                )}
-                placeholder="1"
-              />
+      <TooltipProvider delayDuration={300}>
+        <div className={cn("space-y-2", containerClassName)}>
+          <div className="flex items-start gap-3 px-0.5">
+            {/* Counter Section */}
+            <div className="flex flex-col gap-2 shrink-0">
+              {numberLabel && (
+                <Label className={cn("flex items-center gap-1", labelClassName)}>
+                  {numberLabel}
+                  {required && <span className="text-destructive">*</span>}
+                </Label>
+              )}
+              <div className="flex items-center gap-1">
+                {/* Number Display */}
+                <Input
+                  type="text"
+                  value={chapterNumber}
+                  onChange={handleNumberChange}
+                  className={cn(
+                    "w-16 h-10 text-center font-mono font-semibold text-sm",
+                    hasError && "border-destructive"
+                  )}
+                  placeholder="1"
+                />
 
-              {/* Increment/Decrement Controls */}
-              <div className="flex flex-col gap-0.5">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleIncrement}
-                  className="h-4 w-5 p-0 hover:bg-muted"
-                  title="Incrementar"
-                >
-                  <ChevronUp className="h-3 w-3" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDecrement}
-                  className="h-4 w-5 p-0 hover:bg-muted"
-                  disabled={parseFloat(chapterNumber) <= 1}
-                  title="Decrementar"
-                >
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
+                {/* Increment/Decrement Controls */}
+                <div className="flex flex-col gap-0.5">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleIncrement}
+                        className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <ChevronUp className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Incrementar</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDecrement}
+                        className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                        disabled={parseFloat(chapterNumber) <= 1}
+                      >
+                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Decrementar</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             </div>
-          </div>
 
           {/* Name Input */}
           <div className="flex-1 flex flex-col gap-2">
@@ -162,7 +181,8 @@ export const FormChapterNameWithNumber = React.forwardRef<
             {error}
           </p>
         )}
-      </div>
+        </div>
+      </TooltipProvider>
     );
   }
 );

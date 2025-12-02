@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Bold,
@@ -15,6 +15,10 @@ import {
   Clock,
   CheckCircle2,
   Check,
+  Type,
+  PenTool,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -26,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   Select,
@@ -52,6 +57,10 @@ interface FormattingToolbarProps {
   plotArcId?: string;
   availableArcs: IPlotArc[];
   onPlotArcChange: (arcId: string | undefined) => void;
+  fontSize: number;
+  onFontSizeChange: (size: number) => void;
+  fontFamily: string;
+  onFontFamilyChange: (font: string) => void;
 }
 
 const STATUS_COLORS: Record<ChapterStatus, string> = {
@@ -62,6 +71,14 @@ const STATUS_COLORS: Record<ChapterStatus, string> = {
   published: "bg-purple-500/20 text-purple-300 dark:text-purple-300 border-purple-500/30",
 };
 
+const FONT_OPTIONS = [
+  { value: "Inter", label: "Inter" },
+  { value: "Times New Roman", label: "Times New Roman" },
+  { value: "Courier New", label: "Courier New" },
+  { value: "Arial", label: "Arial" },
+  { value: "sans-serif", label: "Sans Serif" },
+];
+
 export function FormattingToolbar({
   onFormat,
   status,
@@ -69,23 +86,38 @@ export function FormattingToolbar({
   plotArcId,
   availableArcs,
   onPlotArcChange,
+  fontSize,
+  onFontSizeChange,
+  fontFamily,
+  onFontFamilyChange,
 }: FormattingToolbarProps) {
   const { t } = useTranslation("chapter-editor");
   const selectedArc = availableArcs.find((arc) => arc.id === plotArcId);
   const [isArcModalOpen, setIsArcModalOpen] = useState(false);
+  const [fontSizeInput, setFontSizeInput] = useState(fontSize.toString());
 
-  const handleFontSizeChange = (size: string) => {
-    const fontSizeMap: Record<string, string> = {
-      small: "14px",
-      medium: "18px",
-      large: "22px",
-    };
-
-    const editorElement = document.querySelector('[contenteditable="true"]') as HTMLElement;
-    if (editorElement) {
-      editorElement.style.fontSize = fontSizeMap[size];
+  const handleFontSizeInputChange = (value: string) => {
+    setFontSizeInput(value);
+    const numValue = parseInt(value);
+    if (!isNaN(numValue) && numValue >= 1 && numValue <= 100) {
+      onFontSizeChange(numValue);
     }
   };
+
+  const handleFontSizeIncrement = () => {
+    const newSize = Math.min(100, fontSize + 1);
+    onFontSizeChange(newSize);
+  };
+
+  const handleFontSizeDecrement = () => {
+    const newSize = Math.max(1, fontSize - 1);
+    onFontSizeChange(newSize);
+  };
+
+  // Sync fontSizeInput with fontSize prop
+  useEffect(() => {
+    setFontSizeInput(fontSize.toString());
+  }, [fontSize]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -146,19 +178,75 @@ export function FormattingToolbar({
       <div className="border-b border-border bg-card sticky top-0 z-40">
         <div className="flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto">
           <div className="flex items-center gap-1">
-        {/* Font Size */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground font-medium">Tamanho do texto:</span>
-          <Select onValueChange={handleFontSizeChange} defaultValue="medium">
-            <SelectTrigger className="w-28 h-8">
+        {/* Font Controls Group */}
+        <div className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-md border border-border/50">
+          <PenTool className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <Select value={fontFamily} onValueChange={onFontFamilyChange}>
+            <SelectTrigger className="h-7 w-[140px] border-0 bg-transparent px-2 text-xs font-medium focus:ring-0 focus:ring-offset-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="small">Pequeno</SelectItem>
-              <SelectItem value="medium">Médio</SelectItem>
-              <SelectItem value="large">Grande</SelectItem>
+              {FONT_OPTIONS.map((font) => (
+                <SelectItem
+                  key={font.value}
+                  value={font.value}
+                  className="text-xs"
+                  style={{ fontFamily: font.value }}
+                >
+                  {font.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+
+          <div className="h-4 w-px bg-border/50" />
+
+          <div className="flex items-center gap-1.5">
+            <Type className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            <Input
+              type="text"
+              value={fontSizeInput}
+              onChange={(e) => handleFontSizeInputChange(e.target.value)}
+              className="h-7 w-11 border-0 bg-transparent px-1 text-xs font-mono font-semibold text-center focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            <div className="flex flex-col gap-0.5">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleFontSizeIncrement}
+                    className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                    disabled={fontSize >= 100}
+                  >
+                    <ChevronUp className="h-2.5 w-2.5 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Aumentar tamanho</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleFontSizeDecrement}
+                    className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                    disabled={fontSize <= 1}
+                  >
+                    <ChevronDown className="h-2.5 w-2.5 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Diminuir tamanho</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <span className="text-xs text-muted-foreground font-medium">pt</span>
+          </div>
         </div>
 
         <Separator orientation="vertical" className="h-6 mx-1" />

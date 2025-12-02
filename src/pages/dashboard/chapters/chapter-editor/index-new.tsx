@@ -54,6 +54,10 @@ export function ChapterEditorNew() {
   const [isSaving, setIsSaving] = useState(false);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
 
+  // Editor formatting state
+  const [fontSize, setFontSize] = useState<number>(12);
+  const [fontFamily, setFontFamily] = useState<string>("Inter");
+
   // Annotation state
   const [selectedText, setSelectedText] = useState("");
   const [selectedRange, setSelectedRange] = useState<{
@@ -435,6 +439,10 @@ export function ChapterEditorNew() {
           plotArcId={chapter.plotArcId}
           availableArcs={availableArcs}
           onPlotArcChange={(arcId) => setChapter((prev) => ({ ...prev, plotArcId: arcId }))}
+          fontSize={fontSize}
+          onFontSizeChange={setFontSize}
+          fontFamily={fontFamily}
+          onFontFamilyChange={setFontFamily}
         />
 
         {/* Text Editor */}
@@ -443,6 +451,8 @@ export function ChapterEditorNew() {
             content={chapter.content}
             annotations={chapter.annotations}
             selectedAnnotationId={selectedAnnotationId || undefined}
+            fontSize={fontSize}
+            fontFamily={fontFamily}
             summarySection={
               <SummarySection
                 bookId={dashboardId!}
