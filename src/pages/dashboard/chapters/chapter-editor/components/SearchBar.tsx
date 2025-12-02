@@ -145,8 +145,8 @@ export function SearchBar({
 
   return (
     <TooltipProvider>
-      <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 w-full max-w-[600px] px-4">
-        <div className="bg-background border rounded-lg shadow-lg backdrop-blur-sm animate-in slide-in-from-top-2 duration-200">
+      <div className="fixed top-[160px] right-4 z-50 w-full max-w-[500px]">
+        <div className="bg-background border rounded-lg shadow-lg backdrop-blur-sm animate-in slide-in-from-right-2 duration-200">
           <div className="p-3 space-y-2">
             {/* Search Row */}
             <div className="flex items-center gap-2">
