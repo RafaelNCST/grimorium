@@ -61,6 +61,10 @@ interface FormattingToolbarProps {
   onFontSizeChange: (size: number) => void;
   fontFamily: string;
   onFontFamilyChange: (font: string) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 const STATUS_COLORS: Record<ChapterStatus, string> = {
@@ -90,6 +94,10 @@ export function FormattingToolbar({
   onFontSizeChange,
   fontFamily,
   onFontFamilyChange,
+  onUndo,
+  onRedo,
+  canUndo = true,
+  canRedo = true,
 }: FormattingToolbarProps) {
   const { t } = useTranslation("chapter-editor");
   const selectedArc = availableArcs.find((arc) => arc.id === plotArcId);
@@ -370,7 +378,8 @@ export function FormattingToolbar({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onFormat("undo")}
+              onClick={() => onUndo ? onUndo() : onFormat("undo")}
+              disabled={!canUndo}
               className="h-8 w-8 p-0"
             >
               <Undo className="h-4 w-4" />
@@ -385,7 +394,8 @@ export function FormattingToolbar({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onFormat("redo")}
+              onClick={() => onRedo ? onRedo() : onFormat("redo")}
+              disabled={!canRedo}
               className="h-8 w-8 p-0"
             >
               <Redo className="h-4 w-4" />

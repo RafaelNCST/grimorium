@@ -13,7 +13,7 @@ import { EditorHeader } from "./components/EditorHeader";
 import { FormattingToolbar } from "./components/FormattingToolbar";
 import { StatsBar } from "./components/StatsBar";
 import { SummarySection } from "./components/SummarySection";
-import { TextEditor } from "./components/TextEditor";
+import { TextEditor, type TextEditorRef } from "./components/TextEditor";
 import type { ChapterData, Annotation, AnnotationNote, EntityMention } from "./types";
 
 
@@ -74,6 +74,9 @@ export function ChapterEditorNew() {
   useEffect(() => {
     chapterRef.current = chapter;
   }, [chapter]);
+
+  // Ref for TextEditor to access undo/redo
+  const textEditorRef = useRef<TextEditorRef>(null);
 
   // Reload chapter when editorChaptersId changes (navigation between chapters)
   useEffect(() => {
@@ -516,11 +519,16 @@ export function ChapterEditorNew() {
           onFontSizeChange={handleFontSizeChange}
           fontFamily={fontFamily}
           onFontFamilyChange={handleFontFamilyChange}
+          onUndo={() => textEditorRef.current?.undo()}
+          onRedo={() => textEditorRef.current?.redo()}
+          canUndo={textEditorRef.current?.canUndo ?? false}
+          canRedo={textEditorRef.current?.canRedo ?? false}
         />
 
         {/* Text Editor */}
         <div className="flex-1 overflow-hidden">
           <TextEditor
+            ref={textEditorRef}
             content={chapter.content}
             annotations={chapter.annotations}
             selectedAnnotationId={selectedAnnotationId || undefined}

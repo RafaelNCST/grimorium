@@ -1,11 +1,19 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 
 import { cn } from "@/lib/utils";
 
 import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
 import { useTextSearch } from "../hooks/useTextSearch";
+import { useUndoRedo } from "../hooks/useUndoRedo";
 import type { Annotation } from "../types";
+
+export interface TextEditorRef {
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+}
 
 interface TextEditorProps {
   content: string;
@@ -20,9 +28,13 @@ interface TextEditorProps {
   scrollToAnnotation?: string | null;
   fontSize?: number;
   fontFamily?: string;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
-export function TextEditor({
+export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function TextEditor({
   content,
   annotations,
   selectedAnnotationId,
@@ -35,7 +47,11 @@ export function TextEditor({
   scrollToAnnotation,
   fontSize = 12,
   fontFamily = "Inter",
-}: TextEditorProps) {
+  onUndo: externalOnUndo,
+  onRedo: externalOnRedo,
+  canUndo: externalCanUndo,
+  canRedo: externalCanRedo,
+}, ref) {
   const editorRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedSearchText, setSelectedSearchText] = useState('');
@@ -44,9 +60,24 @@ export function TextEditor({
     y: number;
     hasSelection: boolean;
   } | null>(null);
+  const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
+
+  // Undo/Redo functionality
+  const undoRedo = useUndoRedo(content, {
+    maxHistorySize: 100,
+    debounceMs: 300,
+  });
 
   // Search functionality
   const search = useTextSearch({ content, initialSearchTerm: selectedSearchText });
+
+  // Expose undo/redo through ref
+  useImperativeHandle(ref, () => ({
+    undo: handleUndo,
+    redo: handleRedo,
+    canUndo: undoRedo.canUndo,
+    canRedo: undoRedo.canRedo,
+  }));
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -74,6 +105,21 @@ export function TextEditor({
         if (selectedText) {
           onCreateAnnotation();
         }
+      }
+
+      // Ctrl+Z / Cmd+Z to undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+
+      // Ctrl+Y / Cmd+Shift+Z to redo
+      if (
+        ((e.ctrlKey || e.metaKey) && e.key === 'y') ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z')
+      ) {
+        e.preventDefault();
+        handleRedo();
       }
     };
 
@@ -268,6 +314,102 @@ export function TextEditor({
     }
   }, [search.currentResult, search.currentIndex]);
 
+  // Undo/Redo handlers
+  const handleUndo = () => {
+    if (externalOnUndo) {
+      externalOnUndo();
+      return;
+    }
+
+    const previousState = undoRedo.undo();
+    if (previousState && editorRef.current) {
+      setIsUndoRedoAction(true);
+      onContentChange(previousState.content);
+
+      // Restore cursor position after content updates
+      setTimeout(() => {
+        restoreCursorPosition(previousState.cursorPosition);
+        setIsUndoRedoAction(false);
+      }, 0);
+    }
+  };
+
+  const handleRedo = () => {
+    if (externalOnRedo) {
+      externalOnRedo();
+      return;
+    }
+
+    const nextState = undoRedo.redo();
+    if (nextState && editorRef.current) {
+      setIsUndoRedoAction(true);
+      onContentChange(nextState.content);
+
+      // Restore cursor position after content updates
+      setTimeout(() => {
+        restoreCursorPosition(nextState.cursorPosition);
+        setIsUndoRedoAction(false);
+      }, 0);
+    }
+  };
+
+  // Helper to restore cursor position
+  const restoreCursorPosition = (position: number) => {
+    if (!editorRef.current) return;
+
+    try {
+      const selection = window.getSelection();
+      if (!selection) return;
+
+      const textNodes: Text[] = [];
+      const walker = document.createTreeWalker(
+        editorRef.current,
+        NodeFilter.SHOW_TEXT,
+        null
+      );
+
+      let node;
+      while ((node = walker.nextNode())) {
+        textNodes.push(node as Text);
+      }
+
+      let currentLength = 0;
+      for (const textNode of textNodes) {
+        const nodeLength = textNode.textContent?.length || 0;
+        if (currentLength + nodeLength >= position) {
+          const range = document.createRange();
+          const offset = Math.min(position - currentLength, nodeLength);
+          range.setStart(textNode, offset);
+          range.setEnd(textNode, offset);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          break;
+        }
+        currentLength += nodeLength;
+      }
+    } catch (e) {
+      // Ignore cursor restoration errors
+    }
+  };
+
+  // Get current cursor position
+  const getCurrentCursorPosition = (): number => {
+    if (!editorRef.current) return 0;
+
+    try {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return 0;
+
+      const range = selection.getRangeAt(0);
+      const preSelectionRange = range.cloneRange();
+      preSelectionRange.selectNodeContents(editorRef.current);
+      preSelectionRange.setEnd(range.endContainer, range.endOffset);
+      return preSelectionRange.toString().length;
+    } catch (e) {
+      return 0;
+    }
+  };
+
   const handleInput = () => {
     // Clear context menu when typing
     setContextMenu(null);
@@ -318,6 +460,12 @@ export function TextEditor({
       }
 
       onContentChange(newContent);
+
+      // Add to undo/redo history (if not currently doing undo/redo)
+      if (!isUndoRedoAction) {
+        const cursorPos = getCurrentCursorPosition();
+        undoRedo.pushState(newContent, cursorPos);
+      }
 
       // Auto-scroll only if cursor is at or near the end of the text
       const selection = window.getSelection();
@@ -694,4 +842,4 @@ export function TextEditor({
       )}
     </>
   );
-}
+});
