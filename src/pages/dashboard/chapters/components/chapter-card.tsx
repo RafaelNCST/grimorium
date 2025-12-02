@@ -39,6 +39,7 @@ interface Chapter {
   status: ChapterStatus;
   wordCount: number;
   characterCount: number;
+  characterCountWithSpaces: number;
   lastEdited: Date;
   summary?: string;
   plotArc?: { id: string; name: string };
@@ -84,7 +85,7 @@ export function ChapterCard({
         onClick={() => onClick?.(chapter.id)}
       >
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-3">
+          <div className="flex-1">
             {/* Header: Number + Title */}
             <div className="flex items-center gap-1.5">
               <span className="text-lg font-semibold text-amber-500 shrink-0">
@@ -93,55 +94,6 @@ export function ChapterCard({
               <CardTitle className="text-lg font-semibold line-clamp-1">
                 {chapter.title}
               </CardTitle>
-            </div>
-
-            {/* Tags: Arc */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {chapter.plotArc ? (
-                <Badge
-                  variant="secondary"
-                  className="gap-1.5 bg-purple-500 text-white border-purple-600 pointer-events-none"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  <span className="font-medium">Arco:</span>
-                  {chapter.plotArc.name}
-                </Badge>
-              ) : (
-                <Badge
-                  variant="secondary"
-                  className="gap-1.5 bg-gray-500 text-white border-gray-600 pointer-events-none"
-                >
-                  <BookOpen className="w-3 h-3" />
-                  Sem arco definido
-                </Badge>
-              )}
-            </div>
-
-            {/* Stats: Compact and clean */}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Type className="w-3.5 h-3.5" />
-                <span className="text-xs">Palavras:</span>
-                <span className="text-xs font-medium text-foreground">
-                  {chapter.wordCount.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <Hash className="w-3.5 h-3.5" />
-                <span className="text-xs">Caracteres:</span>
-                <span className="text-xs font-medium text-foreground">
-                  {chapter.characterCount.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                <span className="text-xs">Última edição:</span>
-                <span className="text-xs font-medium text-foreground">
-                  {chapter.lastEdited.toLocaleDateString()}
-                </span>
-              </div>
             </div>
           </div>
 
@@ -203,6 +155,70 @@ export function ChapterCard({
 
           {isDetailsExpanded && (
             <div className="px-6 py-4 space-y-4">
+              {/* Plot Arc Section */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">Arco da História</h4>
+                {chapter.plotArc ? (
+                  <Badge
+                    variant="secondary"
+                    className="gap-1.5 bg-purple-500 text-white border-purple-600 pointer-events-none"
+                  >
+                    <BookOpen className="w-3 h-3" />
+                    {chapter.plotArc.name}
+                  </Badge>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    Sem arco definido
+                  </p>
+                )}
+              </div>
+
+              {/* Metrics Section */}
+              <div>
+                <h4 className="text-sm font-medium mb-2">Métricas</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Type className="w-3.5 h-3.5" />
+                      <span className="text-xs">Palavras</span>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {chapter.wordCount.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Hash className="w-3.5 h-3.5" />
+                      <span className="text-xs">Caracteres (sem espaços)</span>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {chapter.characterCount.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Hash className="w-3.5 h-3.5" />
+                      <span className="text-xs">Caracteres (com espaços)</span>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {chapter.characterCountWithSpaces.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span className="text-xs">Última edição</span>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">
+                      {chapter.lastEdited.toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Summary Section */}
               <div>
                 <h4 className="text-sm font-medium mb-2">Resumo</h4>

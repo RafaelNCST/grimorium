@@ -35,6 +35,7 @@ interface Chapter {
   status: ChapterStatus;
   wordCount: number;
   characterCount: number;
+  characterCountWithSpaces: number;
   lastEdited: Date;
   summary?: string;
   plotArc?: { id: string; name: string };
@@ -82,6 +83,7 @@ export function ChaptersPage() {
       status: ch.status,
       wordCount: ch.wordCount,
       characterCount: ch.characterCount,
+      characterCountWithSpaces: ch.characterCountWithSpaces || ch.characterCount,
       lastEdited: ch.lastEdited ? new Date(ch.lastEdited) : new Date(),
       summary: ch.summary,
       plotArc: ch.plotArcId
@@ -167,6 +169,7 @@ export function ChaptersPage() {
       status: data.status,
       wordCount: 0,
       characterCount: 0,
+      characterCountWithSpaces: 0,
       lastEdited: new Date(),
       summary: data.summary,
       plotArc: plotArc ? { id: plotArc.id, name: plotArc.name } : undefined,

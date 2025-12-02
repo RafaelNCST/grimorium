@@ -33,6 +33,7 @@ export interface ChapterData {
   content: string;
   wordCount: number;
   characterCount: number;
+  characterCountWithSpaces?: number;
   lastEdited: string;
   mentionedCharacters: EntityMention[];
   mentionedRegions: EntityMention[];

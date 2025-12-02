@@ -81,6 +81,7 @@ export function ChapterEditorNew() {
       .split(/\s+/)
       .filter((word) => word.length > 0).length;
     const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
+    const charsWithSpaces = currentChapter.content === '' || currentChapter.content === '\n' ? 0 : currentChapter.content.length; // With spaces
 
     const now = new Date().toISOString();
 
@@ -89,6 +90,7 @@ export function ChapterEditorNew() {
       ...currentChapter,
       wordCount: words,
       characterCount: chars,
+      characterCountWithSpaces: charsWithSpaces,
       lastEdited: now,
     });
   }, [updateChapter]);
@@ -105,6 +107,7 @@ export function ChapterEditorNew() {
       .split(/\s+/)
       .filter((word) => word.length > 0).length;
     const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
+    const charsWithSpaces = currentChapter.content === '' || currentChapter.content === '\n' ? 0 : currentChapter.content.length; // With spaces
 
     const now = new Date().toISOString();
 
@@ -113,6 +116,7 @@ export function ChapterEditorNew() {
       ...currentChapter,
       wordCount: words,
       characterCount: chars,
+      characterCountWithSpaces: charsWithSpaces,
       lastEdited: now,
     });
 
@@ -121,6 +125,7 @@ export function ChapterEditorNew() {
         ...prev,
         wordCount: words,
         characterCount: chars,
+        characterCountWithSpaces: charsWithSpaces,
         lastEdited: now
       }));
       setIsSaving(false);
