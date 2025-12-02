@@ -40,6 +40,9 @@ export interface ChapterData {
   mentionedFactions: EntityMention[];
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
+  // Editor formatting settings (individual per chapter)
+  fontSize?: number;
+  fontFamily?: string;
 }
 
 interface ChaptersState {
@@ -49,6 +52,9 @@ interface ChaptersState {
   deleteChapter: (id: string) => void;
   getChapter: (id: string) => ChapterData | undefined;
   getAllChapters: () => ChapterData[];
+  getChaptersSorted: () => ChapterData[];
+  getPreviousChapter: (currentId: string) => ChapterData | undefined;
+  getNextChapter: (currentId: string) => ChapterData | undefined;
 }
 
 export const useChaptersStore = create<ChaptersState>()(
@@ -80,6 +86,33 @@ export const useChaptersStore = create<ChaptersState>()(
       getChapter: (id) => get().chapters[id],
 
       getAllChapters: () => Object.values(get().chapters),
+
+      getChaptersSorted: () => {
+        const chapters = Object.values(get().chapters);
+        return chapters.sort((a, b) => {
+          const numA = parseFloat(a.chapterNumber) || 0;
+          const numB = parseFloat(b.chapterNumber) || 0;
+          return numA - numB;
+        });
+      },
+
+      getPreviousChapter: (currentId) => {
+        const sorted = get().getChaptersSorted();
+        const currentIndex = sorted.findIndex((ch) => ch.id === currentId);
+        if (currentIndex > 0) {
+          return sorted[currentIndex - 1];
+        }
+        return undefined;
+      },
+
+      getNextChapter: (currentId) => {
+        const sorted = get().getChaptersSorted();
+        const currentIndex = sorted.findIndex((ch) => ch.id === currentId);
+        if (currentIndex !== -1 && currentIndex < sorted.length - 1) {
+          return sorted[currentIndex + 1];
+        }
+        return undefined;
+      },
     }),
     {
       name: "chapters-storage",

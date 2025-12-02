@@ -41,4 +41,7 @@ export interface ChapterData {
   mentionedFactions: EntityMention[];
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
+  // Editor formatting settings (individual per chapter)
+  fontSize?: number;
+  fontFamily?: string;
 }

@@ -25,7 +25,7 @@ export function ChapterEditorNew() {
   const editorChaptersId = params["editor-chapters-id"];
   const navigate = useNavigate();
 
-  const { getChapter, updateChapter } = useChaptersStore();
+  const { getChapter, updateChapter, getPreviousChapter, getNextChapter } = useChaptersStore();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -54,9 +54,9 @@ export function ChapterEditorNew() {
   const [isSaving, setIsSaving] = useState(false);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
 
-  // Editor formatting state
-  const [fontSize, setFontSize] = useState<number>(12);
-  const [fontFamily, setFontFamily] = useState<string>("Inter");
+  // Editor formatting state (loaded from chapter data)
+  const [fontSize, setFontSize] = useState<number>(initialChapter.fontSize || 12);
+  const [fontFamily, setFontFamily] = useState<string>(initialChapter.fontFamily || "Inter");
 
   // Annotation state
   const [selectedText, setSelectedText] = useState("");
@@ -74,6 +74,17 @@ export function ChapterEditorNew() {
   useEffect(() => {
     chapterRef.current = chapter;
   }, [chapter]);
+
+  // Reload chapter when editorChaptersId changes (navigation between chapters)
+  useEffect(() => {
+    const loadedChapter = getChapter(editorChaptersId);
+    if (loadedChapter) {
+      setChapter(loadedChapter);
+      // Load chapter-specific formatting settings
+      setFontSize(loadedChapter.fontSize || 12);
+      setFontFamily(loadedChapter.fontFamily || "Inter");
+    }
+  }, [editorChaptersId, getChapter]);
 
   // Immediate/synchronous save (no setTimeout) - used when user is leaving
   const handleImmediateSave = useCallback(() => {
@@ -95,9 +106,11 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
+      fontSize: fontSize,
+      fontFamily: fontFamily,
       lastEdited: now,
     });
-  }, [updateChapter]);
+  }, [updateChapter, fontSize, fontFamily]);
 
   // Auto-save with UI feedback (async with setTimeout)
   const handleAutoSave = useCallback(() => {
@@ -121,6 +134,8 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
+      fontSize: fontSize,
+      fontFamily: fontFamily,
       lastEdited: now,
     });
 
@@ -130,11 +145,13 @@ export function ChapterEditorNew() {
         wordCount: words,
         characterCount: chars,
         characterCountWithSpaces: charsWithSpaces,
+        fontSize: fontSize,
+        fontFamily: fontFamily,
         lastEdited: now
       }));
       setIsSaving(false);
     }, 500);
-  }, [updateChapter]);
+  }, [updateChapter, fontSize, fontFamily]);
 
   // Load plot arcs
   useEffect(() => {
@@ -158,7 +175,7 @@ export function ChapterEditorNew() {
     }, 2000); // 2 seconds after last change
 
     return () => clearTimeout(timeoutId);
-  }, [chapter.content, chapter.summary, chapter.title, chapter.chapterNumber, chapter.status, chapter.plotArcId, chapter.annotations, chapter.mentionedCharacters, chapter.mentionedRegions, chapter.mentionedItems, chapter.mentionedFactions, chapter.mentionedRaces, handleAutoSave]);
+  }, [chapter.content, chapter.summary, chapter.title, chapter.chapterNumber, chapter.status, chapter.plotArcId, chapter.annotations, chapter.mentionedCharacters, chapter.mentionedRegions, chapter.mentionedItems, chapter.mentionedFactions, chapter.mentionedRaces, fontSize, fontFamily, handleAutoSave]);
 
   // Backup interval auto-save (saves every 3 minutes as backup)
   useEffect(() => {
@@ -199,6 +216,40 @@ export function ChapterEditorNew() {
     navigate({
       to: "/dashboard/$dashboardId/chapters",
       params: { dashboardId: dashboardId! },
+    });
+  };
+
+  // Get previous and next chapters
+  const previousChapter = getPreviousChapter(editorChaptersId);
+  const nextChapter = getNextChapter(editorChaptersId);
+
+  const handleNavigateToPrevious = () => {
+    if (!previousChapter) return;
+
+    // Save immediately before navigating
+    handleImmediateSave();
+
+    navigate({
+      to: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
+      params: {
+        dashboardId: dashboardId!,
+        "editor-chapters-id": previousChapter.id
+      },
+    });
+  };
+
+  const handleNavigateToNext = () => {
+    if (!nextChapter) return;
+
+    // Save immediately before navigating
+    handleImmediateSave();
+
+    navigate({
+      to: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
+      params: {
+        dashboardId: dashboardId!,
+        "editor-chapters-id": nextChapter.id
+      },
     });
   };
 
@@ -259,6 +310,16 @@ export function ChapterEditorNew() {
   // Format text command
   const handleFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value);
+  };
+
+  // Handle font size change - always affects entire chapter
+  const handleFontSizeChange = (newSize: number) => {
+    setFontSize(newSize);
+  };
+
+  // Handle font family change - always affects entire chapter
+  const handleFontFamilyChange = (newFont: string) => {
+    setFontFamily(newFont);
   };
 
   // Cancel text selection
@@ -417,6 +478,16 @@ export function ChapterEditorNew() {
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
+          previousChapter={previousChapter ? {
+            id: previousChapter.id,
+            number: previousChapter.chapterNumber,
+            title: previousChapter.title
+          } : undefined}
+          nextChapter={nextChapter ? {
+            id: nextChapter.id,
+            number: nextChapter.chapterNumber,
+            title: nextChapter.title
+          } : undefined}
           onBack={handleBack}
           onChapterNumberChange={(value) =>
             setChapter((prev) => ({ ...prev, chapterNumber: value }))
@@ -429,6 +500,8 @@ export function ChapterEditorNew() {
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
           }}
+          onNavigateToPrevious={handleNavigateToPrevious}
+          onNavigateToNext={handleNavigateToNext}
         />
 
         {/* Formatting Toolbar */}
@@ -440,9 +513,9 @@ export function ChapterEditorNew() {
           availableArcs={availableArcs}
           onPlotArcChange={(arcId) => setChapter((prev) => ({ ...prev, plotArcId: arcId }))}
           fontSize={fontSize}
-          onFontSizeChange={setFontSize}
+          onFontSizeChange={handleFontSizeChange}
           fontFamily={fontFamily}
-          onFontFamilyChange={setFontFamily}
+          onFontFamilyChange={handleFontFamilyChange}
         />
 
         {/* Text Editor */}
