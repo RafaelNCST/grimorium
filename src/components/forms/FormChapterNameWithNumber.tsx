@@ -109,7 +109,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
 
                 {/* Increment/Decrement Controls */}
                 <div className="flex flex-col gap-0.5">
-                  <Tooltip>
+                  <Tooltip delayDuration={300} disableHoverableContent>
                     <TooltipTrigger asChild>
                       <Button
                         type="button"
@@ -125,7 +125,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
                       <p>Incrementar</p>
                     </TooltipContent>
                   </Tooltip>
-                  <Tooltip>
+                  <Tooltip delayDuration={300} disableHoverableContent>
                     <TooltipTrigger asChild>
                       <Button
                         type="button"

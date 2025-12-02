@@ -210,7 +210,7 @@ export function FormattingToolbar({
               className="h-7 w-11 border-0 bg-transparent px-1 text-xs font-mono font-semibold text-center focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <div className="flex flex-col gap-0.5">
-              <Tooltip>
+              <Tooltip delayDuration={300} disableHoverableContent>
                 <TooltipTrigger asChild>
                   <Button
                     type="button"
@@ -227,7 +227,7 @@ export function FormattingToolbar({
                   <p>Aumentar tamanho</p>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
+              <Tooltip delayDuration={300} disableHoverableContent>
                 <TooltipTrigger asChild>
                   <Button
                     type="button"
