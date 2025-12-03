@@ -49,18 +49,20 @@ export function EditorSettingsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[75vw] max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-primary" />
-            <DialogTitle>Configurações do Editor</DialogTitle>
-          </div>
-          <DialogDescription>
-            Personalize sua experiência de escrita para maior conforto em longas sessões
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[75vw] max-h-[85vh] flex flex-col p-0 gap-0">
+        <div className="px-6 pt-6 pb-4">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <Settings className="w-5 h-5 text-primary" />
+              <DialogTitle>Configurações do Editor</DialogTitle>
+            </div>
+            <DialogDescription>
+              Personalize sua experiência de escrita para maior conforto em longas sessões
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 pt-4 pb-6 [&>*:not(:last-child)]:mb-6">
           {/* First Row: Auto Scroll + Typography */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Auto Scroll */}
@@ -241,9 +243,9 @@ export function EditorSettingsModal({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+        {/* Footer - Fixed at bottom */}
+        <div className="flex justify-end gap-2 px-6 py-4 border-t bg-background rounded-b-lg">
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Fechar
           </Button>
         </div>
