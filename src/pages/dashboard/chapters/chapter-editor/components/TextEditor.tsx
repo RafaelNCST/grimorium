@@ -1022,7 +1022,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
               fontSize: `${fontSize}pt`,
               lineHeight: settings?.lineHeight?.toString() || "1.6",
               fontFamily: fontFamily,
-              color: settings?.sepiaMode ? "#4a3f2a" : "#000000",
+              color: "#000000",
               minHeight: "calc(100vh - 200px)",
               caretColor: cursorColor,
               // Add extra padding at bottom based on auto-scroll mode

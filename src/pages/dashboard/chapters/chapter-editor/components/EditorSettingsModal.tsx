@@ -177,9 +177,9 @@ export function EditorSettingsModal({
 
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="space-y-0.5">
-                  <Label>Modo Sépia</Label>
+                  <Label>Diminuir cansaço visual</Label>
                   <p className="text-xs text-muted-foreground">
-                    Diminui cansaço visual
+                    Tom amarelado suave para reduzir fadiga visual
                   </p>
                 </div>
                 <Switch
