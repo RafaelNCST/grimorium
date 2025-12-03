@@ -10,11 +10,14 @@ import { AllAnnotationsSidebar } from "./components/AllAnnotationsSidebar";
 import { AnnotationsSidebar } from "./components/AnnotationsSidebar";
 import { CreateAnnotationPopup } from "./components/CreateAnnotationPopup";
 import { EditorHeader } from "./components/EditorHeader";
+import { EditorSettingsModal } from "./components/EditorSettingsModal";
 import { FormattingToolbar } from "./components/FormattingToolbar";
 import { StatsBar } from "./components/StatsBar";
 import { SummarySection } from "./components/SummarySection";
 import { TextEditor, type TextEditorRef } from "./components/TextEditor";
 import type { ChapterData, Annotation, AnnotationNote, EntityMention } from "./types";
+import type { EditorSettings } from "./types/editor-settings";
+import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
 
 export function ChapterEditorNew() {
@@ -53,6 +56,10 @@ export function ChapterEditorNew() {
   // UI state
   const [isSaving, setIsSaving] = useState(false);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Editor settings state
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>(DEFAULT_EDITOR_SETTINGS);
 
   // Editor formatting state (loaded from chapter data)
   const [fontSize, setFontSize] = useState<number>(initialChapter.fontSize || 12);
@@ -503,6 +510,7 @@ export function ChapterEditorNew() {
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
           }}
+          onShowSettings={() => setShowSettingsModal(true)}
           onNavigateToPrevious={handleNavigateToPrevious}
           onNavigateToNext={handleNavigateToNext}
         />
@@ -534,6 +542,7 @@ export function ChapterEditorNew() {
             selectedAnnotationId={selectedAnnotationId || undefined}
             fontSize={fontSize}
             fontFamily={fontFamily}
+            settings={editorSettings}
             summarySection={
               <SummarySection
                 bookId={dashboardId!}
@@ -612,6 +621,14 @@ export function ChapterEditorNew() {
         characterCount={characterCount}
         characterCountWithSpaces={characterCountWithSpaces}
         isSaving={isSaving}
+      />
+
+      {/* Editor Settings Modal */}
+      <EditorSettingsModal
+        open={showSettingsModal}
+        onOpenChange={setShowSettingsModal}
+        settings={editorSettings}
+        onSettingsChange={setEditorSettings}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-import { ArrowLeft, MessageSquare, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MessageSquare, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
@@ -23,6 +23,7 @@ interface EditorHeaderProps {
   onChapterNumberChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
+  onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
 }
@@ -37,6 +38,7 @@ export function EditorHeader({
   onChapterNumberChange,
   onTitleChange,
   onShowAllAnnotations,
+  onShowSettings,
   onNavigateToPrevious,
   onNavigateToNext,
 }: EditorHeaderProps) {
@@ -177,6 +179,22 @@ export function EditorHeader({
               <MessageSquare className="w-4 h-4 mr-2" />
               Anotações
             </Button>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onShowSettings}
+                  className="h-9 w-9 p-0"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Configurações do Editor</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

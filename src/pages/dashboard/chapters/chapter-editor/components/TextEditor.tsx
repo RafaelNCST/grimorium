@@ -7,6 +7,8 @@ import { SearchBar } from "./SearchBar";
 import { useTextSearch } from "../hooks/useTextSearch";
 import { useUndoRedo } from "../hooks/useUndoRedo";
 import type { Annotation } from "../types";
+import type { EditorSettings } from "../types/editor-settings";
+import { CURSOR_COLORS } from "../types/editor-settings";
 
 export interface TextEditorRef {
   undo: () => void;
@@ -28,6 +30,7 @@ interface TextEditorProps {
   scrollToAnnotation?: string | null;
   fontSize?: number;
   fontFamily?: string;
+  settings?: EditorSettings;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -47,6 +50,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
   scrollToAnnotation,
   fontSize = 12,
   fontFamily = "Inter",
+  settings,
   onUndo: externalOnUndo,
   onRedo: externalOnRedo,
   canUndo: externalCanUndo,
@@ -61,6 +65,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     hasSelection: boolean;
   } | null>(null);
   const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
+  const isTypingRef = useRef(false);
+  const localAnnotationUpdateRef = useRef(false);
 
   // Undo/Redo functionality
   // Initialize with empty state (will be populated on first edit)
@@ -230,6 +236,18 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
   useEffect(() => {
     if (!editorRef.current) return;
 
+    // Skip re-rendering if user is typing (avoid flickering and annotation jumps)
+    if (isTypingRef.current) {
+      isTypingRef.current = false;
+      return;
+    }
+
+    // Skip re-rendering if annotations were updated locally during typing
+    if (localAnnotationUpdateRef.current) {
+      localAnnotationUpdateRef.current = false;
+      return;
+    }
+
     const renderedContent = renderContentWithAnnotations();
     if (editorRef.current.innerHTML !== renderedContent) {
       // Save cursor position
@@ -238,10 +256,50 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
 
       if (selection && selection.rangeCount > 0 && editorRef.current.contains(selection.anchorNode)) {
         const range = selection.getRangeAt(0);
-        const preSelectionRange = range.cloneRange();
-        preSelectionRange.selectNodeContents(editorRef.current);
-        preSelectionRange.setEnd(range.endContainer, range.endOffset);
-        cursorPosition = preSelectionRange.toString().length;
+
+        // Calculate cursor position by walking through nodes and counting BRs
+        const walker = document.createTreeWalker(
+          editorRef.current,
+          NodeFilter.SHOW_ALL,
+          {
+            acceptNode: (node) => {
+              if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+              if (node.nodeName === 'BR') return NodeFilter.FILTER_ACCEPT;
+              return NodeFilter.FILTER_SKIP;
+            }
+          }
+        );
+
+        let node;
+        while ((node = walker.nextNode())) {
+          // Check if we've reached the container node
+          if (node === range.endContainer) {
+            // We've reached the cursor position
+            if (node.nodeType === Node.TEXT_NODE) {
+              cursorPosition += range.endOffset;
+            }
+            break;
+          }
+
+          // Check if the cursor is in a parent element (like the editor div itself)
+          if (range.endContainer.nodeType === Node.ELEMENT_NODE) {
+            const containerElement = range.endContainer as Element;
+            if (node.parentNode === containerElement) {
+              // Check if this node is before the cursor offset
+              const nodeIndex = Array.from(containerElement.childNodes).indexOf(node as ChildNode);
+              if (nodeIndex >= range.endOffset) {
+                break;
+              }
+            }
+          }
+
+          // Count this node
+          if (node.nodeName === 'BR') {
+            cursorPosition += 1;
+          } else if (node.nodeType === Node.TEXT_NODE) {
+            cursorPosition += node.textContent?.length || 0;
+          }
+        }
       }
 
       editorRef.current.innerHTML = renderedContent;
@@ -249,31 +307,57 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
       // Restore cursor position
       if (cursorPosition > 0) {
         try {
-          const textNodes: Text[] = [];
+          // Get all nodes including text nodes and BR elements
           const walker = document.createTreeWalker(
             editorRef.current,
-            NodeFilter.SHOW_TEXT,
-            null
+            NodeFilter.SHOW_ALL,
+            {
+              acceptNode: (node) => {
+                if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+                if (node.nodeName === 'BR') return NodeFilter.FILTER_ACCEPT;
+                return NodeFilter.FILTER_SKIP;
+              }
+            }
           );
 
+          let currentLength = 0;
           let node;
+          let targetNode: Node | null = null;
+          let targetOffset = 0;
+
           while ((node = walker.nextNode())) {
-            textNodes.push(node as Text);
+            if (node.nodeName === 'BR') {
+              // BR represents a newline character
+              currentLength += 1;
+              if (currentLength >= cursorPosition) {
+                // Position cursor after the BR
+                targetNode = node.nextSibling || node;
+                targetOffset = 0;
+                break;
+              }
+            } else if (node.nodeType === Node.TEXT_NODE) {
+              const nodeLength = node.textContent?.length || 0;
+              if (currentLength + nodeLength >= cursorPosition) {
+                targetNode = node;
+                targetOffset = Math.min(cursorPosition - currentLength, nodeLength);
+                break;
+              }
+              currentLength += nodeLength;
+            }
           }
 
-          let currentLength = 0;
-          for (const textNode of textNodes) {
-            const nodeLength = textNode.textContent?.length || 0;
-            if (currentLength + nodeLength >= cursorPosition) {
-              const range = document.createRange();
-              const offset = Math.min(cursorPosition - currentLength, nodeLength);
-              range.setStart(textNode, offset);
-              range.setEnd(textNode, offset);
-              selection?.removeAllRanges();
-              selection?.addRange(range);
-              break;
+          if (targetNode) {
+            const range = document.createRange();
+            if (targetNode.nodeType === Node.TEXT_NODE) {
+              range.setStart(targetNode, targetOffset);
+              range.setEnd(targetNode, targetOffset);
+            } else {
+              // Position before the node
+              range.setStartBefore(targetNode);
+              range.setEndBefore(targetNode);
             }
-            currentLength += nodeLength;
+            selection?.removeAllRanges();
+            selection?.addRange(range);
           }
         } catch (e) {
           // Ignore cursor restoration errors
@@ -366,6 +450,71 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     }
   };
 
+  // Helper to perform auto-scroll based on settings
+  const performAutoScroll = (forceScroll: boolean = false) => {
+    if (settings?.autoScrollMode === 'off' || !containerRef.current || !editorRef.current) {
+      return;
+    }
+
+    const isAtEnd = isCursorAtEnd();
+
+    // Only auto-scroll if cursor is at the end, unless forced
+    if (!forceScroll && !isAtEnd) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (!containerRef.current || !editorRef.current) return;
+
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+
+      if (settings?.autoScrollMode === 'center') {
+        // Typewriter mode: keep cursor centered in the viewport
+        const STATS_BAR_HEIGHT = 38;
+        const ADJUSTMENT = 20; // Small adjustment to center more accurately
+
+        // Calculate center position of viewport (excluding stats bar at bottom)
+        const viewportHeight = window.innerHeight;
+        const usableHeight = viewportHeight - STATS_BAR_HEIGHT;
+        const targetY = (usableHeight / 2) + ADJUSTMENT;
+
+        // Get cursor position in viewport
+        const cursorY = rect.top;
+        const scrollAmount = cursorY - targetY;
+
+        // Always scroll to keep cursor centered (typewriter effect)
+        containerRef.current.scrollBy({
+          top: scrollAmount,
+          behavior: 'smooth'
+        });
+      } else if (settings?.autoScrollMode === 'near-end') {
+        // Near-end mode: keep cursor visible just above StatsBar (fixed at bottom)
+        const STATS_BAR_HEIGHT = 38;
+        const BUFFER = 20; // Small buffer to keep cursor close to status bar
+
+        // Calculate threshold: viewport height - stats bar - buffer
+        const threshold = window.innerHeight - STATS_BAR_HEIGHT - BUFFER;
+
+        // Use bottom of cursor rect (end of line)
+        const cursorBottom = rect.bottom;
+
+        // If cursor bottom is below threshold, scroll to keep it visible
+        if (cursorBottom > threshold) {
+          const scrollAmount = cursorBottom - threshold;
+          containerRef.current.scrollBy({
+            top: scrollAmount,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }, 20);
+  };
+
   // Helper to restore cursor position
   const restoreCursorPosition = (position: number) => {
     if (!editorRef.current) return;
@@ -374,31 +523,57 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
       const selection = window.getSelection();
       if (!selection) return;
 
-      const textNodes: Text[] = [];
+      // Get all nodes including text nodes and BR elements
       const walker = document.createTreeWalker(
         editorRef.current,
-        NodeFilter.SHOW_TEXT,
-        null
+        NodeFilter.SHOW_ALL,
+        {
+          acceptNode: (node) => {
+            if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+            if (node.nodeName === 'BR') return NodeFilter.FILTER_ACCEPT;
+            return NodeFilter.FILTER_SKIP;
+          }
+        }
       );
 
+      let currentLength = 0;
       let node;
+      let targetNode: Node | null = null;
+      let targetOffset = 0;
+
       while ((node = walker.nextNode())) {
-        textNodes.push(node as Text);
+        if (node.nodeName === 'BR') {
+          // BR represents a newline character
+          currentLength += 1;
+          if (currentLength >= position) {
+            // Position cursor after the BR
+            targetNode = node.nextSibling || node;
+            targetOffset = 0;
+            break;
+          }
+        } else if (node.nodeType === Node.TEXT_NODE) {
+          const nodeLength = node.textContent?.length || 0;
+          if (currentLength + nodeLength >= position) {
+            targetNode = node;
+            targetOffset = Math.min(position - currentLength, nodeLength);
+            break;
+          }
+          currentLength += nodeLength;
+        }
       }
 
-      let currentLength = 0;
-      for (const textNode of textNodes) {
-        const nodeLength = textNode.textContent?.length || 0;
-        if (currentLength + nodeLength >= position) {
-          const range = document.createRange();
-          const offset = Math.min(position - currentLength, nodeLength);
-          range.setStart(textNode, offset);
-          range.setEnd(textNode, offset);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          break;
+      if (targetNode) {
+        const range = document.createRange();
+        if (targetNode.nodeType === Node.TEXT_NODE) {
+          range.setStart(targetNode, targetOffset);
+          range.setEnd(targetNode, targetOffset);
+        } else {
+          // Position before the node
+          range.setStartBefore(targetNode);
+          range.setEndBefore(targetNode);
         }
-        currentLength += nodeLength;
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
     } catch (e) {
       // Ignore cursor restoration errors
@@ -414,12 +589,72 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
       if (!selection || selection.rangeCount === 0) return 0;
 
       const range = selection.getRangeAt(0);
-      const preSelectionRange = range.cloneRange();
-      preSelectionRange.selectNodeContents(editorRef.current);
-      preSelectionRange.setEnd(range.endContainer, range.endOffset);
-      return preSelectionRange.toString().length;
+
+      // Calculate cursor position by walking through nodes and counting BRs
+      const walker = document.createTreeWalker(
+        editorRef.current,
+        NodeFilter.SHOW_ALL,
+        {
+          acceptNode: (node) => {
+            if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+            if (node.nodeName === 'BR') return NodeFilter.FILTER_ACCEPT;
+            return NodeFilter.FILTER_SKIP;
+          }
+        }
+      );
+
+      let cursorPosition = 0;
+      let node;
+
+      while ((node = walker.nextNode())) {
+        // Check if we've reached the container node
+        if (node === range.endContainer) {
+          // We've reached the cursor position
+          if (node.nodeType === Node.TEXT_NODE) {
+            cursorPosition += range.endOffset;
+          }
+          break;
+        }
+
+        // Check if the cursor is in a parent element (like the editor div itself)
+        if (range.endContainer.nodeType === Node.ELEMENT_NODE) {
+          const containerElement = range.endContainer as Element;
+          if (node.parentNode === containerElement) {
+            // Check if this node is before the cursor offset
+            const nodeIndex = Array.from(containerElement.childNodes).indexOf(node as ChildNode);
+            if (nodeIndex >= range.endOffset) {
+              break;
+            }
+          }
+        }
+
+        // Count this node
+        if (node.nodeName === 'BR') {
+          cursorPosition += 1;
+        } else if (node.nodeType === Node.TEXT_NODE) {
+          cursorPosition += node.textContent?.length || 0;
+        }
+      }
+
+      return cursorPosition;
     } catch (e) {
       return 0;
+    }
+  };
+
+  // Check if cursor is at the end of the content (last position)
+  const isCursorAtEnd = (): boolean => {
+    if (!editorRef.current) return false;
+
+    try {
+      const currentPosition = getCurrentCursorPosition();
+      const totalLength = editorRef.current.innerText.length;
+
+      // Cursor is at the end if position equals total length, or 1 character before
+      // (happens during typing when content updates before cursor position)
+      return totalLength - currentPosition <= 1;
+    } catch (e) {
+      return false;
     }
   };
 
@@ -449,6 +684,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
   const handleInput = () => {
     // Clear context menu when typing
     setContextMenu(null);
+
+    // Mark that user is typing to avoid unnecessary re-renders
+    isTypingRef.current = true;
 
     if (editorRef.current) {
       // Extract plain text content (removes HTML tags) for onChange
@@ -495,6 +733,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
             const orig = annotations.find((a) => a.id === ann.id);
             return !orig || orig.text !== ann.text || orig.startOffset !== ann.startOffset || orig.endOffset !== ann.endOffset;
           })) {
+        // Mark that this is a local update to avoid re-rendering
+        localAnnotationUpdateRef.current = true;
         onUpdateAnnotations(updatedAnnotations);
       }
 
@@ -507,50 +747,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
         undoRedo.pushState(contentForHistory, cursorPos);
       }
 
-      // Auto-scroll only if cursor is at or near the end of the text
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-
-        // Calculate cursor position in text
-        const preSelectionRange = range.cloneRange();
-        preSelectionRange.selectNodeContents(editorRef.current);
-        preSelectionRange.setEnd(range.endContainer, range.endOffset);
-        const cursorPosition = preSelectionRange.toString().length;
-        const textLength = newContent.length;
-
-        // Only auto-scroll if cursor is at the very end (within 1 character tolerance)
-        const isAtEnd = cursorPosition >= textLength - 1;
-
-        if (isAtEnd && containerRef.current) {
-          // Small delay to ensure cursor position is updated
-          setTimeout(() => {
-            if (!containerRef.current) return;
-
-            const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0) return;
-
-            const range = selection.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-
-            // StatsBar height + some buffer
-            const STATS_BAR_HEIGHT = 38;
-            const BUFFER = 50;
-            const reservedSpace = STATS_BAR_HEIGHT + BUFFER;
-
-            // Check if cursor is too close to bottom (would be behind StatsBar)
-            if (rect.bottom > viewportHeight - reservedSpace) {
-              // Scroll just enough to keep cursor visible above StatsBar
-              const scrollAmount = rect.bottom - (viewportHeight - reservedSpace);
-              containerRef.current.scrollBy({
-                top: scrollAmount,
-                behavior: 'smooth'
-              });
-            }
-          }, 10);
-        }
-      }
+      // Auto-scroll based on settings - need to wait for DOM to update
+      setTimeout(() => {
+        performAutoScroll();
+      }, 0);
     }
   };
 
@@ -578,47 +778,29 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
         const newContent = editorRef.current.innerText;
         onContentChange(newContent);
 
-        // Auto-scroll after paste if cursor is at end
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-
-          // Calculate cursor position in text
-          const preSelectionRange = range.cloneRange();
-          preSelectionRange.selectNodeContents(editorRef.current);
-          preSelectionRange.setEnd(range.endContainer, range.endOffset);
-          const cursorPosition = preSelectionRange.toString().length;
-          const textLength = newContent.length;
-
-          // Only auto-scroll if cursor is at or near the end
-          const isAtEnd = cursorPosition >= textLength - 1;
-
-          if (isAtEnd && containerRef.current) {
-            // Calculate if cursor is hidden behind StatsBar
-            const rect = range.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-
-            // StatsBar height + some buffer
-            const STATS_BAR_HEIGHT = 38;
-            const BUFFER = 50;
-            const reservedSpace = STATS_BAR_HEIGHT + BUFFER;
-
-            // Check if cursor is too close to bottom (would be behind StatsBar)
-            if (rect.bottom > viewportHeight - reservedSpace) {
-              // Scroll just enough to keep cursor visible above StatsBar
-              const scrollAmount = rect.bottom - (viewportHeight - reservedSpace);
-              containerRef.current.scrollBy({
-                top: scrollAmount,
-                behavior: 'smooth'
-              });
-            }
-          }
-        }
+        // Auto-scroll after paste based on settings - wait for DOM update
+        setTimeout(() => {
+          performAutoScroll();
+        }, 0);
       }
     }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      if (!editorRef.current) return;
+
+      // Use the browser's native insertLineBreak command
+      document.execCommand('insertLineBreak');
+
+      // Trigger input handler to update content
+      handleInput();
+
+      return;
+    }
+
     if (e.key === 'Tab') {
       e.preventDefault();
 
@@ -783,11 +965,19 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     document.execCommand('underline', false);
   };
 
+  // Get cursor color based on settings
+  const cursorColor = settings?.cursorColor
+    ? CURSOR_COLORS[settings.cursorColor]
+    : CURSOR_COLORS.default;
+
   return (
     <>
       <div
         ref={containerRef}
-        className="bg-muted/30 overflow-y-auto h-full"
+        className={cn(
+          "bg-muted/30 overflow-y-auto h-full",
+          settings?.sepiaMode && "bg-[#f4f1ea]"
+        )}
       >
         {/* Summary Section - scrolls with content */}
         {summarySection && (
@@ -808,35 +998,44 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
             onKeyDown={handleKeyDown}
             onContextMenu={handleContextMenu}
             className={cn(
-              "p-16 bg-white dark:bg-gray-900",
-              "shadow-lg border border-gray-200 dark:border-gray-800",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20",
+              "p-16 shadow-lg border focus:outline-none focus:ring-2 focus:ring-primary/20",
               "prose prose-lg max-w-none dark:prose-invert",
-              // Annotation styles
-              "[&_.annotation-highlight]:bg-primary/10",
-              "[&_.annotation-highlight]:cursor-pointer [&_.annotation-highlight]:transition-colors",
-              "[&_.annotation-highlight:hover]:bg-primary/20",
-              // Selected annotation styles - darker background
-              "[&_.annotation-selected]:bg-primary/35 [&_.annotation-selected]:dark:bg-primary/40",
-              "[&_.annotation-selected]:font-medium",
-              "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45",
+              // Base colors
+              settings?.sepiaMode
+                ? "bg-[#faf8f3] border-[#e8e3d6] dark:bg-[#2a2520] dark:border-[#3a352f]"
+                : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800",
+              // Annotation styles (conditional)
+              settings?.showAnnotationHighlights !== false && [
+                "[&_.annotation-highlight]:bg-primary/10",
+                "[&_.annotation-highlight]:cursor-pointer [&_.annotation-highlight]:transition-colors",
+                "[&_.annotation-highlight:hover]:bg-primary/20",
+                "[&_.annotation-selected]:bg-primary/35 [&_.annotation-selected]:dark:bg-primary/40",
+                "[&_.annotation-selected]:font-medium",
+                "[&_.annotation-selected:hover]:bg-primary/40 [&_.annotation-selected:hover]:dark:bg-primary/45",
+              ],
               // Search highlight styles
               "[&_.search-highlight]:bg-yellow-200 [&_.search-highlight]:dark:bg-yellow-500/30",
               "[&_.search-highlight]:rounded-sm",
               "[&_.search-highlight]:transition-colors",
-              // Current search result styles - darker/brighter yellow
               "[&_.search-current]:bg-yellow-400 [&_.search-current]:dark:bg-yellow-400/60",
               "[&_.search-current]:font-medium",
               "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50"
             )}
             style={{
               fontSize: `${fontSize}pt`,
-              lineHeight: "1.6",
+              lineHeight: settings?.lineHeight?.toString() || "1.6",
               fontFamily: fontFamily,
-              color: "#000000",
+              color: settings?.sepiaMode ? "#2c2416" : "#000000",
               minHeight: "calc(100vh - 200px)",
-            }}
-            spellCheck="true"
+              caretColor: cursorColor,
+              // Add extra padding at bottom based on auto-scroll mode
+              paddingBottom: settings?.autoScrollMode === 'center'
+                ? `${Math.max(window.innerHeight / 2, 400)}px`
+                : settings?.autoScrollMode === 'off'
+                ? '400px' // Large breathing space when no auto-scroll
+                : undefined, // No extra padding for near-end mode
+            } as React.CSSProperties}
+            spellCheck={settings?.enableSpellCheck !== false}
           />
         </div>
       </div>
