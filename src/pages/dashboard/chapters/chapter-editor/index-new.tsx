@@ -387,6 +387,13 @@ function ChapterEditorContent() {
     }
 
     document.execCommand(command, false, value);
+
+    // Force format state update after execCommand
+    // This ensures the formatting buttons reflect the new state immediately
+    setTimeout(() => {
+      // Dispatch a mouseup event to trigger format state update
+      document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    }, 0);
   };
 
   // Cancel text selection
