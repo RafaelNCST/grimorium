@@ -64,18 +64,12 @@ export function ChapterEditorNew() {
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // Editor settings state
-  const [editorSettings, setEditorSettings] = useState<EditorSettings>(
-    DEFAULT_EDITOR_SETTINGS
-  );
-
-  // Editor formatting state (loaded from chapter data)
-  const [fontSize, setFontSize] = useState<number>(
-    initialChapter.fontSize || 12
-  );
-  const [fontFamily, setFontFamily] = useState<string>(
-    initialChapter.fontFamily || "Inter"
-  );
+  // Editor settings state (includes fontSize and fontFamily now)
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>({
+    ...DEFAULT_EDITOR_SETTINGS,
+    fontSize: initialChapter.fontSize || DEFAULT_EDITOR_SETTINGS.fontSize,
+    fontFamily: initialChapter.fontFamily || DEFAULT_EDITOR_SETTINGS.fontFamily,
+  });
 
   // Annotation state
   const [selectedText, setSelectedText] = useState("");
@@ -107,9 +101,13 @@ export function ChapterEditorNew() {
     const loadedChapter = getChapter(editorChaptersId);
     if (loadedChapter) {
       setChapter(loadedChapter);
-      // Load chapter-specific formatting settings
-      setFontSize(loadedChapter.fontSize || 12);
-      setFontFamily(loadedChapter.fontFamily || "Inter");
+      // Load chapter-specific formatting settings into editor settings
+      setEditorSettings((prev) => ({
+        ...prev,
+        fontSize: loadedChapter.fontSize || DEFAULT_EDITOR_SETTINGS.fontSize,
+        fontFamily:
+          loadedChapter.fontFamily || DEFAULT_EDITOR_SETTINGS.fontFamily,
+      }));
     }
   }, [editorChaptersId, getChapter]);
 
@@ -134,11 +132,11 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize,
-      fontFamily,
+      fontSize: editorSettings.fontSize,
+      fontFamily: editorSettings.fontFamily,
       lastEdited: now,
     });
-  }, [updateChapter, fontSize, fontFamily]);
+  }, [updateChapter, editorSettings.fontSize, editorSettings.fontFamily]);
 
   // Auto-save with UI feedback (async with setTimeout)
   const handleAutoSave = useCallback(() => {
@@ -163,8 +161,8 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize,
-      fontFamily,
+      fontSize: editorSettings.fontSize,
+      fontFamily: editorSettings.fontFamily,
       lastEdited: now,
     });
 
@@ -174,13 +172,13 @@ export function ChapterEditorNew() {
         wordCount: words,
         characterCount: chars,
         characterCountWithSpaces: charsWithSpaces,
-        fontSize,
-        fontFamily,
+        fontSize: editorSettings.fontSize,
+        fontFamily: editorSettings.fontFamily,
         lastEdited: now,
       }));
       setIsSaving(false);
     }, 500);
-  }, [updateChapter, fontSize, fontFamily]);
+  }, [updateChapter, editorSettings.fontSize, editorSettings.fontFamily]);
 
   // Load plot arcs
   useEffect(() => {
@@ -217,8 +215,8 @@ export function ChapterEditorNew() {
     chapter.mentionedItems,
     chapter.mentionedFactions,
     chapter.mentionedRaces,
-    fontSize,
-    fontFamily,
+    editorSettings.fontSize,
+    editorSettings.fontFamily,
     handleAutoSave,
   ]);
 
@@ -361,16 +359,6 @@ export function ChapterEditorNew() {
   // Format text command
   const handleFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value);
-  };
-
-  // Handle font size change - always affects entire chapter
-  const handleFontSizeChange = (newSize: number) => {
-    setFontSize(newSize);
-  };
-
-  // Handle font family change - always affects entire chapter
-  const handleFontFamilyChange = (newFont: string) => {
-    setFontFamily(newFont);
   };
 
   // Cancel text selection
@@ -587,10 +575,6 @@ export function ChapterEditorNew() {
           onPlotArcChange={(arcId) =>
             setChapter((prev) => ({ ...prev, plotArcId: arcId }))
           }
-          fontSize={fontSize}
-          onFontSizeChange={handleFontSizeChange}
-          fontFamily={fontFamily}
-          onFontFamilyChange={handleFontFamilyChange}
           onUndo={() => textEditorRef.current?.undo()}
           onRedo={() => textEditorRef.current?.redo()}
           canUndo={textEditorRef.current?.canUndo ?? false}
@@ -604,8 +588,8 @@ export function ChapterEditorNew() {
             content={chapter.content}
             annotations={chapter.annotations}
             selectedAnnotationId={selectedAnnotationId || undefined}
-            fontSize={fontSize}
-            fontFamily={fontFamily}
+            fontSize={editorSettings.fontSize}
+            fontFamily={editorSettings.fontFamily}
             settings={editorSettings}
             summarySection={
               <SummarySection

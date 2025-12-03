@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react";
+import { Settings, ChevronUp, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,6 +20,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { CURSOR_COLORS } from "../types/editor-settings";
 
@@ -46,6 +53,24 @@ export function EditorSettingsModal({
     value: EditorSettings[K]
   ) => {
     onSettingsChange({ ...settings, [key]: value });
+  };
+
+  const FONT_OPTIONS = [
+    { value: "Inter", label: "Inter" },
+    { value: "Times New Roman", label: "Times New Roman" },
+    { value: "Courier New", label: "Courier New" },
+    { value: "Arial", label: "Arial" },
+    { value: "sans-serif", label: "Sans Serif" },
+  ];
+
+  const handleFontSizeIncrement = () => {
+    const newSize = Math.min(100, settings.fontSize + 1);
+    updateSetting("fontSize", newSize);
+  };
+
+  const handleFontSizeDecrement = () => {
+    const newSize = Math.max(1, settings.fontSize - 1);
+    updateSetting("fontSize", newSize);
   };
 
   return (
@@ -144,8 +169,99 @@ export function EditorSettingsModal({
             <div>
               <Label className="text-base font-semibold">Tipografia</Label>
               <p className="text-sm text-muted-foreground">
-                Ajuste espaçamento para melhor legibilidade
+                Ajuste a aparência do texto para melhor legibilidade
               </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Font Family */}
+              <div className="space-y-2">
+                <Label>Fonte do Texto</Label>
+                <Select
+                  value={settings.fontFamily}
+                  onValueChange={(value) => updateSetting("fontFamily", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem
+                        key={font.value}
+                        value={font.value}
+                        style={{ fontFamily: font.value }}
+                      >
+                        {font.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Fonte aplicada a todo o capítulo
+                </p>
+              </div>
+
+              {/* Font Size */}
+              <div className="space-y-2">
+                <Label>Tamanho da Fonte</Label>
+                <TooltipProvider>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={settings.fontSize}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1 && value <= 100) {
+                          updateSetting("fontSize", value);
+                        }
+                      }}
+                      min={1}
+                      max={100}
+                      className="flex-1 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    />
+                    <div className="flex flex-col gap-0.5">
+                      <Tooltip delayDuration={300} disableHoverableContent>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleFontSizeIncrement}
+                            className="h-5 px-2"
+                            disabled={settings.fontSize >= 100}
+                          >
+                            <ChevronUp className="h-3 w-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Aumentar tamanho</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip delayDuration={300} disableHoverableContent>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleFontSizeDecrement}
+                            className="h-5 px-2"
+                            disabled={settings.fontSize <= 1}
+                          >
+                            <ChevronDown className="h-3 w-3" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Diminuir tamanho</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <span className="text-sm text-muted-foreground">pt</span>
+                  </div>
+                </TooltipProvider>
+                <p className="text-xs text-muted-foreground">
+                  Tamanho aplicado a todo o capítulo (1-100pt)
+                </p>
+              </div>
             </div>
 
             {/* Line Height */}

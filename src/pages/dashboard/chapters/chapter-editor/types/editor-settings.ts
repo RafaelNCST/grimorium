@@ -14,6 +14,8 @@ export interface EditorSettings {
 
   // Typography
   lineHeight: number;
+  fontSize: number;
+  fontFamily: string;
 
   // Visual Toggles
   showAnnotationHighlights: boolean;
@@ -29,6 +31,8 @@ export interface EditorSettings {
 export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   autoScrollMode: "near-end",
   lineHeight: 1.6,
+  fontSize: 12,
+  fontFamily: "Inter",
   showAnnotationHighlights: true,
   enableSpellCheck: true,
   sepiaMode: true,

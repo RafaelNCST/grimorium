@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import {
   Bold,
@@ -15,10 +15,6 @@ import {
   Clock,
   CheckCircle2,
   Check,
-  Type,
-  PenTool,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -48,6 +44,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { IPlotArc } from "@/types/plot-types";
 
+import { useFormatState } from "../hooks/useFormatState";
 import type { ChapterStatus } from "../types";
 
 interface FormattingToolbarProps {
@@ -57,10 +54,6 @@ interface FormattingToolbarProps {
   plotArcId?: string;
   availableArcs: IPlotArc[];
   onPlotArcChange: (arcId: string | undefined) => void;
-  fontSize: number;
-  onFontSizeChange: (size: number) => void;
-  fontFamily: string;
-  onFontFamilyChange: (font: string) => void;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -79,14 +72,6 @@ const STATUS_COLORS: Record<ChapterStatus, string> = {
     "bg-purple-500/20 text-purple-300 dark:text-purple-300 border-purple-500/30",
 };
 
-const FONT_OPTIONS = [
-  { value: "Inter", label: "Inter" },
-  { value: "Times New Roman", label: "Times New Roman" },
-  { value: "Courier New", label: "Courier New" },
-  { value: "Arial", label: "Arial" },
-  { value: "sans-serif", label: "Sans Serif" },
-];
-
 export function FormattingToolbar({
   onFormat,
   status,
@@ -94,10 +79,6 @@ export function FormattingToolbar({
   plotArcId,
   availableArcs,
   onPlotArcChange,
-  fontSize,
-  onFontSizeChange,
-  fontFamily,
-  onFontFamilyChange,
   onUndo,
   onRedo,
   canUndo = true,
@@ -106,30 +87,9 @@ export function FormattingToolbar({
   const { t } = useTranslation("chapter-editor");
   const selectedArc = availableArcs.find((arc) => arc.id === plotArcId);
   const [isArcModalOpen, setIsArcModalOpen] = useState(false);
-  const [fontSizeInput, setFontSizeInput] = useState(fontSize.toString());
 
-  const handleFontSizeInputChange = (value: string) => {
-    setFontSizeInput(value);
-    const numValue = parseInt(value);
-    if (!isNaN(numValue) && numValue >= 1 && numValue <= 100) {
-      onFontSizeChange(numValue);
-    }
-  };
-
-  const handleFontSizeIncrement = () => {
-    const newSize = Math.min(100, fontSize + 1);
-    onFontSizeChange(newSize);
-  };
-
-  const handleFontSizeDecrement = () => {
-    const newSize = Math.max(1, fontSize - 1);
-    onFontSizeChange(newSize);
-  };
-
-  // Sync fontSizeInput with fontSize prop
-  useEffect(() => {
-    setFontSizeInput(fontSize.toString());
-  }, [fontSize]);
+  // Use format state hook to detect active formatting
+  const formatState = useFormatState();
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -214,81 +174,6 @@ export function FormattingToolbar({
       <div className="border-b border-border bg-card sticky top-0 z-40">
         <div className="flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto">
           <div className="flex items-center gap-1">
-            {/* Font Controls Group */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-md border border-border/50">
-              <PenTool className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-              <Select value={fontFamily} onValueChange={onFontFamilyChange}>
-                <SelectTrigger className="h-7 w-[140px] border-0 bg-transparent px-2 text-xs font-medium focus:ring-0 focus:ring-offset-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((font) => (
-                    <SelectItem
-                      key={font.value}
-                      value={font.value}
-                      className="text-xs"
-                      style={{ fontFamily: font.value }}
-                    >
-                      {font.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <div className="h-4 w-px bg-border/50" />
-
-              <div className="flex items-center gap-1.5">
-                <Type className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <Input
-                  type="text"
-                  value={fontSizeInput}
-                  onChange={(e) => handleFontSizeInputChange(e.target.value)}
-                  className="h-7 w-11 border-0 bg-transparent px-1 text-xs font-mono font-semibold text-center focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-                <div className="flex flex-col gap-0.5">
-                  <Tooltip delayDuration={300} disableHoverableContent>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleFontSizeIncrement}
-                        className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                        disabled={fontSize >= 100}
-                      >
-                        <ChevronUp className="h-2.5 w-2.5 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Aumentar tamanho</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip delayDuration={300} disableHoverableContent>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleFontSizeDecrement}
-                        className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                        disabled={fontSize <= 1}
-                      >
-                        <ChevronDown className="h-2.5 w-2.5 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Diminuir tamanho</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <span className="text-xs text-muted-foreground font-medium">
-                  pt
-                </span>
-              </div>
-            </div>
-
-            <Separator orientation="vertical" className="h-6 mx-1" />
-
             {/* Text Formatting */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -296,7 +181,10 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("bold")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.bold && "bg-accent text-accent-foreground"
+                  )}
                 >
                   <Bold className="h-4 w-4" />
                 </Button>
@@ -311,7 +199,10 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("italic")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.italic && "bg-accent text-accent-foreground"
+                  )}
                 >
                   <Italic className="h-4 w-4" />
                 </Button>
@@ -326,7 +217,10 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("underline")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.underline && "bg-accent text-accent-foreground"
+                  )}
                 >
                   <Underline className="h-4 w-4" />
                 </Button>
@@ -345,7 +239,10 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("justifyLeft")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.alignLeft && "bg-accent text-accent-foreground"
+                  )}
                 >
                   <AlignLeft className="h-4 w-4" />
                 </Button>
@@ -360,7 +257,11 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("justifyCenter")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.alignCenter &&
+                      "bg-accent text-accent-foreground"
+                  )}
                 >
                   <AlignCenter className="h-4 w-4" />
                 </Button>
@@ -375,7 +276,10 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("justifyRight")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.alignRight && "bg-accent text-accent-foreground"
+                  )}
                 >
                   <AlignRight className="h-4 w-4" />
                 </Button>
@@ -390,7 +294,11 @@ export function FormattingToolbar({
                   variant="ghost"
                   size="sm"
                   onClick={() => onFormat("justifyFull")}
-                  className="h-8 w-8 p-0"
+                  className={cn(
+                    "h-8 w-8 p-0",
+                    formatState.alignJustify &&
+                      "bg-accent text-accent-foreground"
+                  )}
                 >
                   <AlignJustify className="h-4 w-4" />
                 </Button>
