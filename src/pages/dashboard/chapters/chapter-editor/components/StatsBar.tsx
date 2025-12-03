@@ -1,75 +1,206 @@
-import { FileText, Type, Check, Loader2 } from "lucide-react";
+import {
+  FileText,
+  Type,
+  Check,
+  Loader2,
+  AlignLeft,
+  List,
+  MessageCircle,
+  Clock,
+  Info,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+import { ChapterMetrics } from "../types/metrics";
+
 interface StatsBarProps {
-  wordCount: number;
-  characterCount: number;
-  characterCountWithSpaces: number;
+  metrics: ChapterMetrics;
   isSaving?: boolean;
+  onOpenDetails?: () => void;
 }
 
 export function StatsBar({
-  wordCount,
-  characterCount,
-  characterCountWithSpaces,
+  metrics,
   isSaving = false,
+  onOpenDetails,
 }: StatsBarProps) {
   const { t } = useTranslation("chapter-editor");
 
+  const formatSessionTime = (minutes: number): string => {
+    if (minutes < 1) return "< 1min";
+    if (minutes < 60) return `${minutes}min`;
+
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h ${mins}min`;
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border px-6 py-2">
-      <div className="flex items-center justify-between">
-        {/* Left: Save Status Indicator */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-[120px]">
-          {isSaving ? (
-            <>
-              <Loader2 className="w-3 h-3 animate-spin" />
-              <span>{t("save.saving")}</span>
-            </>
-          ) : (
-            <>
-              <Check className="w-3 h-3 text-green-500" />
-              <span className="text-green-600 dark:text-green-500">
-                {t("save.saved")}
-              </span>
-            </>
-          )}
+    <TooltipProvider delayDuration={300}>
+      <div
+        className={cn(
+          "fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border px-6 py-2 transition-opacity duration-200",
+          onOpenDetails && "cursor-pointer hover:opacity-90"
+        )}
+        onClick={onOpenDetails}
+      >
+        <div className="flex items-center justify-between">
+          {/* Left: Save Status Indicator */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-[120px]">
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span>{t("save.saving")}</span>
+              </>
+            ) : (
+              <>
+                <Check className="w-3 h-3 text-green-500" />
+                <span className="text-green-600 dark:text-green-500">
+                  {t("save.saved")}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Center: Stats */}
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            {/* Palavras */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {metrics.wordCount}
+                    </strong>{" "}
+                    palavras
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total de palavras no capítulo</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Caracteres */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {metrics.characterCount}
+                    </strong>{" "}
+                    caracteres
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Caracteres sem espaços</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Parágrafos */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <AlignLeft className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {metrics.paragraphCount}
+                    </strong>{" "}
+                    parágrafos
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total de parágrafos</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Sentenças */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <List className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {metrics.sentenceCount}
+                    </strong>{" "}
+                    sentenças
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Total de sentenças</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Diálogos */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {metrics.dialogueCount}
+                    </strong>{" "}
+                    falas
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Diálogos estimados (aspas e travessões)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Tempo de Sessão */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>
+                    <strong className="text-foreground">
+                      {formatSessionTime(metrics.sessionDuration)}
+                    </strong>{" "}
+                    de escrita
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Tempo na sessão atual</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {/* Right: Info Icon */}
+          <div className="min-w-[120px] flex justify-end">
+            {onOpenDetails && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Info className="w-3 h-3" />
+                    <span>Detalhes</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Clique para ver estatísticas detalhadas</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
-
-        {/* Center: Stats */}
-        <div className="flex items-center gap-8 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Type className="w-4 h-4" />
-            <span>
-              <strong className="text-foreground">{wordCount}</strong>{" "}
-              {t("stats.words")}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            <span>
-              <strong className="text-foreground">{characterCount}</strong>{" "}
-              {t("stats.characters")}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            <span>
-              <strong className="text-foreground">
-                {characterCountWithSpaces}
-              </strong>{" "}
-              {t("stats.characters_with_spaces")}
-            </span>
-          </div>
-        </div>
-
-        {/* Right: Spacer for balance */}
-        <div className="min-w-[120px]" />
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
