@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from "react";
 
 interface HistoryState {
   content: string;
@@ -11,7 +11,7 @@ interface UseUndoRedoOptions {
 }
 
 export function useUndoRedo(
-  initialContent: string = '',
+  initialContent: string = "",
   options: UseUndoRedoOptions = {}
 ) {
   const { maxHistorySize = 100, debounceMs = 500 } = options;
@@ -112,19 +112,23 @@ export function useUndoRedo(
   const currentState = history[currentIndex];
 
   // Reset history (useful when loading new content)
-  const resetHistory = useCallback((content: string, cursorPosition: number = 0) => {
-    setHistory([{ content, cursorPosition }]);
-    setCurrentIndex(0);
-  }, []);
+  const resetHistory = useCallback(
+    (content: string, cursorPosition: number = 0) => {
+      setHistory([{ content, cursorPosition }]);
+      setCurrentIndex(0);
+    },
+    []
+  );
 
   // Clear debounce on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   return {
     pushState,

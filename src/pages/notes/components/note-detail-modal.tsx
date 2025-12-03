@@ -488,7 +488,9 @@ function NoteDetailModalComponent({
               onChange={handleContentChange}
               placeholder={t("detail_modal.content_placeholder")}
               onManageLinks={
-                showManageLinks ? () => setShowManageLinksModal(true) : undefined
+                showManageLinks
+                  ? () => setShowManageLinksModal(true)
+                  : undefined
               }
               onDelete={() => setShowDeleteConfirm(true)}
               onEditorReady={(editor) => {
@@ -529,7 +531,10 @@ function NoteDetailModalComponent({
       </AlertDialog>
 
       {/* Manage Links Modal */}
-      <Dialog open={showManageLinksModal} onOpenChange={setShowManageLinksModal}>
+      <Dialog
+        open={showManageLinksModal}
+        onOpenChange={setShowManageLinksModal}
+      >
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>{t("create_modal.manage_links")}</DialogTitle>

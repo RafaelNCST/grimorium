@@ -41,7 +41,8 @@ export function AllAnnotationsModal({
         <DialogHeader>
           <DialogTitle>{t("annotations.all_annotations_title")}</DialogTitle>
           <DialogDescription>
-            {annotations.length} {annotations.length === 1 ? "anotação" : "anotações"} neste capítulo
+            {annotations.length}{" "}
+            {annotations.length === 1 ? "anotação" : "anotações"} neste capítulo
           </DialogDescription>
         </DialogHeader>
 
@@ -53,14 +54,17 @@ export function AllAnnotationsModal({
           ) : (
             <div className="space-y-4">
               {annotations.map((annotation) => {
-                const hasImportantNotes = annotation.notes.some((n) => n.isImportant);
+                const hasImportantNotes = annotation.notes.some(
+                  (n) => n.isImportant
+                );
 
                 return (
                   <Card
                     key={annotation.id}
                     className={cn(
                       "p-4",
-                      hasImportantNotes && "border-2 border-amber-500 bg-amber-500/5"
+                      hasImportantNotes &&
+                        "border-2 border-amber-500 bg-amber-500/5"
                     )}
                   >
                     {/* Selected text */}
@@ -93,7 +97,9 @@ export function AllAnnotationsModal({
                               <p className="text-sm flex-1">{note.text}</p>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {note.updatedAt ? new Date(note.updatedAt).toLocaleString() : ''}
+                              {note.updatedAt
+                                ? new Date(note.updatedAt).toLocaleString()
+                                : ""}
                             </p>
                           </div>
                         ))}

@@ -1,4 +1,9 @@
-export type ChapterStatus = "in-progress" | "draft" | "review" | "finished" | "published";
+export type ChapterStatus =
+  | "in-progress"
+  | "draft"
+  | "review"
+  | "finished"
+  | "published";
 
 export interface Annotation {
   id: string;

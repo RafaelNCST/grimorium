@@ -97,7 +97,9 @@ export const FormPlotArcSelector = React.forwardRef<
                       : "border-muted-foreground/30"
                   )}
                 >
-                  {!value && <Check className="w-3 h-3 text-primary-foreground" />}
+                  {!value && (
+                    <Check className="w-3 h-3 text-primary-foreground" />
+                  )}
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">
                   {noArcLabel}

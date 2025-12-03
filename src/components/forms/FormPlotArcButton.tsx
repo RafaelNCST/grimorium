@@ -161,7 +161,10 @@ export const FormPlotArcButton = React.forwardRef<
             >
               <div className="flex items-center gap-3 h-full">
                 {React.createElement(getStatusIcon(selectedArc.status), {
-                  className: cn("w-5 h-5 shrink-0", getStatusIconColor(selectedArc.status)),
+                  className: cn(
+                    "w-5 h-5 shrink-0",
+                    getStatusIconColor(selectedArc.status)
+                  ),
                 })}
                 <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                   <h4 className="font-semibold text-sm truncate">
@@ -259,7 +262,10 @@ export const FormPlotArcButton = React.forwardRef<
                       "w-full text-left p-4 rounded-lg border-2 transition-colors duration-200",
                       "hover:bg-white/5 dark:hover:bg-white/10",
                       value === arc.id
-                        ? cn(getStatusButtonColor(arc.status), getStatusActiveRing(arc.status))
+                        ? cn(
+                            getStatusButtonColor(arc.status),
+                            getStatusActiveRing(arc.status)
+                          )
                         : "border-border bg-card"
                     )}
                   >
@@ -272,9 +278,12 @@ export const FormPlotArcButton = React.forwardRef<
                             ? cn(
                                 "border-current",
                                 getStatusIconColor(arc.status),
-                                arc.status === "atual" && "bg-blue-600 dark:bg-blue-400",
-                                arc.status === "planejamento" && "bg-amber-600 dark:bg-amber-400",
-                                arc.status === "finalizado" && "bg-emerald-600 dark:bg-emerald-400"
+                                arc.status === "atual" &&
+                                  "bg-blue-600 dark:bg-blue-400",
+                                arc.status === "planejamento" &&
+                                  "bg-amber-600 dark:bg-amber-400",
+                                arc.status === "finalizado" &&
+                                  "bg-emerald-600 dark:bg-emerald-400"
                               )
                             : "border-muted-foreground/30"
                         )}
@@ -289,7 +298,10 @@ export const FormPlotArcButton = React.forwardRef<
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
                             {React.createElement(getStatusIcon(arc.status), {
-                              className: cn("w-4 h-4 shrink-0", getStatusIconColor(arc.status)),
+                              className: cn(
+                                "w-4 h-4 shrink-0",
+                                getStatusIconColor(arc.status)
+                              ),
                             })}
                             <h4 className="font-semibold text-sm truncate">
                               {arc.name}

@@ -1,21 +1,26 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import type { SearchOptions, SearchResult } from '../types/search-types';
-import { detectDialogues, isRangeInDialogue } from '../utils/dialogue-detector';
+import { useState, useMemo, useCallback, useEffect } from "react";
+
+import { detectDialogues, isRangeInDialogue } from "../utils/dialogue-detector";
+
+import type { SearchOptions, SearchResult } from "../types/search-types";
 
 interface UseTextSearchProps {
   content: string;
   initialSearchTerm?: string;
 }
 
-export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [replaceTerm, setReplaceTerm] = useState('');
+export function useTextSearch({
+  content,
+  initialSearchTerm,
+}: UseTextSearchProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [replaceTerm, setReplaceTerm] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchOptions, setSearchOptions] = useState<SearchOptions>({
     caseSensitive: false,
     wholeWord: false,
-    mode: 'all',
+    mode: "all",
     dialogueFormats: {
       doubleQuotes: true,
       singleQuotes: true,
@@ -32,7 +37,7 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
 
   // Detect dialogues based on current formats
   const dialogueRanges = useMemo(() => {
-    if (searchOptions.mode === 'all') return [];
+    if (searchOptions.mode === "all") return [];
     return detectDialogues(content, searchOptions.dialogueFormats);
   }, [content, searchOptions.mode, searchOptions.dialogueFormats]);
 
@@ -42,11 +47,11 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
 
     // Helper function to check if a position is in the correct context
     const isInCorrectContext = (start: number, end: number): boolean => {
-      if (searchOptions.mode === 'all') return true;
+      if (searchOptions.mode === "all") return true;
 
       const isInDialogue = isRangeInDialogue(start, end, dialogueRanges);
 
-      if (searchOptions.mode === 'dialogues') {
+      if (searchOptions.mode === "dialogues") {
         return isInDialogue;
       } else {
         // mode === 'narration'
@@ -66,8 +71,8 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
 
     if (searchOptions.wholeWord) {
       // Escape special regex characters
-      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${escapedPattern}\\b`, 'g');
+      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`\\b${escapedPattern}\\b`, "g");
       let match;
 
       while ((match = regex.exec(searchText)) !== null) {
@@ -146,7 +151,7 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
     }));
   }, []);
 
-  const setSearchMode = useCallback((mode: SearchOptions['mode']) => {
+  const setSearchMode = useCallback((mode: SearchOptions["mode"]) => {
     setSearchOptions((prev) => ({
       ...prev,
       mode,
@@ -154,7 +159,7 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
   }, []);
 
   const setDialogueFormats = useCallback(
-    (formats: SearchOptions['dialogueFormats']) => {
+    (formats: SearchOptions["dialogueFormats"]) => {
       setSearchOptions((prev) => ({
         ...prev,
         dialogueFormats: formats,
@@ -187,7 +192,7 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
     if (results.length === 0 || !replaceTerm) return null;
 
     let newContent = content;
-    let offset = 0;
+    const offset = 0;
 
     // Replace from end to start to maintain correct offsets
     const sortedResults = [...results].sort((a, b) => b.start - a.start);
@@ -209,16 +214,16 @@ export function useTextSearch({ content, initialSearchTerm }: UseTextSearchProps
 
   const closeSearch = useCallback(() => {
     setIsSearchOpen(false);
-    setSearchTerm('');
-    setReplaceTerm('');
+    setSearchTerm("");
+    setReplaceTerm("");
     setCurrentIndex(0);
   }, []);
 
   // Clear search term when closing
   useEffect(() => {
     if (!isSearchOpen) {
-      setSearchTerm('');
-      setReplaceTerm('');
+      setSearchTerm("");
+      setReplaceTerm("");
     }
   }, [isSearchOpen]);
 

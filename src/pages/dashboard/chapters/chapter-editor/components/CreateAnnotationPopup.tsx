@@ -22,7 +22,7 @@ export function CreateAnnotationPopup({
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        transform: 'translate(-50%, -120%)',
+        transform: "translate(-50%, -120%)",
       }}
     >
       <Button

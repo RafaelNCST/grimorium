@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from "react";
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import type { DialogueFormats } from '../types/search-types';
+import type { DialogueFormats } from "../types/search-types";
 
 interface DialogueFormatSettingsProps {
   open: boolean;
@@ -29,22 +30,22 @@ interface FormatOption {
 
 const formatOptions: FormatOption[] = [
   {
-    id: 'doubleQuotes',
-    label: 'Aspas duplas',
+    id: "doubleQuotes",
+    label: "Aspas duplas",
     symbol: '" "',
     example: '"Olá," disse João.',
   },
   {
-    id: 'singleQuotes',
-    label: 'Aspas simples',
+    id: "singleQuotes",
+    label: "Aspas simples",
     symbol: "' '",
     example: "'Espere,' ele respondeu.",
   },
   {
-    id: 'emDash',
-    label: 'Travessão',
-    symbol: '—',
-    example: '— Olá — disse João.',
+    id: "emDash",
+    label: "Travessão",
+    symbol: "—",
+    example: "— Olá — disse João.",
   },
 ];
 
@@ -145,7 +146,10 @@ export function DialogueFormatSettings({
             })}
           </div>
 
-          <div className="flex items-start space-x-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer" onClick={handleSelectAll}>
+          <div
+            className="flex items-start space-x-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+            onClick={handleSelectAll}
+          >
             <Checkbox
               id="select-all"
               checked={selectedCount === formatOptions.length}
@@ -163,7 +167,9 @@ export function DialogueFormatSettings({
         </div>
 
         <DialogFooter>
-          <Button variant="secondary" onClick={handleApply}>Fechar</Button>
+          <Button variant="secondary" onClick={handleApply}>
+            Fechar
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

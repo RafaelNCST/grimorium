@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { FileText, Plus, ArrowLeft } from "lucide-react";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
-import type { IPlotArc } from "@/types/plot-types";
 
+import {
+  CreateChapterModal,
+  type IChapterFormData,
+  type EntityMention,
+} from "@/components/modals/create-chapter-modal";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -17,16 +20,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  CreateChapterModal,
-  type IChapterFormData,
-  type EntityMention,
-} from "@/components/modals/create-chapter-modal";
+import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useChaptersStore, type ChapterData } from "@/stores/chapters-store";
+import type { IPlotArc } from "@/types/plot-types";
 
 import { ChapterCard } from "./components/chapter-card";
 
-type ChapterStatus = "draft" | "in-progress" | "review" | "finished" | "published";
+type ChapterStatus =
+  | "draft"
+  | "in-progress"
+  | "review"
+  | "finished"
+  | "published";
 
 interface Chapter {
   id: string;
@@ -63,7 +68,11 @@ export function ChaptersPage() {
   });
   const navigate = useNavigate();
 
-  const { getAllChapters, addChapter, deleteChapter: deleteChapterFromStore } = useChaptersStore();
+  const {
+    getAllChapters,
+    addChapter,
+    deleteChapter: deleteChapterFromStore,
+  } = useChaptersStore();
 
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeTab, setActiveTab] = useState<ChapterStatus | "all">("all");
@@ -83,12 +92,16 @@ export function ChaptersPage() {
       status: ch.status,
       wordCount: ch.wordCount,
       characterCount: ch.characterCount,
-      characterCountWithSpaces: ch.characterCountWithSpaces || ch.characterCount,
+      characterCountWithSpaces:
+        ch.characterCountWithSpaces || ch.characterCount,
       lastEdited: ch.lastEdited ? new Date(ch.lastEdited) : new Date(),
       summary: ch.summary,
       plotArc: ch.plotArcId
         ? plotArcs.find((arc) => arc.id === ch.plotArcId)
-          ? { id: ch.plotArcId, name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name }
+          ? {
+              id: ch.plotArcId,
+              name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name,
+            }
           : undefined
         : undefined,
       mentionedCharacters: ch.mentionedCharacters,
@@ -113,8 +126,8 @@ export function ChaptersPage() {
     loadArcs();
   }, [dashboardId]);
 
-  const getFilteredChapters = (status: ChapterStatus | "all") => {
-    return chapters
+  const getFilteredChapters = (status: ChapterStatus | "all") =>
+    chapters
       .filter((chapter) => status === "all" || chapter.status === status)
       .filter(
         (chapter) =>
@@ -123,8 +136,6 @@ export function ChaptersPage() {
           chapter.number.toString().includes(searchTerm)
       )
       .sort((a, b) => a.number - b.number); // Sort by chapter number
-  };
-
   const handleDeleteChapter = (chapterId: string) => {
     deleteChapterFromStore(chapterId);
     setChapters((prev) => prev.filter((ch) => ch.id !== chapterId));
@@ -216,7 +227,11 @@ export function ChaptersPage() {
 
         <div className="flex-1" />
 
-        <Button onClick={() => setShowCreateModal(true)} variant="magical" className="gap-2 animate-glow">
+        <Button
+          onClick={() => setShowCreateModal(true)}
+          variant="magical"
+          className="gap-2 animate-glow"
+        >
           <Plus className="h-4 w-4" />
           Novo Capítulo
         </Button>
@@ -224,144 +239,160 @@ export function ChaptersPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-      {chapters.length === 0 ? (
-        <div className="h-full flex items-center justify-center">
-          <div className="text-center">
-            <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhum capítulo criado</h3>
-            <p className="text-muted-foreground mb-4">
-              Comece a escrever sua história criando seu primeiro capítulo
-            </p>
+        {chapters.length === 0 ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+              <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">
+                Nenhum capítulo criado
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Comece a escrever sua história criando seu primeiro capítulo
+              </p>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="p-6">
-          <div className="space-y-4">
-            {/* Tabs for Status Filtering */}
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ChapterStatus | "all")}>
-              <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
-                <TabsTrigger
-                  value="all"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  Todos ({chapters.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="draft"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  {statusConfig.draft.label} ({chapters.filter(ch => ch.status === "draft").length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="in-progress"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  {statusConfig["in-progress"].label} ({chapters.filter(ch => ch.status === "in-progress").length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="review"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  {statusConfig.review.label} ({chapters.filter(ch => ch.status === "review").length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="finished"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  {statusConfig.finished.label} ({chapters.filter(ch => ch.status === "finished").length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="published"
-                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
-                >
-                  {statusConfig.published.label} ({chapters.filter(ch => ch.status === "published").length})
-                </TabsTrigger>
-              </TabsList>
+        ) : (
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Tabs for Status Filtering */}
+              <Tabs
+                value={activeTab}
+                onValueChange={(value) =>
+                  setActiveTab(value as ChapterStatus | "all")
+                }
+              >
+                <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
+                  <TabsTrigger
+                    value="all"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    Todos ({chapters.length})
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="draft"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    {statusConfig.draft.label} (
+                    {chapters.filter((ch) => ch.status === "draft").length})
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="in-progress"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    {statusConfig["in-progress"].label} (
+                    {
+                      chapters.filter((ch) => ch.status === "in-progress")
+                        .length
+                    }
+                    )
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="review"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    {statusConfig.review.label} (
+                    {chapters.filter((ch) => ch.status === "review").length})
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="finished"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    {statusConfig.finished.label} (
+                    {chapters.filter((ch) => ch.status === "finished").length})
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="published"
+                    className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
+                  >
+                    {statusConfig.published.label} (
+                    {chapters.filter((ch) => ch.status === "published").length})
+                  </TabsTrigger>
+                </TabsList>
 
-              {/* Search */}
-              <Input
-                type="text"
-                placeholder="Buscar capítulos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-1/2 mt-4"
-              />
+                {/* Search */}
+                <Input
+                  type="text"
+                  placeholder="Buscar capítulos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-1/2 mt-4"
+                />
 
-              <TabsContent value="all" className="space-y-4 mt-4">
-                {getFilteredChapters("all").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
+                <TabsContent value="all" className="space-y-4 mt-4">
+                  {getFilteredChapters("all").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
 
-              <TabsContent value="draft" className="space-y-4 mt-4">
-                {getFilteredChapters("draft").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
+                <TabsContent value="draft" className="space-y-4 mt-4">
+                  {getFilteredChapters("draft").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
 
-              <TabsContent value="in-progress" className="space-y-4 mt-4">
-                {getFilteredChapters("in-progress").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
+                <TabsContent value="in-progress" className="space-y-4 mt-4">
+                  {getFilteredChapters("in-progress").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
 
-              <TabsContent value="review" className="space-y-4 mt-4">
-                {getFilteredChapters("review").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
+                <TabsContent value="review" className="space-y-4 mt-4">
+                  {getFilteredChapters("review").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
 
-              <TabsContent value="finished" className="space-y-4 mt-4">
-                {getFilteredChapters("finished").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
+                <TabsContent value="finished" className="space-y-4 mt-4">
+                  {getFilteredChapters("finished").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
 
-              <TabsContent value="published" className="space-y-4 mt-4">
-                {getFilteredChapters("published").map((chapter) => (
-                  <ChapterCard
-                    key={chapter.id}
-                    chapter={chapter}
-                    onClick={handleChapterClick}
-                    onDelete={handleChapterDelete}
-                    statusConfig={statusConfig}
-                  />
-                ))}
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="published" className="space-y-4 mt-4">
+                  {getFilteredChapters("published").map((chapter) => (
+                    <ChapterCard
+                      key={chapter.id}
+                      chapter={chapter}
+                      onClick={handleChapterClick}
+                      onDelete={handleChapterDelete}
+                      statusConfig={statusConfig}
+                    />
+                  ))}
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
 
       {/* Create Chapter Modal */}

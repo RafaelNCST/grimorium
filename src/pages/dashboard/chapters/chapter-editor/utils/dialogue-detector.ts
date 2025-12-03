@@ -1,4 +1,4 @@
-import type { DialogueFormats, DialogueRange } from '../types/search-types';
+import type { DialogueFormats, DialogueRange } from "../types/search-types";
 
 /**
  * Detects all dialogue ranges in the text based on enabled formats
@@ -17,7 +17,7 @@ export function detectDialogues(
       dialogueRanges.push({
         start: match.index,
         end: match.index + match[0].length,
-        type: 'doubleQuotes',
+        type: "doubleQuotes",
       });
     }
   }
@@ -30,14 +30,14 @@ export function detectDialogues(
       dialogueRanges.push({
         start: match.index,
         end: match.index + match[0].length,
-        type: 'singleQuotes',
+        type: "singleQuotes",
       });
     }
   }
 
   // 3. Em dash (supports open-ended dialogues)
   if (formats.emDash) {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     let offset = 0;
 
     for (let i = 0; i < lines.length; i++) {
@@ -56,7 +56,7 @@ export function detectDialogues(
         while (
           j < lines.length &&
           !/^\s*—/.test(lines[j]) &&
-          lines[j].trim() !== ''
+          lines[j].trim() !== ""
         ) {
           end += lines[j].length + 1; // +1 for \n
           j++;
@@ -65,7 +65,7 @@ export function detectDialogues(
         dialogueRanges.push({
           start,
           end,
-          type: 'emDash',
+          type: "emDash",
         });
       }
 

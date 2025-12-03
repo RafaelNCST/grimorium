@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
   Calendar,
@@ -15,7 +16,6 @@ import { useTranslation } from "react-i18next";
 
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
-import { useNavigate } from "@tanstack/react-router";
 import {
   DisplayEntityList,
   DisplaySelectGrid,

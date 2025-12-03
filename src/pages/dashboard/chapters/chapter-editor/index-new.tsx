@@ -15,20 +15,26 @@ import { FormattingToolbar } from "./components/FormattingToolbar";
 import { StatsBar } from "./components/StatsBar";
 import { SummarySection } from "./components/SummarySection";
 import { TextEditor, type TextEditorRef } from "./components/TextEditor";
-import type { ChapterData, Annotation, AnnotationNote, EntityMention } from "./types";
-import type { EditorSettings } from "./types/editor-settings";
 import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
+import type {
+  ChapterData,
+  Annotation,
+  AnnotationNote,
+  EntityMention,
+} from "./types";
+import type { EditorSettings } from "./types/editor-settings";
 
 export function ChapterEditorNew() {
   const params = useParams({
     from: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
   });
-  const dashboardId = params.dashboardId;
+  const { dashboardId } = params;
   const editorChaptersId = params["editor-chapters-id"];
   const navigate = useNavigate();
 
-  const { getChapter, updateChapter, getPreviousChapter, getNextChapter } = useChaptersStore();
+  const { getChapter, updateChapter, getPreviousChapter, getNextChapter } =
+    useChaptersStore();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -59,11 +65,17 @@ export function ChapterEditorNew() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Editor settings state
-  const [editorSettings, setEditorSettings] = useState<EditorSettings>(DEFAULT_EDITOR_SETTINGS);
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>(
+    DEFAULT_EDITOR_SETTINGS
+  );
 
   // Editor formatting state (loaded from chapter data)
-  const [fontSize, setFontSize] = useState<number>(initialChapter.fontSize || 12);
-  const [fontFamily, setFontFamily] = useState<string>(initialChapter.fontFamily || "Inter");
+  const [fontSize, setFontSize] = useState<number>(
+    initialChapter.fontSize || 12
+  );
+  const [fontFamily, setFontFamily] = useState<string>(
+    initialChapter.fontFamily || "Inter"
+  );
 
   // Annotation state
   const [selectedText, setSelectedText] = useState("");
@@ -71,10 +83,15 @@ export function ChapterEditorNew() {
     start: number;
     end: number;
   } | null>(null);
-  const [selectedAnnotationId, setSelectedAnnotationId] = useState<string | null>(null);
+  const [selectedAnnotationId, setSelectedAnnotationId] = useState<
+    string | null
+  >(null);
   const [showAnnotationsSidebar, setShowAnnotationsSidebar] = useState(false);
-  const [showAllAnnotationsSidebar, setShowAllAnnotationsSidebar] = useState(false);
-  const [scrollToAnnotation, setScrollToAnnotation] = useState<string | null>(null);
+  const [showAllAnnotationsSidebar, setShowAllAnnotationsSidebar] =
+    useState(false);
+  const [scrollToAnnotation, setScrollToAnnotation] = useState<string | null>(
+    null
+  );
 
   // Keep a ref to the latest chapter to avoid re-creating save functions
   const chapterRef = useRef(chapter);
@@ -102,11 +119,12 @@ export function ChapterEditorNew() {
 
     // Calculate stats
     const trimmed = currentChapter.content.trim();
-    const words = trimmed
-      .split(/\s+/)
-      .filter((word) => word.length > 0).length;
-    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
-    const charsWithSpaces = currentChapter.content === '' || currentChapter.content === '\n' ? 0 : currentChapter.content.length; // With spaces
+    const words = trimmed.split(/\s+/).filter((word) => word.length > 0).length;
+    const chars = trimmed.replace(/\s+/g, "").length; // Without spaces
+    const charsWithSpaces =
+      currentChapter.content === "" || currentChapter.content === "\n"
+        ? 0
+        : currentChapter.content.length; // With spaces
 
     const now = new Date().toISOString();
 
@@ -116,8 +134,8 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize: fontSize,
-      fontFamily: fontFamily,
+      fontSize,
+      fontFamily,
       lastEdited: now,
     });
   }, [updateChapter, fontSize, fontFamily]);
@@ -130,11 +148,12 @@ export function ChapterEditorNew() {
 
     // Calculate stats
     const trimmed = currentChapter.content.trim();
-    const words = trimmed
-      .split(/\s+/)
-      .filter((word) => word.length > 0).length;
-    const chars = trimmed.replace(/\s+/g, '').length; // Without spaces
-    const charsWithSpaces = currentChapter.content === '' || currentChapter.content === '\n' ? 0 : currentChapter.content.length; // With spaces
+    const words = trimmed.split(/\s+/).filter((word) => word.length > 0).length;
+    const chars = trimmed.replace(/\s+/g, "").length; // Without spaces
+    const charsWithSpaces =
+      currentChapter.content === "" || currentChapter.content === "\n"
+        ? 0
+        : currentChapter.content.length; // With spaces
 
     const now = new Date().toISOString();
 
@@ -144,8 +163,8 @@ export function ChapterEditorNew() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize: fontSize,
-      fontFamily: fontFamily,
+      fontSize,
+      fontFamily,
       lastEdited: now,
     });
 
@@ -155,9 +174,9 @@ export function ChapterEditorNew() {
         wordCount: words,
         characterCount: chars,
         characterCountWithSpaces: charsWithSpaces,
-        fontSize: fontSize,
-        fontFamily: fontFamily,
-        lastEdited: now
+        fontSize,
+        fontFamily,
+        lastEdited: now,
       }));
       setIsSaving(false);
     }, 500);
@@ -185,7 +204,23 @@ export function ChapterEditorNew() {
     }, 2000); // 2 seconds after last change
 
     return () => clearTimeout(timeoutId);
-  }, [chapter.content, chapter.summary, chapter.title, chapter.chapterNumber, chapter.status, chapter.plotArcId, chapter.annotations, chapter.mentionedCharacters, chapter.mentionedRegions, chapter.mentionedItems, chapter.mentionedFactions, chapter.mentionedRaces, fontSize, fontFamily, handleAutoSave]);
+  }, [
+    chapter.content,
+    chapter.summary,
+    chapter.title,
+    chapter.chapterNumber,
+    chapter.status,
+    chapter.plotArcId,
+    chapter.annotations,
+    chapter.mentionedCharacters,
+    chapter.mentionedRegions,
+    chapter.mentionedItems,
+    chapter.mentionedFactions,
+    chapter.mentionedRaces,
+    fontSize,
+    fontFamily,
+    handleAutoSave,
+  ]);
 
   // Backup interval auto-save (saves every 3 minutes as backup)
   useEffect(() => {
@@ -210,12 +245,12 @@ export function ChapterEditorNew() {
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [handleImmediateSave]);
 
@@ -243,7 +278,7 @@ export function ChapterEditorNew() {
       to: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
       params: {
         dashboardId: dashboardId!,
-        "editor-chapters-id": previousChapter.id
+        "editor-chapters-id": previousChapter.id,
       },
     });
   };
@@ -258,13 +293,17 @@ export function ChapterEditorNew() {
       to: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
       params: {
         dashboardId: dashboardId!,
-        "editor-chapters-id": nextChapter.id
+        "editor-chapters-id": nextChapter.id,
       },
     });
   };
 
   // Text selection handler
-  const handleTextSelect = (text: string, startOffset: number, endOffset: number) => {
+  const handleTextSelect = (
+    text: string,
+    startOffset: number,
+    endOffset: number
+  ) => {
     setSelectedText(text);
     setSelectedRange({ start: startOffset, end: endOffset });
   };
@@ -274,17 +313,19 @@ export function ChapterEditorNew() {
     if (!selectedText || !selectedRange) return;
 
     // Check for overlapping annotations
-    const overlappingAnnotations = chapter.annotations.filter((ann) => {
-      // Check if annotation overlaps with selected range
-      return (
-        (ann.startOffset >= selectedRange.start && ann.startOffset < selectedRange.end) ||
-        (ann.endOffset > selectedRange.start && ann.endOffset <= selectedRange.end) ||
-        (ann.startOffset <= selectedRange.start && ann.endOffset >= selectedRange.end)
-      );
-    });
+    const overlappingAnnotations = chapter.annotations.filter(
+      (ann) =>
+        // Check if annotation overlaps with selected range
+        (ann.startOffset >= selectedRange.start &&
+          ann.startOffset < selectedRange.end) ||
+        (ann.endOffset > selectedRange.start &&
+          ann.endOffset <= selectedRange.end) ||
+        (ann.startOffset <= selectedRange.start &&
+          ann.endOffset >= selectedRange.end)
+    );
 
     let mergedNotes: AnnotationNote[] = [];
-    let annotationsToRemove: string[] = [];
+    const annotationsToRemove: string[] = [];
 
     if (overlappingAnnotations.length > 0) {
       // Merge notes from all overlapping annotations
@@ -390,7 +431,6 @@ export function ChapterEditorNew() {
           : ann
       ),
     }));
-
   };
 
   // Edit note
@@ -412,7 +452,6 @@ export function ChapterEditorNew() {
           : ann
       ),
     }));
-
   };
 
   // Delete note
@@ -429,16 +468,19 @@ export function ChapterEditorNew() {
     }));
 
     // If annotation has no more notes, delete the annotation
-    const annotation = chapter.annotations.find((a) => a.id === selectedAnnotationId);
+    const annotation = chapter.annotations.find(
+      (a) => a.id === selectedAnnotationId
+    );
     if (annotation && annotation.notes.length === 1) {
       setChapter((prev) => ({
         ...prev,
-        annotations: prev.annotations.filter((a) => a.id !== selectedAnnotationId),
+        annotations: prev.annotations.filter(
+          (a) => a.id !== selectedAnnotationId
+        ),
       }));
       setShowAnnotationsSidebar(false);
       setSelectedAnnotationId(null);
     }
-
   };
 
   // Toggle note importance
@@ -453,7 +495,11 @@ export function ChapterEditorNew() {
               ...ann,
               notes: ann.notes.map((note) =>
                 note.id === noteId
-                  ? { ...note, isImportant: !note.isImportant, updatedAt: new Date().toISOString() }
+                  ? {
+                      ...note,
+                      isImportant: !note.isImportant,
+                      updatedAt: new Date().toISOString(),
+                    }
                   : note
               ),
             }
@@ -468,11 +514,15 @@ export function ChapterEditorNew() {
     .split(/\s+/)
     .filter((word) => word.length > 0).length;
 
-  const characterCount = trimmedContent.replace(/\s+/g, '').length; // Without spaces
+  const characterCount = trimmedContent.replace(/\s+/g, "").length; // Without spaces
   // With spaces - counts ALL spaces, even if only spaces are typed. Only ignores the initial newline from contentEditable
-  const characterCountWithSpaces = chapter.content === '' || chapter.content === '\n' ? 0 : chapter.content.length;
+  const characterCountWithSpaces =
+    chapter.content === "" || chapter.content === "\n"
+      ? 0
+      : chapter.content.length;
 
-  const selectedAnnotation = chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
+  const selectedAnnotation =
+    chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
 
   const hasSidebarOpen = showAnnotationsSidebar || showAllAnnotationsSidebar;
 
@@ -481,28 +531,38 @@ export function ChapterEditorNew() {
       {/* Main Content - Adjust width when sidebar is open */}
       <div
         className="flex-1 transition-all duration-300 flex flex-col overflow-hidden"
-        style={{ marginRight: hasSidebarOpen ? '384px' : '0' }}
+        style={{ marginRight: hasSidebarOpen ? "384px" : "0" }}
       >
         {/* Header */}
         <EditorHeader
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
-          previousChapter={previousChapter ? {
-            id: previousChapter.id,
-            number: previousChapter.chapterNumber,
-            title: previousChapter.title
-          } : undefined}
-          nextChapter={nextChapter ? {
-            id: nextChapter.id,
-            number: nextChapter.chapterNumber,
-            title: nextChapter.title
-          } : undefined}
+          previousChapter={
+            previousChapter
+              ? {
+                  id: previousChapter.id,
+                  number: previousChapter.chapterNumber,
+                  title: previousChapter.title,
+                }
+              : undefined
+          }
+          nextChapter={
+            nextChapter
+              ? {
+                  id: nextChapter.id,
+                  number: nextChapter.chapterNumber,
+                  title: nextChapter.title,
+                }
+              : undefined
+          }
           onBack={handleBack}
           onChapterNumberChange={(value) =>
             setChapter((prev) => ({ ...prev, chapterNumber: value }))
           }
-          onTitleChange={(value) => setChapter((prev) => ({ ...prev, title: value }))}
+          onTitleChange={(value) =>
+            setChapter((prev) => ({ ...prev, title: value }))
+          }
           onShowAllAnnotations={() => {
             // Close specific annotation sidebar if open
             setShowAnnotationsSidebar(false);
@@ -519,10 +579,14 @@ export function ChapterEditorNew() {
         <FormattingToolbar
           onFormat={handleFormat}
           status={chapter.status}
-          onStatusChange={(status) => setChapter((prev) => ({ ...prev, status }))}
+          onStatusChange={(status) =>
+            setChapter((prev) => ({ ...prev, status }))
+          }
           plotArcId={chapter.plotArcId}
           availableArcs={availableArcs}
-          onPlotArcChange={(arcId) => setChapter((prev) => ({ ...prev, plotArcId: arcId }))}
+          onPlotArcChange={(arcId) =>
+            setChapter((prev) => ({ ...prev, plotArcId: arcId }))
+          }
           fontSize={fontSize}
           onFontSizeChange={handleFontSizeChange}
           fontFamily={fontFamily}
@@ -552,9 +616,14 @@ export function ChapterEditorNew() {
                 mentionedItems={chapter.mentionedItems}
                 mentionedFactions={chapter.mentionedFactions}
                 mentionedRaces={chapter.mentionedRaces}
-                onSummaryChange={(value) => setChapter((prev) => ({ ...prev, summary: value }))}
+                onSummaryChange={(value) =>
+                  setChapter((prev) => ({ ...prev, summary: value }))
+                }
                 onMentionedCharactersChange={(value) =>
-                  setChapter((prev) => ({ ...prev, mentionedCharacters: value }))
+                  setChapter((prev) => ({
+                    ...prev,
+                    mentionedCharacters: value,
+                  }))
                 }
                 onMentionedRegionsChange={(value) =>
                   setChapter((prev) => ({ ...prev, mentionedRegions: value }))
@@ -570,7 +639,9 @@ export function ChapterEditorNew() {
                 }
               />
             }
-            onContentChange={(content) => setChapter((prev) => ({ ...prev, content }))}
+            onContentChange={(content) =>
+              setChapter((prev) => ({ ...prev, content }))
+            }
             onTextSelect={handleTextSelect}
             onAnnotationClick={handleAnnotationClick}
             onCreateAnnotation={handleCreateAnnotation}
@@ -587,11 +658,15 @@ export function ChapterEditorNew() {
           onClose={() => {
             // Delete annotation if it has no notes
             if (selectedAnnotationId) {
-              const annotation = chapter.annotations.find((a) => a.id === selectedAnnotationId);
+              const annotation = chapter.annotations.find(
+                (a) => a.id === selectedAnnotationId
+              );
               if (annotation && annotation.notes.length === 0) {
                 setChapter((prev) => ({
                   ...prev,
-                  annotations: prev.annotations.filter((a) => a.id !== selectedAnnotationId),
+                  annotations: prev.annotations.filter(
+                    (a) => a.id !== selectedAnnotationId
+                  ),
                 }));
               }
             }

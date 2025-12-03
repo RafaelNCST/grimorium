@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
+
 import {
   Copy,
   Scissors,
@@ -8,7 +9,7 @@ import {
   Bold,
   Italic,
   Underline,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ContextMenuProps {
   x: number;
@@ -50,17 +51,17 @@ export function ContextMenu({
     };
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [onClose]);
 
@@ -107,7 +108,9 @@ export function ContextMenu({
           >
             <Copy className="h-4 w-4" />
             Copiar
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+C</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+C
+            </span>
           </button>
           <button
             onClick={() => handleAction(onCut)}
@@ -115,7 +118,9 @@ export function ContextMenu({
           >
             <Scissors className="h-4 w-4" />
             Recortar
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+X</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+X
+            </span>
           </button>
         </>
       )}
@@ -141,7 +146,9 @@ export function ContextMenu({
           >
             <MessageSquare className="h-4 w-4" />
             Criar Anotação
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+M</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+M
+            </span>
           </button>
           <button
             onClick={() => handleAction(onSearch)}
@@ -149,7 +156,9 @@ export function ContextMenu({
           >
             <Search className="h-4 w-4" />
             Buscar texto selecionado
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+F</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+F
+            </span>
           </button>
 
           {/* Separator */}
@@ -162,7 +171,9 @@ export function ContextMenu({
           >
             <Bold className="h-4 w-4" />
             Negrito
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+B</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+B
+            </span>
           </button>
           <button
             onClick={() => handleAction(onItalic)}
@@ -170,7 +181,9 @@ export function ContextMenu({
           >
             <Italic className="h-4 w-4" />
             Itálico
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+I</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+I
+            </span>
           </button>
           <button
             onClick={() => handleAction(onUnderline)}
@@ -178,7 +191,9 @@ export function ContextMenu({
           >
             <Underline className="h-4 w-4" />
             Sublinhado
-            <span className="ml-auto text-xs text-muted-foreground">Ctrl+U</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              Ctrl+U
+            </span>
           </button>
         </>
       )}

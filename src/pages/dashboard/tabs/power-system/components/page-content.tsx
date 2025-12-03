@@ -234,7 +234,9 @@ export function PageContent({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p className="text-sm font-medium">{t("pages.add_section")}</p>
+                  <p className="text-sm font-medium">
+                    {t("pages.add_section")}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             )}

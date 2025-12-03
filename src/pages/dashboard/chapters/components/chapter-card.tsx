@@ -12,14 +12,11 @@ import {
   Hash,
 } from "lucide-react";
 
+import type { EntityMention } from "@/components/modals/create-chapter-modal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +24,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { EntityMention } from "@/components/modals/create-chapter-modal";
 
-type ChapterStatus = "draft" | "in-progress" | "review" | "finished" | "published";
+type ChapterStatus =
+  | "draft"
+  | "in-progress"
+  | "review"
+  | "finished"
+  | "published";
 
 interface Chapter {
   id: string;
@@ -98,7 +98,10 @@ export function ChapterCard({
           </div>
 
           {/* Actions */}
-          <div className="flex items-start gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-start gap-1 shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -240,7 +243,8 @@ export function ChapterCard({
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
                     Personagens
                   </h5>
-                  {chapter.mentionedCharacters && chapter.mentionedCharacters.length > 0 ? (
+                  {chapter.mentionedCharacters &&
+                  chapter.mentionedCharacters.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {chapter.mentionedCharacters.map((char) => (
                         <div
@@ -269,7 +273,8 @@ export function ChapterCard({
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
                     Regiões
                   </h5>
-                  {chapter.mentionedRegions && chapter.mentionedRegions.length > 0 ? (
+                  {chapter.mentionedRegions &&
+                  chapter.mentionedRegions.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {chapter.mentionedRegions.map((region) => (
                         <div
@@ -298,7 +303,8 @@ export function ChapterCard({
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
                     Itens
                   </h5>
-                  {chapter.mentionedItems && chapter.mentionedItems.length > 0 ? (
+                  {chapter.mentionedItems &&
+                  chapter.mentionedItems.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {chapter.mentionedItems.map((item) => (
                         <div
@@ -327,7 +333,8 @@ export function ChapterCard({
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
                     Facções
                   </h5>
-                  {chapter.mentionedFactions && chapter.mentionedFactions.length > 0 ? (
+                  {chapter.mentionedFactions &&
+                  chapter.mentionedFactions.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {chapter.mentionedFactions.map((faction) => (
                         <div
@@ -356,7 +363,8 @@ export function ChapterCard({
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
                     Raças
                   </h5>
-                  {chapter.mentionedRaces && chapter.mentionedRaces.length > 0 ? (
+                  {chapter.mentionedRaces &&
+                  chapter.mentionedRaces.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {chapter.mentionedRaces.map((race) => (
                         <div

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { Map, AlertCircle, Trash2, Clock, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "@tanstack/react-router";
 
 import {
   type IFieldVisibility,

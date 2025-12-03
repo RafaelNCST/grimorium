@@ -2,9 +2,14 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 
-import type { EntityType, INote, INoteLink, NoteColor } from "@/types/note-types";
-import { useNotesStore } from "@/stores/notes-store";
 import { useBookStore } from "@/stores/book-store";
+import { useNotesStore } from "@/stores/notes-store";
+import type {
+  EntityType,
+  INote,
+  INoteLink,
+  NoteColor,
+} from "@/types/note-types";
 
 import { EntityNotesView } from "./view";
 
@@ -34,11 +39,13 @@ export function EntityNotesPage() {
   const currentBook = useBookStore((state) => state.currentBook);
 
   // Filter notes linked to this entity
-  const filteredNotes = useMemo(() => {
-    return notes.filter((note) =>
-      note.links.some((link) => link.entityId === entityId)
-    );
-  }, [notes, entityId]);
+  const filteredNotes = useMemo(
+    () =>
+      notes.filter((note) =>
+        note.links.some((link) => link.entityId === entityId)
+      ),
+    [notes, entityId]
+  );
 
   // Load notes on mount
   useEffect(() => {

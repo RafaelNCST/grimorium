@@ -1,9 +1,9 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enChapterEditor from "../../locales/en/chapter-editor.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
-import enChapterEditor from "../../locales/en/chapter-editor.json";
 import enCommon from "../../locales/en/common.json";
 import enCreateBook from "../../locales/en/create-book.json";
 import enCreateChapter from "../../locales/en/create-chapter.json";
@@ -28,9 +28,9 @@ import enRaces from "../../locales/en/races.json";
 import enRegionDetail from "../../locales/en/region-detail.json";
 import enSettings from "../../locales/en/settings.json";
 import enWorld from "../../locales/en/world.json";
+import ptChapterEditor from "../../locales/pt/chapter-editor.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
-import ptChapterEditor from "../../locales/pt/chapter-editor.json";
 import ptCommon from "../../locales/pt/common.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateChapter from "../../locales/pt/create-chapter.json";

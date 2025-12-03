@@ -16,8 +16,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useInboxStore } from "@/stores/inbox-store";
 import { useBookStore } from "@/stores/book-store";
+import { useInboxStore } from "@/stores/inbox-store";
 
 type TitleKey =
   | "home"
@@ -124,7 +124,7 @@ export const TitleBar = () => {
     const dashboardMatch = pathname.match(/\/dashboard\/([^/]+)/);
     if (dashboardMatch && dashboardMatch[1]) {
       const bookId = dashboardMatch[1];
-      const book = books.find(b => b.id === bookId);
+      const book = books.find((b) => b.id === bookId);
       return book ? { id: bookId, name: book.title } : null;
     }
     return null;

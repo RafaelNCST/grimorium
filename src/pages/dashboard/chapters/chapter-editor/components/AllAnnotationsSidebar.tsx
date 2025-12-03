@@ -36,9 +36,12 @@ export function AllAnnotationsSidebar({
         {/* Header */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-lg">{t("annotations.all_annotations_title")}</h3>
+            <h3 className="font-semibold text-lg">
+              {t("annotations.all_annotations_title")}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              {annotations.length} {annotations.length === 1 ? "anotação" : "anotações"}
+              {annotations.length}{" "}
+              {annotations.length === 1 ? "anotação" : "anotações"}
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -54,7 +57,9 @@ export function AllAnnotationsSidebar({
             </div>
           ) : (
             annotations.map((annotation) => {
-              const hasImportantNotes = annotation.notes.some((n) => n.isImportant);
+              const hasImportantNotes = annotation.notes.some(
+                (n) => n.isImportant
+              );
 
               return (
                 <Card
@@ -62,7 +67,8 @@ export function AllAnnotationsSidebar({
                   onClick={() => handleNavigate(annotation.id)}
                   className={cn(
                     "p-4 cursor-pointer transition-all hover:shadow-md hover:border-primary/50",
-                    hasImportantNotes && "border-2 border-amber-500/50 bg-amber-500/5 hover:border-amber-500"
+                    hasImportantNotes &&
+                      "border-2 border-amber-500/50 bg-amber-500/5 hover:border-amber-500"
                   )}
                 >
                   {/* Selected text with pin icon */}
@@ -83,7 +89,8 @@ export function AllAnnotationsSidebar({
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="font-medium">
-                          {annotation.notes.length} {annotation.notes.length === 1 ? "nota" : "notas"}
+                          {annotation.notes.length}{" "}
+                          {annotation.notes.length === 1 ? "nota" : "notas"}
                         </span>
                         {hasImportantNotes && (
                           <Tooltip>

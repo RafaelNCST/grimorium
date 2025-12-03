@@ -89,7 +89,9 @@ export const FormChapterNameWithNumber = React.forwardRef<
             {/* Counter Section */}
             <div className="flex flex-col gap-2 shrink-0">
               {numberLabel && (
-                <Label className={cn("flex items-center gap-1", labelClassName)}>
+                <Label
+                  className={cn("flex items-center gap-1", labelClassName)}
+                >
                   {numberLabel}
                   {required && <span className="text-destructive">*</span>}
                 </Label>
@@ -146,41 +148,43 @@ export const FormChapterNameWithNumber = React.forwardRef<
               </div>
             </div>
 
-          {/* Name Input */}
-          <div className="flex-1 flex flex-col gap-2">
-            {nameLabel && (
-              <Label className={cn("flex items-center gap-1", labelClassName)}>
-                {nameLabel}
-                {required && <span className="text-destructive">*</span>}
-              </Label>
-            )}
-            <Input
-              ref={ref}
-              type="text"
-              value={chapterName}
-              onChange={(e) => onChapterNameChange(e.target.value)}
-              placeholder={namePlaceholder}
-              maxLength={maxLength}
-              className={cn("h-10", hasError && "border-destructive")}
-            />
+            {/* Name Input */}
+            <div className="flex-1 flex flex-col gap-2">
+              {nameLabel && (
+                <Label
+                  className={cn("flex items-center gap-1", labelClassName)}
+                >
+                  {nameLabel}
+                  {required && <span className="text-destructive">*</span>}
+                </Label>
+              )}
+              <Input
+                ref={ref}
+                type="text"
+                value={chapterName}
+                onChange={(e) => onChapterNameChange(e.target.value)}
+                placeholder={namePlaceholder}
+                maxLength={maxLength}
+                className={cn("h-10", hasError && "border-destructive")}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Character count */}
-        {maxLength && showCharCount && (
-          <div className="flex justify-end">
-            <p className="text-xs text-muted-foreground">
-              {currentLength}/{maxLength}
+          {/* Character count */}
+          {maxLength && showCharCount && (
+            <div className="flex justify-end">
+              <p className="text-xs text-muted-foreground">
+                {currentLength}/{maxLength}
+              </p>
+            </div>
+          )}
+
+          {/* Error message */}
+          {hasError && (
+            <p className="text-sm text-destructive" role="alert">
+              {error}
             </p>
-          </div>
-        )}
-
-        {/* Error message */}
-        {hasError && (
-          <p className="text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
+          )}
         </div>
       </TooltipProvider>
     );

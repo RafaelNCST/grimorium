@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 
-import { ArrowLeft, MessageSquare, ChevronLeft, ChevronRight, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
@@ -87,117 +93,122 @@ export function EditorHeader({
               </Button>
             </div>
 
-          {/* Center: Chapter Navigation + Title - Fixed height container */}
-          <div className="flex items-center gap-3 min-h-[44px]">
-            {/* Previous Chapter Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onNavigateToPrevious}
-                  disabled={!previousChapter}
-                  className="h-8 w-8 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                >
-                  <ChevronLeft className="h-4 w-4 text-foreground" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {previousChapter ? (
-                  <p>Capítulo {previousChapter.number}: {previousChapter.title}</p>
-                ) : (
-                  <p>Nenhum capítulo anterior</p>
-                )}
-              </TooltipContent>
-            </Tooltip>
+            {/* Center: Chapter Navigation + Title - Fixed height container */}
+            <div className="flex items-center gap-3 min-h-[44px]">
+              {/* Previous Chapter Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNavigateToPrevious}
+                    disabled={!previousChapter}
+                    className="h-8 w-8 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                  >
+                    <ChevronLeft className="h-4 w-4 text-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {previousChapter ? (
+                    <p>
+                      Capítulo {previousChapter.number}: {previousChapter.title}
+                    </p>
+                  ) : (
+                    <p>Nenhum capítulo anterior</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
 
-            {/* Title */}
-            <div
-              ref={titleContainerRef}
-              className="flex justify-center items-center"
-              onClick={handleTitleClick}
-            >
-              {isEditingTitle ? (
-                <div className="max-w-3xl w-full">
-                  <FormChapterNameWithNumber
-                    numberLabel=""
-                    nameLabel=""
-                    chapterNumber={chapterNumber}
-                    chapterName={title}
-                    onChapterNumberChange={onChapterNumberChange}
-                    onChapterNameChange={onTitleChange}
-                    maxLength={200}
-                    namePlaceholder={t("chapter.title_placeholder")}
-                    showCharCount={false}
-                  />
-                </div>
-              ) : (
-                <div className="cursor-pointer px-3 py-2">
-                  <h1 className="text-lg font-semibold whitespace-nowrap">
-                    Capítulo {chapterNumber}: {title || t("chapter.title_placeholder")}
-                  </h1>
-                </div>
-              )}
+              {/* Title */}
+              <div
+                ref={titleContainerRef}
+                className="flex justify-center items-center"
+                onClick={handleTitleClick}
+              >
+                {isEditingTitle ? (
+                  <div className="max-w-3xl w-full">
+                    <FormChapterNameWithNumber
+                      numberLabel=""
+                      nameLabel=""
+                      chapterNumber={chapterNumber}
+                      chapterName={title}
+                      onChapterNumberChange={onChapterNumberChange}
+                      onChapterNameChange={onTitleChange}
+                      maxLength={200}
+                      namePlaceholder={t("chapter.title_placeholder")}
+                      showCharCount={false}
+                    />
+                  </div>
+                ) : (
+                  <div className="cursor-pointer px-3 py-2">
+                    <h1 className="text-lg font-semibold whitespace-nowrap">
+                      Capítulo {chapterNumber}:{" "}
+                      {title || t("chapter.title_placeholder")}
+                    </h1>
+                  </div>
+                )}
+              </div>
+
+              {/* Next Chapter Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNavigateToNext}
+                    disabled={!nextChapter}
+                    className="h-8 w-8 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                  >
+                    <ChevronRight className="h-4 w-4 text-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {nextChapter ? (
+                    <p>
+                      Capítulo {nextChapter.number}: {nextChapter.title}
+                    </p>
+                  ) : (
+                    <p>Nenhum capítulo seguinte</p>
+                  )}
+                </TooltipContent>
+              </Tooltip>
             </div>
 
-            {/* Next Chapter Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onNavigateToNext}
-                  disabled={!nextChapter}
-                  className="h-8 w-8 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                >
-                  <ChevronRight className="h-4 w-4 text-foreground" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {nextChapter ? (
-                  <p>Capítulo {nextChapter.number}: {nextChapter.title}</p>
-                ) : (
-                  <p>Nenhum capítulo seguinte</p>
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2 shrink-0 justify-end">
+              <Button
+                variant="ghost-bright"
+                size="sm"
+                onClick={onShowAllAnnotations}
+                className={cn(
+                  "border border-transparent transition-all duration-200",
+                  showAllAnnotationsSidebar
+                    ? "bg-primary/10 border-primary text-primary"
+                    : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
                 )}
-              </TooltipContent>
-            </Tooltip>
-          </div>
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Anotações
+              </Button>
 
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2 shrink-0 justify-end">
-            <Button
-              variant="ghost-bright"
-              size="sm"
-              onClick={onShowAllAnnotations}
-              className={cn(
-                "border border-transparent transition-all duration-200",
-                showAllAnnotationsSidebar
-                  ? "bg-primary/10 border-primary text-primary"
-                  : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
-              )}
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Anotações
-            </Button>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onShowSettings}
-                  className="h-9 w-9 p-0"
-                >
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Configurações do Editor</p>
-              </TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onShowSettings}
+                    className="h-9 w-9 p-0"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Configurações do Editor</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </TooltipProvider>
   );

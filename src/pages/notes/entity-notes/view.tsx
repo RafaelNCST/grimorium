@@ -4,12 +4,17 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import type { INote, INoteLink, NoteColor, EntityType } from "@/types/note-types";
+import type {
+  INote,
+  INoteLink,
+  NoteColor,
+  EntityType,
+} from "@/types/note-types";
 
 import { CreateNoteModal } from "../components/create-note-modal";
+import { EntityNotesEmptyState } from "../components/entity-notes-empty-state";
 import { NoteDetailModal } from "../components/note-detail-modal";
 import { NoteGrid } from "../components/note-grid";
-import { EntityNotesEmptyState } from "../components/entity-notes-empty-state";
 
 import type { JSONContent } from "@tiptap/react";
 

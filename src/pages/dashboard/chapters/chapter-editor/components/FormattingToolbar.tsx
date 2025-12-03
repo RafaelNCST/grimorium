@@ -31,7 +31,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -39,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -68,11 +68,15 @@ interface FormattingToolbarProps {
 }
 
 const STATUS_COLORS: Record<ChapterStatus, string> = {
-  "in-progress": "bg-blue-500/20 text-blue-300 dark:text-blue-300 border-blue-500/30",
+  "in-progress":
+    "bg-blue-500/20 text-blue-300 dark:text-blue-300 border-blue-500/30",
   draft: "bg-gray-500/20 text-gray-200 dark:text-gray-200 border-gray-500/30",
-  review: "bg-yellow-500/20 text-yellow-300 dark:text-yellow-300 border-yellow-500/30",
-  finished: "bg-green-500/20 text-green-300 dark:text-green-300 border-green-500/30",
-  published: "bg-purple-500/20 text-purple-300 dark:text-purple-300 border-purple-500/30",
+  review:
+    "bg-yellow-500/20 text-yellow-300 dark:text-yellow-300 border-yellow-500/30",
+  finished:
+    "bg-green-500/20 text-green-300 dark:text-green-300 border-green-500/30",
+  published:
+    "bg-purple-500/20 text-purple-300 dark:text-purple-300 border-purple-500/30",
 };
 
 const FONT_OPTIONS = [
@@ -129,55 +133,79 @@ export function FormattingToolbar({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "atual": return Sparkles;
-      case "planejamento": return Clock;
-      case "finalizado": return CheckCircle2;
-      default: return Sparkles;
+      case "atual":
+        return Sparkles;
+      case "planejamento":
+        return Clock;
+      case "finalizado":
+        return CheckCircle2;
+      default:
+        return Sparkles;
     }
   };
 
   const getStatusIconColor = (status: string) => {
     switch (status) {
-      case "atual": return "text-blue-600 dark:text-blue-400";
-      case "planejamento": return "text-amber-600 dark:text-amber-400";
-      case "finalizado": return "text-emerald-600 dark:text-emerald-400";
-      default: return "text-primary";
+      case "atual":
+        return "text-blue-600 dark:text-blue-400";
+      case "planejamento":
+        return "text-amber-600 dark:text-amber-400";
+      case "finalizado":
+        return "text-emerald-600 dark:text-emerald-400";
+      default:
+        return "text-primary";
     }
   };
 
   const getStatusButtonColor = (status: string) => {
     switch (status) {
-      case "atual": return "border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10";
-      case "planejamento": return "border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10";
-      case "finalizado": return "border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10";
-      default: return "border-primary/30 bg-primary/5 hover:bg-primary/10";
+      case "atual":
+        return "border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10";
+      case "planejamento":
+        return "border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10";
+      case "finalizado":
+        return "border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10";
+      default:
+        return "border-primary/30 bg-primary/5 hover:bg-primary/10";
     }
   };
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case "atual": return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30";
-      case "planejamento": return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30";
-      case "finalizado": return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
-      default: return "bg-muted text-muted-foreground border-border";
+      case "atual":
+        return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30";
+      case "planejamento":
+        return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30";
+      case "finalizado":
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
+      default:
+        return "bg-muted text-muted-foreground border-border";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "atual": return "Atual";
-      case "planejamento": return "Planejamento";
-      case "finalizado": return "Finalizado";
-      default: return status;
+      case "atual":
+        return "Atual";
+      case "planejamento":
+        return "Planejamento";
+      case "finalizado":
+        return "Finalizado";
+      default:
+        return status;
     }
   };
 
   const getStatusActiveRing = (status: string) => {
     switch (status) {
-      case "atual": return "ring-2 ring-blue-500/20";
-      case "planejamento": return "ring-2 ring-amber-500/20";
-      case "finalizado": return "ring-2 ring-emerald-500/20";
-      default: return "ring-2 ring-primary/20";
+      case "atual":
+        return "ring-2 ring-blue-500/20";
+      case "planejamento":
+        return "ring-2 ring-amber-500/20";
+      case "finalizado":
+        return "ring-2 ring-emerald-500/20";
+      default:
+        return "ring-2 ring-primary/20";
     }
   };
 
@@ -186,274 +214,293 @@ export function FormattingToolbar({
       <div className="border-b border-border bg-card sticky top-0 z-40">
         <div className="flex items-center justify-between gap-1 px-4 py-2 overflow-x-auto">
           <div className="flex items-center gap-1">
-        {/* Font Controls Group */}
-        <div className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-md border border-border/50">
-          <PenTool className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <Select value={fontFamily} onValueChange={onFontFamilyChange}>
-            <SelectTrigger className="h-7 w-[140px] border-0 bg-transparent px-2 text-xs font-medium focus:ring-0 focus:ring-offset-0">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {FONT_OPTIONS.map((font) => (
-                <SelectItem
-                  key={font.value}
-                  value={font.value}
-                  className="text-xs"
-                  style={{ fontFamily: font.value }}
-                >
-                  {font.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {/* Font Controls Group */}
+            <div className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-md border border-border/50">
+              <PenTool className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              <Select value={fontFamily} onValueChange={onFontFamilyChange}>
+                <SelectTrigger className="h-7 w-[140px] border-0 bg-transparent px-2 text-xs font-medium focus:ring-0 focus:ring-offset-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FONT_OPTIONS.map((font) => (
+                    <SelectItem
+                      key={font.value}
+                      value={font.value}
+                      className="text-xs"
+                      style={{ fontFamily: font.value }}
+                    >
+                      {font.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          <div className="h-4 w-px bg-border/50" />
+              <div className="h-4 w-px bg-border/50" />
 
-          <div className="flex items-center gap-1.5">
-            <Type className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            <Input
-              type="text"
-              value={fontSizeInput}
-              onChange={(e) => handleFontSizeInputChange(e.target.value)}
-              className="h-7 w-11 border-0 bg-transparent px-1 text-xs font-mono font-semibold text-center focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-            <div className="flex flex-col gap-0.5">
-              <Tooltip delayDuration={300} disableHoverableContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleFontSizeIncrement}
-                    className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                    disabled={fontSize >= 100}
-                  >
-                    <ChevronUp className="h-2.5 w-2.5 text-muted-foreground" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Aumentar tamanho</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip delayDuration={300} disableHoverableContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleFontSizeDecrement}
-                    className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
-                    disabled={fontSize <= 1}
-                  >
-                    <ChevronDown className="h-2.5 w-2.5 text-muted-foreground" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Diminuir tamanho</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <span className="text-xs text-muted-foreground font-medium">pt</span>
-          </div>
-        </div>
-
-        <Separator orientation="vertical" className="h-6 mx-1" />
-
-        {/* Text Formatting */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("bold")}
-              className="h-8 w-8 p-0"
-            >
-              <Bold className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Negrito (Ctrl+B)</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("italic")}
-              className="h-8 w-8 p-0"
-            >
-              <Italic className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Itálico (Ctrl+I)</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("underline")}
-              className="h-8 w-8 p-0"
-            >
-              <Underline className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Sublinhado (Ctrl+U)</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Separator orientation="vertical" className="h-6 mx-1" />
-
-        {/* Alignment */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("justifyLeft")}
-              className="h-8 w-8 p-0"
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Alinhar à esquerda</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("justifyCenter")}
-              className="h-8 w-8 p-0"
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Centralizar</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("justifyRight")}
-              className="h-8 w-8 p-0"
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Alinhar à direita</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onFormat("justifyFull")}
-              className="h-8 w-8 p-0"
-            >
-              <AlignJustify className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Justificar</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Separator orientation="vertical" className="h-6 mx-1" />
-
-        {/* Undo/Redo */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onUndo ? onUndo() : onFormat("undo")}
-              disabled={!canUndo}
-              className="h-8 w-8 p-0"
-            >
-              <Undo className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Desfazer (Ctrl+Z)</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onRedo ? onRedo() : onFormat("redo")}
-              disabled={!canRedo}
-              className="h-8 w-8 p-0"
-            >
-              <Redo className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Refazer (Ctrl+Y)</p>
-          </TooltipContent>
-        </Tooltip>
-        </div>
-
-        {/* Right side: Status and Arc */}
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Status */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground font-medium">Status do capítulo:</span>
-            <Select value={status} onValueChange={(value: ChapterStatus) => onStatusChange(value)}>
-              <SelectTrigger className={cn("w-auto min-w-[140px] h-8 text-sm border", STATUS_COLORS[status])}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="in-progress">Em Andamento</SelectItem>
-                <SelectItem value="draft">Rascunho</SelectItem>
-                <SelectItem value="review">Em Revisão</SelectItem>
-                <SelectItem value="finished">Finalizado</SelectItem>
-                <SelectItem value="published">Publicado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Arc */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground font-medium">Arco:</span>
-            <button
-              onClick={() => setIsArcModalOpen(true)}
-              className={cn(
-                "h-8 px-3 rounded-md border text-sm font-medium cursor-pointer",
-                "hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200",
-                selectedArc
-                  ? cn(getStatusButtonColor(selectedArc.status), "border")
-                  : "border-border bg-background"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                {selectedArc ? (
-                  <>
-                    {React.createElement(getStatusIcon(selectedArc.status), {
-                      className: cn("w-4 h-4", getStatusIconColor(selectedArc.status)),
-                    })}
-                    <span>{selectedArc.name}</span>
-                  </>
-                ) : (
-                  <span className="text-muted-foreground">{t("arc.no_arc")}</span>
-                )}
+              <div className="flex items-center gap-1.5">
+                <Type className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <Input
+                  type="text"
+                  value={fontSizeInput}
+                  onChange={(e) => handleFontSizeInputChange(e.target.value)}
+                  className="h-7 w-11 border-0 bg-transparent px-1 text-xs font-mono font-semibold text-center focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+                <div className="flex flex-col gap-0.5">
+                  <Tooltip delayDuration={300} disableHoverableContent>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleFontSizeIncrement}
+                        className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                        disabled={fontSize >= 100}
+                      >
+                        <ChevronUp className="h-2.5 w-2.5 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Aumentar tamanho</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip delayDuration={300} disableHoverableContent>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleFontSizeDecrement}
+                        className="h-3 w-4 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                        disabled={fontSize <= 1}
+                      >
+                        <ChevronDown className="h-2.5 w-2.5 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Diminuir tamanho</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">
+                  pt
+                </span>
               </div>
-            </button>
+            </div>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Text Formatting */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("bold")}
+                  className="h-8 w-8 p-0"
+                >
+                  <Bold className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Negrito (Ctrl+B)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("italic")}
+                  className="h-8 w-8 p-0"
+                >
+                  <Italic className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Itálico (Ctrl+I)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("underline")}
+                  className="h-8 w-8 p-0"
+                >
+                  <Underline className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Sublinhado (Ctrl+U)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Alignment */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("justifyLeft")}
+                  className="h-8 w-8 p-0"
+                >
+                  <AlignLeft className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Alinhar à esquerda</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("justifyCenter")}
+                  className="h-8 w-8 p-0"
+                >
+                  <AlignCenter className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Centralizar</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("justifyRight")}
+                  className="h-8 w-8 p-0"
+                >
+                  <AlignRight className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Alinhar à direita</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onFormat("justifyFull")}
+                  className="h-8 w-8 p-0"
+                >
+                  <AlignJustify className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Justificar</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Undo/Redo */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => (onUndo ? onUndo() : onFormat("undo"))}
+                  disabled={!canUndo}
+                  className="h-8 w-8 p-0"
+                >
+                  <Undo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Desfazer (Ctrl+Z)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => (onRedo ? onRedo() : onFormat("redo"))}
+                  disabled={!canRedo}
+                  className="h-8 w-8 p-0"
+                >
+                  <Redo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Refazer (Ctrl+Y)</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
-        </div>
+
+          {/* Right side: Status and Arc */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Status */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground font-medium">
+                Status do capítulo:
+              </span>
+              <Select
+                value={status}
+                onValueChange={(value: ChapterStatus) => onStatusChange(value)}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "w-auto min-w-[140px] h-8 text-sm border",
+                    STATUS_COLORS[status]
+                  )}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="in-progress">Em Andamento</SelectItem>
+                  <SelectItem value="draft">Rascunho</SelectItem>
+                  <SelectItem value="review">Em Revisão</SelectItem>
+                  <SelectItem value="finished">Finalizado</SelectItem>
+                  <SelectItem value="published">Publicado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Arc */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground font-medium">
+                Arco:
+              </span>
+              <button
+                onClick={() => setIsArcModalOpen(true)}
+                className={cn(
+                  "h-8 px-3 rounded-md border text-sm font-medium cursor-pointer",
+                  "hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200",
+                  selectedArc
+                    ? cn(getStatusButtonColor(selectedArc.status), "border")
+                    : "border-border bg-background"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {selectedArc ? (
+                    <>
+                      {React.createElement(getStatusIcon(selectedArc.status), {
+                        className: cn(
+                          "w-4 h-4",
+                          getStatusIconColor(selectedArc.status)
+                        ),
+                      })}
+                      <span>{selectedArc.name}</span>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      {t("arc.no_arc")}
+                    </span>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -530,7 +577,10 @@ export function FormattingToolbar({
                       "w-full text-left p-4 rounded-lg border-2 transition-colors duration-200",
                       "hover:bg-white/5 dark:hover:bg-white/10",
                       isSelected
-                        ? cn(getStatusButtonColor(arc.status), getStatusActiveRing(arc.status))
+                        ? cn(
+                            getStatusButtonColor(arc.status),
+                            getStatusActiveRing(arc.status)
+                          )
                         : "border-border bg-card"
                     )}
                   >
@@ -543,9 +593,12 @@ export function FormattingToolbar({
                             ? cn(
                                 "border-current",
                                 getStatusIconColor(arc.status),
-                                arc.status === "atual" && "bg-blue-600 dark:bg-blue-400",
-                                arc.status === "planejamento" && "bg-amber-600 dark:bg-amber-400",
-                                arc.status === "finalizado" && "bg-emerald-600 dark:bg-emerald-400"
+                                arc.status === "atual" &&
+                                  "bg-blue-600 dark:bg-blue-400",
+                                arc.status === "planejamento" &&
+                                  "bg-amber-600 dark:bg-amber-400",
+                                arc.status === "finalizado" &&
+                                  "bg-emerald-600 dark:bg-emerald-400"
                               )
                             : "border-muted-foreground/30"
                         )}
@@ -560,7 +613,10 @@ export function FormattingToolbar({
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
                             {React.createElement(getStatusIcon(arc.status), {
-                              className: cn("w-4 h-4 shrink-0", getStatusIconColor(arc.status)),
+                              className: cn(
+                                "w-4 h-4 shrink-0",
+                                getStatusIconColor(arc.status)
+                              ),
                             })}
                             <h4 className="font-semibold text-sm truncate">
                               {arc.name}

@@ -6,15 +6,11 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
-import { getCharactersByBookId } from "@/lib/db/characters.service";
-import { getRegionsByBookId } from "@/lib/db/regions.service";
-import { getItemsByBookId } from "@/lib/db/items.service";
-import { getFactionsByBookId } from "@/lib/db/factions.service";
-import { getRacesByBookId } from "@/lib/db/races.service";
-
-import { FormEntityMultiSelectAuto, type EntityOption } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
+import {
+  FormEntityMultiSelectAuto,
+  type EntityOption,
+} from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormPlotArcButton } from "@/components/forms/FormPlotArcButton";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormTextarea } from "@/components/forms/FormTextarea";
@@ -35,6 +31,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { getCharactersByBookId } from "@/lib/db/characters.service";
+import { getFactionsByBookId } from "@/lib/db/factions.service";
+import { getItemsByBookId } from "@/lib/db/items.service";
+import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+import { getRacesByBookId } from "@/lib/db/races.service";
+import { getRegionsByBookId } from "@/lib/db/regions.service";
 import type { IPlotArc } from "@/types/plot-types";
 
 export type ChapterStatus =
@@ -80,7 +82,11 @@ const entityMentionSchema = z.object({
 const chapterFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
   chapterNumber: z.string().min(1, "Numeração é obrigatória"),
-  summary: z.string().max(500, "Resumo muito longo").optional().or(z.literal("")),
+  summary: z
+    .string()
+    .max(500, "Resumo muito longo")
+    .optional()
+    .or(z.literal("")),
   status: z.enum(["in-progress", "draft", "review", "finished", "published"]),
   plotArcId: z.string().optional().or(z.literal("")),
   mentionedCharacters: z.array(entityMentionSchema).optional(),
@@ -167,10 +173,14 @@ export function CreateChapterModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
-  const [availableCharacters, setAvailableCharacters] = useState<EntityOption[]>([]);
+  const [availableCharacters, setAvailableCharacters] = useState<
+    EntityOption[]
+  >([]);
   const [availableRegions, setAvailableRegions] = useState<EntityOption[]>([]);
   const [availableItems, setAvailableItems] = useState<EntityOption[]>([]);
-  const [availableFactions, setAvailableFactions] = useState<EntityOption[]>([]);
+  const [availableFactions, setAvailableFactions] = useState<EntityOption[]>(
+    []
+  );
   const [availableRaces, setAvailableRaces] = useState<EntityOption[]>([]);
 
   // Load arcs and entities when modal opens
@@ -181,24 +191,25 @@ export function CreateChapterModal({
       // Load all entities
       const loadEntities = async () => {
         try {
-          const [arcs, characters, regions, items, factions, races] = await Promise.all([
-            getPlotArcsByBookId(bookId),
-            getCharactersByBookId(bookId).then(data =>
-              data.map(c => ({ id: c.id, name: c.name, image: c.image }))
-            ),
-            getRegionsByBookId(bookId).then(data =>
-              data.map(r => ({ id: r.id, name: r.name, image: r.image }))
-            ),
-            getItemsByBookId(bookId).then(data =>
-              data.map(i => ({ id: i.id, name: i.name, image: i.image }))
-            ),
-            getFactionsByBookId(bookId).then(data =>
-              data.map(f => ({ id: f.id, name: f.name, image: f.image }))
-            ),
-            getRacesByBookId(bookId).then(data =>
-              data.map(r => ({ id: r.id, name: r.name, image: r.image }))
-            ),
-          ]);
+          const [arcs, characters, regions, items, factions, races] =
+            await Promise.all([
+              getPlotArcsByBookId(bookId),
+              getCharactersByBookId(bookId).then((data) =>
+                data.map((c) => ({ id: c.id, name: c.name, image: c.image }))
+              ),
+              getRegionsByBookId(bookId).then((data) =>
+                data.map((r) => ({ id: r.id, name: r.name, image: r.image }))
+              ),
+              getItemsByBookId(bookId).then((data) =>
+                data.map((i) => ({ id: i.id, name: i.name, image: i.image }))
+              ),
+              getFactionsByBookId(bookId).then((data) =>
+                data.map((f) => ({ id: f.id, name: f.name, image: f.image }))
+              ),
+              getRacesByBookId(bookId).then((data) =>
+                data.map((r) => ({ id: r.id, name: r.name, image: r.image }))
+              ),
+            ]);
 
           setAvailableArcs(arcs);
           setAvailableCharacters(characters);
@@ -216,17 +227,18 @@ export function CreateChapterModal({
   }, [open, bookId]);
 
   // Helper function to convert IDs to EntityMention[]
-  const idsToEntities = (ids: string[], availableEntities: EntityOption[]): EntityMention[] => {
-    return ids.map(id => {
-      const entity = availableEntities.find(e => e.id === id);
+  const idsToEntities = (
+    ids: string[],
+    availableEntities: EntityOption[]
+  ): EntityMention[] =>
+    ids.map((id) => {
+      const entity = availableEntities.find((e) => e.id === id);
       return entity || { id, name: id, image: undefined };
     });
-  };
 
   // Helper function to convert EntityMention[] to IDs
-  const entitiesToIds = (entities: EntityMention[]): string[] => {
-    return entities.map(e => e.id);
-  };
+  const entitiesToIds = (entities: EntityMention[]): string[] =>
+    entities.map((e) => e.id);
 
   const form = useForm<ChapterFormValues>({
     resolver: zodResolver(chapterFormSchema),
@@ -317,7 +329,9 @@ export function CreateChapterModal({
                   chapterNumber={form.watch("chapterNumber")}
                   chapterName={form.watch("name")}
                   onChapterNumberChange={(value) =>
-                    form.setValue("chapterNumber", value, { shouldValidate: true })
+                    form.setValue("chapterNumber", value, {
+                      shouldValidate: true,
+                    })
                   }
                   onChapterNameChange={(value) =>
                     form.setValue("name", value, { shouldValidate: true })
@@ -422,7 +436,11 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_characters_selected")}
                           searchPlaceholder={t("modal.search_character")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) => field.onChange(idsToEntities(ids, availableCharacters))}
+                          onChange={(ids) =>
+                            field.onChange(
+                              idsToEntities(ids, availableCharacters)
+                            )
+                          }
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -447,7 +465,9 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_regions_selected")}
                           searchPlaceholder={t("modal.search_region")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) => field.onChange(idsToEntities(ids, availableRegions))}
+                          onChange={(ids) =>
+                            field.onChange(idsToEntities(ids, availableRegions))
+                          }
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -472,7 +492,9 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_items_selected")}
                           searchPlaceholder={t("modal.search_item")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) => field.onChange(idsToEntities(ids, availableItems))}
+                          onChange={(ids) =>
+                            field.onChange(idsToEntities(ids, availableItems))
+                          }
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -492,12 +514,18 @@ export function CreateChapterModal({
                           entityType="faction"
                           bookId={bookId}
                           label={t("modal.mentioned_factions_label")}
-                          placeholder={t("modal.mentioned_factions_placeholder")}
+                          placeholder={t(
+                            "modal.mentioned_factions_placeholder"
+                          )}
                           emptyText={t("modal.no_factions_available")}
                           noSelectionText={t("modal.no_factions_selected")}
                           searchPlaceholder={t("modal.search_faction")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) => field.onChange(idsToEntities(ids, availableFactions))}
+                          onChange={(ids) =>
+                            field.onChange(
+                              idsToEntities(ids, availableFactions)
+                            )
+                          }
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -522,7 +550,9 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_races_selected")}
                           searchPlaceholder={t("modal.search_race")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) => field.onChange(idsToEntities(ids, availableRaces))}
+                          onChange={(ids) =>
+                            field.onChange(idsToEntities(ids, availableRaces))
+                          }
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>

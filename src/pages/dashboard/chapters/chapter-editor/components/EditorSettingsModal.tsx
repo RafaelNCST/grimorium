@@ -20,12 +20,13 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 
+import { CURSOR_COLORS } from "../types/editor-settings";
+
 import type {
   EditorSettings,
   AutoScrollMode,
   CursorColor,
 } from "../types/editor-settings";
-import { CURSOR_COLORS } from "../types/editor-settings";
 
 interface EditorSettingsModalProps {
   open: boolean;
@@ -57,7 +58,8 @@ export function EditorSettingsModal({
               <DialogTitle>Configurações do Editor</DialogTitle>
             </div>
             <DialogDescription>
-              Personalize sua experiência de escrita para maior conforto em longas sessões
+              Personalize sua experiência de escrita para maior conforto em
+              longas sessões
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -76,7 +78,7 @@ export function EditorSettingsModal({
               <Select
                 value={settings.autoScrollMode}
                 onValueChange={(value: AutoScrollMode) =>
-                  updateSetting('autoScrollMode', value)
+                  updateSetting("autoScrollMode", value)
                 }
               >
                 <SelectTrigger>
@@ -93,7 +95,9 @@ export function EditorSettingsModal({
             {/* Visual Toggles */}
             <div className="space-y-4">
               <div>
-                <Label className="text-base font-semibold">Elementos Visuais</Label>
+                <Label className="text-base font-semibold">
+                  Elementos Visuais
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   Desative elementos que possam distrair durante a escrita
                 </p>
@@ -110,7 +114,7 @@ export function EditorSettingsModal({
                 <Switch
                   checked={settings.showAnnotationHighlights}
                   onCheckedChange={(checked) =>
-                    updateSetting('showAnnotationHighlights', checked)
+                    updateSetting("showAnnotationHighlights", checked)
                   }
                 />
               </div>
@@ -125,7 +129,9 @@ export function EditorSettingsModal({
                 </div>
                 <Switch
                   checked={settings.enableSpellCheck}
-                  onCheckedChange={(checked) => updateSetting('enableSpellCheck', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("enableSpellCheck", checked)
+                  }
                 />
               </div>
             </div>
@@ -146,11 +152,13 @@ export function EditorSettingsModal({
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label>Altura da Linha</Label>
-                <span className="text-sm text-muted-foreground">{settings.lineHeight}</span>
+                <span className="text-sm text-muted-foreground">
+                  {settings.lineHeight}
+                </span>
               </div>
               <Slider
                 value={[settings.lineHeight]}
-                onValueChange={([value]) => updateSetting('lineHeight', value)}
+                onValueChange={([value]) => updateSetting("lineHeight", value)}
                 min={1.0}
                 max={2.5}
                 step={0.1}
@@ -184,7 +192,9 @@ export function EditorSettingsModal({
                 </div>
                 <Switch
                   checked={settings.sepiaMode}
-                  onCheckedChange={(checked) => updateSetting('sepiaMode', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("sepiaMode", checked)
+                  }
                 />
               </div>
             </div>
@@ -205,36 +215,36 @@ export function EditorSettingsModal({
 
                   // Labels amigáveis
                   const labels: Record<CursorColor, string> = {
-                    default: 'Padrão',
-                    primary: 'Primária',
-                    blue: 'Azul',
-                    green: 'Verde',
-                    purple: 'Roxo',
-                    orange: 'Laranja',
+                    default: "Padrão",
+                    primary: "Primária",
+                    blue: "Azul",
+                    green: "Verde",
+                    purple: "Roxo",
+                    orange: "Laranja",
                   };
 
                   return (
                     <button
                       key={key}
-                      onClick={() => updateSetting('cursorColor', colorKey)}
+                      onClick={() => updateSetting("cursorColor", colorKey)}
                       className={`
                         flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all
                         ${
                           isSelected
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50 hover:bg-muted/50"
                         }
                       `}
                     >
                       <div
                         className="w-5 h-5 rounded border border-border flex-shrink-0"
                         style={{
-                          background: color.startsWith('hsl')
-                            ? color
-                            : color,
+                          background: color.startsWith("hsl") ? color : color,
                         }}
                       />
-                      <span className="text-sm font-medium">{labels[colorKey]}</span>
+                      <span className="text-sm font-medium">
+                        {labels[colorKey]}
+                      </span>
                     </button>
                   );
                 })}

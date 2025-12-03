@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
+
 import {
   X,
   ChevronUp,
@@ -9,25 +10,26 @@ import {
   Globe,
   MessageSquare,
   BookText,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
 
-import { DialogueFormatSettings } from './DialogueFormatSettings';
-import type { SearchOptions } from '../types/search-types';
+import { DialogueFormatSettings } from "./DialogueFormatSettings";
+
+import type { SearchOptions } from "../types/search-types";
 
 interface SearchBarProps {
   searchTerm: string;
@@ -42,8 +44,8 @@ interface SearchBarProps {
   onClose: () => void;
   onToggleCaseSensitive: () => void;
   onToggleWholeWord: () => void;
-  onSearchModeChange: (mode: SearchOptions['mode']) => void;
-  onDialogueFormatsChange: (formats: SearchOptions['dialogueFormats']) => void;
+  onSearchModeChange: (mode: SearchOptions["mode"]) => void;
+  onDialogueFormatsChange: (formats: SearchOptions["dialogueFormats"]) => void;
   onReplaceCurrent: () => void;
   onReplaceAll: () => void;
 }
@@ -91,7 +93,7 @@ export function SearchBar({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Enter - next result
-      if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         if (document.activeElement === searchInputRef.current) {
           e.preventDefault();
           onNext();
@@ -99,33 +101,33 @@ export function SearchBar({
       }
 
       // Shift+Enter - previous result
-      if (e.key === 'Enter' && e.shiftKey) {
+      if (e.key === "Enter" && e.shiftKey) {
         e.preventDefault();
         onPrevious();
       }
 
       // Escape - close
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         onClose();
       }
 
       // Ctrl+H / Cmd+H - toggle replace
-      if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "h") {
         e.preventDefault();
         setShowReplace((prev) => !prev);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onNext, onPrevious, onClose]);
 
   const getModeIcon = () => {
     switch (searchOptions.mode) {
-      case 'dialogues':
+      case "dialogues":
         return MessageSquare;
-      case 'narration':
+      case "narration":
         return BookText;
       default:
         return Globe;
@@ -134,12 +136,12 @@ export function SearchBar({
 
   const getModeLabel = () => {
     switch (searchOptions.mode) {
-      case 'dialogues':
-        return 'Diálogos';
-      case 'narration':
-        return 'Narração';
+      case "dialogues":
+        return "Diálogos";
+      case "narration":
+        return "Narração";
       default:
-        return 'Tudo';
+        return "Tudo";
     }
   };
 
@@ -215,8 +217,8 @@ export function SearchBar({
                       data-active={searchOptions.caseSensitive}
                       className={`h-8 w-8 font-mono text-xs ${
                         searchOptions.caseSensitive
-                          ? 'bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary'
-                          : ''
+                          ? "bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary"
+                          : ""
                       }`}
                     >
                       Aa
@@ -236,8 +238,8 @@ export function SearchBar({
                       data-active={searchOptions.wholeWord}
                       className={`h-8 w-8 font-mono text-xs ${
                         searchOptions.wholeWord
-                          ? 'bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary'
-                          : ''
+                          ? "bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary"
+                          : ""
                       }`}
                     >
                       |w|
@@ -256,11 +258,11 @@ export function SearchBar({
                         <Button
                           size="icon"
                           variant="ghost"
-                          data-active={searchOptions.mode !== 'all'}
+                          data-active={searchOptions.mode !== "all"}
                           className={`h-8 w-8 ${
-                            searchOptions.mode !== 'all'
-                              ? 'bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary'
-                              : ''
+                            searchOptions.mode !== "all"
+                              ? "bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary"
+                              : ""
                           }`}
                         >
                           {(() => {
@@ -275,18 +277,18 @@ export function SearchBar({
                     </TooltipContent>
                   </Tooltip>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onSearchModeChange('all')}>
+                    <DropdownMenuItem onClick={() => onSearchModeChange("all")}>
                       <Globe className="mr-2 h-4 w-4" />
                       Tudo
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => onSearchModeChange('dialogues')}
+                      onClick={() => onSearchModeChange("dialogues")}
                     >
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Apenas diálogos
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => onSearchModeChange('narration')}
+                      onClick={() => onSearchModeChange("narration")}
                     >
                       <BookText className="mr-2 h-4 w-4" />
                       Apenas narração
@@ -295,7 +297,7 @@ export function SearchBar({
                 </DropdownMenu>
 
                 {/* Format Settings (only show in dialogue mode) */}
-                {searchOptions.mode === 'dialogues' && (
+                {searchOptions.mode === "dialogues" && (
                   <Tooltip delayDuration={300}>
                     <TooltipTrigger asChild>
                       <Button
@@ -323,8 +325,8 @@ export function SearchBar({
                       data-active={showReplace}
                       className={`h-8 w-8 ${
                         showReplace
-                          ? 'bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary'
-                          : ''
+                          ? "bg-primary/10 border-2 border-primary text-primary data-[active=true]:hover:bg-primary/10 data-[active=true]:hover:border-primary data-[active=true]:hover:text-primary"
+                          : ""
                       }`}
                     >
                       <Replace className="h-4 w-4" />

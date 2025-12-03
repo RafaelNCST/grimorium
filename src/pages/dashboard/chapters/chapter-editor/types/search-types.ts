@@ -4,7 +4,7 @@ export interface DialogueFormats {
   emDash: boolean;
 }
 
-export type SearchMode = 'all' | 'dialogues' | 'narration';
+export type SearchMode = "all" | "dialogues" | "narration";
 
 export interface SearchOptions {
   caseSensitive: boolean;
@@ -23,5 +23,5 @@ export interface SearchResult {
 export interface DialogueRange {
   start: number;
   end: number;
-  type: 'doubleQuotes' | 'singleQuotes' | 'emDash';
+  type: "doubleQuotes" | "singleQuotes" | "emDash";
 }

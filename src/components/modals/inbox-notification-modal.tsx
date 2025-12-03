@@ -278,10 +278,7 @@ export function InboxNotificationModal({
       </div>
 
       {/* Diálogo de Confirmação */}
-      <AlertDialog
-        open={showConfirmDialog}
-        onOpenChange={setShowConfirmDialog}
-      >
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("confirm.delete_all_title")}</AlertDialogTitle>

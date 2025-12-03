@@ -3,7 +3,12 @@ import { persist } from "zustand/middleware";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
 
-export type ChapterStatus = "draft" | "in-progress" | "review" | "finished" | "published";
+export type ChapterStatus =
+  | "draft"
+  | "in-progress"
+  | "review"
+  | "finished"
+  | "published";
 
 export interface Annotation {
   id: string;
@@ -72,7 +77,11 @@ export const useChaptersStore = create<ChaptersState>()(
           chapters: {
             ...state.chapters,
             [id]: state.chapters[id]
-              ? { ...state.chapters[id], ...updates, lastEdited: new Date().toISOString() }
+              ? {
+                  ...state.chapters[id],
+                  ...updates,
+                  lastEdited: new Date().toISOString(),
+                }
               : state.chapters[id],
           },
         })),

@@ -3,7 +3,10 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { FormEntityMultiSelectAuto, type EntityOption } from "@/components/forms/FormEntityMultiSelectAuto";
+import {
+  FormEntityMultiSelectAuto,
+  type EntityOption,
+} from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,17 +50,18 @@ export function SummarySection({
   const [isOpen, setIsOpen] = useState(false);
 
   // Helper to convert EntityMention[] to IDs
-  const entitiesToIds = (entities: EntityMention[]): string[] => {
-    return entities.map((e) => e.id);
-  };
+  const entitiesToIds = (entities: EntityMention[]): string[] =>
+    entities.map((e) => e.id);
 
   // Helper to convert IDs to EntityMention[]
-  const idsToEntities = (ids: string[], availableEntities: EntityOption[]): EntityMention[] => {
-    return ids.map((id) => {
+  const idsToEntities = (
+    ids: string[],
+    availableEntities: EntityOption[]
+  ): EntityMention[] =>
+    ids.map((id) => {
       const entity = availableEntities.find((e) => e.id === id);
       return entity || { id, name: id, image: undefined };
     });
-  };
 
   return (
     <Card className="border-2 border-primary/20">
@@ -65,8 +69,14 @@ export function SummarySection({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full p-4 flex items-center justify-between cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 rounded-t-lg"
       >
-        <h2 className="text-lg font-semibold">{t("collapsible.summary_title")}</h2>
-        {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        <h2 className="text-lg font-semibold">
+          {t("collapsible.summary_title")}
+        </h2>
+        {isOpen ? (
+          <ChevronUp className="w-5 h-5" />
+        ) : (
+          <ChevronDown className="w-5 h-5" />
+        )}
       </div>
 
       <div

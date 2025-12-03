@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   Shield,
   Trash2,
@@ -10,7 +11,6 @@ import {
   StickyNote,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "@tanstack/react-router";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {

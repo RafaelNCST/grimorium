@@ -368,7 +368,9 @@ export function CreateNoteModal({
               onChange={handleContentChange}
               placeholder={t("create_modal.content_placeholder")}
               onManageLinks={
-                showManageLinks ? () => setShowManageLinksModal(true) : undefined
+                showManageLinks
+                  ? () => setShowManageLinksModal(true)
+                  : undefined
               }
             />
           </div>
@@ -391,7 +393,10 @@ export function CreateNoteModal({
       </Dialog>
 
       {/* Manage Links Modal */}
-      <Dialog open={showManageLinksModal} onOpenChange={setShowManageLinksModal}>
+      <Dialog
+        open={showManageLinksModal}
+        onOpenChange={setShowManageLinksModal}
+      >
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>{t("create_modal.manage_links")}</DialogTitle>
