@@ -358,6 +358,22 @@ export function ChapterEditorNew() {
 
   // Format text command
   const handleFormat = (command: string, value?: string) => {
+    // Mark formatting changes as immediate undo points
+    // These commands change text appearance and should create separate undo points
+    const formattingCommands = [
+      "bold",
+      "italic",
+      "underline",
+      "justifyLeft",
+      "justifyCenter",
+      "justifyRight",
+      "justifyFull",
+    ];
+
+    if (formattingCommands.includes(command)) {
+      textEditorRef.current?.markNextAsImmediate();
+    }
+
     document.execCommand(command, false, value);
   };
 

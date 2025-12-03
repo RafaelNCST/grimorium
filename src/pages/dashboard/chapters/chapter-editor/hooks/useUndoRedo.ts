@@ -38,13 +38,13 @@ export function useUndoRedo(
 
   // Add new state to history
   const pushState = useCallback(
-    (content: string, cursorPosition: number) => {
+    (content: string, cursorPosition: number, immediate: boolean = false) => {
       // Clear debounce timer
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
 
-      debounceTimerRef.current = setTimeout(() => {
+      const addToHistory = () => {
         setHistory((prev) => {
           const currentIdx = currentIndexRef.current;
 
@@ -78,7 +78,15 @@ export function useUndoRedo(
           }
           return prev + 1;
         });
-      }, debounceMs);
+      };
+
+      // If immediate, add to history right away (for Enter, paste, formatting changes)
+      if (immediate) {
+        addToHistory();
+      } else {
+        // Otherwise, debounce (for continuous typing)
+        debounceTimerRef.current = setTimeout(addToHistory, debounceMs);
+      }
     },
     [maxHistorySize, debounceMs]
   );

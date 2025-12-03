@@ -23,6 +23,7 @@ export interface TextEditorRef {
   redo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  markNextAsImmediate: () => void; // Mark next save as immediate (for formatting changes)
 }
 
 interface TextEditorProps {
@@ -79,12 +80,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const [isUndoRedoAction, setIsUndoRedoAction] = useState(false);
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
+    const isImmediateActionRef = useRef(false); // Track if next save should be immediate
 
     // Undo/Redo functionality
     // Initialize with empty state (will be populated on first edit)
     const undoRedo = useUndoRedo("", {
       maxHistorySize: 100,
-      debounceMs: 300,
+      debounceMs: 500, // 500ms debounce for continuous typing
     });
 
     // Search functionality
@@ -99,11 +101,32 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       redo: handleRedo,
       canUndo: undoRedo.canUndo,
       canRedo: undoRedo.canRedo,
+      markNextAsImmediate: () => {
+        isImmediateActionRef.current = true;
+      },
     }));
 
     // Handle keyboard shortcuts
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
+        // Ctrl+B / Cmd+B for bold (mark as immediate)
+        if ((e.ctrlKey || e.metaKey) && e.key === "b") {
+          isImmediateActionRef.current = true;
+          // Let browser handle the bold command
+        }
+
+        // Ctrl+I / Cmd+I for italic (mark as immediate)
+        if ((e.ctrlKey || e.metaKey) && e.key === "i") {
+          isImmediateActionRef.current = true;
+          // Let browser handle the italic command
+        }
+
+        // Ctrl+U / Cmd+U for underline (mark as immediate)
+        if ((e.ctrlKey || e.metaKey) && e.key === "u") {
+          isImmediateActionRef.current = true;
+          // Let browser handle the underline command
+        }
+
         // Ctrl+F / Cmd+F to open search
         if ((e.ctrlKey || e.metaKey) && e.key === "f") {
           e.preventDefault();
@@ -801,7 +824,13 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         // Save HTML with formatting, not just plain text
         if (!isUndoRedoAction) {
           const cursorPos = getCurrentCursorPosition();
-          undoRedo.pushState(contentForHistory, cursorPos);
+          const immediate = isImmediateActionRef.current;
+          undoRedo.pushState(contentForHistory, cursorPos, immediate);
+
+          // Reset immediate flag after use
+          if (immediate) {
+            isImmediateActionRef.current = false;
+          }
         }
 
         // Auto-scroll based on settings - need to wait for DOM to update
@@ -833,6 +862,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     };
 
     const handlePaste = () => {
+      // Mark as immediate action (paste should create undo point)
+      isImmediateActionRef.current = true;
+
       // Use setTimeout to wait for paste content to be inserted
       setTimeout(() => {
         if (editorRef.current) {
@@ -852,6 +884,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         e.preventDefault();
 
         if (!editorRef.current) return;
+
+        // Mark as immediate action (Enter creates new undo point)
+        isImmediateActionRef.current = true;
 
         // Use the browser's native insertLineBreak command
         document.execCommand("insertLineBreak");
@@ -1018,15 +1053,24 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     };
 
     const handleBold = () => {
+      // Mark as immediate action (formatting change creates undo point)
+      isImmediateActionRef.current = true;
       document.execCommand("bold", false);
+      handleInput();
     };
 
     const handleItalic = () => {
+      // Mark as immediate action (formatting change creates undo point)
+      isImmediateActionRef.current = true;
       document.execCommand("italic", false);
+      handleInput();
     };
 
     const handleUnderline = () => {
+      // Mark as immediate action (formatting change creates undo point)
+      isImmediateActionRef.current = true;
       document.execCommand("underline", false);
+      handleInput();
     };
 
     // Get cursor color based on settings
