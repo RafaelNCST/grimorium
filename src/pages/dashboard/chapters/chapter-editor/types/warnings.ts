@@ -2,13 +2,13 @@
  * Sistema de Avisos do Editor de Capítulos
  *
  * Este arquivo define os tipos para o sistema de avisos/notificações
- * que alerta o usuário sobre problemas de tipografia, gramática, metas e limites.
+ * que alerta o usuário sobre problemas de tipografia, gramática e metas.
  */
 
 /**
  * Tipos de avisos disponíveis no sistema
  */
-export type WarningType = "typography" | "grammar" | "goals" | "limits";
+export type WarningType = "typography" | "grammar" | "goals";
 
 /**
  * Severidade do aviso
@@ -44,7 +44,6 @@ export const WARNING_TYPE_LABELS: Record<WarningType, string> = {
   typography: "Tipografia",
   grammar: "Gramática",
   goals: "Metas",
-  limits: "Limites",
 };
 
 /**
@@ -54,7 +53,6 @@ export const WARNING_TYPE_COLORS: Record<WarningType, string> = {
   typography: "text-blue-600 dark:text-blue-400",
   grammar: "text-yellow-600 dark:text-yellow-400",
   goals: "text-purple-600 dark:text-purple-400",
-  limits: "text-red-600 dark:text-red-400",
 };
 
 /**
@@ -64,16 +62,24 @@ export const WARNING_TYPE_ICONS: Record<WarningType, string> = {
   typography: "Type",
   grammar: "FileText",
   goals: "Target",
-  limits: "AlertTriangle",
+};
+
+/**
+ * Labels de severidade em português
+ */
+export const WARNING_SEVERITY_LABELS: Record<WarningSeverity, string> = {
+  info: "Informação",
+  warning: "Importante",
+  error: "Crítico",
 };
 
 /**
  * Cores por severidade
  */
 export const WARNING_SEVERITY_COLORS: Record<WarningSeverity, string> = {
-  info: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-  warning: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
-  error: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+  info: "text-blue-600 dark:text-blue-400 border-blue-500/30",
+  warning: "text-yellow-600 dark:text-yellow-400 border-yellow-500/30",
+  error: "text-red-600 dark:text-red-400 border-red-500/30",
 };
 
 /**

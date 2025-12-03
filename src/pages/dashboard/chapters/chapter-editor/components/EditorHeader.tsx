@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Settings,
   AlertCircle,
-  Target,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -26,7 +25,6 @@ interface EditorHeaderProps {
   title: string;
   showAllAnnotationsSidebar?: boolean;
   showWarningsSidebar?: boolean;
-  showGoalsAndLimitsModal?: boolean;
   warningsCount?: number;
   previousChapter?: { id: string; number: string; title: string };
   nextChapter?: { id: string; number: string; title: string };
@@ -36,7 +34,6 @@ interface EditorHeaderProps {
   onShowAllAnnotations: () => void;
   onShowWarnings: () => void;
   onShowSettings: () => void;
-  onShowGoalsAndLimits: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
 }
@@ -46,7 +43,6 @@ export function EditorHeader({
   title,
   showAllAnnotationsSidebar = false,
   showWarningsSidebar = false,
-  showGoalsAndLimitsModal = false,
   warningsCount = 0,
   previousChapter,
   nextChapter,
@@ -56,7 +52,6 @@ export function EditorHeader({
   onShowAllAnnotations,
   onShowWarnings,
   onShowSettings,
-  onShowGoalsAndLimits,
   onNavigateToPrevious,
   onNavigateToNext,
 }: EditorHeaderProps) {
@@ -206,21 +201,6 @@ export function EditorHeader({
               <Button
                 variant="ghost-bright"
                 size="sm"
-                onClick={onShowGoalsAndLimits}
-                className={cn(
-                  "border border-transparent transition-all duration-200",
-                  showGoalsAndLimitsModal
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
-                )}
-              >
-                <Target className="w-4 h-4 mr-2" />
-                Metas e Limites
-              </Button>
-
-              <Button
-                variant="ghost-bright"
-                size="sm"
                 onClick={onShowWarnings}
                 className={cn(
                   "border border-transparent transition-all duration-200 relative",
@@ -232,7 +212,7 @@ export function EditorHeader({
                 <AlertCircle className="w-4 h-4 mr-2" />
                 Avisos
                 {warningsCount > 0 && (
-                  <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold bg-primary text-white rounded-full min-w-[18px] text-center">
+                  <span className="ml-1.5 flex items-center justify-center min-w-[18px] min-h-[18px] px-1.5 text-[10px] font-semibold bg-primary text-white rounded-full">
                     {warningsCount > 99 ? "99+" : warningsCount}
                   </span>
                 )}

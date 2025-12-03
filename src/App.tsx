@@ -5,6 +5,7 @@ import { InboxInitializer } from "@/components/inbox-initializer";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { GlobalGoalsProvider } from "@/contexts/GlobalGoalsContext";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -20,13 +21,15 @@ declare module "@tanstack/react-router" {
 }
 
 const App = () => (
-  <TooltipProvider>
-    <InboxInitializer />
-    <Toaster />
-    <Sonner />
-    <RouterProvider router={router} />
-    <ResetDatabaseButton />
-  </TooltipProvider>
+  <GlobalGoalsProvider>
+    <TooltipProvider>
+      <InboxInitializer />
+      <Toaster />
+      <Sonner />
+      <RouterProvider router={router} />
+      <ResetDatabaseButton />
+    </TooltipProvider>
+  </GlobalGoalsProvider>
 );
 
 export default App;

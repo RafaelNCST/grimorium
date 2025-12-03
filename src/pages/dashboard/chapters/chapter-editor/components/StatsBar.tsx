@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { GlobalGoals, ChapterStatus } from "@/types/global-goals";
 
 import { ChapterMetrics } from "../types/metrics";
 
@@ -25,12 +26,16 @@ interface StatsBarProps {
   metrics: ChapterMetrics;
   isSaving?: boolean;
   onOpenDetails?: () => void;
+  globalGoals?: GlobalGoals;
+  chapterStatus?: ChapterStatus;
 }
 
 export function StatsBar({
   metrics,
   isSaving = false,
   onOpenDetails,
+  globalGoals,
+  chapterStatus,
 }: StatsBarProps) {
   const { t } = useTranslation("chapter-editor");
 
@@ -44,6 +49,60 @@ export function StatsBar({
     if (mins === 0) return `${hours}h`;
     return `${hours}h ${mins}min`;
   };
+
+  /**
+   * Calcula a cor do texto baseada na porcentagem de progresso em relação à meta
+   * Retorna uma cor com transição suave:
+   * - < 90%: cor normal (foreground)
+   * - 90-99%: amarelo
+   * - >= 100%: vermelho
+   */
+  const getGoalColor = (
+    current: number,
+    target: number,
+    enabled: boolean
+  ): string => {
+    // Se a meta não está habilitada ou não se aplica ao status, usa cor normal
+    if (
+      !enabled ||
+      !globalGoals ||
+      !chapterStatus ||
+      !globalGoals.appliesTo.includes(chapterStatus)
+    ) {
+      return "text-foreground";
+    }
+
+    const percentage = (current / target) * 100;
+
+    if (percentage >= 100) {
+      return "text-red-500 transition-colors duration-500";
+    }
+
+    if (percentage >= 90) {
+      return "text-amber-500 transition-colors duration-500";
+    }
+
+    return "text-foreground transition-colors duration-500";
+  };
+
+  // Calcula as cores para cada métrica
+  const wordColor = getGoalColor(
+    metrics.wordCount,
+    globalGoals?.words.target || 0,
+    globalGoals?.words.enabled || false
+  );
+
+  const characterColor = getGoalColor(
+    metrics.characterCount,
+    globalGoals?.characters.target || 0,
+    globalGoals?.characters.enabled || false
+  );
+
+  const sessionTimeColor = getGoalColor(
+    metrics.sessionDuration,
+    globalGoals?.sessionTime.targetMinutes || 0,
+    globalGoals?.sessionTime.enabled || false
+  );
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -80,9 +139,7 @@ export function StatsBar({
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4" />
                   <span>
-                    <strong className="text-foreground">
-                      {metrics.wordCount}
-                    </strong>{" "}
+                    <strong className={wordColor}>{metrics.wordCount}</strong>{" "}
                     palavras
                   </span>
                 </div>
@@ -98,7 +155,7 @@ export function StatsBar({
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
                   <span>
-                    <strong className="text-foreground">
+                    <strong className={characterColor}>
                       {metrics.characterCount}
                     </strong>{" "}
                     caracteres
@@ -170,7 +227,7 @@ export function StatsBar({
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   <span>
-                    <strong className="text-foreground">
+                    <strong className={sessionTimeColor}>
                       {formatSessionTime(metrics.sessionDuration)}
                     </strong>{" "}
                     de escrita

@@ -5,7 +5,6 @@
  * - Tipografia
  * - Gramática
  * - Metas
- * - Limites
  */
 
 import React, { useState } from "react";
@@ -216,17 +215,18 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
             <div className="flex items-center gap-3">
               {stats.bySeverity.error > 0 && (
                 <span className="text-red-600 dark:text-red-400">
-                  {stats.bySeverity.error} erros
+                  {stats.bySeverity.error} {stats.bySeverity.error === 1 ? "crítico" : "críticos"}
                 </span>
               )}
               {stats.bySeverity.warning > 0 && (
                 <span className="text-yellow-600 dark:text-yellow-400">
-                  {stats.bySeverity.warning} avisos
+                  {stats.bySeverity.warning} {stats.bySeverity.warning === 1 ? "importante" : "importantes"}
                 </span>
               )}
               {stats.bySeverity.info > 0 && (
                 <span className="text-blue-600 dark:text-blue-400">
-                  {stats.bySeverity.info} info
+                  {stats.bySeverity.info}{" "}
+                  {stats.bySeverity.info === 1 ? "informação" : "informações"}
                 </span>
               )}
             </div>

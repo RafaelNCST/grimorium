@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { FileText, Plus, ArrowLeft } from "lucide-react";
+import { FileText, Plus, ArrowLeft, Target } from "lucide-react";
 
 import {
   CreateChapterModal,
   type IChapterFormData,
   type EntityMention,
 } from "@/components/modals/create-chapter-modal";
+import { GlobalGoalsModal } from "@/components/modals/global-goals-modal";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useChaptersStore, type ChapterData } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -80,7 +82,10 @@ export function ChaptersPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showGoalsModal, setShowGoalsModal] = useState(false);
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
+
+  const { goals: globalGoals, updateGoals } = useGlobalGoals();
 
   // Load chapters from store
   useEffect(() => {
@@ -226,6 +231,15 @@ export function ChaptersPage() {
         <h1 className="text-xl font-semibold">Capítulos</h1>
 
         <div className="flex-1" />
+
+        <Button
+          onClick={() => setShowGoalsModal(true)}
+          variant="secondary"
+          className="gap-2"
+        >
+          <Target className="h-4 w-4" />
+          Metas
+        </Button>
 
         <Button
           onClick={() => setShowCreateModal(true)}
@@ -404,6 +418,14 @@ export function ChaptersPage() {
         existingChapters={chapters.map((ch) => ({
           chapterNumber: String(ch.number),
         }))}
+      />
+
+      {/* Global Goals Modal */}
+      <GlobalGoalsModal
+        open={showGoalsModal}
+        onOpenChange={setShowGoalsModal}
+        goals={globalGoals}
+        onSave={updateGoals}
       />
 
       {/* Delete Single Chapter Dialog */}

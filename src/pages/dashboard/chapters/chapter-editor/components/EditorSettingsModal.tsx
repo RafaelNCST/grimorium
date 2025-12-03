@@ -181,7 +181,8 @@ export function EditorSettingsModal({
                 <div className="space-y-0.5">
                   <Label>Notificações de Avisos</Label>
                   <p className="text-xs text-muted-foreground">
-                    Mostra toasts quando novos avisos aparecem
+                    Mostra notificações no canto da tela quando novos avisos
+                    aparecem
                   </p>
                 </div>
                 <Switch

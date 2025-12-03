@@ -11,7 +11,8 @@
 export interface WordGoal {
   enabled: boolean;
   target: number;
-  warnAt: number; // Percentual (ex: 90 para avisar em 90%)
+  warnAt90: boolean; // Avisar em 90%
+  warnAt100: boolean; // Avisar em 100%
 }
 
 /**
@@ -20,7 +21,8 @@ export interface WordGoal {
 export interface CharacterGoal {
   enabled: boolean;
   target: number;
-  warnAt: number; // Percentual (ex: 90 para avisar em 90%)
+  warnAt90: boolean; // Avisar em 90%
+  warnAt100: boolean; // Avisar em 100%
 }
 
 /**
@@ -29,7 +31,8 @@ export interface CharacterGoal {
 export interface WordLimit {
   enabled: boolean;
   limit: number;
-  warnAt: number; // Percentual (ex: 90 para avisar em 90%)
+  warnAt90: boolean; // Avisar em 90%
+  warnAt100: boolean; // Avisar em 100%
 }
 
 /**
@@ -38,7 +41,8 @@ export interface WordLimit {
 export interface CharacterLimit {
   enabled: boolean;
   limit: number;
-  warnAt: number; // Percentual (ex: 90 para avisar em 90%)
+  warnAt90: boolean; // Avisar em 90%
+  warnAt100: boolean; // Avisar em 100%
 }
 
 /**
@@ -47,7 +51,8 @@ export interface CharacterLimit {
 export interface SessionLimit {
   enabled: boolean;
   minutes: number; // Tempo em minutos
-  warnAt: number; // Percentual (ex: 90 para avisar em 90%)
+  warnAt90: boolean; // Avisar em 90%
+  warnAt100: boolean; // Avisar em 100%
 }
 
 /**
@@ -73,7 +78,8 @@ export interface ChapterLimits {
 export const DEFAULT_WORD_GOAL: WordGoal = {
   enabled: false,
   target: 2000,
-  warnAt: 90,
+  warnAt90: true,
+  warnAt100: true,
 };
 
 /**
@@ -82,7 +88,8 @@ export const DEFAULT_WORD_GOAL: WordGoal = {
 export const DEFAULT_CHARACTER_GOAL: CharacterGoal = {
   enabled: false,
   target: 10000,
-  warnAt: 90,
+  warnAt90: true,
+  warnAt100: true,
 };
 
 /**
@@ -91,7 +98,8 @@ export const DEFAULT_CHARACTER_GOAL: CharacterGoal = {
 export const DEFAULT_WORD_LIMIT: WordLimit = {
   enabled: false,
   limit: 5000,
-  warnAt: 90,
+  warnAt90: true,
+  warnAt100: false,
 };
 
 /**
@@ -100,7 +108,8 @@ export const DEFAULT_WORD_LIMIT: WordLimit = {
 export const DEFAULT_CHARACTER_LIMIT: CharacterLimit = {
   enabled: false,
   limit: 25000,
-  warnAt: 90,
+  warnAt90: true,
+  warnAt100: false,
 };
 
 /**
@@ -109,7 +118,8 @@ export const DEFAULT_CHARACTER_LIMIT: CharacterLimit = {
 export const DEFAULT_SESSION_LIMIT: SessionLimit = {
   enabled: false,
   minutes: 120, // 2 horas
-  warnAt: 90,
+  warnAt90: true,
+  warnAt100: false,
 };
 
 /**

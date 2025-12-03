@@ -502,6 +502,140 @@
   body[data-dialog-open] [data-radix-portal] {
     pointer-events: auto !important;
   }
+
+  /* Remove any backdrop/overlay effects from toast viewport */
+  [data-radix-toast-viewport] {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 1rem !important;
+    isolation: isolate !important; /* Create new stacking context */
+  }
+
+  /* Ensure toast items don't have any extra background/blur effects */
+  [data-radix-toast-viewport]::before,
+  [data-radix-toast-viewport]::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* Remove any background/shadow from individual toast items */
+  [data-radix-toast-viewport] > * {
+    margin-bottom: 0.5rem !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Ensure toasts have solid background to cover body radial gradients */
+  [data-radix-toast-viewport] [data-state] {
+    background: hsl(var(--background)) !important;
+    box-shadow: 0 4px 12px hsl(240 10% 3.9% / 0.4) !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Ensure no circular elements or pseudo-elements appear */
+  [data-radix-toast-viewport] *::before,
+  [data-radix-toast-viewport] *::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Remove any filters or effects from toast container elements */
+  [data-radix-toast-viewport] > *,
+  [data-radix-toast-viewport] > * > *,
+  [data-radix-toast-viewport] > * > * > * {
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* ===== SONNER TOAST STYLES ===== */
+  /* Remove circular shadows and backdrops from Sonner toasts */
+  [data-sonner-toaster],
+  [data-sonner-toast],
+  .toaster,
+  .toast {
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Remove any circular pseudo-elements from Sonner */
+  [data-sonner-toaster]::before,
+  [data-sonner-toaster]::after,
+  [data-sonner-toast]::before,
+  [data-sonner-toast]::after,
+  .toaster::before,
+  .toaster::after,
+  .toast::before,
+  .toast::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure Sonner toasts have solid background */
+  [data-sonner-toast] {
+    background: hsl(var(--background)) !important;
+  }
+
+  /* Remove any backdrop from Sonner toaster container */
+  [data-sonner-toaster] {
+    background: transparent !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Remove shadows and effects from all Sonner children */
+  [data-sonner-toaster] *,
+  [data-sonner-toast] * {
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  [data-sonner-toaster] *::before,
+  [data-sonner-toaster] *::after,
+  [data-sonner-toast] *::before,
+  [data-sonner-toast] *::after {
+    content: none !important;
+    display: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Nuclear option: remove all box-shadows from anything sonner-related */
+  [data-sonner-toaster],
+  [data-sonner-toaster] *,
+  [data-sonner-toast],
+  [data-sonner-toast] *,
+  li[data-sonner-toast],
+  li[data-sonner-toast] *,
+  ol[data-sonner-toaster],
+  ol[data-sonner-toaster] *,
+  ol[data-sonner-toaster] li {
+    box-shadow: none !important;
+    outline: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Force solid background on toast items with clean shadow */
+  li[data-sonner-toast] {
+    background: hsl(var(--background)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Remove the toaster list background and shadows */
+  ol[data-sonner-toaster] {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
 }
 
 /* CRITICAL: Force text selection - Must be outside @layer to have max precedence */

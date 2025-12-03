@@ -56,10 +56,14 @@ export function useGoalsAndLimitsMonitor({
     // Meta de Palavras
     if (goals.words?.enabled && goals.words.target > 0) {
       const percentage = (metrics.wordCount / goals.words.target) * 100;
-      const warnAt = goals.words.warnAt;
 
-      // Aviso no percentual configurado (ex: 90%)
-      if (percentage >= warnAt && percentage < 100 && !shown.wordGoal90) {
+      // Aviso em 90%
+      if (
+        goals.words.warnAt90 &&
+        percentage >= 90 &&
+        percentage < 100 &&
+        !shown.wordGoal90
+      ) {
         shown.wordGoal90 = true;
         onWarning(
           "goals",
@@ -70,7 +74,7 @@ export function useGoalsAndLimitsMonitor({
       }
 
       // Aviso ao atingir 100%
-      if (percentage >= 100 && !shown.wordGoal100) {
+      if (goals.words.warnAt100 && percentage >= 100 && !shown.wordGoal100) {
         shown.wordGoal100 = true;
         onWarning(
           "goals",
@@ -85,10 +89,14 @@ export function useGoalsAndLimitsMonitor({
     if (goals.characters?.enabled && goals.characters.target > 0) {
       const percentage =
         (metrics.characterCount / goals.characters.target) * 100;
-      const warnAt = goals.characters.warnAt;
 
-      // Aviso no percentual configurado (ex: 90%)
-      if (percentage >= warnAt && percentage < 100 && !shown.characterGoal90) {
+      // Aviso em 90%
+      if (
+        goals.characters.warnAt90 &&
+        percentage >= 90 &&
+        percentage < 100 &&
+        !shown.characterGoal90
+      ) {
         shown.characterGoal90 = true;
         onWarning(
           "goals",
@@ -99,7 +107,11 @@ export function useGoalsAndLimitsMonitor({
       }
 
       // Aviso ao atingir 100%
-      if (percentage >= 100 && !shown.characterGoal100) {
+      if (
+        goals.characters.warnAt100 &&
+        percentage >= 100 &&
+        !shown.characterGoal100
+      ) {
         shown.characterGoal100 = true;
         onWarning(
           "goals",
@@ -115,10 +127,14 @@ export function useGoalsAndLimitsMonitor({
     // Limite de Palavras
     if (limits.words?.enabled && limits.words.limit > 0) {
       const percentage = (metrics.wordCount / limits.words.limit) * 100;
-      const warnAt = limits.words.warnAt;
 
-      // Aviso no percentual configurado (ex: 90%)
-      if (percentage >= warnAt && percentage < 100 && !shown.wordLimit90) {
+      // Aviso em 90%
+      if (
+        limits.words.warnAt90 &&
+        percentage >= 90 &&
+        percentage < 100 &&
+        !shown.wordLimit90
+      ) {
         shown.wordLimit90 = true;
         onWarning(
           "limits",
@@ -129,7 +145,7 @@ export function useGoalsAndLimitsMonitor({
       }
 
       // Aviso ao ultrapassar 100%
-      if (percentage >= 100 && !shown.wordLimit100) {
+      if (limits.words.warnAt100 && percentage >= 100 && !shown.wordLimit100) {
         shown.wordLimit100 = true;
         onWarning(
           "limits",
@@ -144,11 +160,11 @@ export function useGoalsAndLimitsMonitor({
     if (limits.characters?.enabled && limits.characters.limit > 0) {
       const percentage =
         (metrics.characterCount / limits.characters.limit) * 100;
-      const warnAt = limits.characters.warnAt;
 
-      // Aviso no percentual configurado (ex: 90%)
+      // Aviso em 90%
       if (
-        percentage >= warnAt &&
+        limits.characters.warnAt90 &&
+        percentage >= 90 &&
         percentage < 100 &&
         !shown.characterLimit90
       ) {
@@ -162,7 +178,11 @@ export function useGoalsAndLimitsMonitor({
       }
 
       // Aviso ao ultrapassar 100%
-      if (percentage >= 100 && !shown.characterLimit100) {
+      if (
+        limits.characters.warnAt100 &&
+        percentage >= 100 &&
+        !shown.characterLimit100
+      ) {
         shown.characterLimit100 = true;
         onWarning(
           "limits",
@@ -177,10 +197,14 @@ export function useGoalsAndLimitsMonitor({
     if (limits.session?.enabled && limits.session.minutes > 0) {
       const percentage =
         (metrics.sessionDuration / limits.session.minutes) * 100;
-      const warnAt = limits.session.warnAt;
 
-      // Aviso no percentual configurado (ex: 90%)
-      if (percentage >= warnAt && percentage < 100 && !shown.sessionLimit90) {
+      // Aviso em 90%
+      if (
+        limits.session.warnAt90 &&
+        percentage >= 90 &&
+        percentage < 100 &&
+        !shown.sessionLimit90
+      ) {
         shown.sessionLimit90 = true;
         const remainingMinutes = Math.ceil(
           limits.session.minutes - metrics.sessionDuration
@@ -194,7 +218,11 @@ export function useGoalsAndLimitsMonitor({
       }
 
       // Aviso ao ultrapassar 100%
-      if (percentage >= 100 && !shown.sessionLimit100) {
+      if (
+        limits.session.warnAt100 &&
+        percentage >= 100 &&
+        !shown.sessionLimit100
+      ) {
         shown.sessionLimit100 = true;
         onWarning(
           "limits",

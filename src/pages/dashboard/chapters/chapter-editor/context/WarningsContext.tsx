@@ -5,6 +5,7 @@
  * - Adição, remoção e dismissal de avisos
  * - Notificações via toast
  * - Estatísticas de avisos
+ * - Persistência em localStorage
  */
 
 import React, {
@@ -14,6 +15,7 @@ import React, {
   useCallback,
   useMemo,
   ReactNode,
+  useEffect,
 } from "react";
 import { toast } from "sonner";
 import {
@@ -24,6 +26,8 @@ import {
   WarningAction,
   WARNING_TYPE_LABELS,
 } from "../types/warnings";
+
+const WARNINGS_STORAGE_KEY = "grimorium_chapter_warnings";
 
 interface WarningsContextValue {
   warnings: Warning[];
@@ -58,9 +62,29 @@ export function WarningsProvider({
   children,
   showWarningToasts: initialShowToasts = true,
 }: WarningsProviderProps) {
-  const [warnings, setWarnings] = useState<Warning[]>([]);
+  // Carrega avisos do localStorage na inicialização
+  const [warnings, setWarnings] = useState<Warning[]>(() => {
+    try {
+      const stored = localStorage.getItem(WARNINGS_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar avisos do localStorage:", error);
+    }
+    return [];
+  });
   const [showWarningToasts, setShowWarningToasts] =
     useState(initialShowToasts);
+
+  // Salva avisos no localStorage sempre que mudarem
+  useEffect(() => {
+    try {
+      localStorage.setItem(WARNINGS_STORAGE_KEY, JSON.stringify(warnings));
+    } catch (error) {
+      console.error("Erro ao salvar avisos no localStorage:", error);
+    }
+  }, [warnings]);
 
   /**
    * Calcula estatísticas dos avisos
@@ -72,7 +96,6 @@ export function WarningsProvider({
       typography: 0,
       grammar: 0,
       goals: 0,
-      limits: 0,
     };
 
     const bySeverity: Record<WarningSeverity, number> = {

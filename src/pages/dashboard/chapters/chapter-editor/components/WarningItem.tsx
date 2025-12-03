@@ -23,7 +23,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Warning, WARNING_SEVERITY_COLORS } from "../types/warnings";
+import {
+  Warning,
+  WARNING_SEVERITY_COLORS,
+  WARNING_SEVERITY_LABELS,
+} from "../types/warnings";
 
 interface WarningItemProps {
   warning: Warning;
@@ -65,8 +69,8 @@ export function WarningItem({ warning, onRemove, onClick }: WarningItemProps) {
   return (
     <div
       className={cn(
-        "group relative flex flex-col gap-2 p-3 rounded-lg border transition-all cursor-pointer",
-        "hover:bg-accent/50 hover:border-primary/30",
+        "group relative flex flex-col gap-2 p-3 rounded-lg border cursor-pointer",
+        "hover:bg-white/5 dark:hover:bg-white/10 hover:border-primary/30 transition-colors duration-200",
         WARNING_SEVERITY_COLORS[warning.severity]
       )}
       onClick={() => onClick(warning)}
@@ -114,7 +118,7 @@ export function WarningItem({ warning, onRemove, onClick }: WarningItemProps) {
         {/* Indicador de severidade */}
         <div className="flex items-center gap-1">
           <SeverityIcon className="w-3 h-3" />
-          <span className="capitalize">{warning.severity}</span>
+          <span>{WARNING_SEVERITY_LABELS[warning.severity]}</span>
         </div>
       </div>
     </div>

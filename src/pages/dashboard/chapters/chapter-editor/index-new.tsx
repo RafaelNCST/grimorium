@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
+import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -12,7 +13,6 @@ import { CreateAnnotationPopup } from "./components/CreateAnnotationPopup";
 import { EditorHeader } from "./components/EditorHeader";
 import { EditorSettingsModal } from "./components/EditorSettingsModal";
 import { FormattingToolbar } from "./components/FormattingToolbar";
-import { GoalsAndLimitsModal } from "./components/GoalsAndLimitsModal";
 import { StatsBar } from "./components/StatsBar";
 import { StatsDetailModal } from "./components/StatsDetailModal";
 import { SummarySection } from "./components/SummarySection";
@@ -20,15 +20,9 @@ import { TextEditor, type TextEditorRef } from "./components/TextEditor";
 import { WarningsSidebar } from "./components/WarningsSidebar";
 import { WarningsProvider, useWarnings } from "./context/WarningsContext";
 import { useChapterMetrics } from "./hooks/useChapterMetrics";
-import { useGoalsAndLimitsMonitor } from "./hooks/useGoalsAndLimitsMonitor";
+import { useGlobalGoalsMonitor } from "./hooks/useGlobalGoalsMonitor";
 import { useSessionTimer } from "./hooks/useSessionTimer";
 import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
-import {
-  DEFAULT_CHAPTER_GOALS,
-  DEFAULT_CHAPTER_LIMITS,
-  type ChapterGoals,
-  type ChapterLimits,
-} from "./types/goals-and-limits";
 
 import type {
   ChapterData,
@@ -50,6 +44,7 @@ function ChapterEditorContent() {
     useChaptersStore();
 
   const { stats: warningStats, setShowWarningToasts } = useWarnings();
+  const { goals: globalGoals } = useGlobalGoals();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -105,10 +100,7 @@ function ChapterEditorContent() {
   // Warnings state
   const [showWarningsSidebar, setShowWarningsSidebar] = useState(false);
 
-  // Goals and Limits state
-  const [goals, setGoals] = useState<ChapterGoals>(DEFAULT_CHAPTER_GOALS);
-  const [limits, setLimits] = useState<ChapterLimits>(DEFAULT_CHAPTER_LIMITS);
-  const [showGoalsAndLimitsModal, setShowGoalsAndLimitsModal] = useState(false);
+  // Stats modal state
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
 
   // Session timer hook
@@ -120,14 +112,14 @@ function ChapterEditorContent() {
     sessionDuration: sessionMinutes,
   });
 
-  // Monitor goals and limits
+  // Monitor global goals
   const { addWarning } = useWarnings();
-  useGoalsAndLimitsMonitor({
+  useGlobalGoalsMonitor({
     metrics,
-    goals,
-    limits,
-    onWarning: (type, severity, title, message) => {
-      addWarning(type, severity, title, message);
+    globalGoals,
+    chapterStatus: chapter.status,
+    onWarning: (severity, title, message) => {
+      addWarning("goals", severity, title, message);
     },
   });
 
@@ -343,16 +335,6 @@ function ChapterEditorContent() {
         "editor-chapters-id": nextChapter.id,
       },
     });
-  };
-
-  // Save goals and limits
-  const handleSaveGoalsAndLimits = (
-    newGoals: ChapterGoals,
-    newLimits: ChapterLimits
-  ) => {
-    setGoals(newGoals);
-    setLimits(newLimits);
-    // TODO: Persist to database/localStorage if needed
   };
 
   // Text selection handler
@@ -609,7 +591,6 @@ function ChapterEditorContent() {
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
           showWarningsSidebar={showWarningsSidebar}
-          showGoalsAndLimitsModal={showGoalsAndLimitsModal}
           warningsCount={warningStats.total}
           previousChapter={
             previousChapter
@@ -654,7 +635,6 @@ function ChapterEditorContent() {
             setShowWarningsSidebar(!showWarningsSidebar);
           }}
           onShowSettings={() => setShowSettingsModal(true)}
-          onShowGoalsAndLimits={() => setShowGoalsAndLimitsModal(true)}
           onNavigateToPrevious={handleNavigateToPrevious}
           onNavigateToNext={handleNavigateToNext}
         />
@@ -781,6 +761,8 @@ function ChapterEditorContent() {
         metrics={metrics}
         isSaving={isSaving}
         onOpenDetails={() => setShowStatsDetailModal(true)}
+        globalGoals={globalGoals}
+        chapterStatus={chapter.status}
       />
 
       {/* Editor Settings Modal */}
@@ -789,15 +771,6 @@ function ChapterEditorContent() {
         onOpenChange={setShowSettingsModal}
         settings={editorSettings}
         onSettingsChange={setEditorSettings}
-      />
-
-      {/* Goals and Limits Modal */}
-      <GoalsAndLimitsModal
-        open={showGoalsAndLimitsModal}
-        onOpenChange={setShowGoalsAndLimitsModal}
-        goals={goals}
-        limits={limits}
-        onSave={handleSaveGoalsAndLimits}
       />
 
       {/* Stats Detail Modal */}
