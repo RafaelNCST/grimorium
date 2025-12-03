@@ -44,6 +44,44 @@ export function useFormatState(): FormatState {
           return;
         }
 
+        // Check if we're inside a contentEditable element
+        const range = selection.getRangeAt(0);
+        const anchorNode = selection.anchorNode;
+
+        if (!anchorNode) {
+          setFormatState({
+            bold: false,
+            italic: false,
+            underline: false,
+            alignLeft: false,
+            alignCenter: false,
+            alignRight: false,
+            alignJustify: false,
+          });
+          return;
+        }
+
+        // Get the element containing the selection
+        let element = anchorNode.nodeType === Node.TEXT_NODE
+          ? anchorNode.parentElement
+          : anchorNode as HTMLElement;
+
+        const contentEditable = element?.closest('[contenteditable="true"]');
+
+        // If we're not inside the editor, reset all formatting
+        if (!contentEditable) {
+          setFormatState({
+            bold: false,
+            italic: false,
+            underline: false,
+            alignLeft: false,
+            alignCenter: false,
+            alignRight: false,
+            alignJustify: false,
+          });
+          return;
+        }
+
         // Check text formatting (bold, italic, underline)
         // queryCommandState returns true only if the entire selection has that formatting
         const bold = document.queryCommandState("bold");
