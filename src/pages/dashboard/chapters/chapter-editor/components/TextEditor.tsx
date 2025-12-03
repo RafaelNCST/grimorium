@@ -1082,9 +1082,11 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       <>
         <div ref={containerRef} className="bg-muted/30 overflow-y-auto h-full">
           {/* Summary Section - scrolls with content */}
-          {summarySection && <div className="px-8 py-6">{summarySection}</div>}
+          {summarySection && settings?.showSummarySection !== false && (
+            <div className="px-8 py-6">{summarySection}</div>
+          )}
 
-          <div className="max-w-5xl mx-auto py-8 px-6">
+          <div className="max-w-5xl mx-auto pt-8 px-6">
             <div
               ref={editorRef}
               contentEditable

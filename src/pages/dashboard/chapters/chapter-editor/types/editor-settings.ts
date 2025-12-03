@@ -20,6 +20,7 @@ export interface EditorSettings {
   // Visual Toggles
   showAnnotationHighlights: boolean;
   enableSpellCheck: boolean;
+  showSummarySection: boolean;
 
   // Theme
   sepiaMode: boolean;
@@ -38,6 +39,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   fontFamily: "Inter",
   showAnnotationHighlights: true,
   enableSpellCheck: true,
+  showSummarySection: true,
   sepiaMode: true,
   cursorColor: "default",
   showWarningToasts: true,

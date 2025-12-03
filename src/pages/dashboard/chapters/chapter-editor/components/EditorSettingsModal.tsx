@@ -160,6 +160,22 @@ export function EditorSettingsModal({
                 />
               </div>
 
+              {/* Summary Section */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Resumo & Entidades Mencionadas</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Mostra seção de resumo e entidades no editor
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.showSummarySection}
+                  onCheckedChange={(checked) =>
+                    updateSetting("showSummarySection", checked)
+                  }
+                />
+              </div>
+
               {/* Warning Toasts */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
