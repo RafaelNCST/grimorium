@@ -25,7 +25,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   lineHeight: 1.6,
   showAnnotationHighlights: true,
   enableSpellCheck: true,
-  sepiaMode: false,
+  sepiaMode: true,
   cursorColor: 'default',
 };
 

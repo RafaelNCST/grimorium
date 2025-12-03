@@ -171,7 +171,7 @@ export function EditorSettingsModal({
               <div>
                 <Label className="text-base font-semibold">Tema Visual</Label>
                 <p className="text-sm text-muted-foreground">
-                  Modo sépia reduz luz azul e cria tom mais quente
+                  Ajuste as cores do editor para maior conforto
                 </p>
               </div>
 
@@ -179,7 +179,7 @@ export function EditorSettingsModal({
                 <div className="space-y-0.5">
                   <Label>Modo Sépia</Label>
                   <p className="text-xs text-muted-foreground">
-                    Tom amarelado suave para reduzir fadiga visual
+                    Diminui cansaço visual
                   </p>
                 </div>
                 <Switch

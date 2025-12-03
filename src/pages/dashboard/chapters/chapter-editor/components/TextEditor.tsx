@@ -974,10 +974,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
     <>
       <div
         ref={containerRef}
-        className={cn(
-          "bg-muted/30 overflow-y-auto h-full",
-          settings?.sepiaMode && "bg-[#f4f1ea]"
-        )}
+        className="bg-muted/30 overflow-y-auto h-full"
       >
         {/* Summary Section - scrolls with content */}
         {summarySection && (
@@ -1002,7 +999,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
               "prose prose-lg max-w-none dark:prose-invert",
               // Base colors
               settings?.sepiaMode
-                ? "bg-[#faf8f3] border-[#e8e3d6] dark:bg-[#2a2520] dark:border-[#3a352f]"
+                ? "bg-[#faf6ed] border-[#e5dcc8] dark:bg-[#2a2520] dark:border-[#3a352f]"
                 : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800",
               // Annotation styles (conditional)
               settings?.showAnnotationHighlights !== false && [
@@ -1025,7 +1022,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(function Te
               fontSize: `${fontSize}pt`,
               lineHeight: settings?.lineHeight?.toString() || "1.6",
               fontFamily: fontFamily,
-              color: settings?.sepiaMode ? "#2c2416" : "#000000",
+              color: settings?.sepiaMode ? "#4a3f2a" : "#000000",
               minHeight: "calc(100vh - 200px)",
               caretColor: cursorColor,
               // Add extra padding at bottom based on auto-scroll mode
