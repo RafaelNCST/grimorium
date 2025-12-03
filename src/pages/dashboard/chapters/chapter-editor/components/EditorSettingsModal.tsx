@@ -159,6 +159,22 @@ export function EditorSettingsModal({
                   }
                 />
               </div>
+
+              {/* Warning Toasts */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Notificações de Avisos</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Mostra toasts quando novos avisos aparecem
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.showWarningToasts}
+                  onCheckedChange={(checked) =>
+                    updateSetting("showWarningToasts", checked)
+                  }
+                />
+              </div>
             </div>
           </div>
 

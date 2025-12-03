@@ -26,6 +26,9 @@ export interface EditorSettings {
 
   // Cursor
   cursorColor: CursorColor;
+
+  // Warnings
+  showWarningToasts: boolean;
 }
 
 export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
@@ -37,6 +40,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   enableSpellCheck: true,
   sepiaMode: true,
   cursorColor: "default",
+  showWarningToasts: true,
 };
 
 export const CURSOR_COLORS: Record<CursorColor, string> = {

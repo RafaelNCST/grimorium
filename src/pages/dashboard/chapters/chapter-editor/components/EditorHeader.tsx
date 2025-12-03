@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
+  AlertCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -23,12 +24,15 @@ interface EditorHeaderProps {
   chapterNumber: string;
   title: string;
   showAllAnnotationsSidebar?: boolean;
+  showWarningsSidebar?: boolean;
+  warningsCount?: number;
   previousChapter?: { id: string; number: string; title: string };
   nextChapter?: { id: string; number: string; title: string };
   onBack: () => void;
   onChapterNumberChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
+  onShowWarnings: () => void;
   onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
@@ -38,12 +42,15 @@ export function EditorHeader({
   chapterNumber,
   title,
   showAllAnnotationsSidebar = false,
+  showWarningsSidebar = false,
+  warningsCount = 0,
   previousChapter,
   nextChapter,
   onBack,
   onChapterNumberChange,
   onTitleChange,
   onShowAllAnnotations,
+  onShowWarnings,
   onShowSettings,
   onNavigateToPrevious,
   onNavigateToNext,
@@ -189,6 +196,26 @@ export function EditorHeader({
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Anotações
+              </Button>
+
+              <Button
+                variant="ghost-bright"
+                size="sm"
+                onClick={onShowWarnings}
+                className={cn(
+                  "border border-transparent transition-all duration-200 relative",
+                  showWarningsSidebar
+                    ? "bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400"
+                    : "hover:bg-amber-500/5 hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400"
+                )}
+              >
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Avisos
+                {warningsCount > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold bg-amber-500 text-white rounded-full min-w-[18px] text-center">
+                    {warningsCount > 99 ? "99+" : warningsCount}
+                  </span>
+                )}
               </Button>
 
               <Tooltip>

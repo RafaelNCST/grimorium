@@ -15,6 +15,8 @@ import { FormattingToolbar } from "./components/FormattingToolbar";
 import { StatsBar } from "./components/StatsBar";
 import { SummarySection } from "./components/SummarySection";
 import { TextEditor, type TextEditorRef } from "./components/TextEditor";
+import { WarningsSidebar } from "./components/WarningsSidebar";
+import { WarningsProvider, useWarnings } from "./context/WarningsContext";
 import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
 import type {
@@ -25,7 +27,7 @@ import type {
 } from "./types";
 import type { EditorSettings } from "./types/editor-settings";
 
-export function ChapterEditorNew() {
+function ChapterEditorContent() {
   const params = useParams({
     from: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
   });
@@ -35,6 +37,8 @@ export function ChapterEditorNew() {
 
   const { getChapter, updateChapter, getPreviousChapter, getNextChapter } =
     useChaptersStore();
+
+  const { stats: warningStats, setShowWarningToasts } = useWarnings();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -86,6 +90,14 @@ export function ChapterEditorNew() {
   const [scrollToAnnotation, setScrollToAnnotation] = useState<string | null>(
     null
   );
+
+  // Warnings state
+  const [showWarningsSidebar, setShowWarningsSidebar] = useState(false);
+
+  // Sync showWarningToasts setting with warnings context
+  useEffect(() => {
+    setShowWarningToasts(editorSettings.showWarningToasts);
+  }, [editorSettings.showWarningToasts, setShowWarningToasts]);
 
   // Keep a ref to the latest chapter to avoid re-creating save functions
   const chapterRef = useRef(chapter);
@@ -528,7 +540,7 @@ export function ChapterEditorNew() {
   const selectedAnnotation =
     chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
 
-  const hasSidebarOpen = showAnnotationsSidebar || showAllAnnotationsSidebar;
+  const hasSidebarOpen = showAnnotationsSidebar || showAllAnnotationsSidebar || showWarningsSidebar;
 
   return (
     <div className="h-full bg-background flex">
@@ -542,6 +554,8 @@ export function ChapterEditorNew() {
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
+          showWarningsSidebar={showWarningsSidebar}
+          warningsCount={warningStats.total}
           previousChapter={
             previousChapter
               ? {
@@ -571,8 +585,18 @@ export function ChapterEditorNew() {
             // Close specific annotation sidebar if open
             setShowAnnotationsSidebar(false);
             setSelectedAnnotationId(null);
+            // Close warnings sidebar
+            setShowWarningsSidebar(false);
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
+          }}
+          onShowWarnings={() => {
+            // Close annotation sidebars if open
+            setShowAnnotationsSidebar(false);
+            setSelectedAnnotationId(null);
+            setShowAllAnnotationsSidebar(false);
+            // Toggle warnings sidebar
+            setShowWarningsSidebar(!showWarningsSidebar);
           }}
           onShowSettings={() => setShowSettingsModal(true)}
           onNavigateToPrevious={handleNavigateToPrevious}
@@ -690,6 +714,12 @@ export function ChapterEditorNew() {
         />
       )}
 
+      {/* Warnings Sidebar */}
+      <WarningsSidebar
+        isOpen={showWarningsSidebar}
+        onClose={() => setShowWarningsSidebar(false)}
+      />
+
       {/* Stats Bar */}
       <StatsBar
         wordCount={wordCount}
@@ -706,5 +736,13 @@ export function ChapterEditorNew() {
         onSettingsChange={setEditorSettings}
       />
     </div>
+  );
+}
+
+export function ChapterEditorNew() {
+  return (
+    <WarningsProvider showWarningToasts={true}>
+      <ChapterEditorContent />
+    </WarningsProvider>
   );
 }
