@@ -8,7 +8,7 @@
 /**
  * Tipos de avisos disponíveis no sistema
  */
-export type WarningType = "typography" | "grammar" | "goals";
+export type WarningType = "typography" | "goals" | "time";
 
 /**
  * Severidade do aviso
@@ -42,8 +42,8 @@ export interface Warning {
  */
 export const WARNING_TYPE_LABELS: Record<WarningType, string> = {
   typography: "Tipografia",
-  grammar: "Gramática",
   goals: "Metas",
+  time: "Tempo",
 };
 
 /**
@@ -51,8 +51,8 @@ export const WARNING_TYPE_LABELS: Record<WarningType, string> = {
  */
 export const WARNING_TYPE_COLORS: Record<WarningType, string> = {
   typography: "text-blue-600 dark:text-blue-400",
-  grammar: "text-yellow-600 dark:text-yellow-400",
   goals: "text-purple-600 dark:text-purple-400",
+  time: "text-orange-600 dark:text-orange-400",
 };
 
 /**
@@ -60,8 +60,8 @@ export const WARNING_TYPE_COLORS: Record<WarningType, string> = {
  */
 export const WARNING_TYPE_ICONS: Record<WarningType, string> = {
   typography: "Type",
-  grammar: "FileText",
   goals: "Target",
+  time: "Clock",
 };
 
 /**

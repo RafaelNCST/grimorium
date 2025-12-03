@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import { cn } from "@/lib/utils";
 
 interface EditorHeaderProps {
@@ -56,6 +57,7 @@ export function EditorHeader({
   onNavigateToNext,
 }: EditorHeaderProps) {
   const { t } = useTranslation("chapter-editor");
+  const { settings: warningsSettings } = useWarningsSettings();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleContainerRef = useRef<HTMLDivElement>(null);
 
@@ -198,25 +200,27 @@ export function EditorHeader({
                 Anotações
               </Button>
 
-              <Button
-                variant="ghost-bright"
-                size="sm"
-                onClick={onShowWarnings}
-                className={cn(
-                  "border border-transparent transition-all duration-200 relative",
-                  showWarningsSidebar
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
-                )}
-              >
-                <AlertCircle className="w-4 h-4 mr-2" />
-                Avisos
-                {warningsCount > 0 && (
-                  <span className="ml-1.5 flex items-center justify-center min-w-[18px] min-h-[18px] px-1.5 text-[10px] font-semibold bg-primary text-white rounded-full">
-                    {warningsCount > 99 ? "99+" : warningsCount}
-                  </span>
-                )}
-              </Button>
+              {warningsSettings.enabled && (
+                <Button
+                  variant="ghost-bright"
+                  size="sm"
+                  onClick={onShowWarnings}
+                  className={cn(
+                    "border border-transparent transition-all duration-200 relative",
+                    showWarningsSidebar
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
+                  )}
+                >
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Avisos
+                  {warningsCount > 0 && (
+                    <span className="ml-1.5 flex items-center justify-center min-w-[18px] min-h-[18px] px-1.5 text-[10px] font-semibold bg-primary text-white rounded-full">
+                      {warningsCount > 99 ? "99+" : warningsCount}
+                    </span>
+                  )}
+                </Button>
+              )}
 
               <Tooltip>
                 <TooltipTrigger asChild>

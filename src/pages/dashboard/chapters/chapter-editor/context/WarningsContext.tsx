@@ -6,6 +6,7 @@
  * - Notificações via toast
  * - Estatísticas de avisos
  * - Persistência em localStorage
+ * - Respeita configurações globais de avisos
  */
 
 import React, {
@@ -26,6 +27,7 @@ import {
   WarningAction,
   WARNING_TYPE_LABELS,
 } from "../types/warnings";
+import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 
 const WARNINGS_STORAGE_KEY = "grimorium_chapter_warnings";
 
@@ -62,6 +64,8 @@ export function WarningsProvider({
   children,
   showWarningToasts: initialShowToasts = true,
 }: WarningsProviderProps) {
+  const { settings } = useWarningsSettings();
+
   // Carrega avisos do localStorage na inicialização
   const [warnings, setWarnings] = useState<Warning[]>(() => {
     try {
@@ -94,8 +98,8 @@ export function WarningsProvider({
 
     const byType: Record<WarningType, number> = {
       typography: 0,
-      grammar: 0,
       goals: 0,
+      time: 0,
     };
 
     const bySeverity: Record<WarningSeverity, number> = {
@@ -128,6 +132,11 @@ export function WarningsProvider({
       message: string,
       action?: WarningAction
     ): string => {
+      // Se avisos estão desligados completamente, não faz nada
+      if (!settings.enabled) {
+        return "";
+      }
+
       const newWarning: Warning = {
         id: `warning-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type,
@@ -141,8 +150,8 @@ export function WarningsProvider({
 
       setWarnings((prev) => [newWarning, ...prev]);
 
-      // Mostra toast se habilitado
-      if (showWarningToasts) {
+      // Mostra toast apenas se notificações estiverem habilitadas
+      if (showWarningToasts && settings.notificationsEnabled) {
         const typeLabel = WARNING_TYPE_LABELS[type];
         const toastMessage = `${typeLabel}: ${title}`;
 
@@ -170,7 +179,7 @@ export function WarningsProvider({
 
       return newWarning.id;
     },
-    [showWarningToasts]
+    [showWarningToasts, settings.enabled, settings.notificationsEnabled]
   );
 
   /**

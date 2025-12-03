@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
+import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -22,6 +23,8 @@ import { WarningsProvider, useWarnings } from "./context/WarningsContext";
 import { useChapterMetrics } from "./hooks/useChapterMetrics";
 import { useGlobalGoalsMonitor } from "./hooks/useGlobalGoalsMonitor";
 import { useSessionTimer } from "./hooks/useSessionTimer";
+import { useTimeWarningsMonitor } from "./hooks/useTimeWarningsMonitor";
+import { useTypographyWarningsMonitor } from "./hooks/useTypographyWarningsMonitor";
 import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
 import type {
@@ -114,12 +117,32 @@ function ChapterEditorContent() {
 
   // Monitor global goals
   const { addWarning } = useWarnings();
+  const { settings: warningsSettings } = useWarningsSettings();
+
   useGlobalGoalsMonitor({
     metrics,
     globalGoals,
     chapterStatus: chapter.status,
     onWarning: (severity, title, message) => {
       addWarning("goals", severity, title, message);
+    },
+  });
+
+  // Monitor time warnings
+  useTimeWarningsMonitor({
+    metrics,
+    enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
+    onWarning: (severity, title, message) => {
+      addWarning("time", severity, title, message);
+    },
+  });
+
+  // Monitor typography warnings
+  useTypographyWarningsMonitor({
+    metrics,
+    enabled: warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
+    onWarning: (severity, title, message) => {
+      addWarning("typography", severity, title, message);
     },
   });
 

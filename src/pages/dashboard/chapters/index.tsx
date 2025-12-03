@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { FileText, Plus, ArrowLeft, Target } from "lucide-react";
+import { FileText, Plus, ArrowLeft, Target, Bell } from "lucide-react";
 
 import {
   CreateChapterModal,
@@ -9,6 +9,7 @@ import {
   type EntityMention,
 } from "@/components/modals/create-chapter-modal";
 import { GlobalGoalsModal } from "@/components/modals/global-goals-modal";
+import { WarningsSettingsModal } from "@/components/modals/warnings-settings-modal";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
+import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useChaptersStore, type ChapterData } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -83,9 +85,11 @@ export function ChaptersPage() {
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showGoalsModal, setShowGoalsModal] = useState(false);
+  const [showWarningsSettingsModal, setShowWarningsSettingsModal] = useState(false);
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
 
   const { goals: globalGoals, updateGoals } = useGlobalGoals();
+  const { settings: warningsSettings, updateSettings: updateWarningsSettings } = useWarningsSettings();
 
   // Load chapters from store
   useEffect(() => {
@@ -239,6 +243,15 @@ export function ChaptersPage() {
         >
           <Target className="h-4 w-4" />
           Metas
+        </Button>
+
+        <Button
+          onClick={() => setShowWarningsSettingsModal(true)}
+          variant="secondary"
+          className="gap-2"
+        >
+          <Bell className="h-4 w-4" />
+          Gerenciar Avisos
         </Button>
 
         <Button
@@ -426,6 +439,14 @@ export function ChaptersPage() {
         onOpenChange={setShowGoalsModal}
         goals={globalGoals}
         onSave={updateGoals}
+      />
+
+      {/* Warnings Settings Modal */}
+      <WarningsSettingsModal
+        open={showWarningsSettingsModal}
+        onOpenChange={setShowWarningsSettingsModal}
+        settings={warningsSettings}
+        onSave={updateWarningsSettings}
       />
 
       {/* Delete Single Chapter Dialog */}
