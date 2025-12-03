@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 import { useTextSearch } from "../hooks/useTextSearch";
 import { useUndoRedo } from "../hooks/useUndoRedo";
+import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
 import { CURSOR_COLORS } from "../types/editor-settings";
 
 import { ContextMenu } from "./ContextMenu";
@@ -93,6 +94,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const search = useTextSearch({
       content,
       initialSearchTerm: selectedSearchText,
+    });
+
+    // Editor shortcuts (auto-close quotes, em-dash, etc.)
+    useEditorShortcuts({
+      editorRef,
+      enabled: true,
     });
 
     // Expose undo/redo through ref
