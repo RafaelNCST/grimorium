@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 export interface FormatState {
   bold: boolean;
   italic: boolean;
-  underline: boolean;
   alignLeft: boolean;
   alignCenter: boolean;
   alignRight: boolean;
@@ -11,7 +10,7 @@ export interface FormatState {
 }
 
 /**
- * Hook to detect active formatting states (bold, italic, underline, alignment)
+ * Hook to detect active formatting states (bold, italic, alignment)
  * Only returns true if the ENTIRE selection has that formatting applied.
  * If selection is mixed (part formatted, part not), returns false.
  */
@@ -19,7 +18,6 @@ export function useFormatState(): FormatState {
   const [formatState, setFormatState] = useState<FormatState>({
     bold: false,
     italic: false,
-    underline: false,
     alignLeft: false,
     alignCenter: false,
     alignRight: false,
@@ -35,7 +33,6 @@ export function useFormatState(): FormatState {
           setFormatState({
             bold: false,
             italic: false,
-            underline: false,
             alignLeft: false,
             alignCenter: false,
             alignRight: false,
@@ -52,7 +49,6 @@ export function useFormatState(): FormatState {
           setFormatState({
             bold: false,
             italic: false,
-            underline: false,
             alignLeft: false,
             alignCenter: false,
             alignRight: false,
@@ -73,7 +69,6 @@ export function useFormatState(): FormatState {
           setFormatState({
             bold: false,
             italic: false,
-            underline: false,
             alignLeft: false,
             alignCenter: false,
             alignRight: false,
@@ -82,11 +77,10 @@ export function useFormatState(): FormatState {
           return;
         }
 
-        // Check text formatting (bold, italic, underline)
+        // Check text formatting (bold, italic)
         // queryCommandState returns true only if the entire selection has that formatting
         const bold = document.queryCommandState("bold");
         const italic = document.queryCommandState("italic");
-        const underline = document.queryCommandState("underline");
 
         // Check alignment
         const alignLeft = document.queryCommandState("justifyLeft");
@@ -97,7 +91,6 @@ export function useFormatState(): FormatState {
         setFormatState({
           bold,
           italic,
-          underline,
           alignLeft,
           alignCenter,
           alignRight,

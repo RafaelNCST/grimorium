@@ -8,7 +8,6 @@ import {
   Search,
   Bold,
   Italic,
-  Underline,
 } from "lucide-react";
 
 interface ContextMenuProps {
@@ -23,7 +22,6 @@ interface ContextMenuProps {
   onSearch: () => void;
   onBold: () => void;
   onItalic: () => void;
-  onUnderline: () => void;
 }
 
 export function ContextMenu({
@@ -38,7 +36,6 @@ export function ContextMenu({
   onSearch,
   onBold,
   onItalic,
-  onUnderline,
 }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -183,16 +180,6 @@ export function ContextMenu({
             Itálico
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+I
-            </span>
-          </button>
-          <button
-            onClick={() => handleAction(onUnderline)}
-            className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
-          >
-            <Underline className="h-4 w-4" />
-            Sublinhado
-            <span className="ml-auto text-xs text-muted-foreground">
-              Ctrl+U
             </span>
           </button>
         </>

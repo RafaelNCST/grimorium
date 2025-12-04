@@ -128,12 +128,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Let browser handle the italic command
         }
 
-        // Ctrl+U / Cmd+U for underline (mark as immediate)
-        if ((e.ctrlKey || e.metaKey) && e.key === "u") {
-          isImmediateActionRef.current = true;
-          // Let browser handle the underline command
-        }
-
         // Ctrl+F / Cmd+F to open search
         if ((e.ctrlKey || e.metaKey) && e.key === "f") {
           e.preventDefault();
@@ -1073,13 +1067,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       handleInput();
     };
 
-    const handleUnderline = () => {
-      // Mark as immediate action (formatting change creates undo point)
-      isImmediateActionRef.current = true;
-      document.execCommand("underline", false);
-      handleInput();
-    };
-
     // Get cursor color based on settings
     const cursorColor = settings?.cursorColor
       ? CURSOR_COLORS[settings.cursorColor]
@@ -1186,7 +1173,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             onSearch={handleSearchFromContextMenu}
             onBold={handleBold}
             onItalic={handleItalic}
-            onUnderline={handleUnderline}
           />
         )}
       </>

@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   Bold,
   Italic,
-  Underline,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -209,24 +208,6 @@ export function FormattingToolbar({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Itálico (Ctrl+I)</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFormat("underline")}
-                  className={cn(
-                    "h-8 w-8 p-0",
-                    formatState.underline && "bg-accent text-accent-foreground"
-                  )}
-                >
-                  <Underline className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Sublinhado (Ctrl+U)</p>
               </TooltipContent>
             </Tooltip>
 

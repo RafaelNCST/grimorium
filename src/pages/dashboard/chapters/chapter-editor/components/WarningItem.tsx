@@ -38,17 +38,16 @@ interface WarningItemProps {
 /**
  * Mapeamento de ícones por tipo de aviso
  */
-const TYPE_ICON_MAP = {
+const TYPE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   typography: Type,
-  grammar: FileText,
   goals: Target,
-  limits: AlertTriangle,
+  time: AlertTriangle,
 };
 
 /**
  * Mapeamento de ícones por severidade
  */
-const SEVERITY_ICON_MAP = {
+const SEVERITY_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   info: Info,
   warning: AlertCircle,
   error: AlertTriangle,
