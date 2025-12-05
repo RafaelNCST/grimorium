@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Settings,
   AlertCircle,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -26,7 +27,9 @@ interface EditorHeaderProps {
   title: string;
   showAllAnnotationsSidebar?: boolean;
   showWarningsSidebar?: boolean;
+  showPlotArcEventsSidebar?: boolean;
   warningsCount?: number;
+  hasPlotArc?: boolean;
   previousChapter?: { id: string; number: string; title: string };
   nextChapter?: { id: string; number: string; title: string };
   onBack: () => void;
@@ -34,6 +37,7 @@ interface EditorHeaderProps {
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
   onShowWarnings: () => void;
+  onShowPlotArcEvents?: () => void;
   onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
@@ -44,7 +48,9 @@ export function EditorHeader({
   title,
   showAllAnnotationsSidebar = false,
   showWarningsSidebar = false,
+  showPlotArcEventsSidebar = false,
   warningsCount = 0,
+  hasPlotArc = false,
   previousChapter,
   nextChapter,
   onBack,
@@ -52,6 +58,7 @@ export function EditorHeader({
   onTitleChange,
   onShowAllAnnotations,
   onShowWarnings,
+  onShowPlotArcEvents,
   onShowSettings,
   onNavigateToPrevious,
   onNavigateToNext,
@@ -199,6 +206,23 @@ export function EditorHeader({
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Anotações
               </Button>
+
+              {hasPlotArc && onShowPlotArcEvents && (
+                <Button
+                  variant="ghost-bright"
+                  size="sm"
+                  onClick={onShowPlotArcEvents}
+                  className={cn(
+                    "border border-transparent transition-all duration-200",
+                    showPlotArcEventsSidebar
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
+                  )}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Arco
+                </Button>
+              )}
 
               {warningsSettings.enabled && (
                 <Button

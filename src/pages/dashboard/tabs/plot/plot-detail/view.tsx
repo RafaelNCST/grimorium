@@ -168,7 +168,7 @@ function SortableEvent({
           }}
           onPointerDown={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
-          className="mt-1 text-primary hover:text-primary/80 transition-colors cursor-pointer"
+          className="mt-1 text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
         >
           {event.completed ? (
             <CheckCircle2 className="w-5 h-5" />

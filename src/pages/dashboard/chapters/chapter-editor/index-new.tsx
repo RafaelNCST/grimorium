@@ -8,7 +8,11 @@ import {
   getChapterById,
   updateChapter as updateChapterInDB,
 } from "@/lib/db/chapters.service";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+import {
+  getPlotArcsByBookId,
+  getPlotArcById,
+  updatePlotArc,
+} from "@/lib/db/plot.service";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
@@ -19,6 +23,7 @@ import { CreateAnnotationPopup } from "./components/CreateAnnotationPopup";
 import { EditorHeader } from "./components/EditorHeader";
 import { EditorSettingsModal } from "./components/EditorSettingsModal";
 import { FormattingToolbar } from "./components/FormattingToolbar";
+import { PlotArcEventsSidebar } from "./components/PlotArcEventsSidebar";
 import { StatsBar } from "./components/StatsBar";
 import { StatsDetailModal } from "./components/StatsDetailModal";
 import { SummarySection } from "./components/SummarySection";
@@ -107,6 +112,11 @@ function ChapterEditorContent() {
 
   // Warnings state
   const [showWarningsSidebar, setShowWarningsSidebar] = useState(false);
+
+  // Plot Arc Events state
+  const [showPlotArcEventsSidebar, setShowPlotArcEventsSidebar] =
+    useState(false);
+  const [currentPlotArc, setCurrentPlotArc] = useState<IPlotArc | null>(null);
 
   // Stats modal state
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
@@ -301,6 +311,24 @@ function ChapterEditorContent() {
     };
     loadArcs();
   }, [dashboardId]);
+
+  // Load current plot arc when plotArcId changes
+  useEffect(() => {
+    const loadCurrentArc = async () => {
+      if (chapter.plotArcId) {
+        try {
+          const arc = await getPlotArcById(chapter.plotArcId);
+          setCurrentPlotArc(arc);
+        } catch (error) {
+          console.error("Error loading current arc:", error);
+          setCurrentPlotArc(null);
+        }
+      } else {
+        setCurrentPlotArc(null);
+      }
+    };
+    loadCurrentArc();
+  }, [chapter.plotArcId]);
 
   // Debounced auto-save (primary strategy - saves 2 seconds after user stops typing)
   useEffect(() => {
@@ -644,8 +672,44 @@ function ChapterEditorContent() {
   const selectedAnnotation =
     chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
 
+  // Plot arc events handlers
+  const handleShowPlotArcEvents = () => {
+    // Close other sidebars
+    setShowAnnotationsSidebar(false);
+    setSelectedAnnotationId(null);
+    setShowAllAnnotationsSidebar(false);
+    setShowWarningsSidebar(false);
+    // Toggle plot arc events sidebar
+    setShowPlotArcEventsSidebar(!showPlotArcEventsSidebar);
+  };
+
+  const handleToggleEventCompletion = async (eventId: string) => {
+    if (!currentPlotArc) return;
+
+    const updatedEvents = currentPlotArc.events.map((event) =>
+      event.id === eventId ? { ...event, completed: !event.completed } : event
+    );
+
+    const completedCount = updatedEvents.filter((e) => e.completed).length;
+    const progress =
+      updatedEvents.length > 0 ? (completedCount / updatedEvents.length) * 100 : 0;
+
+    try {
+      await updatePlotArc(currentPlotArc.id, { events: updatedEvents, progress });
+      setCurrentPlotArc((prev) => {
+        if (!prev) return prev;
+        return { ...prev, events: updatedEvents, progress };
+      });
+    } catch (error) {
+      console.error("Error updating event completion:", error);
+    }
+  };
+
   const hasSidebarOpen =
-    showAnnotationsSidebar || showAllAnnotationsSidebar || showWarningsSidebar;
+    showAnnotationsSidebar ||
+    showAllAnnotationsSidebar ||
+    showWarningsSidebar ||
+    showPlotArcEventsSidebar;
 
   return (
     <div className="h-full bg-background flex">
@@ -660,7 +724,9 @@ function ChapterEditorContent() {
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
           showWarningsSidebar={showWarningsSidebar}
+          showPlotArcEventsSidebar={showPlotArcEventsSidebar}
           warningsCount={warningStats.total}
+          hasPlotArc={!!currentPlotArc}
           previousChapter={
             previousChapter
               ? {
@@ -692,6 +758,8 @@ function ChapterEditorContent() {
             setSelectedAnnotationId(null);
             // Close warnings sidebar
             setShowWarningsSidebar(false);
+            // Close plot arc events sidebar
+            setShowPlotArcEventsSidebar(false);
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
           }}
@@ -700,9 +768,12 @@ function ChapterEditorContent() {
             setShowAnnotationsSidebar(false);
             setSelectedAnnotationId(null);
             setShowAllAnnotationsSidebar(false);
+            // Close plot arc events sidebar
+            setShowPlotArcEventsSidebar(false);
             // Toggle warnings sidebar
             setShowWarningsSidebar(!showWarningsSidebar);
           }}
+          onShowPlotArcEvents={handleShowPlotArcEvents}
           onShowSettings={() => setShowSettingsModal(true)}
           onNavigateToPrevious={handleNavigateToPrevious}
           onNavigateToNext={handleNavigateToNext}
@@ -841,6 +912,15 @@ function ChapterEditorContent() {
         isOpen={showWarningsSidebar}
         onClose={() => setShowWarningsSidebar(false)}
       />
+
+      {/* Plot Arc Events Sidebar */}
+      {showPlotArcEventsSidebar && currentPlotArc && (
+        <PlotArcEventsSidebar
+          arc={currentPlotArc}
+          onClose={() => setShowPlotArcEventsSidebar(false)}
+          onToggleEventCompletion={handleToggleEventCompletion}
+        />
+      )}
 
       {/* Stats Bar */}
       <StatsBar
