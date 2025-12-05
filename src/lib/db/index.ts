@@ -603,6 +603,8 @@ async function runMigrations(database: Database): Promise<void> {
       word_count INTEGER DEFAULT 0,
       character_count INTEGER DEFAULT 0,
       character_count_with_spaces INTEGER DEFAULT 0,
+      paragraph_count INTEGER DEFAULT 0,
+      dialogue_count INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       last_edited INTEGER NOT NULL,
@@ -1285,6 +1287,26 @@ async function runMigrations(database: Database): Promise<void> {
         "ALTER TABLE factions ADD COLUMN areas_of_interest TEXT"
       );
       console.log("[db] Added areas_of_interest column to factions table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add paragraph_count column to chapters table
+    try {
+      await database.execute(
+        "ALTER TABLE chapters ADD COLUMN paragraph_count INTEGER DEFAULT 0"
+      );
+      console.log("[db] Added paragraph_count column to chapters table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add dialogue_count column to chapters table
+    try {
+      await database.execute(
+        "ALTER TABLE chapters ADD COLUMN dialogue_count INTEGER DEFAULT 0"
+      );
+      console.log("[db] Added dialogue_count column to chapters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }

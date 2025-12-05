@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import enChapterEditor from "../../locales/en/chapter-editor.json";
+import enChapterMetrics from "../../locales/en/chapter-metrics.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
 import enCommon from "../../locales/en/common.json";
@@ -29,6 +30,7 @@ import enRegionDetail from "../../locales/en/region-detail.json";
 import enSettings from "../../locales/en/settings.json";
 import enWorld from "../../locales/en/world.json";
 import ptChapterEditor from "../../locales/pt/chapter-editor.json";
+import ptChapterMetrics from "../../locales/pt/chapter-metrics.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
 import ptCommon from "../../locales/pt/common.json";
@@ -64,6 +66,7 @@ const resources = {
     characters: enCharacters,
     "character-detail": enCharacterDetail,
     "chapter-editor": enChapterEditor,
+    "chapter-metrics": enChapterMetrics,
     "create-book": enCreateBook,
     "create-chapter": enCreateChapter,
     "create-character": enCreateCharacter,
@@ -93,6 +96,7 @@ const resources = {
     characters: ptCharacters,
     "character-detail": ptCharacterDetail,
     "chapter-editor": ptChapterEditor,
+    "chapter-metrics": ptChapterMetrics,
     "create-book": ptCreateBook,
     "create-chapter": ptCreateChapter,
     "create-character": ptCreateCharacter,

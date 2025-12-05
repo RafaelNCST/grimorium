@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Dna, Users, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayText,
@@ -1161,6 +1162,30 @@ export function RaceDetailView({
       onAddClick: () => setIsAddRelationshipDialogOpen(true),
       blockedEntityName: "raças",
     },
+    // Chapter Metrics section (only visible in view mode)
+    ...(!isEditing
+      ? [
+          {
+            id: "chapter-metrics",
+            title: "Métricas de capítulo",
+            content: (
+              <EntityChapterMetricsSection
+                bookId={bookId}
+                entityId={race.id}
+                entityType="race"
+                onChapterClick={(chapterId) =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/chapters/$chapterId",
+                    params: { dashboardId: bookId, chapterId },
+                  })
+                }
+              />
+            ),
+            isCollapsible: true,
+            defaultOpen: false,
+          },
+        ]
+      : []),
   ];
 
   // Validation message

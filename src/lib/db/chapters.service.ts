@@ -21,6 +21,8 @@ interface DBChapter {
   word_count: number;
   character_count: number;
   character_count_with_spaces: number;
+  paragraph_count: number;
+  dialogue_count: number;
   created_at: number;
   updated_at: number;
   last_edited: number;
@@ -76,6 +78,8 @@ export interface ChapterMetadata {
   wordCount: number;
   characterCount: number;
   characterCountWithSpaces: number;
+  paragraphCount: number;
+  dialogueCount: number;
   lastEdited: string;
   mentionedCharacters: EntityMention[];
   mentionedRegions: EntityMention[];
@@ -116,7 +120,7 @@ export async function getChapterMetadataByBookId(
 
   // Buscar capítulos
   const chapters = await db.select<DBChapter[]>(
-    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
+    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, paragraph_count, dialogue_count, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
     [bookId]
   );
 
@@ -195,6 +199,8 @@ export async function getChapterMetadataByBookId(
       wordCount: ch.word_count,
       characterCount: ch.character_count,
       characterCountWithSpaces: ch.character_count_with_spaces,
+      paragraphCount: ch.paragraph_count || 0,
+      dialogueCount: ch.dialogue_count || 0,
       lastEdited: new Date(ch.last_edited).toISOString(),
       mentionedCharacters: chapterMentions.characters,
       mentionedRegions: chapterMentions.regions,
@@ -332,9 +338,9 @@ export async function createChapter(
   await db.execute(
     `INSERT INTO chapters (
       id, book_id, chapter_number, title, status, plot_arc_id, summary, content,
-      word_count, character_count, character_count_with_spaces,
+      word_count, character_count, character_count_with_spaces, paragraph_count, dialogue_count,
       created_at, updated_at, last_edited
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
     [
       chapterData.id,
       bookId,
@@ -347,6 +353,8 @@ export async function createChapter(
       chapterData.wordCount,
       chapterData.characterCount,
       chapterData.characterCountWithSpaces || chapterData.characterCount,
+      chapterData.paragraphCount || 0,
+      chapterData.dialogueCount || 0,
       now,
       now,
       Date.parse(chapterData.lastEdited) || now,
@@ -488,6 +496,14 @@ export async function updateChapter(
     fields.push(`character_count_with_spaces = $${paramIndex++}`);
     values.push(updates.characterCountWithSpaces);
   }
+  if (updates.paragraphCount !== undefined) {
+    fields.push(`paragraph_count = $${paramIndex++}`);
+    values.push(updates.paragraphCount);
+  }
+  if (updates.dialogueCount !== undefined) {
+    fields.push(`dialogue_count = $${paramIndex++}`);
+    values.push(updates.dialogueCount);
+  }
 
   // Sempre atualizar updated_at e last_edited
   fields.push(`updated_at = $${paramIndex++}`);
@@ -627,7 +643,7 @@ export async function getChaptersByStatus(
   const db = await getDB();
 
   const chapters = await db.select<DBChapter[]>(
-    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 AND status = $2 ORDER BY CAST(chapter_number AS REAL)",
+    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, paragraph_count, dialogue_count, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 AND status = $2 ORDER BY CAST(chapter_number AS REAL)",
     [bookId, status]
   );
 
@@ -705,6 +721,8 @@ export async function getChaptersByStatus(
       wordCount: ch.word_count,
       characterCount: ch.character_count,
       characterCountWithSpaces: ch.character_count_with_spaces,
+      paragraphCount: ch.paragraph_count || 0,
+      dialogueCount: ch.dialogue_count || 0,
       lastEdited: new Date(ch.last_edited).toISOString(),
       mentionedCharacters: chapterMentions.characters,
       mentionedRegions: chapterMentions.regions,

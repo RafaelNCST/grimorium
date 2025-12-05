@@ -1,0 +1,25 @@
+{
+  "entity_section": {
+    "title": "Chapter Metrics",
+    "no_mentions": "This entity has not been mentioned in any chapter yet.",
+    "total_mentions": "Total mentions",
+    "chapter_singular": "chapter",
+    "chapter_plural": "chapters",
+    "first_mention": "First mentioned",
+    "last_mention": "Last mentioned",
+    "chapter_label": "Chapter",
+    "view_chapter": "View chapter"
+  },
+  "plot_section": {
+    "title": "Chapter Metrics",
+    "no_chapters": "No chapters are linked to this plot arc.",
+    "total_chapters": "Total chapters",
+    "chapter_singular": "chapter",
+    "chapter_plural": "chapters",
+    "total_words": "Words",
+    "total_characters": "Characters",
+    "total_characters_with_spaces": "Characters with spaces",
+    "total_paragraphs": "Paragraphs",
+    "total_dialogues": "Dialogues"
+  }
+}

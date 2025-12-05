@@ -5,6 +5,7 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { Map, AlertCircle, Trash2, Clock, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import {
   type IFieldVisibility,
   type ISectionVisibility,
@@ -1374,6 +1375,30 @@ export function RegionDetailView({
                 addButtonLabel: "Criar Primeira Era",
                 onAddClick: () => setIsCreateEraDialogOpen(true),
               },
+              // Chapter Metrics section (only visible in view mode)
+              ...(!isEditing
+                ? [
+                    {
+                      id: "chapter-metrics",
+                      title: "Métricas de capítulo",
+                      content: (
+                        <EntityChapterMetricsSection
+                          bookId={bookId}
+                          entityId={region.id}
+                          entityType="region"
+                          onChapterClick={(chapterId) =>
+                            navigate({
+                              to: "/dashboard/$dashboardId/chapters/$chapterId",
+                              params: { dashboardId: bookId, chapterId },
+                            })
+                          }
+                        />
+                      ),
+                      isCollapsible: true,
+                      defaultOpen: false,
+                    },
+                  ]
+                : []),
             ]}
             // Versions panel
             versionsPanel={

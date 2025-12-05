@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Info, Package, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayImage,
@@ -881,6 +882,32 @@ export const ItemDetailView = React.memo(
               advancedSectionOpen={advancedSectionOpen}
               onAdvancedSectionToggle={onAdvancedSectionToggle}
               versionsPanel={versionsPanel}
+              extraSections={[
+                // Chapter Metrics section (only visible in view mode)
+                ...(!isEditing
+                  ? [
+                      {
+                        id: "chapter-metrics",
+                        title: "Métricas de capítulo",
+                        content: (
+                          <EntityChapterMetricsSection
+                            bookId={item.bookId}
+                            entityId={item.id}
+                            entityType="item"
+                            onChapterClick={(chapterId) =>
+                              navigate({
+                                to: "/dashboard/$dashboardId/chapters/$chapterId",
+                                params: { dashboardId: item.bookId, chapterId },
+                              })
+                            }
+                          />
+                        ),
+                        isCollapsible: true,
+                        defaultOpen: false,
+                      },
+                    ]
+                  : []),
+              ]}
               showMenuButton
               onMenuToggle={onNavigationSidebarToggle}
               menuTooltip={t("common:tooltips.quick_navigation")}

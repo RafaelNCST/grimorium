@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayText,
@@ -1544,6 +1545,29 @@ export function FactionDetailView({
       blockedEntityName: "personagens",
     },
   ];
+
+  // Add Chapter Metrics section (always visible, not editable)
+  if (!isEditing) {
+    extraSections.push({
+      id: "chapter-metrics",
+      title: "Métricas de capítulo",
+      content: (
+        <EntityChapterMetricsSection
+          bookId={bookId}
+          entityId={faction.id}
+          entityType="faction"
+          onChapterClick={(chapterId) =>
+            navigate({
+              to: "/dashboard/$dashboardId/chapters/$chapterId",
+              params: { dashboardId: bookId, chapterId },
+            })
+          }
+        />
+      ),
+      isCollapsible: true,
+      defaultOpen: false,
+    });
+  }
 
   // ==================
   // VERSIONS PANEL

@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
+import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayEntityList,
@@ -1308,6 +1309,29 @@ export function CharacterDetailView({
             />
           ))}
         </div>
+      ),
+      isCollapsible: true,
+      defaultOpen: false,
+    });
+  }
+
+  // Add Chapter Metrics section (always visible, not editable)
+  if (!isEditing) {
+    extraSections.push({
+      id: "chapter-metrics",
+      title: "Métricas de capítulo",
+      content: (
+        <EntityChapterMetricsSection
+          bookId={bookId}
+          entityId={character.id}
+          entityType="character"
+          onChapterClick={(chapterId) =>
+            navigate({
+              to: "/dashboard/$dashboardId/chapters/$chapterId",
+              params: { dashboardId: bookId, chapterId },
+            })
+          }
+        />
       ),
       isCollapsible: true,
       defaultOpen: false,

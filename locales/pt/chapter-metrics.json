@@ -1,0 +1,25 @@
+{
+  "entity_section": {
+    "title": "Métricas de capítulo",
+    "no_mentions": "Esta entidade ainda não foi mencionada em nenhum capítulo.",
+    "total_mentions": "Total de menções",
+    "chapter_singular": "capítulo",
+    "chapter_plural": "capítulos",
+    "first_mention": "Primeira vez mencionado",
+    "last_mention": "Última vez mencionado",
+    "chapter_label": "Capítulo",
+    "view_chapter": "Ver capítulo"
+  },
+  "plot_section": {
+    "title": "Métricas de capítulo",
+    "no_chapters": "Nenhum capítulo está vinculado a este arco de enredo.",
+    "total_chapters": "Total de capítulos",
+    "chapter_singular": "capítulo",
+    "chapter_plural": "capítulos",
+    "total_words": "Palavras",
+    "total_characters": "Caracteres",
+    "total_characters_with_spaces": "Caracteres com espaço",
+    "total_paragraphs": "Parágrafos",
+    "total_dialogues": "Diálogos"
+  }
+}

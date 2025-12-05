@@ -4,6 +4,7 @@ import { getDB } from "./index";
 
 export interface IItem {
   id: string;
+  bookId: string;
   name: string;
   status?: string;
   category?: string;
@@ -69,6 +70,7 @@ function itemToDBItem(bookId: string, item: IItem): DBItem {
 function dbItemToItem(dbItem: DBItem): IItem {
   return {
     id: dbItem.id,
+    bookId: dbItem.book_id,
     name: dbItem.name,
     status: dbItem.status,
     category: dbItem.category,

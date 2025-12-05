@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { PlotArcChapterMetricsSection } from "@/components/chapter-metrics/PlotArcChapterMetricsSection";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayTextarea,
@@ -276,6 +277,8 @@ export function PlotArcDetailView({
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);
   const [newEventName, setNewEventName] = useState("");
   const [newEventDescription, setNewEventDescription] = useState("");
+  const [chapterMetricsSectionOpen, setChapterMetricsSectionOpen] =
+    useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -997,6 +1000,25 @@ export function PlotArcDetailView({
                   </FieldWithVisibilityToggle>
                 </div>
               )}
+            </CollapsibleSection>
+          )}
+
+          {/* Chapter Metrics Section - Only visible in view mode */}
+          {!isEditing && (
+            <CollapsibleSection
+              title="Métricas de capítulo"
+              isOpen={chapterMetricsSectionOpen}
+              onToggle={() =>
+                setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)
+              }
+            >
+              <PlotArcChapterMetricsSection
+                bookId={bookId}
+                plotArcId={arc.id}
+                onChapterClick={(chapterId) =>
+                  window.location.href = `/dashboard/chapters/${chapterId}`
+                }
+              />
             </CollapsibleSection>
           )}
         </div>
