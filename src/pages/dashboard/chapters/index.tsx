@@ -285,9 +285,17 @@ export function ChaptersPage() {
 
     if (chapters.length === 0) {
       return (
-        <p className="text-center text-muted-foreground py-8">
-          Nenhum capítulo encontrado com os filtros aplicados.
-        </p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+            <h3 className="text-base font-medium mb-1">
+              Nenhum capítulo encontrado
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Tente ajustar os filtros ou termo de busca
+            </p>
+          </div>
+        </div>
       );
     }
 
@@ -479,31 +487,31 @@ export function ChaptersPage() {
                   className="w-1/2 mt-4"
                 />
 
-                <TabsContent value="all" className="mt-4">
+                <TabsContent value="all" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList chapters={getFilteredChapters("all")} />
                 </TabsContent>
 
-                <TabsContent value="draft" className="mt-4">
+                <TabsContent value="draft" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList chapters={getFilteredChapters("draft")} />
                 </TabsContent>
 
-                <TabsContent value="in-progress" className="mt-4">
+                <TabsContent value="in-progress" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("in-progress")}
                   />
                 </TabsContent>
 
-                <TabsContent value="review" className="mt-4">
+                <TabsContent value="review" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList chapters={getFilteredChapters("review")} />
                 </TabsContent>
 
-                <TabsContent value="finished" className="mt-4">
+                <TabsContent value="finished" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("finished")}
                   />
                 </TabsContent>
 
-                <TabsContent value="published" className="mt-4">
+                <TabsContent value="published" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("published")}
                   />
