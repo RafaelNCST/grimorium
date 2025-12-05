@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 import { useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
 
@@ -46,6 +47,8 @@ function ChapterEditorContent() {
   const { getChapter, updateChapter, getPreviousChapter, getNextChapter } =
     useChaptersStore();
 
+  const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
+
   const { stats: warningStats, setShowWarningToasts } = useWarnings();
   const { goals: globalGoals } = useGlobalGoals();
 
@@ -77,11 +80,9 @@ function ChapterEditorContent() {
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // Editor settings state (includes fontSize and fontFamily now)
-  const [editorSettings, setEditorSettings] = useState<EditorSettings>({
-    ...DEFAULT_EDITOR_SETTINGS,
-    fontSize: initialChapter.fontSize || DEFAULT_EDITOR_SETTINGS.fontSize,
-    fontFamily: initialChapter.fontFamily || DEFAULT_EDITOR_SETTINGS.fontFamily,
+  // Editor settings state (loaded from book-level settings)
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>(() => {
+    return getBookSettings(dashboardId);
   });
 
   // Annotation state
@@ -165,15 +166,19 @@ function ChapterEditorContent() {
     const loadedChapter = getChapter(editorChaptersId);
     if (loadedChapter) {
       setChapter(loadedChapter);
-      // Load chapter-specific formatting settings into editor settings
-      setEditorSettings((prev) => ({
-        ...prev,
-        fontSize: loadedChapter.fontSize || DEFAULT_EDITOR_SETTINGS.fontSize,
-        fontFamily:
-          loadedChapter.fontFamily || DEFAULT_EDITOR_SETTINGS.fontFamily,
-      }));
+      // Editor settings are loaded from book-level store, not from chapter
+      // They persist across all chapters of the same book
     }
   }, [editorChaptersId, getChapter]);
+
+  // Handle settings change - updates both local state and book store
+  const handleSettingsChange = useCallback(
+    (newSettings: EditorSettings) => {
+      setEditorSettings(newSettings);
+      updateBookSettings(dashboardId, newSettings);
+    },
+    [dashboardId, updateBookSettings]
+  );
 
   // Immediate/synchronous save (no setTimeout) - used when user is leaving
   const handleImmediateSave = useCallback(() => {
@@ -196,11 +201,9 @@ function ChapterEditorContent() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize: editorSettings.fontSize,
-      fontFamily: editorSettings.fontFamily,
       lastEdited: now,
     });
-  }, [updateChapter, editorSettings.fontSize, editorSettings.fontFamily]);
+  }, [updateChapter]);
 
   // Auto-save with UI feedback (async with setTimeout)
   const handleAutoSave = useCallback(() => {
@@ -225,8 +228,6 @@ function ChapterEditorContent() {
       wordCount: words,
       characterCount: chars,
       characterCountWithSpaces: charsWithSpaces,
-      fontSize: editorSettings.fontSize,
-      fontFamily: editorSettings.fontFamily,
       lastEdited: now,
     });
 
@@ -236,13 +237,11 @@ function ChapterEditorContent() {
         wordCount: words,
         characterCount: chars,
         characterCountWithSpaces: charsWithSpaces,
-        fontSize: editorSettings.fontSize,
-        fontFamily: editorSettings.fontFamily,
         lastEdited: now,
       }));
       setIsSaving(false);
     }, 500);
-  }, [updateChapter, editorSettings.fontSize, editorSettings.fontFamily]);
+  }, [updateChapter]);
 
   // Load plot arcs
   useEffect(() => {
@@ -812,7 +811,7 @@ function ChapterEditorContent() {
         open={showSettingsModal}
         onOpenChange={setShowSettingsModal}
         settings={editorSettings}
-        onSettingsChange={setEditorSettings}
+        onSettingsChange={handleSettingsChange}
         blacklistedEntityIds={chapter.blacklistedEntityIds}
         mentionedEntities={{
           characters: chapter.mentionedCharacters,

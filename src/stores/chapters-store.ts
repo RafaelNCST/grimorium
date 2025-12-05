@@ -47,9 +47,6 @@ export interface ChapterData {
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
   entityLinks?: EntityLink[]; // Persistent entity links
-  // Editor formatting settings (individual per chapter)
-  fontSize?: number;
-  fontFamily?: string;
 }
 
 interface ChaptersState {
