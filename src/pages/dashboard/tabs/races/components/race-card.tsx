@@ -5,10 +5,10 @@ import { Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
-import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { getDomainDisplayData } from "../helpers/domain-filter-config";
 import { IRace } from "../types/race-types";
 
 interface PropsRaceCard {
@@ -83,22 +83,18 @@ export function RaceCard({
           {/* Domains */}
           <div className="flex flex-wrap gap-1.5">
             {race.domain.map((domainValue) => {
-              const domainData = DOMAIN_CONSTANT.find(
-                (d) => d.value === domainValue
-              );
-              const DomainIcon = domainData?.icon;
+              const { icon: DomainIcon, colorConfig } =
+                getDomainDisplayData(domainValue);
 
-              if (!domainData || !DomainIcon) return null;
+              if (!DomainIcon || !colorConfig) return null;
 
               return (
                 <Badge
                   key={domainValue}
-                  className={`flex items-center gap-1 ${domainData.activeColor} bg-transparent border px-2 py-0.5 pointer-events-none`}
+                  className={`flex items-center gap-1 ${colorConfig.inactiveClasses} px-2 py-0.5 pointer-events-none`}
                 >
                   <DomainIcon className="w-3.5 h-3.5" />
-                  <span className="text-xs font-medium">
-                    {domainData.label}
-                  </span>
+                  <span className="text-xs font-medium">{domainValue}</span>
                 </Badge>
               );
             })}

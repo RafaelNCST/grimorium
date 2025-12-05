@@ -5,19 +5,23 @@ import {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "@/lib/utils";
 
 import { useTextSearch } from "../hooks/useTextSearch";
 import { useUndoRedo } from "../hooks/useUndoRedo";
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
+import { useEntityAutoLink } from "../hooks/useEntityAutoLink";
 import { CURSOR_COLORS } from "../types/editor-settings";
 
 import { ContextMenu } from "./ContextMenu";
 import { SearchBar } from "./SearchBar";
+import { EntityHoverCard } from "./EntityHoverCard";
 
 import type { Annotation } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
+import type { MentionedEntities, EntityLink } from "../types/entity-link";
 
 export interface TextEditorRef {
   undo: () => void;
@@ -45,6 +49,14 @@ interface TextEditorProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  // Entity linking
+  mentionedEntities?: MentionedEntities;
+  bookId?: string; // For navigation to entity details
+  chapterId?: string; // Current chapter ID for back navigation
+  entityLinks?: EntityLink[]; // Persistent entity links
+  onEntityLinksChange?: (links: EntityLink[]) => void;
+  blacklistedEntityIds?: string[]; // Entity IDs blacklisted from auto-linking
+  onBlacklistedEntityIdsChange?: (ids: string[]) => void;
 }
 
 export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
@@ -67,9 +79,17 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       onRedo: externalOnRedo,
       canUndo: externalCanUndo,
       canRedo: externalCanRedo,
+      mentionedEntities,
+      bookId,
+      chapterId,
+      entityLinks,
+      onEntityLinksChange,
+      blacklistedEntityIds,
+      onBlacklistedEntityIdsChange,
     },
     ref
   ) => {
+    const navigate = useNavigate();
     const editorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [selectedSearchText, setSelectedSearchText] = useState("");
@@ -82,6 +102,15 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
     const isImmediateActionRef = useRef(false); // Track if next save should be immediate
+
+    // Entity hover card state
+    const [hoveredEntityLink, setHoveredEntityLink] = useState<{
+      entityLink: EntityLink;
+      x: number;
+      y: number;
+    } | null>(null);
+    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isOverCardRef = useRef(false);
 
     // Undo/Redo functionality
     // Initialize with empty state (will be populated on first edit)
@@ -101,6 +130,38 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       editorRef,
       enabled: true,
     });
+
+    // Entity auto-linking
+    const entityAutoLink = useEntityAutoLink({
+      editorRef,
+      mentionedEntities: mentionedEntities || {
+        characters: [],
+        regions: [],
+        items: [],
+        factions: [],
+        races: [],
+      },
+      enabled: !!mentionedEntities && settings?.showEntityLinks !== false,
+      initialLinks: entityLinks,
+      blacklistedEntityIds: blacklistedEntityIds,
+      onBlacklistChange: onBlacklistedEntityIdsChange,
+    });
+
+    // Notify parent when active links change
+    useEffect(() => {
+      if (onEntityLinksChange) {
+        onEntityLinksChange(entityAutoLink.activeLinks);
+      }
+    }, [entityAutoLink.activeLinks, onEntityLinksChange]);
+
+    // Cleanup hover timeout on unmount
+    useEffect(() => {
+      return () => {
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+        }
+      };
+    }, []);
 
     // Expose undo/redo through ref
     useImperativeHandle(ref, () => ({
@@ -203,19 +264,25 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     };
 
     // Render content with annotations and search highlights
-    const renderContentWithAnnotations = () => {
+    const renderContentWithAnnotations = (
+      annotationsToRender?: Annotation[]
+    ) => {
       if (!content) return "";
 
-      // Combine annotations and search results
+      // Use provided annotations or default to prop
+      const currentAnnotations = annotationsToRender || annotations;
+
+      // Combine annotations, search results, and entity links
       const allHighlights: Array<{
         start: number;
         end: number;
-        type: "annotation" | "search" | "search-current";
+        type: "annotation" | "search" | "search-current" | "entity-link";
         id?: string;
+        entityLink?: EntityLink;
       }> = [];
 
       // Add annotations
-      annotations.forEach((annotation) => {
+      currentAnnotations.forEach((annotation) => {
         allHighlights.push({
           start: annotation.startOffset,
           end: annotation.endOffset,
@@ -233,6 +300,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         });
       });
 
+      // Add entity links
+      entityAutoLink.activeLinks.forEach((link) => {
+        allHighlights.push({
+          start: link.startOffset,
+          end: link.endOffset,
+          type: "entity-link",
+          entityLink: link,
+        });
+      });
+
       // Sort by start position
       allHighlights.sort((a, b) => a.start - b.start);
 
@@ -240,6 +317,9 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       let lastIndex = 0;
 
       allHighlights.forEach((highlight) => {
+        // Skip if this highlight starts before lastIndex (already covered)
+        if (highlight.start < lastIndex) return;
+
         // Add text before highlight
         const beforeText = content.substring(lastIndex, highlight.start);
         result += escapeHtml(beforeText);
@@ -255,7 +335,46 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           const className = isSelected
             ? "annotation-highlight annotation-selected"
             : "annotation-highlight";
+
           result += `<span class="${className}" data-annotation-id="${highlight.id}">${escapeHtml(highlightedText)}</span>`;
+        } else if (highlight.type === "entity-link" && highlight.entityLink) {
+          // Check if this entity link overlaps with any annotation - if so, skip it
+          const hasAnnotationOverlap = currentAnnotations.some(
+            (ann) =>
+              (ann.startOffset <= highlight.start && ann.endOffset >= highlight.end) ||
+              (highlight.start < ann.endOffset && highlight.end > ann.startOffset)
+          );
+
+          if (hasAnnotationOverlap) {
+            return; // Skip rendering entity link if there's an annotation
+          }
+
+          const entity = highlight.entityLink.entity;
+          const linkData = JSON.stringify({
+            text: highlight.entityLink.text,
+            entityId: entity.id,
+            entityName: entity.name,
+            entityType: highlight.entityLink.entityType,
+            entityImage: entity.image,
+            age: entity.age,
+            gender: entity.gender,
+            role: entity.role,
+            status: entity.status,
+            description: entity.description,
+            category: entity.category,
+            basicDescription: entity.basicDescription,
+            summary: entity.summary,
+            factionType: entity.factionType,
+            scientificName: entity.scientificName,
+            domain: entity.domain,
+            scale: entity.scale,
+            parentId: entity.parentId,
+            parentName: entity.parentName,
+            startOffset: highlight.entityLink.startOffset,
+            endOffset: highlight.entityLink.endOffset,
+          });
+
+          result += `<span class="entity-link" data-entity-link='${escapeHtml(linkData)}'>${escapeHtml(highlightedText)}</span>`;
         } else if (highlight.type === "search-current") {
           result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
         } else {
@@ -425,6 +544,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       selectedAnnotationId,
       search.results,
       search.currentIndex,
+      entityAutoLink.activeLinks,
     ]);
 
     // Scroll to annotation when requested
@@ -755,10 +875,34 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       // Clear context menu when typing
       setContextMenu(null);
 
-      // Mark that user is typing to avoid unnecessary re-renders
-      isTypingRef.current = true;
-
       if (editorRef.current) {
+        // CRITICAL: Remove ghost spans with inline background-color that browser creates
+        // This happens when user deletes annotation content and types in the same location
+        const ghostSpans = editorRef.current.querySelectorAll('span[style*="background-color"]');
+        let hasGhostSpans = false;
+        ghostSpans.forEach((span) => {
+          // Check if this is NOT an annotation span, entity link, or search highlight
+          if (
+            !span.classList.contains('annotation-highlight') &&
+            !span.classList.contains('entity-link') &&
+            !span.classList.contains('search-highlight')
+          ) {
+            hasGhostSpans = true;
+            // Remove the background-color style
+            const element = span as HTMLElement;
+            element.style.backgroundColor = '';
+
+            // If the span has no other styles or classes, unwrap it
+            if (!element.style.cssText && !element.className) {
+              const parent = element.parentNode;
+              while (element.firstChild) {
+                parent?.insertBefore(element.firstChild, element);
+              }
+              parent?.removeChild(element);
+            }
+          }
+        });
+
         // Extract plain text content (removes HTML tags) for onChange
         const newContent = editorRef.current.innerText;
 
@@ -770,6 +914,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           ".annotation-highlight"
         );
         const updatedAnnotations: Annotation[] = [];
+        let needsForceRerender = hasGhostSpans; // Force rerender if we found ghost spans
 
         annotationSpans.forEach((span) => {
           const annotationId = span.getAttribute("data-annotation-id");
@@ -783,26 +928,73 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Get the text content of the span
           const spanText = span.textContent || "";
 
-          // Skip if text is completely empty
-          if (spanText.trim().length === 0) return;
+          // RULE 2: Delete annotation if all content is removed
+          if (spanText.length === 0) {
+            needsForceRerender = true;
+            return; // Skip this annotation (will be removed from list)
+          }
 
           // Calculate the offset of this span in the full text
           const range = document.createRange();
           range.selectNodeContents(editorRef.current);
           range.setEnd(span, 0);
           const startOffset = range.toString().length;
-          const endOffset = startOffset + spanText.length;
+
+          // RULE 1: Annotation is fixed and can only shrink, never grow
+          // Calculate the maximum allowed length based on original annotation
+          const originalLength = originalAnnotation.endOffset - originalAnnotation.startOffset;
+          const actualSpanLength = spanText.length;
+
+          // Cap the annotation to its original length
+          const finalLength = Math.min(actualSpanLength, originalLength);
+          const finalText = spanText.substring(0, finalLength);
+          const finalEndOffset = startOffset + finalLength;
+
+          // Check if annotation was capped (grew beyond original size)
+          if (actualSpanLength > originalLength) {
+            needsForceRerender = true;
+          }
 
           updatedAnnotations.push({
             ...originalAnnotation,
-            text: spanText,
+            text: finalText,
             startOffset,
-            endOffset,
+            endOffset: finalEndOffset,
           });
         });
 
+        // Check if annotations were removed (deleted)
+        if (updatedAnnotations.length < annotations.length) {
+          needsForceRerender = true;
+
+          // CRITICAL: Remove all inline background-color styles that the browser might have kept
+          // This prevents the "ghost span" issue where the browser remembers the formatting
+          const allSpans = editorRef.current.querySelectorAll('span[style*="background-color"]');
+          allSpans.forEach((span) => {
+            // Check if this is NOT an annotation span, entity link, or search highlight
+            if (
+              !span.classList.contains('annotation-highlight') &&
+              !span.classList.contains('entity-link') &&
+              !span.classList.contains('search-highlight')
+            ) {
+              // Remove the background-color style
+              const element = span as HTMLElement;
+              element.style.backgroundColor = '';
+
+              // If the span has no other styles or classes, unwrap it
+              if (!element.style.cssText && !element.className) {
+                const parent = element.parentNode;
+                while (element.firstChild) {
+                  parent?.insertBefore(element.firstChild, element);
+                }
+                parent?.removeChild(element);
+              }
+            }
+          });
+        }
+
         // Update annotations if any were removed or changed
-        if (
+        const hasAnnotationChanges =
           updatedAnnotations.length !== annotations.length ||
           updatedAnnotations.some((ann) => {
             const orig = annotations.find((a) => a.id === ann.id);
@@ -812,11 +1004,27 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               orig.startOffset !== ann.startOffset ||
               orig.endOffset !== ann.endOffset
             );
-          })
-        ) {
-          // Mark that this is a local update to avoid re-rendering
+          });
+
+        // Handle force rerender separately - even if annotations didn't "change" in data,
+        // we need to re-render the DOM to fix visual issues (capped spans, deleted annotations)
+        if (needsForceRerender) {
+          // CRITICAL: Reset typing flag to ensure useEffect will re-render
+          isTypingRef.current = false;
+          localAnnotationUpdateRef.current = false;
+
+          // Update annotations if they changed
+          if (hasAnnotationChanges) {
+            onUpdateAnnotations(updatedAnnotations);
+          }
+        } else if (hasAnnotationChanges) {
+          // Normal update - mark as typing to avoid unnecessary re-renders
+          isTypingRef.current = true;
           localAnnotationUpdateRef.current = true;
           onUpdateAnnotations(updatedAnnotations);
+        } else {
+          // No annotation changes and no force rerender - mark as typing to avoid re-render
+          isTypingRef.current = true;
         }
 
         onContentChange(newContent);
@@ -848,17 +1056,29 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         selection.toString().trim() &&
         selection.rangeCount > 0
       ) {
-        const selectedText = selection.toString().trim();
         const range = selection.getRangeAt(0);
 
-        // Calculate offsets
+        // Get the ACTUAL selected text (without trim to preserve exact selection)
+        const actualSelectedText = selection.toString();
+        // Get trimmed version for checking
+        const trimmedText = actualSelectedText.trim();
+
+        // Calculate offsets based on ACTUAL selection (not trimmed)
         const preSelectionRange = range.cloneRange();
         preSelectionRange.selectNodeContents(editorRef.current!);
         preSelectionRange.setEnd(range.startContainer, range.startOffset);
         const startOffset = preSelectionRange.toString().length;
-        const endOffset = startOffset + selectedText.length;
+        const endOffset = startOffset + actualSelectedText.length;
 
-        onTextSelect(selectedText, startOffset, endOffset);
+        // Send the TRIMMED text but calculate proper offsets
+        // Adjust startOffset to account for leading whitespace
+        const leadingWhitespace = actualSelectedText.match(/^\s*/)?.[0].length || 0;
+        const trailingWhitespace = actualSelectedText.match(/\s*$/)?.[0].length || 0;
+
+        const adjustedStartOffset = startOffset + leadingWhitespace;
+        const adjustedEndOffset = endOffset - trailingWhitespace;
+
+        onTextSelect(trimmedText, adjustedStartOffset, adjustedEndOffset);
       }
     };
 
@@ -976,6 +1196,22 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement;
 
+      // Check if clicked on an entity link (only if enabled)
+      const entityLinkSpan = target.closest(".entity-link");
+      if (entityLinkSpan && bookId && settings?.showEntityLinks !== false) {
+        e.preventDefault();
+        const linkDataStr = entityLinkSpan.getAttribute("data-entity-link");
+        if (linkDataStr) {
+          try {
+            const linkData = JSON.parse(linkDataStr);
+            handleEntityLinkClick(linkData.entityType, linkData.entityId);
+          } catch (err) {
+            console.error("Failed to parse entity link data:", err);
+          }
+        }
+        return;
+      }
+
       // Check if clicked on an annotation
       const annotationSpan = target.closest(".annotation-highlight");
       if (annotationSpan) {
@@ -984,6 +1220,126 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           e.preventDefault();
           onAnnotationClick(annotationId);
         }
+      }
+    };
+
+    // Handle entity link navigation (super-view mode)
+    const handleEntityLinkClick = (entityType: string, entityId: string) => {
+      if (!bookId || !chapterId) return;
+
+      const routes: Record<string, string> = {
+        character: `/dashboard/$dashboardId/super-views/character/$characterId`,
+        region: `/dashboard/$dashboardId/super-views/region/$regionId`,
+        item: `/dashboard/$dashboardId/super-views/item/$itemId`,
+        faction: `/dashboard/$dashboardId/super-views/faction/$factionId`,
+        race: `/dashboard/$dashboardId/super-views/race/$raceId`,
+      };
+
+      const route = routes[entityType];
+      if (!route) {
+        console.error(`Unknown entity type: ${entityType}`);
+        return;
+      }
+
+      // Build params dynamically based on entity type
+      const params: Record<string, string> = {
+        dashboardId: bookId,
+      };
+
+      if (entityType === "character") params.characterId = entityId;
+      else if (entityType === "region") params.regionId = entityId;
+      else if (entityType === "item") params.itemId = entityId;
+      else if (entityType === "faction") params.factionId = entityId;
+      else if (entityType === "race") params.raceId = entityId;
+
+      navigate({
+        to: route as any,
+        params: params as any,
+        search: { from: chapterId },
+      });
+    };
+
+    // Handle hover over entity links
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+      // Skip if entity links are disabled
+      if (settings?.showEntityLinks === false) {
+        return;
+      }
+
+      const target = e.target as HTMLElement;
+
+      // Check if hovering over entity link (even if inside annotation)
+      const entityLinkSpan = target.closest(".entity-link");
+
+      if (entityLinkSpan) {
+        // Clear any pending timeout
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+          hoverTimeoutRef.current = null;
+        }
+
+        const linkDataStr = entityLinkSpan.getAttribute("data-entity-link");
+        if (linkDataStr) {
+          try {
+            const linkData = JSON.parse(linkDataStr);
+            const rect = entityLinkSpan.getBoundingClientRect();
+
+            // Only update if it's a different link (check both entity and position)
+            if (
+              !hoveredEntityLink ||
+              hoveredEntityLink.entityLink.entity.id !== linkData.entityId ||
+              hoveredEntityLink.entityLink.startOffset !== linkData.startOffset ||
+              hoveredEntityLink.entityLink.endOffset !== linkData.endOffset
+            ) {
+              setHoveredEntityLink({
+                entityLink: {
+                  text: linkData.text,
+                  entity: {
+                    id: linkData.entityId,
+                    name: linkData.entityName,
+                    image: linkData.entityImage,
+                    // Character fields
+                    age: linkData.age,
+                    gender: linkData.gender,
+                    role: linkData.role,
+                    status: linkData.status,
+                    description: linkData.description,
+                    // Item fields
+                    category: linkData.category,
+                    basicDescription: linkData.basicDescription,
+                    // Faction fields
+                    summary: linkData.summary,
+                    factionType: linkData.factionType,
+                    // Race fields
+                    scientificName: linkData.scientificName,
+                    domain: linkData.domain,
+                    // Region fields
+                    scale: linkData.scale,
+                    parentId: linkData.parentId,
+                    parentName: linkData.parentName,
+                  },
+                  entityType: linkData.entityType,
+                  startOffset: linkData.startOffset,
+                  endOffset: linkData.endOffset,
+                },
+                x: rect.left + rect.width / 2,
+                y: rect.top - 10,
+              });
+            }
+          } catch (err) {
+            console.error("Failed to parse entity link data:", err);
+          }
+        }
+      } else if (hoveredEntityLink && !isOverCardRef.current) {
+        // Clear hover after a delay if mouse is not over card
+        if (hoverTimeoutRef.current) {
+          clearTimeout(hoverTimeoutRef.current);
+        }
+        hoverTimeoutRef.current = setTimeout(() => {
+          if (!isOverCardRef.current) {
+            setHoveredEntityLink(null);
+          }
+        }, 100);
       }
     };
 
@@ -1089,6 +1445,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               onPaste={handlePaste}
               onMouseUp={handleMouseUp}
               onClick={handleClick}
+              onMouseMove={handleMouseMove}
               onKeyDown={handleKeyDown}
               onContextMenu={handleContextMenu}
               className={cn(
@@ -1113,7 +1470,16 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                 "[&_.search-highlight]:transition-colors",
                 "[&_.search-current]:bg-yellow-400 [&_.search-current]:dark:bg-yellow-400/60",
                 "[&_.search-current]:font-medium",
-                "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50"
+                "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50",
+                // Entity link styles (conditional)
+                settings?.showEntityLinks !== false && [
+                  "[&_.entity-link]:border-b-2",
+                  "[&_.entity-link]:border-primary/40",
+                  "[&_.entity-link]:cursor-pointer",
+                  "[&_.entity-link]:transition-all",
+                  "[&_.entity-link]:duration-150",
+                  "[&_.entity-link:hover]:border-primary/70",
+                ]
               )}
               style={
                 {
@@ -1174,6 +1540,58 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             onBold={handleBold}
             onItalic={handleItalic}
           />
+        )}
+
+        {/* Entity Hover Card */}
+        {hoveredEntityLink && settings?.showEntityLinks !== false && (
+          <div
+            className="fixed z-50"
+            style={{
+              left: `${hoveredEntityLink.x}px`,
+              top: `${hoveredEntityLink.y}px`,
+              transform: "translate(-50%, -100%)",
+            }}
+            onMouseEnter={() => {
+              // Mark that mouse is over the card
+              isOverCardRef.current = true;
+              // Clear any pending timeout
+              if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+                hoverTimeoutRef.current = null;
+              }
+            }}
+            onMouseLeave={() => {
+              // Mark that mouse left the card
+              isOverCardRef.current = false;
+              // Close after a short delay
+              hoverTimeoutRef.current = setTimeout(() => {
+                setHoveredEntityLink(null);
+              }, 100);
+            }}
+          >
+            <EntityHoverCard
+              entityLink={hoveredEntityLink.entityLink}
+              onViewDetails={() => {
+                isOverCardRef.current = false;
+                handleEntityLinkClick(
+                  hoveredEntityLink.entityLink.entityType,
+                  hoveredEntityLink.entityLink.entity.id
+                );
+                setHoveredEntityLink(null);
+              }}
+              onRemoveLink={() => {
+                isOverCardRef.current = false;
+                entityAutoLink.addToBlacklist(
+                  hoveredEntityLink.entityLink.entity.id
+                );
+                setHoveredEntityLink(null);
+              }}
+              onClose={() => {
+                isOverCardRef.current = false;
+                setHoveredEntityLink(null);
+              }}
+            />
+          </div>
         )}
       </>
     );

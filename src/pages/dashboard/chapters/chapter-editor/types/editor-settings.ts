@@ -21,6 +21,7 @@ export interface EditorSettings {
   showAnnotationHighlights: boolean;
   enableSpellCheck: boolean;
   showSummarySection: boolean;
+  showEntityLinks: boolean;
 
   // Theme
   sepiaMode: boolean;
@@ -40,6 +41,7 @@ export const DEFAULT_EDITOR_SETTINGS: EditorSettings = {
   showAnnotationHighlights: true,
   enableSpellCheck: true,
   showSummarySection: true,
+  showEntityLinks: true,
   sepiaMode: true,
   cursorColor: "default",
   showWarningToasts: true,

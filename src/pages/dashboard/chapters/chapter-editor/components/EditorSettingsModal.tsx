@@ -1,4 +1,4 @@
-import { Settings, ChevronUp, ChevronDown } from "lucide-react";
+import { Settings, ChevronUp, ChevronDown, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,12 +34,17 @@ import type {
   AutoScrollMode,
   CursorColor,
 } from "../types/editor-settings";
+import type { MentionedEntities } from "../types/entity-link";
 
 interface EditorSettingsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   settings: EditorSettings;
   onSettingsChange: (settings: EditorSettings) => void;
+  // Blacklist management
+  blacklistedEntityIds?: string[];
+  mentionedEntities?: MentionedEntities;
+  onRemoveFromBlacklist?: (entityId: string) => void;
 }
 
 export function EditorSettingsModal({
@@ -47,6 +52,9 @@ export function EditorSettingsModal({
   onOpenChange,
   settings,
   onSettingsChange,
+  blacklistedEntityIds = [],
+  mentionedEntities,
+  onRemoveFromBlacklist,
 }: EditorSettingsModalProps) {
   const updateSetting = <K extends keyof EditorSettings>(
     key: K,
@@ -172,6 +180,22 @@ export function EditorSettingsModal({
                   checked={settings.showSummarySection}
                   onCheckedChange={(checked) =>
                     updateSetting("showSummarySection", checked)
+                  }
+                />
+              </div>
+
+              {/* Entity Links */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Links Automáticos de Entidades</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Sublinha automaticamente entidades mencionadas no texto
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.showEntityLinks}
+                  onCheckedChange={(checked) =>
+                    updateSetting("showEntityLinks", checked)
                   }
                 />
               </div>
@@ -383,6 +407,70 @@ export function EditorSettingsModal({
               </div>
             </div>
           </div>
+
+          {/* Blacklisted Entities Section */}
+          {blacklistedEntityIds.length > 0 && mentionedEntities && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base font-semibold">
+                    Entidades Não Linkadas
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Entidades que você escolheu não auto-linkar neste capítulo
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {blacklistedEntityIds.map((entityId) => {
+                    // Find entity in mentioned entities
+                    const allEntities = [
+                      ...mentionedEntities.characters.map((e) => ({ ...e, type: "Personagem" })),
+                      ...mentionedEntities.regions.map((e) => ({ ...e, type: "Local" })),
+                      ...mentionedEntities.items.map((e) => ({ ...e, type: "Item" })),
+                      ...mentionedEntities.factions.map((e) => ({ ...e, type: "Facção" })),
+                      ...mentionedEntities.races.map((e) => ({ ...e, type: "Raça" })),
+                    ];
+
+                    const entity = allEntities.find((e) => e.id === entityId);
+                    if (!entity) return null;
+
+                    return (
+                      <div
+                        key={entityId}
+                        className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
+                      >
+                        <div className="flex items-center gap-3">
+                          {entity.image && (
+                            <img
+                              src={entity.image}
+                              alt={entity.name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          )}
+                          <div>
+                            <p className="font-medium text-sm">{entity.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {entity.type}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onRemoveFromBlacklist?.(entityId)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer - Fixed at bottom */}

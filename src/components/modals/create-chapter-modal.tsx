@@ -50,6 +50,25 @@ export interface EntityMention {
   id: string;
   name: string;
   image?: string;
+  // Character fields
+  age?: string;
+  gender?: string;
+  role?: string;
+  status?: string;
+  description?: string;
+  // Item fields
+  category?: string;
+  basicDescription?: string;
+  // Faction fields
+  summary?: string;
+  factionType?: string;
+  // Race fields
+  scientificName?: string;
+  domain?: string[];
+  // Region fields
+  scale?: string;
+  parentId?: string;
+  parentName?: string;
 }
 
 export interface IChapterFormData {
@@ -77,6 +96,25 @@ const entityMentionSchema = z.object({
   id: z.string(),
   name: z.string(),
   image: z.string().optional(),
+  // Character fields
+  age: z.string().optional(),
+  gender: z.string().optional(),
+  role: z.string().optional(),
+  status: z.string().optional(),
+  description: z.string().optional(),
+  // Item fields
+  category: z.string().optional(),
+  basicDescription: z.string().optional(),
+  // Faction fields
+  summary: z.string().optional(),
+  factionType: z.string().optional(),
+  // Race fields
+  scientificName: z.string().optional(),
+  domain: z.array(z.string()).optional(),
+  // Region fields
+  scale: z.string().optional(),
+  parentId: z.string().optional(),
+  parentName: z.string().optional(),
 });
 
 const chapterFormSchema = z.object({
@@ -195,19 +233,63 @@ export function CreateChapterModal({
             await Promise.all([
               getPlotArcsByBookId(bookId),
               getCharactersByBookId(bookId).then((data) =>
-                data.map((c) => ({ id: c.id, name: c.name, image: c.image }))
+                data.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  image: c.image,
+                  age: c.age,
+                  gender: c.gender,
+                  role: c.role,
+                  status: c.status,
+                  description: c.description,
+                }))
               ),
               getRegionsByBookId(bookId).then((data) =>
-                data.map((r) => ({ id: r.id, name: r.name, image: r.image }))
+                data.map((r) => {
+                  // Find parent region name if parentId exists
+                  const parentRegion = r.parentId
+                    ? data.find((region: any) => region.id === r.parentId)
+                    : null;
+                  return {
+                    id: r.id,
+                    name: r.name,
+                    image: r.image,
+                    scale: r.scale,
+                    parentId: r.parentId,
+                    parentName: parentRegion?.name || (r.parentId ? "Região Neutra" : undefined),
+                    summary: r.summary,
+                  };
+                })
               ),
               getItemsByBookId(bookId).then((data) =>
-                data.map((i) => ({ id: i.id, name: i.name, image: i.image }))
+                data.map((i) => ({
+                  id: i.id,
+                  name: i.name,
+                  image: i.image,
+                  category: i.category,
+                  basicDescription: i.basicDescription,
+                  status: i.status,
+                }))
               ),
               getFactionsByBookId(bookId).then((data) =>
-                data.map((f) => ({ id: f.id, name: f.name, image: f.image }))
+                data.map((f) => ({
+                  id: f.id,
+                  name: f.name,
+                  image: f.image,
+                  summary: f.summary,
+                  factionType: f.factionType,
+                  status: f.status,
+                }))
               ),
               getRacesByBookId(bookId).then((data) =>
-                data.map((r) => ({ id: r.id, name: r.name, image: r.image }))
+                data.map((r) => ({
+                  id: r.id,
+                  name: r.name,
+                  image: r.image,
+                  scientificName: r.scientificName,
+                  domain: r.domain,
+                  summary: r.summary,
+                }))
               ),
             ]);
 
@@ -227,13 +309,43 @@ export function CreateChapterModal({
   }, [open, bookId]);
 
   // Helper function to convert IDs to EntityMention[]
+  // This function is no longer needed since FormEntityMultiSelectAuto
+  // returns full entity objects in the onChange callback
+  // Keeping it for backwards compatibility but it now passes through the full entity data
   const idsToEntities = (
     ids: string[],
     availableEntities: EntityOption[]
   ): EntityMention[] =>
     ids.map((id) => {
       const entity = availableEntities.find((e) => e.id === id);
-      return entity || { id, name: id, image: undefined };
+      if (!entity) {
+        return { id, name: id, image: undefined };
+      }
+      // Return complete entity with all fields
+      return {
+        id: entity.id,
+        name: entity.name,
+        image: entity.image,
+        // Character fields
+        age: entity.age,
+        gender: entity.gender,
+        role: entity.role,
+        status: entity.status,
+        description: entity.description,
+        // Item fields
+        category: entity.category,
+        basicDescription: entity.basicDescription,
+        // Faction fields
+        summary: entity.summary,
+        factionType: entity.factionType,
+        // Race fields
+        scientificName: entity.scientificName,
+        domain: entity.domain,
+        // Region fields
+        scale: entity.scale,
+        parentId: entity.parentId,
+        parentName: entity.parentName,
+      };
     });
 
   // Helper function to convert EntityMention[] to IDs
@@ -436,11 +548,7 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_characters_selected")}
                           searchPlaceholder={t("modal.search_character")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) =>
-                            field.onChange(
-                              idsToEntities(ids, availableCharacters)
-                            )
-                          }
+                          onChange={(ids, entities) => field.onChange(entities)}
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -465,9 +573,7 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_regions_selected")}
                           searchPlaceholder={t("modal.search_region")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) =>
-                            field.onChange(idsToEntities(ids, availableRegions))
-                          }
+                          onChange={(ids, entities) => field.onChange(entities)}
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -492,9 +598,7 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_items_selected")}
                           searchPlaceholder={t("modal.search_item")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) =>
-                            field.onChange(idsToEntities(ids, availableItems))
-                          }
+                          onChange={(ids, entities) => field.onChange(entities)}
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -521,11 +625,7 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_factions_selected")}
                           searchPlaceholder={t("modal.search_faction")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) =>
-                            field.onChange(
-                              idsToEntities(ids, availableFactions)
-                            )
-                          }
+                          onChange={(ids, entities) => field.onChange(entities)}
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>
@@ -550,9 +650,7 @@ export function CreateChapterModal({
                           noSelectionText={t("modal.no_races_selected")}
                           searchPlaceholder={t("modal.search_race")}
                           value={entitiesToIds(field.value || [])}
-                          onChange={(ids) =>
-                            field.onChange(idsToEntities(ids, availableRaces))
-                          }
+                          onChange={(ids, entities) => field.onChange(entities)}
                           labelClassName="text-sm font-medium text-primary"
                         />
                       </FormControl>

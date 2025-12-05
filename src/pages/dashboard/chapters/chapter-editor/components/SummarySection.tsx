@@ -53,16 +53,6 @@ export function SummarySection({
   const entitiesToIds = (entities: EntityMention[]): string[] =>
     entities.map((e) => e.id);
 
-  // Helper to convert IDs to EntityMention[]
-  const idsToEntities = (
-    ids: string[],
-    availableEntities: EntityOption[]
-  ): EntityMention[] =>
-    ids.map((id) => {
-      const entity = availableEntities.find((e) => e.id === id);
-      return entity || { id, name: id, image: undefined };
-    });
-
   return (
     <Card className="border-2 border-primary/20">
       <div
@@ -112,15 +102,7 @@ export function SummarySection({
             noSelectionText={t("collapsible.no_entities_selected")}
             searchPlaceholder={t("collapsible.mentioned_characters")}
             value={entitiesToIds(mentionedCharacters)}
-            onChange={(ids, entities) =>
-              onMentionedCharactersChange(
-                ids.map((id, index) => ({
-                  id,
-                  name: entities[index]?.name || id,
-                  image: entities[index]?.image,
-                }))
-              )
-            }
+            onChange={(ids, entities) => onMentionedCharactersChange(entities)}
             labelClassName="text-sm font-medium text-primary"
           />
 
@@ -135,13 +117,7 @@ export function SummarySection({
             searchPlaceholder={t("collapsible.mentioned_regions")}
             value={entitiesToIds(mentionedRegions)}
             onChange={(ids, entities) =>
-              onMentionedRegionsChange(
-                ids.map((id, index) => ({
-                  id,
-                  name: entities[index]?.name || id,
-                  image: entities[index]?.image,
-                }))
-              )
+              onMentionedRegionsChange(entities)
             }
             labelClassName="text-sm font-medium text-primary"
           />
@@ -156,15 +132,7 @@ export function SummarySection({
             noSelectionText={t("collapsible.no_entities_selected")}
             searchPlaceholder={t("collapsible.mentioned_items")}
             value={entitiesToIds(mentionedItems)}
-            onChange={(ids, entities) =>
-              onMentionedItemsChange(
-                ids.map((id, index) => ({
-                  id,
-                  name: entities[index]?.name || id,
-                  image: entities[index]?.image,
-                }))
-              )
-            }
+            onChange={(ids, entities) => onMentionedItemsChange(entities)}
             labelClassName="text-sm font-medium text-primary"
           />
 
@@ -179,13 +147,7 @@ export function SummarySection({
             searchPlaceholder={t("collapsible.mentioned_factions")}
             value={entitiesToIds(mentionedFactions)}
             onChange={(ids, entities) =>
-              onMentionedFactionsChange(
-                ids.map((id, index) => ({
-                  id,
-                  name: entities[index]?.name || id,
-                  image: entities[index]?.image,
-                }))
-              )
+              onMentionedFactionsChange(entities)
             }
             labelClassName="text-sm font-medium text-primary"
           />
@@ -201,13 +163,7 @@ export function SummarySection({
             searchPlaceholder={t("collapsible.mentioned_races")}
             value={entitiesToIds(mentionedRaces)}
             onChange={(ids, entities) =>
-              onMentionedRacesChange(
-                ids.map((id, index) => ({
-                  id,
-                  name: entities[index]?.name || id,
-                  image: entities[index]?.image,
-                }))
-              )
+              onMentionedRacesChange(entities)
             }
             labelClassName="text-sm font-medium text-primary"
           />

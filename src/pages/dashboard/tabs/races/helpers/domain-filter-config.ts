@@ -1,4 +1,5 @@
 import { FilterRow, BADGE_COLORS } from "@/components/entity-list";
+import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
 
 import { DomainType } from "../types/race-types";
 
@@ -35,7 +36,7 @@ export function createDomainFilterRows(
 /**
  * Maps domain to its color configuration
  */
-function getDomainColorConfig(domain: DomainType) {
+export function getDomainColorConfig(domain: DomainType) {
   const colorMap: Record<DomainType, keyof typeof BADGE_COLORS> = {
     Aquático: "blue",
     Terrestre: "green",
@@ -48,4 +49,17 @@ function getDomainColorConfig(domain: DomainType) {
   };
 
   return BADGE_COLORS[colorMap[domain]];
+}
+
+/**
+ * Gets domain display data (icon and color config)
+ */
+export function getDomainDisplayData(domain: DomainType) {
+  const domainData = RACE_DOMAINS.find((d) => d.label === domain);
+  const colorConfig = getDomainColorConfig(domain);
+
+  return {
+    icon: domainData?.icon,
+    colorConfig,
+  };
 }

@@ -1,3 +1,5 @@
+import type { EntityLink } from "./types/entity-link";
+
 export type ChapterStatus =
   | "in-progress"
   | "draft"
@@ -26,6 +28,25 @@ export interface EntityMention {
   id: string;
   name: string;
   image?: string;
+  // Character fields
+  age?: string;
+  gender?: string;
+  role?: string;
+  status?: string;
+  description?: string;
+  // Item fields
+  category?: string;
+  basicDescription?: string;
+  // Faction fields
+  summary?: string;
+  factionType?: string;
+  // Race fields
+  scientificName?: string;
+  domain?: string[];
+  // Region fields
+  scale?: string;
+  parentId?: string;
+  parentName?: string;
 }
 
 export interface ChapterData {
@@ -46,6 +67,8 @@ export interface ChapterData {
   mentionedFactions: EntityMention[];
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
+  entityLinks?: EntityLink[]; // Persistent entity links
+  blacklistedEntityIds?: string[]; // Entity IDs that user chose not to auto-link
   // Editor formatting settings (individual per chapter)
   fontSize?: number;
   fontFamily?: string;

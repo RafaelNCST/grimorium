@@ -24,7 +24,6 @@ import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/co
 import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
 import { RACE_COMMUNICATIONS } from "@/components/modals/create-race-modal/constants/communications";
 import { DIET_OPTIONS } from "@/components/modals/create-race-modal/constants/diets";
-import { DOMAIN_CONSTANT } from "@/components/modals/create-race-modal/constants/domains";
 import { HABITS_OPTIONS } from "@/components/modals/create-race-modal/constants/habits";
 import { MORAL_TENDENCY_OPTIONS } from "@/components/modals/create-race-modal/constants/moral-tendencies";
 import { PHYSICAL_CAPACITY_OPTIONS } from "@/components/modals/create-race-modal/constants/physical-capacities";
@@ -45,6 +44,7 @@ import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialo
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
 import { RaceVersionCard } from "./components/race-version-card";
+import { getDomainDisplayData } from "../helpers/domain-filter-config";
 
 import type {
   IRaceRelationship,
@@ -321,22 +321,18 @@ export function RaceDetailView({
             {race.domain && race.domain.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {race.domain.map((domainValue) => {
-                  const domainData = DOMAIN_CONSTANT.find(
-                    (d) => d.value === domainValue
-                  );
-                  const DomainIcon = domainData?.icon;
+                  const { icon: DomainIcon, colorConfig } =
+                    getDomainDisplayData(domainValue);
 
-                  if (!domainData || !DomainIcon) return null;
+                  if (!DomainIcon || !colorConfig) return null;
 
                   return (
                     <Badge
                       key={domainValue}
-                      className={`flex items-center gap-1 ${domainData.activeColor} bg-transparent border px-2 py-0.5 pointer-events-none`}
+                      className={`flex items-center gap-1 ${colorConfig.inactiveClasses} px-2 py-0.5 pointer-events-none`}
                     >
                       <DomainIcon className="w-3.5 h-3.5" />
-                      <span className="text-xs font-medium">
-                        {domainData.label}
-                      </span>
+                      <span className="text-xs font-medium">{domainValue}</span>
                     </Badge>
                   );
                 })}

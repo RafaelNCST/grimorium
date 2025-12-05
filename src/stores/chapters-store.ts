@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
+import type { EntityLink } from "@/pages/dashboard/chapters/chapter-editor/types/entity-link";
 
 export type ChapterStatus =
   | "draft"
@@ -45,6 +46,7 @@ export interface ChapterData {
   mentionedFactions: EntityMention[];
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
+  entityLinks?: EntityLink[]; // Persistent entity links
   // Editor formatting settings (individual per chapter)
   fontSize?: number;
   fontFamily?: string;

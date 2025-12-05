@@ -8,7 +8,12 @@ import {
   Search,
   Bold,
   Italic,
+  ExternalLink,
+  Link,
+  Unlink,
 } from "lucide-react";
+
+import type { EntityLink } from "../types/entity-link";
 
 interface ContextMenuProps {
   x: number;
@@ -22,6 +27,13 @@ interface ContextMenuProps {
   onSearch: () => void;
   onBold: () => void;
   onItalic: () => void;
+  // Entity link actions
+  entityLink?: EntityLink | null;
+  hasAnnotation?: boolean;
+  onViewEntityDetails?: () => void;
+  onViewAnnotation?: () => void;
+  onLinkToEntity?: () => void;
+  onUnlinkEntity?: () => void;
 }
 
 export function ContextMenu({
@@ -36,6 +48,12 @@ export function ContextMenu({
   onSearch,
   onBold,
   onItalic,
+  entityLink,
+  hasAnnotation,
+  onViewEntityDetails,
+  onViewAnnotation,
+  onLinkToEntity,
+  onUnlinkEntity,
 }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -182,6 +200,57 @@ export function ContextMenu({
               Ctrl+I
             </span>
           </button>
+        </>
+      )}
+
+      {/* Entity Link Actions */}
+      {(entityLink || hasAnnotation || (hasSelection && onLinkToEntity)) && (
+        <>
+          <div className="my-1 h-px bg-border" />
+
+          {/* View Entity Details */}
+          {entityLink && onViewEntityDetails && (
+            <button
+              onClick={() => handleAction(onViewEntityDetails)}
+              className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Ver detalhes de {entityLink.entity.name}
+            </button>
+          )}
+
+          {/* View Annotation */}
+          {hasAnnotation && onViewAnnotation && (
+            <button
+              onClick={() => handleAction(onViewAnnotation)}
+              className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Ver anotação
+            </button>
+          )}
+
+          {/* Link to Entity (manual) */}
+          {hasSelection && !entityLink && onLinkToEntity && (
+            <button
+              onClick={() => handleAction(onLinkToEntity)}
+              className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
+            >
+              <Link className="h-4 w-4" />
+              Linkar a entidade mencionada
+            </button>
+          )}
+
+          {/* Unlink Entity */}
+          {entityLink && onUnlinkEntity && (
+            <button
+              onClick={() => handleAction(onUnlinkEntity)}
+              className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors text-destructive hover:bg-destructive/10"
+            >
+              <Unlink className="h-4 w-4" />
+              Remover link
+            </button>
+          )}
         </>
       )}
     </div>

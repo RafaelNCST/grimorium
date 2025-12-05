@@ -64,7 +64,8 @@
       "Bash(lsof:*)",
       "Bash(Stop-Process -Force -Id 19796)",
       "Bash(Stop-Process -Force -Id 23592)",
-      "Bash(Stop-Process -Force -Id 24472)"
+      "Bash(Stop-Process -Force -Id 24472)",
+      "Bash(Stop-Process -Force -Id 26552)"
     ],
     "deny": [
       "Bash(git push --force:*)",

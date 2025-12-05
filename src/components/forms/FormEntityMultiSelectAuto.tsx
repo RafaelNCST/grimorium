@@ -27,6 +27,25 @@ export interface EntityOption {
   id: string;
   name: string;
   image?: string;
+  // Character fields
+  age?: string;
+  gender?: string;
+  role?: string;
+  status?: string;
+  description?: string;
+  // Item fields
+  category?: string;
+  basicDescription?: string;
+  // Faction fields
+  summary?: string;
+  factionType?: string;
+  // Race fields
+  scientificName?: string;
+  domain?: string[];
+  // Region fields
+  scale?: string;
+  parentId?: string;
+  parentName?: string;
 }
 
 interface FormEntityMultiSelectAutoProps {
@@ -141,12 +160,63 @@ const loadEntities = async (
       }
     }
 
-    // Map to EntityOption interface
-    return data.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      image: item.image,
-    }));
+    // Map to EntityOption interface with all relevant fields
+    return data.map((item: any) => {
+      const base = {
+        id: item.id,
+        name: item.name,
+        image: item.image,
+      };
+
+      // Add type-specific fields
+      switch (entityType) {
+        case "character":
+          return {
+            ...base,
+            age: item.age,
+            gender: item.gender,
+            role: item.role,
+            status: item.status,
+            description: item.description,
+          };
+        case "item":
+          return {
+            ...base,
+            category: item.category,
+            basicDescription: item.basicDescription,
+            status: item.status,
+          };
+        case "faction":
+          return {
+            ...base,
+            summary: item.summary,
+            factionType: item.factionType,
+            status: item.status,
+          };
+        case "race":
+          return {
+            ...base,
+            scientificName: item.scientificName,
+            domain: item.domain,
+            summary: item.summary,
+          };
+        case "region": {
+          // Find parent region name if parentId exists
+          const parentRegion = item.parentId
+            ? data.find((r: any) => r.id === item.parentId)
+            : null;
+          return {
+            ...base,
+            scale: item.scale,
+            parentId: item.parentId,
+            parentName: parentRegion?.name || (item.parentId ? "Região Neutra" : undefined),
+            summary: item.summary,
+          };
+        }
+        default:
+          return base;
+      }
+    });
   } catch (error) {
     console.error(`Error loading ${entityType} entities:`, error);
     return [];

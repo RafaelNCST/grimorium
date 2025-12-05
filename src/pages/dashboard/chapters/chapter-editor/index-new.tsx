@@ -279,6 +279,8 @@ function ChapterEditorContent() {
     chapter.mentionedItems,
     chapter.mentionedFactions,
     chapter.mentionedRaces,
+    chapter.entityLinks,
+    chapter.blacklistedEntityIds,
     editorSettings.fontSize,
     editorSettings.fontFamily,
     handleAutoSave,
@@ -690,6 +692,23 @@ function ChapterEditorContent() {
             fontSize={editorSettings.fontSize}
             fontFamily={editorSettings.fontFamily}
             settings={editorSettings}
+            bookId={dashboardId}
+            chapterId={editorChaptersId}
+            mentionedEntities={{
+              characters: chapter.mentionedCharacters,
+              regions: chapter.mentionedRegions,
+              items: chapter.mentionedItems,
+              factions: chapter.mentionedFactions,
+              races: chapter.mentionedRaces,
+            }}
+            entityLinks={chapter.entityLinks}
+            onEntityLinksChange={(links) =>
+              setChapter((prev) => ({ ...prev, entityLinks: links }))
+            }
+            blacklistedEntityIds={chapter.blacklistedEntityIds}
+            onBlacklistedEntityIdsChange={(ids) =>
+              setChapter((prev) => ({ ...prev, blacklistedEntityIds: ids }))
+            }
             summarySection={
               <SummarySection
                 bookId={dashboardId!}
@@ -794,6 +813,22 @@ function ChapterEditorContent() {
         onOpenChange={setShowSettingsModal}
         settings={editorSettings}
         onSettingsChange={setEditorSettings}
+        blacklistedEntityIds={chapter.blacklistedEntityIds}
+        mentionedEntities={{
+          characters: chapter.mentionedCharacters,
+          regions: chapter.mentionedRegions,
+          items: chapter.mentionedItems,
+          factions: chapter.mentionedFactions,
+          races: chapter.mentionedRaces,
+        }}
+        onRemoveFromBlacklist={(entityId) => {
+          setChapter((prev) => ({
+            ...prev,
+            blacklistedEntityIds: prev.blacklistedEntityIds?.filter(
+              (id) => id !== entityId
+            ),
+          }));
+        }}
       />
 
       {/* Stats Detail Modal */}
