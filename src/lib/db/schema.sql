@@ -167,3 +167,77 @@ CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_note_links_note_id ON note_links(note_id);
 CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
 CREATE INDEX IF NOT EXISTS idx_note_links_entity_type ON note_links(entity_type);
+
+-- CAPÍTULOS
+CREATE TABLE IF NOT EXISTS chapters (
+  id TEXT PRIMARY KEY,
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+  chapter_number TEXT NOT NULL,
+  title TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft', -- 'draft', 'in-progress', 'review', 'finished', 'published'
+  plot_arc_id TEXT,
+  summary TEXT,
+  content TEXT, -- Conteúdo completo do capítulo
+  word_count INTEGER DEFAULT 0,
+  character_count INTEGER DEFAULT 0,
+  character_count_with_spaces INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  last_edited INTEGER NOT NULL,
+  UNIQUE(book_id, chapter_number)
+);
+
+-- MENÇÕES DE ENTIDADES EM CAPÍTULOS
+CREATE TABLE IF NOT EXISTS chapter_entity_mentions (
+  id TEXT PRIMARY KEY,
+  chapter_id TEXT NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+  entity_id TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'character', 'region', 'item', 'faction', 'race'
+  entity_name TEXT NOT NULL,
+  entity_image TEXT,
+  created_at INTEGER NOT NULL,
+  UNIQUE(chapter_id, entity_id, entity_type)
+);
+
+-- ANOTAÇÕES DE CAPÍTULOS
+CREATE TABLE IF NOT EXISTS chapter_annotations (
+  id TEXT PRIMARY KEY,
+  chapter_id TEXT NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+  start_offset INTEGER NOT NULL,
+  end_offset INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+-- NOTAS DE ANOTAÇÕES
+CREATE TABLE IF NOT EXISTS chapter_annotation_notes (
+  id TEXT PRIMARY KEY,
+  annotation_id TEXT NOT NULL REFERENCES chapter_annotations(id) ON DELETE CASCADE,
+  text TEXT NOT NULL,
+  is_important INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- LINKS DE ENTIDADES EM CAPÍTULOS
+CREATE TABLE IF NOT EXISTS chapter_entity_links (
+  id TEXT PRIMARY KEY,
+  chapter_id TEXT NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+  entity_id TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'character', 'region', 'item', 'faction', 'race'
+  entity_name TEXT NOT NULL,
+  start_offset INTEGER NOT NULL,
+  end_offset INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+-- ÍNDICES PARA CAPÍTULOS
+CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id);
+CREATE INDEX IF NOT EXISTS idx_chapters_status ON chapters(status);
+CREATE INDEX IF NOT EXISTS idx_chapters_chapter_number ON chapters(chapter_number);
+CREATE INDEX IF NOT EXISTS idx_chapters_last_edited ON chapters(last_edited DESC);
+CREATE INDEX IF NOT EXISTS idx_chapter_entity_mentions_chapter ON chapter_entity_mentions(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_chapter_entity_mentions_entity ON chapter_entity_mentions(entity_id, entity_type);
+CREATE INDEX IF NOT EXISTS idx_chapter_annotations_chapter ON chapter_annotations(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_chapter_annotation_notes_annotation ON chapter_annotation_notes(annotation_id);
+CREATE INDEX IF NOT EXISTS idx_chapter_entity_links_chapter ON chapter_entity_links(chapter_id);

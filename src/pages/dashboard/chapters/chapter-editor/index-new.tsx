@@ -4,6 +4,10 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
+import {
+  getChapterById,
+  updateChapter as updateChapterInDB,
+} from "@/lib/db/chapters.service";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 import { useBookEditorSettingsStore } from "@/stores/book-editor-settings-store";
 import { useChaptersStore } from "@/stores/chapters-store";
@@ -44,7 +48,7 @@ function ChapterEditorContent() {
   const editorChaptersId = params["editor-chapters-id"];
   const navigate = useNavigate();
 
-  const { getChapter, updateChapter, getPreviousChapter, getNextChapter } =
+  const { setCachedChapter, getChapter, getPreviousChapter, getNextChapter } =
     useChaptersStore();
 
   const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
@@ -163,13 +167,33 @@ function ChapterEditorContent() {
 
   // Reload chapter when editorChaptersId changes (navigation between chapters)
   useEffect(() => {
-    const loadedChapter = getChapter(editorChaptersId);
-    if (loadedChapter) {
-      setChapter(loadedChapter);
-      // Editor settings are loaded from book-level store, not from chapter
-      // They persist across all chapters of the same book
-    }
-  }, [editorChaptersId, getChapter]);
+    const loadChapter = async () => {
+      try {
+        // Primeiro tenta do cache
+        let loadedChapter = getChapter(editorChaptersId);
+
+        // Se não estiver no cache, busca do banco
+        if (!loadedChapter) {
+          const chapterFromDB = await getChapterById(editorChaptersId);
+          if (chapterFromDB) {
+            loadedChapter = chapterFromDB;
+            // Salva no cache
+            setCachedChapter(chapterFromDB);
+          }
+        }
+
+        if (loadedChapter) {
+          setChapter(loadedChapter);
+        }
+        // Editor settings are loaded from book-level store, not from chapter
+        // They persist across all chapters of the same book
+      } catch (error) {
+        console.error("[ChapterEditor] Erro ao carregar capítulo:", error);
+      }
+    };
+
+    loadChapter();
+  }, [editorChaptersId, getChapter, setCachedChapter]);
 
   // Handle settings change - updates both local state and book store
   const handleSettingsChange = useCallback(
@@ -181,7 +205,7 @@ function ChapterEditorContent() {
   );
 
   // Immediate/synchronous save (no setTimeout) - used when user is leaving
-  const handleImmediateSave = useCallback(() => {
+  const handleImmediateSave = useCallback(async () => {
     const currentChapter = chapterRef.current;
 
     // Calculate stats
@@ -195,18 +219,27 @@ function ChapterEditorContent() {
 
     const now = new Date().toISOString();
 
-    // Update chapter in store immediately (synchronous)
-    updateChapter(currentChapter.id, {
-      ...currentChapter,
-      wordCount: words,
-      characterCount: chars,
-      characterCountWithSpaces: charsWithSpaces,
-      lastEdited: now,
-    });
-  }, [updateChapter]);
+    try {
+      const updatedData = {
+        ...currentChapter,
+        wordCount: words,
+        characterCount: chars,
+        characterCountWithSpaces: charsWithSpaces,
+        lastEdited: now,
+      };
+
+      // Update chapter in database
+      await updateChapterInDB(currentChapter.id, updatedData);
+
+      // Update cache
+      setCachedChapter(updatedData);
+    } catch (error) {
+      console.error("[ChapterEditor] Erro ao salvar capítulo:", error);
+    }
+  }, [setCachedChapter]);
 
   // Auto-save with UI feedback (async with setTimeout)
-  const handleAutoSave = useCallback(() => {
+  const handleAutoSave = useCallback(async () => {
     const currentChapter = chapterRef.current;
 
     setIsSaving(true);
@@ -222,26 +255,36 @@ function ChapterEditorContent() {
 
     const now = new Date().toISOString();
 
-    // Update chapter in store
-    updateChapter(currentChapter.id, {
-      ...currentChapter,
-      wordCount: words,
-      characterCount: chars,
-      characterCountWithSpaces: charsWithSpaces,
-      lastEdited: now,
-    });
-
-    setTimeout(() => {
-      setChapter((prev) => ({
-        ...prev,
+    try {
+      const updatedData = {
+        ...currentChapter,
         wordCount: words,
         characterCount: chars,
         characterCountWithSpaces: charsWithSpaces,
         lastEdited: now,
-      }));
+      };
+
+      // Update chapter in database
+      await updateChapterInDB(currentChapter.id, updatedData);
+
+      // Update cache
+      setCachedChapter(updatedData);
+
+      setTimeout(() => {
+        setChapter((prev) => ({
+          ...prev,
+          wordCount: words,
+          characterCount: chars,
+          characterCountWithSpaces: charsWithSpaces,
+          lastEdited: now,
+        }));
+        setIsSaving(false);
+      }, 500);
+    } catch (error) {
+      console.error("[ChapterEditor] Erro ao salvar capítulo:", error);
       setIsSaving(false);
-    }, 500);
-  }, [updateChapter]);
+    }
+  }, [setCachedChapter]);
 
   // Load plot arcs
   useEffect(() => {
