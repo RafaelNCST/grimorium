@@ -39,11 +39,9 @@ export async function createTestChapters(
     for (let p = 0; p < paragraphs; p++) {
       const words = [];
       for (let w = 0; w < wordsPerParagraph; w++) {
-        words.push(
-          `palavra${Math.floor(Math.random() * 1000)}`
-        );
+        words.push(`palavra${Math.floor(Math.random() * 1000)}`);
       }
-      content += words.join(" ") + "\n\n";
+      content += `${words.join(" ")}\n\n`;
     }
 
     const wordCount = content.trim().split(/\s+/).length;
@@ -77,8 +75,12 @@ export async function createTestChapters(
   const endTime = performance.now();
   const duration = (endTime - startTime) / 1000;
 
-  console.log(`[Performance Test] ✓ ${count} capítulos criados em ${duration.toFixed(2)}s`);
-  console.log(`[Performance Test] Média: ${(duration / count).toFixed(4)}s por capítulo`);
+  console.log(
+    `[Performance Test] ✓ ${count} capítulos criados em ${duration.toFixed(2)}s`
+  );
+  console.log(
+    `[Performance Test] Média: ${(duration / count).toFixed(4)}s por capítulo`
+  );
 }
 
 /**
@@ -96,12 +98,16 @@ export async function testMetadataLoading(bookId: string): Promise<void> {
 
   console.log(`[Performance Test] ✓ ${metadata.length} capítulos carregados`);
   console.log(`[Performance Test] Tempo: ${duration.toFixed(2)}ms`);
-  console.log(`[Performance Test] Média: ${(duration / metadata.length).toFixed(4)}ms por capítulo`);
+  console.log(
+    `[Performance Test] Média: ${(duration / metadata.length).toFixed(4)}ms por capítulo`
+  );
 
   // Análise de uso de memória (aproximado)
   const avgMetadataSize = JSON.stringify(metadata[0] || {}).length;
   const totalSize = avgMetadataSize * metadata.length;
-  console.log(`[Performance Test] Tamanho estimado em memória: ${(totalSize / 1024).toFixed(2)}KB`);
+  console.log(
+    `[Performance Test] Tamanho estimado em memória: ${(totalSize / 1024).toFixed(2)}KB`
+  );
 }
 
 /**

@@ -23,7 +23,7 @@ export interface EntityMention {
   parentName?: string;
 }
 
-export type EntityType = 'character' | 'region' | 'item' | 'faction' | 'race';
+export type EntityType = "character" | "region" | "item" | "faction" | "race";
 
 export interface EntityLink {
   text: string; // O texto original que o usuário digitou

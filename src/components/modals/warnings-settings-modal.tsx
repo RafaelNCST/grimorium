@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
+
 import { Bell, BellOff, Clock, Type, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,8 @@ export function WarningsSettingsModal({
   settings,
   onSave,
 }: WarningsSettingsModalProps) {
-  const [localSettings, setLocalSettings] = useState<WarningsSettings>(settings);
+  const [localSettings, setLocalSettings] =
+    useState<WarningsSettings>(settings);
 
   // Reseta o estado local sempre que o modal abrir
   useEffect(() => {
@@ -56,7 +58,8 @@ export function WarningsSettingsModal({
             Gerenciar Avisos
           </DialogTitle>
           <DialogDescription>
-            Configure quais tipos de avisos você deseja receber durante a escrita.
+            Configure quais tipos de avisos você deseja receber durante a
+            escrita.
           </DialogDescription>
         </DialogHeader>
 
@@ -73,7 +76,8 @@ export function WarningsSettingsModal({
                 Sistema de Avisos
               </Label>
               <p className="text-sm text-muted-foreground">
-                Desabilita completamente o sistema de avisos (menu lateral e toasts)
+                Desabilita completamente o sistema de avisos (menu lateral e
+                toasts)
               </p>
             </div>
             <Switch
@@ -92,9 +96,12 @@ export function WarningsSettingsModal({
               {/* Notificações (toasts) */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base font-semibold">Notificações (Toasts)</Label>
+                  <Label className="text-base font-semibold">
+                    Notificações (Toasts)
+                  </Label>
                   <p className="text-sm text-muted-foreground">
-                    Exibe notificações popup. Avisos ainda aparecem no menu lateral
+                    Exibe notificações popup. Avisos ainda aparecem no menu
+                    lateral
                   </p>
                 </div>
                 <Switch
@@ -108,7 +115,9 @@ export function WarningsSettingsModal({
               <Separator />
 
               <div className="space-y-4">
-                <Label className="text-base font-semibold">Tipos de Avisos</Label>
+                <Label className="text-base font-semibold">
+                  Tipos de Avisos
+                </Label>
 
                 {/* Avisos de Tempo */}
                 <div className="flex items-center justify-between pl-4">
@@ -124,7 +133,10 @@ export function WarningsSettingsModal({
                   <Switch
                     checked={localSettings.timeWarningsEnabled}
                     onCheckedChange={(timeWarningsEnabled) =>
-                      setLocalSettings({ ...localSettings, timeWarningsEnabled })
+                      setLocalSettings({
+                        ...localSettings,
+                        timeWarningsEnabled,
+                      })
                     }
                   />
                 </div>
@@ -143,7 +155,10 @@ export function WarningsSettingsModal({
                   <Switch
                     checked={localSettings.typographyWarningsEnabled}
                     onCheckedChange={(typographyWarningsEnabled) =>
-                      setLocalSettings({ ...localSettings, typographyWarningsEnabled })
+                      setLocalSettings({
+                        ...localSettings,
+                        typographyWarningsEnabled,
+                      })
                     }
                   />
                 </div>

@@ -58,6 +58,7 @@ interface ChapterCardProps {
     ChapterStatus,
     { label: string; color: string; icon: any }
   >;
+  showStatus?: boolean;
 }
 
 export function ChapterCard({
@@ -65,23 +66,28 @@ export function ChapterCard({
   onClick,
   onDelete,
   statusConfig,
+  showStatus = true,
 }: ChapterCardProps) {
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
   return (
     <Card className="hover:shadow-md transition-shadow relative overflow-hidden">
       {/* Status Badge - Large identifier at top left */}
-      <div className="absolute top-0 left-0 z-10">
-        <Badge
-          variant="secondary"
-          className={`${statusConfig[chapter.status].color} text-white pointer-events-none rounded-none rounded-br-lg px-4 py-2 text-sm font-semibold shadow-md`}
-        >
-          {statusConfig[chapter.status].label}
-        </Badge>
-      </div>
+      {showStatus && (
+        <div className="absolute top-0 left-0 z-10">
+          <Badge
+            variant="secondary"
+            className={`${statusConfig[chapter.status].color} text-white pointer-events-none rounded-none rounded-br-lg px-4 py-2 text-sm font-semibold shadow-md`}
+          >
+            {statusConfig[chapter.status].label}
+          </Badge>
+        </div>
+      )}
 
       <CardHeader
-        className="pb-4 pt-14 cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+        className={`pb-4 cursor-pointer hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 ${
+          showStatus ? "pt-14" : "pt-6"
+        }`}
         onClick={() => onClick?.(chapter.id)}
       >
         <div className="flex items-start justify-between gap-4">

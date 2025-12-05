@@ -341,7 +341,7 @@ export function ItemSuperView({
           basicFields={basicFields}
           advancedFields={advancedFields}
           advancedSectionTitle={t("item-detail:sections.advanced_info")}
-          advancedSectionOpen={true}
+          advancedSectionOpen
         />
       </div>
     </div>

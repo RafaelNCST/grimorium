@@ -12,7 +12,10 @@ interface BookEditorSettingsState {
   getBookSettings: (bookId: string) => EditorSettings;
 
   // Update settings for a specific book
-  updateBookSettings: (bookId: string, updates: Partial<EditorSettings>) => void;
+  updateBookSettings: (
+    bookId: string,
+    updates: Partial<EditorSettings>
+  ) => void;
 
   // Set complete settings for a specific book
   setBookSettings: (bookId: string, settings: EditorSettings) => void;
@@ -30,7 +33,8 @@ export const useBookEditorSettingsStore = create<BookEditorSettingsState>()(
 
       updateBookSettings: (bookId, updates) =>
         set((state) => {
-          const currentSettings = state.bookSettings[bookId] || DEFAULT_EDITOR_SETTINGS;
+          const currentSettings =
+            state.bookSettings[bookId] || DEFAULT_EDITOR_SETTINGS;
           return {
             bookSettings: {
               ...state.bookSettings,

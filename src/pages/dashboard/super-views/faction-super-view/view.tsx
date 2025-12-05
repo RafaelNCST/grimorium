@@ -594,7 +594,7 @@ export function FactionSuperView({
           basicFields={basicFields}
           advancedFields={advancedFields}
           advancedSectionTitle={t("faction-detail:sections.advanced_info")}
-          advancedSectionOpen={true}
+          advancedSectionOpen
         />
       </div>
     </div>

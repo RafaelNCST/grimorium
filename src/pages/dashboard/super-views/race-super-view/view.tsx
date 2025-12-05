@@ -517,7 +517,7 @@ export function RaceSuperView({
           basicFields={basicFields}
           advancedFields={advancedFields}
           advancedSectionTitle={t("race-detail:sections.advanced_info")}
-          advancedSectionOpen={true}
+          advancedSectionOpen
         />
       </div>
     </div>

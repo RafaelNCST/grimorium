@@ -174,7 +174,12 @@ interface MetricCardProps {
   description: string;
 }
 
-function MetricCard({ icon: Icon, label, value, description }: MetricCardProps) {
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  description,
+}: MetricCardProps) {
   return (
     <div className="bg-card border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors">
       <div className="flex items-start gap-3">

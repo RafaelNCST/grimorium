@@ -367,7 +367,7 @@ export function RegionSuperView({
           basicFields={basicFields}
           advancedFields={advancedFields}
           advancedSectionTitle={t("region-detail:sections.advanced_info")}
-          advancedSectionOpen={true}
+          advancedSectionOpen
         />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface UseEditorShortcutsProps {
   editorRef: React.RefObject<HTMLDivElement>;
@@ -16,7 +16,7 @@ export function useEditorShortcuts({
   editorRef,
   enabled = true,
 }: UseEditorShortcutsProps) {
-  const lastInputRef = useRef<string>('');
+  const lastInputRef = useRef<string>("");
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -36,11 +36,14 @@ export function useEditorShortcuts({
       const selectedText = selection.toString();
 
       // Rule 4: Wrap selection with quotes or asterisks
-      if (hasSelection && (inputChar === '"' || inputChar === "'" || inputChar === '*')) {
+      if (
+        hasSelection &&
+        (inputChar === '"' || inputChar === "'" || inputChar === "*")
+      ) {
         e.preventDefault();
         wrapSelection(range, inputChar, inputChar);
         // Trigger input event manually
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
         return;
       }
 
@@ -51,31 +54,34 @@ export function useEditorShortcuts({
       if ((inputChar === '"' || inputChar === "'") && !hasTextAfterCursor) {
         e.preventDefault();
         insertAutoClosePair(range, inputChar, inputChar);
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
         return;
       }
 
       // Rule 3: Auto-close asterisks
-      if (inputChar === '*' && !hasTextAfterCursor) {
+      if (inputChar === "*" && !hasTextAfterCursor) {
         e.preventDefault();
-        insertAutoClosePair(range, '*', '*');
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
+        insertAutoClosePair(range, "*", "*");
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
         return;
       }
 
       // Rule 1: -- → em-dash
-      if (inputChar === '-') {
+      if (inputChar === "-") {
         const textBefore = getTextBeforeCursor(range, 1);
-        if (textBefore === '-') {
+        if (textBefore === "-") {
           e.preventDefault();
           // Remove the previous dash
           const deleteRange = range.cloneRange();
-          deleteRange.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
+          deleteRange.setStart(
+            range.startContainer,
+            Math.max(0, range.startOffset - 1)
+          );
           deleteRange.setEnd(range.startContainer, range.startOffset);
           deleteRange.deleteContents();
 
           // Insert em-dash
-          const emDash = document.createTextNode('—');
+          const emDash = document.createTextNode("—");
           range.insertNode(emDash);
 
           // Move cursor after em-dash
@@ -84,14 +90,14 @@ export function useEditorShortcuts({
           selection.removeAllRanges();
           selection.addRange(range);
 
-          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          editor.dispatchEvent(new Event("input", { bubbles: true }));
           return;
         }
       }
     };
 
-    editor.addEventListener('beforeinput', handleBeforeInput);
-    return () => editor.removeEventListener('beforeinput', handleBeforeInput);
+    editor.addEventListener("beforeinput", handleBeforeInput);
+    return () => editor.removeEventListener("beforeinput", handleBeforeInput);
   }, [editorRef, enabled]);
 }
 
@@ -103,12 +109,12 @@ function getTextBeforeCursor(range: Range, maxLength: number): string {
   const offset = range.startOffset;
 
   if (container.nodeType === Node.TEXT_NODE) {
-    const text = container.textContent || '';
+    const text = container.textContent || "";
     const start = Math.max(0, offset - maxLength);
     return text.slice(start, offset);
   }
 
-  return '';
+  return "";
 }
 
 /**
@@ -120,11 +126,11 @@ function checkTextAfterCursor(range: Range): boolean {
   const offset = range.startOffset;
 
   if (container.nodeType === Node.TEXT_NODE) {
-    const text = container.textContent || '';
+    const text = container.textContent || "";
     const nextChar = text.charAt(offset);
 
     // Consider text exists if next char is not whitespace or empty
-    if (nextChar && nextChar.trim() !== '') {
+    if (nextChar && nextChar.trim() !== "") {
       return true;
     }
   }
@@ -133,7 +139,7 @@ function checkTextAfterCursor(range: Range): boolean {
   const nextNode = getNextTextNode(container, offset);
   if (nextNode && nextNode.textContent) {
     const firstChar = nextNode.textContent.charAt(0);
-    return firstChar.trim() !== '';
+    return firstChar.trim() !== "";
   }
 
   return false;
@@ -145,7 +151,7 @@ function checkTextAfterCursor(range: Range): boolean {
 function getNextTextNode(node: Node, offset: number): Node | null {
   // If we're in a text node and there's text after offset
   if (node.nodeType === Node.TEXT_NODE) {
-    const text = node.textContent || '';
+    const text = node.textContent || "";
     if (offset < text.length) {
       return node;
     }
@@ -169,7 +175,11 @@ function getNextTextNode(node: Node, offset: number): Node | null {
 /**
  * Inserts an auto-closing pair and positions cursor between them
  */
-function insertAutoClosePair(range: Range, openChar: string, closeChar: string) {
+function insertAutoClosePair(
+  range: Range,
+  openChar: string,
+  closeChar: string
+) {
   const selection = window.getSelection();
   if (!selection) return;
 

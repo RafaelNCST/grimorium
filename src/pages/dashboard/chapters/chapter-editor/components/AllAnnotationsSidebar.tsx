@@ -73,89 +73,91 @@ export function AllAnnotationsSidebar({
           ) : (
             <div className="p-4 space-y-3">
               {annotations.map((annotation) => {
-              const hasImportantNotes = annotation.notes.some(
-                (n) => n.isImportant
-              );
+                const hasImportantNotes = annotation.notes.some(
+                  (n) => n.isImportant
+                );
 
-              return (
-                <Card
-                  key={annotation.id}
-                  onClick={() => handleNavigate(annotation.id)}
-                  className={cn(
-                    "p-4 cursor-pointer",
-                    "hover:bg-white/5 dark:hover:bg-white/10 hover:border-primary/30 transition-colors duration-200",
-                    hasImportantNotes &&
-                      "border-2 border-amber-500/50 bg-amber-500/5 hover:border-amber-500"
-                  )}
-                >
-                  {/* Selected text with pin icon */}
-                  <div className="mb-3">
-                    <p className="text-xs text-muted-foreground mb-1.5">
-                      {t("annotations.selected_text")}:
-                    </p>
-                    <div className="flex items-start gap-2 group">
-                      <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <p className="text-sm font-medium italic flex-1 group-hover:text-primary transition-colors">
-                        "{annotation.text}"
+                return (
+                  <Card
+                    key={annotation.id}
+                    onClick={() => handleNavigate(annotation.id)}
+                    className={cn(
+                      "p-4 cursor-pointer",
+                      "hover:bg-white/5 dark:hover:bg-white/10 hover:border-primary/30 transition-colors duration-200",
+                      hasImportantNotes &&
+                        "border-2 border-amber-500/50 bg-amber-500/5 hover:border-amber-500"
+                    )}
+                  >
+                    {/* Selected text with pin icon */}
+                    <div className="mb-3">
+                      <p className="text-xs text-muted-foreground mb-1.5">
+                        {t("annotations.selected_text")}:
                       </p>
-                    </div>
-                  </div>
-
-                  {/* Notes count and preview */}
-                  {annotation.notes.length > 0 ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-medium">
-                          {annotation.notes.length}{" "}
-                          {annotation.notes.length === 1 ? "nota" : "notas"}
-                        </span>
-                        {hasImportantNotes && (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Star className="w-3 h-3 text-amber-500 fill-current" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Contém notas importantes</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
+                      <div className="flex items-start gap-2 group">
+                        <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <p className="text-sm font-medium italic flex-1 group-hover:text-primary transition-colors">
+                          "{annotation.text}"
+                        </p>
                       </div>
+                    </div>
 
-                      {/* Notes preview */}
-                      <div className="space-y-1.5">
-                        {annotation.notes.slice(0, 3).map((note) => (
-                          <div
-                            key={note.id}
-                            className={cn(
-                              "p-2 rounded text-xs",
-                              note.isImportant
-                                ? "bg-amber-500/10 border border-amber-500/30"
-                                : "bg-muted/50"
-                            )}
-                          >
-                            <div className="flex items-start gap-1.5">
-                              {note.isImportant && (
-                                <Star className="w-3 h-3 text-amber-500 fill-current shrink-0 mt-0.5" />
+                    {/* Notes count and preview */}
+                    {annotation.notes.length > 0 ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="font-medium">
+                            {annotation.notes.length}{" "}
+                            {annotation.notes.length === 1 ? "nota" : "notas"}
+                          </span>
+                          {hasImportantNotes && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Star className="w-3 h-3 text-amber-500 fill-current" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Contém notas importantes</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+
+                        {/* Notes preview */}
+                        <div className="space-y-1.5">
+                          {annotation.notes.slice(0, 3).map((note) => (
+                            <div
+                              key={note.id}
+                              className={cn(
+                                "p-2 rounded text-xs",
+                                note.isImportant
+                                  ? "bg-amber-500/10 border border-amber-500/30"
+                                  : "bg-muted/50"
                               )}
-                              <p className="flex-1 line-clamp-2">{note.text}</p>
+                            >
+                              <div className="flex items-start gap-1.5">
+                                {note.isImportant && (
+                                  <Star className="w-3 h-3 text-amber-500 fill-current shrink-0 mt-0.5" />
+                                )}
+                                <p className="flex-1 line-clamp-2">
+                                  {note.text}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                        {annotation.notes.length > 3 && (
-                          <p className="text-xs text-muted-foreground text-center pt-1">
-                            +{annotation.notes.length - 3} mais...
-                          </p>
-                        )}
+                          ))}
+                          {annotation.notes.length > 3 && (
+                            <p className="text-xs text-muted-foreground text-center pt-1">
+                              +{annotation.notes.length - 3} mais...
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground italic">
-                      Sem notas ainda
-                    </p>
-                  )}
-                </Card>
-              );
-            })}
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">
+                        Sem notas ainda
+                      </p>
+                    )}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </ScrollArea>

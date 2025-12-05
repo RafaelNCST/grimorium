@@ -39,12 +39,13 @@ import {
   CreateVersionWithEntityDialog,
 } from "@/components/version-system";
 
+import { getDomainDisplayData } from "../helpers/domain-filter-config";
+
 import { CommunicationDisplay } from "./components/communication-display";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
 import { RaceVersionCard } from "./components/race-version-card";
-import { getDomainDisplayData } from "../helpers/domain-filter-config";
 
 import type {
   IRaceRelationship,

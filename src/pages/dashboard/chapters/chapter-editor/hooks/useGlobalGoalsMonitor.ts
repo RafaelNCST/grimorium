@@ -128,7 +128,11 @@ export function useGlobalGoalsMonitor({
 
     // ========== METAS DE PALAVRAS ==========
 
-    if (globalGoals.words.enabled && globalGoals.words.target > 0 && !globalGoals.words.silent) {
+    if (
+      globalGoals.words.enabled &&
+      globalGoals.words.target > 0 &&
+      !globalGoals.words.silent
+    ) {
       const percentage = (metrics.wordCount / globalGoals.words.target) * 100;
 
       // Notificação aos 90%
@@ -213,8 +217,7 @@ export function useGlobalGoalsMonitor({
       !globalGoals.sessionTime.silent
     ) {
       const percentage =
-        (metrics.sessionDuration / globalGoals.sessionTime.targetMinutes) *
-        100;
+        (metrics.sessionDuration / globalGoals.sessionTime.targetMinutes) * 100;
 
       // Notificação aos 90%
       if (

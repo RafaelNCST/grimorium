@@ -116,9 +116,7 @@ export function SummarySection({
             noSelectionText={t("collapsible.no_entities_selected")}
             searchPlaceholder={t("collapsible.mentioned_regions")}
             value={entitiesToIds(mentionedRegions)}
-            onChange={(ids, entities) =>
-              onMentionedRegionsChange(entities)
-            }
+            onChange={(ids, entities) => onMentionedRegionsChange(entities)}
             labelClassName="text-sm font-medium text-primary"
           />
 
@@ -146,9 +144,7 @@ export function SummarySection({
             noSelectionText={t("collapsible.no_entities_selected")}
             searchPlaceholder={t("collapsible.mentioned_factions")}
             value={entitiesToIds(mentionedFactions)}
-            onChange={(ids, entities) =>
-              onMentionedFactionsChange(entities)
-            }
+            onChange={(ids, entities) => onMentionedFactionsChange(entities)}
             labelClassName="text-sm font-medium text-primary"
           />
 
@@ -162,9 +158,7 @@ export function SummarySection({
             noSelectionText={t("collapsible.no_entities_selected")}
             searchPlaceholder={t("collapsible.mentioned_races")}
             value={entitiesToIds(mentionedRaces)}
-            onChange={(ids, entities) =>
-              onMentionedRacesChange(entities)
-            }
+            onChange={(ids, entities) => onMentionedRacesChange(entities)}
             labelClassName="text-sm font-medium text-primary"
           />
         </div>

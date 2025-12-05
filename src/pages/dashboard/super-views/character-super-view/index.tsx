@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { getCharacterById } from "@/lib/db/characters.service";
-import type { ICharacter } from "@/types/character-types";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/character/$characterId";
+import type { ICharacter } from "@/types/character-types";
 
 import { CharacterSuperView } from "./view";
 

@@ -209,7 +209,9 @@ const loadEntities = async (
             ...base,
             scale: item.scale,
             parentId: item.parentId,
-            parentName: parentRegion?.name || (item.parentId ? "Região Neutra" : undefined),
+            parentName:
+              parentRegion?.name ||
+              (item.parentId ? "Região Neutra" : undefined),
             summary: item.summary,
           };
         }

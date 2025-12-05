@@ -1,18 +1,27 @@
-import { ExternalLink, X, MapPin, User, Swords, Building2, Dna, Map } from "lucide-react";
+import {
+  ExternalLink,
+  X,
+  MapPin,
+  User,
+  Swords,
+  Building2,
+  Dna,
+  Map,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
 import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
-import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
-import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
-import { getDomainDisplayData } from "@/pages/dashboard/tabs/races/helpers/domain-filter-config";
-import { REGION_SCALES_CONSTANT } from "@/pages/dashboard/tabs/world/constants/scale-colors";
+import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getDomainDisplayData } from "@/pages/dashboard/tabs/races/helpers/domain-filter-config";
+import { REGION_SCALES_CONSTANT } from "@/pages/dashboard/tabs/world/constants/scale-colors";
 
 import type { EntityLink } from "../types/entity-link";
 
@@ -93,7 +102,6 @@ export function EntityHoverCard({
     return t(`create-faction:status.${status}`, status);
   };
 
-
   // Translate region scale
   const translateScale = (scale?: string) => {
     if (!scale) return scale;
@@ -136,7 +144,6 @@ export function EntityHoverCard({
     return FACTION_STATUS_CONSTANT.find((s) => s.value === status);
   };
 
-
   // Get badge config for region scale
   const getScaleConfig = (scale?: string) => {
     if (!scale) return null;
@@ -154,17 +161,16 @@ export function EntityHoverCard({
     return icons[type] || User;
   };
 
-  const getEntityInitials = (name: string) => {
-    return name
+  const getEntityInitials = (name: string) =>
+    name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .slice(0, 2)
       .toUpperCase();
-  };
 
   const renderEntityDetails = () => {
-    const entity = entityLink.entity;
+    const { entity } = entityLink;
 
     switch (entityLink.entityType) {
       case "character":
@@ -203,7 +209,8 @@ export function EntityHoverCard({
               )}
               {entity.gender && (
                 <p className="text-muted-foreground">
-                  <span className="font-medium">Gênero:</span> {translateGender(entity.gender)}
+                  <span className="font-medium">Gênero:</span>{" "}
+                  {translateGender(entity.gender)}
                 </p>
               )}
             </div>
@@ -301,7 +308,8 @@ export function EntityHoverCard({
             {entity.domain && entity.domain.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {entity.domain.map((d) => {
-                  const { icon: DomainIcon, colorConfig } = getDomainDisplayData(d as any);
+                  const { icon: DomainIcon, colorConfig } =
+                    getDomainDisplayData(d as any);
 
                   if (!DomainIcon || !colorConfig) return null;
 
@@ -374,7 +382,10 @@ export function EntityHoverCard({
           {/* Entity Avatar/Image */}
           {entityLink.entity.image ? (
             <Avatar className="w-12 h-12 flex-shrink-0">
-              <AvatarImage src={entityLink.entity.image} className="object-cover" />
+              <AvatarImage
+                src={entityLink.entity.image}
+                className="object-cover"
+              />
               <AvatarFallback className="text-sm bg-gradient-to-br from-primary/20 to-primary/10">
                 {getEntityInitials(entityLink.entity.name)}
               </AvatarFallback>

@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useRef } from "react";
+
 import { ChapterMetrics } from "../types/metrics";
 
 interface UseTimeWarningsMonitorProps {

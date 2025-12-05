@@ -83,9 +83,7 @@ export function GlobalGoalsProvider({ children }: GlobalGoalsProviderProps) {
   }, []);
 
   const isGoalApplicableToStatus = useCallback(
-    (status: ChapterStatus): boolean => {
-      return goals.appliesTo.includes(status);
-    },
+    (status: ChapterStatus): boolean => goals.appliesTo.includes(status),
     [goals.appliesTo]
   );
 
@@ -110,9 +108,7 @@ export function useGlobalGoals() {
   const context = useContext(GlobalGoalsContext);
 
   if (!context) {
-    throw new Error(
-      "useGlobalGoals must be used within a GlobalGoalsProvider"
-    );
+    throw new Error("useGlobalGoals must be used within a GlobalGoalsProvider");
   }
 
   return context;

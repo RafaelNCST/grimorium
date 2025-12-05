@@ -96,10 +96,8 @@ export function ChaptersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const { goals: globalGoals, updateGoals } = useGlobalGoals();
-  const {
-    settings: warningsSettings,
-    updateSettings: updateWarningsSettings,
-  } = useWarningsSettings();
+  const { settings: warningsSettings, updateSettings: updateWarningsSettings } =
+    useWarningsSettings();
 
   // Load plot arcs and chapters
   useEffect(() => {
@@ -113,7 +111,9 @@ export function ChaptersPage() {
 
         // Verificar se há dados no localStorage para migrar
         if (hasChaptersInLocalStorage()) {
-          console.log("[ChaptersPage] Detectados capítulos no localStorage, migrando...");
+          console.log(
+            "[ChaptersPage] Detectados capítulos no localStorage, migrando..."
+          );
           await migrateChaptersFromLocalStorage(dashboardId);
         }
 
@@ -272,8 +272,10 @@ export function ChaptersPage() {
   // Componente auxiliar para lista virtualizada
   const VirtualizedChapterList = ({
     chapters,
+    showStatus,
   }: {
     chapters: Chapter[];
+    showStatus: boolean;
   }) => {
     const rowVirtualizer = useVirtualizer({
       count: chapters.length,
@@ -310,6 +312,7 @@ export function ChaptersPage() {
               onClick={handleChapterClick}
               onDelete={handleChapterDelete}
               statusConfig={statusConfig}
+              showStatus={showStatus}
             />
           ))}
         </div>
@@ -345,6 +348,7 @@ export function ChaptersPage() {
                   onClick={handleChapterClick}
                   onDelete={handleChapterDelete}
                   statusConfig={statusConfig}
+                  showStatus={showStatus}
                 />
               </div>
             </div>
@@ -487,33 +491,69 @@ export function ChaptersPage() {
                   className="w-1/2 mt-4"
                 />
 
-                <TabsContent value="all" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
-                  <VirtualizedChapterList chapters={getFilteredChapters("all")} />
+                <TabsContent
+                  value="all"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
+                  <VirtualizedChapterList
+                    chapters={getFilteredChapters("all")}
+                    showStatus={true}
+                  />
                 </TabsContent>
 
-                <TabsContent value="draft" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
-                  <VirtualizedChapterList chapters={getFilteredChapters("draft")} />
+                <TabsContent
+                  value="draft"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
+                  <VirtualizedChapterList
+                    chapters={getFilteredChapters("draft")}
+                    showStatus={false}
+                  />
                 </TabsContent>
 
-                <TabsContent value="in-progress" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
+                <TabsContent
+                  value="in-progress"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("in-progress")}
+                    showStatus={false}
                   />
                 </TabsContent>
 
-                <TabsContent value="review" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
-                  <VirtualizedChapterList chapters={getFilteredChapters("review")} />
+                <TabsContent
+                  value="review"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
+                  <VirtualizedChapterList
+                    chapters={getFilteredChapters("review")}
+                    showStatus={false}
+                  />
                 </TabsContent>
 
-                <TabsContent value="finished" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
+                <TabsContent
+                  value="finished"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("finished")}
+                    showStatus={false}
                   />
                 </TabsContent>
 
-                <TabsContent value="published" className="mt-4 relative" style={{ minHeight: 'calc(100vh - 300px)' }}>
+                <TabsContent
+                  value="published"
+                  className="mt-4 relative"
+                  style={{ minHeight: "calc(100vh - 300px)" }}
+                >
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("published")}
+                    showStatus={false}
                   />
                 </TabsContent>
               </Tabs>

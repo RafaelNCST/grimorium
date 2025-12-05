@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { getRaceById } from "@/lib/db/races.service";
-import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRaceVersion } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
+import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/race/$raceId";
 
 import { RaceSuperView } from "./view";

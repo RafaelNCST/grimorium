@@ -10,6 +10,7 @@
  */
 
 import React from "react";
+
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -21,8 +22,10 @@ import {
   Info,
   AlertCircle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
 import {
   Warning,
   WARNING_SEVERITY_COLORS,
@@ -38,7 +41,10 @@ interface WarningItemProps {
 /**
  * Mapeamento de ícones por tipo de aviso
  */
-const TYPE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const TYPE_ICON_MAP: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
   typography: Type,
   goals: Target,
   time: AlertTriangle,
@@ -47,7 +53,10 @@ const TYPE_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>>
 /**
  * Mapeamento de ícones por severidade
  */
-const SEVERITY_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const SEVERITY_ICON_MAP: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
   info: Info,
   warning: AlertCircle,
   error: AlertTriangle,

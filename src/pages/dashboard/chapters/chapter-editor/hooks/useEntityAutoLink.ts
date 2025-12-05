@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from "react";
 
-import type { EntityMention, MentionedEntities, EntityType, EntityLink } from '../types/entity-link';
+import type {
+  EntityMention,
+  MentionedEntities,
+  EntityType,
+  EntityLink,
+} from "../types/entity-link";
 
 interface UseEntityAutoLinkProps {
   editorRef: React.RefObject<HTMLDivElement>;
@@ -75,7 +80,7 @@ export function useEntityAutoLink({
 
     // Also handle space key directly (no debounce)
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === ' ') {
+      if (e.key === " ") {
         // Clear existing timer
         if (debounceTimerRef.current) {
           clearTimeout(debounceTimerRef.current);
@@ -88,12 +93,12 @@ export function useEntityAutoLink({
       }
     };
 
-    editor.addEventListener('input', handleInput);
-    editor.addEventListener('keydown', handleKeyDown);
+    editor.addEventListener("input", handleInput);
+    editor.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      editor.removeEventListener('input', handleInput);
-      editor.removeEventListener('keydown', handleKeyDown);
+      editor.removeEventListener("input", handleInput);
+      editor.removeEventListener("keydown", handleKeyDown);
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
@@ -113,19 +118,37 @@ export function useEntityAutoLink({
 
     // Flatten all mentioned entities with their types
     const allEntities: Array<{ entity: EntityMention; type: EntityType }> = [
-      ...mentionedEntities.characters.map(e => ({ entity: e, type: 'character' as EntityType })),
-      ...mentionedEntities.regions.map(e => ({ entity: e, type: 'region' as EntityType })),
-      ...mentionedEntities.items.map(e => ({ entity: e, type: 'item' as EntityType })),
-      ...mentionedEntities.factions.map(e => ({ entity: e, type: 'faction' as EntityType })),
-      ...mentionedEntities.races.map(e => ({ entity: e, type: 'race' as EntityType })),
+      ...mentionedEntities.characters.map((e) => ({
+        entity: e,
+        type: "character" as EntityType,
+      })),
+      ...mentionedEntities.regions.map((e) => ({
+        entity: e,
+        type: "region" as EntityType,
+      })),
+      ...mentionedEntities.items.map((e) => ({
+        entity: e,
+        type: "item" as EntityType,
+      })),
+      ...mentionedEntities.factions.map((e) => ({
+        entity: e,
+        type: "faction" as EntityType,
+      })),
+      ...mentionedEntities.races.map((e) => ({
+        entity: e,
+        type: "race" as EntityType,
+      })),
     ];
 
     // On first run, keep initial links that are still valid
     let persistedLinks: EntityLink[] = [];
     if (!initialLinksLoadedRef.current && initialLinks.length > 0) {
-      persistedLinks = initialLinks.filter(link => {
+      persistedLinks = initialLinks.filter((link) => {
         // Check if the link's text is still at the same position in content
-        const textAtPosition = content.substring(link.startOffset, link.endOffset);
+        const textAtPosition = content.substring(
+          link.startOffset,
+          link.endOffset
+        );
         return textAtPosition === link.text;
       });
       initialLinksLoadedRef.current = true;
@@ -135,7 +158,7 @@ export function useEntityAutoLink({
     for (const word of words) {
       // Skip if already in persisted links (prevent duplicate linking)
       const alreadyLinked = persistedLinks.some(
-        link => link.startOffset === word.start && link.endOffset === word.end
+        (link) => link.startOffset === word.start && link.endOffset === word.end
       );
       if (alreadyLinked) {
         continue;
@@ -164,15 +187,17 @@ export function useEntityAutoLink({
     const allLinks = [...persistedLinks, ...newLinks];
 
     // Only update if links actually changed (deep comparison by entity id and position)
-    setActiveLinks(prev => {
+    setActiveLinks((prev) => {
       if (prev.length !== allLinks.length) return allLinks;
 
       const hasChanges = allLinks.some((newLink, index) => {
         const oldLink = prev[index];
-        return !oldLink ||
-               oldLink.entity.id !== newLink.entity.id ||
-               oldLink.startOffset !== newLink.startOffset ||
-               oldLink.endOffset !== newLink.endOffset;
+        return (
+          !oldLink ||
+          oldLink.entity.id !== newLink.entity.id ||
+          oldLink.startOffset !== newLink.startOffset ||
+          oldLink.endOffset !== newLink.endOffset
+        );
       });
 
       return hasChanges ? allLinks : prev;
@@ -205,8 +230,8 @@ export function useEntityAutoLink({
     }
 
     // Remove all links for this entity from active links
-    setActiveLinks(prev =>
-      prev.filter(link => link.entity.id !== entityId)
+    setActiveLinks((prev) =>
+      prev.filter((link) => link.entity.id !== entityId)
     );
   };
 
@@ -221,7 +246,9 @@ export function useEntityAutoLink({
 /**
  * Extracts words with their positions from text
  */
-function extractWords(text: string): Array<{ text: string; start: number; end: number }> {
+function extractWords(
+  text: string
+): Array<{ text: string; start: number; end: number }> {
   const words: Array<{ text: string; start: number; end: number }> = [];
 
   // Match words (letters, numbers, hyphens, apostrophes)
@@ -257,7 +284,10 @@ function findBestMatch(
     const normalizedEntityName = entity.name.toLowerCase().trim();
 
     // Calculate similarity
-    const similarity = calculateSimilarity(normalizedText, normalizedEntityName);
+    const similarity = calculateSimilarity(
+      normalizedText,
+      normalizedEntityName
+    );
 
     if (similarity >= threshold && similarity > bestSimilarity) {
       bestSimilarity = similarity;
@@ -311,9 +341,9 @@ function levenshteinDistance(str1: string, str2: string): number {
         dp[i][j] = dp[i - 1][j - 1];
       } else {
         dp[i][j] = Math.min(
-          dp[i - 1][j] + 1,     // deletion
-          dp[i][j - 1] + 1,     // insertion
-          dp[i - 1][j - 1] + 1  // substitution
+          dp[i - 1][j] + 1, // deletion
+          dp[i][j - 1] + 1, // insertion
+          dp[i - 1][j - 1] + 1 // substitution
         );
       }
     }

@@ -1,10 +1,10 @@
+import type { EntityMention } from "@/components/modals/create-chapter-modal";
+import type { EntityLink } from "@/pages/dashboard/chapters/chapter-editor/types/entity-link";
 import type {
   Annotation,
   ChapterData,
   ChapterStatus,
 } from "@/stores/chapters-store";
-import type { EntityMention } from "@/components/modals/create-chapter-modal";
-import type { EntityLink } from "@/pages/dashboard/chapters/chapter-editor/types/entity-link";
 
 import { getDB } from "./index";
 

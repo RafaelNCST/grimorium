@@ -256,7 +256,9 @@ export function CreateChapterModal({
                     image: r.image,
                     scale: r.scale,
                     parentId: r.parentId,
-                    parentName: parentRegion?.name || (r.parentId ? "Região Neutra" : undefined),
+                    parentName:
+                      parentRegion?.name ||
+                      (r.parentId ? "Região Neutra" : undefined),
                     summary: r.summary,
                   };
                 })

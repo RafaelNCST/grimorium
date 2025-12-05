@@ -426,11 +426,26 @@ export function EditorSettingsModal({
                   {blacklistedEntityIds.map((entityId) => {
                     // Find entity in mentioned entities
                     const allEntities = [
-                      ...mentionedEntities.characters.map((e) => ({ ...e, type: "Personagem" })),
-                      ...mentionedEntities.regions.map((e) => ({ ...e, type: "Local" })),
-                      ...mentionedEntities.items.map((e) => ({ ...e, type: "Item" })),
-                      ...mentionedEntities.factions.map((e) => ({ ...e, type: "Facção" })),
-                      ...mentionedEntities.races.map((e) => ({ ...e, type: "Raça" })),
+                      ...mentionedEntities.characters.map((e) => ({
+                        ...e,
+                        type: "Personagem",
+                      })),
+                      ...mentionedEntities.regions.map((e) => ({
+                        ...e,
+                        type: "Local",
+                      })),
+                      ...mentionedEntities.items.map((e) => ({
+                        ...e,
+                        type: "Item",
+                      })),
+                      ...mentionedEntities.factions.map((e) => ({
+                        ...e,
+                        type: "Facção",
+                      })),
+                      ...mentionedEntities.races.map((e) => ({
+                        ...e,
+                        type: "Raça",
+                      })),
                     ];
 
                     const entity = allEntities.find((e) => e.id === entityId);

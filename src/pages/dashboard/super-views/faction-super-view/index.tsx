@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { getFactionById } from "@/lib/db/factions.service";
-import type { IFaction } from "@/types/faction-types";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/faction/$factionId";
+import type { IFaction } from "@/types/faction-types";
 
 import { FactionSuperView } from "./view";
 

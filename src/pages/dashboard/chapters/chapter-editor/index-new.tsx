@@ -85,9 +85,9 @@ function ChapterEditorContent() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Editor settings state (loaded from book-level settings)
-  const [editorSettings, setEditorSettings] = useState<EditorSettings>(() => {
-    return getBookSettings(dashboardId);
-  });
+  const [editorSettings, setEditorSettings] = useState<EditorSettings>(() =>
+    getBookSettings(dashboardId)
+  );
 
   // Annotation state
   const [selectedText, setSelectedText] = useState("");
@@ -145,7 +145,8 @@ function ChapterEditorContent() {
   // Monitor typography warnings
   useTypographyWarningsMonitor({
     metrics,
-    enabled: warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
+    enabled:
+      warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
     onWarning: (severity, title, message) => {
       addWarning("typography", severity, title, message);
     },
@@ -643,7 +644,8 @@ function ChapterEditorContent() {
   const selectedAnnotation =
     chapter.annotations.find((a) => a.id === selectedAnnotationId) || null;
 
-  const hasSidebarOpen = showAnnotationsSidebar || showAllAnnotationsSidebar || showWarningsSidebar;
+  const hasSidebarOpen =
+    showAnnotationsSidebar || showAllAnnotationsSidebar || showWarningsSidebar;
 
   return (
     <div className="h-full bg-background flex">
@@ -885,7 +887,7 @@ function ChapterEditorContent() {
 
 export function ChapterEditorNew() {
   return (
-    <WarningsProvider showWarningToasts={true}>
+    <WarningsProvider showWarningToasts>
       <ChapterEditorContent />
     </WarningsProvider>
   );

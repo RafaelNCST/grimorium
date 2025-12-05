@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useRef } from "react";
+
 import { ChapterMetrics } from "../types/metrics";
 
 interface UseTypographyWarningsMonitorProps {
@@ -34,7 +35,10 @@ function loadTypographyWarningTracker(): TypographyWarningTracker {
       return JSON.parse(stored);
     }
   } catch (error) {
-    console.error("Erro ao carregar rastreador de avisos de tipografia:", error);
+    console.error(
+      "Erro ao carregar rastreador de avisos de tipografia:",
+      error
+    );
   }
   return {};
 }
@@ -115,12 +119,7 @@ export function useTypographyWarningsMonitor({
     if (needsSave) {
       saveTypographyWarningTracker(shown);
     }
-  }, [
-    metrics.wordCount,
-    metrics.characterCount,
-    enabled,
-    onWarning,
-  ]);
+  }, [metrics.wordCount, metrics.characterCount, enabled, onWarning]);
 
   // Reseta avisos quando o capítulo é esvaziado ou reiniciado
   useEffect(() => {

@@ -7,7 +7,13 @@
 
 import { useState } from "react";
 
-import { Target, AlertTriangle, Clock, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  Target,
+  AlertTriangle,
+  Clock,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -65,7 +71,10 @@ export function GoalsAndLimitsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="goals" className="mt-4 w-full flex-1 flex flex-col overflow-hidden">
+        <Tabs
+          defaultValue="goals"
+          className="mt-4 w-full flex-1 flex flex-col overflow-hidden"
+        >
           <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-1 text-muted-foreground">
             <TabsTrigger
               value="goals"
@@ -84,21 +93,32 @@ export function GoalsAndLimitsModal({
           </TabsList>
 
           {/* Tab de Metas */}
-          <TabsContent value="goals" className="space-y-6 mt-6 pb-6 pr-4 w-full flex-1 overflow-y-auto">
+          <TabsContent
+            value="goals"
+            className="space-y-6 mt-6 pb-6 pr-4 w-full flex-1 overflow-y-auto"
+          >
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Metas</strong> são
-                objetivos que você deseja alcançar. Um aviso será criado quando
-                você atingir a porcentagem configurada.
+                <strong className="text-foreground">Metas</strong> são objetivos
+                que você deseja alcançar. Um aviso será criado quando você
+                atingir a porcentagem configurada.
               </p>
             </div>
 
             {/* Meta de Palavras */}
             <GoalConfig
               enabled={localGoals.words?.enabled ?? false}
-              target={localGoals.words?.target ?? DEFAULT_CHAPTER_GOALS.words!.target}
-              warnAt90={localGoals.words?.warnAt90 ?? DEFAULT_CHAPTER_GOALS.words!.warnAt90}
-              warnAt100={localGoals.words?.warnAt100 ?? DEFAULT_CHAPTER_GOALS.words!.warnAt100}
+              target={
+                localGoals.words?.target ?? DEFAULT_CHAPTER_GOALS.words!.target
+              }
+              warnAt90={
+                localGoals.words?.warnAt90 ??
+                DEFAULT_CHAPTER_GOALS.words!.warnAt90
+              }
+              warnAt100={
+                localGoals.words?.warnAt100 ??
+                DEFAULT_CHAPTER_GOALS.words!.warnAt100
+              }
               label="Meta de Palavras"
               description="Defina quantas palavras deseja escrever"
               unit="palavras"
@@ -176,11 +196,14 @@ export function GoalsAndLimitsModal({
           </TabsContent>
 
           {/* Tab de Limites */}
-          <TabsContent value="limits" className="space-y-6 mt-6 pb-6 pr-4 w-full flex-1 overflow-y-auto">
+          <TabsContent
+            value="limits"
+            className="space-y-6 mt-6 pb-6 pr-4 w-full flex-1 overflow-y-auto"
+          >
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Limites</strong> são
-                valores máximos recomendados. Um aviso será criado quando você
+                <strong className="text-foreground">Limites</strong> são valores
+                máximos recomendados. Um aviso será criado quando você
                 ultrapassar a porcentagem configurada.
               </p>
             </div>
@@ -417,7 +440,9 @@ function GoalConfig({
                 <Checkbox
                   id={`${label}-90`}
                   checked={warnAt90}
-                  onCheckedChange={(checked) => onWarnAt90Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt90Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-90`}
@@ -430,7 +455,9 @@ function GoalConfig({
                 <Checkbox
                   id={`${label}-100`}
                   checked={warnAt100}
-                  onCheckedChange={(checked) => onWarnAt100Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt100Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-100`}
@@ -532,7 +559,9 @@ function LimitConfig({
                 <Checkbox
                   id={`${label}-limit-90`}
                   checked={warnAt90}
-                  onCheckedChange={(checked) => onWarnAt90Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt90Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-limit-90`}
@@ -545,7 +574,9 @@ function LimitConfig({
                 <Checkbox
                   id={`${label}-limit-100`}
                   checked={warnAt100}
-                  onCheckedChange={(checked) => onWarnAt100Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt100Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-limit-100`}
@@ -625,7 +656,9 @@ function SessionLimitConfig({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => onMinutesChange(Math.min(23, hours + 1) * 60 + mins)}
+                    onClick={() =>
+                      onMinutesChange(Math.min(23, hours + 1) * 60 + mins)
+                    }
                     className="h-5 px-2"
                     disabled={hours >= 23}
                   >
@@ -635,7 +668,9 @@ function SessionLimitConfig({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => onMinutesChange(Math.max(0, hours - 1) * 60 + mins)}
+                    onClick={() =>
+                      onMinutesChange(Math.max(0, hours - 1) * 60 + mins)
+                    }
                     className="h-5 px-2"
                     disabled={hours <= 0}
                   >
@@ -665,7 +700,9 @@ function SessionLimitConfig({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => onMinutesChange(hours * 60 + Math.min(59, mins + 1))}
+                    onClick={() =>
+                      onMinutesChange(hours * 60 + Math.min(59, mins + 1))
+                    }
                     className="h-5 px-2"
                     disabled={mins >= 59}
                   >
@@ -675,7 +712,9 @@ function SessionLimitConfig({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => onMinutesChange(hours * 60 + Math.max(0, mins - 1))}
+                    onClick={() =>
+                      onMinutesChange(hours * 60 + Math.max(0, mins - 1))
+                    }
                     className="h-5 px-2"
                     disabled={mins <= 0}
                   >
@@ -693,7 +732,9 @@ function SessionLimitConfig({
                 <Checkbox
                   id="session-limit-90"
                   checked={warnAt90}
-                  onCheckedChange={(checked) => onWarnAt90Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt90Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor="session-limit-90"
@@ -706,7 +747,9 @@ function SessionLimitConfig({
                 <Checkbox
                   id="session-limit-100"
                   checked={warnAt100}
-                  onCheckedChange={(checked) => onWarnAt100Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt100Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor="session-limit-100"

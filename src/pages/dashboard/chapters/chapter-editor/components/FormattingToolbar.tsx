@@ -44,6 +44,7 @@ import { cn } from "@/lib/utils";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { useFormatState } from "../hooks/useFormatState";
+
 import type { ChapterStatus } from "../types";
 
 interface FormattingToolbarProps {

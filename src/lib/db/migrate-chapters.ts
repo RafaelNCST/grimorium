@@ -91,10 +91,7 @@ export function hasChaptersInLocalStorage(): boolean {
 
     return chapters.length > 0;
   } catch (error) {
-    console.error(
-      "[migrate-chapters] Erro ao verificar localStorage:",
-      error
-    );
+    console.error("[migrate-chapters] Erro ao verificar localStorage:", error);
     return false;
   }
 }

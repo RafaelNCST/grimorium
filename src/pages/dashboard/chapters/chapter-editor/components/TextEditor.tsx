@@ -5,19 +5,20 @@ import {
   forwardRef,
   useImperativeHandle,
 } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 
 import { cn } from "@/lib/utils";
 
-import { useTextSearch } from "../hooks/useTextSearch";
-import { useUndoRedo } from "../hooks/useUndoRedo";
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
 import { useEntityAutoLink } from "../hooks/useEntityAutoLink";
+import { useTextSearch } from "../hooks/useTextSearch";
+import { useUndoRedo } from "../hooks/useUndoRedo";
 import { CURSOR_COLORS } from "../types/editor-settings";
 
 import { ContextMenu } from "./ContextMenu";
-import { SearchBar } from "./SearchBar";
 import { EntityHoverCard } from "./EntityHoverCard";
+import { SearchBar } from "./SearchBar";
 
 import type { Annotation } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
@@ -143,7 +144,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       },
       enabled: !!mentionedEntities && settings?.showEntityLinks !== false,
       initialLinks: entityLinks,
-      blacklistedEntityIds: blacklistedEntityIds,
+      blacklistedEntityIds,
       onBlacklistChange: onBlacklistedEntityIdsChange,
     });
 
@@ -155,13 +156,14 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     }, [entityAutoLink.activeLinks, onEntityLinksChange]);
 
     // Cleanup hover timeout on unmount
-    useEffect(() => {
-      return () => {
+    useEffect(
+      () => () => {
         if (hoverTimeoutRef.current) {
           clearTimeout(hoverTimeoutRef.current);
         }
-      };
-    }, []);
+      },
+      []
+    );
 
     // Expose undo/redo through ref
     useImperativeHandle(ref, () => ({
@@ -341,15 +343,17 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           // Check if this entity link overlaps with any annotation - if so, skip it
           const hasAnnotationOverlap = currentAnnotations.some(
             (ann) =>
-              (ann.startOffset <= highlight.start && ann.endOffset >= highlight.end) ||
-              (highlight.start < ann.endOffset && highlight.end > ann.startOffset)
+              (ann.startOffset <= highlight.start &&
+                ann.endOffset >= highlight.end) ||
+              (highlight.start < ann.endOffset &&
+                highlight.end > ann.startOffset)
           );
 
           if (hasAnnotationOverlap) {
             return; // Skip rendering entity link if there's an annotation
           }
 
-          const entity = highlight.entityLink.entity;
+          const { entity } = highlight.entityLink;
           const linkData = JSON.stringify({
             text: highlight.entityLink.text,
             entityId: entity.id,
@@ -878,19 +882,21 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       if (editorRef.current) {
         // CRITICAL: Remove ghost spans with inline background-color that browser creates
         // This happens when user deletes annotation content and types in the same location
-        const ghostSpans = editorRef.current.querySelectorAll('span[style*="background-color"]');
+        const ghostSpans = editorRef.current.querySelectorAll(
+          'span[style*="background-color"]'
+        );
         let hasGhostSpans = false;
         ghostSpans.forEach((span) => {
           // Check if this is NOT an annotation span, entity link, or search highlight
           if (
-            !span.classList.contains('annotation-highlight') &&
-            !span.classList.contains('entity-link') &&
-            !span.classList.contains('search-highlight')
+            !span.classList.contains("annotation-highlight") &&
+            !span.classList.contains("entity-link") &&
+            !span.classList.contains("search-highlight")
           ) {
             hasGhostSpans = true;
             // Remove the background-color style
             const element = span as HTMLElement;
-            element.style.backgroundColor = '';
+            element.style.backgroundColor = "";
 
             // If the span has no other styles or classes, unwrap it
             if (!element.style.cssText && !element.className) {
@@ -942,7 +948,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
           // RULE 1: Annotation is fixed and can only shrink, never grow
           // Calculate the maximum allowed length based on original annotation
-          const originalLength = originalAnnotation.endOffset - originalAnnotation.startOffset;
+          const originalLength =
+            originalAnnotation.endOffset - originalAnnotation.startOffset;
           const actualSpanLength = spanText.length;
 
           // Cap the annotation to its original length
@@ -969,17 +976,19 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
           // CRITICAL: Remove all inline background-color styles that the browser might have kept
           // This prevents the "ghost span" issue where the browser remembers the formatting
-          const allSpans = editorRef.current.querySelectorAll('span[style*="background-color"]');
+          const allSpans = editorRef.current.querySelectorAll(
+            'span[style*="background-color"]'
+          );
           allSpans.forEach((span) => {
             // Check if this is NOT an annotation span, entity link, or search highlight
             if (
-              !span.classList.contains('annotation-highlight') &&
-              !span.classList.contains('entity-link') &&
-              !span.classList.contains('search-highlight')
+              !span.classList.contains("annotation-highlight") &&
+              !span.classList.contains("entity-link") &&
+              !span.classList.contains("search-highlight")
             ) {
               // Remove the background-color style
               const element = span as HTMLElement;
-              element.style.backgroundColor = '';
+              element.style.backgroundColor = "";
 
               // If the span has no other styles or classes, unwrap it
               if (!element.style.cssText && !element.className) {
@@ -1072,8 +1081,10 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         // Send the TRIMMED text but calculate proper offsets
         // Adjust startOffset to account for leading whitespace
-        const leadingWhitespace = actualSelectedText.match(/^\s*/)?.[0].length || 0;
-        const trailingWhitespace = actualSelectedText.match(/\s*$/)?.[0].length || 0;
+        const leadingWhitespace =
+          actualSelectedText.match(/^\s*/)?.[0].length || 0;
+        const trailingWhitespace =
+          actualSelectedText.match(/\s*$/)?.[0].length || 0;
 
         const adjustedStartOffset = startOffset + leadingWhitespace;
         const adjustedEndOffset = endOffset - trailingWhitespace;
@@ -1288,7 +1299,8 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             if (
               !hoveredEntityLink ||
               hoveredEntityLink.entityLink.entity.id !== linkData.entityId ||
-              hoveredEntityLink.entityLink.startOffset !== linkData.startOffset ||
+              hoveredEntityLink.entityLink.startOffset !==
+                linkData.startOffset ||
               hoveredEntityLink.entityLink.endOffset !== linkData.endOffset
             ) {
               setHoveredEntityLink({

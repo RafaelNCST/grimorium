@@ -168,19 +168,32 @@ export function GlobalGoalsModal({
               onWarnAt90Change={(warnAt90) =>
                 setLocalGoals({
                   ...localGoals,
-                  words: { ...localGoals.words, warnAt90, silent: warnAt90 ? false : localGoals.words.silent },
+                  words: {
+                    ...localGoals.words,
+                    warnAt90,
+                    silent: warnAt90 ? false : localGoals.words.silent,
+                  },
                 })
               }
               onWarnAt100Change={(warnAt100) =>
                 setLocalGoals({
                   ...localGoals,
-                  words: { ...localGoals.words, warnAt100, silent: warnAt100 ? false : localGoals.words.silent },
+                  words: {
+                    ...localGoals.words,
+                    warnAt100,
+                    silent: warnAt100 ? false : localGoals.words.silent,
+                  },
                 })
               }
               onSilentChange={(silent) =>
                 setLocalGoals({
                   ...localGoals,
-                  words: { ...localGoals.words, silent, warnAt90: silent ? false : localGoals.words.warnAt90, warnAt100: silent ? false : localGoals.words.warnAt100 },
+                  words: {
+                    ...localGoals.words,
+                    silent,
+                    warnAt90: silent ? false : localGoals.words.warnAt90,
+                    warnAt100: silent ? false : localGoals.words.warnAt100,
+                  },
                 })
               }
             />
@@ -212,19 +225,32 @@ export function GlobalGoalsModal({
               onWarnAt90Change={(warnAt90) =>
                 setLocalGoals({
                   ...localGoals,
-                  characters: { ...localGoals.characters, warnAt90, silent: warnAt90 ? false : localGoals.characters.silent },
+                  characters: {
+                    ...localGoals.characters,
+                    warnAt90,
+                    silent: warnAt90 ? false : localGoals.characters.silent,
+                  },
                 })
               }
               onWarnAt100Change={(warnAt100) =>
                 setLocalGoals({
                   ...localGoals,
-                  characters: { ...localGoals.characters, warnAt100, silent: warnAt100 ? false : localGoals.characters.silent },
+                  characters: {
+                    ...localGoals.characters,
+                    warnAt100,
+                    silent: warnAt100 ? false : localGoals.characters.silent,
+                  },
                 })
               }
               onSilentChange={(silent) =>
                 setLocalGoals({
                   ...localGoals,
-                  characters: { ...localGoals.characters, silent, warnAt90: silent ? false : localGoals.characters.warnAt90, warnAt100: silent ? false : localGoals.characters.warnAt100 },
+                  characters: {
+                    ...localGoals.characters,
+                    silent,
+                    warnAt90: silent ? false : localGoals.characters.warnAt90,
+                    warnAt100: silent ? false : localGoals.characters.warnAt100,
+                  },
                 })
               }
             />
@@ -253,19 +279,34 @@ export function GlobalGoalsModal({
               onWarnAt90Change={(warnAt90) =>
                 setLocalGoals({
                   ...localGoals,
-                  sessionTime: { ...localGoals.sessionTime, warnAt90, silent: warnAt90 ? false : localGoals.sessionTime.silent },
+                  sessionTime: {
+                    ...localGoals.sessionTime,
+                    warnAt90,
+                    silent: warnAt90 ? false : localGoals.sessionTime.silent,
+                  },
                 })
               }
               onWarnAt100Change={(warnAt100) =>
                 setLocalGoals({
                   ...localGoals,
-                  sessionTime: { ...localGoals.sessionTime, warnAt100, silent: warnAt100 ? false : localGoals.sessionTime.silent },
+                  sessionTime: {
+                    ...localGoals.sessionTime,
+                    warnAt100,
+                    silent: warnAt100 ? false : localGoals.sessionTime.silent,
+                  },
                 })
               }
               onSilentChange={(silent) =>
                 setLocalGoals({
                   ...localGoals,
-                  sessionTime: { ...localGoals.sessionTime, silent, warnAt90: silent ? false : localGoals.sessionTime.warnAt90, warnAt100: silent ? false : localGoals.sessionTime.warnAt100 },
+                  sessionTime: {
+                    ...localGoals.sessionTime,
+                    silent,
+                    warnAt90: silent ? false : localGoals.sessionTime.warnAt90,
+                    warnAt100: silent
+                      ? false
+                      : localGoals.sessionTime.warnAt100,
+                  },
                 })
               }
             />
@@ -374,7 +415,9 @@ function GoalConfig({
                 <Checkbox
                   id={`${label}-90`}
                   checked={warnAt90}
-                  onCheckedChange={(checked) => onWarnAt90Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt90Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-90`}
@@ -387,7 +430,9 @@ function GoalConfig({
                 <Checkbox
                   id={`${label}-100`}
                   checked={warnAt100}
-                  onCheckedChange={(checked) => onWarnAt100Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt100Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-100`}
@@ -400,7 +445,9 @@ function GoalConfig({
                 <Checkbox
                   id={`${label}-silent`}
                   checked={silent}
-                  onCheckedChange={(checked) => onSilentChange(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onSilentChange(checked === true)
+                  }
                 />
                 <label
                   htmlFor={`${label}-silent`}
@@ -560,7 +607,9 @@ function SessionTimeGoalConfig({
                 <Checkbox
                   id="session-time-90"
                   checked={warnAt90}
-                  onCheckedChange={(checked) => onWarnAt90Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt90Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor="session-time-90"
@@ -573,7 +622,9 @@ function SessionTimeGoalConfig({
                 <Checkbox
                   id="session-time-100"
                   checked={warnAt100}
-                  onCheckedChange={(checked) => onWarnAt100Change(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onWarnAt100Change(checked === true)
+                  }
                 />
                 <label
                   htmlFor="session-time-100"
@@ -586,7 +637,9 @@ function SessionTimeGoalConfig({
                 <Checkbox
                   id="session-time-silent"
                   checked={silent}
-                  onCheckedChange={(checked) => onSilentChange(checked === true)}
+                  onCheckedChange={(checked) =>
+                    onSilentChange(checked === true)
+                  }
                 />
                 <label
                   htmlFor="session-time-silent"

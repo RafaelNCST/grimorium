@@ -18,7 +18,11 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+
 import { toast } from "sonner";
+
+import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
+
 import {
   Warning,
   WarningType,
@@ -27,7 +31,6 @@ import {
   WarningAction,
   WARNING_TYPE_LABELS,
 } from "../types/warnings";
-import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 
 const WARNINGS_STORAGE_KEY = "grimorium_chapter_warnings";
 
@@ -78,8 +81,7 @@ export function WarningsProvider({
     }
     return [];
   });
-  const [showWarningToasts, setShowWarningToasts] =
-    useState(initialShowToasts);
+  const [showWarningToasts, setShowWarningToasts] = useState(initialShowToasts);
 
   // Salva avisos no localStorage sempre que mudarem
   useEffect(() => {
@@ -216,9 +218,8 @@ export function WarningsProvider({
    * Obtém avisos por tipo
    */
   const getWarningsByType = useCallback(
-    (type: WarningType): Warning[] => {
-      return warnings.filter((w) => w.type === type && !w.dismissed);
-    },
+    (type: WarningType): Warning[] =>
+      warnings.filter((w) => w.type === type && !w.dismissed),
     [warnings]
   );
 

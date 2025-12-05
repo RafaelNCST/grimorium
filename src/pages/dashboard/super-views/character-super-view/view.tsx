@@ -164,7 +164,9 @@ export function CharacterSuperView({
                 const GenderIcon = currentGender.icon;
                 return <GenderIcon className="w-4 h-4 text-primary" />;
               })()}
-              <span>{t(`create-character:${currentGender.translationKey}`)}</span>
+              <span>
+                {t(`create-character:${currentGender.translationKey}`)}
+              </span>
             </div>
           )}
         </div>
@@ -592,7 +594,7 @@ export function CharacterSuperView({
           basicFields={basicFields}
           advancedFields={advancedFields}
           advancedSectionTitle={t("character-detail:sections.advanced_info")}
-          advancedSectionOpen={true}
+          advancedSectionOpen
         />
       </div>
     </div>

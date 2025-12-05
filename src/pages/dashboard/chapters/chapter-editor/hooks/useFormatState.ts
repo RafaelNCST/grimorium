@@ -43,7 +43,7 @@ export function useFormatState(): FormatState {
 
         // Check if we're inside a contentEditable element
         const range = selection.getRangeAt(0);
-        const anchorNode = selection.anchorNode;
+        const { anchorNode } = selection;
 
         if (!anchorNode) {
           setFormatState({
@@ -58,9 +58,10 @@ export function useFormatState(): FormatState {
         }
 
         // Get the element containing the selection
-        let element = anchorNode.nodeType === Node.TEXT_NODE
-          ? anchorNode.parentElement
-          : anchorNode as HTMLElement;
+        const element =
+          anchorNode.nodeType === Node.TEXT_NODE
+            ? anchorNode.parentElement
+            : (anchorNode as HTMLElement);
 
         const contentEditable = element?.closest('[contenteditable="true"]');
 

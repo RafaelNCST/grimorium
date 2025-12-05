@@ -4,7 +4,14 @@
  * Gerencia configurações globais de avisos com persistência em localStorage
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+
 import {
   WarningsSettings,
   DEFAULT_WARNINGS_SETTINGS,
