@@ -51,62 +51,83 @@ export function useEntityAutoLink({
   // Update blacklist ref when blacklistedEntityIds prop changes
   useEffect(() => {
     blacklistRef.current = new Set(blacklistedEntityIds);
-    // Re-run matching when blacklist changes
-    findAndLinkEntities();
   }, [blacklistedEntityIds]);
 
-  // Run initial matching when component mounts or when mentioned entities change
+  // Load initial links on mount only
   useEffect(() => {
-    if (enabled) {
-      findAndLinkEntities();
+    if (initialLinks.length > 0 && !initialLinksLoadedRef.current) {
+      setActiveLinks(initialLinks);
+      initialLinksLoadedRef.current = true;
     }
-  }, [enabled, mentionedEntities]);
+  }, [initialLinks]);
 
+  // Debounced cleanup of invalid links (runs in background, doesn't affect cursor)
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor || !enabled) return;
 
+    let cleanupTimer: NodeJS.Timeout | null = null;
+
     const handleInput = () => {
       // Clear existing timer
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+      if (cleanupTimer) {
+        clearTimeout(cleanupTimer);
       }
 
-      // Set new debounce timer
-      debounceTimerRef.current = setTimeout(() => {
-        findAndLinkEntities();
-      }, debounceMs);
+      // Wait 300ms after typing stops to clean up invalid links
+      cleanupTimer = setTimeout(() => {
+        const content = editor.innerText;
+
+        const validLinks = activeLinks.filter((link) => {
+          // Check if link is still within content bounds
+          if (link.endOffset > content.length) return false;
+
+          // Check if the text at the link position still matches
+          const textAtPosition = content.substring(link.startOffset, link.endOffset);
+          return textAtPosition === link.text;
+        });
+
+        // Only update if links were actually removed
+        if (validLinks.length !== activeLinks.length) {
+          setActiveLinks(validLinks);
+        }
+      }, 300);
     };
 
-    // Also handle space key directly (no debounce)
+    editor.addEventListener("input", handleInput);
+
+    return () => {
+      editor.removeEventListener("input", handleInput);
+      if (cleanupTimer) {
+        clearTimeout(cleanupTimer);
+      }
+    };
+  }, [editorRef, enabled, activeLinks]);
+
+  // Listen for space key to CREATE new links (and immediately clean if needed)
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || !enabled) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === " ") {
-        // Clear existing timer
-        if (debounceTimerRef.current) {
-          clearTimeout(debounceTimerRef.current);
-        }
-
-        // Trigger immediately after space
+        // Trigger after space is inserted
         setTimeout(() => {
           findAndLinkEntities();
         }, 50);
       }
     };
 
-    editor.addEventListener("input", handleInput);
     editor.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      editor.removeEventListener("input", handleInput);
       editor.removeEventListener("keydown", handleKeyDown);
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
-  }, [editorRef, mentionedEntities, enabled, matchThreshold, debounceMs]);
+  }, [editorRef, mentionedEntities, enabled, matchThreshold]);
 
   /**
-   * Finds potential entity matches in the editor content
+   * Finds potential entity matches ONLY near cursor after space
+   * Checks last word before cursor and works backwards
    */
   const findAndLinkEntities = () => {
     const editor = editorRef.current;
@@ -114,7 +135,48 @@ export function useEntityAutoLink({
 
     const content = editor.innerText;
     const words = extractWords(content);
-    const newLinks: EntityLink[] = [];
+
+    // FIRST: Clean up invalid links (where text no longer matches)
+    const validLinks = activeLinks.filter((link) => {
+      // Check if link is still within content bounds
+      if (link.endOffset > content.length) return false;
+
+      // Check if the text at the link position still matches
+      const textAtPosition = content.substring(link.startOffset, link.endOffset);
+      return textAtPosition === link.text;
+    });
+
+    // Update active links if any were removed
+    if (validLinks.length !== activeLinks.length) {
+      setActiveLinks(validLinks);
+    }
+
+    // Get cursor position
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    let cursorOffset = 0;
+
+    try {
+      const preCaretRange = range.cloneRange();
+      preCaretRange.selectNodeContents(editor);
+      preCaretRange.setEnd(range.endContainer, range.endOffset);
+      cursorOffset = preCaretRange.toString().length;
+    } catch (e) {
+      return;
+    }
+
+    // Find last word before cursor
+    let lastWordIndex = -1;
+    for (let i = words.length - 1; i >= 0; i--) {
+      if (words[i].end <= cursorOffset) {
+        lastWordIndex = i;
+        break;
+      }
+    }
+
+    if (lastWordIndex === -1) return;
 
     // Flatten all mentioned entities with their types
     const allEntities: Array<{ entity: EntityMention; type: EntityType }> = [
@@ -140,68 +202,79 @@ export function useEntityAutoLink({
       })),
     ];
 
-    // On first run, keep initial links that are still valid
-    let persistedLinks: EntityLink[] = [];
-    if (!initialLinksLoadedRef.current && initialLinks.length > 0) {
-      persistedLinks = initialLinks.filter((link) => {
-        // Check if the link's text is still at the same position in content
-        const textAtPosition = content.substring(
-          link.startOffset,
-          link.endOffset
-        );
-        return textAtPosition === link.text;
+    // Track which word indices are already linked (using VALID links only)
+    const linkedWordIndices = new Set<number>();
+    validLinks.forEach((link) => {
+      words.forEach((word, index) => {
+        if (word.start >= link.startOffset && word.end <= link.endOffset) {
+          linkedWordIndices.add(index);
+        }
       });
-      initialLinksLoadedRef.current = true;
-    }
-
-    // Check each word against entities
-    for (const word of words) {
-      // Skip if already in persisted links (prevent duplicate linking)
-      const alreadyLinked = persistedLinks.some(
-        (link) => link.startOffset === word.start && link.endOffset === word.end
-      );
-      if (alreadyLinked) {
-        continue;
-      }
-
-      // Try to find matching entity
-      const match = findBestMatch(word.text, allEntities, matchThreshold);
-
-      // Skip if entity is blacklisted
-      if (match && blacklistRef.current.has(match.entity.id)) {
-        continue;
-      }
-
-      if (match) {
-        newLinks.push({
-          text: word.text,
-          entity: match.entity,
-          entityType: match.type,
-          startOffset: word.start,
-          endOffset: word.end,
-        });
-      }
-    }
-
-    // Merge persisted links with new links
-    const allLinks = [...persistedLinks, ...newLinks];
-
-    // Only update if links actually changed (deep comparison by entity id and position)
-    setActiveLinks((prev) => {
-      if (prev.length !== allLinks.length) return allLinks;
-
-      const hasChanges = allLinks.some((newLink, index) => {
-        const oldLink = prev[index];
-        return (
-          !oldLink ||
-          oldLink.entity.id !== newLink.entity.id ||
-          oldLink.startOffset !== newLink.startOffset ||
-          oldLink.endOffset !== newLink.endOffset
-        );
-      });
-
-      return hasChanges ? allLinks : prev;
     });
+
+    // Skip if last word is already linked
+    if (linkedWordIndices.has(lastWordIndex)) return;
+
+    // Try to match against each entity
+    for (const { entity, type } of allEntities) {
+      if (blacklistRef.current.has(entity.id)) continue;
+
+      const entityWords = extractWords(entity.name);
+
+      // Check if we have enough words
+      if (lastWordIndex + 1 < entityWords.length) continue;
+
+      // Try to match entity words backwards from last word
+      let allWordsMatch = true;
+      const matchedWords: typeof words = [];
+
+      for (let j = entityWords.length - 1; j >= 0; j--) {
+        const textWordIndex = lastWordIndex - (entityWords.length - 1 - j);
+
+        if (textWordIndex < 0) {
+          allWordsMatch = false;
+          break;
+        }
+
+        const textWord = words[textWordIndex];
+        const entityWord = entityWords[j];
+
+        if (linkedWordIndices.has(textWordIndex)) {
+          allWordsMatch = false;
+          break;
+        }
+
+        const similarity = calculateSimilarity(
+          textWord.text.toLowerCase(),
+          entityWord.text.toLowerCase()
+        );
+
+        if (similarity < matchThreshold) {
+          allWordsMatch = false;
+          break;
+        }
+
+        matchedWords.unshift(textWord);
+      }
+
+      // If all words matched, create link
+      if (allWordsMatch && matchedWords.length > 0) {
+        const startOffset = matchedWords[0].start;
+        const endOffset = matchedWords[matchedWords.length - 1].end;
+        const linkText = content.substring(startOffset, endOffset);
+
+        const newLink: EntityLink = {
+          text: linkText,
+          entity: entity,
+          entityType: type,
+          startOffset,
+          endOffset,
+        };
+
+        setActiveLinks((prev) => [...prev, newLink]);
+        break;
+      }
+    }
   };
 
   /**
@@ -264,38 +337,6 @@ function extractWords(
   }
 
   return words;
-}
-
-/**
- * Finds the best matching entity for a given text
- * Uses Levenshtein distance for fuzzy matching
- */
-function findBestMatch(
-  text: string,
-  entities: Array<{ entity: EntityMention; type: EntityType }>,
-  threshold: number
-): { entity: EntityMention; type: EntityType } | null {
-  let bestMatch: { entity: EntityMention; type: EntityType } | null = null;
-  let bestSimilarity = 0;
-
-  const normalizedText = text.toLowerCase().trim();
-
-  for (const { entity, type } of entities) {
-    const normalizedEntityName = entity.name.toLowerCase().trim();
-
-    // Calculate similarity
-    const similarity = calculateSimilarity(
-      normalizedText,
-      normalizedEntityName
-    );
-
-    if (similarity >= threshold && similarity > bestSimilarity) {
-      bestSimilarity = similarity;
-      bestMatch = { entity, type };
-    }
-  }
-
-  return bestMatch;
 }
 
 /**
