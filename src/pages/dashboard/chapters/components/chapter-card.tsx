@@ -124,13 +124,44 @@ export function ChapterCard({
     }
   };
 
-  const handleExportWord = (
+  const handleExportWord = async (
     config: ExportConfig,
     content: string,
     pages: PageContent[]
   ) => {
-    console.log("Exporting to Word with config:", config);
-    // TODO: Implement Word export logic
+    try {
+      // Generate Word blob
+      const { generateChapterWord } = await import("@/lib/services/export-word.service");
+      const blob = await generateChapterWord(
+        chapter.number.toString(),
+        chapter.title,
+        content,
+        config
+      );
+
+      // Convert blob to Uint8Array for Tauri
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Ask user where to save
+      const filePath = await save({
+        defaultPath: `Capitulo_${chapter.number}_${chapter.title}.docx`,
+        filters: [
+          {
+            name: "Word Document",
+            extensions: ["docx"],
+          },
+        ],
+      });
+
+      if (filePath) {
+        // Save file
+        await writeFile(filePath, uint8Array);
+      }
+    } catch (error) {
+      console.error("Error exporting Word:", error);
+      toast.error("Erro ao exportar Word");
+    }
   };
 
   return (
