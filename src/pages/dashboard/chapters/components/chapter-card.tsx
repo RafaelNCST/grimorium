@@ -18,13 +18,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type ChapterStatus =
   | "draft"
@@ -72,10 +71,8 @@ export function ChapterCard({
 }: ChapterCardProps) {
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [exportFormat, setExportFormat] = useState<"pdf" | "word">("pdf");
 
-  const handleExportClick = (format: "pdf" | "word") => {
-    setExportFormat(format);
+  const handleExportClick = () => {
     setShowExportModal(true);
   };
 
@@ -127,23 +124,23 @@ export function ChapterCard({
             className="flex items-start gap-1 shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleExportClick();
+                  }}
+                >
                   <Download className="w-4 h-4" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleExportClick("word")}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Exportar como Word
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExportClick("pdf")}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Exportar como PDF
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Exportar capítulo</p>
+              </TooltipContent>
+            </Tooltip>
 
             <Button
               variant="ghost-destructive"

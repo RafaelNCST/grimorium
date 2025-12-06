@@ -92,6 +92,14 @@ export function ExportPreviewModal({
     pageNumberPosition: "center",
   });
 
+  const getFontFamily = (fontValue: string): string => {
+    const fontMap: Record<string, string> = {
+      serif: "Georgia, 'Times New Roman', serif",
+      sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    };
+    return fontMap[fontValue] || fontMap.serif;
+  };
+
   // Load chapter content when modal opens
   useEffect(() => {
     if (!open) return;
@@ -119,45 +127,101 @@ export function ExportPreviewModal({
     loadContent();
   }, [open, chapterId]);
 
-  // Estimate total pages based on content length
-  const estimatedPages = useMemo(() => {
-    if (!content) return 1;
+  // Calculate page breaks by measuring actual rendered height
+  const pages = useMemo(() => {
+    if (!content) return [{ content: "", pageNumber: 1 }];
 
     const format = PAGE_FORMATS[config.pageFormat];
     const margins = MARGIN_PRESETS[config.margins];
 
-    // Calculate usable height per page
-    const pageHeight = format.height - margins.top - margins.bottom - (config.showPageNumbers ? 30 : 0);
+    // Calculate usable dimensions (scaled for 0.6 preview)
+    const pageHeight = (format.height - margins.top - margins.bottom - (config.showPageNumbers ? 30 : 0)) * 0.6;
+    const pageWidth = (format.width - margins.left - margins.right) * 0.6;
 
-    // Estimate based on characters (rough approximation)
-    // Average: ~2500 chars per page with 12pt, 1.5 spacing
-    const charsPerPage = 2500;
+    // Create invisible measuring element
+    const measuringDiv = document.createElement('div');
+    measuringDiv.style.position = 'absolute';
+    measuringDiv.style.visibility = 'hidden';
+    measuringDiv.style.width = `${pageWidth}px`;
+    measuringDiv.style.fontFamily = "Georgia, 'Times New Roman', serif";
+    measuringDiv.style.fontSize = '7.2px'; // 12pt * 0.6
+    measuringDiv.style.lineHeight = '1.5';
+    measuringDiv.style.whiteSpace = 'pre-wrap';
+    measuringDiv.style.wordWrap = 'break-word';
+    document.body.appendChild(measuringDiv);
+
+    // Calculate title height for first page
     const titleSizePt = parseInt(config.titleSize);
-    const titleSpacing = titleSizePt * 1.33 + 30; // Title height + margin
+    let titleHeight = 0;
+    if (true) { // Always calculate for first page
+      const titleDiv = document.createElement('div');
+      titleDiv.style.fontFamily = getFontFamily(config.titleFont);
+      titleDiv.style.fontSize = `calc(${config.titleSize} * 0.6)`;
+      titleDiv.style.fontWeight = config.titleBold ? 'bold' : 'normal';
+      titleDiv.style.marginBottom = '24px'; // 6 * 0.6 converted to px
+      titleDiv.textContent = `Capítulo ${chapterNumber}: ${chapterTitle}`;
+      measuringDiv.appendChild(titleDiv);
+      titleHeight = measuringDiv.offsetHeight;
+      measuringDiv.innerHTML = '';
+    }
 
-    // First page has less space due to title
-    const firstPageChars = charsPerPage - (titleSpacing / pageHeight) * charsPerPage;
-    const remainingChars = Math.max(0, content.length - firstPageChars);
-    const additionalPages = Math.ceil(remainingChars / charsPerPage);
+    const pageContents: { content: string; pageNumber: number }[] = [];
+    let currentPageNumber = 1;
+    let currentPageContent = '';
 
-    return Math.max(1, 1 + additionalPages);
-  }, [content, config]);
+    // Split into words while preserving line breaks
+    const words = content.split(/(\s+)/); // Splits by whitespace but keeps the whitespace
 
-  const totalPages = estimatedPages;
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      const maxHeight = currentPageNumber === 1 ? pageHeight - titleHeight : pageHeight;
+
+      // Test adding this word to current page
+      const testContent = currentPageContent + word;
+      measuringDiv.textContent = testContent;
+      const testHeight = measuringDiv.offsetHeight;
+
+      // Use 95% of max height to leave safety margin
+      const safeMaxHeight = maxHeight * 0.95;
+
+      // Check if it exceeds safe page height
+      if (testHeight > safeMaxHeight && currentPageContent.length > 0) {
+        // Current page is full, save it and start new page
+        pageContents.push({
+          content: currentPageContent.trim(),
+          pageNumber: currentPageNumber,
+        });
+
+        // Reset for new page
+        currentPageContent = word;
+        currentPageNumber++;
+      } else {
+        // Word fits, add it to current page
+        currentPageContent += word;
+      }
+    }
+
+    // Add remaining content as last page
+    if (currentPageContent.trim().length > 0) {
+      pageContents.push({
+        content: currentPageContent.trim(),
+        pageNumber: currentPageNumber,
+      });
+    }
+
+    // Cleanup
+    document.body.removeChild(measuringDiv);
+
+    return pageContents.length > 0 ? pageContents : [{ content: "", pageNumber: 1 }];
+  }, [content, config, chapterNumber, chapterTitle]);
+
+  const totalPages = pages.length;
 
   const handleConfigChange = <K extends keyof ExportConfig>(
     key: K,
     value: ExportConfig[K]
   ) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const getFontFamily = (fontValue: string): string => {
-    const fontMap: Record<string, string> = {
-      serif: "Georgia, 'Times New Roman', serif",
-      sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    };
-    return fontMap[fontValue] || fontMap.serif;
   };
 
   return (
@@ -394,49 +458,77 @@ export function ExportPreviewModal({
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center">
-                  {/* Single page preview with all content */}
-                  <div
-                    className="bg-white shadow-2xl relative"
-                    style={{
-                      width: `${PAGE_FORMATS[config.pageFormat].width * 0.6}px`,
-                      minHeight: `${PAGE_FORMATS[config.pageFormat].height * 0.6}px`,
-                      padding: `${MARGIN_PRESETS[config.margins].top * 0.6}px ${MARGIN_PRESETS[config.margins].right * 0.6}px ${MARGIN_PRESETS[config.margins].bottom * 0.6}px ${MARGIN_PRESETS[config.margins].left * 0.6}px`,
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      {/* Title */}
-                      <div
-                        className="mb-6"
-                        style={{
-                          fontFamily: getFontFamily(config.titleFont),
-                          fontSize: `calc(${config.titleSize} * 0.6)`,
-                          fontWeight: config.titleBold ? "bold" : "normal",
-                          textAlign: config.titleAlignment,
-                          color: "#000",
-                        }}
-                      >
-                        Capítulo {chapterNumber}: {chapterTitle}
+                <div className="flex flex-col items-center gap-8">
+                  {/* Multiple pages with page breaks */}
+                  {pages.map((page, index) => (
+                    <div key={page.pageNumber} className="relative">
+                      {/* Page number indicator above page */}
+                      <div className="text-center mb-2">
+                        <span className="text-xs font-medium text-muted-foreground bg-card px-3 py-1 rounded-full border">
+                          Página {page.pageNumber} de {totalPages}
+                        </span>
                       </div>
 
-                      {/* Text Content - Preserva formatação completa */}
+                      {/* Page content */}
                       <div
-                        className="whitespace-pre-wrap"
+                        className="bg-white shadow-2xl relative"
                         style={{
-                          fontFamily: "Georgia, 'Times New Roman', serif",
-                          fontSize: "7.2px", // 12pt * 0.6
-                          lineHeight: "1.5",
-                          color: "#000",
+                          width: `${PAGE_FORMATS[config.pageFormat].width * 0.6}px`,
+                          height: `${PAGE_FORMATS[config.pageFormat].height * 0.6}px`,
+                          padding: `${MARGIN_PRESETS[config.margins].top * 0.6}px ${MARGIN_PRESETS[config.margins].right * 0.6}px ${MARGIN_PRESETS[config.margins].bottom * 0.6}px ${MARGIN_PRESETS[config.margins].left * 0.6}px`,
                         }}
                       >
-                        {content}
+                        <div className="flex flex-col h-full">
+                          {/* Title - only on first page */}
+                          {page.pageNumber === 1 && (
+                            <div
+                              className="mb-6"
+                              style={{
+                                fontFamily: getFontFamily(config.titleFont),
+                                fontSize: `calc(${config.titleSize} * 0.6)`,
+                                fontWeight: config.titleBold ? "bold" : "normal",
+                                textAlign: config.titleAlignment,
+                                color: "#000",
+                              }}
+                            >
+                              Capítulo {chapterNumber}: {chapterTitle}
+                            </div>
+                          )}
+
+                          {/* Text Content - Preserva formatação completa */}
+                          <div
+                            className="whitespace-pre-wrap flex-1"
+                            style={{
+                              fontFamily: "Georgia, 'Times New Roman', serif",
+                              fontSize: "7.2px", // 12pt * 0.6
+                              lineHeight: "1.5",
+                              color: "#000",
+                            }}
+                          >
+                            {page.content}
+                          </div>
+
+                          {/* Page number at bottom if enabled */}
+                          {config.showPageNumbers && (
+                            <div
+                              className="mt-4 pt-2"
+                              style={{
+                                textAlign: config.pageNumberPosition,
+                                fontSize: "6px",
+                                color: "#666",
+                              }}
+                            >
+                              {page.pageNumber}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
 
                   {/* Info note */}
-                  <p className="text-xs text-muted-foreground mt-6 text-center max-w-md">
-                    Esta é uma pré-visualização. A paginação final será calculada durante a exportação.
+                  <p className="text-xs text-muted-foreground text-center max-w-md">
+                    Pré-visualização com quebra de páginas real. Use as configurações à esquerda para ajustar a formatação.
                   </p>
                 </div>
               )}
@@ -452,7 +544,7 @@ export function ExportPreviewModal({
 
           <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant="magical"
               onClick={() => {
                 onExportWord(config);
                 onOpenChange(false);
@@ -462,7 +554,7 @@ export function ExportPreviewModal({
               Exportar como Word
             </Button>
             <Button
-              variant="default"
+              variant="magical"
               onClick={() => {
                 onExportPDF(config);
                 onOpenChange(false);
