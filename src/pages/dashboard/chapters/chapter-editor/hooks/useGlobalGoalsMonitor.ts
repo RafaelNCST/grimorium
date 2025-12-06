@@ -12,6 +12,7 @@ interface UseGlobalGoalsMonitorProps {
   metrics: ChapterMetrics;
   globalGoals: GlobalGoals;
   chapterStatus: ChapterStatus;
+  chapterId: string;
   onWarning: (
     severity: "info" | "warning" | "error",
     title: string,
@@ -22,13 +23,18 @@ interface UseGlobalGoalsMonitorProps {
 interface WarningTracker {
   wordGoal90?: boolean;
   wordGoal100?: boolean;
-  characterGoal90?: boolean;
-  characterGoal100?: boolean;
   sessionGoal90?: boolean;
   sessionGoal100?: boolean;
 }
 
-const WARNINGS_STORAGE_KEY = "grimorium_global_goals_warnings";
+const WARNINGS_STORAGE_KEY_PREFIX = "grimorium_global_goals_warnings";
+
+/**
+ * Gera a chave de storage específica para o capítulo
+ */
+function getStorageKey(chapterId: string): string {
+  return `${WARNINGS_STORAGE_KEY_PREFIX}_${chapterId}`;
+}
 
 /**
  * Gera uma chave única baseada na configuração atual das metas
@@ -43,13 +49,6 @@ function generateGoalsConfigKey(goals: GlobalGoals): string {
       warnAt100: goals.words.warnAt100,
       silent: goals.words.silent,
     },
-    characters: {
-      enabled: goals.characters.enabled,
-      target: goals.characters.target,
-      warnAt90: goals.characters.warnAt90,
-      warnAt100: goals.characters.warnAt100,
-      silent: goals.characters.silent,
-    },
     sessionTime: {
       enabled: goals.sessionTime.enabled,
       targetMinutes: goals.sessionTime.targetMinutes,
@@ -62,11 +61,11 @@ function generateGoalsConfigKey(goals: GlobalGoals): string {
 }
 
 /**
- * Carrega o rastreador de avisos do localStorage
+ * Carrega o rastreador de avisos do localStorage para um capítulo específico
  */
-function loadWarningTracker(configKey: string): WarningTracker {
+function loadWarningTracker(chapterId: string, configKey: string): WarningTracker {
   try {
-    const stored = localStorage.getItem(WARNINGS_STORAGE_KEY);
+    const stored = localStorage.getItem(getStorageKey(chapterId));
     if (stored) {
       const data = JSON.parse(stored);
       // Verifica se a chave de configuração bate
@@ -81,12 +80,12 @@ function loadWarningTracker(configKey: string): WarningTracker {
 }
 
 /**
- * Salva o rastreador de avisos no localStorage
+ * Salva o rastreador de avisos no localStorage para um capítulo específico
  */
-function saveWarningTracker(configKey: string, tracker: WarningTracker): void {
+function saveWarningTracker(chapterId: string, configKey: string, tracker: WarningTracker): void {
   try {
     localStorage.setItem(
-      WARNINGS_STORAGE_KEY,
+      getStorageKey(chapterId),
       JSON.stringify({ configKey, tracker })
     );
   } catch (error) {
@@ -96,26 +95,35 @@ function saveWarningTracker(configKey: string, tracker: WarningTracker): void {
 
 /**
  * Monitora métricas globais e dispara avisos quando metas são atingidas
+ * Cada capítulo tem seu próprio rastreamento de avisos
  */
 export function useGlobalGoalsMonitor({
   metrics,
   globalGoals,
   chapterStatus,
+  chapterId,
   onWarning,
 }: UseGlobalGoalsMonitorProps) {
   const configKeyRef = useRef<string>("");
   const warningsShownRef = useRef<WarningTracker>({});
 
-  // Inicializa ou reseta o rastreador quando a configuração muda
+  // Inicializa ou reseta o rastreador quando a configuração ou capítulo muda
   useEffect(() => {
     const newConfigKey = generateGoalsConfigKey(globalGoals);
 
     // Se a configuração mudou, reseta os avisos
     if (configKeyRef.current !== newConfigKey) {
       configKeyRef.current = newConfigKey;
-      warningsShownRef.current = loadWarningTracker(newConfigKey);
+      warningsShownRef.current = loadWarningTracker(chapterId, newConfigKey);
     }
-  }, [globalGoals]);
+  }, [globalGoals, chapterId]);
+
+  // Recarrega avisos quando o capítulo mudar
+  useEffect(() => {
+    const configKey = generateGoalsConfigKey(globalGoals);
+    configKeyRef.current = configKey;
+    warningsShownRef.current = loadWarningTracker(chapterId, configKey);
+  }, [chapterId, globalGoals]);
 
   useEffect(() => {
     // Verifica se as metas se aplicam ao status atual do capítulo
@@ -167,48 +175,6 @@ export function useGlobalGoalsMonitor({
       }
     }
 
-    // ========== METAS DE CARACTERES ==========
-
-    if (
-      globalGoals.characters.enabled &&
-      globalGoals.characters.target > 0 &&
-      !globalGoals.characters.silent
-    ) {
-      const percentage =
-        (metrics.characterCount / globalGoals.characters.target) * 100;
-
-      // Notificação aos 90%
-      if (
-        globalGoals.characters.warnAt90 &&
-        percentage >= 90 &&
-        percentage < 100 &&
-        !shown.characterGoal90
-      ) {
-        shown.characterGoal90 = true;
-        needsSave = true;
-        onWarning(
-          "info",
-          `Quase lá! 90% da meta de caracteres`,
-          `Você já escreveu ${metrics.characterCount} de ${globalGoals.characters.target} caracteres.`
-        );
-      }
-
-      // Notificação ao atingir 100%
-      if (
-        globalGoals.characters.warnAt100 &&
-        percentage >= 100 &&
-        !shown.characterGoal100
-      ) {
-        shown.characterGoal100 = true;
-        needsSave = true;
-        onWarning(
-          "info",
-          "🎉 Meta de caracteres atingida!",
-          `Parabéns! Você atingiu sua meta de ${globalGoals.characters.target} caracteres!`
-        );
-      }
-    }
-
     // ========== METAS DE TEMPO DE SESSÃO ==========
 
     if (
@@ -256,7 +222,15 @@ export function useGlobalGoalsMonitor({
 
     // Salva o rastreador atualizado no localStorage
     if (needsSave) {
-      saveWarningTracker(configKeyRef.current, shown);
+      saveWarningTracker(chapterId, configKeyRef.current, shown);
     }
-  }, [metrics, globalGoals, chapterStatus, onWarning]);
+  }, [metrics, globalGoals, chapterStatus, chapterId, onWarning]);
+
+  // Reseta avisos quando o capítulo é esvaziado ou reiniciado
+  useEffect(() => {
+    if (metrics.wordCount < 100) {
+      warningsShownRef.current = {};
+      saveWarningTracker(chapterId, configKeyRef.current, {});
+    }
+  }, [metrics.wordCount, chapterId]);
 }

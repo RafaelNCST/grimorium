@@ -138,6 +138,7 @@ function ChapterEditorContent() {
     metrics,
     globalGoals,
     chapterStatus: chapter.status,
+    chapterId: editorChaptersId,
     onWarning: (severity, title, message) => {
       addWarning("goals", severity, title, message);
     },
@@ -147,6 +148,7 @@ function ChapterEditorContent() {
   useTimeWarningsMonitor({
     metrics,
     enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
+    hasSessionTimeGoal: globalGoals.sessionTime.enabled,
     onWarning: (severity, title, message) => {
       addWarning("time", severity, title, message);
     },
@@ -157,6 +159,8 @@ function ChapterEditorContent() {
     metrics,
     enabled:
       warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
+    hasWordGoal: globalGoals.words.enabled,
+    chapterId: editorChaptersId,
     onWarning: (severity, title, message) => {
       addWarning("typography", severity, title, message);
     },

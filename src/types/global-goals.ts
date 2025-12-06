@@ -16,25 +16,14 @@ export type ChapterStatus =
   | "published";
 
 /**
- * Meta de palavras global
+ * Meta de palavras global (mínimo: 1000 palavras)
  */
 export interface WordGoal {
   enabled: boolean;
-  target: number;
+  target: number; // Mínimo: 1000
   warnAt90: boolean;
   warnAt100: boolean;
   silent: boolean; // Se true, não notifica (apenas visual)
-}
-
-/**
- * Meta de caracteres global
- */
-export interface CharacterGoal {
-  enabled: boolean;
-  target: number;
-  warnAt90: boolean;
-  warnAt100: boolean;
-  silent: boolean;
 }
 
 /**
@@ -53,29 +42,17 @@ export interface SessionTimeGoal {
  */
 export interface GlobalGoals {
   words: WordGoal;
-  characters: CharacterGoal;
   sessionTime: SessionTimeGoal;
   // Status de capítulos onde as metas se aplicam
   appliesTo: ChapterStatus[];
 }
 
 /**
- * Valores padrão para meta de palavras
+ * Valores padrão para meta de palavras (mínimo: 1000)
  */
 export const DEFAULT_WORD_GOAL: WordGoal = {
   enabled: false,
   target: 2000,
-  warnAt90: true,
-  warnAt100: true,
-  silent: false,
-};
-
-/**
- * Valores padrão para meta de caracteres
- */
-export const DEFAULT_CHARACTER_GOAL: CharacterGoal = {
-  enabled: false,
-  target: 10000,
   warnAt90: true,
   warnAt100: true,
   silent: false,
@@ -98,10 +75,14 @@ export const DEFAULT_SESSION_TIME_GOAL: SessionTimeGoal = {
  */
 export const DEFAULT_GLOBAL_GOALS: GlobalGoals = {
   words: DEFAULT_WORD_GOAL,
-  characters: DEFAULT_CHARACTER_GOAL,
   sessionTime: DEFAULT_SESSION_TIME_GOAL,
   appliesTo: ["draft", "in-progress", "review", "finished"],
 };
+
+/**
+ * Constantes de validação
+ */
+export const MIN_WORD_GOAL = 1000;
 
 /**
  * Labels dos status de capítulos

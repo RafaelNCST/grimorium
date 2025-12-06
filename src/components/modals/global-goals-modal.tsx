@@ -27,6 +27,7 @@ import {
   DEFAULT_GLOBAL_GOALS,
   CHAPTER_STATUS_LABELS,
   ChapterStatus,
+  MIN_WORD_GOAL,
 } from "@/types/global-goals";
 
 interface GlobalGoalsModalProps {
@@ -151,8 +152,9 @@ export function GlobalGoalsModal({
               warnAt100={localGoals.words.warnAt100}
               silent={localGoals.words.silent}
               label="Meta de Palavras"
-              description="Quantas palavras deseja escrever por capítulo"
+              description="Quantas palavras deseja escrever por capítulo (mínimo: 1.000 palavras)"
               unit="palavras"
+              minValue={MIN_WORD_GOAL}
               onEnabledChange={(enabled) =>
                 setLocalGoals({
                   ...localGoals,
@@ -162,7 +164,7 @@ export function GlobalGoalsModal({
               onTargetChange={(target) =>
                 setLocalGoals({
                   ...localGoals,
-                  words: { ...localGoals.words, target },
+                  words: { ...localGoals.words, target: Math.max(MIN_WORD_GOAL, target) },
                 })
               }
               onWarnAt90Change={(warnAt90) =>
@@ -193,63 +195,6 @@ export function GlobalGoalsModal({
                     silent,
                     warnAt90: silent ? false : localGoals.words.warnAt90,
                     warnAt100: silent ? false : localGoals.words.warnAt100,
-                  },
-                })
-              }
-            />
-
-            <Separator />
-
-            {/* Meta de Caracteres */}
-            <GoalConfig
-              enabled={localGoals.characters.enabled}
-              target={localGoals.characters.target}
-              warnAt90={localGoals.characters.warnAt90}
-              warnAt100={localGoals.characters.warnAt100}
-              silent={localGoals.characters.silent}
-              label="Meta de Caracteres"
-              description="Quantos caracteres deseja escrever por capítulo"
-              unit="caracteres"
-              onEnabledChange={(enabled) =>
-                setLocalGoals({
-                  ...localGoals,
-                  characters: { ...localGoals.characters, enabled },
-                })
-              }
-              onTargetChange={(target) =>
-                setLocalGoals({
-                  ...localGoals,
-                  characters: { ...localGoals.characters, target },
-                })
-              }
-              onWarnAt90Change={(warnAt90) =>
-                setLocalGoals({
-                  ...localGoals,
-                  characters: {
-                    ...localGoals.characters,
-                    warnAt90,
-                    silent: warnAt90 ? false : localGoals.characters.silent,
-                  },
-                })
-              }
-              onWarnAt100Change={(warnAt100) =>
-                setLocalGoals({
-                  ...localGoals,
-                  characters: {
-                    ...localGoals.characters,
-                    warnAt100,
-                    silent: warnAt100 ? false : localGoals.characters.silent,
-                  },
-                })
-              }
-              onSilentChange={(silent) =>
-                setLocalGoals({
-                  ...localGoals,
-                  characters: {
-                    ...localGoals.characters,
-                    silent,
-                    warnAt90: silent ? false : localGoals.characters.warnAt90,
-                    warnAt100: silent ? false : localGoals.characters.warnAt100,
                   },
                 })
               }
@@ -335,6 +280,7 @@ interface GoalConfigProps {
   label: string;
   description: string;
   unit: string;
+  minValue?: number;
   onEnabledChange: (enabled: boolean) => void;
   onTargetChange: (target: number) => void;
   onWarnAt90Change: (warnAt90: boolean) => void;
@@ -351,6 +297,7 @@ function GoalConfig({
   label,
   description,
   unit,
+  minValue = 1,
   onEnabledChange,
   onTargetChange,
   onWarnAt90Change,
@@ -377,11 +324,11 @@ function GoalConfig({
                 value={target}
                 onChange={(e) => {
                   const value = Number(e.target.value);
-                  if (!isNaN(value) && value >= 1) {
+                  if (!isNaN(value) && value >= minValue) {
                     onTargetChange(value);
                   }
                 }}
-                min={1}
+                min={minValue}
                 className="flex-1 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               />
               <div className="flex flex-col gap-0.5">
@@ -389,7 +336,7 @@ function GoalConfig({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => onTargetChange(target + 1)}
+                  onClick={() => onTargetChange(target + 100)}
                   className="h-5 px-2"
                 >
                   <ChevronUp className="h-3 w-3" />
@@ -398,9 +345,9 @@ function GoalConfig({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => onTargetChange(Math.max(1, target - 1))}
+                  onClick={() => onTargetChange(Math.max(minValue, target - 100))}
                   className="h-5 px-2"
-                  disabled={target <= 1}
+                  disabled={target <= minValue}
                 >
                   <ChevronDown className="h-3 w-3" />
                 </Button>

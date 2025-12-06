@@ -9,6 +9,7 @@ import { ChapterMetrics } from "../types/metrics";
 interface UseTimeWarningsMonitorProps {
   metrics: ChapterMetrics;
   enabled: boolean;
+  hasSessionTimeGoal: boolean;
   onWarning: (
     severity: "info" | "warning" | "error",
     title: string,
@@ -58,16 +59,21 @@ function saveTimeWarningTracker(tracker: TimeWarningTracker): void {
 
 /**
  * Monitora tempo de sessão e dispara avisos
+ * Só funciona quando não há meta de tempo de sessão ativada
  */
 export function useTimeWarningsMonitor({
   metrics,
   enabled,
+  hasSessionTimeGoal,
   onWarning,
 }: UseTimeWarningsMonitorProps) {
   const warningsShownRef = useRef<TimeWarningTracker>(loadTimeWarningTracker());
 
   useEffect(() => {
-    if (!enabled) return;
+    // Não exibe avisos se:
+    // 1. O sistema de avisos está desativado
+    // 2. Há uma meta de tempo de sessão ativada
+    if (!enabled || hasSessionTimeGoal) return;
 
     const shown = warningsShownRef.current;
     let needsSave = false;
@@ -100,7 +106,7 @@ export function useTimeWarningsMonitor({
     if (needsSave) {
       saveTimeWarningTracker(shown);
     }
-  }, [metrics.sessionDuration, enabled, onWarning]);
+  }, [metrics.sessionDuration, enabled, hasSessionTimeGoal, onWarning]);
 
   // Reseta avisos quando uma nova sessão começa (quando sessionDuration volta para valores baixos)
   useEffect(() => {
