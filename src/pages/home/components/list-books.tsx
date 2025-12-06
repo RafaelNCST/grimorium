@@ -2,8 +2,6 @@ import {
   Book as BookIcon,
   Search,
   Library,
-  Type,
-  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -20,22 +18,8 @@ const METRICS_CONFIG: Record<string, IEntityTagConfig> = {
     value: "books",
     icon: Library,
     translationKey: "metrics.total_books",
-    colorClass: "text-blue-600 dark:text-blue-400",
-    bgColorClass: "bg-blue-500/20 border-blue-500/30",
-  },
-  characters: {
-    value: "characters",
-    icon: Type,
-    translationKey: "metrics.total_characters",
-    colorClass: "text-green-600 dark:text-green-400",
-    bgColorClass: "bg-green-500/20 border-green-500/30",
-  },
-  words: {
-    value: "words",
-    icon: FileText,
-    translationKey: "metrics.total_words",
-    colorClass: "text-purple-600 dark:text-purple-400",
-    bgColorClass: "bg-purple-500/20 border-purple-500/30",
+    colorClass: "text-blue-400",
+    bgColorClass: "bg-blue-500/20",
   },
 };
 
@@ -43,8 +27,6 @@ interface ListBooksProps {
   filteredBooks: BookType[];
   searchTerm: string;
   totalBooks: number;
-  totalCharacters: number;
-  totalWords: number;
   onSearchTermChange: (term: string) => void;
   onBookSelect: (bookId: string) => void;
 }
@@ -53,15 +35,12 @@ export function ListBooks({
   filteredBooks,
   searchTerm,
   totalBooks,
-  totalCharacters,
-  totalWords,
   onSearchTermChange,
   onBookSelect,
 }: ListBooksProps) {
   const { t } = useTranslation("home");
 
-  const shouldShowMetrics =
-    totalBooks > 0 || totalCharacters > 0 || totalWords > 0;
+  const shouldShowMetrics = totalBooks > 0;
 
   const isEmpty = filteredBooks.length === 0;
 
@@ -86,14 +65,6 @@ export function ListBooks({
             <EntityTagBadge
               config={METRICS_CONFIG.books}
               label={`${t("metrics.total_books")}: ${totalBooks}`}
-            />
-            <EntityTagBadge
-              config={METRICS_CONFIG.characters}
-              label={`${t("metrics.total_characters")}: ${totalCharacters.toLocaleString()}`}
-            />
-            <EntityTagBadge
-              config={METRICS_CONFIG.words}
-              label={`${t("metrics.total_words")}: ${totalWords.toLocaleString()}`}
             />
           </div>
         )}
@@ -135,14 +106,6 @@ export function ListBooks({
           <EntityTagBadge
             config={METRICS_CONFIG.books}
             label={`${t("metrics.total_books")}: ${totalBooks}`}
-          />
-          <EntityTagBadge
-            config={METRICS_CONFIG.characters}
-            label={`${t("metrics.total_characters")}: ${totalCharacters.toLocaleString()}`}
-          />
-          <EntityTagBadge
-            config={METRICS_CONFIG.words}
-            label={`${t("metrics.total_words")}: ${totalWords.toLocaleString()}`}
           />
         </div>
       )}

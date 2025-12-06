@@ -12,8 +12,6 @@ interface PropsHomeView {
   filteredBooks: BookType[];
   searchTerm: string;
   totalBooks: number;
-  totalCharacters: number;
-  totalWords: number;
   lastEditedBook: string;
   lastEditedDate?: Date;
   lastChapter?: {
@@ -34,8 +32,6 @@ export function HomeView({
   filteredBooks,
   searchTerm,
   totalBooks,
-  totalCharacters,
-  totalWords,
   lastEditedBook,
   lastEditedDate,
   lastChapter,
@@ -63,8 +59,6 @@ export function HomeView({
         filteredBooks={filteredBooks}
         searchTerm={searchTerm}
         totalBooks={totalBooks}
-        totalCharacters={totalCharacters}
-        totalWords={totalWords}
         onSearchTermChange={onSearchTermChange}
         onBookSelect={onBookSelect}
       />

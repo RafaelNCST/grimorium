@@ -88,11 +88,6 @@ export function HomePage() {
     return mostRecent ? new Date(mostRecent.lastModified) : undefined;
   }, [books]);
 
-  // Calculate total characters and words from all books
-  // Note: These values should come from actual chapter data in the future
-  const totalCharacters = 0;
-  const totalWords = 0;
-
   // This should come from actual chapter data
   const lastChapter = undefined;
 
@@ -181,8 +176,6 @@ export function HomePage() {
       filteredBooks={filteredBooks}
       searchTerm={searchTerm}
       totalBooks={books.length}
-      totalCharacters={totalCharacters}
-      totalWords={totalWords}
       lastEditedBook={lastEditedBook}
       lastEditedDate={lastEditedDate}
       lastChapter={lastChapter}
