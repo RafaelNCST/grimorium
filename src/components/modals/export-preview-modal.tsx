@@ -1,6 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 
 import { FileText, Loader2 } from "lucide-react";
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,6 +23,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { generateChapterPDF } from "@/lib/services/export-pdf.service";
+
+// Configure PDF.js worker - using CDN for compatibility
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 // Page format dimensions in pixels (at 96 DPI)
 const PAGE_FORMATS = {
@@ -40,16 +47,19 @@ const MARGIN_PRESETS = {
   wide: { top: 95, bottom: 95, left: 142, right: 142, label: "Larga" },
 } as const;
 
-// Font families (sistema)
+// Font families - same as in chapter editor
 const FONT_FAMILIES = [
-  { value: "serif", label: "Serif (padrão para livros)" },
-  { value: "sans", label: "Sans-serif" },
+  { value: "Inter", label: "Inter" },
+  { value: "Times New Roman", label: "Times New Roman" },
+  { value: "Courier New", label: "Courier New" },
+  { value: "Arial", label: "Arial" },
+  { value: "sans-serif", label: "Sans Serif" },
 ] as const;
 
 // Font sizes (múltiplos de 8 para melhor alinhamento)
 const TITLE_SIZES = ["16pt", "24pt", "32pt"] as const;
 
-interface ExportConfig {
+export interface ExportConfig {
   pageFormat: "a4" | "letter";
   margins: keyof typeof MARGIN_PRESETS;
   titleFont: string;
@@ -60,14 +70,19 @@ interface ExportConfig {
   pageNumberPosition: "left" | "center" | "right";
 }
 
+export interface PageContent {
+  content: string;
+  pageNumber: number;
+}
+
 interface ExportPreviewModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   chapterId: string;
   chapterTitle: string;
   chapterNumber: string;
-  onExportPDF: (config: ExportConfig) => void;
-  onExportWord: (config: ExportConfig) => void;
+  onExportPDF: (config: ExportConfig, content: string, pages: PageContent[]) => void;
+  onExportWord: (config: ExportConfig, content: string, pages: PageContent[]) => void;
 }
 
 export function ExportPreviewModal({
@@ -81,24 +96,21 @@ export function ExportPreviewModal({
 }: ExportPreviewModalProps) {
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [numPages, setNumPages] = useState<number>(0);
+  const [documentHeight, setDocumentHeight] = useState<number>(0);
+  const scale = 1.0; // Fixed zoom at 100%
   const [config, setConfig] = useState<ExportConfig>({
     pageFormat: "a4",
     margins: "editorial",
-    titleFont: "serif",
+    titleFont: "Inter",
     titleSize: "24pt",
     titleAlignment: "center",
     titleBold: true,
     showPageNumbers: true,
     pageNumberPosition: "center",
   });
-
-  const getFontFamily = (fontValue: string): string => {
-    const fontMap: Record<string, string> = {
-      serif: "Georgia, 'Times New Roman', serif",
-      sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    };
-    return fontMap[fontValue] || fontMap.serif;
-  };
 
   // Load chapter content when modal opens
   useEffect(() => {
@@ -127,95 +139,87 @@ export function ExportPreviewModal({
     loadContent();
   }, [open, chapterId]);
 
-  // Calculate page breaks by measuring actual rendered height
-  const pages = useMemo(() => {
-    if (!content) return [{ content: "", pageNumber: 1 }];
-
+  // Calculate fixed container dimensions based on page format
+  const containerDimensions = useMemo(() => {
     const format = PAGE_FORMATS[config.pageFormat];
-    const margins = MARGIN_PRESETS[config.margins];
 
-    // Calculate usable dimensions (scaled for 0.6 preview)
-    const pageHeight = (format.height - margins.top - margins.bottom - (config.showPageNumbers ? 30 : 0)) * 0.6;
-    const pageWidth = (format.width - margins.left - margins.right) * 0.6;
+    // Use a reasonable fixed width that fits the modal well
+    // The PDF pages will render at their natural size which is smaller than PAGE_FORMATS values
+    const width = 597; // Fixed width that works well for both A4 and Letter
 
-    // Create invisible measuring element
-    const measuringDiv = document.createElement('div');
-    measuringDiv.style.position = 'absolute';
-    measuringDiv.style.visibility = 'hidden';
-    measuringDiv.style.width = `${pageWidth}px`;
-    measuringDiv.style.fontFamily = "Georgia, 'Times New Roman', serif";
-    measuringDiv.style.fontSize = '7.2px'; // 12pt * 0.6
-    measuringDiv.style.lineHeight = '1.5';
-    measuringDiv.style.whiteSpace = 'pre-wrap';
-    measuringDiv.style.wordWrap = 'break-word';
-    document.body.appendChild(measuringDiv);
+    const pageHeight = format.height * scale;
+    // Height: use locked document height if available, otherwise estimate
+    const estimatedHeight = Math.max(800, pageHeight + 100);
 
-    // Calculate title height for first page
-    const titleSizePt = parseInt(config.titleSize);
-    let titleHeight = 0;
-    if (true) { // Always calculate for first page
-      const titleDiv = document.createElement('div');
-      titleDiv.style.fontFamily = getFontFamily(config.titleFont);
-      titleDiv.style.fontSize = `calc(${config.titleSize} * 0.6)`;
-      titleDiv.style.fontWeight = config.titleBold ? 'bold' : 'normal';
-      titleDiv.style.marginBottom = '24px'; // 6 * 0.6 converted to px
-      titleDiv.textContent = `Capítulo ${chapterNumber}: ${chapterTitle}`;
-      measuringDiv.appendChild(titleDiv);
-      titleHeight = measuringDiv.offsetHeight;
-      measuringDiv.innerHTML = '';
-    }
+    return { width, estimatedHeight };
+  }, [config.pageFormat, scale]);
 
-    const pageContents: { content: string; pageNumber: number }[] = [];
-    let currentPageNumber = 1;
-    let currentPageContent = '';
+  // Generate PDF preview when content or config changes
+  useEffect(() => {
+    if (!content || !open) return;
 
-    // Split into words while preserving line breaks
-    const words = content.split(/(\s+)/); // Splits by whitespace but keeps the whitespace
+    let cancelled = false;
 
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      const maxHeight = currentPageNumber === 1 ? pageHeight - titleHeight : pageHeight;
+    const generatePreview = async () => {
+      setIsGeneratingPreview(true);
 
-      // Test adding this word to current page
-      const testContent = currentPageContent + word;
-      measuringDiv.textContent = testContent;
-      const testHeight = measuringDiv.offsetHeight;
+      try {
+        // Generate PDF blob
+        const blob = await generateChapterPDF(
+          chapterNumber,
+          chapterTitle,
+          content,
+          config,
+          [] // Pages array not used anymore
+        );
 
-      // Use 95% of max height to leave safety margin
-      const safeMaxHeight = maxHeight * 0.95;
+        if (cancelled) return;
 
-      // Check if it exceeds safe page height
-      if (testHeight > safeMaxHeight && currentPageContent.length > 0) {
-        // Current page is full, save it and start new page
-        pageContents.push({
-          content: currentPageContent.trim(),
-          pageNumber: currentPageNumber,
-        });
+        // Create object URL for preview
+        const newUrl = URL.createObjectURL(blob);
 
-        // Reset for new page
-        currentPageContent = word;
-        currentPageNumber++;
-      } else {
-        // Word fits, add it to current page
-        currentPageContent += word;
+        // Cleanup old URL before setting new one
+        if (pdfPreviewUrl) {
+          URL.revokeObjectURL(pdfPreviewUrl);
+        }
+
+        setPdfPreviewUrl(newUrl);
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Error generating PDF preview:", error);
+          setPdfPreviewUrl(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsGeneratingPreview(false);
+        }
       }
+    };
+
+    generatePreview();
+
+    // Cleanup on unmount or dependency change
+    return () => {
+      cancelled = true;
+      // Note: We don't revoke the URL here as it might still be needed
+      // URL cleanup happens when setting a new URL or on modal close
+    };
+  }, [content, config, open, chapterNumber, chapterTitle]);
+
+  // Reset document height when page format changes
+  useEffect(() => {
+    setDocumentHeight(0);
+  }, [config.pageFormat]);
+
+  // Cleanup PDF URL when modal closes
+  useEffect(() => {
+    if (!open && pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl);
+      setPdfPreviewUrl(null);
+      setNumPages(0);
+      setDocumentHeight(0);
     }
-
-    // Add remaining content as last page
-    if (currentPageContent.trim().length > 0) {
-      pageContents.push({
-        content: currentPageContent.trim(),
-        pageNumber: currentPageNumber,
-      });
-    }
-
-    // Cleanup
-    document.body.removeChild(measuringDiv);
-
-    return pageContents.length > 0 ? pageContents : [{ content: "", pageNumber: 1 }];
-  }, [content, config, chapterNumber, chapterTitle]);
-
-  const totalPages = pages.length;
+  }, [open]);
 
   const handleConfigChange = <K extends keyof ExportConfig>(
     key: K,
@@ -226,7 +230,7 @@ export function ExportPreviewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-[90vw] w-[1400px] max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
@@ -374,162 +378,131 @@ export function ExportPreviewModal({
                   </div>
                 </div>
               </div>
-
-              <Separator />
-
-              {/* Header/Footer */}
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  Cabeçalho e Rodapé
-                </Label>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="page-numbers"
-                    checked={config.showPageNumbers}
-                    onCheckedChange={(checked) =>
-                      handleConfigChange("showPageNumbers", checked === true)
-                    }
-                  />
-                  <Label
-                    htmlFor="page-numbers"
-                    className="cursor-pointer text-sm font-normal"
-                  >
-                    Mostrar números de página
-                  </Label>
-                </div>
-
-                {config.showPageNumbers && (
-                  <div className="space-y-2 pl-6">
-                    <Label>Posição</Label>
-                    <RadioGroup
-                      value={config.pageNumberPosition}
-                      onValueChange={(value) =>
-                        handleConfigChange(
-                          "pageNumberPosition",
-                          value as "left" | "center" | "right"
-                        )
-                      }
-                      className="flex flex-col gap-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="left" id="page-left" />
-                        <Label htmlFor="page-left" className="cursor-pointer">
-                          Esquerda
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="center" id="page-center" />
-                        <Label htmlFor="page-center" className="cursor-pointer">
-                          Centro
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="right" id="page-right" />
-                        <Label htmlFor="page-right" className="cursor-pointer">
-                          Direita
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
           {/* Preview Panel - Right Side */}
           <div className="flex-1 flex flex-col bg-muted/30 rounded-lg overflow-hidden">
-            {/* Total pages indicator - Fixed at top */}
-            <div className="flex-shrink-0 text-center py-3 border-b border-border bg-card/50">
-              <span className="text-sm font-medium text-muted-foreground">
-                Total: {totalPages} {totalPages === 1 ? "página" : "páginas"}
-              </span>
-            </div>
+            {/* PDF Controls */}
+            {pdfPreviewUrl && !isLoading && (
+              <div className="flex-shrink-0 flex items-center justify-center px-4 py-3 border-b border-border bg-card/50">
+                <span className="text-sm text-muted-foreground">
+                  {numPages} {numPages === 1 ? 'página' : 'páginas'}
+                </span>
+              </div>
+            )}
 
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto p-8">
+            {/* PDF Preview - with FIXED container to prevent any resizing */}
+            <div className="flex-1 overflow-y-auto bg-muted/20 p-4 flex items-start justify-center">
               {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">
-                      Carregando conteúdo do capítulo...
-                    </p>
-                  </div>
+                <div className="flex flex-col items-center gap-4 mt-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">
+                    Carregando conteúdo do capítulo...
+                  </p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-8">
-                  {/* Multiple pages with page breaks */}
-                  {pages.map((page, index) => (
-                    <div key={page.pageNumber} className="relative">
-                      {/* Page number indicator above page */}
-                      <div className="text-center mb-2">
-                        <span className="text-xs font-medium text-muted-foreground bg-card px-3 py-1 rounded-full border">
-                          Página {page.pageNumber} de {totalPages}
-                        </span>
-                      </div>
-
-                      {/* Page content */}
-                      <div
-                        className="bg-white shadow-2xl relative"
-                        style={{
-                          width: `${PAGE_FORMATS[config.pageFormat].width * 0.6}px`,
-                          height: `${PAGE_FORMATS[config.pageFormat].height * 0.6}px`,
-                          padding: `${MARGIN_PRESETS[config.margins].top * 0.6}px ${MARGIN_PRESETS[config.margins].right * 0.6}px ${MARGIN_PRESETS[config.margins].bottom * 0.6}px ${MARGIN_PRESETS[config.margins].left * 0.6}px`,
-                        }}
-                      >
-                        <div className="flex flex-col h-full">
-                          {/* Title - only on first page */}
-                          {page.pageNumber === 1 && (
-                            <div
-                              className="mb-6"
-                              style={{
-                                fontFamily: getFontFamily(config.titleFont),
-                                fontSize: `calc(${config.titleSize} * 0.6)`,
-                                fontWeight: config.titleBold ? "bold" : "normal",
-                                textAlign: config.titleAlignment,
-                                color: "#000",
-                              }}
-                            >
-                              Capítulo {chapterNumber}: {chapterTitle}
-                            </div>
-                          )}
-
-                          {/* Text Content - Preserva formatação completa */}
-                          <div
-                            className="whitespace-pre-wrap flex-1"
-                            style={{
-                              fontFamily: "Georgia, 'Times New Roman', serif",
-                              fontSize: "7.2px", // 12pt * 0.6
-                              lineHeight: "1.5",
-                              color: "#000",
-                            }}
-                          >
-                            {page.content}
-                          </div>
-
-                          {/* Page number at bottom if enabled */}
-                          {config.showPageNumbers && (
-                            <div
-                              className="mt-4 pt-2"
-                              style={{
-                                textAlign: config.pageNumberPosition,
-                                fontSize: "6px",
-                                color: "#666",
-                              }}
-                            >
-                              {page.pageNumber}
-                            </div>
-                          )}
-                        </div>
+                <div
+                  className="relative flex-shrink-0"
+                  style={{
+                    width: `${containerDimensions.width}px`,
+                    minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`,
+                  }}
+                >
+                  {/* Loading overlay during regeneration - covers the fixed container */}
+                  {isGeneratingPreview && pdfPreviewUrl && (
+                    <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+                      <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <p className="text-sm text-muted-foreground">
+                          Atualizando pré-visualização...
+                        </p>
                       </div>
                     </div>
-                  ))}
+                  )}
 
-                  {/* Info note */}
-                  <p className="text-xs text-muted-foreground text-center max-w-md">
-                    Pré-visualização com quebra de páginas real. Use as configurações à esquerda para ajustar a formatação.
-                  </p>
+                  {/* PDF Document inside fixed container */}
+                  {pdfPreviewUrl ? (
+                    <div className="flex flex-col gap-6">
+                      <Document
+                        key="pdf-document"
+                        file={pdfPreviewUrl}
+                        onLoadSuccess={({ numPages }) => {
+                          setNumPages(numPages);
+                          // Calculate and lock document height after first load
+                          setTimeout(() => {
+                            const pageHeight = PAGE_FORMATS[config.pageFormat].height;
+                            const totalHeight = (pageHeight * scale * numPages) + (numPages * 80); // 80px gap per page
+                            setDocumentHeight(totalHeight);
+                          }, 100);
+                        }}
+                        loading={
+                          <div
+                            className="flex flex-col items-center gap-4 justify-center"
+                            style={{
+                              width: `${containerDimensions.width}px`,
+                              minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
+                            }}
+                          >
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            <p className="text-sm text-muted-foreground">
+                              Carregando PDF...
+                            </p>
+                          </div>
+                        }
+                      >
+                        {Array.from(new Array(numPages), (_, index) => (
+                          <div key={`page_${index + 1}`} className="flex flex-col gap-2">
+                            <div className="shadow-xl bg-white border border-border">
+                              <Page
+                                pageNumber={index + 1}
+                                scale={scale}
+                                loading={
+                                  <div
+                                    className="flex items-center justify-center p-8 bg-white"
+                                    style={{
+                                      width: `${PAGE_FORMATS[config.pageFormat].width * scale}px`,
+                                      height: `${PAGE_FORMATS[config.pageFormat].height * scale}px`
+                                    }}
+                                  >
+                                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                  </div>
+                                }
+                              />
+                            </div>
+                            <div className="text-center text-xs text-muted-foreground">
+                              Página {index + 1} de {numPages}
+                            </div>
+                          </div>
+                        ))}
+                      </Document>
+                    </div>
+                  ) : isGeneratingPreview ? (
+                    <div
+                      className="flex flex-col items-center gap-4 justify-center"
+                      style={{
+                        width: `${containerDimensions.width}px`,
+                        minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
+                      }}
+                    >
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">
+                        Gerando pré-visualização...
+                      </p>
+                    </div>
+                  ) : (
+                    <div
+                      className="flex flex-col items-center justify-center"
+                      style={{
+                        width: `${containerDimensions.width}px`,
+                        minHeight: `${containerDimensions.estimatedHeight}px`
+                      }}
+                    >
+                      <p className="text-sm text-muted-foreground">
+                        Erro ao gerar pré-visualização
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -546,7 +519,7 @@ export function ExportPreviewModal({
             <Button
               variant="magical"
               onClick={() => {
-                onExportWord(config);
+                onExportWord(config, content, []);
                 onOpenChange(false);
               }}
             >
@@ -556,7 +529,7 @@ export function ExportPreviewModal({
             <Button
               variant="magical"
               onClick={() => {
-                onExportPDF(config);
+                onExportPDF(config, content, []);
                 onOpenChange(false);
               }}
             >

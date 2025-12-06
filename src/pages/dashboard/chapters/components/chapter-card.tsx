@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { save } from "@tauri-apps/plugin-dialog";
+import { writeFile } from "@tauri-apps/plugin-fs";
 import {
   FileText,
   Clock,
@@ -11,9 +13,15 @@ import {
   Type,
   Hash,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
-import { ExportPreviewModal } from "@/components/modals/export-preview-modal";
+import {
+  ExportPreviewModal,
+  type ExportConfig,
+  type PageContent,
+} from "@/components/modals/export-preview-modal";
+import { generateChapterPDF } from "@/lib/services/export-pdf.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -76,12 +84,51 @@ export function ChapterCard({
     setShowExportModal(true);
   };
 
-  const handleExportPDF = (config: any) => {
-    console.log("Exporting to PDF with config:", config);
-    // TODO: Implement PDF export logic
+  const handleExportPDF = async (
+    config: ExportConfig,
+    content: string,
+    pages: PageContent[]
+  ) => {
+    try {
+      // Generate PDF blob
+      const blob = await generateChapterPDF(
+        chapter.number.toString(),
+        chapter.title,
+        content,
+        config,
+        pages
+      );
+
+      // Convert blob to Uint8Array for Tauri
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Ask user where to save
+      const filePath = await save({
+        defaultPath: `Capitulo_${chapter.number}_${chapter.title}.pdf`,
+        filters: [
+          {
+            name: "PDF",
+            extensions: ["pdf"],
+          },
+        ],
+      });
+
+      if (filePath) {
+        // Save file
+        await writeFile(filePath, uint8Array);
+      }
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      toast.error("Erro ao exportar PDF");
+    }
   };
 
-  const handleExportWord = (config: any) => {
+  const handleExportWord = (
+    config: ExportConfig,
+    content: string,
+    pages: PageContent[]
+  ) => {
     console.log("Exporting to Word with config:", config);
     // TODO: Implement Word export logic
   };
