@@ -8,11 +8,18 @@ import {
   Settings,
   AlertCircle,
   BookOpen,
+  Download,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormChapterNameWithNumber } from "@/components/forms/FormChapterNameWithNumber";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -41,6 +48,7 @@ interface EditorHeaderProps {
   onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
   onNavigateToNext?: () => void;
+  onExport?: (format: "pdf" | "word") => void;
 }
 
 export function EditorHeader({
@@ -62,6 +70,7 @@ export function EditorHeader({
   onShowSettings,
   onNavigateToPrevious,
   onNavigateToNext,
+  onExport,
 }: EditorHeaderProps) {
   const { t } = useTranslation("chapter-editor");
   const { settings: warningsSettings } = useWarningsSettings();
@@ -192,6 +201,25 @@ export function EditorHeader({
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 shrink-0 justify-end">
+              {onExport && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Download className="w-4 h-4 mr-2" />
+                      Exportar
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onExport("word")}>
+                      Exportar como Word
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onExport("pdf")}>
+                      Exportar como PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
               <Button
                 variant="ghost-bright"
                 size="sm"

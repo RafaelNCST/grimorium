@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
+import { ExportPreviewModal } from "@/components/modals/export-preview-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ interface Chapter {
   characterCountWithSpaces: number;
   lastEdited: Date;
   summary?: string;
+  content?: string;
   plotArc?: { id: string; name: string };
   mentionedCharacters?: EntityMention[];
   mentionedRegions?: EntityMention[];
@@ -69,6 +71,23 @@ export function ChapterCard({
   showStatus = true,
 }: ChapterCardProps) {
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"pdf" | "word">("pdf");
+
+  const handleExportClick = (format: "pdf" | "word") => {
+    setExportFormat(format);
+    setShowExportModal(true);
+  };
+
+  const handleExportPDF = (config: any) => {
+    console.log("Exporting to PDF with config:", config);
+    // TODO: Implement PDF export logic
+  };
+
+  const handleExportWord = (config: any) => {
+    console.log("Exporting to Word with config:", config);
+    // TODO: Implement Word export logic
+  };
 
   return (
     <Card className="hover:shadow-md transition-shadow relative overflow-hidden">
@@ -115,11 +134,11 @@ export function ChapterCard({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportClick("word")}>
                   <FileText className="w-4 h-4 mr-2" />
                   Exportar como Word
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportClick("pdf")}>
                   <FileText className="w-4 h-4 mr-2" />
                   Exportar como PDF
                 </DropdownMenuItem>
@@ -398,6 +417,17 @@ export function ChapterCard({
           )}
         </CardContent>
       </>
+
+      {/* Export Preview Modal */}
+      <ExportPreviewModal
+        open={showExportModal}
+        onOpenChange={setShowExportModal}
+        chapterId={chapter.id}
+        chapterTitle={chapter.title}
+        chapterNumber={chapter.number.toString()}
+        onExportPDF={handleExportPDF}
+        onExportWord={handleExportWord}
+      />
     </Card>
   );
 }
