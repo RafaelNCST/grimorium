@@ -9,11 +9,6 @@ interface HeaderProps {
   daysSinceLastChapter: number;
   lastEditedBook: string;
   lastEditedDate?: Date;
-  lastChapter?: {
-    title: string;
-    bookTitle: string;
-    date?: Date;
-  };
   onOpenCreateModal: () => void;
 }
 
@@ -38,13 +33,11 @@ export function Header({
   daysSinceLastChapter,
   lastEditedBook,
   lastEditedDate,
-  lastChapter,
   onOpenCreateModal,
 }: HeaderProps) {
   const { t, i18n } = useTranslation("home");
 
   const formattedLastEditedDate = formatDate(lastEditedDate, i18n.language);
-  const formattedLastChapterDate = formatDate(lastChapter?.date, i18n.language);
 
   return (
     <div className="relative h-80 overflow-hidden rounded-xl mx-6 my-6">
@@ -72,25 +65,14 @@ export function Header({
               </span>
               <span className="text-gray-200"> {t("header.subtext")}</span>
             </p>
-            <div className="flex gap-6 text-sm text-gray-300">
-              <div>
-                <span className="text-gray-400">
-                  {t("header.last_edited")}:{" "}
-                </span>
-                <span className="font-medium">
-                  {lastEditedBook || t("header.no_book")}
-                  {formattedLastEditedDate && ` - ${formattedLastEditedDate}`}
-                </span>
-              </div>
-              <div>
-                <span className="text-gray-400">
-                  {t("header.last_chapter")}:{" "}
-                </span>
-                <span className="font-medium">
-                  {lastChapter?.title || t("header.no_chapter")}
-                  {formattedLastChapterDate && ` - ${formattedLastChapterDate}`}
-                </span>
-              </div>
+            <div className="text-sm text-gray-300">
+              <span className="text-gray-400">
+                {t("header.last_edited")}:{" "}
+              </span>
+              <span className="font-medium">
+                {lastEditedBook || t("header.no_book")}
+                {formattedLastEditedDate && ` - ${formattedLastEditedDate}`}
+              </span>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import {
   createBook as createBookDB,
   updateLastOpened,
 } from "@/lib/db/books.service";
+import { getChapterMetadataByBookId } from "@/lib/db/chapters.service";
 import { useBookStore } from "@/stores/book-store";
 
 import { getLastEditedBook } from "./utils/get-last-edited-book";
@@ -26,6 +27,7 @@ export function HomePage() {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [_isLoading, setIsLoading] = useState(true);
+  const [daysSinceLastChapter, setDaysSinceLastChapter] = useState(0);
 
   // Load books from database on mount
   useEffect(() => {
@@ -88,10 +90,49 @@ export function HomePage() {
     return mostRecent ? new Date(mostRecent.lastModified) : undefined;
   }, [books]);
 
-  // This should come from actual chapter data
-  const lastChapter = undefined;
+  // Calculate days since last chapter was edited across all books
+  useEffect(() => {
+    const calculateDaysSinceLastChapter = async () => {
+      try {
+        if (books.length === 0) {
+          setDaysSinceLastChapter(0);
+          return;
+        }
 
-  const daysSinceLastChapter = 0;
+        // Get all chapters from all books
+        const allChaptersPromises = books.map((book) =>
+          getChapterMetadataByBookId(book.id)
+        );
+        const allChaptersArrays = await Promise.all(allChaptersPromises);
+        const allChapters = allChaptersArrays.flat();
+
+        if (allChapters.length === 0) {
+          setDaysSinceLastChapter(0);
+          return;
+        }
+
+        // Find the most recently edited chapter
+        const mostRecentChapter = allChapters.reduce((prev, current) => {
+          const prevDate = new Date(prev.lastEdited).getTime();
+          const currentDate = new Date(current.lastEdited).getTime();
+          return currentDate > prevDate ? current : prev;
+        });
+
+        // Calculate days since that chapter was edited
+        const lastEditedDate = new Date(mostRecentChapter.lastEdited);
+        const now = new Date();
+        const diffMs = now.getTime() - lastEditedDate.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        setDaysSinceLastChapter(diffDays);
+      } catch (error) {
+        console.error("Error calculating days since last chapter:", error);
+        setDaysSinceLastChapter(0);
+      }
+    };
+
+    calculateDaysSinceLastChapter();
+  }, [books]);
 
   const handleOpenCreateModal = useCallback(() => {
     setShowCreateModal(true);
@@ -178,7 +219,6 @@ export function HomePage() {
       totalBooks={books.length}
       lastEditedBook={lastEditedBook}
       lastEditedDate={lastEditedDate}
-      lastChapter={lastChapter}
       daysSinceLastChapter={daysSinceLastChapter}
       showCreateModal={showCreateModal}
       onSearchTermChange={setSearchTerm}

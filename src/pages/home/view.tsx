@@ -14,11 +14,6 @@ interface PropsHomeView {
   totalBooks: number;
   lastEditedBook: string;
   lastEditedDate?: Date;
-  lastChapter?: {
-    title: string;
-    bookTitle: string;
-    date?: Date;
-  };
   daysSinceLastChapter: number;
   showCreateModal: boolean;
   onSearchTermChange: (term: string) => void;
@@ -34,7 +29,6 @@ export function HomeView({
   totalBooks,
   lastEditedBook,
   lastEditedDate,
-  lastChapter,
   daysSinceLastChapter,
   showCreateModal,
   onSearchTermChange,
@@ -50,7 +44,6 @@ export function HomeView({
           daysSinceLastChapter={daysSinceLastChapter}
           lastEditedBook={lastEditedBook}
           lastEditedDate={lastEditedDate}
-          lastChapter={lastChapter}
           onOpenCreateModal={onOpenCreateModal}
         />
       </div>
