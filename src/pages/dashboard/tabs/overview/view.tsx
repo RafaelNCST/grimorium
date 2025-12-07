@@ -1,5 +1,7 @@
+import { useState, useRef, useEffect } from "react";
+
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import { StickyNote as StickyNoteIcon, Plus } from "lucide-react";
+import { StickyNote as StickyNoteIcon, Plus, GripHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormTextarea } from "@/components/forms";
@@ -25,6 +27,9 @@ const MAX_NOTE_CHARACTER_LIMIT = 200;
 
 export function OverviewView(props: PropsOverviewView) {
   const { t } = useTranslation("overview");
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartY = useRef(0);
+  const resizeStartHeight = useRef(0);
 
   const {
     book: _book,
@@ -47,6 +52,7 @@ export function OverviewView(props: PropsOverviewView) {
     sensors,
     checklistItems,
     selectedColor,
+    notesBoardHeight,
     dragModifiers,
     onGoalsChange: _onGoalsChange,
     onEditingGoalsChange: _onEditingGoalsChange,
@@ -57,6 +63,7 @@ export function OverviewView(props: PropsOverviewView) {
     onEditingNoteChange,
     onEditContentChange,
     onSelectedColorChange,
+    onNotesBoardHeightChange,
     onAddNote,
     onDeleteNote,
     onEditNote,
@@ -76,6 +83,38 @@ export function OverviewView(props: PropsOverviewView) {
     onEditChecklistItem,
     onDeleteChecklistItem,
   } = props;
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+    resizeStartY.current = e.clientY;
+    resizeStartHeight.current = notesBoardHeight;
+  };
+
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!isResizing) return;
+
+    const delta = e.clientY - resizeStartY.current;
+    const newHeight = Math.max(300, Math.min(800, resizeStartHeight.current + delta));
+    onNotesBoardHeightChange(newHeight);
+  };
+
+  const handleResizeEnd = () => {
+    setIsResizing(false);
+  };
+
+  // Add event listeners for resize
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener("mousemove", handleResizeMove);
+      window.addEventListener("mouseup", handleResizeEnd);
+
+      return () => {
+        window.removeEventListener("mousemove", handleResizeMove);
+        window.removeEventListener("mouseup", handleResizeEnd);
+      };
+    }
+  }, [isResizing]);
 
   const renderStatsSection = () => (
     <MetricsCard stats={overviewStats} isCustomizing={isCustomizing} />
@@ -145,11 +184,12 @@ export function OverviewView(props: PropsOverviewView) {
           onDragMove={onNoteDragMove}
           onDragEnd={onNoteDragEnd}
         >
-          <div
-            id="notes-drop-area"
-            className="relative min-h-[400px] bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 mb-4 overflow-hidden select-none"
-            style={{ touchAction: "none" }}
-          >
+          <div className="relative">
+            <div
+              id="notes-drop-area"
+              className="relative bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 overflow-hidden select-none"
+              style={{ touchAction: "none", height: `${notesBoardHeight}px` }}
+            >
             {stickyNotes.length === 0 ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className="text-muted-foreground text-sm">
@@ -174,10 +214,17 @@ export function OverviewView(props: PropsOverviewView) {
                 />
               ))
             )}
+            </div>
+            <div
+              className="absolute bottom-0 left-0 right-0 h-6 flex items-center justify-center cursor-ns-resize hover:bg-primary/10 transition-colors group"
+              onMouseDown={handleResizeStart}
+            >
+              <GripHorizontal className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
           </div>
         </DndContext>
 
-        <div className="space-y-3">
+        <div className="space-y-3 mt-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
               {t("notes_board.select_color")}

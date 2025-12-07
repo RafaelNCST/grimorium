@@ -87,6 +87,7 @@ export interface PropsOverviewView {
   sensors: SensorDescriptor<SensorOptions>[];
   checklistItems: IChecklistItem[];
   selectedColor: string;
+  notesBoardHeight: number;
   dragModifiers: Modifier[];
   onGoalsChange: (goals: IGoals) => void;
   onEditingGoalsChange: (editing: boolean) => void;
@@ -100,6 +101,7 @@ export interface PropsOverviewView {
   onActiveNoteIdChange: (id: string | null) => void;
   onDraggedNoteDataChange: (data: IStickyNote | null) => void;
   onSelectedColorChange: (color: string) => void;
+  onNotesBoardHeightChange: (height: number) => void;
   onAddNote: () => void;
   onDeleteNote: (id: string) => void;
   onEditNote: (id: string, content: string) => void;

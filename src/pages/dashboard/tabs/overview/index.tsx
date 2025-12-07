@@ -84,6 +84,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [selectedColor, setSelectedColor] = useState<string>(
     NOTE_COLORS_CONSTANT[0]
   );
+  const [notesBoardHeight, setNotesBoardHeight] = useState(400);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [sections, setSections] = useState<ISection[]>([
     {
@@ -434,6 +435,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       sensors={sensors}
       checklistItems={checklistItems}
       selectedColor={selectedColor}
+      notesBoardHeight={notesBoardHeight}
       dragModifiers={[restrictToNotesBoard]}
       onGoalsChange={setGoals}
       onEditingGoalsChange={setIsEditingGoals}
@@ -447,6 +449,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       onActiveNoteIdChange={setActiveNoteId}
       onDraggedNoteDataChange={setDraggedNoteData}
       onSelectedColorChange={setSelectedColor}
+      onNotesBoardHeightChange={setNotesBoardHeight}
       onAddNote={handleAddNote}
       onDeleteNote={handleDeleteNote}
       onEditNote={handleEditNote}

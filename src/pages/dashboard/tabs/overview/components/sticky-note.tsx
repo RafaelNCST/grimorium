@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { useDraggable } from "@dnd-kit/core";
 import { Edit2, Trash2, Palette, BringToFront, SendToBack } from "lucide-react";
@@ -37,6 +37,7 @@ export function StickyNote({
 }: PropsSortableNote) {
   const { t } = useTranslation("overview");
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({
@@ -44,6 +45,14 @@ export function StickyNote({
       disabled: isCustomizing || editingNote === note.id,
       data: note,
     });
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    if (textareaRef.current && editingNote === note.id) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [editContent, editingNote, note.id]);
 
   const style = {
     left: `${note.x}px`,
@@ -56,19 +65,17 @@ export function StickyNote({
 
   const isEditing = editingNote === note.id;
 
-  const handleSaveEdit = () => {
-    onEditNote(note.id, editContent);
-    onEditingNoteChange(null);
-  };
-
-  const handleCancelEdit = () => {
-    onEditingNoteChange(null);
-  };
-
-  const handleStartEdit = () => {
+  const handleToggleEdit = () => {
     if (!isCustomizing) {
-      onEditingNoteChange(note.id);
-      onEditContentChange(note.content);
+      if (isEditing) {
+        // Save and exit edit mode
+        onEditNote(note.id, editContent);
+        onEditingNoteChange(null);
+      } else {
+        // Enter edit mode
+        onEditingNoteChange(note.id);
+        onEditContentChange(note.content);
+      }
     }
   };
 
@@ -85,7 +92,7 @@ export function StickyNote({
       className={`absolute min-w-[180px] max-w-[220px] select-none ${
         isDragging
           ? "cursor-grabbing shadow-2xl z-50"
-          : "rotate-1 hover:rotate-0 shadow-lg transition-all duration-200"
+          : "rotate-1 hover:rotate-0 shadow-lg"
       } ${isCustomizing ? "pointer-events-none opacity-70" : ""}`}
     >
       <div
@@ -188,10 +195,10 @@ export function StickyNote({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 hover:bg-black/10"
+                  className={`h-6 w-6 hover:bg-black/10 ${isEditing ? "bg-black/20" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleStartEdit();
+                    handleToggleEdit();
                   }}
                   disabled={isCustomizing}
                 >
@@ -200,7 +207,7 @@ export function StickyNote({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-sm font-medium">
-                  {t("notes_board.edit_note")}
+                  {isEditing ? t("notes_board.save") : t("notes_board.edit_note")}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -229,57 +236,26 @@ export function StickyNote({
         </div>
 
         {isEditing ? (
-          <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
-            <textarea
-              value={editContent}
-              onChange={(e) => {
-                const newValue = e.target.value;
-                if (newValue.length <= MAX_CHARACTER_LIMIT) {
-                  onEditContentChange(newValue);
-                }
-              }}
-              className="w-full p-2 text-xs bg-transparent border border-black/20 rounded resize-none font-handwriting"
-              rows={3}
-              autoFocus
-              onClick={(e) => e.stopPropagation()}
-              maxLength={MAX_CHARACTER_LIMIT}
-            />
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] text-muted-foreground">
-                {editContent.length}/{MAX_CHARACTER_LIMIT}
-              </span>
-              <div className="flex gap-1">
-                <Button
-                  variant="magical"
-                  size="sm"
-                  className="text-xs h-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSaveEdit();
-                  }}
-                >
-                  {t("notes_board.save")}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="text-xs h-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCancelEdit();
-                  }}
-                >
-                  {t("notes_board.cancel")}
-                </Button>
-              </div>
-            </div>
-          </div>
+          <textarea
+            ref={textareaRef}
+            value={editContent}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= MAX_CHARACTER_LIMIT) {
+                onEditContentChange(newValue);
+              }
+            }}
+            className="w-full p-2 text-xs bg-transparent border border-black/20 rounded resize-none font-handwriting overflow-hidden"
+            autoFocus
+            onClick={(e) => e.stopPropagation()}
+            maxLength={MAX_CHARACTER_LIMIT}
+          />
         ) : (
           <p
-            className="text-xs leading-relaxed font-handwriting break-words"
+            className="text-xs leading-relaxed font-handwriting break-words cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              handleStartEdit();
+              handleToggleEdit();
             }}
           >
             {note.content}
