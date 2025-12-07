@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { Edit2, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const MAX_SUMMARY_LENGTH = 1000;
+const MAX_SUMMARY_LENGTH = 2000;
 
 interface SummariesCardProps {
   authorSummary: string;
@@ -46,22 +46,57 @@ function SummaryItem({
   emptyMessage,
   onSummaryChange,
 }: SummaryItemProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea based on content and window width
+  useEffect(() => {
+    const handleResize = () => {
+      if (textareaRef.current && isEditing) {
+        const textarea = textareaRef.current;
+        // Reset height to recalculate
+        textarea.style.height = "120px";
+        // Set new height based on content, with a minimum
+        const newHeight = Math.max(120, textarea.scrollHeight);
+        textarea.style.height = `${newHeight}px`;
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [summary, isEditing]);
+
   return (
     <div className="space-y-2">
       {isEditing ? (
-        <FormTextarea
-          label={title}
-          value={summary}
-          onChange={(e) => onSummaryChange(e.target.value)}
-          className="min-h-[120px] text-xs resize-none"
-          placeholder={placeholder}
-          maxLength={MAX_SUMMARY_LENGTH}
-          showCharCount
-          showOptionalLabel={false}
-          labelClassName="text-sm font-semibold"
-          containerClassName="space-y-2"
-          rows={5}
-        />
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">
+            {title}
+          </label>
+          <div className="relative">
+            <textarea
+              ref={textareaRef}
+              value={summary}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                if (newValue.length <= MAX_SUMMARY_LENGTH) {
+                  onSummaryChange(newValue);
+                }
+              }}
+              placeholder={placeholder}
+              maxLength={MAX_SUMMARY_LENGTH}
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden"
+            />
+            <div className="flex justify-end mt-1">
+              <span className="text-xs text-muted-foreground">
+                {summary.length}/{MAX_SUMMARY_LENGTH}
+              </span>
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div>
