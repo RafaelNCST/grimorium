@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
+import { getChapterMetadataByBookId } from "@/lib/db/chapters.service";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
@@ -88,6 +89,35 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   );
   const [notesBoardHeight, setNotesBoardHeight] = useState(400);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [overviewStats, setOverviewStats] = useState<{
+    totalWords: number;
+    totalCharacters: number;
+    totalChapters: number;
+    lastChapterNumber: number;
+    lastChapterName: string;
+    averagePerWeek: number;
+    averagePerMonth: number;
+    chaptersInProgress: number;
+    chaptersFinished: number;
+    chaptersDraft: number;
+    chaptersPlanning: number;
+    averageWordsPerChapter: number;
+    averageCharactersPerChapter: number;
+  }>({
+    totalWords: 0,
+    totalCharacters: 0,
+    totalChapters: 0,
+    lastChapterNumber: 0,
+    lastChapterName: "",
+    averagePerWeek: 0,
+    averagePerMonth: 0,
+    chaptersInProgress: 0,
+    chaptersFinished: 0,
+    chaptersDraft: 0,
+    chaptersPlanning: 0,
+    averageWordsPerChapter: 0,
+    averageCharactersPerChapter: 0,
+  });
   const [sections, setSections] = useState<ISection[]>([
     {
       id: "stats",
@@ -126,24 +156,104 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     },
   ]);
 
-  const overviewStats = useMemo(
-    () => ({
-      totalWords: 0,
-      totalCharacters: 0,
-      totalChapters: book.chapters || 0,
-      lastChapterNumber: 0,
-      lastChapterName: "",
-      averagePerWeek: 0,
-      averagePerMonth: 0,
-      chaptersInProgress: 0,
-      chaptersFinished: 0,
-      chaptersDraft: 0,
-      chaptersPlanning: 0,
-      averageWordsPerChapter: 0,
-      averageCharactersPerChapter: 0,
-    }),
-    [book.chapters]
-  );
+  // Calculate overview stats based on real chapters
+  useEffect(() => {
+    const calculateStats = async () => {
+      try {
+        const chapters = await getChapterMetadataByBookId(bookId);
+
+        if (chapters.length === 0) {
+          // No chapters, keep default values (already set in state)
+          return;
+        }
+
+        // Line 1 - General metrics
+        const totalWords = chapters.reduce((sum, ch) => sum + ch.wordCount, 0);
+        const totalCharacters = chapters.reduce((sum, ch) => sum + ch.characterCount, 0);
+        const totalChapters = chapters.length;
+
+        // Find last finished chapter (highest chapter number with status "finished")
+        const finishedChapters = chapters.filter((ch) => ch.status === "finished");
+        const lastFinishedChapter = finishedChapters.length > 0
+          ? finishedChapters.reduce((prev, current) => {
+              const prevNum = parseInt(prev.chapterNumber) || 0;
+              const currentNum = parseInt(current.chapterNumber) || 0;
+              return currentNum > prevNum ? current : prev;
+            })
+          : null;
+
+        const lastChapterNumber = lastFinishedChapter
+          ? parseInt(lastFinishedChapter.chapterNumber) || 0
+          : 0;
+        const lastChapterName = lastFinishedChapter?.title || "";
+
+        // Line 2 - Averages
+        const averageWordsPerChapter = totalChapters > 0
+          ? Math.round(totalWords / totalChapters)
+          : 0;
+        const averageCharactersPerChapter = totalChapters > 0
+          ? Math.round(totalCharacters / totalChapters)
+          : 0;
+
+        // Calculate average finished chapters per week/month
+        let averagePerWeek = 0;
+        let averagePerMonth = 0;
+
+        if (finishedChapters.length >= 2) {
+          // Sort by last edited date
+          const sortedFinished = [...finishedChapters].sort((a, b) => {
+            const dateA = new Date(a.lastEdited).getTime();
+            const dateB = new Date(b.lastEdited).getTime();
+            return dateA - dateB;
+          });
+
+          const firstDate = new Date(sortedFinished[0].lastEdited);
+          const lastDate = new Date(sortedFinished[sortedFinished.length - 1].lastEdited);
+
+          // Calculate difference in days
+          const diffMs = lastDate.getTime() - firstDate.getTime();
+          const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+          // Only calculate if there's a meaningful time period (at least 1 day)
+          if (diffDays >= 1) {
+            const weeks = diffDays / 7;
+            const months = diffDays / 30;
+
+            averagePerWeek = weeks > 0 ? parseFloat((finishedChapters.length / weeks).toFixed(1)) : 0;
+            averagePerMonth = months > 0 ? parseFloat((finishedChapters.length / months).toFixed(1)) : 0;
+          }
+        }
+
+        // Line 3 - Status counts
+        const chaptersInProgress = chapters.filter((ch) => ch.status === "in-progress").length;
+        const chaptersFinished = chapters.filter((ch) => ch.status === "finished").length;
+        const chaptersDraft = chapters.filter((ch) => ch.status === "draft").length;
+        const chaptersPlanning = chapters.filter((ch) => ch.status === "planning").length;
+
+        setOverviewStats({
+          totalWords,
+          totalCharacters,
+          totalChapters,
+          lastChapterNumber,
+          lastChapterName,
+          averagePerWeek,
+          averagePerMonth,
+          chaptersInProgress,
+          chaptersFinished,
+          chaptersDraft,
+          chaptersPlanning,
+          averageWordsPerChapter,
+          averageCharactersPerChapter,
+        });
+      } catch (error) {
+        console.error("Failed to calculate overview stats:", error);
+      }
+    };
+
+    if (hasInitialized) {
+      calculateStats();
+    }
+  }, [bookId, hasInitialized]);
 
   // Calculate overall progress as average of all arcs' progress
   const [allArcsProgress, setAllArcsProgress] = useState<number[]>([]);
