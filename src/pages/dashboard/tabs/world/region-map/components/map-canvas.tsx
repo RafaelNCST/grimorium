@@ -422,7 +422,7 @@ export function MapCanvas({
         minScale={0.25}
         maxScale={4}
         disabled={false}
-        disablePadding
+        limitToBounds={false}
         panning={{
           disabled:
             isDraggingRef.current ||
@@ -478,13 +478,24 @@ export function MapCanvas({
             </div>
 
             <TransformComponent
-              wrapperClass="w-full h-full select-none"
+              wrapperClass="select-none"
+              wrapperStyle={{
+                width: "100%",
+                height: "100%",
+              }}
               contentClass={cn(
-                "flex items-center justify-center select-none",
+                "select-none",
                 selectedChildForPlacement && "cursor-pointer",
                 (draggingMarkerId || isPanning) && "cursor-grabbing",
                 resizingMarkerId && "cursor-nwse-resize"
               )}
+              contentStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <div
                 className="relative select-none"
