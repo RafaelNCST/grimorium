@@ -72,7 +72,7 @@ export function EditorHeader({
   onNavigateToNext,
   onExport,
 }: EditorHeaderProps) {
-  const { t } = useTranslation("chapter-editor");
+  const { t } = useTranslation(["chapter-editor", "empty-states", "tooltips"]);
   const { settings: warningsSettings } = useWarningsSettings();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleContainerRef = useRef<HTMLDivElement>(null);
@@ -139,7 +139,7 @@ export function EditorHeader({
                       Capítulo {previousChapter.number}: {previousChapter.title}
                     </p>
                   ) : (
-                    <p>Nenhum capítulo anterior</p>
+                    <p>{t("empty-states:chapters.no_previous_chapter")}</p>
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -193,7 +193,7 @@ export function EditorHeader({
                       Capítulo {nextChapter.number}: {nextChapter.title}
                     </p>
                   ) : (
-                    <p>Nenhum capítulo seguinte</p>
+                    <p>{t("empty-states:chapters.no_next_chapter")}</p>
                   )}
                 </TooltipContent>
               </Tooltip>
@@ -286,7 +286,7 @@ export function EditorHeader({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Configurações do Editor</p>
+                  <p>{t("tooltips:editor.settings")}</p>
                 </TooltipContent>
               </Tooltip>
             </div>

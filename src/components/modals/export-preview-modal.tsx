@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 
 import { FileText, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -34,17 +35,16 @@ const PAGE_FORMATS = {
   letter: { width: 816, height: 1056, label: "US Letter (21.6 x 27.9 cm)" },
 } as const;
 
-// Margin presets in pixels
+// Margin presets in pixels - labels will be translated at runtime
 const MARGIN_PRESETS = {
   editorial: {
     top: 95,
     bottom: 76,
     left: 113,
     right: 113,
-    label: "Padrão Editorial",
   },
-  narrow: { top: 48, bottom: 48, left: 48, right: 48, label: "Estreita" },
-  wide: { top: 95, bottom: 95, left: 142, right: 142, label: "Larga" },
+  narrow: { top: 48, bottom: 48, left: 48, right: 48 },
+  wide: { top: 95, bottom: 95, left: 142, right: 142 },
 } as const;
 
 // Font families - same as in chapter editor
@@ -94,6 +94,7 @@ export function ExportPreviewModal({
   onExportPDF,
   onExportWord,
 }: ExportPreviewModalProps) {
+  const { t } = useTranslation("export-preview");
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
@@ -234,7 +235,7 @@ export function ExportPreviewModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Pré-visualização de Exportação
+            {t("modal.title")}
           </DialogTitle>
         </DialogHeader>
 
@@ -246,7 +247,7 @@ export function ExportPreviewModal({
               {/* Page Format */}
               <div className="space-y-3">
                 <Label className="text-base font-semibold">
-                  Formato de Página
+                  {t("settings.page_format")}
                 </Label>
                 <RadioGroup
                   value={config.pageFormat}
@@ -273,7 +274,7 @@ export function ExportPreviewModal({
 
               {/* Margins */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">Margens</Label>
+                <Label className="text-base font-semibold">{t("settings.margins")}</Label>
                 <Select
                   value={config.margins}
                   onValueChange={(value) =>
@@ -287,9 +288,9 @@ export function ExportPreviewModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(MARGIN_PRESETS).map(([key, preset]) => (
+                    {Object.keys(MARGIN_PRESETS).map((key) => (
                       <SelectItem key={key} value={key}>
-                        {preset.label}
+                        {t(`margins.${key}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -301,12 +302,12 @@ export function ExportPreviewModal({
               {/* Title Settings */}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  Configurações do Título
+                  {t("settings.title_settings")}
                 </Label>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Fonte</Label>
+                    <Label>{t("settings.font")}</Label>
                     <Select
                       value={config.titleFont}
                       onValueChange={(value) =>
@@ -327,7 +328,7 @@ export function ExportPreviewModal({
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Tamanho</Label>
+                    <Label>{t("settings.size")}</Label>
                     <Select
                       value={config.titleSize}
                       onValueChange={(value) =>
@@ -348,7 +349,7 @@ export function ExportPreviewModal({
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Alinhamento</Label>
+                    <Label>{t("settings.alignment")}</Label>
                     <RadioGroup
                       value={config.titleAlignment}
                       onValueChange={(value) =>
@@ -362,7 +363,7 @@ export function ExportPreviewModal({
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="left" id="title-left" />
                         <Label htmlFor="title-left" className="cursor-pointer">
-                          Esquerda
+                          {t("settings.alignment_left")}
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -371,7 +372,7 @@ export function ExportPreviewModal({
                           htmlFor="title-center"
                           className="cursor-pointer"
                         >
-                          Centro
+                          {t("settings.alignment_center")}
                         </Label>
                       </div>
                     </RadioGroup>
@@ -387,7 +388,7 @@ export function ExportPreviewModal({
             {pdfPreviewUrl && !isLoading && (
               <div className="flex-shrink-0 flex items-center justify-center px-4 py-3 border-b border-border bg-card/50">
                 <span className="text-sm text-muted-foreground">
-                  {numPages} {numPages === 1 ? 'página' : 'páginas'}
+                  {numPages} {numPages === 1 ? t("preview.page_singular") : t("preview.page_plural")}
                 </span>
               </div>
             )}
@@ -398,7 +399,7 @@ export function ExportPreviewModal({
                 <div className="flex flex-col items-center gap-4 mt-20">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                   <p className="text-sm text-muted-foreground">
-                    Carregando conteúdo do capítulo...
+                    {t("preview.loading_content")}
                   </p>
                 </div>
               ) : (
@@ -415,7 +416,7 @@ export function ExportPreviewModal({
                       <div className="flex flex-col items-center gap-4">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                         <p className="text-sm text-muted-foreground">
-                          Atualizando pré-visualização...
+                          {t("preview.updating_preview")}
                         </p>
                       </div>
                     </div>
@@ -446,7 +447,7 @@ export function ExportPreviewModal({
                           >
                             <Loader2 className="w-8 h-8 animate-spin text-primary" />
                             <p className="text-sm text-muted-foreground">
-                              Carregando PDF...
+                              {t("preview.loading_pdf")}
                             </p>
                           </div>
                         }
@@ -471,7 +472,7 @@ export function ExportPreviewModal({
                               />
                             </div>
                             <div className="text-center text-xs text-muted-foreground">
-                              Página {index + 1} de {numPages}
+                              {t("preview.page_of", { current: index + 1, total: numPages })}
                             </div>
                           </div>
                         ))}
@@ -487,7 +488,7 @@ export function ExportPreviewModal({
                     >
                       <Loader2 className="w-8 h-8 animate-spin text-primary" />
                       <p className="text-sm text-muted-foreground">
-                        Gerando pré-visualização...
+                        {t("preview.generating_preview")}
                       </p>
                     </div>
                   ) : (
@@ -499,7 +500,7 @@ export function ExportPreviewModal({
                       }}
                     >
                       <p className="text-sm text-muted-foreground">
-                        Erro ao gerar pré-visualização
+                        {t("preview.error_generating")}
                       </p>
                     </div>
                   )}
@@ -512,7 +513,7 @@ export function ExportPreviewModal({
         {/* Footer Actions */}
         <div className="flex justify-between items-center pt-4 border-t">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t("actions.cancel")}
           </Button>
 
           <div className="flex gap-2">
@@ -524,7 +525,7 @@ export function ExportPreviewModal({
               }}
             >
               <FileText className="w-4 h-4 mr-2" />
-              Exportar como Word
+              {t("actions.export_word")}
             </Button>
             <Button
               variant="magical"
@@ -534,7 +535,7 @@ export function ExportPreviewModal({
               }}
             >
               <FileText className="w-4 h-4 mr-2" />
-              Exportar como PDF
+              {t("actions.export_pdf")}
             </Button>
           </div>
         </div>

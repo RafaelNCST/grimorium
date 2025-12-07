@@ -12,6 +12,7 @@ import {
   Search,
   Plus,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export function EntityLinksModal({
   currentLinks,
   onLinksChange,
 }: PropsEntityLinksModal) {
+  const { t } = useTranslation("empty-states");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
 
@@ -263,7 +265,9 @@ export function EntityLinksModal({
                     <div className="text-center py-8">
                       <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">
-                        {`Nenhuma entidade encontrada com "${searchTerm}"`}
+                        {t("entity_search.no_entity_found", {
+                          searchTerm,
+                        })}
                       </p>
                     </div>
                   )}

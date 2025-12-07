@@ -1,4 +1,5 @@
 import { Plus, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Accordion,
@@ -33,6 +34,8 @@ export function SpeciesCard({
   onRaceClick,
   onOpenCreateRaceModal,
 }: PropsSpeciesCard) {
+  const { t } = useTranslation(["empty-states"]);
+
   return (
     <AccordionItem
       key={species.id}
@@ -83,7 +86,7 @@ export function SpeciesCard({
 
             {species.races.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">
-                Nenhuma raça cadastrada para esta espécie
+                {t("empty-states:entities.no_race_registered")}
               </p>
             ) : (
               <div className="grid gap-3">

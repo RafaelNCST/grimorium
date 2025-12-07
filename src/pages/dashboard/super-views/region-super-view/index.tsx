@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { getRegionById } from "@/lib/db/regions.service";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
@@ -13,6 +14,7 @@ export function RegionSuperViewPage() {
     from: "/dashboard/$dashboardId/super-views/region/$regionId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const search = Route.useSearch();
   const { dashboardId, regionId } = params;
   const fromChapterId = search.from;
@@ -65,7 +67,7 @@ export function RegionSuperViewPage() {
   if (!region) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Região não encontrada</p>
+        <p className="text-muted-foreground">{t("errors:not_found.region")}</p>
       </div>
     );
   }

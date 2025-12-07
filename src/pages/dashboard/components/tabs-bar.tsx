@@ -7,6 +7,7 @@ import {
   SensorOptions,
 } from "@dnd-kit/core";
 import { Palette } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { TabsList } from "@/components/ui/tabs";
 
@@ -49,6 +50,7 @@ export function TabsBar({
   onDragEnd,
   onToggleVisibility,
 }: PropsTabsBar) {
+  const { t } = useTranslation("tooltips");
   const displayTabs =
     previewTabs && previewTabs.length > 0 ? previewTabs : tabs;
   if (isCustomizing) {
@@ -60,7 +62,7 @@ export function TabsBar({
             Personalizar Abas
           </h3>
           <p className="text-sm text-muted-foreground">
-            Arraste para reordenar ou clique no olho para mostrar/ocultar. A aba
+            {t("instructions.drag_to_reorder")}
             &quot;Visão Geral&quot; não pode ser movida ou ocultada.
           </p>
         </div>

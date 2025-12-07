@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { getRaceById } from "@/lib/db/races.service";
 import type { IRaceVersion } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
@@ -14,6 +15,7 @@ export function RaceSuperViewPage() {
     from: "/dashboard/$dashboardId/super-views/race/$raceId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const search = Route.useSearch();
   const { dashboardId, raceId } = params;
   const fromChapterId = search.from;
@@ -66,7 +68,7 @@ export function RaceSuperViewPage() {
   if (!race) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Raça não encontrada</p>
+        <p className="text-muted-foreground">{t("errors:not_found.race")}</p>
       </div>
     );
   }

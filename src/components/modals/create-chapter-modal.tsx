@@ -117,24 +117,28 @@ const entityMentionSchema = z.object({
   parentName: z.string().optional(),
 });
 
-const chapterFormSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
-  chapterNumber: z.string().min(1, "Numeração é obrigatória"),
-  summary: z
-    .string()
-    .max(500, "Resumo muito longo")
-    .optional()
-    .or(z.literal("")),
-  status: z.enum(["in-progress", "draft", "review", "finished", "published"]),
-  plotArcId: z.string().optional().or(z.literal("")),
-  mentionedCharacters: z.array(entityMentionSchema).optional(),
-  mentionedRegions: z.array(entityMentionSchema).optional(),
-  mentionedItems: z.array(entityMentionSchema).optional(),
-  mentionedFactions: z.array(entityMentionSchema).optional(),
-  mentionedRaces: z.array(entityMentionSchema).optional(),
-});
+const createChapterFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("forms:validation.name_required"))
+      .max(200, t("forms:validation.name_too_long")),
+    chapterNumber: z.string().min(1, t("forms:validation.name_required")),
+    summary: z
+      .string()
+      .max(500, t("forms:validation.summary_too_long"))
+      .optional()
+      .or(z.literal("")),
+    status: z.enum(["in-progress", "draft", "review", "finished", "published"]),
+    plotArcId: z.string().optional().or(z.literal("")),
+    mentionedCharacters: z.array(entityMentionSchema).optional(),
+    mentionedRegions: z.array(entityMentionSchema).optional(),
+    mentionedItems: z.array(entityMentionSchema).optional(),
+    mentionedFactions: z.array(entityMentionSchema).optional(),
+    mentionedRaces: z.array(entityMentionSchema).optional(),
+  });
 
-type ChapterFormValues = z.infer<typeof chapterFormSchema>;
+type ChapterFormValues = z.infer<ReturnType<typeof createChapterFormSchema>>;
 
 // Status options for FormSelectGrid
 const STATUS_OPTIONS = [
@@ -207,7 +211,7 @@ export function CreateChapterModal({
   bookId,
   existingChapters = [],
 }: CreateChapterModalProps) {
-  const { t } = useTranslation("create-chapter");
+  const { t } = useTranslation(["create-chapter", "forms"]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
@@ -355,7 +359,7 @@ export function CreateChapterModal({
     entities.map((e) => e.id);
 
   const form = useForm<ChapterFormValues>({
-    resolver: zodResolver(chapterFormSchema),
+    resolver: zodResolver(createChapterFormSchema(t)),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {

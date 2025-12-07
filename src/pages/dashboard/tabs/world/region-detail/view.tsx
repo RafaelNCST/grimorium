@@ -179,7 +179,7 @@ export function RegionDetailView({
   onAdvancedSectionToggle,
   onTimelineSectionToggle,
 }: RegionDetailViewProps) {
-  const { t } = useTranslation(["region-detail", "world"]);
+  const { t } = useTranslation(["region-detail", "world", "empty-states"]);
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   // State for controlling the create era dialog from the empty state button
@@ -1370,8 +1370,8 @@ export function RegionDetailView({
                       : "empty-view"
                     : null,
                 emptyIcon: Clock,
-                emptyTitle: "Nenhuma linha do tempo definida",
-                emptyDescription: "Use o modo de edição para adicionar eras",
+                emptyTitle: t("empty-states:timeline.no_timeline_defined"),
+                emptyDescription: t("empty-states:timeline.use_edit_mode_to_add_eras"),
                 addButtonLabel: "Criar Primeira Era",
                 onAddClick: () => setIsCreateEraDialogOpen(true),
               },

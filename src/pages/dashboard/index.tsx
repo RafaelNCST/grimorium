@@ -10,6 +10,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { deleteBook as deleteBookDB } from "@/lib/db/books.service";
 import { useBookStore, Book as BookType } from "@/stores/book-store";
@@ -33,6 +34,7 @@ interface TabConfig {
 
 export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const { books, updateBook, deleteBook, setCurrentBook } = useBookStore();
   const {
     activeTab,
@@ -401,7 +403,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
   }, [isCustomizing, setIsCustomizing, setActiveTab]);
 
   if (!book) {
-    return <div>Livro não encontrado</div>;
+    return <div>{t("errors:not_found.book")}</div>;
   }
 
   return (

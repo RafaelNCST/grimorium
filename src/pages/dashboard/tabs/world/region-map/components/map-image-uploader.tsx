@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { open } from "@tauri-apps/plugin-dialog";
 import { Upload, ImageIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { uploadMapImage } from "@/lib/db/region-maps.service";
@@ -17,6 +18,7 @@ export function MapImageUploader({
   versionId = null,
   onUploadComplete,
 }: MapImageUploaderProps) {
+  const { t } = useTranslation(["empty-states", "dialogs"]);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleUpload = async () => {
@@ -56,10 +58,11 @@ export function MapImageUploader({
         </div>
 
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold">Nenhum mapa cadastrado</h3>
+          <h3 className="text-lg font-semibold">
+            {t("empty-states:map.no_map_registered")}
+          </h3>
           <p className="text-sm text-muted-foreground max-w-md">
-            Faça upload de uma imagem para representar o mapa desta região.
-            Formatos suportados: PNG, JPEG, SVG.
+            {t("empty-states:map.upload_image_instruction")}
           </p>
         </div>
 
@@ -71,7 +74,7 @@ export function MapImageUploader({
           className="animate-glow"
         >
           <Upload className="w-4 h-4 mr-2" />
-          {isUploading ? "Carregando..." : "Fazer Upload"}
+          {isUploading ? t("dialogs:upload.loading") : t("dialogs:upload.upload_button")}
         </Button>
       </div>
     </div>

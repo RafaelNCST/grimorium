@@ -84,7 +84,7 @@ export function FormattingToolbar({
   canUndo = true,
   canRedo = true,
 }: FormattingToolbarProps) {
-  const { t } = useTranslation("chapter-editor");
+  const { t } = useTranslation(["chapter-editor", "empty-states"]);
   const selectedArc = availableArcs.find((arc) => arc.id === plotArcId);
   const [isArcModalOpen, setIsArcModalOpen] = useState(false);
 
@@ -446,7 +446,7 @@ export function FormattingToolbar({
               <div className="p-6 text-center border-2 border-dashed border-border rounded-lg bg-muted/20">
                 <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Nenhum arco cadastrado
+                  {t("empty-states:plot_arc.no_arc_registered")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Crie arcos na aba Enredo

@@ -38,7 +38,7 @@ export function PlotArcEventsSidebar({
   onClose,
   onToggleEventCompletion,
 }: PlotArcEventsSidebarProps) {
-  const { t } = useTranslation(["chapter-editor", "plot"]);
+  const { t } = useTranslation(["chapter-editor", "plot", "empty-states", "dialogs", "tooltips"]);
 
   const statusConfig = ARC_STATUSES_CONSTANT.find(
     (s) => s.value === arc.status
@@ -98,7 +98,7 @@ export function PlotArcEventsSidebar({
               Progresso
             </span>
             <span className="text-sm text-muted-foreground">
-              {completedCount}/{totalCount} eventos
+              {t("dialogs:plot_arc_events.events_count", { completedCount, totalCount })}
             </span>
           </div>
           <Progress value={arc.progress} className="h-2" />
@@ -166,7 +166,7 @@ export function PlotArcEventsSidebar({
 
               {arc.events.length === 0 ? (
                 <div className="text-center text-muted-foreground text-sm py-8">
-                  Nenhum evento definido
+                  {t("empty-states:plot_arc.no_event_defined")}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -186,7 +186,7 @@ export function PlotArcEventsSidebar({
         {/* Footer */}
         <div className="p-4 border-t border-border bg-muted/20">
           <p className="text-xs text-muted-foreground text-center">
-            Marque eventos conforme escreve para acompanhar seu progresso
+            {t("tooltips:instructions.mark_events_as_you_write")}
           </p>
         </div>
       </div>

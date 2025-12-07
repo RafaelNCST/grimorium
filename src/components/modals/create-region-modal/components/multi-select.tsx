@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { X, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export function MultiSelect({
   disabled = false,
   labelClassName,
 }: MultiSelectProps) {
+  const { t } = useTranslation("empty-states");
   const [searchQuery, setSearchQuery] = useState("");
 
   const selectedOptions = options.filter((opt) => value.includes(opt.id));
@@ -122,7 +124,7 @@ export function MultiSelect({
                 <div className="max-h-[300px] overflow-y-auto">
                   {filteredOptions.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">
-                      Nenhum resultado encontrado
+                      {t("search.no_result_found")}
                     </div>
                   ) : (
                     filteredOptions.map((option) => (

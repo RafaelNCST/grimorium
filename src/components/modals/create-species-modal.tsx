@@ -2,6 +2,7 @@ import React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const formSchema = z.object({
-  knownName: z.string().min(1, "Nome conhecido é obrigatório"),
-  scientificName: z.string().optional(),
-  description: z.string().min(1, "Descrição é obrigatória"),
-});
+const createFormSchema = (t: (key: string) => string) =>
+  z.object({
+    knownName: z.string().min(1, t("forms:validation.known_name_required")),
+    scientificName: z.string().optional(),
+    description: z.string().min(1, t("forms:validation.summary_required")),
+  });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
 interface PropsCreateSpeciesModal {
   isOpen: boolean;
@@ -42,8 +44,10 @@ export function CreateSpeciesModal({
   onClose,
   onSubmit,
 }: PropsCreateSpeciesModal) {
+  const { t } = useTranslation(["dialogs", "forms"]);
+
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createFormSchema(t)),
     defaultValues: {
       knownName: "",
       scientificName: "",
@@ -66,10 +70,9 @@ export function CreateSpeciesModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nova Espécie</DialogTitle>
+          <DialogTitle>{t("dialogs:create_species.title")}</DialogTitle>
           <DialogDescription>
-            Crie uma nova espécie para este mundo. Você poderá adicionar raças
-            posteriormente.
+            {t("dialogs:create_species.description")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -82,10 +85,10 @@ export function CreateSpeciesModal({
               name="knownName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome Conhecido *</FormLabel>
+                  <FormLabel>{t("forms:labels.known_name")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Ex: Elfos, Dragões, Humanos..."
+                      placeholder={t("forms:placeholders.known_name_example")}
                       {...field}
                     />
                   </FormControl>
@@ -99,10 +102,12 @@ export function CreateSpeciesModal({
               name="scientificName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome Científico</FormLabel>
+                  <FormLabel>{t("forms:labels.scientific_name")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Ex: Homo elvensis (opcional)"
+                      placeholder={t(
+                        "forms:placeholders.scientific_name_example"
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -116,10 +121,10 @@ export function CreateSpeciesModal({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição *</FormLabel>
+                  <FormLabel>{t("forms:labels.description")} *</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Descreva as características gerais desta espécie..."
+                      placeholder={t("forms:placeholders.describe_species")}
                       className="min-h-[80px]"
                       {...field}
                     />
@@ -131,9 +136,9 @@ export function CreateSpeciesModal({
 
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={handleClose}>
-                Cancelar
+                {t("forms:buttons.cancel")}
               </Button>
-              <Button type="submit">Criar Espécie</Button>
+              <Button type="submit">{t("forms:buttons.create_species")}</Button>
             </div>
           </form>
         </Form>

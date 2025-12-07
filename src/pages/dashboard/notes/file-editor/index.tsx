@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, Edit2, Trash2, Save, Link } from "lucide-react";
 
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
@@ -22,6 +23,7 @@ export default function FileEditor() {
     from: "/dashboard/$dashboardId/file/$fileId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors", "forms"]);
   const [file, setFile] = useState<NoteFile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
@@ -87,7 +89,9 @@ export default function FileEditor() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Arquivo não encontrado</h1>
+          <h1 className="text-2xl font-bold mb-4">
+            {t("errors:not_found.file")}
+          </h1>
           <Button
             onClick={() =>
               navigate({
@@ -120,7 +124,7 @@ export default function FileEditor() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className="text-2xl font-bold border-none px-0 focus-visible:ring-0 bg-transparent"
-                    placeholder="Nome do arquivo"
+                    placeholder={t("forms:labels.file_name")}
                   />
                 ) : (
                   <h1 className="text-2xl font-bold">{file.name}</h1>

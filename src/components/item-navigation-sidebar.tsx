@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { X, Search, Package } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export function ItemNavigationSidebar({
   currentItemId,
   onItemSelect,
 }: PropsItemNavigationSidebar) {
+  const { t } = useTranslation(["empty-states", "forms", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const currentItem = items.find((item) => item.id === currentItemId);
@@ -65,7 +67,7 @@ export function ItemNavigationSidebar({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar item..."
+            placeholder={t("forms:placeholders.search_item")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -88,7 +90,7 @@ export function ItemNavigationSidebar({
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">{currentItem.name}</p>
               <p className="text-xs text-primary font-medium">
-                Visualizando atualmente
+                {t("common:sidebar.viewing_currently")}
               </p>
             </div>
           </div>
@@ -100,7 +102,7 @@ export function ItemNavigationSidebar({
           {filteredOtherItems.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Package className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>Nenhum item encontrado</p>
+              <p>{t("empty-states:entity_search.no_item")}</p>
             </div>
           ) : (
             <div className="space-y-1">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { X, Search, Map } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export function RegionNavigationSidebar({
   currentRegionId,
   onRegionSelect,
 }: PropsRegionNavigationSidebar) {
+  const { t } = useTranslation(["empty-states", "forms", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Separate current region from others
@@ -69,7 +71,7 @@ export function RegionNavigationSidebar({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar região..."
+            placeholder={t("forms:placeholders.search_region")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9"
@@ -97,7 +99,7 @@ export function RegionNavigationSidebar({
                 {currentRegion.name}
               </p>
               <p className="text-xs text-primary font-medium">
-                Visualizando atualmente
+                {t("common:sidebar.viewing_currently")}
               </p>
             </div>
           </div>
@@ -110,7 +112,7 @@ export function RegionNavigationSidebar({
           {filteredOtherRegions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Map className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>Nenhuma região encontrada</p>
+              <p>{t("empty-states:entity_search.no_region")}</p>
             </div>
           ) : (
             <div className="space-y-1">

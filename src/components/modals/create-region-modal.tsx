@@ -56,51 +56,55 @@ interface CreateRegionModalProps {
   _unused?: never; // Marker to indicate legacy props are intentionally unused
 }
 
-const regionFormSchema = z.object({
-  // Basic fields
-  name: z.string().min(1, "Nome é obrigatório").max(100, "Nome muito longo"),
-  parentId: z.string().nullable(),
-  scale: z.enum([
-    "local",
-    "continental",
-    "planetary",
-    "galactic",
-    "universal",
-    "multiversal",
-  ]),
-  summary: z
-    .string()
-    .min(1, "Resumo é obrigatório")
-    .max(500, "Resumo muito longo"),
-  image: z.string().optional(),
+const createRegionFormSchema = (t: (key: string) => string) =>
+  z.object({
+    // Basic fields
+    name: z
+      .string()
+      .min(1, t("forms:validation.name_required"))
+      .max(100, t("forms:validation.name_too_long")),
+    parentId: z.string().nullable(),
+    scale: z.enum([
+      "local",
+      "continental",
+      "planetary",
+      "galactic",
+      "universal",
+      "multiversal",
+    ]),
+    summary: z
+      .string()
+      .min(1, t("forms:validation.summary_required"))
+      .max(500, t("forms:validation.summary_too_long")),
+    image: z.string().optional(),
 
-  // Environment fields
-  climate: z.string().max(500).optional(),
-  currentSeason: z
-    .enum(["spring", "summer", "autumn", "winter", "custom"])
-    .optional(),
-  customSeasonName: z.string().max(50).optional(),
-  generalDescription: z.string().max(1000).optional(),
-  regionAnomalies: z.array(z.string()).optional(),
+    // Environment fields
+    climate: z.string().max(500).optional(),
+    currentSeason: z
+      .enum(["spring", "summer", "autumn", "winter", "custom"])
+      .optional(),
+    customSeasonName: z.string().max(50).optional(),
+    generalDescription: z.string().max(1000).optional(),
+    regionAnomalies: z.array(z.string()).optional(),
 
-  // Information fields
-  residentFactions: z.array(z.string()).optional(),
-  dominantFactions: z.array(z.string()).optional(),
-  importantCharacters: z.array(z.string()).optional(),
-  racesFound: z.array(z.string()).optional(),
-  itemsFound: z.array(z.string()).optional(),
+    // Information fields
+    residentFactions: z.array(z.string()).optional(),
+    dominantFactions: z.array(z.string()).optional(),
+    importantCharacters: z.array(z.string()).optional(),
+    racesFound: z.array(z.string()).optional(),
+    itemsFound: z.array(z.string()).optional(),
 
-  // Narrative fields
-  narrativePurpose: z.string().max(500).optional(),
-  uniqueCharacteristics: z.string().max(500).optional(),
-  politicalImportance: z.string().max(500).optional(),
-  religiousImportance: z.string().max(500).optional(),
-  worldPerception: z.string().max(500).optional(),
-  regionMysteries: z.array(z.string()).optional(),
-  inspirations: z.array(z.string()).optional(),
-});
+    // Narrative fields
+    narrativePurpose: z.string().max(500).optional(),
+    uniqueCharacteristics: z.string().max(500).optional(),
+    politicalImportance: z.string().max(500).optional(),
+    religiousImportance: z.string().max(500).optional(),
+    worldPerception: z.string().max(500).optional(),
+    regionMysteries: z.array(z.string()).optional(),
+    inspirations: z.array(z.string()).optional(),
+  });
 
-type RegionFormValues = z.infer<typeof regionFormSchema>;
+type RegionFormValues = z.infer<ReturnType<typeof createRegionFormSchema>>;
 
 // Helper to parse JSON array fields from IRegion
 function parseJsonArray(jsonString: string | undefined): string[] {
@@ -120,7 +124,7 @@ export function CreateRegionModal({
   editRegion = null,
   bookId,
 }: CreateRegionModalProps) {
-  const { t } = useTranslation("world");
+  const { t } = useTranslation(["world", "forms"]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -132,7 +136,7 @@ export function CreateRegionModal({
   }, [open]);
 
   const form = useForm<RegionFormValues>({
-    resolver: zodResolver(regionFormSchema),
+    resolver: zodResolver(createRegionFormSchema(t)),
     mode: "onChange",
     defaultValues: {
       name: editRegion?.name || "",
@@ -252,8 +256,7 @@ export function CreateRegionModal({
               : t("create_region.title"),
             icon: Map,
             description: t("description"),
-            warning:
-              "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.",
+            warning: t("create_region.warning"),
           }}
           basicFieldsTitle={t("create_region.basic_fields")}
           basicFields={

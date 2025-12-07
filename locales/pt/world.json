@@ -32,6 +32,7 @@
   "create_region": {
     "title": "Criar Nova Região",
     "edit_title": "Editar Região",
+    "warning": "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da região.",
     "name_label": "Nome da Região",
     "name_placeholder": "Reino de Eldoria",
     "parent_label": "Região Pai",

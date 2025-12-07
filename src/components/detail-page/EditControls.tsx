@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Edit, Save, X, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,15 +44,20 @@ export function EditControls({
   onCancel,
   className,
   position = "sticky",
-  saveText = "Salvar",
-  cancelText = "Cancelar",
-  editText = "Editar",
+  saveText,
+  cancelText,
+  editText,
 }: EditControlsProps) {
+  const { t } = useTranslation("common");
   const positionClasses = {
     top: "sticky top-0 z-10",
     bottom: "sticky bottom-0 z-10",
     sticky: "sticky top-0 z-10",
   };
+
+  const displaySaveText = saveText ?? t("actions.save");
+  const displayCancelText = cancelText ?? t("actions.cancel");
+  const displayEditText = editText ?? t("actions.edit");
 
   return (
     <div
@@ -64,7 +70,7 @@ export function EditControls({
       <div className="flex items-center gap-2">
         {hasChanges && isEditing && (
           <span className="text-sm text-muted-foreground">
-            Alterações não salvas
+            {t("actions.unsaved_changes")}
           </span>
         )}
       </div>
@@ -73,13 +79,13 @@ export function EditControls({
         {!isEditing ? (
           <Button onClick={onEdit} variant="default">
             <Edit className="h-4 w-4" />
-            {editText}
+            {displayEditText}
           </Button>
         ) : (
           <>
             <Button onClick={onCancel} variant="outline" disabled={isSaving}>
               <X className="h-4 w-4" />
-              {cancelText}
+              {displayCancelText}
             </Button>
             <Button
               onClick={onSave}
@@ -91,7 +97,7 @@ export function EditControls({
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isSaving ? "Salvando..." : saveText}
+              {isSaving ? t("actions.saving") : displaySaveText}
             </Button>
           </>
         )}

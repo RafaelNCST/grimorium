@@ -1,0 +1,70 @@
+{
+  "entity_search": {
+    "no_entity_found": "No entity found with \"{{searchTerm}}\"",
+    "no_character": "No character found",
+    "no_faction": "No faction found",
+    "no_item": "No item found",
+    "no_region": "No region found",
+    "no_race": "No race found",
+    "no_species": "No species found"
+  },
+  "annotations": {
+    "no_linked_notes": "No linked annotations",
+    "no_linked_notes_description": "You can create links to annotations in the annotations tabs or in the file editor.",
+    "no_annotation": "No annotations"
+  },
+  "chapters": {
+    "no_chapter_found": "No chapter found",
+    "no_chapter_created": "No chapter created",
+    "no_previous_chapter": "No previous chapter",
+    "no_next_chapter": "No next chapter"
+  },
+  "plot_arc": {
+    "no_arc": "No arc",
+    "no_arc_registered": "No arc registered",
+    "no_event_defined": "No event defined"
+  },
+  "warnings": {
+    "no_warning": "No warnings"
+  },
+  "items": {
+    "no_item_available": "No item available",
+    "no_item_found": "No item found"
+  },
+  "search": {
+    "no_result_found": "No result found"
+  },
+  "map": {
+    "no_map_registered": "No map registered",
+    "upload_image_instruction": "Upload an image to represent this region's map. Supported formats: PNG, JPEG, SVG."
+  },
+  "alignment": {
+    "no_alignment_chosen": "No alignment chosen",
+    "use_edit_mode_to_select": "Use edit mode to select an alignment"
+  },
+  "timeline": {
+    "no_timeline_defined": "No timeline defined",
+    "use_edit_mode_to_add_eras": "Use edit mode to add eras",
+    "era_has_no_events": "This era has no events yet"
+  },
+  "relationships": {
+    "no_relationship_defined": "No relationship defined",
+    "use_edit_mode_to_add_relationships": "Use edit mode to add relationships",
+    "no_family_relation_defined": "No family relation defined",
+    "use_edit_mode_to_add_family": "Use edit mode to add family members"
+  },
+  "diplomacy": {
+    "no_diplomatic_relation_defined": "No diplomatic relation defined",
+    "use_edit_mode_to_add_relations": "Use edit mode to add relations"
+  },
+  "hierarchy": {
+    "no_hierarchy_defined": "No hierarchy defined",
+    "use_edit_mode_to_add_members": "Use edit mode to add members"
+  },
+  "entities": {
+    "no_character_registered": "No character registered",
+    "no_faction_registered": "No faction registered",
+    "no_race_registered": "No race registered",
+    "no_item_registered": "No item registered"
+  }
+}

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Calendar, MoreVertical, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export const VersionCard = React.memo(
     onActivate,
     className,
   }: VersionCardProps) => {
+    const { t } = useTranslation("common");
     const createdAtTimestamp =
       typeof version.createdAt === "string"
         ? new Date(version.createdAt).getTime()
@@ -67,7 +69,7 @@ export const VersionCard = React.memo(
                 {version.isMain && (
                   <Badge variant="default" className="ml-auto">
                     <Star className="h-3 w-3" />
-                    Principal
+                    {t("version.main_badge")}
                   </Badge>
                 )}
               </CardTitle>
@@ -80,11 +82,13 @@ export const VersionCard = React.memo(
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {onEdit && (
-                  <DropdownMenuItem onClick={onEdit}>Editar</DropdownMenuItem>
+                  <DropdownMenuItem onClick={onEdit}>
+                    {t("actions.edit")}
+                  </DropdownMenuItem>
                 )}
                 {onActivate && !version.isMain && (
                   <DropdownMenuItem onClick={onActivate}>
-                    Tornar Principal
+                    {t("actions.make_main")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -93,7 +97,7 @@ export const VersionCard = React.memo(
                     onClick={onDelete}
                     className="text-destructive"
                   >
-                    Excluir
+                    {t("actions.delete")}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

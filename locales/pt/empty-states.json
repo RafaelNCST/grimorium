@@ -1,0 +1,70 @@
+{
+  "entity_search": {
+    "no_entity_found": "Nenhuma entidade encontrada com \"{{searchTerm}}\"",
+    "no_character": "Nenhum personagem encontrado",
+    "no_faction": "Nenhuma facção encontrada",
+    "no_item": "Nenhum item encontrado",
+    "no_region": "Nenhuma região encontrada",
+    "no_race": "Nenhuma raça criada",
+    "no_species": "Nenhuma espécie encontrada"
+  },
+  "annotations": {
+    "no_linked_notes": "Nenhuma anotação linkada",
+    "no_linked_notes_description": "Você pode criar links para anotações nas abas de anotações ou no editor de arquivos.",
+    "no_annotation": "Nenhuma anotação"
+  },
+  "chapters": {
+    "no_chapter_found": "Nenhum capítulo encontrado",
+    "no_chapter_created": "Nenhum capítulo criado",
+    "no_previous_chapter": "Nenhum capítulo anterior",
+    "no_next_chapter": "Nenhum capítulo seguinte"
+  },
+  "plot_arc": {
+    "no_arc": "Nenhum arco",
+    "no_arc_registered": "Nenhum arco cadastrado",
+    "no_event_defined": "Nenhum evento definido"
+  },
+  "warnings": {
+    "no_warning": "Nenhum aviso"
+  },
+  "items": {
+    "no_item_available": "Nenhum item disponível",
+    "no_item_found": "Nenhum item encontrado"
+  },
+  "search": {
+    "no_result_found": "Nenhum resultado encontrado"
+  },
+  "map": {
+    "no_map_registered": "Nenhum mapa cadastrado",
+    "upload_image_instruction": "Faça upload de uma imagem para representar o mapa desta região. Formatos suportados: PNG, JPEG, SVG."
+  },
+  "alignment": {
+    "no_alignment_chosen": "Nenhum alinhamento escolhido",
+    "use_edit_mode_to_select": "Use o modo de edição para selecionar um alinhamento"
+  },
+  "timeline": {
+    "no_timeline_defined": "Nenhuma linha do tempo definida",
+    "use_edit_mode_to_add_eras": "Use o modo de edição para adicionar eras",
+    "era_has_no_events": "Esta era ainda não possui eventos"
+  },
+  "relationships": {
+    "no_relationship_defined": "Nenhum relacionamento definido",
+    "use_edit_mode_to_add_relationships": "Use o modo de edição para adicionar relacionamentos",
+    "no_family_relation_defined": "Nenhuma relação familiar definida",
+    "use_edit_mode_to_add_family": "Use o modo de edição para adicionar familiares"
+  },
+  "diplomacy": {
+    "no_diplomatic_relation_defined": "Nenhuma relação diplomática definida",
+    "use_edit_mode_to_add_relations": "Use o modo de edição para adicionar relações"
+  },
+  "hierarchy": {
+    "no_hierarchy_defined": "Nenhuma hierarquia definida",
+    "use_edit_mode_to_add_members": "Use o modo de edição para adicionar membros"
+  },
+  "entities": {
+    "no_character_registered": "Nenhum personagem cadastrado",
+    "no_faction_registered": "Nenhuma facção cadastrada",
+    "no_race_registered": "Nenhuma raça cadastrada",
+    "no_item_registered": "Nenhum item cadastrado"
+  }
+}

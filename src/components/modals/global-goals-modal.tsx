@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 
 import { Target, Clock, ChevronUp, ChevronDown, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,6 +44,7 @@ export function GlobalGoalsModal({
   goals,
   onSave,
 }: GlobalGoalsModalProps) {
+  const { t } = useTranslation("global-goals");
   const [localGoals, setLocalGoals] = useState<GlobalGoals>(goals);
 
   // Reseta o estado local sempre que o modal abrir ou as goals mudarem
@@ -72,11 +74,10 @@ export function GlobalGoalsModal({
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             <Target className="w-6 h-6" />
-            Metas Globais
+            {t("modal.title")}
           </DialogTitle>
           <DialogDescription>
-            Configure metas que se aplicam a todos os capítulos do livro.
-            Escolha os tipos de status onde as metas serão aplicadas.
+            {t("modal.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -89,21 +90,19 @@ export function GlobalGoalsModal({
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
                     <strong className="text-foreground">
-                      Estas metas se aplicam a todos os capítulos
+                      {t("info.applies_to_all")}
                     </strong>{" "}
-                    que possuem os status selecionados abaixo. Os números da
-                    barra de estatísticas mudarão de cor gradualmente conforme
-                    você se aproxima da meta.
+                    {t("info.description")}
                   </p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
                     <li>
-                      <strong>Cor normal:</strong> Abaixo de 90% da meta
+                      <strong>{t("info.color_normal")}</strong> {t("info.color_normal_desc")}
                     </li>
                     <li>
-                      <strong>Amarelo:</strong> Entre 90% e 100% da meta
+                      <strong>{t("info.color_yellow")}</strong> {t("info.color_yellow_desc")}
                     </li>
                     <li>
-                      <strong>Vermelho:</strong> Meta atingida ou ultrapassada
+                      <strong>{t("info.color_red")}</strong> {t("info.color_red_desc")}
                     </li>
                   </ul>
                 </div>
@@ -113,7 +112,7 @@ export function GlobalGoalsModal({
             {/* Aplicar a quais status */}
             <div className="space-y-4">
               <Label className="text-base font-semibold">
-                Aplicar metas aos capítulos com status:
+                {t("applies_to.label")}
               </Label>
               <div className="grid grid-cols-2 gap-3 pl-4">
                 {(
@@ -151,10 +150,11 @@ export function GlobalGoalsModal({
               warnAt90={localGoals.words.warnAt90}
               warnAt100={localGoals.words.warnAt100}
               silent={localGoals.words.silent}
-              label="Meta de Palavras"
-              description="Quantas palavras deseja escrever por capítulo (mínimo: 1.000 palavras)"
-              unit="palavras"
+              label={t("words.label")}
+              description={t("words.description")}
+              unit={t("words.unit")}
               minValue={MIN_WORD_GOAL}
+              t={t}
               onEnabledChange={(enabled) =>
                 setLocalGoals({
                   ...localGoals,
@@ -209,6 +209,7 @@ export function GlobalGoalsModal({
               warnAt90={localGoals.sessionTime.warnAt90}
               warnAt100={localGoals.sessionTime.warnAt100}
               silent={localGoals.sessionTime.silent}
+              t={t}
               onEnabledChange={(enabled) =>
                 setLocalGoals({
                   ...localGoals,
@@ -259,10 +260,10 @@ export function GlobalGoalsModal({
 
           <div className="flex justify-end gap-2 pt-4 border-t mt-auto">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
-              Cancelar
+              {t("actions.cancel")}
             </Button>
             <Button variant="magical" onClick={handleSave}>
-              Salvar Metas
+              {t("actions.save")}
             </Button>
           </div>
         </div>
@@ -281,6 +282,7 @@ interface GoalConfigProps {
   description: string;
   unit: string;
   minValue?: number;
+  t: (key: string, options?: any) => string;
   onEnabledChange: (enabled: boolean) => void;
   onTargetChange: (target: number) => void;
   onWarnAt90Change: (warnAt90: boolean) => void;
@@ -298,6 +300,7 @@ function GoalConfig({
   description,
   unit,
   minValue = 1,
+  t,
   onEnabledChange,
   onTargetChange,
   onWarnAt90Change,
@@ -317,7 +320,7 @@ function GoalConfig({
       {enabled && (
         <div className="space-y-4 pl-4 border-l-2 border-primary/20">
           <div>
-            <Label>Meta ({unit})</Label>
+            <Label>{t("goal_config.target_label", { unit })}</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 type="number"
@@ -356,7 +359,7 @@ function GoalConfig({
           </div>
 
           <div>
-            <Label className="mb-3 block">Avisar quando atingir:</Label>
+            <Label className="mb-3 block">{t("goal_config.warn_label")}</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -370,7 +373,7 @@ function GoalConfig({
                   htmlFor={`${label}-90`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  90% da meta
+                  {t("goal_config.warn_90")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -385,7 +388,7 @@ function GoalConfig({
                   htmlFor={`${label}-100`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  100% da meta (atingida)
+                  {t("goal_config.warn_100")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -400,7 +403,7 @@ function GoalConfig({
                   htmlFor={`${label}-silent`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  Silencioso (apenas visual)
+                  {t("goal_config.silent")}
                 </label>
               </div>
             </div>
@@ -417,6 +420,7 @@ interface SessionTimeGoalConfigProps {
   warnAt90: boolean;
   warnAt100: boolean;
   silent: boolean;
+  t: (key: string, options?: any) => string;
   onEnabledChange: (enabled: boolean) => void;
   onTargetMinutesChange: (minutes: number) => void;
   onWarnAt90Change: (warnAt90: boolean) => void;
@@ -430,6 +434,7 @@ function SessionTimeGoalConfig({
   warnAt90,
   warnAt100,
   silent,
+  t,
   onEnabledChange,
   onTargetMinutesChange,
   onWarnAt90Change,
@@ -445,10 +450,10 @@ function SessionTimeGoalConfig({
         <div>
           <Label className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            Meta de Tempo de Sessão
+            {t("session_time.label")}
           </Label>
           <p className="text-sm text-muted-foreground">
-            Tempo meta para cada sessão de escrita
+            {t("session_time.description")}
           </p>
         </div>
         <Switch checked={enabled} onCheckedChange={onEnabledChange} />
@@ -458,7 +463,7 @@ function SessionTimeGoalConfig({
         <div className="space-y-4 pl-4 border-l-2 border-primary/20">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Horas</Label>
+              <Label>{t("session_time.hours")}</Label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
                   type="number"
@@ -502,7 +507,7 @@ function SessionTimeGoalConfig({
               </div>
             </div>
             <div>
-              <Label>Minutos</Label>
+              <Label>{t("session_time.minutes")}</Label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
                   type="number"
@@ -548,7 +553,7 @@ function SessionTimeGoalConfig({
           </div>
 
           <div>
-            <Label className="mb-3 block">Avisar quando atingir:</Label>
+            <Label className="mb-3 block">{t("goal_config.warn_label")}</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -562,7 +567,7 @@ function SessionTimeGoalConfig({
                   htmlFor="session-time-90"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  90% do tempo meta
+                  {t("session_time_config.warn_90")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -577,7 +582,7 @@ function SessionTimeGoalConfig({
                   htmlFor="session-time-100"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  100% do tempo meta (atingido)
+                  {t("session_time_config.warn_100")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -592,7 +597,7 @@ function SessionTimeGoalConfig({
                   htmlFor="session-time-silent"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  Silencioso (apenas visual)
+                  {t("goal_config.silent")}
                 </label>
               </div>
             </div>

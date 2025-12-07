@@ -1,0 +1,31 @@
+{
+  "create_species": {
+    "title": "Create New Species",
+    "description": "Create a new species for this world. You will be able to add races"
+  },
+  "create_version": {
+    "title": "Create New Version",
+    "description": "Create a new version for this entity."
+  },
+  "create_race": {
+    "empty_state_title": "No race created",
+    "empty_state_description": "Create your first race by clicking the 'New Race' button"
+  },
+  "timeline": {
+    "create_era_description": "Create a new era on the timeline.",
+    "create_event_description": "Add a new event to the timeline.",
+    "edit_event_description": "Modify the event information",
+    "edit_era_description": "Modify the era information."
+  },
+  "upload": {
+    "upload_button": "Upload",
+    "loading": "Loading..."
+  },
+  "editor_settings": {
+    "summary_and_entities": "Summary & Mentioned Entities",
+    "visual_theme": "Visual Theme"
+  },
+  "plot_arc_events": {
+    "events_count": "{{completedCount}}/{{totalCount}} events"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "header": {
+    "chapter": "Capítulo"
+  },
+  "tooltips": {
+    "export_chapter": "Exportar capítulo"
+  },
+  "details": {
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "label": "Detalhes"
+  },
+  "plot_arc": {
+    "title": "Arco da História",
+    "no_arc": "Sem arco definido"
+  },
+  "metrics": {
+    "title": "Métricas",
+    "words": "Palavras",
+    "characters_no_spaces": "Caracteres (sem espaços)",
+    "characters_with_spaces": "Caracteres (com espaços)",
+    "last_edited": "Última edição"
+  },
+  "summary": {
+    "title": "Resumo",
+    "no_summary": "Nenhum resumo adicionado."
+  },
+  "entities": {
+    "characters": "Personagens",
+    "regions": "Regiões",
+    "items": "Itens",
+    "factions": "Facções",
+    "races": "Raças",
+    "no_characters": "Nenhum personagem mencionado.",
+    "no_regions": "Nenhuma região mencionada.",
+    "no_items": "Nenhum item mencionado.",
+    "no_factions": "Nenhuma facção mencionada.",
+    "no_races": "Nenhuma raça mencionada."
+  },
+  "export": {
+    "error_pdf": "Erro ao exportar PDF",
+    "error_word": "Erro ao exportar Word",
+    "filename_prefix": "Capitulo"
+  }
+}

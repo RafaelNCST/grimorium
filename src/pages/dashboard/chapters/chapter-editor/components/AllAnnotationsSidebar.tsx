@@ -25,7 +25,7 @@ export function AllAnnotationsSidebar({
   onClose,
   onNavigateToAnnotation,
 }: AllAnnotationsSidebarProps) {
-  const { t } = useTranslation("chapter-editor");
+  const { t } = useTranslation(["chapter-editor", "empty-states", "tooltips"]);
 
   const handleNavigate = (annotationId: string) => {
     onNavigateToAnnotation(annotationId);
@@ -64,10 +64,10 @@ export function AllAnnotationsSidebar({
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
               <MessageSquare className="w-12 h-12 text-muted-foreground/30 mb-4" />
               <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Nenhuma anotação
+                {t("empty-states:annotations.no_annotation")}
               </h3>
               <p className="text-xs text-muted-foreground/70">
-                {t("annotations.no_annotations")}
+                {t("chapter-editor:annotations.no_annotations")}
               </p>
             </div>
           ) : (
@@ -115,7 +115,7 @@ export function AllAnnotationsSidebar({
                                 <Star className="w-3 h-3 text-amber-500 fill-current" />
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Contém notas importantes</p>
+                                <p>{t("tooltips:annotations.contains_important_notes")}</p>
                               </TooltipContent>
                             </Tooltip>
                           )}

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { useParams } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
@@ -87,6 +88,7 @@ export const EntitySelect = React.forwardRef<
     },
     ref
   ) => {
+    const { t } = useTranslation(["empty-states", "loading"]);
     const { dashboardId } = useParams({ strict: false }) as {
       dashboardId?: string;
     };
@@ -171,7 +173,7 @@ export const EntitySelect = React.forwardRef<
               </div>
             ) : (
               <SelectValue
-                placeholder={isLoading ? "Carregando..." : placeholder}
+                placeholder={isLoading ? t("loading:loading") : placeholder}
               />
             )}
           </SelectTrigger>
@@ -179,7 +181,7 @@ export const EntitySelect = React.forwardRef<
             <SelectGroup>
               {!required && (
                 <SelectItem value="__none__">
-                  <span className="text-muted-foreground">Nenhum</span>
+                  <span className="text-muted-foreground">{t("empty-states:plot_arc.no_arc")}</span>
                 </SelectItem>
               )}
               {entities.map((entity) => (
@@ -199,7 +201,7 @@ export const EntitySelect = React.forwardRef<
               ))}
               {entities.length === 0 && !isLoading && (
                 <div className="p-2 text-sm text-muted-foreground text-center">
-                  Nenhum item disponível
+                  {t("empty-states:items.no_item_available")}
                 </div>
               )}
             </SelectGroup>

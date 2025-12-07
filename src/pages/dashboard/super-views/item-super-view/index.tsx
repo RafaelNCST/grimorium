@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { getItemById, type IItem } from "@/lib/db/items.service";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/item/$itemId";
@@ -12,6 +13,7 @@ export function ItemSuperViewPage() {
     from: "/dashboard/$dashboardId/super-views/item/$itemId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const search = Route.useSearch();
   const { dashboardId, itemId } = params;
   const fromChapterId = search.from;
@@ -64,7 +66,7 @@ export function ItemSuperViewPage() {
   if (!item) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Item não encontrado</p>
+        <p className="text-muted-foreground">{t("errors:not_found.item")}</p>
       </div>
     );
   }

@@ -33,5 +33,31 @@
     "power_system_detail": "Power System Details",
     "note_detail": "Note Details",
     "fallback": "Grimorium"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "confirm": "Confirm",
+    "back": "Back",
+    "new": "New",
+    "new_feminine": "New",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "make_main": "Make Main",
+    "unsaved_changes": "Unsaved changes"
+  },
+  "version": {
+    "main_badge": "Main",
+    "label": "Version",
+    "select_placeholder": "Select a version"
+  },
+  "delete_confirmation": {
+    "title": "Delete {{type}}?",
+    "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
   }
 }

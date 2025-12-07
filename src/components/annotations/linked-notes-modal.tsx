@@ -10,6 +10,7 @@ import {
   MapPin,
   Package,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ export function LinkedNotesModal({
   entityType,
   linkedNotes,
 }: PropsLinkedNotesModal) {
+  const { t } = useTranslation("empty-states");
   const navigate = useNavigate();
 
   const getEntityIcon = () => {
@@ -128,11 +130,10 @@ export function LinkedNotesModal({
             <div className="text-center py-8">
               <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                Nenhuma anotação linkada
+                {t("annotations.no_linked_notes")}
               </h3>
               <p className="text-muted-foreground">
-                Você pode criar links para anotações nas abas de anotações ou no
-                editor de arquivos.
+                {t("annotations.no_linked_notes_description")}
               </p>
             </div>
           ) : (

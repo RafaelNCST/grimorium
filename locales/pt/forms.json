@@ -1,0 +1,46 @@
+{
+  "validation": {
+    "name_required": "Nome é obrigatório",
+    "name_too_long": "Nome muito longo",
+    "known_name_required": "Nome conhecido é obrigatório",
+    "summary_required": "Resumo é obrigatório",
+    "summary_too_long": "Resumo muito longo",
+    "summary_max_characters": "Resumo deve ter no máximo 500 caracteres",
+    "era_name_required": "Nome da era é obrigatório",
+    "event_name_required": "Nome do evento é obrigatório",
+    "event_name_and_era_required": "Nome do evento e era são obrigatórios"
+  },
+  "labels": {
+    "chapter_name": "Nome do Capítulo",
+    "file_name": "Nome do arquivo",
+    "event_title": "Título do Evento",
+    "event_type": "Tipo de Evento",
+    "involved_character": "Personagem Envolvido",
+    "era_name": "Nome da Era",
+    "event_name": "Nome do Evento",
+    "known_name": "Nome Conhecido",
+    "scientific_name": "Nome Científico",
+    "description": "Descrição",
+    "version_name": "Nome da Versão"
+  },
+  "placeholders": {
+    "search_character": "Buscar personagem...",
+    "search_faction": "Buscar facção...",
+    "search_chapter": "Buscar capítulos...",
+    "search_item": "Buscar item...",
+    "search_region": "Buscar região...",
+    "describe_species": "Descreva as características gerais desta espécie...",
+    "chapter_summary": "Escreva um resumo do que acontece neste capítulo...",
+    "event_title_example": "Ex: Era dos Deuses, Ano 1542...",
+    "add_comment": "Adicione um novo comentário...",
+    "known_name_example": "Ex: Elfos, Dragões, Humanos...",
+    "scientific_name_example": "Ex: Homo elvensis (opcional)",
+    "version_name_example": "Ex: Versão Pré-Guerra",
+    "version_description": "Descreva as mudanças desta versão do(a) {{entityType}}..."
+  },
+  "buttons": {
+    "cancel": "Cancelar",
+    "create_species": "Criar Espécie",
+    "create_version": "Criar Versão"
+  }
+}

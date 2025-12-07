@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Check, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -35,10 +36,13 @@ export const FormPlotArcSelector = React.forwardRef<
       required,
       labelClassName,
       containerClassName,
-      noArcLabel = "Nenhum arco",
+      noArcLabel,
     },
     ref
   ) => {
+    const { t } = useTranslation(["empty-states"]);
+    const defaultNoArcLabel = noArcLabel || t("empty-states:plot_arc.no_arc");
+
     const getStatusColor = (status: string) => {
       switch (status) {
         case "atual":
@@ -102,7 +106,7 @@ export const FormPlotArcSelector = React.forwardRef<
                   )}
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">
-                  {noArcLabel}
+                  {defaultNoArcLabel}
                 </span>
               </div>
             </div>
@@ -113,7 +117,7 @@ export const FormPlotArcSelector = React.forwardRef<
             <div className="p-6 text-center border-2 border-dashed border-border rounded-lg bg-muted/20">
               <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">
-                Nenhum arco cadastrado
+                {t("empty-states:plot_arc.no_arc_registered")}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Crie arcos na aba Enredo

@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Link,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import {
@@ -134,12 +135,13 @@ export function NotesView({
   onSetItemToDelete,
 }: NotesViewProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation("notes");
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Anotações</h2>
+          <h2 className="text-xl font-semibold">{t("page.title")}</h2>
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             {getFolderPath().map((folder, index) => (
               <span key={index}>
@@ -154,7 +156,7 @@ export function NotesView({
           {currentPath.length > 0 && (
             <Button variant="outline" onClick={onBackClick}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
+              {t("page.back")}
             </Button>
           )}
 
@@ -162,21 +164,21 @@ export function NotesView({
             <DialogTrigger asChild>
               <Button variant="outline">
                 <FileText className="w-4 h-4 mr-2" />
-                Novo Arquivo
+                {t("page.new_file")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Criar Novo Arquivo</DialogTitle>
+                <DialogTitle>{t("file_manager.create_file_title")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="fileName">Nome do arquivo</Label>
+                  <Label htmlFor="fileName">{t("file_manager.file_name_label")}</Label>
                   <Input
                     id="fileName"
                     value={newFileName}
                     onChange={(e) => onSetNewFileName(e.target.value)}
-                    placeholder="Nome do arquivo"
+                    placeholder={t("file_manager.file_name_placeholder")}
                   />
                 </div>
                 <div className="flex justify-end gap-2">
@@ -184,9 +186,9 @@ export function NotesView({
                     variant="outline"
                     onClick={() => onSetShowCreateFile(false)}
                   >
-                    Cancelar
+                    {t("page.cancel")}
                   </Button>
-                  <Button onClick={onCreateFile}>Criar</Button>
+                  <Button onClick={onCreateFile}>{t("page.create")}</Button>
                 </div>
               </div>
             </DialogContent>
@@ -196,21 +198,21 @@ export function NotesView({
             <DialogTrigger asChild>
               <Button variant="outline">
                 <FolderOpen className="w-4 h-4 mr-2" />
-                Nova Pasta
+                {t("page.new_folder")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Criar Nova Pasta</DialogTitle>
+                <DialogTitle>{t("file_manager.create_folder_title")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="folderName">Nome da pasta</Label>
+                  <Label htmlFor="folderName">{t("file_manager.folder_name_label")}</Label>
                   <Input
                     id="folderName"
                     value={newFolderName}
                     onChange={(e) => onSetNewFolderName(e.target.value)}
-                    placeholder="Nome da pasta"
+                    placeholder={t("file_manager.folder_name_placeholder")}
                   />
                 </div>
                 <div className="flex justify-end gap-2">
@@ -218,9 +220,9 @@ export function NotesView({
                     variant="outline"
                     onClick={() => onSetShowCreateFolder(false)}
                   >
-                    Cancelar
+                    {t("page.cancel")}
                   </Button>
-                  <Button onClick={onCreateFolder}>Criar</Button>
+                  <Button onClick={onCreateFolder}>{t("page.create")}</Button>
                 </div>
               </div>
             </DialogContent>
@@ -273,14 +275,14 @@ export function NotesView({
                             variant="outline"
                             onClick={onSaveFolderName}
                           >
-                            Salvar
+                            {t("page.save")}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={onCancelEdit}
                           >
-                            Cancelar
+                            {t("page.cancel")}
                           </Button>
                         </div>
                       </div>
@@ -292,16 +294,12 @@ export function NotesView({
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <div className="flex flex-col gap-1">
                             <span>
-                              Criado:{" "}
-                              {new Date(item.createdAt).toLocaleDateString(
-                                "pt-BR"
-                              )}
+                              {t("page.created")}{" "}
+                              {new Date(item.createdAt).toLocaleDateString()}
                             </span>
                             <span>
-                              Editado:{" "}
-                              {new Date(item.updatedAt).toLocaleDateString(
-                                "pt-BR"
-                              )}
+                              {t("page.edited")}{" "}
+                              {new Date(item.updatedAt).toLocaleDateString()}
                             </span>
                           </div>
                           {item.type === "file" &&
@@ -393,9 +391,9 @@ export function NotesView({
         {getCurrentItems().length === 0 && (
           <div className="col-span-full text-center py-12">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Nenhuma anotação encontrada</p>
+            <p className="text-muted-foreground">{t("file_manager.empty_state_title")}</p>
             <p className="text-sm text-muted-foreground">
-              Crie seu primeiro arquivo ou pasta
+              {t("file_manager.empty_state_description")}
             </p>
           </div>
         )}
@@ -409,12 +407,12 @@ export function NotesView({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-destructive" />
-              Confirmar exclusão
+              {t("file_manager.confirm_delete_title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {itemToDelete?.type === "folder"
-                ? `A pasta "${itemToDelete.name}" contém arquivos com conteúdo. Tem certeza que deseja excluí-la? Esta ação não pode ser desfeita.`
-                : `O arquivo "${itemToDelete?.name}" contém conteúdo. Tem certeza que deseja excluí-lo? Esta ação não pode ser desfeita.`}
+                ? t("file_manager.confirm_delete_folder", { name: itemToDelete.name })
+                : t("file_manager.confirm_delete_file", { name: itemToDelete?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -424,7 +422,7 @@ export function NotesView({
                 onSetItemToDelete(null);
               }}
             >
-              Cancelar
+              {t("page.cancel")}
             </AlertDialogCancel>
             <Button
               variant="destructive"
@@ -432,7 +430,7 @@ export function NotesView({
               className="animate-glow-red"
               onClick={() => itemToDelete && onDeleteItem(itemToDelete.id)}
             >
-              Excluir
+              {t("page.delete")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

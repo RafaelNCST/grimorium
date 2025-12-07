@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Check, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,7 @@ export const FormMultiSelect = React.forwardRef<
       options,
       placeholder = "Selecione itens...",
       searchPlaceholder = "Buscar...",
-      emptyText = "Nenhum item encontrado",
+      emptyText,
       error,
       helperText,
       containerClassName,
@@ -84,8 +85,10 @@ export const FormMultiSelect = React.forwardRef<
     },
     ref
   ) => {
+    const { t } = useTranslation(["empty-states"]);
     const [open, setOpen] = React.useState(false);
     const hasError = Boolean(error);
+    const defaultEmptyText = emptyText || t("empty-states:items.no_item_found");
     const selectedCount = value.length;
     const hasReachedMax = maxItems !== undefined && selectedCount >= maxItems;
 
@@ -149,7 +152,7 @@ export const FormMultiSelect = React.forwardRef<
             <Command>
               <CommandInput placeholder={searchPlaceholder} />
               <CommandList>
-                <CommandEmpty>{emptyText}</CommandEmpty>
+                <CommandEmpty>{defaultEmptyText}</CommandEmpty>
                 <CommandGroup>
                   {options.map((option) => {
                     const isSelected = value.includes(option.value);

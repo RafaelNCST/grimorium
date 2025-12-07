@@ -7,7 +7,26 @@
     "delete_mode": "Delete Mode",
     "cancel": "Cancel",
     "delete": "Delete",
-    "clear_filters": "Clear"
+    "clear_filters": "Clear",
+    "new_file": "New File",
+    "new_folder": "New Folder",
+    "save": "Save",
+    "create": "Create",
+    "created": "Created:",
+    "edited": "Edited:"
+  },
+  "file_manager": {
+    "create_file_title": "Create New File",
+    "create_folder_title": "Create New Folder",
+    "file_name_label": "File name",
+    "file_name_placeholder": "File name",
+    "folder_name_label": "Folder name",
+    "folder_name_placeholder": "Folder name",
+    "empty_state_title": "No notes found",
+    "empty_state_description": "Create your first file or folder",
+    "confirm_delete_title": "Confirm deletion",
+    "confirm_delete_folder": "The folder \"{{name}}\" contains files with content. Are you sure you want to delete it? This action cannot be undone.",
+    "confirm_delete_file": "The file \"{{name}}\" contains content. Are you sure you want to delete it? This action cannot be undone."
   },
   "sort": {
     "label": "Sort",

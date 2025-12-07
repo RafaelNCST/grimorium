@@ -1,0 +1,31 @@
+{
+  "create_species": {
+    "title": "Criar Nova Espécie",
+    "description": "Crie uma nova espécie para este mundo. Você poderá adicionar raças"
+  },
+  "create_version": {
+    "title": "Criar Nova Versão",
+    "description": "Crie uma nova versão para esta entidade."
+  },
+  "create_race": {
+    "empty_state_title": "Nenhuma raça criada",
+    "empty_state_description": "Crie sua primeira raça clicando no botão 'Nova Raça'"
+  },
+  "timeline": {
+    "create_era_description": "Crie uma nova era na linha do tempo.",
+    "create_event_description": "Adicione um novo evento à linha do tempo.",
+    "edit_event_description": "Modifique as informações do evento",
+    "edit_era_description": "Modifique as informações da era."
+  },
+  "upload": {
+    "upload_button": "Fazer Upload",
+    "loading": "Carregando..."
+  },
+  "editor_settings": {
+    "summary_and_entities": "Resumo & Entidades Mencionadas",
+    "visual_theme": "Tema Visual"
+  },
+  "plot_arc_events": {
+    "events_count": "{{completedCount}}/{{totalCount}} eventos"
+  }
+}

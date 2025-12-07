@@ -171,7 +171,7 @@ export function EditorSettingsModal({
               {/* Summary Section */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Resumo & Entidades Mencionadas</Label>
+                  <Label>{t("dialogs:editor_settings.summary_and_entities")}</Label>
                   <p className="text-xs text-muted-foreground">
                     Mostra seção de resumo e entidades no editor
                   </p>
@@ -333,7 +333,7 @@ export function EditorSettingsModal({
             {/* Theme */}
             <div className="space-y-3">
               <div>
-                <Label className="text-base font-semibold">Tema Visual</Label>
+                <Label className="text-base font-semibold">{t("dialogs:editor_settings.visual_theme")}</Label>
                 <p className="text-sm text-muted-foreground">
                   Ajuste as cores do editor para maior conforto
                 </p>

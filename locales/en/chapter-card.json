@@ -1,0 +1,45 @@
+{
+  "header": {
+    "chapter": "Chapter"
+  },
+  "tooltips": {
+    "export_chapter": "Export chapter"
+  },
+  "details": {
+    "hide": "Hide",
+    "show": "Show",
+    "label": "Details"
+  },
+  "plot_arc": {
+    "title": "Story Arc",
+    "no_arc": "No arc defined"
+  },
+  "metrics": {
+    "title": "Metrics",
+    "words": "Words",
+    "characters_no_spaces": "Characters (without spaces)",
+    "characters_with_spaces": "Characters (with spaces)",
+    "last_edited": "Last edited"
+  },
+  "summary": {
+    "title": "Summary",
+    "no_summary": "No summary added."
+  },
+  "entities": {
+    "characters": "Characters",
+    "regions": "Regions",
+    "items": "Items",
+    "factions": "Factions",
+    "races": "Races",
+    "no_characters": "No characters mentioned.",
+    "no_regions": "No regions mentioned.",
+    "no_items": "No items mentioned.",
+    "no_factions": "No factions mentioned.",
+    "no_races": "No races mentioned."
+  },
+  "export": {
+    "error_pdf": "Error exporting PDF",
+    "error_word": "Error exporting Word",
+    "filename_prefix": "Chapter"
+  }
+}

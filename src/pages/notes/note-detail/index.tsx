@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { useNotesStore } from "@/stores/notes-store";
 import { INote, INoteLink, PaperMode } from "@/types/note-types";
@@ -12,6 +13,7 @@ import type { JSONContent } from "@tiptap/react";
 export function NoteDetailPage() {
   const navigate = useNavigate();
   const { noteId } = useParams({ strict: false });
+  const { t } = useTranslation(["errors"]);
 
   // Store
   const getNoteById = useNotesStore((state) => state.getNoteById);
@@ -194,7 +196,7 @@ export function NoteDetailPage() {
   if (!note) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
-        <p className="text-muted-foreground">Anotação não encontrada</p>
+        <p className="text-muted-foreground">{t("errors:not_found.annotation")}</p>
       </div>
     );
   }

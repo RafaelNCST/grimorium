@@ -1,0 +1,14 @@
+{
+  "not_found": {
+    "book": "Book not found",
+    "file": "File not found",
+    "character": "Character not found",
+    "faction": "Faction not found",
+    "item": "Item not found",
+    "race": "Race not found",
+    "region": "Region not found",
+    "annotation": "Annotation not found",
+    "version": "Version not found",
+    "version_showing_main": "Version not found, showing main version"
+  }
+}

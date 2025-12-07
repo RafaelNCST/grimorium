@@ -1,0 +1,35 @@
+{
+  "modal": {
+    "title": "Pré-visualização de Exportação"
+  },
+  "margins": {
+    "editorial": "Padrão Editorial",
+    "narrow": "Estreita",
+    "wide": "Larga"
+  },
+  "settings": {
+    "page_format": "Formato de Página",
+    "margins": "Margens",
+    "title_settings": "Configurações do Título",
+    "font": "Fonte",
+    "size": "Tamanho",
+    "alignment": "Alinhamento",
+    "alignment_left": "Esquerda",
+    "alignment_center": "Centro"
+  },
+  "preview": {
+    "page_singular": "página",
+    "page_plural": "páginas",
+    "loading_content": "Carregando conteúdo do capítulo...",
+    "updating_preview": "Atualizando pré-visualização...",
+    "loading_pdf": "Carregando PDF...",
+    "page_of": "Página {{current}} de {{total}}",
+    "generating_preview": "Gerando pré-visualização...",
+    "error_generating": "Erro ao gerar pré-visualização"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "export_word": "Exportar como Word",
+    "export_pdf": "Exportar como PDF"
+  }
+}

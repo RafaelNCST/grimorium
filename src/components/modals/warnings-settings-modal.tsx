@@ -7,6 +7,7 @@
 import { useState, useEffect } from "react";
 
 import { Bell, BellOff, Clock, Type, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,7 @@ export function WarningsSettingsModal({
   settings,
   onSave,
 }: WarningsSettingsModalProps) {
+  const { t } = useTranslation("warnings-settings");
   const [localSettings, setLocalSettings] =
     useState<WarningsSettings>(settings);
 
@@ -55,11 +57,10 @@ export function WarningsSettingsModal({
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             <AlertCircle className="w-6 h-6" />
-            Gerenciar Avisos
+            {t("modal.title")}
           </DialogTitle>
           <DialogDescription>
-            Configure quais tipos de avisos você deseja receber durante a
-            escrita.
+            {t("modal.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -73,11 +74,10 @@ export function WarningsSettingsModal({
                 ) : (
                   <BellOff className="w-4 h-4" />
                 )}
-                Sistema de Avisos
+                {t("warnings_system.label")}
               </Label>
               <p className="text-sm text-muted-foreground">
-                Desabilita completamente o sistema de avisos (menu lateral e
-                toasts)
+                {t("warnings_system.description")}
               </p>
             </div>
             <Switch
@@ -97,11 +97,10 @@ export function WarningsSettingsModal({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-base font-semibold">
-                    Notificações (Toasts)
+                    {t("notifications.label")}
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Exibe notificações popup. Avisos ainda aparecem no menu
-                    lateral
+                    {t("notifications.description")}
                   </p>
                 </div>
                 <Switch
@@ -116,7 +115,7 @@ export function WarningsSettingsModal({
 
               <div className="space-y-4">
                 <Label className="text-base font-semibold">
-                  Tipos de Avisos
+                  {t("types.label")}
                 </Label>
 
                 {/* Avisos de Tempo */}
@@ -124,10 +123,10 @@ export function WarningsSettingsModal({
                   <div className="space-y-0.5">
                     <Label className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      Avisos de Tempo
+                      {t("time_warnings.label")}
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      Lembretes para fazer pausas durante a escrita
+                      {t("time_warnings.description")}
                     </p>
                   </div>
                   <Switch
@@ -146,10 +145,10 @@ export function WarningsSettingsModal({
                   <div className="space-y-0.5">
                     <Label className="flex items-center gap-2">
                       <Type className="w-4 h-4" />
-                      Avisos de Tipografia
+                      {t("typography_warnings.label")}
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      Alertas sobre o tamanho do capítulo
+                      {t("typography_warnings.description")}
                     </p>
                   </div>
                   <Switch
@@ -169,10 +168,10 @@ export function WarningsSettingsModal({
 
         <div className="flex justify-end gap-2 pt-4 border-t">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t("actions.cancel")}
           </Button>
           <Button variant="magical" onClick={handleSave}>
-            Salvar Configurações
+            {t("actions.save")}
           </Button>
         </div>
       </DialogContent>

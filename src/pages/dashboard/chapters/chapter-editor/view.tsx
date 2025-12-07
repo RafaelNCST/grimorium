@@ -22,6 +22,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { LinkTooltip } from "@/components/link-tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -135,6 +136,8 @@ export function ChapterEditorView({
   renderAnnotatedText,
   getAnnotationComments,
 }: ChapterEditorViewProps) {
+  const { t } = useTranslation(["forms"]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -488,7 +491,7 @@ export function ChapterEditorView({
                 <Textarea
                   value={newComment}
                   onChange={(e) => onNewCommentChange(e.target.value)}
-                  placeholder="Adicione um novo comentário..."
+                  placeholder={t("forms:placeholders.add_comment")}
                   rows={3}
                 />
                 <Button
@@ -578,7 +581,7 @@ export function ChapterEditorView({
               <Textarea
                 value={chapter.summary}
                 onChange={(e) => onChapterSummaryChange(e.target.value)}
-                placeholder="Escreva um resumo do que acontece neste capítulo..."
+                placeholder={t("forms:placeholders.chapter_summary")}
                 rows={6}
                 disabled={isReadOnly}
               />

@@ -279,6 +279,7 @@ export function CharacterDetailView({
   onSavePowerLink,
 }: CharacterDetailViewProps) {
   const { t } = useTranslation(["character-detail", "create-character"]);
+  const { t: tEmpty } = useTranslation("empty-states");
 
   // State for controlling the add relationship dialog from the empty state button
   const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
@@ -1207,8 +1208,8 @@ export function CharacterDetailView({
         return null;
       })(),
       emptyIcon: Users,
-      emptyTitle: "Nenhum relacionamento definido",
-      emptyDescription: "Use o modo de edição para adicionar relacionamentos",
+      emptyTitle: tEmpty("relationships.no_relationship_defined"),
+      emptyDescription: tEmpty("relationships.use_edit_mode_to_add_relationships"),
       addButtonLabel: t("character-detail:relationships.add_relationship"),
       onAddClick: () => {
         setIsAddRelationshipDialogOpen(true);
@@ -1283,8 +1284,8 @@ export function CharacterDetailView({
         return null;
       })(),
       emptyIcon: Heart,
-      emptyTitle: "Nenhuma relação familiar definida",
-      emptyDescription: "Use o modo de edição para adicionar familiares",
+      emptyTitle: tEmpty("relationships.no_family_relation_defined"),
+      emptyDescription: tEmpty("relationships.use_edit_mode_to_add_family"),
       blockedEntityName: "personagens",
     },
   ];

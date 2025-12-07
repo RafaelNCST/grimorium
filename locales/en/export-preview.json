@@ -1,0 +1,35 @@
+{
+  "modal": {
+    "title": "Export Preview"
+  },
+  "margins": {
+    "editorial": "Editorial Standard",
+    "narrow": "Narrow",
+    "wide": "Wide"
+  },
+  "settings": {
+    "page_format": "Page Format",
+    "margins": "Margins",
+    "title_settings": "Title Settings",
+    "font": "Font",
+    "size": "Size",
+    "alignment": "Alignment",
+    "alignment_left": "Left",
+    "alignment_center": "Center"
+  },
+  "preview": {
+    "page_singular": "page",
+    "page_plural": "pages",
+    "loading_content": "Loading chapter content...",
+    "updating_preview": "Updating preview...",
+    "loading_pdf": "Loading PDF...",
+    "page_of": "Page {{current}} of {{total}}",
+    "generating_preview": "Generating preview...",
+    "error_generating": "Error generating preview"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "export_word": "Export as Word",
+    "export_pdf": "Export as PDF"
+  }
+}

@@ -13,12 +13,15 @@ import enCreateFaction from "../../locales/en/create-faction.json";
 import enCreateItem from "../../locales/en/create-item.json";
 import enCreatePlotArc from "../../locales/en/create-plot-arc.json";
 import enCreateRace from "../../locales/en/create-race.json";
+import enEmptyStates from "../../locales/en/empty-states.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
 import enFactions from "../../locales/en/factions.json";
+import enForms from "../../locales/en/forms.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
 import enItems from "../../locales/en/items.json";
+import enLoading from "../../locales/en/loading.json";
 import enNoteDetail from "../../locales/en/note-detail.json";
 import enNotes from "../../locales/en/notes.json";
 import enOverview from "../../locales/en/overview.json";
@@ -41,12 +44,15 @@ import ptCreateFaction from "../../locales/pt/create-faction.json";
 import ptCreateItem from "../../locales/pt/create-item.json";
 import ptCreatePlotArc from "../../locales/pt/create-plot-arc.json";
 import ptCreateRace from "../../locales/pt/create-race.json";
+import ptEmptyStates from "../../locales/pt/empty-states.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
 import ptFactions from "../../locales/pt/factions.json";
+import ptForms from "../../locales/pt/forms.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
 import ptItems from "../../locales/pt/items.json";
+import ptLoading from "../../locales/pt/loading.json";
 import ptNoteDetail from "../../locales/pt/note-detail.json";
 import ptNotes from "../../locales/pt/notes.json";
 import ptOverview from "../../locales/pt/overview.json";
@@ -74,10 +80,13 @@ const resources = {
     "create-item": enCreateItem,
     "create-plot-arc": enCreatePlotArc,
     "create-race": enCreateRace,
+    "empty-states": enEmptyStates,
     "faction-detail": enFactionDetail,
     factions: enFactions,
+    forms: enForms,
     "item-detail": enItemDetail,
     items: enItems,
+    loading: enLoading,
     notes: enNotes,
     "note-detail": enNoteDetail,
     overview: enOverview,
@@ -104,10 +113,13 @@ const resources = {
     "create-item": ptCreateItem,
     "create-plot-arc": ptCreatePlotArc,
     "create-race": ptCreateRace,
+    "empty-states": ptEmptyStates,
     "faction-detail": ptFactionDetail,
     factions: ptFactions,
+    forms: ptForms,
     "item-detail": ptItemDetail,
     items: ptItems,
+    loading: ptLoading,
     notes: ptNotes,
     "note-detail": ptNoteDetail,
     overview: ptOverview,

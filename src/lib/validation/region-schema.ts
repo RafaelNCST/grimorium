@@ -1,10 +1,11 @@
 import { z } from "zod";
+import i18next from "i18next";
 
 export const RegionSchema = z.object({
   // Campos obrigatórios
   name: z
     .string()
-    .min(1, "Nome é obrigatório")
+    .min(1, () => i18next.t("forms:validation.name_required"))
     .max(200, "Nome deve ter no máximo 200 caracteres")
     .trim(),
 
@@ -12,8 +13,8 @@ export const RegionSchema = z.object({
 
   summary: z
     .string()
-    .min(1, "Resumo é obrigatório")
-    .max(500, "Resumo deve ter no máximo 500 caracteres")
+    .min(1, () => i18next.t("forms:validation.summary_required"))
+    .max(500, () => i18next.t("forms:validation.summary_max_characters"))
     .trim(),
 
   // Campos opcionais

@@ -1,0 +1,18 @@
+{
+  "navigation": {
+    "click_to_navigate": "Clique para navegar para {{entityType}}",
+    "linked_text": "Texto linkado: \"{{text}}\""
+  },
+  "instructions": {
+    "double_click_to_edit": "Duplo clique para editar",
+    "click_for_detailed_stats": "Clique para ver estatísticas detalhadas",
+    "drag_to_reorder": "Arraste para reordenar ou clique no olho para mostrar/ocultar. A aba",
+    "mark_events_as_you_write": "Marque eventos conforme escreve para acompanhar seu progresso"
+  },
+  "annotations": {
+    "contains_important_notes": "Contém notas importantes"
+  },
+  "editor": {
+    "settings": "Configurações do Editor"
+  }
+}

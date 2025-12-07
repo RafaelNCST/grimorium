@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { getCharacterById } from "@/lib/db/characters.service";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/character/$characterId";
@@ -13,6 +14,7 @@ export function CharacterSuperViewPage() {
     from: "/dashboard/$dashboardId/super-views/character/$characterId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const search = Route.useSearch();
   const { dashboardId, characterId } = params;
   const fromChapterId = search.from;
@@ -65,7 +67,7 @@ export function CharacterSuperViewPage() {
   if (!character) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Personagem não encontrado</p>
+        <p className="text-muted-foreground">{t("errors:not_found.character")}</p>
       </div>
     );
   }

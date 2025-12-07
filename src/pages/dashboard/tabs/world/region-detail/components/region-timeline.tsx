@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Plus,
@@ -100,6 +101,13 @@ export function RegionTimeline({
   isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
   onCreateEraDialogOpenChange,
 }: PropsRegionTimeline) {
+  const { t } = useTranslation([
+    "forms",
+    "errors",
+    "empty-states",
+    "dialogs",
+  ]);
+
   const [selectedEvent, setSelectedEvent] = useState<ITimelineEvent | null>(
     null
   );
@@ -155,7 +163,7 @@ export function RegionTimeline({
 
   const handleCreateEra = () => {
     if (!newEra.name.trim()) {
-      toast.error("Nome da era é obrigatório");
+      toast.error(t("forms:validation.era_name_required"));
       return;
     }
 
@@ -173,7 +181,7 @@ export function RegionTimeline({
 
   const handleCreateEvent = () => {
     if (!newEvent.name.trim() || !selectedEraId) {
-      toast.error("Nome do evento e era são obrigatórios");
+      toast.error(t("forms:validation.event_name_and_era_required"));
       return;
     }
 
@@ -245,7 +253,7 @@ export function RegionTimeline({
 
   const handleUpdateEra = () => {
     if (!editEra.name.trim() || !editingEra) {
-      toast.error("Nome da era é obrigatório");
+      toast.error(t("forms:validation.era_name_required"));
       return;
     }
 
@@ -263,7 +271,7 @@ export function RegionTimeline({
 
   const handleUpdateEvent = () => {
     if (!newEvent.name.trim() || !selectedEvent) {
-      toast.error("Nome do evento é obrigatório");
+      toast.error(t("forms:validation.event_name_required"));
       return;
     }
 
@@ -318,16 +326,17 @@ export function RegionTimeline({
   };
 
   const getCharacterName = (id: string) =>
-    characters.find((c) => c.id === id)?.name || "Personagem não encontrado";
+    characters.find((c) => c.id === id)?.name ||
+    t("errors:not_found.character");
 
   const getFactionName = (id: string) =>
-    factions.find((f) => f.id === id)?.name || "Facção não encontrada";
+    factions.find((f) => f.id === id)?.name || t("errors:not_found.faction");
 
   const getRaceName = (id: string) =>
-    races.find((r) => r.id === id)?.name || "Raça não encontrada";
+    races.find((r) => r.id === id)?.name || t("errors:not_found.race");
 
   const getItemName = (id: string) =>
-    items.find((i) => i.id === id)?.name || "Item não encontrado";
+    items.find((i) => i.id === id)?.name || t("errors:not_found.item");
 
   return (
     <>
@@ -625,7 +634,7 @@ export function RegionTimeline({
                                 <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
                                   <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
                                   <p className="text-sm text-muted-foreground">
-                                    Esta era ainda não possui eventos
+                                    {t("empty-states:timeline.era_has_no_events")}
                                   </p>
                                 </div>
                               </div>
@@ -673,7 +682,7 @@ export function RegionTimeline({
             </DialogTitle>
             <DialogDescription>
               {editingEvent
-                ? "Modifique as informações do evento"
+                ? t("dialogs:timeline.edit_event_description")
                 : `${selectedEvent?.startDate} - ${selectedEvent?.endDate}`}
             </DialogDescription>
           </DialogHeader>
@@ -682,7 +691,9 @@ export function RegionTimeline({
             (editingEvent ? (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-event-name">Nome do Evento *</Label>
+                  <Label htmlFor="edit-event-name">
+                    {t("forms:labels.event_name")} *
+                  </Label>
                   <Input
                     id="edit-event-name"
                     value={newEvent.name}
@@ -803,7 +814,7 @@ export function RegionTimeline({
                 <MultiSelect
                   label="Personagens Envolvidos"
                   placeholder="Selecionar personagens"
-                  emptyText="Nenhum personagem cadastrado"
+                  emptyText={t("empty-states:entities.no_character_registered")}
                   noSelectionText="Nenhum personagem selecionado"
                   searchPlaceholder="Buscar personagem..."
                   options={characters}
@@ -819,7 +830,7 @@ export function RegionTimeline({
                 <MultiSelect
                   label="Facções Envolvidas"
                   placeholder="Selecionar facções"
-                  emptyText="Nenhuma facção cadastrada"
+                  emptyText={t("empty-states:entities.no_faction_registered")}
                   noSelectionText="Nenhuma facção selecionada"
                   searchPlaceholder="Buscar facção..."
                   options={factions}
@@ -835,7 +846,7 @@ export function RegionTimeline({
                 <MultiSelect
                   label="Raças Envolvidas"
                   placeholder="Selecionar raças"
-                  emptyText="Nenhuma raça cadastrada"
+                  emptyText={t("empty-states:entities.no_race_registered")}
                   noSelectionText="Nenhuma raça selecionada"
                   searchPlaceholder="Buscar raça..."
                   options={races}
@@ -851,7 +862,7 @@ export function RegionTimeline({
                 <MultiSelect
                   label="Itens Envolvidos"
                   placeholder="Selecionar itens"
-                  emptyText="Nenhum item cadastrado"
+                  emptyText={t("empty-states:entities.no_item_registered")}
                   noSelectionText="Nenhum item selecionado"
                   searchPlaceholder="Buscar item..."
                   options={items}
@@ -1009,14 +1020,15 @@ export function RegionTimeline({
           <DialogHeader>
             <DialogTitle>Nova Era</DialogTitle>
             <DialogDescription>
-              Crie uma nova era na linha do tempo.
+              {t("dialogs:timeline.create_era_description")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="era-name" className="text-primary">
-                Nome da Era <span className="text-destructive">*</span>
+                {t("forms:labels.era_name")}{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="era-name"
@@ -1148,14 +1160,15 @@ export function RegionTimeline({
           <DialogHeader>
             <DialogTitle>Novo Evento</DialogTitle>
             <DialogDescription>
-              Adicione um novo evento à linha do tempo.
+              {t("dialogs:timeline.create_event_description")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto space-y-4 px-3 -mb-4 pb-4">
             <div className="space-y-2">
               <Label htmlFor="event-name" className="text-primary">
-                Nome do Evento <span className="text-destructive">*</span>
+                {t("forms:labels.event_name")}{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="event-name"
@@ -1284,7 +1297,7 @@ export function RegionTimeline({
             <MultiSelect
               label="Personagens Envolvidos"
               placeholder="Selecionar personagens"
-              emptyText="Nenhum personagem cadastrado"
+              emptyText={t("empty-states:entities.no_character_registered")}
               noSelectionText="Nenhum personagem selecionado"
               searchPlaceholder="Buscar personagem..."
               options={characters}
@@ -1301,7 +1314,7 @@ export function RegionTimeline({
             <MultiSelect
               label="Facções Envolvidas"
               placeholder="Selecionar facções"
-              emptyText="Nenhuma facção cadastrada"
+              emptyText={t("empty-states:entities.no_faction_registered")}
               noSelectionText="Nenhuma facção selecionada"
               searchPlaceholder="Buscar facção..."
               options={factions}
@@ -1318,7 +1331,7 @@ export function RegionTimeline({
             <MultiSelect
               label="Raças Envolvidas"
               placeholder="Selecionar raças"
-              emptyText="Nenhuma raça cadastrada"
+              emptyText={t("empty-states:entities.no_race_registered")}
               noSelectionText="Nenhuma raça selecionada"
               searchPlaceholder="Buscar raça..."
               options={races}
@@ -1335,7 +1348,7 @@ export function RegionTimeline({
             <MultiSelect
               label="Itens Envolvidos"
               placeholder="Selecionar itens"
-              emptyText="Nenhum item cadastrado"
+              emptyText={t("empty-states:entities.no_item_registered")}
               noSelectionText="Nenhum item selecionado"
               searchPlaceholder="Buscar item..."
               options={items}
@@ -1398,13 +1411,15 @@ export function RegionTimeline({
           <DialogHeader>
             <DialogTitle>Editar Era</DialogTitle>
             <DialogDescription>
-              Modifique as informações da era.
+              {t("dialogs:timeline.edit_era_description")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-era-name">Nome da Era *</Label>
+              <Label htmlFor="edit-era-name">
+                {t("forms:labels.era_name")} *
+              </Label>
               <Input
                 id="edit-era-name"
                 value={editEra.name}

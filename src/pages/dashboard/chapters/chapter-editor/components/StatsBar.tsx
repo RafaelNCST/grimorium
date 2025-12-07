@@ -37,7 +37,7 @@ export function StatsBar({
   globalGoals,
   chapterStatus,
 }: StatsBarProps) {
-  const { t } = useTranslation("chapter-editor");
+  const { t } = useTranslation(["chapter-editor", "tooltips"]);
 
   const formatSessionTime = (minutes: number): string => {
     if (minutes < 1) return "< 1min";
@@ -251,7 +251,7 @@ export function StatsBar({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Clique para ver estatísticas detalhadas</p>
+                  <p>{t("tooltips:instructions.click_for_detailed_stats")}</p>
                 </TooltipContent>
               </Tooltip>
             )}

@@ -1,0 +1,29 @@
+{
+  "modal": {
+    "title": "Gerenciar Avisos",
+    "description": "Configure quais tipos de avisos você deseja receber durante a escrita."
+  },
+  "warnings_system": {
+    "label": "Sistema de Avisos",
+    "description": "Desabilita completamente o sistema de avisos (menu lateral e toasts)"
+  },
+  "notifications": {
+    "label": "Notificações (Toasts)",
+    "description": "Exibe notificações popup. Avisos ainda aparecem no menu lateral"
+  },
+  "types": {
+    "label": "Tipos de Avisos"
+  },
+  "time_warnings": {
+    "label": "Avisos de Tempo",
+    "description": "Lembretes para fazer pausas durante a escrita"
+  },
+  "typography_warnings": {
+    "label": "Avisos de Tipografia",
+    "description": "Alertas sobre o tamanho do capítulo"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "save": "Salvar Configurações"
+  }
+}

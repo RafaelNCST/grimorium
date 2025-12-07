@@ -33,5 +33,34 @@
     "power_system_detail": "Detalhes do Sistema de Poder",
     "note_detail": "Detalhes da Anotação",
     "fallback": "Grimorium"
+  },
+  "actions": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "create": "Criar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "new": "Novo",
+    "new_feminine": "Nova",
+    "saving": "Salvando...",
+    "deleting": "Excluindo...",
+    "make_main": "Tornar Principal",
+    "unsaved_changes": "Alterações não salvas"
+  },
+  "version": {
+    "main_badge": "Principal",
+    "label": "Versão",
+    "select_placeholder": "Selecione uma versão"
+  },
+  "delete_confirmation": {
+    "title": "Excluir {{type}}?",
+    "message": "Tem certeza que deseja excluir \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  },
+  "sidebar": {
+    "viewing_currently": "Visualizando atualmente"
   }
 }

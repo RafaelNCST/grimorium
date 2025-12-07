@@ -1,0 +1,46 @@
+{
+  "validation": {
+    "name_required": "Name is required",
+    "name_too_long": "Name too long",
+    "known_name_required": "Known name is required",
+    "summary_required": "Summary is required",
+    "summary_too_long": "Summary too long",
+    "summary_max_characters": "Summary must have a maximum of 500 characters",
+    "era_name_required": "Era name is required",
+    "event_name_required": "Event name is required",
+    "event_name_and_era_required": "Event name and era are required"
+  },
+  "labels": {
+    "chapter_name": "Chapter Name",
+    "file_name": "File name",
+    "event_title": "Event Title",
+    "event_type": "Event Type",
+    "involved_character": "Involved Character",
+    "era_name": "Era Name",
+    "event_name": "Event Name",
+    "known_name": "Known Name",
+    "scientific_name": "Scientific Name",
+    "description": "Description",
+    "version_name": "Version Name"
+  },
+  "placeholders": {
+    "search_character": "Search character...",
+    "search_faction": "Search faction...",
+    "search_chapter": "Search chapters...",
+    "search_item": "Search item...",
+    "search_region": "Search region...",
+    "describe_species": "Describe the general characteristics of this species...",
+    "chapter_summary": "Write a summary of what happens in this chapter...",
+    "event_title_example": "E.g.: Age of the Gods, Year 1542...",
+    "add_comment": "Add a new comment...",
+    "known_name_example": "E.g.: Elves, Dragons, Humans...",
+    "scientific_name_example": "E.g.: Homo elvensis (optional)",
+    "version_name_example": "E.g.: Pre-War Version",
+    "version_description": "Describe the changes in this version of the {{entityType}}..."
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "create_species": "Create Species",
+    "create_version": "Create Version"
+  }
+}

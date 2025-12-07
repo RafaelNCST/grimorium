@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 export interface IVersion<T> {
@@ -74,6 +75,7 @@ export function useVersionManagement<T>({
   hasUnsavedChanges = false,
   entityType = "entity",
 }: UseVersionManagementOptions<T>): UseVersionManagementReturn<T> {
+  const { t } = useTranslation(["errors"]);
   const [currentVersion, setCurrentVersion] = useState<IVersion<T> | null>(
     null
   );
@@ -96,7 +98,7 @@ export function useVersionManagement<T>({
         console.warn(
           `[useVersionManagement] Version ${currentVersionId} not found, falling back to main version`
         );
-        toast.warning("Versão não encontrada, exibindo versão principal");
+        toast.warning(t("errors:not_found.version_showing_main"));
         selectedVersion = versions.find((v) => v.isMain);
       }
     } else {
@@ -121,7 +123,7 @@ export function useVersionManagement<T>({
       const version = versions.find((v) => v.id === versionId);
       if (!version) {
         console.error(`[useVersionManagement] Version ${versionId} not found`);
-        toast.error("Versão não encontrada");
+        toast.error(t("errors:not_found.version"));
         return;
       }
 

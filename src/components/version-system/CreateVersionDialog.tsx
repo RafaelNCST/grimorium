@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { FormInput } from "@/components/forms/FormInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
@@ -35,10 +36,11 @@ export function CreateVersionDialog({
   open,
   onOpenChange,
   onSubmit,
-  title = "Criar Nova Versão",
-  description = "Crie uma nova versão para esta entidade.",
+  title,
+  description,
   entityType = "entidade",
 }: CreateVersionDialogProps) {
+  const { t } = useTranslation(["dialogs", "forms"]);
   const [name, setName] = React.useState("");
   const [versionDescription, setVersionDescription] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -71,25 +73,31 @@ export function CreateVersionDialog({
       <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
+            <DialogTitle>
+              {title || t("dialogs:create_version.title")}
+            </DialogTitle>
+            <DialogDescription>
+              {description || t("dialogs:create_version.description")}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <FormInput
-              label="Nome da Versão"
+              label={t("forms:labels.version_name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Versão Pré-Guerra"
+              placeholder={t("forms:placeholders.version_name_example")}
               required
               autoFocus
             />
 
             <FormTextarea
-              label="Descrição"
+              label={t("forms:labels.description")}
               value={versionDescription}
               onChange={(e) => setVersionDescription(e.target.value)}
-              placeholder={`Descreva as mudanças desta versão do(a) ${entityType}...`}
+              placeholder={t("forms:placeholders.version_description", {
+                entityType,
+              })}
               rows={4}
               maxLength={500}
               showCharCount
@@ -103,11 +111,11 @@ export function CreateVersionDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancelar
+              {t("forms:buttons.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting || !name.trim()}>
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Criar Versão
+              {t("forms:buttons.create_version")}
             </Button>
           </DialogFooter>
         </form>

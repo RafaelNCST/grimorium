@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,12 +53,14 @@ export const FormChapterNameWithNumber = React.forwardRef<
       labelClassName,
       containerClassName,
       maxLength = 200,
-      namePlaceholder = "Nome do Capítulo",
+      namePlaceholder,
       showCharCount = true,
     },
     ref
   ) => {
+    const { t } = useTranslation(["forms"]);
     const hasError = Boolean(error);
+    const defaultPlaceholder = namePlaceholder || t("forms:labels.chapter_name");
 
     // Increment by 1
     const handleIncrement = () => {
@@ -163,7 +166,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
                 type="text"
                 value={chapterName}
                 onChange={(e) => onChapterNameChange(e.target.value)}
-                placeholder={namePlaceholder}
+                placeholder={defaultPlaceholder}
                 maxLength={maxLength}
                 className={cn("h-10", hasError && "border-destructive")}
               />

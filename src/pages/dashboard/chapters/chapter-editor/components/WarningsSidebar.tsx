@@ -10,6 +10,7 @@
 import React, { useState } from "react";
 
 import { X, Trash2, AlertCircle, Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +40,7 @@ interface WarningsSidebarProps {
 }
 
 export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
+  const { t } = useTranslation(["empty-states"]);
   const {
     warnings,
     stats,
@@ -154,7 +156,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
               <AlertCircle className="w-12 h-12 text-muted-foreground/30 mb-4" />
               <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Nenhum aviso
+                {t("empty-states:warnings.no_warning")}
               </h3>
               <p className="text-xs text-muted-foreground/70">
                 {selectedType === "all"

@@ -1,0 +1,45 @@
+{
+  "modal": {
+    "title": "Global Goals",
+    "description": "Configure goals that apply to all book chapters. Choose the status types where goals will be applied."
+  },
+  "info": {
+    "applies_to_all": "These goals apply to all chapters",
+    "description": "that have the statuses selected below. Statistics bar numbers will gradually change color as you approach your goal.",
+    "color_normal": "Normal color:",
+    "color_normal_desc": "Below 90% of goal",
+    "color_yellow": "Yellow:",
+    "color_yellow_desc": "Between 90% and 100% of goal",
+    "color_red": "Red:",
+    "color_red_desc": "Goal met or exceeded"
+  },
+  "applies_to": {
+    "label": "Apply goals to chapters with status:"
+  },
+  "words": {
+    "label": "Word Goal",
+    "description": "How many words to write per chapter (minimum: 1,000 words)",
+    "unit": "words"
+  },
+  "session_time": {
+    "label": "Session Time Goal",
+    "description": "Target time for each writing session",
+    "hours": "Hours",
+    "minutes": "Minutes"
+  },
+  "goal_config": {
+    "target_label": "Goal ({{unit}})",
+    "warn_label": "Warn when reaching:",
+    "warn_90": "90% of goal",
+    "warn_100": "100% of goal (achieved)",
+    "silent": "Silent (visual only)"
+  },
+  "session_time_config": {
+    "warn_90": "90% of target time",
+    "warn_100": "100% of target time (achieved)"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save Goals"
+  }
+}

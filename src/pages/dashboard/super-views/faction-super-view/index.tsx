@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import { getFactionById } from "@/lib/db/factions.service";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/faction/$factionId";
@@ -13,6 +14,7 @@ export function FactionSuperViewPage() {
     from: "/dashboard/$dashboardId/super-views/faction/$factionId",
   });
   const navigate = useNavigate();
+  const { t } = useTranslation(["errors"]);
   const search = Route.useSearch();
   const { dashboardId, factionId } = params;
   const fromChapterId = search.from;
@@ -65,7 +67,7 @@ export function FactionSuperViewPage() {
   if (!faction) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Facção não encontrada</p>
+        <p className="text-muted-foreground">{t("errors:not_found.faction")}</p>
       </div>
     );
   }

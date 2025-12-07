@@ -69,6 +69,7 @@ export function AlignmentMatrix({
   isEditable = false,
 }: AlignmentMatrixProps) {
   const { t } = useTranslation("create-character");
+  const { t: tEmpty } = useTranslation("empty-states");
 
   const alignmentOrder = [
     "lawful-good",
@@ -93,10 +94,10 @@ export function AlignmentMatrix({
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-foreground">
-                Nenhum alinhamento escolhido
+                {tEmpty("alignment.no_alignment_chosen")}
               </p>
               <p className="text-xs text-muted-foreground">
-                Use o modo de edição para selecionar um alinhamento
+                {tEmpty("alignment.use_edit_mode_to_select")}
               </p>
             </div>
           </div>

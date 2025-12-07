@@ -1,4 +1,5 @@
 import { User, MapPin, Sword, Building, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,6 +37,7 @@ export function LinkTooltip({
   entityId,
   text,
 }: PropsLinkTooltip) {
+  const { t } = useTranslation("tooltips");
   const Icon = entityIcons[entityType as keyof typeof entityIcons] || User;
   const colorClass =
     entityColors[entityType as keyof typeof entityColors] || "bg-gray-500";
@@ -56,10 +58,10 @@ export function LinkTooltip({
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {`Texto linkado: "${text}"`}
+              {t("navigation.linked_text", { text })}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Clique para navegar para {entityType}
+              {t("navigation.click_to_navigate", { entityType })}
             </p>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   ArrowLeft,
@@ -89,6 +90,8 @@ export function ItemTimelineView({
   onDeleteEvent,
   onNewEventChange,
 }: PropsItemTimelineView) {
+  const { t } = useTranslation("forms");
+
   return (
     <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -203,7 +206,7 @@ export function ItemTimelineView({
 
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título do Evento *</Label>
+                <Label htmlFor="title">{t("labels.event_title")} *</Label>
                 <Input
                   id="title"
                   value={newEvent.title || ""}
@@ -232,12 +235,12 @@ export function ItemTimelineView({
                     id="date"
                     value={newEvent.date || ""}
                     onChange={(e) => onNewEventChange("date", e.target.value)}
-                    placeholder="Ex: Era dos Deuses, Ano 1542..."
+                    placeholder={t("placeholders.event_title_example")}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="eventType">Tipo de Evento</Label>
+                  <Label htmlFor="eventType">{t("labels.event_type")}</Label>
                   <select
                     className="w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md"
                     value={newEvent.eventType}
@@ -272,7 +275,7 @@ export function ItemTimelineView({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="character">Personagem Envolvido</Label>
+                  <Label htmlFor="character">{t("labels.involved_character")}</Label>
                   <Input
                     id="character"
                     value={newEvent.character || ""}

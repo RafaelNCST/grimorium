@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   AlertDialog,
@@ -53,10 +54,14 @@ export function DeleteConfirmationDialog({
   children,
   title,
   description,
-  confirmText = "Excluir",
-  cancelText = "Cancelar",
+  confirmText,
+  cancelText,
 }: DeleteConfirmationDialogProps) {
+  const { t } = useTranslation("common");
   const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const displayConfirmText = confirmText ?? t("delete_confirmation.confirm");
+  const displayCancelText = cancelText ?? t("delete_confirmation.cancel");
 
   const handleConfirm = async () => {
     setIsDeleting(true);
@@ -80,13 +85,13 @@ export function DeleteConfirmationDialog({
             </div>
             <div className="flex-1">
               <AlertDialogTitle>
-                {title || `Excluir ${entityType}?`}
+                {title || t("delete_confirmation.title", { type: entityType })}
               </AlertDialogTitle>
             </div>
           </div>
           <AlertDialogDescription className="pt-2">
             {description ||
-              `Tem certeza que deseja excluir "${entityName}"? Esta ação não pode ser desfeita.`}
+              t("delete_confirmation.message", { name: entityName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -96,7 +101,7 @@ export function DeleteConfirmationDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>
-            {cancelText}
+            {displayCancelText}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
@@ -104,7 +109,7 @@ export function DeleteConfirmationDialog({
             className="bg-destructive hover:bg-destructive/90"
           >
             {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isDeleting ? "Excluindo..." : confirmText}
+            {isDeleting ? t("actions.deleting") : displayConfirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
@@ -47,16 +49,20 @@ export function VersionSelector({
   versions,
   currentVersionId,
   onVersionChange,
-  label = "Versão",
-  placeholder = "Selecione uma versão",
+  label,
+  placeholder,
   disabled,
   className,
 }: VersionSelectorProps) {
+  const { t } = useTranslation("common");
   const currentVersion = versions.find((v) => v.id === currentVersionId);
+
+  const displayLabel = label ?? t("version.label");
+  const displayPlaceholder = placeholder ?? t("version.select_placeholder");
 
   return (
     <div className={cn("space-y-2", className)}>
-      {label && <Label>{label}</Label>}
+      {displayLabel && <Label>{displayLabel}</Label>}
       <Select
         value={currentVersionId ?? undefined}
         onValueChange={onVersionChange}
@@ -68,12 +74,12 @@ export function VersionSelector({
               <span>{currentVersion.name}</span>
               {currentVersion.isMain && (
                 <Badge variant="default" className="ml-auto">
-                  Principal
+                  {t("version.main_badge")}
                 </Badge>
               )}
             </div>
           ) : (
-            <SelectValue placeholder={placeholder} />
+            <SelectValue placeholder={displayPlaceholder} />
           )}
         </SelectTrigger>
         <SelectContent>
@@ -84,7 +90,7 @@ export function VersionSelector({
                   <span>{version.name}</span>
                   {version.isMain && (
                     <Badge variant="default" className="ml-2">
-                      Principal
+                      {t("version.main_badge")}
                     </Badge>
                   )}
                 </div>

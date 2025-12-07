@@ -96,6 +96,7 @@ function NoteDetailViewComponent({
   onLinksChange,
 }: NoteDetailViewProps) {
   const { t, i18n } = useTranslation("note-detail");
+  const { t: tTooltips } = useTranslation("tooltips");
 
   const locale = i18n.language === "pt" ? ptBR : enUS;
 
@@ -145,7 +146,7 @@ function NoteDetailViewComponent({
             <h1
               className="text-xl font-semibold cursor-pointer hover:text-primary transition-colors"
               onDoubleClick={onStartEditName}
-              title="Duplo clique para editar"
+              title={tTooltips("instructions.double_click_to_edit")}
             >
               {note.name || t("header.untitled")}
             </h1>
@@ -339,3 +340,4 @@ function NoteDetailViewComponent({
 }
 
 export const NoteDetailView = memo(NoteDetailViewComponent);
+

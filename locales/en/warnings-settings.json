@@ -1,0 +1,29 @@
+{
+  "modal": {
+    "title": "Manage Warnings",
+    "description": "Configure which types of warnings you want to receive while writing."
+  },
+  "warnings_system": {
+    "label": "Warnings System",
+    "description": "Completely disables the warnings system (sidebar and toasts)"
+  },
+  "notifications": {
+    "label": "Notifications (Toasts)",
+    "description": "Show popup notifications. Warnings still appear in the sidebar"
+  },
+  "types": {
+    "label": "Warning Types"
+  },
+  "time_warnings": {
+    "label": "Time Warnings",
+    "description": "Reminders to take breaks during writing"
+  },
+  "typography_warnings": {
+    "label": "Typography Warnings",
+    "description": "Alerts about chapter size"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save Settings"
+  }
+}

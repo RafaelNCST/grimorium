@@ -1,4 +1,5 @@
 import { Plus, Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { EntityListLayout } from "@/components/layouts";
 import { CreateRaceModal } from "@/components/modals/create-race-modal";
@@ -43,6 +44,8 @@ export function SpeciesView({
   onDomainToggle,
   onClearFilters,
 }: SpeciesViewProps) {
+  const { t } = useTranslation(["loading", "empty-states", "dialogs"]);
+
   // Configure filter rows
   const filterRows = createDomainFilterRows(domainStats);
 
@@ -50,12 +53,12 @@ export function SpeciesView({
     <>
       <EntityListLayout
         isLoading={isLoading}
-        loadingText="Carregando raças..."
+        loadingText={t("loading:loading_races")}
         isEmpty={allRaces.length === 0}
         emptyState={{
           icon: Users,
-          title: "Nenhuma raça criada",
-          description: "Crie sua primeira raça clicando no botão 'Nova Raça'",
+          title: t("empty-states:entity_search.no_race"),
+          description: t("dialogs:create_race.empty_state_description"),
         }}
         header={{
           title: "Raças",

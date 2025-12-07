@@ -175,7 +175,7 @@ export function FactionDetailView({
   onActiveDiplomacyTabChange,
   hasChanges,
 }: FactionDetailViewProps) {
-  const { t } = useTranslation(["faction-detail", "create-faction"]);
+  const { t } = useTranslation(["faction-detail", "create-faction", "empty-states"]);
 
   // State for controlling dialogs from empty state buttons
   const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] =
@@ -1424,8 +1424,8 @@ export function FactionDetailView({
             : "empty-view"
           : null,
       emptyIcon: Clock,
-      emptyTitle: "Nenhuma linha do tempo definida",
-      emptyDescription: "Use o modo de edição para adicionar eras",
+      emptyTitle: t("empty-states:timeline.no_timeline_defined"),
+      emptyDescription: t("empty-states:timeline.use_edit_mode_to_add_eras"),
       addButtonLabel: "Criar Primeira Era",
       onAddClick: () => setIsCreateEraDialogOpen(true),
     },
@@ -1484,8 +1484,8 @@ export function FactionDetailView({
         return null;
       })(),
       emptyIcon: Handshake,
-      emptyTitle: "Nenhuma relação diplomática definida",
-      emptyDescription: "Use o modo de edição para adicionar relações",
+      emptyTitle: t("empty-states:diplomacy.no_diplomatic_relation_defined"),
+      emptyDescription: t("empty-states:diplomacy.use_edit_mode_to_add_relations"),
       addButtonLabel: "Adicionar Relação Diplomática",
       onAddClick: () => setIsAddDiplomacyDialogOpen(true),
       blockedEntityName: "facções",
@@ -1535,8 +1535,8 @@ export function FactionDetailView({
         return null;
       })(),
       emptyIcon: Users2,
-      emptyTitle: "Nenhuma hierarquia definida",
-      emptyDescription: "Use o modo de edição para adicionar membros",
+      emptyTitle: t("empty-states:hierarchy.no_hierarchy_defined"),
+      emptyDescription: t("empty-states:hierarchy.use_edit_mode_to_add_members"),
       addButtonLabel: "Adicionar Membro",
       onAddClick: () => setIsAddMemberDialogOpen(true),
       secondaryButtonLabel: "Gerenciar Títulos",

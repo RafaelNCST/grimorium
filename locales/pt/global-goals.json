@@ -1,0 +1,45 @@
+{
+  "modal": {
+    "title": "Metas Globais",
+    "description": "Configure metas que se aplicam a todos os capítulos do livro. Escolha os tipos de status onde as metas serão aplicadas."
+  },
+  "info": {
+    "applies_to_all": "Estas metas se aplicam a todos os capítulos",
+    "description": "que possuem os status selecionados abaixo. Os números da barra de estatísticas mudarão de cor gradualmente conforme você se aproxima da meta.",
+    "color_normal": "Cor normal:",
+    "color_normal_desc": "Abaixo de 90% da meta",
+    "color_yellow": "Amarelo:",
+    "color_yellow_desc": "Entre 90% e 100% da meta",
+    "color_red": "Vermelho:",
+    "color_red_desc": "Meta atingida ou ultrapassada"
+  },
+  "applies_to": {
+    "label": "Aplicar metas aos capítulos com status:"
+  },
+  "words": {
+    "label": "Meta de Palavras",
+    "description": "Quantas palavras deseja escrever por capítulo (mínimo: 1.000 palavras)",
+    "unit": "palavras"
+  },
+  "session_time": {
+    "label": "Meta de Tempo de Sessão",
+    "description": "Tempo meta para cada sessão de escrita",
+    "hours": "Horas",
+    "minutes": "Minutos"
+  },
+  "goal_config": {
+    "target_label": "Meta ({{unit}})",
+    "warn_label": "Avisar quando atingir:",
+    "warn_90": "90% da meta",
+    "warn_100": "100% da meta (atingida)",
+    "silent": "Silencioso (apenas visual)"
+  },
+  "session_time_config": {
+    "warn_90": "90% do tempo meta",
+    "warn_100": "100% do tempo meta (atingido)"
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "save": "Salvar Metas"
+  }
+}

@@ -13,6 +13,7 @@ import {
   Type,
   Hash,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
@@ -77,6 +78,7 @@ export function ChapterCard({
   statusConfig,
   showStatus = true,
 }: ChapterCardProps) {
+  const { t } = useTranslation("chapter-card");
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
 
@@ -105,7 +107,7 @@ export function ChapterCard({
 
       // Ask user where to save
       const filePath = await save({
-        defaultPath: `Capitulo_${chapter.number}_${chapter.title}.pdf`,
+        defaultPath: `${t("export.filename_prefix")}_${chapter.number}_${chapter.title}.pdf`,
         filters: [
           {
             name: "PDF",
@@ -120,7 +122,7 @@ export function ChapterCard({
       }
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      toast.error("Erro ao exportar PDF");
+      toast.error(t("export.error_pdf"));
     }
   };
 
@@ -145,7 +147,7 @@ export function ChapterCard({
 
       // Ask user where to save
       const filePath = await save({
-        defaultPath: `Capitulo_${chapter.number}_${chapter.title}.docx`,
+        defaultPath: `${t("export.filename_prefix")}_${chapter.number}_${chapter.title}.docx`,
         filters: [
           {
             name: "Word Document",
@@ -160,7 +162,7 @@ export function ChapterCard({
       }
     } catch (error) {
       console.error("Error exporting Word:", error);
-      toast.error("Erro ao exportar Word");
+      toast.error(t("export.error_word"));
     }
   };
 
@@ -189,7 +191,7 @@ export function ChapterCard({
             {/* Header: Number + Title */}
             <div className="flex items-center gap-1.5">
               <span className="text-lg font-semibold text-amber-500 shrink-0">
-                Capítulo {chapter.number}:
+                {t("header.chapter")} {chapter.number}:
               </span>
               <CardTitle className="text-lg font-semibold line-clamp-1">
                 {chapter.title}
@@ -216,7 +218,7 @@ export function ChapterCard({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Exportar capítulo</p>
+                <p>{t("tooltips.export_chapter")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -247,7 +249,7 @@ export function ChapterCard({
             className="w-full justify-between rounded-none hover:bg-white/5 dark:hover:bg-white/10 hover:text-foreground transition-colors duration-200 px-6 py-3"
           >
             <span className="text-sm font-medium">
-              {isDetailsExpanded ? "Ocultar" : "Mostrar"} Detalhes
+              {t(isDetailsExpanded ? "details.hide" : "details.show")} {t("details.label")}
             </span>
             {isDetailsExpanded ? (
               <ChevronUp className="w-4 h-4" />
@@ -260,7 +262,7 @@ export function ChapterCard({
             <div className="px-6 py-4 space-y-4">
               {/* Plot Arc Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Arco da História</h4>
+                <h4 className="text-sm font-medium mb-2">{t("plot_arc.title")}</h4>
                 {chapter.plotArc ? (
                   <Badge
                     variant="secondary"
@@ -271,19 +273,19 @@ export function ChapterCard({
                   </Badge>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">
-                    Sem arco definido
+                    {t("plot_arc.no_arc")}
                   </p>
                 )}
               </div>
 
               {/* Metrics Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Métricas</h4>
+                <h4 className="text-sm font-medium mb-2">{t("metrics.title")}</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Type className="w-3.5 h-3.5" />
-                      <span className="text-xs">Palavras</span>
+                      <span className="text-xs">{t("metrics.words")}</span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.wordCount.toLocaleString()}
@@ -293,7 +295,7 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Hash className="w-3.5 h-3.5" />
-                      <span className="text-xs">Caracteres (sem espaços)</span>
+                      <span className="text-xs">{t("metrics.characters_no_spaces")}</span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.characterCount.toLocaleString()}
@@ -303,7 +305,7 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Hash className="w-3.5 h-3.5" />
-                      <span className="text-xs">Caracteres (com espaços)</span>
+                      <span className="text-xs">{t("metrics.characters_with_spaces")}</span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.characterCountWithSpaces.toLocaleString()}
@@ -313,7 +315,7 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Clock className="w-3.5 h-3.5" />
-                      <span className="text-xs">Última edição</span>
+                      <span className="text-xs">{t("metrics.last_edited")}</span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.lastEdited.toLocaleDateString()}
@@ -324,14 +326,14 @@ export function ChapterCard({
 
               {/* Summary Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">Resumo</h4>
+                <h4 className="text-sm font-medium mb-2">{t("summary.title")}</h4>
                 {chapter.summary ? (
                   <p className="text-sm text-muted-foreground">
                     {chapter.summary}
                   </p>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">
-                    Nenhum resumo adicionado.
+                    {t("summary.no_summary")}
                   </p>
                 )}
               </div>
@@ -341,7 +343,7 @@ export function ChapterCard({
                 {/* Personagens */}
                 <div>
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
-                    Personagens
+                    {t("entities.characters")}
                   </h5>
                   {chapter.mentionedCharacters &&
                   chapter.mentionedCharacters.length > 0 ? (
@@ -363,7 +365,7 @@ export function ChapterCard({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      Nenhum personagem mencionado.
+                      {t("entities.no_characters")}
                     </p>
                   )}
                 </div>
@@ -371,7 +373,7 @@ export function ChapterCard({
                 {/* Regiões */}
                 <div>
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
-                    Regiões
+                    {t("entities.regions")}
                   </h5>
                   {chapter.mentionedRegions &&
                   chapter.mentionedRegions.length > 0 ? (
@@ -393,7 +395,7 @@ export function ChapterCard({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      Nenhuma região mencionada.
+                      {t("entities.no_regions")}
                     </p>
                   )}
                 </div>
@@ -401,7 +403,7 @@ export function ChapterCard({
                 {/* Itens */}
                 <div>
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
-                    Itens
+                    {t("entities.items")}
                   </h5>
                   {chapter.mentionedItems &&
                   chapter.mentionedItems.length > 0 ? (
@@ -423,7 +425,7 @@ export function ChapterCard({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      Nenhum item mencionado.
+                      {t("entities.no_items")}
                     </p>
                   )}
                 </div>
@@ -431,7 +433,7 @@ export function ChapterCard({
                 {/* Facções */}
                 <div>
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
-                    Facções
+                    {t("entities.factions")}
                   </h5>
                   {chapter.mentionedFactions &&
                   chapter.mentionedFactions.length > 0 ? (
@@ -453,7 +455,7 @@ export function ChapterCard({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      Nenhuma facção mencionada.
+                      {t("entities.no_factions")}
                     </p>
                   )}
                 </div>
@@ -461,7 +463,7 @@ export function ChapterCard({
                 {/* Raças */}
                 <div>
                   <h5 className="text-xs font-medium mb-1.5 text-foreground">
-                    Raças
+                    {t("entities.races")}
                   </h5>
                   {chapter.mentionedRaces &&
                   chapter.mentionedRaces.length > 0 ? (
@@ -483,7 +485,7 @@ export function ChapterCard({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      Nenhuma raça mencionada.
+                      {t("entities.no_races")}
                     </p>
                   )}
                 </div>
