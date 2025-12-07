@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ListChecks, Plus, Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormTextarea } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { PropsChecklistCard } from "../types/overview-types";
@@ -52,19 +52,6 @@ export function ChecklistCard({
     setEditingText("");
   };
 
-  const handleCancelEdit = () => {
-    setEditingItemId(null);
-    setEditingText("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
-    if (e.key === "Enter") {
-      action();
-    } else if (e.key === "Escape") {
-      handleCancelEdit();
-    }
-  };
-
   return (
     <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -80,57 +67,48 @@ export function ChecklistCard({
         <ScrollArea className="h-[300px] pr-4 mb-4">
           <div className="space-y-2">
             {checklistItems.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                {t("checklist.empty_state")}
-              </p>
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <ListChecks className="w-12 h-12 text-muted-foreground/50" />
+                <p className="text-base text-muted-foreground">
+                  {t("checklist.empty_state")}
+                </p>
+              </div>
             )}
             {checklistItems.map((item) => (
               <div
                 key={item.id}
-                className="group flex items-center gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
+                className="group flex items-start gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors"
               >
-                <Checkbox
-                  checked={item.checked}
-                  onCheckedChange={() => onToggleItem(item.id)}
-                  disabled={isCustomizing}
-                  className="flex-shrink-0"
-                />
                 {editingItemId === item.id ? (
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Input
+                  <div className="flex-1 flex gap-2">
+                    <div className="flex-1">
+                      <FormTextarea
                         value={editingText}
                         onChange={(e) => setEditingText(e.target.value)}
-                        onKeyDown={(e) =>
-                          handleKeyDown(e, () => handleSaveEdit(item.id))
-                        }
+                        className="min-h-[100px] resize-none"
                         autoFocus
                         maxLength={MAX_TASK_LENGTH}
-                        className="flex-1"
+                        showCharCount
+                        showOptionalLabel={false}
+                        rows={4}
                       />
-                      <Button
-                        size="sm"
-                        variant="magical"
-                        onClick={() => handleSaveEdit(item.id)}
-                      >
-                        {t("checklist.save")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={handleCancelEdit}
-                      >
-                        {t("checklist.cancel")}
-                      </Button>
                     </div>
-                    <div className="flex justify-end">
-                      <span className="text-xs text-muted-foreground">
-                        {editingText.length}/{MAX_TASK_LENGTH}
-                      </span>
-                    </div>
+                    <Button
+                      size="sm"
+                      variant="magical"
+                      onClick={() => handleSaveEdit(item.id)}
+                    >
+                      {t("checklist.save")}
+                    </Button>
                   </div>
                 ) : (
                   <>
+                    <Checkbox
+                      checked={item.checked}
+                      onCheckedChange={() => onToggleItem(item.id)}
+                      disabled={isCustomizing}
+                      className="flex-shrink-0"
+                    />
                     <span
                       className={`flex-1 text-sm select-text ${
                         item.checked ? "line-through text-muted-foreground" : ""
@@ -138,7 +116,7 @@ export function ChecklistCard({
                     >
                       {item.text}
                     </span>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-1">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -165,29 +143,27 @@ export function ChecklistCard({
           </div>
         </ScrollArea>
 
-        <div className="space-y-1">
-          <div className="flex gap-2">
-            <Input
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <FormTextarea
               placeholder={t("checklist.add_item_placeholder")}
               value={newItemText}
               onChange={(e) => setNewItemText(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, handleAddItem)}
+              className="min-h-[100px] resize-none"
               disabled={isCustomizing}
               maxLength={MAX_TASK_LENGTH}
+              showCharCount
+              showOptionalLabel={false}
+              rows={4}
             />
-            <Button
-              variant="secondary"
-              onClick={handleAddItem}
-              disabled={isCustomizing || !newItemText.trim()}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
           </div>
-          <div className="flex justify-end">
-            <span className="text-xs text-muted-foreground">
-              {newItemText.length}/{MAX_TASK_LENGTH}
-            </span>
-          </div>
+          <Button
+            variant="secondary"
+            onClick={handleAddItem}
+            disabled={isCustomizing || !newItemText.trim()}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
         </div>
       </CardContent>
     </Card>
