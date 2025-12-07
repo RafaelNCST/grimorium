@@ -12,6 +12,8 @@ import {
 } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
+import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
 import { useOverviewPersistence } from "./hooks/useOverviewPersistence";
 import {
@@ -143,16 +145,37 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     [book.chapters]
   );
 
+  // Calculate overall progress as average of all arcs' progress
+  const [allArcsProgress, setAllArcsProgress] = useState<number[]>([]);
+
+  useEffect(() => {
+    const loadArcsProgress = async () => {
+      try {
+        const arcs = await getPlotArcsByBookId(bookId);
+        const progressValues = arcs.map((arc) => {
+          // Finished arcs = 100%, others use their actual progress
+          return arc.status === "finished" ? 100 : arc.progress;
+        });
+        setAllArcsProgress(progressValues);
+      } catch (error) {
+        console.error("Failed to load arcs progress:", error);
+      }
+    };
+
+    if (hasInitialized) {
+      loadArcsProgress();
+    }
+  }, [bookId, hasInitialized]);
+
   const storyProgressPercentage = useMemo(() => {
-    if (storyProgress.estimatedArcs === 0) return 0;
-    const totalProgress =
-      storyProgress.completedArcs + storyProgress.currentArcProgress / 100;
-    return Math.round((totalProgress / storyProgress.estimatedArcs) * 100);
-  }, [
-    storyProgress.completedArcs,
-    storyProgress.currentArcProgress,
-    storyProgress.estimatedArcs,
-  ]);
+    if (allArcsProgress.length === 0) return 0;
+
+    // Calculate average progress across all arcs
+    const totalProgress = allArcsProgress.reduce((sum, progress) => sum + progress, 0);
+    const averageProgress = totalProgress / allArcsProgress.length;
+
+    return Math.round(averageProgress);
+  }, [allArcsProgress]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -207,6 +230,52 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       setStickyNotes([defaultNote]);
     }
   }, [hasInitialized, stickyNotes.length, t]);
+
+  // Calculate story progress based on real plot arcs
+  useEffect(() => {
+    const calculateProgressFromArcs = async () => {
+      try {
+        const arcs = await getPlotArcsByBookId(bookId);
+
+        if (arcs.length === 0) {
+          // No arcs, keep default values
+          setStoryProgress({
+            estimatedArcs: 0,
+            estimatedChapters: 0,
+            completedArcs: 0,
+            currentArcProgress: 0,
+          });
+          return;
+        }
+
+        // Count arcs with status "finished"
+        const completedArcs = arcs.filter((arc) => arc.status === "finished").length;
+
+        // Find current arc (status "current")
+        const currentArc = arcs.find((arc) => arc.status === "current");
+        const currentArcProgress = currentArc ? currentArc.progress : 0;
+
+        // Calculate estimated chapters (you can adjust this logic if needed)
+        const estimatedChapters = arcs.reduce((sum, arc) => {
+          // This is a placeholder - adjust based on your arc size logic
+          return sum + 10; // or use arc.events.length, etc.
+        }, 0);
+
+        setStoryProgress({
+          estimatedArcs: arcs.length,
+          estimatedChapters,
+          completedArcs,
+          currentArcProgress,
+        });
+      } catch (error) {
+        console.error("Failed to calculate story progress:", error);
+      }
+    };
+
+    if (hasInitialized) {
+      calculateProgressFromArcs();
+    }
+  }, [bookId, hasInitialized]);
 
   const handleToggleSectionVisibility = useCallback((sectionId: string) => {
     setSections((sections) =>
