@@ -2,7 +2,11 @@ import { useRef, useState, useEffect, useCallback } from "react";
 
 import { readFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import {
+  TransformWrapper,
+  TransformComponent,
+  ReactZoomPanPinchRef,
+} from "react-zoom-pan-pinch";
 
 import { Button } from "@/components/ui/button";
 import { IRegionMapMarker } from "@/lib/db/region-maps.service";
@@ -42,6 +46,7 @@ export function MapCanvas({
   });
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
   const [imageUrl, setImageUrl] = useState("");
 
@@ -63,6 +68,19 @@ export function MapCanvas({
 
   // Pan/zoom states
   const [isPanning, setIsPanning] = useState(false);
+  const [savedScale, setSavedScale] = useState<number>(1);
+
+  // Load saved scale state
+  useEffect(() => {
+    const saved = localStorage.getItem(`map-scale-${imagePath}`);
+    if (saved) {
+      try {
+        setSavedScale(parseFloat(saved));
+      } catch (error) {
+        console.error("Failed to parse saved scale:", error);
+      }
+    }
+  }, [imagePath]);
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -104,6 +122,17 @@ export function MapCanvas({
       }
     };
   }, [imagePath]);
+
+  // Center image when loaded with saved scale
+  useEffect(() => {
+    if (imageLoaded && transformRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        // Always center, but use saved scale
+        transformRef.current?.centerView(savedScale, 0);
+      }, 100);
+    }
+  }, [imageLoaded, savedScale]);
 
   // Convert client coordinates to image coordinates considering zoom/pan
   const clientToImageCoords = useCallback(
@@ -418,11 +447,15 @@ export function MapCanvas({
       }}
     >
       <TransformWrapper
+        ref={transformRef}
         initialScale={1}
         minScale={0.25}
         maxScale={4}
         disabled={false}
         limitToBounds={false}
+        centerOnInit={false}
+        centerZoomedOut={false}
+        alignmentAnimation={{ disabled: true }}
         panning={{
           disabled:
             isDraggingRef.current ||
@@ -433,16 +466,17 @@ export function MapCanvas({
           allowMiddleClickPan: true,
           allowRightClickPan: false,
         }}
-        centerOnInit
         wheel={{
-          step: 0.03,
-          smoothStep: 0.002,
+          step: 0.015,
+          smoothStep: 0.001,
           limitsOnWheel: true,
           disabled: false,
         }}
         doubleClick={{ disabled: true }}
         onTransformed={(ref, state) => {
           setCurrentScale(state.scale);
+          // Save only scale to localStorage
+          localStorage.setItem(`map-scale-${imagePath}`, state.scale.toString());
         }}
         onPanningStart={() => setIsPanning(true)}
         onPanningStop={() => setIsPanning(false)}
@@ -470,7 +504,15 @@ export function MapCanvas({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => resetTransform()}
+                onClick={() => {
+                  resetTransform();
+                  // Clear saved scale
+                  localStorage.removeItem(`map-scale-${imagePath}`);
+                  setSavedScale(1);
+                  setTimeout(() => {
+                    transformRef.current?.centerView(1, 0);
+                  }, 50);
+                }}
                 className="shadow-lg"
               >
                 <Maximize2 className="w-4 h-4" />
@@ -489,13 +531,6 @@ export function MapCanvas({
                 (draggingMarkerId || isPanning) && "cursor-grabbing",
                 resizingMarkerId && "cursor-nwse-resize"
               )}
-              contentStyle={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
             >
               <div
                 className="relative select-none"

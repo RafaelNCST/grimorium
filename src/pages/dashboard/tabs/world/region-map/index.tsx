@@ -68,12 +68,18 @@ export function RegionMapPage() {
     Array<{ id: string; name: string; image?: string }>
   >([]);
   const [showChangeImageWarning, setShowChangeImageWarning] = useState(false);
+  const [showChangeImageTooltip, setShowChangeImageTooltip] = useState(false);
 
   const regionId = params.regionId as string;
 
   useEffect(() => {
     loadData();
   }, [regionId]);
+
+  // Close tooltip when map image changes
+  useEffect(() => {
+    setShowChangeImageTooltip(false);
+  }, [mapImagePath]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -222,14 +228,19 @@ export function RegionMapPage() {
     setMapImagePath(imagePath);
     setMapId(mapId);
     setMarkers([]); // Clear markers when new map is uploaded
+    // Clear saved zoom scale so the new map starts centered with default zoom
+    localStorage.removeItem(`map-scale-${imagePath}`);
   };
 
-  const handleChangeImage = () => {
+  const handleChangeImage = async () => {
+    // Close tooltip immediately when clicking
+    setShowChangeImageTooltip(false);
+
     // Check if there are markers placed on the map
     if (markers.length > 0) {
       setShowChangeImageWarning(true);
     } else {
-      proceedWithImageChange();
+      await proceedWithImageChange();
     }
   };
 
@@ -248,6 +259,8 @@ export function RegionMapPage() {
       });
 
       if (!selected || typeof selected !== "string") {
+        // Close tooltip if user cancels
+        setShowChangeImageTooltip(false);
         return;
       }
 
@@ -255,8 +268,14 @@ export function RegionMapPage() {
       setMapImagePath(regionMap.imagePath);
       setMapId(regionMap.id);
       setMarkers([]); // Clear markers when changing image
+      // Clear saved zoom scale so the new map starts centered with default zoom
+      localStorage.removeItem(`map-scale-${regionMap.imagePath}`);
+      // Close tooltip after image change
+      setShowChangeImageTooltip(false);
     } catch (error) {
       console.error("Failed to update map image:", error);
+      // Close tooltip on error
+      setShowChangeImageTooltip(false);
     }
   };
 
@@ -428,7 +447,7 @@ export function RegionMapPage() {
         <h1 className="text-lg font-semibold">{region.name}</h1>
         {mapImagePath && (
           <TooltipProvider delayDuration={300}>
-            <Tooltip>
+            <Tooltip open={showChangeImageTooltip} onOpenChange={setShowChangeImageTooltip}>
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleChangeImage}
@@ -486,6 +505,7 @@ export function RegionMapPage() {
       <div className="fixed inset-x-0 bottom-0 top-8 w-full">
         {mapImagePath ? (
           <MapCanvas
+            key={mapImagePath}
             imagePath={mapImagePath}
             children={childrenRegions}
             markers={markers}
