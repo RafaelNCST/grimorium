@@ -1366,6 +1366,9 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Migrate book genres to new format (english lowercase)
     await migrateBookGenres(database);
+
+    // Migrate plot arc status and size values from Portuguese to English
+    await migratePlotArcValues(database);
   } catch (error) {
     console.error("[db] Error during migrations:", error);
     throw error;
@@ -1477,6 +1480,68 @@ async function migrateBookGenres(database: Database): Promise<void> {
     }
   } catch (error) {
     console.error("[db] Error during genre migration:", error);
+    // Don't throw - this is a non-critical migration
+  }
+}
+
+// Migration: Update plot arc status and size values from Portuguese to English
+async function migratePlotArcValues(database: Database): Promise<void> {
+  try {
+    console.log("[db] Starting plot arc values migration...");
+
+    // Check if plot_arcs table exists
+    const tables = await database.select<{ name: string }[]>(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='plot_arcs'"
+    );
+
+    if (tables.length === 0) {
+      console.log("[db] plot_arcs table does not exist, skipping...");
+      return;
+    }
+
+    // Get all plot arcs to check if migration is needed
+    const arcs = await database.select<{ id: string; status: string; size: string }[]>(
+      "SELECT id, status, size FROM plot_arcs"
+    );
+
+    if (arcs.length === 0) {
+      console.log("[db] No plot arcs found, skipping...");
+      return;
+    }
+
+    // Count how many need migration
+    const needsMigration = arcs.filter(
+      (arc) =>
+        arc.status === "finalizado" ||
+        arc.status === "atual" ||
+        arc.status === "planejamento" ||
+        arc.size === "pequeno" ||
+        arc.size === "médio" ||
+        arc.size === "grande"
+    );
+
+    if (needsMigration.length === 0) {
+      console.log("[db] All arcs already migrated, skipping...");
+      return;
+    }
+
+    console.log(`[db] Migrating ${needsMigration.length} arcs...`);
+
+    // Update status values
+    await database.execute("UPDATE plot_arcs SET status = 'finished' WHERE status = 'finalizado'");
+    await database.execute("UPDATE plot_arcs SET status = 'current' WHERE status = 'atual'");
+    await database.execute("UPDATE plot_arcs SET status = 'planning' WHERE status = 'planejamento'");
+    console.log("[db] Updated status values");
+
+    // Update size values
+    await database.execute("UPDATE plot_arcs SET size = 'small' WHERE size = 'pequeno'");
+    await database.execute("UPDATE plot_arcs SET size = 'medium' WHERE size = 'médio'");
+    await database.execute("UPDATE plot_arcs SET size = 'large' WHERE size = 'grande'");
+    console.log("[db] Updated size values");
+
+    console.log("[db] Plot arc migration completed successfully!");
+  } catch (error) {
+    console.error("[db] Error during plot arc migration:", error);
     // Don't throw - this is a non-critical migration
   }
 }
