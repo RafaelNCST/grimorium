@@ -17,6 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { PropsChecklistCard } from "../types/overview-types";
 
+const MAX_TASK_LENGTH = 200;
+
 export function ChecklistCard({
   checklistItems,
   isCustomizing,
@@ -94,30 +96,38 @@ export function ChecklistCard({
                   className="flex-shrink-0"
                 />
                 {editingItemId === item.id ? (
-                  <div className="flex-1 flex items-center gap-2">
-                    <Input
-                      value={editingText}
-                      onChange={(e) => setEditingText(e.target.value)}
-                      onKeyDown={(e) =>
-                        handleKeyDown(e, () => handleSaveEdit(item.id))
-                      }
-                      className="flex-1"
-                      autoFocus
-                    />
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleSaveEdit(item.id)}
-                    >
-                      {t("checklist.save")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleCancelEdit}
-                    >
-                      {t("checklist.cancel")}
-                    </Button>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onKeyDown={(e) =>
+                          handleKeyDown(e, () => handleSaveEdit(item.id))
+                        }
+                        autoFocus
+                        maxLength={MAX_TASK_LENGTH}
+                        className="flex-1"
+                      />
+                      <Button
+                        size="sm"
+                        variant="magical"
+                        onClick={() => handleSaveEdit(item.id)}
+                      >
+                        {t("checklist.save")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={handleCancelEdit}
+                      >
+                        {t("checklist.cancel")}
+                      </Button>
+                    </div>
+                    <div className="flex justify-end">
+                      <span className="text-xs text-muted-foreground">
+                        {editingText.length}/{MAX_TASK_LENGTH}
+                      </span>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -140,10 +150,10 @@ export function ChecklistCard({
                       </Button>
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="ghost-destructive"
                         onClick={() => onDeleteItem(item.id)}
                         disabled={isCustomizing}
-                        className="h-8 w-8 p-0 hover:text-destructive"
+                        className="h-8 w-8 p-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -155,21 +165,29 @@ export function ChecklistCard({
           </div>
         </ScrollArea>
 
-        <div className="flex gap-2">
-          <Input
-            placeholder={t("checklist.add_item_placeholder")}
-            value={newItemText}
-            onChange={(e) => setNewItemText(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, handleAddItem)}
-            disabled={isCustomizing}
-          />
-          <Button
-            variant="outline"
-            onClick={handleAddItem}
-            disabled={isCustomizing}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+        <div className="space-y-1">
+          <div className="flex gap-2">
+            <Input
+              placeholder={t("checklist.add_item_placeholder")}
+              value={newItemText}
+              onChange={(e) => setNewItemText(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, handleAddItem)}
+              disabled={isCustomizing}
+              maxLength={MAX_TASK_LENGTH}
+            />
+            <Button
+              variant="secondary"
+              onClick={handleAddItem}
+              disabled={isCustomizing || !newItemText.trim()}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex justify-end">
+            <span className="text-xs text-muted-foreground">
+              {newItemText.length}/{MAX_TASK_LENGTH}
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

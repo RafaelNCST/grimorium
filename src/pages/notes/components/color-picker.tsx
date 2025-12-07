@@ -1,6 +1,7 @@
 import { memo, useState, useRef, useEffect } from "react";
 
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Tooltip,
@@ -18,22 +19,22 @@ interface ColorPickerProps {
 
 const COLOR_OPTIONS: Array<{
   color: NoteColor;
-  label: string;
+  translationKey: string;
   hex: string;
 }> = [
-  { color: "sepia", label: "Amarelo", hex: "#FFF176" },
-  { color: "purple", label: "Roxo", hex: "#E879F9" },
-  { color: "green", label: "Verde", hex: "#6EE7B7" },
-  { color: "blue", label: "Azul", hex: "#60A5FA" },
-  { color: "red", label: "Rosa", hex: "#F9A8D4" },
-  { color: "gold", label: "Laranja", hex: "#FDBA74" },
-  { color: "cyan", label: "Ciano", hex: "#67E8F9" },
-  { color: "indigo", label: "Índigo", hex: "#C4B5FD" },
-  { color: "lime", label: "Lima", hex: "#BEF264" },
+  { color: "sepia", translationKey: "colors.sepia", hex: "#FFF176" },
+  { color: "purple", translationKey: "colors.purple", hex: "#E879F9" },
+  { color: "green", translationKey: "colors.green", hex: "#6EE7B7" },
+  { color: "blue", translationKey: "colors.blue", hex: "#60A5FA" },
+  { color: "red", translationKey: "colors.red", hex: "#F9A8D4" },
+  { color: "gold", translationKey: "colors.gold", hex: "#FDBA74" },
+  { color: "cyan", translationKey: "colors.cyan", hex: "#67E8F9" },
+  { color: "indigo", translationKey: "colors.indigo", hex: "#C4B5FD" },
+  { color: "lime", translationKey: "colors.lime", hex: "#BEF264" },
 ];
 
 interface ColorButtonProps {
-  option: { color: NoteColor; label: string; hex: string };
+  option: { color: NoteColor; translationKey: string; hex: string; label: string };
   isSelected: boolean;
   onClick: () => void;
   isSmall: boolean;
@@ -108,6 +109,7 @@ function ColorPickerComponent({
   onChange,
   size = "md",
 }: ColorPickerProps) {
+  const { t } = useTranslation("notes");
   const isSmall = size === "sm";
 
   return (
@@ -120,7 +122,7 @@ function ColorPickerComponent({
       {COLOR_OPTIONS.map((option) => (
         <ColorButton
           key={option.color}
-          option={option}
+          option={{ ...option, label: t(option.translationKey) }}
           isSelected={value === option.color}
           onClick={() => onChange(option.color)}
           isSmall={isSmall}

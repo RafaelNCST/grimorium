@@ -250,6 +250,7 @@ export function StickyNote({
               </span>
               <div className="flex gap-1">
                 <Button
+                  variant="magical"
                   size="sm"
                   className="text-xs h-6"
                   onClick={(e) => {
@@ -260,7 +261,7 @@ export function StickyNote({
                   {t("notes_board.save")}
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   className="text-xs h-6"
                   onClick={(e) => {

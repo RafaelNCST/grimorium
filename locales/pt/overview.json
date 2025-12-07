@@ -73,5 +73,13 @@
     "add_item_placeholder": "Adicionar nova tarefa",
     "save": "Salvar",
     "cancel": "Cancelar"
+  },
+  "colors": {
+    "yellow": "Amarelo",
+    "pink": "Rosa",
+    "green": "Verde",
+    "blue": "Azul",
+    "purple": "Roxo",
+    "orange": "Laranja"
   }
 }

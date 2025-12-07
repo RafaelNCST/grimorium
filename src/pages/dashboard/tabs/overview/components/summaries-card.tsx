@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Edit2, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { DisplayTextarea } from "@/components/displays";
+import { FormTextarea } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+
+const MAX_SUMMARY_LENGTH = 1000;
 
 interface SummariesCardProps {
   authorSummary: string;
@@ -45,23 +48,28 @@ function SummaryItem({
 }: SummaryItemProps) {
   return (
     <div className="space-y-2">
-      <div>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
       {isEditing ? (
-        <Textarea
+        <FormTextarea
+          label={title}
           value={summary}
           onChange={(e) => onSummaryChange(e.target.value)}
-          className="min-h-[80px] text-xs"
+          className="min-h-[120px] text-xs resize-none"
           placeholder={placeholder}
+          maxLength={MAX_SUMMARY_LENGTH}
+          showCharCount
+          showOptionalLabel={false}
+          labelClassName="text-sm font-semibold"
+          containerClassName="space-y-2"
+          rows={5}
         />
       ) : (
-        <p className="text-xs text-foreground leading-relaxed select-text">
-          {summary || (
-            <span className="text-muted-foreground italic">{emptyMessage}</span>
-          )}
-        </p>
+        <>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+            <p className="text-xs text-muted-foreground">{description}</p>
+          </div>
+          <DisplayTextarea value={summary || null} className="text-xs" />
+        </>
       )}
     </div>
   );
@@ -254,28 +262,6 @@ export function SummariesCard({
             )}
           </div>
         </div>
-
-        {/* Save/Cancel buttons when editing */}
-        {isEditingSummaries && !isCustomizing && (
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="accent"
-              size="sm"
-              className="h-7 text-xs"
-              onClick={onSaveSummaries}
-            >
-              {t("author_summary.save")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => onEditingSummariesChange(false)}
-            >
-              {t("author_summary.cancel")}
-            </Button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

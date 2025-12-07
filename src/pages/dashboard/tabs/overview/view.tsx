@@ -2,6 +2,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { StickyNote as StickyNoteIcon, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormTextarea } from "@/components/forms";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
 
 import { ChecklistCard } from "./components/checklist-card";
 import { ColorPicker } from "./components/color-picker";
@@ -188,32 +188,27 @@ export function OverviewView(props: PropsOverviewView) {
               disabled={isCustomizing}
             />
           </div>
-          <div className="space-y-1">
-            <div className="flex gap-2">
-              <Textarea
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <FormTextarea
                 placeholder={t("notes_board.add_note_placeholder")}
                 value={newNote}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value.length <= MAX_NOTE_CHARACTER_LIMIT) {
-                    onNewNoteChange(value);
-                  }
-                }}
-                className="min-h-[60px]"
+                onChange={(e) => onNewNoteChange(e.target.value)}
+                className="min-h-[100px] resize-none"
                 disabled={isCustomizing}
                 maxLength={MAX_NOTE_CHARACTER_LIMIT}
+                showCharCount
+                showOptionalLabel={false}
+                rows={4}
               />
-              <Button
-                variant="outline"
-                onClick={onAddNote}
-                disabled={isCustomizing || !newNote.trim()}
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
             </div>
-            <span className="text-xs text-muted-foreground">
-              {newNote.length}/{MAX_NOTE_CHARACTER_LIMIT}
-            </span>
+            <Button
+              variant="secondary"
+              onClick={onAddNote}
+              disabled={isCustomizing || !newNote.trim()}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </CardContent>

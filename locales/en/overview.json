@@ -73,5 +73,13 @@
     "add_item_placeholder": "Add new task...",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "colors": {
+    "yellow": "Yellow",
+    "pink": "Pink",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "orange": "Orange"
   }
 }
