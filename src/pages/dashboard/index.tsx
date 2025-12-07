@@ -12,7 +12,11 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { deleteBook as deleteBookDB } from "@/lib/db/books.service";
+import {
+  deleteBook as deleteBookDB,
+  getTabsConfig,
+  updateTabsConfig,
+} from "@/lib/db/books.service";
 import { useBookStore, Book as BookType } from "@/stores/book-store";
 import { useDashboardStore } from "@/stores/dashboard-store";
 
@@ -83,6 +87,36 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       setDraftBook(book);
     }
   }, [book, setCurrentBook]);
+
+  // Load tabs configuration from database when book opens
+  useEffect(() => {
+    const loadTabsConfig = async () => {
+      try {
+        const dbTabs = await getTabsConfig(bookId);
+        if (dbTabs.length > 0) {
+          // Merge with DEFAULT_TABS_CONSTANT to ensure we have icons
+          const mergedTabs = DEFAULT_TABS_CONSTANT.map((defaultTab) => {
+            const dbTab = dbTabs.find((t) => t.id === defaultTab.id);
+            return dbTab
+              ? { ...defaultTab, visible: dbTab.visible }
+              : defaultTab;
+          });
+          setTabs(mergedTabs);
+          updateTabs(mergedTabs);
+        } else {
+          // No saved config, use defaults
+          setTabs(DEFAULT_TABS_CONSTANT);
+          updateTabs(DEFAULT_TABS_CONSTANT);
+        }
+      } catch (error) {
+        console.error("Error loading tabs config:", error);
+        setTabs(DEFAULT_TABS_CONSTANT);
+        updateTabs(DEFAULT_TABS_CONSTANT);
+      }
+    };
+
+    loadTabsConfig();
+  }, [bookId, updateTabs]);
 
   useEffect(() => {
     if (storeTabs.length === 0) {
@@ -304,12 +338,22 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
 
         setTabs(newTabs);
         updateTabs(newTabs);
+
+        // Save to database
+        const tabsForDB = newTabs.map(({ id, label, visible }) => ({
+          id,
+          label,
+          visible,
+        }));
+        updateTabsConfig(bookId, tabsForDB).catch((error) =>
+          console.error("Error saving tabs config:", error)
+        );
       }
 
       setDraggedTabId(null);
       setPreviewTabs([]);
     },
-    [tabs, updateTabs, draggedTabId]
+    [tabs, updateTabs, draggedTabId, bookId]
   );
 
   const handleToggleVisibility = useCallback(
@@ -319,8 +363,18 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       );
       setTabs(updatedTabs);
       toggleTabVisibility(tabId);
+
+      // Save to database
+      const tabsForDB = updatedTabs.map(({ id, label, visible }) => ({
+        id,
+        label,
+        visible,
+      }));
+      updateTabsConfig(bookId, tabsForDB).catch((error) =>
+        console.error("Error saving tabs config:", error)
+      );
     },
-    [tabs, toggleTabVisibility]
+    [tabs, toggleTabVisibility, bookId]
   );
 
   const handleSave = useCallback(() => {

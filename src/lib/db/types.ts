@@ -33,6 +33,9 @@ export interface DBBook {
   sticky_notes?: string; // JSON array of IStickyNote
   checklist_items?: string; // JSON array of IChecklistItem
   sections_config?: string; // JSON array of section visibility/order
+
+  // Dashboard customization
+  tabs_config?: string; // JSON array of tab visibility/order
 }
 
 export interface DBCharacter {

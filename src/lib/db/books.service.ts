@@ -35,6 +35,7 @@ function bookToDBBook(book: Book): DBBook {
     sticky_notes: undefined,
     checklist_items: undefined,
     sections_config: undefined,
+    tabs_config: undefined,
   };
 }
 
@@ -114,10 +115,10 @@ export async function createBook(book: Book): Promise<void> {
         status, word_count_goal, current_word_count, author_summary, story_summary,
         current_arc, chapters, created_at, updated_at, last_opened_at,
         words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
-        completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
+        completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config, tabs_config
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-        $18, $19, $20, $21, $22, $23, $24, $25, $26
+        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
       )`,
       [
         dbBook.id,
@@ -146,6 +147,7 @@ export async function createBook(book: Book): Promise<void> {
         dbBook.sticky_notes,
         dbBook.checklist_items,
         dbBook.sections_config,
+        dbBook.tabs_config,
       ]
     );
 
@@ -402,4 +404,42 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
   }
 
   return overviewData;
+}
+
+// Tabs configuration
+export interface TabConfig {
+  id: string;
+  label: string;
+  visible: boolean;
+}
+
+export async function getTabsConfig(bookId: string): Promise<TabConfig[]> {
+  const db = await getDB();
+  const result = await db.select<DBBook[]>(
+    `SELECT tabs_config FROM books WHERE id = $1`,
+    [bookId]
+  );
+
+  if (result.length === 0 || !result[0].tabs_config) {
+    return []; // Return empty array, dashboard will use defaults
+  }
+
+  try {
+    return JSON.parse(result[0].tabs_config);
+  } catch (e) {
+    console.error("Error parsing tabs config:", e);
+    return [];
+  }
+}
+
+export async function updateTabsConfig(
+  bookId: string,
+  tabs: TabConfig[]
+): Promise<void> {
+  const db = await getDB();
+  const now = Date.now();
+  await db.execute(
+    "UPDATE books SET tabs_config = $1, updated_at = $2 WHERE id = $3",
+    [JSON.stringify(tabs), now, bookId]
+  );
 }

@@ -1311,6 +1311,14 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add tabs_config column to books table for dashboard customization
+    try {
+      await database.execute("ALTER TABLE books ADD COLUMN tabs_config TEXT");
+      console.log("[db] Added tabs_config column to books table");
+    } catch (error) {
+      // Column already exists - safe to ignore
+    }
+
     // Add book_id column to notes table
     try {
       // Check if column already exists

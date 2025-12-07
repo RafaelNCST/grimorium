@@ -19,23 +19,13 @@ export function SortableSection({
   }
 
   return (
-    <div
-      className={`relative transition-all duration-200 w-full ${
-        !section.visible
-          ? "opacity-50 border-2 border-dashed border-muted-foreground/30 rounded-lg"
-          : ""
-      } ${
-        isCustomizing
-          ? "hover:shadow-lg hover:border hover:border-primary/30 rounded-lg"
-          : ""
-      }`}
-    >
+    <div className="relative w-full">
       {isCustomizing && (
-        <div className="absolute -top-2 -right-2 z-10 flex gap-1">
+        <div className="absolute top-2 right-2 z-20 flex gap-1">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
+            className="h-8 w-8 p-0"
             disabled={isFirst}
             onClick={(e) => {
               e.stopPropagation();
@@ -45,9 +35,9 @@ export function SortableSection({
             <ArrowUp className="w-4 h-4" />
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
+            className="h-8 w-8 p-0"
             disabled={isLast}
             onClick={(e) => {
               e.stopPropagation();
@@ -57,9 +47,9 @@ export function SortableSection({
             <ArrowDown className="w-4 h-4" />
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 bg-background/90 backdrop-blur-sm"
+            className="h-8 w-8 p-0"
             onClick={(e) => {
               e.stopPropagation();
               onToggleVisibility(section.id);
@@ -73,7 +63,19 @@ export function SortableSection({
           </Button>
         </div>
       )}
-      {children}
+      <div
+        className={`transition-all duration-200 ${
+          !section.visible
+            ? "opacity-50 border-2 border-dashed border-muted-foreground/30 rounded-lg"
+            : ""
+        } ${
+          isCustomizing
+            ? "rounded-lg pt-12"
+            : ""
+        }`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
