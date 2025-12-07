@@ -45,10 +45,10 @@ export function SortableTab({
           isDragging && transform
             ? `translate3d(${transform.x}px, 0, 0)`
             : undefined,
-        opacity: isDragging ? 0.7 : 1,
+        opacity: isDragging ? 0.7 : !tab.visible ? 0.4 : 1,
         transition: isDragging
           ? "none"
-          : "transform 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+          : "transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms",
         zIndex: isDragging ? 50 : "auto",
       }
     : undefined;
@@ -59,11 +59,11 @@ export function SortableTab({
         ref={setNodeRef}
         style={style}
         data-tab-id={tab.id}
-        className={`relative flex items-center gap-2 px-4 py-2 bg-muted border border-border rounded-md flex-1 min-w-0 ${
-          tab.isDefault ? "opacity-75" : ""
-        } ${!tab.visible ? "opacity-50" : ""} ${
-          isDragging ? "cursor-grabbing shadow-lg" : ""
-        }`}
+        className={`relative flex items-center gap-2 px-4 py-2 bg-muted border rounded-md flex-1 min-w-0 ${
+          !tab.visible
+            ? "border-dashed border-muted-foreground/30"
+            : "border-border"
+        } ${isDragging ? "cursor-grabbing shadow-lg" : ""}`}
       >
         {!tab.isDefault && (
           <div
