@@ -1369,6 +1369,9 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Migrate plot arc status and size values from Portuguese to English
     await migratePlotArcValues(database);
+
+    // Migrate race domain values from Portuguese to English
+    await migrateRaceDomainValues(database);
   } catch (error) {
     console.error("[db] Error during migrations:", error);
     throw error;
@@ -1542,6 +1545,98 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     console.log("[db] Plot arc migration completed successfully!");
   } catch (error) {
     console.error("[db] Error during plot arc migration:", error);
+    // Don't throw - this is a non-critical migration
+  }
+}
+
+// Migration: Update race domain values from Portuguese to English
+async function migrateRaceDomainValues(database: Database): Promise<void> {
+  try {
+    console.log("[db] Starting race domain values migration...");
+
+    // Check if races table exists
+    const tables = await database.select<{ name: string }[]>(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='races'"
+    );
+
+    if (tables.length === 0) {
+      console.log("[db] races table does not exist, skipping...");
+      return;
+    }
+
+    // Get all races
+    const races = await database.select<{ id: string; domain: string }[]>(
+      "SELECT id, domain FROM races WHERE domain IS NOT NULL"
+    );
+
+    if (races.length === 0) {
+      console.log("[db] No races found, skipping...");
+      return;
+    }
+
+    // Domain mapping from Portuguese to English
+    const domainMapping: Record<string, string> = {
+      "Aquático": "aquatic",
+      "Terrestre": "terrestrial",
+      "Aéreo": "aerial",
+      "Subterrâneo": "underground",
+      "Elevado": "elevated",
+      "Dimensional": "dimensional",
+      "Espiritual": "spiritual",
+      "Cósmico": "cosmic"
+    };
+
+    let migratedCount = 0;
+
+    for (const race of races) {
+      try {
+        // Parse the domain JSON array
+        const domains: string[] = JSON.parse(race.domain);
+        let needsMigration = false;
+        const newDomains: string[] = [];
+
+        for (const domain of domains) {
+          const mappedDomain = domainMapping[domain];
+
+          if (mappedDomain) {
+            // Domain needs migration
+            if (mappedDomain !== domain) {
+              needsMigration = true;
+            }
+            newDomains.push(mappedDomain);
+          } else {
+            // Already in English or unknown, keep as-is
+            newDomains.push(domain);
+          }
+        }
+
+        if (needsMigration) {
+          await database.execute(
+            "UPDATE races SET domain = $1 WHERE id = $2",
+            [JSON.stringify(newDomains), race.id]
+          );
+          migratedCount++;
+          console.log(
+            `[db] Migrated domains for race ${race.id}: ${domains.join(", ")} -> ${newDomains.join(", ")}`
+          );
+        }
+      } catch (parseError) {
+        console.warn(
+          `[db] Could not parse domain for race ${race.id}:`,
+          parseError
+        );
+      }
+    }
+
+    if (migratedCount > 0) {
+      console.log(
+        `[db] Race domain migration completed. Migrated ${migratedCount} races.`
+      );
+    } else {
+      console.log("[db] No races needed domain migration.");
+    }
+  } catch (error) {
+    console.error("[db] Error during race domain migration:", error);
     // Don't throw - this is a non-critical migration
   }
 }
