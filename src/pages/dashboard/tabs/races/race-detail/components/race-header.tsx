@@ -1,4 +1,5 @@
 import { Edit, Save, X, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,8 @@ export function RaceHeader({
   onDeleteModalOpen,
   onEditFormChange,
 }: PropsRaceHeader) {
+  const { t } = useTranslation(["common"]);
+
   return (
     <div className="flex items-start justify-between">
       <div className="flex-1">
@@ -91,22 +94,22 @@ export function RaceHeader({
           <>
             <Button onClick={onSave} size="sm">
               <Save className="mr-2 h-4 w-4" />
-              Salvar
+              {t("common:actions.save")}
             </Button>
             <Button onClick={onCancel} variant="outline" size="sm">
               <X className="mr-2 h-4 w-4" />
-              Cancelar
+              {t("common:actions.cancel")}
             </Button>
           </>
         ) : (
           <>
             <Button onClick={onEdit} variant="outline" size="sm">
               <Edit className="mr-2 h-4 w-4" />
-              Editar
+              {t("common:actions.edit")}
             </Button>
             <Button onClick={onDeleteModalOpen} variant="destructive" size="sm">
               <Trash2 className="mr-2 h-4 w-4" />
-              Excluir
+              {t("common:actions.delete")}
             </Button>
           </>
         )}

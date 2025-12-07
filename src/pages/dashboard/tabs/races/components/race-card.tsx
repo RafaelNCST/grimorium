@@ -84,7 +84,7 @@ export function RaceCard({
           <div className="flex flex-wrap gap-1.5">
             {race.domain.map((domainValue) => {
               const { icon: DomainIcon, colorConfig } =
-                getDomainDisplayData(domainValue);
+                getDomainDisplayData(domainValue, t);
 
               if (!DomainIcon || !colorConfig) return null;
 

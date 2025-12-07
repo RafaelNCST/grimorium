@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { CommunicationPicker } from "@/components/modals/create-race-modal/components/communication-picker";
-import { RACE_COMMUNICATIONS } from "@/components/modals/create-race-modal/constants/communications";
+import { getRaceCommunications } from "@/components/modals/create-race-modal/constants/communications";
 import { Badge } from "@/components/ui/badge";
 
 interface CommunicationDisplayProps {
@@ -44,7 +44,7 @@ export function CommunicationDisplay({
   return (
     <div className="flex flex-wrap gap-2">
       {communications.map((value) => {
-        const comm = RACE_COMMUNICATIONS.find((c) => c.value === value);
+        const comm = getRaceCommunications(t).find((c) => c.value === value);
         if (!comm) return null;
         const Icon = comm.icon;
         return (

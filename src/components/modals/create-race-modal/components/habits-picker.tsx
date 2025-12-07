@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 
-import { HABITS_OPTIONS } from "../constants/habits";
+import { getRaceHabits } from "../constants/habits";
 
 interface PropsHabitsPicker {
   value: string;
@@ -16,13 +16,14 @@ export function HabitsPicker({
   hideLabel,
 }: PropsHabitsPicker) {
   const { t } = useTranslation("create-race");
+  const habitsOptions = getRaceHabits(t);
 
   return (
     <FormSelectGrid
       value={value}
       onChange={onChange}
       label={hideLabel ? "" : t("modal.habits")}
-      options={HABITS_OPTIONS}
+      options={habitsOptions}
       columns={4}
     />
   );

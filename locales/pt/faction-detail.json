@@ -34,7 +34,8 @@
     "timeline": "Linha do Tempo da Facção",
     "diplomacy": "Diplomacia",
     "hierarchy": "Hierarquia",
-    "territory": "Território"
+    "territory": "Território",
+    "chapter_metrics": "Métricas de Capítulo"
   },
   "fields": {
     "image": "Imagem",

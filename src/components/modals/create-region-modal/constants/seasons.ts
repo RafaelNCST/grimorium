@@ -15,35 +15,39 @@ export interface SeasonOption {
   requiresCustomName?: boolean;
 }
 
+/**
+ * Region seasons constant with translation keys
+ * Use with i18n: t('region-detail:seasons.spring'), etc.
+ */
 export const REGION_SEASONS: SeasonOption[] = [
   {
     value: "spring",
-    label: "Primavera",
-    description: "Estação do renascimento",
+    label: "region-detail:seasons.spring",
+    description: "region-detail:seasons.spring_description",
     icon: Leaf,
   },
   {
     value: "summer",
-    label: "Verão",
-    description: "Estação do calor",
+    label: "region-detail:seasons.summer",
+    description: "region-detail:seasons.summer_description",
     icon: Sun,
   },
   {
     value: "autumn",
-    label: "Outono",
-    description: "Estação da colheita",
+    label: "region-detail:seasons.autumn",
+    description: "region-detail:seasons.autumn_description",
     icon: Wind,
   },
   {
     value: "winter",
-    label: "Inverno",
-    description: "Estação do frio",
+    label: "region-detail:seasons.winter",
+    description: "region-detail:seasons.winter_description",
     icon: Snowflake,
   },
   {
     value: "custom",
-    label: "Outra",
-    description: "Estação personalizada",
+    label: "region-detail:seasons.custom",
+    description: "region-detail:seasons.custom_description",
     icon: Sparkles,
     requiresCustomName: true,
   },

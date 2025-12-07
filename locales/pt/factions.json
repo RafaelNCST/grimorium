@@ -1,4 +1,5 @@
 {
+  "tab_title": "Facções",
   "page": {
     "title": "Facções",
     "description": "Gerencie as facções, reinos, seitas e grupos do seu mundo",
@@ -11,5 +12,18 @@
     "no_factions_description": "Comece criando a primeira facção do seu mundo para gerenciar reinos, seitas e grupos.",
     "no_factions_found": "Nenhuma facção encontrada",
     "no_factions_found_description": "Tente ajustar seus filtros para encontrar facções."
+  },
+  "alignment": {
+    "good": "Bem",
+    "chaotic": "Caótico",
+    "neutral": "Neutro"
+  },
+  "influence": {
+    "nonexistent": "Inexistente",
+    "low": "Baixa",
+    "medium": "Média",
+    "high": "Alta",
+    "superior": "Superior",
+    "dominant": "Dominante"
   }
 }

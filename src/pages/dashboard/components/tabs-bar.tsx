@@ -59,11 +59,11 @@ export function TabsBar({
         <div className={`px-6 mb-4 ${isHeaderHidden ? "pt-2" : "pt-10"}`}>
           <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
             <Palette className="w-5 h-5" />
-            Personalizar Abas
+            {t("customize.customize_tabs")}
           </h3>
           <p className="text-sm text-muted-foreground">
             {t("instructions.drag_to_reorder")}
-            &quot;Visão Geral&quot; não pode ser movida ou ocultada.
+            &quot;{t("tabs.overview")}&quot; {t("customize.overview_note")}
           </p>
         </div>
         <div className="pb-3 px-6">

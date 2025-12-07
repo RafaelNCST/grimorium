@@ -1,0 +1,32 @@
+{
+  "page": {
+    "title": "Capítulos",
+    "description": "Gerencie os capítulos do seu livro",
+    "new_chapter": "Novo Capítulo",
+    "total_badge": "Total",
+    "search_placeholder": "Buscar capítulos...",
+    "goals_button": "Metas",
+    "warnings_button": "Gerenciar Avisos",
+    "back": "Voltar"
+  },
+  "status": {
+    "draft": "Rascunho",
+    "in_progress": "Em andamento",
+    "review": "Em revisão",
+    "finished": "Finalizado",
+    "published": "Lançado"
+  },
+  "empty_state": {
+    "no_chapters": "Nenhum capítulo criado",
+    "no_chapters_description": "Comece criando seu primeiro capítulo para começar a escrever sua história.",
+    "no_chapters_found": "Nenhum capítulo encontrado",
+    "no_chapters_found_description": "Tente ajustar sua busca para encontrar capítulos."
+  },
+  "delete": {
+    "title": "Excluir Capítulo",
+    "description": "Tem certeza que deseja excluir este capítulo? Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  },
+  "loading": "Carregando capítulos..."
+}

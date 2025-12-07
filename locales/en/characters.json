@@ -1,4 +1,5 @@
 {
+  "tab_title": "Characters",
   "page": {
     "title": "Characters",
     "description": "Manage your story's characters",
@@ -18,5 +19,58 @@
     "no_results_description": "Try adjusting your search or create a new character",
     "no_role_characters": "No {{role}} characters",
     "no_role_characters_description": "You haven't created characters with this role yet"
+  },
+  "alignments": {
+    "good": "Good",
+    "neutral": "Neutral",
+    "chaotic": "Chaotic"
+  },
+  "relationship_types": {
+    "friend": "Friend",
+    "rival": "Rival",
+    "mentor": "Mentor",
+    "apprentice": "Apprentice",
+    "enemy": "Enemy",
+    "love_interest": "Love Interest",
+    "ally": "Ally",
+    "acquaintance": "Acquaintance",
+    "leader": "Leader",
+    "subordinate": "Subordinate",
+    "family_love": "Family Love",
+    "romantic_relationship": "Romantic Relationship",
+    "best_friend": "Best Friend",
+    "hatred": "Hatred",
+    "neutral": "Neutral",
+    "devotion": "Devotion"
+  },
+  "family_relations": {
+    "father": "Father",
+    "mother": "Mother",
+    "spouse": "Spouse",
+    "child": "Child",
+    "sibling": "Sibling",
+    "half_sibling": "Half-sibling",
+    "uncle_aunt": "Uncle/Aunt",
+    "cousin": "Cousin",
+    "grandparent": "Grandparent"
+  },
+  "family_relation_labels": {
+    "father_of": "Father of {{name}}",
+    "mother_of": "Mother of {{name}}",
+    "spouse_of": "Spouse of {{name}}",
+    "child_of": "Child of {{name}}",
+    "sibling_of": "Sibling of {{name}}",
+    "half_sibling_of": "Half-sibling of {{name}}",
+    "uncle_aunt_of": "Uncle/Aunt of {{name}}",
+    "cousin_of": "Cousin of {{name}}",
+    "grandparent_of": "Grandparent of {{name}}"
+  },
+  "roles": {
+    "protagonist": "Protagonist",
+    "co_protagonist": "Co-protagonist",
+    "antagonist": "Antagonist",
+    "villain": "Villain",
+    "secondary": "Secondary",
+    "extra": "Extra"
   }
 }

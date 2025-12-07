@@ -6,6 +6,7 @@ import {
   Sword,
   LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 
@@ -26,12 +27,13 @@ export interface RacePhysicalCapacityOption {
   borderColor: string;
 }
 
-export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
+export const getRacePhysicalCapacities = (
+  t: TFunction
+): RacePhysicalCapacityOption[] => [
   {
     value: "powerless",
-    label: "Impotente",
-    description:
-      "Um membro médio seria facilmente derrotado por um humano comum",
+    label: t("races:physical_capacities.powerless.label"),
+    description: t("races:physical_capacities.powerless.description"),
     icon: BanIcon,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950",
@@ -39,8 +41,8 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
   },
   {
     value: "weaker",
-    label: "Mais fraco",
-    description: "Um membro médio é mais fraco que um humano comum",
+    label: t("races:physical_capacities.weaker.label"),
+    description: t("races:physical_capacities.weaker.description"),
     icon: TrendingDown,
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950",
@@ -48,8 +50,8 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
   },
   {
     value: "comparable",
-    label: "Comparável",
-    description: "Um membro médio tem força similar a um humano comum",
+    label: t("races:physical_capacities.comparable.label"),
+    description: t("races:physical_capacities.comparable.description"),
     icon: Equal,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -57,8 +59,8 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
   },
   {
     value: "stronger",
-    label: "Mais forte",
-    description: "Um membro médio é mais forte que um humano comum",
+    label: t("races:physical_capacities.stronger.label"),
+    description: t("races:physical_capacities.stronger.description"),
     icon: TrendingUp,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-950",
@@ -66,8 +68,8 @@ export const RACE_PHYSICAL_CAPACITIES: RacePhysicalCapacityOption[] = [
   },
   {
     value: "invincible",
-    label: "Invencível",
-    description: "Um membro médio poderia facilmente eliminar um humano comum",
+    label: t("races:physical_capacities.invincible.label"),
+    description: t("races:physical_capacities.invincible.description"),
     icon: Sword,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -98,8 +100,10 @@ const convertBorderToTailwindAlpha = (borderColor: string): string => {
   return "gray-500/30";
 };
 
-export const PHYSICAL_CAPACITY_OPTIONS: GridSelectOption<RacePhysicalCapacity>[] =
-  RACE_PHYSICAL_CAPACITIES.map((capacity) => ({
+export const getPhysicalCapacityOptions = (
+  t: TFunction
+): GridSelectOption<RacePhysicalCapacity>[] =>
+  getRacePhysicalCapacities(t).map((capacity) => ({
     value: capacity.value,
     label: capacity.label,
     description: capacity.description,

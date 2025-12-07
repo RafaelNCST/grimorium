@@ -53,5 +53,8 @@
     "cancel": "Cancel",
     "create": "Create",
     "save": "Save"
+  },
+  "synopsis": {
+    "no_synopsis": "No synopsis yet. Edit the header to add one."
   }
 }

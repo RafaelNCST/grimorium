@@ -5,7 +5,7 @@ import {
   SimpleGridSelectOption,
 } from "@/components/forms/FormSimpleGrid";
 
-import { RACE_DOMAINS, RaceDomain } from "../constants/domains";
+import { getRaceDomains, RaceDomain } from "../constants/domains";
 
 interface PropsDomainPicker {
   value: string[];
@@ -50,29 +50,6 @@ const colorMap: Record<string, { bg: string; border: string }> = {
   },
 };
 
-// Map para converter entre português (DomainType - usado no DB) e inglês (RaceDomain - usado no picker)
-const domainPtToEn: Record<string, RaceDomain> = {
-  Aquático: "aquatic",
-  Terrestre: "terrestrial",
-  Aéreo: "aerial",
-  Subterrâneo: "underground",
-  Elevado: "elevated",
-  Dimensional: "dimensional",
-  Espiritual: "spiritual",
-  Cósmico: "cosmic",
-};
-
-const domainEnToPt: Record<RaceDomain, string> = {
-  aquatic: "Aquático",
-  terrestrial: "Terrestre",
-  aerial: "Aéreo",
-  underground: "Subterrâneo",
-  elevated: "Elevado",
-  dimensional: "Dimensional",
-  spiritual: "Espiritual",
-  cosmic: "Cósmico",
-};
-
 export function DomainPicker({
   value,
   onChange,
@@ -81,11 +58,14 @@ export function DomainPicker({
 }: PropsDomainPicker) {
   const { t } = useTranslation("create-race");
 
-  // Converter valores do DB (português) para o picker (inglês)
-  const pickerValue = value.map((v) => domainPtToEn[v] || v) as RaceDomain[];
+  // Value is already in English (RaceDomain) - no need for conversion
+  const pickerValue = value as RaceDomain[];
 
-  // Converter RACE_DOMAINS para o formato SimpleGridSelectOption
-  const options: SimpleGridSelectOption<RaceDomain>[] = RACE_DOMAINS.map(
+  // Get race domains with translations
+  const raceDomains = getRaceDomains(t);
+
+  // Converter getRaceDomains para o formato SimpleGridSelectOption
+  const options: SimpleGridSelectOption<RaceDomain>[] = raceDomains.map(
     (domain) => {
       const colors = colorMap[domain.color] || {
         bg: "gray-500/10",
@@ -101,16 +81,10 @@ export function DomainPicker({
     }
   );
 
-  // Converter valores do picker (inglês) de volta para o DB (português)
-  const handleChange = (newValue: RaceDomain[]) => {
-    const dbValue = newValue.map((v) => domainEnToPt[v] || v);
-    onChange(dbValue);
-  };
-
   return (
     <FormSimpleGrid
       value={pickerValue}
-      onChange={handleChange}
+      onChange={onChange}
       options={options}
       label={hideLabel ? "" : t("modal.domain")}
       required

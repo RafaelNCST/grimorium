@@ -1,10 +1,12 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enChapterCard from "../../locales/en/chapter-card.json";
 import enChapterEditor from "../../locales/en/chapter-editor.json";
 import enChapterMetrics from "../../locales/en/chapter-metrics.json";
 import enCharacterDetail from "../../locales/en/character-detail.json";
 import enCharacters from "../../locales/en/characters.json";
+import enChapters from "../../locales/en/chapters.json";
 import enCommon from "../../locales/en/common.json";
 import enCreateBook from "../../locales/en/create-book.json";
 import enCreateChapter from "../../locales/en/create-chapter.json";
@@ -13,10 +15,14 @@ import enCreateFaction from "../../locales/en/create-faction.json";
 import enCreateItem from "../../locales/en/create-item.json";
 import enCreatePlotArc from "../../locales/en/create-plot-arc.json";
 import enCreateRace from "../../locales/en/create-race.json";
+import enDialogs from "../../locales/en/dialogs.json";
 import enEmptyStates from "../../locales/en/empty-states.json";
+import enErrors from "../../locales/en/errors.json";
+import enExportPreview from "../../locales/en/export-preview.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
 import enFactions from "../../locales/en/factions.json";
 import enForms from "../../locales/en/forms.json";
+import enGlobalGoals from "../../locales/en/global-goals.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
@@ -31,11 +37,15 @@ import enRaceDetail from "../../locales/en/race-detail.json";
 import enRaces from "../../locales/en/races.json";
 import enRegionDetail from "../../locales/en/region-detail.json";
 import enSettings from "../../locales/en/settings.json";
+import enTooltips from "../../locales/en/tooltips.json";
+import enWarningsSettings from "../../locales/en/warnings-settings.json";
 import enWorld from "../../locales/en/world.json";
+import ptChapterCard from "../../locales/pt/chapter-card.json";
 import ptChapterEditor from "../../locales/pt/chapter-editor.json";
 import ptChapterMetrics from "../../locales/pt/chapter-metrics.json";
 import ptCharacterDetail from "../../locales/pt/character-detail.json";
 import ptCharacters from "../../locales/pt/characters.json";
+import ptChapters from "../../locales/pt/chapters.json";
 import ptCommon from "../../locales/pt/common.json";
 import ptCreateBook from "../../locales/pt/create-book.json";
 import ptCreateChapter from "../../locales/pt/create-chapter.json";
@@ -44,10 +54,14 @@ import ptCreateFaction from "../../locales/pt/create-faction.json";
 import ptCreateItem from "../../locales/pt/create-item.json";
 import ptCreatePlotArc from "../../locales/pt/create-plot-arc.json";
 import ptCreateRace from "../../locales/pt/create-race.json";
+import ptDialogs from "../../locales/pt/dialogs.json";
 import ptEmptyStates from "../../locales/pt/empty-states.json";
+import ptErrors from "../../locales/pt/errors.json";
+import ptExportPreview from "../../locales/pt/export-preview.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
 import ptFactions from "../../locales/pt/factions.json";
 import ptForms from "../../locales/pt/forms.json";
+import ptGlobalGoals from "../../locales/pt/global-goals.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
@@ -62,6 +76,8 @@ import ptRaceDetail from "../../locales/pt/race-detail.json";
 import ptRaces from "../../locales/pt/races.json";
 import ptRegionDetail from "../../locales/pt/region-detail.json";
 import ptSettings from "../../locales/pt/settings.json";
+import ptTooltips from "../../locales/pt/tooltips.json";
+import ptWarningsSettings from "../../locales/pt/warnings-settings.json";
 import ptWorld from "../../locales/pt/world.json";
 
 const resources = {
@@ -70,6 +86,8 @@ const resources = {
     home: enHome,
     inbox: enInbox,
     characters: enCharacters,
+    chapters: enChapters,
+    "chapter-card": enChapterCard,
     "character-detail": enCharacterDetail,
     "chapter-editor": enChapterEditor,
     "chapter-metrics": enChapterMetrics,
@@ -80,10 +98,14 @@ const resources = {
     "create-item": enCreateItem,
     "create-plot-arc": enCreatePlotArc,
     "create-race": enCreateRace,
+    dialogs: enDialogs,
     "empty-states": enEmptyStates,
+    errors: enErrors,
+    "export-preview": enExportPreview,
     "faction-detail": enFactionDetail,
     factions: enFactions,
     forms: enForms,
+    "global-goals": enGlobalGoals,
     "item-detail": enItemDetail,
     items: enItems,
     loading: enLoading,
@@ -96,6 +118,8 @@ const resources = {
     races: enRaces,
     "region-detail": enRegionDetail,
     settings: enSettings,
+    tooltips: enTooltips,
+    "warnings-settings": enWarningsSettings,
     world: enWorld,
   },
   pt: {
@@ -103,6 +127,8 @@ const resources = {
     home: ptHome,
     inbox: ptInbox,
     characters: ptCharacters,
+    chapters: ptChapters,
+    "chapter-card": ptChapterCard,
     "character-detail": ptCharacterDetail,
     "chapter-editor": ptChapterEditor,
     "chapter-metrics": ptChapterMetrics,
@@ -113,10 +139,14 @@ const resources = {
     "create-item": ptCreateItem,
     "create-plot-arc": ptCreatePlotArc,
     "create-race": ptCreateRace,
+    dialogs: ptDialogs,
     "empty-states": ptEmptyStates,
+    errors: ptErrors,
+    "export-preview": ptExportPreview,
     "faction-detail": ptFactionDetail,
     factions: ptFactions,
     forms: ptForms,
+    "global-goals": ptGlobalGoals,
     "item-detail": ptItemDetail,
     items: ptItems,
     loading: ptLoading,
@@ -129,6 +159,8 @@ const resources = {
     races: ptRaces,
     "region-detail": ptRegionDetail,
     settings: ptSettings,
+    tooltips: ptTooltips,
+    "warnings-settings": ptWarningsSettings,
     world: ptWorld,
   },
 };

@@ -96,12 +96,12 @@ export function BookCard({
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>{visualStyle}</span>
-          <span>{chapters} capítulos</span>
+          <span>{chapters} {t("book_card.chapters", { count: chapters })}</span>
         </div>
 
         {formattedLastModified && (
           <p className="text-xs text-muted-foreground mt-2">
-            Modificado {formattedLastModified}
+            {t("book_card.modified")} {formattedLastModified}
           </p>
         )}
       </div>

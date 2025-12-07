@@ -15,7 +15,7 @@ export interface IArcStatusConstant {
 
 export const ARC_STATUSES_CONSTANT: IArcStatusConstant[] = [
   {
-    value: "finalizado",
+    value: "finished",
     icon: CheckCircle2,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:
@@ -25,7 +25,7 @@ export const ARC_STATUSES_CONSTANT: IArcStatusConstant[] = [
     translationKey: "statuses.finished",
   },
   {
-    value: "atual",
+    value: "current",
     icon: Sparkles,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:
@@ -35,7 +35,7 @@ export const ARC_STATUSES_CONSTANT: IArcStatusConstant[] = [
     translationKey: "statuses.current",
   },
   {
-    value: "planejamento",
+    value: "planning",
     icon: Clock,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:

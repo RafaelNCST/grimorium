@@ -21,7 +21,15 @@
     "known_name": "Nome Conhecido",
     "scientific_name": "Nome Científico",
     "description": "Descrição",
-    "version_name": "Nome da Versão"
+    "version_name": "Nome da Versão",
+    "date_period": "Data/Período",
+    "location": "Local",
+    "reason": "Motivo",
+    "how_it_ended": "Como Terminou",
+    "start_date": "Data Início",
+    "end_date": "Data Fim",
+    "start": "Início",
+    "end": "Fim"
   },
   "placeholders": {
     "search_character": "Buscar personagem...",
@@ -33,14 +41,42 @@
     "chapter_summary": "Escreva um resumo do que acontece neste capítulo...",
     "event_title_example": "Ex: Era dos Deuses, Ano 1542...",
     "add_comment": "Adicione um novo comentário...",
+    "type_your_comment": "Digite seu comentário...",
     "known_name_example": "Ex: Elfos, Dragões, Humanos...",
     "scientific_name_example": "Ex: Homo elvensis (opcional)",
     "version_name_example": "Ex: Versão Pré-Guerra",
-    "version_description": "Descreva as mudanças desta versão do(a) {{entityType}}..."
+    "version_description": "Descreva as mudanças desta versão do(a) {{entityType}}...",
+    "item_event_title": "Ex: Forjado por Merlim",
+    "item_event_description": "Descreva o que aconteceu neste momento...",
+    "item_event_location": "Ex: Camelot, Forjas Celestiais...",
+    "item_event_character": "Ex: Rei Arthur, Merlim...",
+    "region_event_description": "Durante três noites, o céu ficou vermelho...",
+    "region_event_reason": "O ritual proibido realizado pelos magos...",
+    "region_event_outcome": "Os heróis conseguiram fechar os portais..."
   },
   "buttons": {
     "cancel": "Cancelar",
     "create_species": "Criar Espécie",
-    "create_version": "Criar Versão"
+    "create_version": "Criar Versão",
+    "new_event": "Novo Evento",
+    "edit_event": "Editar Evento",
+    "new_timeline_event": "Novo Evento da Timeline",
+    "add_member": "Adicionar Membro",
+    "manage_titles": "Gerenciar Títulos",
+    "add_diplomatic_relation": "Adicionar Relação Diplomática",
+    "create_first_era": "Criar Primeira Era",
+    "new_era": "Nova Era",
+    "create_era": "Criar Era",
+    "create_event": "Criar Evento",
+    "edit_era": "Editar Era",
+    "save_changes": "Salvar Alterações"
+  },
+  "event_types": {
+    "creation": "Criação",
+    "battle": "Batalha",
+    "discovery": "Descoberta",
+    "loss": "Perda",
+    "transformation": "Transformação",
+    "other": "Outro"
   }
 }

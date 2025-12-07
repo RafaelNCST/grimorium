@@ -1426,7 +1426,7 @@ export function FactionDetailView({
       emptyIcon: Clock,
       emptyTitle: t("empty-states:timeline.no_timeline_defined"),
       emptyDescription: t("empty-states:timeline.use_edit_mode_to_add_eras"),
-      addButtonLabel: "Criar Primeira Era",
+      addButtonLabel: t("forms:buttons.create_first_era"),
       onAddClick: () => setIsCreateEraDialogOpen(true),
     },
     {
@@ -1486,9 +1486,9 @@ export function FactionDetailView({
       emptyIcon: Handshake,
       emptyTitle: t("empty-states:diplomacy.no_diplomatic_relation_defined"),
       emptyDescription: t("empty-states:diplomacy.use_edit_mode_to_add_relations"),
-      addButtonLabel: "Adicionar Relação Diplomática",
+      addButtonLabel: t("forms:buttons.add_diplomatic_relation"),
       onAddClick: () => setIsAddDiplomacyDialogOpen(true),
-      blockedEntityName: "facções",
+      blockedEntityName: t("factions:header.title").toLowerCase(),
     },
     {
       id: "hierarchy",
@@ -1537,12 +1537,12 @@ export function FactionDetailView({
       emptyIcon: Users2,
       emptyTitle: t("empty-states:hierarchy.no_hierarchy_defined"),
       emptyDescription: t("empty-states:hierarchy.use_edit_mode_to_add_members"),
-      addButtonLabel: "Adicionar Membro",
+      addButtonLabel: t("forms:buttons.add_member"),
       onAddClick: () => setIsAddMemberDialogOpen(true),
-      secondaryButtonLabel: "Gerenciar Títulos",
+      secondaryButtonLabel: t("forms:buttons.manage_titles"),
       SecondaryButtonIcon: Settings,
       onSecondaryClick: () => setIsManageTitlesDialogOpen(true),
-      blockedEntityName: "personagens",
+      blockedEntityName: t("characters:header.title").toLowerCase(),
     },
   ];
 
@@ -1550,7 +1550,7 @@ export function FactionDetailView({
   if (!isEditing) {
     extraSections.push({
       id: "chapter-metrics",
-      title: "Métricas de capítulo",
+      title: t("faction-detail:sections.chapter_metrics"),
       content: (
         <EntityChapterMetricsSection
           bookId={bookId}

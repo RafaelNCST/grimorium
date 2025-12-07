@@ -85,12 +85,13 @@ export const DEFAULT_GLOBAL_GOALS: GlobalGoals = {
 export const MIN_WORD_GOAL = 1000;
 
 /**
- * Labels dos status de capítulos
+ * Translation keys for chapter statuses
+ * Use with i18n: t('chapters:status.draft'), etc.
  */
-export const CHAPTER_STATUS_LABELS: Record<ChapterStatus, string> = {
-  draft: "Rascunho",
-  "in-progress": "Em andamento",
-  review: "Em revisão",
-  finished: "Finalizado",
-  published: "Lançado",
+export const CHAPTER_STATUS_TRANSLATION_KEYS: Record<ChapterStatus, string> = {
+  draft: "chapters:status.draft",
+  "in-progress": "chapters:status.in_progress",
+  review: "chapters:status.review",
+  finished: "chapters:status.finished",
+  published: "chapters:status.published",
 };

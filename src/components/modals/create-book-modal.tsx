@@ -43,10 +43,10 @@ export interface IBookFormData {
 }
 
 const STATUS_KEYS: { key: string; value: BookStatus }[] = [
-  { key: "status.planning", value: "Em planejamento" },
-  { key: "status.releasing", value: "Em lançamento" },
-  { key: "status.hiatus", value: "Hiato" },
-  { key: "status.complete", value: "Completo" },
+  { key: "status.planning", value: "planning" },
+  { key: "status.releasing", value: "releasing" },
+  { key: "status.hiatus", value: "hiatus" },
+  { key: "status.complete", value: "complete" },
 ];
 
 export function CreateBookModal({
@@ -60,7 +60,7 @@ export function CreateBookModal({
     title: "",
     genre: [],
     visualStyle: "",
-    status: "Em planejamento",
+    status: "planning",
     cover: "",
     synopsis: "",
     authorSummary: "",
@@ -106,7 +106,7 @@ export function CreateBookModal({
       title: "",
       genre: [],
       visualStyle: "",
-      status: "Em planejamento",
+      status: "planning",
       cover: "",
       synopsis: "",
       authorSummary: "",

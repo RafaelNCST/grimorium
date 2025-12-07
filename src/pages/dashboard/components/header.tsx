@@ -37,36 +37,49 @@ import {
 } from "../constants/dashboard-constants";
 
 const BOOK_STATUS_OPTIONS: BookStatus[] = [
-  "Em planejamento",
-  "Em lançamento",
-  "Hiato",
-  "Completo",
+  "planning",
+  "releasing",
+  "hiatus",
+  "complete",
 ];
 
+// Legacy status mapping for backwards compatibility with old Portuguese values
+const LEGACY_STATUS_MAP: Record<string, BookStatus> = {
+  "Em planejamento": "planning",
+  "Em lançamento": "releasing",
+  "Hiato": "hiatus",
+  "Completo": "complete",
+};
+
+// Helper to normalize status values (handles both old Portuguese and new English values)
+const normalizeStatus = (status: string): BookStatus => {
+  return (LEGACY_STATUS_MAP[status] as BookStatus) || (status as BookStatus);
+};
+
 const STATUS_CONFIG: Record<BookStatus, IEntityTagConfig> = {
-  "Em planejamento": {
-    value: "Em planejamento",
+  planning: {
+    value: "planning",
     icon: BookOpen,
     translationKey: "status.planning",
     colorClass: "text-blue-600 dark:text-blue-400",
     bgColorClass: "bg-blue-500/20 border-blue-500/30",
   },
-  "Em lançamento": {
-    value: "Em lançamento",
+  releasing: {
+    value: "releasing",
     icon: Rocket,
     translationKey: "status.releasing",
     colorClass: "text-yellow-600 dark:text-yellow-400",
     bgColorClass: "bg-yellow-500/20 border-yellow-500/30",
   },
-  Hiato: {
-    value: "Hiato",
+  hiatus: {
+    value: "hiatus",
     icon: Pause,
     translationKey: "status.hiatus",
     colorClass: "text-orange-600 dark:text-orange-400",
     bgColorClass: "bg-orange-500/20 border-orange-500/30",
   },
-  Completo: {
-    value: "Completo",
+  complete: {
+    value: "complete",
     icon: CheckCircle2,
     translationKey: "status.complete",
     colorClass: "text-green-600 dark:text-green-400",
@@ -102,6 +115,7 @@ export function Header({
   onCancel,
 }: PropsHeader) {
   const { t } = useTranslation("create-book");
+  const { t: tCommon } = useTranslation("common");
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -230,7 +244,7 @@ export function Header({
                 <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={draftBook?.status || "Em planejamento"}
+                value={normalizeStatus(draftBook?.status || "planning")}
                 onValueChange={(v) =>
                   onDraftBookChange({ status: v as BookStatus })
                 }
@@ -241,7 +255,7 @@ export function Header({
                 <SelectContent>
                   {BOOK_STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status}
+                      {t(STATUS_CONFIG[status].translationKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -348,8 +362,8 @@ export function Header({
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-3xl font-bold">{book.title}</h2>
               <EntityTagBadge
-                config={STATUS_CONFIG[book.status]}
-                label={book.status}
+                config={STATUS_CONFIG[normalizeStatus(book.status)]}
+                label={t(STATUS_CONFIG[normalizeStatus(book.status)].translationKey)}
               />
             </div>
 
@@ -381,13 +395,13 @@ export function Header({
                     onClick={() => setShowFullSynopsis(!showFullSynopsis)}
                     className="text-primary hover:underline text-sm mt-1"
                   >
-                    {showFullSynopsis ? "Esconder" : "Ler mais"}
+                    {showFullSynopsis ? tCommon("button.hide") : tCommon("button.read_more")}
                   </button>
                 )}
               </div>
             ) : (
               <p className="text-muted-foreground italic mb-3">
-                Ainda não há sinopse. Edite o cabeçalho para adicionar.
+                {t("synopsis.no_synopsis")}
               </p>
             )}
           </div>
@@ -396,7 +410,7 @@ export function Header({
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" onClick={handleEditClick}>
               <Edit2 className="w-4 h-4 mr-2" />
-              Editar
+              {tCommon("actions.edit")}
             </Button>
           </div>
         </div>

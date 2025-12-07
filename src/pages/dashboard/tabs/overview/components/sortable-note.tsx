@@ -1,6 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Edit2, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,7 @@ export function SortableNote({
   onEditNote,
   onDeleteNote,
 }: PropsSortableNote) {
+  const { t } = useTranslation("common");
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useSortable({ id: `note-${note.id}` });
 
@@ -80,7 +82,7 @@ export function SortableNote({
                 onEditingNoteChange(null);
               }}
             >
-              Salvar
+              {t("actions.save")}
             </Button>
             <Button
               variant="ghost"
@@ -88,7 +90,7 @@ export function SortableNote({
               className="text-xs h-6"
               onClick={() => onEditingNoteChange(null)}
             >
-              Cancelar
+              {t("actions.cancel")}
             </Button>
           </div>
         </div>

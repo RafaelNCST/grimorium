@@ -14,5 +14,28 @@
   },
   "editor": {
     "settings": "Editor Settings"
+  },
+  "visibility": {
+    "hide_in_view_mode": "Hide in view mode",
+    "show_in_view_mode": "Show in view mode"
+  },
+  "timeline": {
+    "add_event": "Add Event",
+    "edit_era": "Edit Era",
+    "delete_era": "Delete Era"
+  },
+  "customize": {
+    "customize_tabs": "Customize Tabs",
+    "overview_note": "cannot be moved or hidden."
+  },
+  "tabs": {
+    "overview": "Overview",
+    "characters": "Characters",
+    "world": "World",
+    "factions": "Factions",
+    "plot": "Plot",
+    "magic": "Power System",
+    "species": "Races",
+    "items": "Items"
   }
 }

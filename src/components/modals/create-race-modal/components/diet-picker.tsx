@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 
-import { DIET_OPTIONS } from "../constants/diets";
+import { getRaceDiets } from "../constants/diets";
 
 interface PropsDietPicker {
   value: string;
@@ -24,13 +24,14 @@ export function DietPicker({
 }: PropsDietPicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
+  const dietOptions = getRaceDiets(t);
 
   return (
     <FormSelectGrid
       value={value}
       onChange={onChange}
       label={hideLabel ? "" : t("modal.diet")}
-      options={DIET_OPTIONS}
+      options={dietOptions}
       columns={3}
       showExpandedContent={isOther}
       expandedContent={

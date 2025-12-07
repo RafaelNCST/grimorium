@@ -12,12 +12,12 @@ import {
 } from "@/components/displays";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
-import { RACE_COMMUNICATIONS } from "@/components/modals/create-race-modal/constants/communications";
-import { DIET_OPTIONS } from "@/components/modals/create-race-modal/constants/diets";
-import { HABITS_OPTIONS } from "@/components/modals/create-race-modal/constants/habits";
-import { MORAL_TENDENCY_OPTIONS } from "@/components/modals/create-race-modal/constants/moral-tendencies";
-import { PHYSICAL_CAPACITY_OPTIONS } from "@/components/modals/create-race-modal/constants/physical-capacities";
-import { REPRODUCTIVE_CYCLE_OPTIONS } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
+import { getRaceCommunications } from "@/components/modals/create-race-modal/constants/communications";
+import { getRaceDiets } from "@/components/modals/create-race-modal/constants/diets";
+import { getRaceHabits } from "@/components/modals/create-race-modal/constants/habits";
+import { getRaceMoralTendencies } from "@/components/modals/create-race-modal/constants/moral-tendencies";
+import { getRacePhysicalCapacities } from "@/components/modals/create-race-modal/constants/physical-capacities";
+import { getRaceReproductiveCycles } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
@@ -102,7 +102,7 @@ export function RaceSuperView({
           <div className="flex flex-wrap gap-1.5">
             {race.domain.map((domainValue) => {
               const { icon: DomainIcon, colorConfig } =
-                getDomainDisplayData(domainValue);
+                getDomainDisplayData(domainValue, t);
 
               if (!DomainIcon || !colorConfig) return null;
 
@@ -258,7 +258,7 @@ export function RaceSuperView({
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
-          <DisplaySelectGrid value={race.habits} options={HABITS_OPTIONS} />
+          <DisplaySelectGrid value={race.habits} options={getRaceHabits(t)} />
         </FieldWithVisibilityToggle>
 
         {/* Reproductive Cycle */}
@@ -272,7 +272,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.reproductiveCycle}
-            options={REPRODUCTIVE_CYCLE_OPTIONS}
+            options={getRaceReproductiveCycles(t)}
           />
         </FieldWithVisibilityToggle>
 
@@ -285,7 +285,7 @@ export function RaceSuperView({
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
-          <DisplaySelectGrid value={race.diet} options={DIET_OPTIONS} />
+          <DisplaySelectGrid value={race.diet} options={getRaceDiets(t)} />
         </FieldWithVisibilityToggle>
 
         {/* Communication */}
@@ -300,7 +300,7 @@ export function RaceSuperView({
           {race.communication && race.communication.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {race.communication.map((commValue) => {
-                const commOption = RACE_COMMUNICATIONS.find(
+                const commOption = getRaceCommunications(t).find(
                   (c) => c.value === commValue
                 );
                 if (!commOption) return null;
@@ -346,7 +346,7 @@ export function RaceSuperView({
           ) : (
             <DisplaySelectGrid
               value={null}
-              options={RACE_COMMUNICATIONS.map((c) => ({
+              options={getRaceCommunications(t).map((c) => ({
                 value: c.value,
                 label: c.label,
                 description: c.description,
@@ -389,7 +389,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.moralTendency}
-            options={MORAL_TENDENCY_OPTIONS}
+            options={getRaceMoralTendencies(t)}
           />
         </FieldWithVisibilityToggle>
 
@@ -440,7 +440,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.physicalCapacity}
-            options={PHYSICAL_CAPACITY_OPTIONS}
+            options={getRacePhysicalCapacities(t)}
           />
         </FieldWithVisibilityToggle>
 

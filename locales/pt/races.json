@@ -1,4 +1,5 @@
 {
+  "tab_title": "Raças",
   "title": "Raças",
   "description": "Gerencie as raças, bestas e espécies que habitam o seu mundo",
   "new_race_button": "Nova Raça",
@@ -10,7 +11,8 @@
   "not_found": "Nenhuma raça encontrada",
   "filters": {
     "all": "Todas",
-    "domain": "Domínio"
+    "domain": "Domínio",
+    "total": "Total"
   },
   "domains": {
     "Aquático": "Aquático",
@@ -20,6 +22,238 @@
     "Elevado": "Elevado",
     "Dimensional": "Dimensional",
     "Espiritual": "Espiritual",
-    "Cósmico": "Cósmico"
+    "Cósmico": "Cósmico",
+    "aquatic": {
+      "label": "Aquático"
+    },
+    "terrestrial": {
+      "label": "Terrestre"
+    },
+    "aerial": {
+      "label": "Aéreo"
+    },
+    "underground": {
+      "label": "Subterrâneo"
+    },
+    "elevated": {
+      "label": "Elevado"
+    },
+    "dimensional": {
+      "label": "Dimensional"
+    },
+    "spiritual": {
+      "label": "Espiritual"
+    },
+    "cosmic": {
+      "label": "Cósmico"
+    }
+  },
+  "diets": {
+    "herbivore": {
+      "label": "Herbívoro",
+      "description": "Alimenta-se de plantas"
+    },
+    "carnivore": {
+      "label": "Carnívoro",
+      "description": "Alimenta-se de carne"
+    },
+    "omnivore": {
+      "label": "Onívoro",
+      "description": "Alimenta-se de tudo"
+    },
+    "insectivore": {
+      "label": "Insetívoro",
+      "description": "Alimenta-se de insetos"
+    },
+    "frugivore": {
+      "label": "Frugívoro",
+      "description": "Alimenta-se de frutas e sementes"
+    },
+    "detritivore": {
+      "label": "Detritívoro",
+      "description": "Alimenta-se de matéria não viva e detritos"
+    },
+    "spiritual": {
+      "label": "Espiritual",
+      "description": "Alimenta-se de energia espiritual"
+    },
+    "blood": {
+      "label": "Hematófago",
+      "description": "Se alimenta de sangue"
+    },
+    "other": {
+      "label": "Outro",
+      "description": "Fonte de alimento personalizada"
+    }
+  },
+  "habits": {
+    "nocturnal": {
+      "label": "Noturno",
+      "description": "Ativo durante a noite"
+    },
+    "diurnal": {
+      "label": "Diurno",
+      "description": "Ativo durante o dia"
+    },
+    "crepuscular": {
+      "label": "Crepuscular",
+      "description": "Ativo ao amanhecer e entardecer"
+    },
+    "catemeral": {
+      "label": "Catemeral",
+      "description": "Ativo em horários variados"
+    },
+    "lunar": {
+      "label": "Lunar",
+      "description": "Ativo conforme fases da lua"
+    },
+    "solar": {
+      "label": "Solar",
+      "description": "Ativo em luz solar intensa"
+    },
+    "transcendental": {
+      "label": "Transcendental",
+      "description": "Não afetado por tempo e espaço"
+    },
+    "infernal": {
+      "label": "Ínfero",
+      "description": "Ativo em regiões sem luz solar"
+    }
+  },
+  "moral_tendencies": {
+    "chaotic": {
+      "label": "Caótico",
+      "description": "Essa raça costuma ter membros caóticos que seguem seus próprios desejos"
+    },
+    "neutral": {
+      "label": "Neutro",
+      "description": "Essa raça costuma ser equilibrada nas suas ações, não sendo nem bem e nem mal necessariamente"
+    },
+    "honorable": {
+      "label": "Honrado",
+      "description": "Essa raça costuma ter membros que seguem códigos de honra e princípios morais"
+    },
+    "extreme_chaotic": {
+      "label": "Extremo Caótico",
+      "description": "Essa raça só possui indivíduos caóticos que seguem seus próprios desejos"
+    },
+    "extreme_honorable": {
+      "label": "Extremo Honrado",
+      "description": "Essa raça só possui indivíduos que seguem rigidamente códigos de honra"
+    },
+    "extreme_neutral": {
+      "label": "Extremo Neutro",
+      "description": "Essa raça possui indivíduos com morais extremamente opostas, variando entre caóticos absolutos e honrados inflexíveis"
+    }
+  },
+  "physical_capacities": {
+    "powerless": {
+      "label": "Impotente",
+      "description": "Um membro médio seria facilmente derrotado por um humano comum"
+    },
+    "weaker": {
+      "label": "Mais fraco",
+      "description": "Um membro médio é mais fraco que um humano comum"
+    },
+    "comparable": {
+      "label": "Comparável",
+      "description": "Um membro médio tem força similar a um humano comum"
+    },
+    "stronger": {
+      "label": "Mais forte",
+      "description": "Um membro médio é mais forte que um humano comum"
+    },
+    "invincible": {
+      "label": "Invencível",
+      "description": "Um membro médio poderia facilmente eliminar um humano comum"
+    }
+  },
+  "reproductive_cycles": {
+    "sexual": {
+      "label": "Sexuado",
+      "description": "Reprodução que requer dois indivíduos de sexos diferentes para gerar descendentes"
+    },
+    "asexual": {
+      "label": "Assexuado",
+      "description": "Reprodução por divisão celular ou brotamento, sem necessidade de parceiro"
+    },
+    "hermaphrodite": {
+      "label": "Hermafrodita",
+      "description": "Indivíduos possuem órgãos reprodutores de ambos os sexos, podendo se autofecundar ou cruzar"
+    },
+    "parthenogenic": {
+      "label": "Partenogênico",
+      "description": "Desenvolvimento de um embrião sem fecundação por um macho, gerando clones genéticos"
+    },
+    "viviparous": {
+      "label": "Vivíparo",
+      "description": "Filhotes se desenvolvem dentro do corpo do progenitor e nascem completamente formados"
+    },
+    "other": {
+      "label": "Outro",
+      "description": "Ciclo reprodutivo personalizado ou único desta raça"
+    }
+  },
+  "communications": {
+    "speech": {
+      "label": "Fala",
+      "description": "Comunicação verbal"
+    },
+    "telepathy": {
+      "label": "Telepatia",
+      "description": "Comunicação mental"
+    },
+    "pheromones": {
+      "label": "Feromônios",
+      "description": "Comunicação química"
+    },
+    "gestures": {
+      "label": "Gestos",
+      "description": "Comunicação corporal"
+    },
+    "other": {
+      "label": "Outro",
+      "description": "Forma de comunicação personalizada"
+    }
+  },
+  "types": {
+    "aquatic": {
+      "label": "Aquática"
+    },
+    "terrestrial": {
+      "label": "Terrestre"
+    },
+    "flying": {
+      "label": "Voadora"
+    },
+    "spatial": {
+      "label": "Espacial"
+    },
+    "ethereal": {
+      "label": "Espiritual"
+    }
+  },
+  "relationships": {
+    "predation": {
+      "description": "Esta raça caça a outra"
+    },
+    "prey": {
+      "description": "Esta raça é presa da outra"
+    },
+    "parasitism": {
+      "description": "Esta raça se beneficia prejudicando a outra"
+    },
+    "commensalism": {
+      "description": "Esta raça se beneficia sem afetar a outra"
+    },
+    "mutualism": {
+      "description": "Ambas as raças se beneficiam"
+    },
+    "competition": {
+      "description": "Ambas as raças competem por recursos"
+    },
+    "neutralism": {
+      "description": "Nenhuma raça afeta a outra"
+    }
   }
 }

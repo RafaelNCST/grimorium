@@ -7,6 +7,7 @@ import {
   SensorDescriptor,
   SensorOptions,
 } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 import {
   AlertDialog,
@@ -137,6 +138,8 @@ export function DashboardView({
   onDeleteInputChange,
   onDraftBookChange,
 }: PropsDashboardView) {
+  const { t } = useTranslation(["dialogs"]);
+
   return (
     <TooltipProvider>
       <div className="h-full flex flex-col bg-background overflow-hidden">
@@ -254,17 +257,24 @@ export function DashboardView({
         <AlertDialog open={showDeleteDialog} onOpenChange={onShowDeleteDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-              <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Para confirmar a exclusão,
-                digite o nome do livro: <strong>{book.title}</strong>
-              </AlertDialogDescription>
+              <AlertDialogTitle>
+                {t("dialogs:delete_book.title")}
+              </AlertDialogTitle>
+              <AlertDialogDescription
+                dangerouslySetInnerHTML={{
+                  __html: t("dialogs:delete_book.description", {
+                    bookTitle: book.title,
+                  }),
+                }}
+              />
             </AlertDialogHeader>
             <div className="my-4">
               <Input
                 value={deleteInput}
                 onChange={(e) => onDeleteInputChange(e.target.value)}
-                placeholder={`Digite "${book.title}" para confirmar`}
+                placeholder={t("dialogs:delete_book.placeholder", {
+                  bookTitle: book.title,
+                })}
                 className="font-mono"
               />
             </div>
@@ -275,7 +285,7 @@ export function DashboardView({
                   onShowDeleteDialog(false);
                 }}
               >
-                Cancelar
+                {t("dialogs:delete_book.cancel")}
               </AlertDialogCancel>
               <Button
                 variant="destructive"
@@ -284,7 +294,7 @@ export function DashboardView({
                 onClick={onDelete}
                 disabled={deleteInput !== book.title}
               >
-                Excluir Livro
+                {t("dialogs:delete_book.confirm")}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

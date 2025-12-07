@@ -12,7 +12,18 @@
   "tooltips": {
     "quick_navigation": "Quick Navigation",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "hide_section": "Hide section",
+    "show_section": "Show section",
+    "delete_book": "Delete book",
+    "back_to_library": "Back to library",
+    "chapters": "Chapters",
+    "notes": "Notes",
+    "customize": "Customize",
+    "exit_customize_mode": "Exit customize mode",
+    "show_header": "Show header",
+    "hide_header": "Hide header",
+    "change_image": "Change Image"
   },
   "title_bar": {
     "home": "Home",
@@ -47,7 +58,10 @@
     "saving": "Saving...",
     "deleting": "Deleting...",
     "make_main": "Make Main",
-    "unsaved_changes": "Unsaved changes"
+    "unsaved_changes": "Unsaved changes",
+    "back_to": "Back to {{name}}",
+    "add": "Add",
+    "save_changes": "Save Changes"
   },
   "version": {
     "main_badge": "Main",
@@ -59,5 +73,18 @@
     "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
     "cancel": "Cancel",
     "confirm": "Delete"
+  },
+  "unsaved_changes": {
+    "title": "Discard changes?",
+    "description": "You have unsaved changes. If you leave now, all changes will be lost.",
+    "cancel": "Continue Editing",
+    "confirm": "Discard Changes"
+  },
+  "sidebar": {
+    "viewing_currently": "Currently viewing"
+  },
+  "button": {
+    "hide": "Hide",
+    "read_more": "Read more"
   }
 }

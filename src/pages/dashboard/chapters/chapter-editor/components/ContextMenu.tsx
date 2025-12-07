@@ -12,6 +12,7 @@ import {
   Link,
   Unlink,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { EntityLink } from "../types/entity-link";
 
@@ -55,6 +56,7 @@ export function ContextMenu({
   onLinkToEntity,
   onUnlinkEntity,
 }: ContextMenuProps) {
+  const { t } = useTranslation(["chapter-editor"]);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close on click outside
@@ -122,7 +124,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <Copy className="h-4 w-4" />
-            Copiar
+            {t("context_menu.copy")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+C
             </span>
@@ -132,7 +134,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <Scissors className="h-4 w-4" />
-            Recortar
+            {t("context_menu.cut")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+X
             </span>
@@ -145,7 +147,7 @@ export function ContextMenu({
         className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
       >
         <Clipboard className="h-4 w-4" />
-        Colar
+        {t("context_menu.paste")}
         <span className="ml-auto text-xs text-muted-foreground">Ctrl+V</span>
       </button>
 
@@ -160,7 +162,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <MessageSquare className="h-4 w-4" />
-            Criar Anotação
+            {t("context_menu.create_annotation")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+M
             </span>
@@ -170,7 +172,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <Search className="h-4 w-4" />
-            Buscar texto selecionado
+            {t("context_menu.search_selected_text")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+F
             </span>
@@ -185,7 +187,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <Bold className="h-4 w-4" />
-            Negrito
+            {t("formatting.bold")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+B
             </span>
@@ -195,7 +197,7 @@ export function ContextMenu({
             className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
           >
             <Italic className="h-4 w-4" />
-            Itálico
+            {t("formatting.italic")}
             <span className="ml-auto text-xs text-muted-foreground">
               Ctrl+I
             </span>
@@ -215,7 +217,7 @@ export function ContextMenu({
               className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
             >
               <ExternalLink className="h-4 w-4" />
-              Ver detalhes de {entityLink.entity.name}
+              {t("context_menu.view_entity_details", { entityName: entityLink.entity.name })}
             </button>
           )}
 
@@ -226,7 +228,7 @@ export function ContextMenu({
               className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
             >
               <MessageSquare className="h-4 w-4" />
-              Ver anotação
+              {t("context_menu.view_annotation")}
             </button>
           )}
 
@@ -237,7 +239,7 @@ export function ContextMenu({
               className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
             >
               <Link className="h-4 w-4" />
-              Linkar a entidade mencionada
+              {t("context_menu.link_to_entity")}
             </button>
           )}
 
@@ -248,7 +250,7 @@ export function ContextMenu({
               className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors text-destructive hover:bg-destructive/10"
             >
               <Unlink className="h-4 w-4" />
-              Remover link
+              {t("context_menu.remove_link")}
             </button>
           )}
         </>

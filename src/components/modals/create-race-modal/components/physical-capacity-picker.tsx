@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { InfoAlert } from "@/components/ui/info-alert";
 
-import { PHYSICAL_CAPACITY_OPTIONS } from "../constants/physical-capacities";
+import { getRacePhysicalCapacities } from "../constants/physical-capacities";
 
 interface PropsPhysicalCapacityPicker {
   value: string;
@@ -17,6 +17,7 @@ export function PhysicalCapacityPicker({
   hideLabel,
 }: PropsPhysicalCapacityPicker) {
   const { t } = useTranslation("create-race");
+  const physicalCapacityOptions = getRacePhysicalCapacities(t);
 
   return (
     <div className="space-y-3">
@@ -25,7 +26,7 @@ export function PhysicalCapacityPicker({
         onChange={onChange}
         label={hideLabel ? "" : t("modal.physical_capacity")}
         alertText={t("modal.physical_capacity_description")}
-        options={PHYSICAL_CAPACITY_OPTIONS}
+        options={physicalCapacityOptions}
         columns={3}
       />
     </div>

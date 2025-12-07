@@ -11,6 +11,7 @@ import {
   MessageSquare,
   BookText,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +69,7 @@ export function SearchBar({
   onReplaceCurrent,
   onReplaceAll,
 }: SearchBarProps) {
+  const { t } = useTranslation("chapter-editor");
   const [showReplace, setShowReplace] = useState(false);
   const [showFormatSettings, setShowFormatSettings] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -137,11 +139,11 @@ export function SearchBar({
   const getModeLabel = () => {
     switch (searchOptions.mode) {
       case "dialogues":
-        return "Diálogos";
+        return t("search.mode_dialogues");
       case "narration":
-        return "Narração";
+        return t("search.mode_narration");
       default:
-        return "Tudo";
+        return t("search.mode_all");
     }
   };
 
@@ -157,14 +159,14 @@ export function SearchBar({
                 <Input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search..."
+                  placeholder={t("search.placeholder")}
                   value={searchTerm}
                   onChange={(e) => onSearchTermChange(e.target.value)}
                   className="pl-9 pr-24"
                 />
                 {totalResults > 0 && (
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                    {currentIndex + 1} of {totalResults}
+                    {t("search.results", { current: currentIndex + 1, total: totalResults })}
                   </span>
                 )}
               </div>
@@ -184,7 +186,7 @@ export function SearchBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Anterior (Shift+Enter)</p>
+                    <p>{t("search.previous")}</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -201,7 +203,7 @@ export function SearchBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Próximo (Enter)</p>
+                    <p>{t("search.next")}</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -225,7 +227,7 @@ export function SearchBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Sensível a maiúsculas</p>
+                    <p>{t("search.case_sensitive")}</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -246,7 +248,7 @@ export function SearchBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Palavra inteira</p>
+                    <p>{t("search.whole_word")}</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -279,19 +281,19 @@ export function SearchBar({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onSearchModeChange("all")}>
                       <Globe className="mr-2 h-4 w-4" />
-                      Tudo
+                      {t("search.mode_all")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onSearchModeChange("dialogues")}
                     >
                       <MessageSquare className="mr-2 h-4 w-4" />
-                      Apenas diálogos
+                      {t("search.mode_only_dialogues")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onSearchModeChange("narration")}
                     >
                       <BookText className="mr-2 h-4 w-4" />
-                      Apenas narração
+                      {t("search.mode_only_narration")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -310,7 +312,7 @@ export function SearchBar({
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Formatos de diálogo</p>
+                      <p>{t("search.dialogue_formats")}</p>
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -333,7 +335,7 @@ export function SearchBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Alternar substituir (Ctrl+H)</p>
+                    <p>{t("search.toggle_replace")}</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -356,7 +358,7 @@ export function SearchBar({
                   <Replace className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Substituir por..."
+                    placeholder={t("search.replace_placeholder")}
                     value={replaceTerm}
                     onChange={(e) => onReplaceTermChange(e.target.value)}
                     className="pl-9"
@@ -369,7 +371,7 @@ export function SearchBar({
                   onClick={onReplaceCurrent}
                   disabled={totalResults === 0 || !replaceTerm}
                 >
-                  Substituir
+                  {t("search.replace")}
                 </Button>
 
                 <Button
@@ -378,7 +380,7 @@ export function SearchBar({
                   onClick={onReplaceAll}
                   disabled={totalResults === 0 || !replaceTerm}
                 >
-                  Substituir Todos
+                  {t("search.replace_all")}
                 </Button>
               </div>
             )}

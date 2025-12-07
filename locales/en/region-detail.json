@@ -107,5 +107,17 @@
   },
   "upload": {
     "click": "Click to upload"
+  },
+  "seasons": {
+    "spring": "Spring",
+    "spring_description": "Season of rebirth",
+    "summer": "Summer",
+    "summer_description": "Season of heat",
+    "autumn": "Autumn",
+    "autumn_description": "Season of harvest",
+    "winter": "Winter",
+    "winter_description": "Season of cold",
+    "custom": "Other",
+    "custom_description": "Custom season"
   }
 }

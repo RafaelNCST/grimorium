@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 export type BookStatus =
-  | "Em planejamento"
-  | "Em lançamento"
-  | "Hiato"
-  | "Completo";
+  | "planning"
+  | "releasing"
+  | "hiatus"
+  | "complete";
 
 export interface Book {
   id: string;

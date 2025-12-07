@@ -23,12 +23,12 @@ import { HabitsPicker } from "@/components/modals/create-race-modal/components/h
 import { MoralTendencyPicker } from "@/components/modals/create-race-modal/components/moral-tendency-picker";
 import { PhysicalCapacityPicker } from "@/components/modals/create-race-modal/components/physical-capacity-picker";
 import { ReproductiveCyclePicker } from "@/components/modals/create-race-modal/components/reproductive-cycle-picker";
-import { RACE_COMMUNICATIONS } from "@/components/modals/create-race-modal/constants/communications";
-import { DIET_OPTIONS } from "@/components/modals/create-race-modal/constants/diets";
-import { HABITS_OPTIONS } from "@/components/modals/create-race-modal/constants/habits";
-import { MORAL_TENDENCY_OPTIONS } from "@/components/modals/create-race-modal/constants/moral-tendencies";
-import { PHYSICAL_CAPACITY_OPTIONS } from "@/components/modals/create-race-modal/constants/physical-capacities";
-import { REPRODUCTIVE_CYCLE_OPTIONS } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
+import { getRaceCommunications } from "@/components/modals/create-race-modal/constants/communications";
+import { getRaceDiets } from "@/components/modals/create-race-modal/constants/diets";
+import { getRaceHabits } from "@/components/modals/create-race-modal/constants/habits";
+import { getRaceMoralTendencies } from "@/components/modals/create-race-modal/constants/moral-tendencies";
+import { getRacePhysicalCapacities } from "@/components/modals/create-race-modal/constants/physical-capacities";
+import { getRaceReproductiveCycles } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -324,7 +324,7 @@ export function RaceDetailView({
               <div className="flex flex-wrap gap-1.5">
                 {race.domain.map((domainValue) => {
                   const { icon: DomainIcon, colorConfig } =
-                    getDomainDisplayData(domainValue);
+                    getDomainDisplayData(domainValue, t);
 
                   if (!DomainIcon || !colorConfig) return null;
 
@@ -679,7 +679,7 @@ export function RaceDetailView({
                 hideLabel
               />
             ) : (
-              <DisplaySelectGrid value={race.habits} options={HABITS_OPTIONS} />
+              <DisplaySelectGrid value={race.habits} options={getRaceHabits(t)} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -707,7 +707,7 @@ export function RaceDetailView({
             ) : (
               <DisplaySelectGrid
                 value={race.reproductiveCycle}
-                options={REPRODUCTIVE_CYCLE_OPTIONS}
+                options={getRaceReproductiveCycles(t)}
               />
             )}
           </FieldWithVisibilityToggle>
@@ -732,7 +732,7 @@ export function RaceDetailView({
                 hideLabel
               />
             ) : (
-              <DisplaySelectGrid value={race.diet} options={DIET_OPTIONS} />
+              <DisplaySelectGrid value={race.diet} options={getRaceDiets(t)} />
             )}
           </FieldWithVisibilityToggle>
 
@@ -760,7 +760,7 @@ export function RaceDetailView({
             ) : race.communication && race.communication.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {race.communication.map((commValue) => {
-                  const commOption = RACE_COMMUNICATIONS.find(
+                  const commOption = getRaceCommunications(t).find(
                     (c) => c.value === commValue
                   );
                   if (!commOption) return null;
@@ -807,7 +807,7 @@ export function RaceDetailView({
             ) : (
               <DisplaySelectGrid
                 value={null}
-                options={RACE_COMMUNICATIONS.map((c) => ({
+                options={getRaceCommunications(t).map((c) => ({
                   value: c.value,
                   label: c.label,
                   description: c.description,
@@ -857,7 +857,7 @@ export function RaceDetailView({
             ) : (
               <DisplaySelectGrid
                 value={race.moralTendency}
-                options={MORAL_TENDENCY_OPTIONS}
+                options={getRaceMoralTendencies(t)}
               />
             )}
           </FieldWithVisibilityToggle>
@@ -953,7 +953,7 @@ export function RaceDetailView({
             ) : (
               <DisplaySelectGrid
                 value={race.physicalCapacity}
-                options={PHYSICAL_CAPACITY_OPTIONS}
+                options={getRacePhysicalCapacities(t)}
               />
             )}
           </FieldWithVisibilityToggle>

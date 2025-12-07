@@ -27,5 +27,19 @@
   },
   "plot_arc_events": {
     "events_count": "{{completedCount}}/{{totalCount}} events"
+  },
+  "delete_book": {
+    "title": "Confirm Deletion",
+    "description": "This action cannot be undone. To confirm deletion, type the book name: <strong>{{bookTitle}}</strong>",
+    "placeholder": "Type \"{{bookTitle}}\" to confirm",
+    "cancel": "Cancel",
+    "confirm": "Delete Book"
+  },
+  "change_map_image": {
+    "title": "Change map image?",
+    "description_singular": "There is {{count}} element placed on this map. By changing the map image, all elements will be removed and you will need to position them again on the new map.",
+    "description_plural": "There are {{count}} elements placed on this map. By changing the map image, all elements will be removed and you will need to position them again on the new map.",
+    "cancel": "Cancel",
+    "confirm": "Continue and choose image"
   }
 }

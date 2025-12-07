@@ -1,10 +1,14 @@
+import { TFunction } from "i18next";
+
 import {
-  RACE_RELATIONSHIP_TYPES,
+  getRaceRelationshipTypes,
   type RaceRelationshipTypeConfig,
 } from "../constants/race-relationship-types";
 
 export const getRaceRelationshipTypeData = (
-  type: string
-): RaceRelationshipTypeConfig =>
-  RACE_RELATIONSHIP_TYPES.find((rt) => rt.value === type) ||
-  RACE_RELATIONSHIP_TYPES[0];
+  type: string,
+  t: TFunction
+): RaceRelationshipTypeConfig => {
+  const relationshipTypes = getRaceRelationshipTypes(t);
+  return relationshipTypes.find((rt) => rt.value === type) || relationshipTypes[0];
+};

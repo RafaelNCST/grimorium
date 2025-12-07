@@ -309,7 +309,7 @@ export function EntityHoverCard({
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {entity.domain.map((d) => {
                   const { icon: DomainIcon, colorConfig } =
-                    getDomainDisplayData(d as any);
+                    getDomainDisplayData(d as any, t);
 
                   if (!DomainIcon || !colorConfig) return null;
 

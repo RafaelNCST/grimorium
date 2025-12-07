@@ -68,7 +68,8 @@
       "Bash(Stop-Process -Force -Id 26552)",
       "Bash(Start-Sleep -Seconds 8)",
       "Bash(Stop-Process -Force -Id 11500)",
-      "Bash(Stop-Process -Force -Id 31564)"
+      "Bash(Stop-Process -Force -Id 31564)",
+      "Bash(Stop-Process -Force -Id 8448)"
     ],
     "deny": [
       "Bash(git push --force:*)",

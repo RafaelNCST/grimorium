@@ -7,7 +7,7 @@ import {
 import { FormTextarea } from "@/components/forms/FormTextarea";
 
 import {
-  RACE_COMMUNICATIONS,
+  getRaceCommunications,
   RaceCommunication,
 } from "../constants/communications";
 
@@ -57,9 +57,10 @@ export function CommunicationPicker({
   // Verificar se "other" está selecionado
   const isOtherSelected = values?.includes("other") ?? false;
 
-  // Converter RACE_COMMUNICATIONS para o formato GridSelectOption
+  // Converter getRaceCommunications para o formato GridSelectOption
+  const raceCommunications = getRaceCommunications(t);
   const options: GridSelectOption<RaceCommunication>[] =
-    RACE_COMMUNICATIONS.map((comm) => {
+    raceCommunications.map((comm) => {
       const colors = colorMap[comm.color] || {
         bg: "gray-500/10",
         border: "gray-500/30",

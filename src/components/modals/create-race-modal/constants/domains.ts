@@ -9,6 +9,7 @@ import {
   Orbit,
   type LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 export type RaceDomain =
   | "aquatic"
@@ -29,10 +30,10 @@ export interface RaceDomainOption {
   borderColor: string;
 }
 
-export const RACE_DOMAINS: RaceDomainOption[] = [
+export const getRaceDomains = (t: TFunction): RaceDomainOption[] => [
   {
     value: "aquatic",
-    label: "Aquático",
+    label: t("races:domains.aquatic.label"),
     icon: Waves,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -40,7 +41,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "terrestrial",
-    label: "Terrestre",
+    label: t("races:domains.terrestrial.label"),
     icon: Mountain,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950",
@@ -48,7 +49,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "aerial",
-    label: "Aéreo",
+    label: t("races:domains.aerial.label"),
     icon: Cloud,
     color: "text-cyan-600 dark:text-cyan-400",
     bgColor: "bg-cyan-50 dark:bg-cyan-950",
@@ -56,7 +57,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "underground",
-    label: "Subterrâneo",
+    label: t("races:domains.underground.label"),
     icon: ArrowDown,
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950",
@@ -64,7 +65,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "elevated",
-    label: "Elevado",
+    label: t("races:domains.elevated.label"),
     icon: TrendingUp,
     color: "text-teal-600 dark:text-teal-400",
     bgColor: "bg-teal-50 dark:bg-teal-950",
@@ -72,7 +73,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "dimensional",
-    label: "Dimensional",
+    label: t("races:domains.dimensional.label"),
     icon: Sparkles,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -80,7 +81,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "spiritual",
-    label: "Espiritual",
+    label: t("races:domains.spiritual.label"),
     icon: Ghost,
     color: "text-violet-600 dark:text-violet-400",
     bgColor: "bg-violet-50 dark:bg-violet-950",
@@ -88,7 +89,7 @@ export const RACE_DOMAINS: RaceDomainOption[] = [
   },
   {
     value: "cosmic",
-    label: "Cósmico",
+    label: t("races:domains.cosmic.label"),
     icon: Orbit,
     color: "text-indigo-600 dark:text-indigo-400",
     bgColor: "bg-indigo-50 dark:bg-indigo-950",
@@ -107,13 +108,12 @@ export interface DomainDisplayOption {
 }
 
 // Export for cards and badges (uses label as value for matching with domain array)
-export const DOMAIN_CONSTANT: DomainDisplayOption[] = RACE_DOMAINS.map(
-  (domain) => ({
+export const getDomainConstant = (t: TFunction): DomainDisplayOption[] =>
+  getRaceDomains(t).map((domain) => ({
     value: domain.label, // Use label as value to match with DomainType
     label: domain.label,
     icon: domain.icon,
     baseColor: domain.bgColor.replace("dark:bg-", "").split(" ")[0],
     activeColor: `${domain.color} ${domain.bgColor} border ${domain.borderColor}`,
     hoverColor: `hover:${domain.color} hover:${domain.bgColor}`,
-  })
-);
+  }));

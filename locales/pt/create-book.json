@@ -53,5 +53,8 @@
     "cancel": "Cancelar",
     "create": "Criar",
     "save": "Salvar"
+  },
+  "synopsis": {
+    "no_synopsis": "Ainda não há sinopse. Edite o cabeçalho para adicionar."
   }
 }

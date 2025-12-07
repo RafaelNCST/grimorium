@@ -1,0 +1,32 @@
+{
+  "page": {
+    "title": "Chapters",
+    "description": "Manage your book chapters",
+    "new_chapter": "New Chapter",
+    "total_badge": "Total",
+    "search_placeholder": "Search chapters...",
+    "goals_button": "Goals",
+    "warnings_button": "Manage Warnings",
+    "back": "Back"
+  },
+  "status": {
+    "draft": "Draft",
+    "in_progress": "In Progress",
+    "review": "In Review",
+    "finished": "Finished",
+    "published": "Published"
+  },
+  "empty_state": {
+    "no_chapters": "No chapters created",
+    "no_chapters_description": "Start by creating your first chapter to begin writing your story.",
+    "no_chapters_found": "No chapters found",
+    "no_chapters_found_description": "Try adjusting your search to find chapters."
+  },
+  "delete": {
+    "title": "Delete Chapter",
+    "description": "Are you sure you want to delete this chapter? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "loading": "Loading chapters..."
+}

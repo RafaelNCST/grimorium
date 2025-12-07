@@ -6,6 +6,7 @@ import {
   HelpCircle,
   LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 export type RaceCommunication =
   | "speech"
@@ -25,11 +26,13 @@ export interface RaceCommunicationOption {
   requiresDescription?: boolean;
 }
 
-export const RACE_COMMUNICATIONS: RaceCommunicationOption[] = [
+export const getRaceCommunications = (
+  t: TFunction
+): RaceCommunicationOption[] => [
   {
     value: "speech",
-    label: "Fala",
-    description: "Comunicação verbal",
+    label: t("races:communications.speech.label"),
+    description: t("races:communications.speech.description"),
     icon: MessageSquare,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -37,8 +40,8 @@ export const RACE_COMMUNICATIONS: RaceCommunicationOption[] = [
   },
   {
     value: "telepathy",
-    label: "Telepatia",
-    description: "Comunicação mental",
+    label: t("races:communications.telepathy.label"),
+    description: t("races:communications.telepathy.description"),
     icon: Brain,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -46,8 +49,8 @@ export const RACE_COMMUNICATIONS: RaceCommunicationOption[] = [
   },
   {
     value: "pheromones",
-    label: "Feromônios",
-    description: "Comunicação química",
+    label: t("races:communications.pheromones.label"),
+    description: t("races:communications.pheromones.description"),
     icon: Waves,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-950",
@@ -55,8 +58,8 @@ export const RACE_COMMUNICATIONS: RaceCommunicationOption[] = [
   },
   {
     value: "gestures",
-    label: "Gestos",
-    description: "Comunicação corporal",
+    label: t("races:communications.gestures.label"),
+    description: t("races:communications.gestures.description"),
     icon: Hand,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950",
@@ -64,8 +67,8 @@ export const RACE_COMMUNICATIONS: RaceCommunicationOption[] = [
   },
   {
     value: "other",
-    label: "Outro",
-    description: "Forma de comunicação personalizada",
+    label: t("races:communications.other.label"),
+    description: t("races:communications.other.description"),
     icon: HelpCircle,
     color: "text-violet-600 dark:text-violet-400",
     bgColor: "bg-violet-50 dark:bg-violet-950",

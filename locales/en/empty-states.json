@@ -45,7 +45,10 @@
   "timeline": {
     "no_timeline_defined": "No timeline defined",
     "use_edit_mode_to_add_eras": "Use edit mode to add eras",
-    "era_has_no_events": "This era has no events yet"
+    "era_has_no_events": "This era has no events yet",
+    "create_first_era": "Create First Era",
+    "timeline_title": "Region Timeline",
+    "chapter_metrics_title": "Chapter metrics"
   },
   "relationships": {
     "no_relationship_defined": "No relationship defined",

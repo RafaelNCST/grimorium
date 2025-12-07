@@ -7,6 +7,7 @@ import {
   RotateCcw,
   LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 
@@ -28,12 +29,13 @@ export interface RaceMoralTendencyOption {
   borderColor: string;
 }
 
-export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
+export const getRaceMoralTendencies = (
+  t: TFunction
+): RaceMoralTendencyOption[] => [
   {
     value: "chaotic",
-    label: "Caótico",
-    description:
-      "Essa raça costuma ter membros caóticos que seguem seus próprios desejos",
+    label: t("races:moral_tendencies.chaotic.label"),
+    description: t("races:moral_tendencies.chaotic.description"),
     icon: Zap,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950",
@@ -41,9 +43,8 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
   },
   {
     value: "neutral",
-    label: "Neutro",
-    description:
-      "Essa raça costuma ser equilibrada nas suas ações, não sendo nem bem e nem mal necessariamente",
+    label: t("races:moral_tendencies.neutral.label"),
+    description: t("races:moral_tendencies.neutral.description"),
     icon: Scale,
     color: "text-slate-600 dark:text-slate-400",
     bgColor: "bg-slate-50 dark:bg-slate-950",
@@ -51,9 +52,8 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
   },
   {
     value: "honorable",
-    label: "Honrado",
-    description:
-      "Essa raça costuma ter membros que seguem códigos de honra e princípios morais",
+    label: t("races:moral_tendencies.honorable.label"),
+    description: t("races:moral_tendencies.honorable.description"),
     icon: Shield,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -61,9 +61,8 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
   },
   {
     value: "extreme_chaotic",
-    label: "Extremo Caótico",
-    description:
-      "Essa raça só possui indivíduos caóticos que seguem seus próprios desejos",
+    label: t("races:moral_tendencies.extreme_chaotic.label"),
+    description: t("races:moral_tendencies.extreme_chaotic.description"),
     icon: Flame,
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950",
@@ -71,9 +70,8 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
   },
   {
     value: "extreme_honorable",
-    label: "Extremo Honrado",
-    description:
-      "Essa raça só possui indivíduos que seguem rigidamente códigos de honra",
+    label: t("races:moral_tendencies.extreme_honorable.label"),
+    description: t("races:moral_tendencies.extreme_honorable.description"),
     icon: Crown,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950",
@@ -81,9 +79,8 @@ export const RACE_MORAL_TENDENCIES: RaceMoralTendencyOption[] = [
   },
   {
     value: "extreme_neutral",
-    label: "Extremo Neutro",
-    description:
-      "Essa raça possui indivíduos com morais extremamente opostas, variando entre caóticos absolutos e honrados inflexíveis",
+    label: t("races:moral_tendencies.extreme_neutral.label"),
+    description: t("races:moral_tendencies.extreme_neutral.description"),
     icon: RotateCcw,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -112,8 +109,10 @@ const convertBorderToTailwindAlpha = (borderColor: string): string => {
   return "gray-500/30";
 };
 
-export const MORAL_TENDENCY_OPTIONS: GridSelectOption<RaceMoralTendency>[] =
-  RACE_MORAL_TENDENCIES.map((tendency) => ({
+export const getMoralTendencyOptions = (
+  t: TFunction
+): GridSelectOption<RaceMoralTendency>[] =>
+  getRaceMoralTendencies(t).map((tendency) => ({
     value: tendency.value,
     label: tendency.label,
     description: tendency.description,

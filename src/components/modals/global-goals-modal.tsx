@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   GlobalGoals,
   DEFAULT_GLOBAL_GOALS,
-  CHAPTER_STATUS_LABELS,
+  CHAPTER_STATUS_TRANSLATION_KEYS,
   ChapterStatus,
   MIN_WORD_GOAL,
 } from "@/types/global-goals";
@@ -44,7 +44,7 @@ export function GlobalGoalsModal({
   goals,
   onSave,
 }: GlobalGoalsModalProps) {
-  const { t } = useTranslation("global-goals");
+  const { t } = useTranslation(["global-goals", "chapters"]);
   const [localGoals, setLocalGoals] = useState<GlobalGoals>(goals);
 
   // Reseta o estado local sempre que o modal abrir ou as goals mudarem
@@ -134,7 +134,7 @@ export function GlobalGoalsModal({
                       htmlFor={`status-${status}`}
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
-                      {CHAPTER_STATUS_LABELS[status]}
+                      {t(CHAPTER_STATUS_TRANSLATION_KEYS[status])}
                     </label>
                   </div>
                 ))}

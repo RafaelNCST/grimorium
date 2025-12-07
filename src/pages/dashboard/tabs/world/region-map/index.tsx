@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
 import { open } from "@tauri-apps/plugin-dialog";
 import { ArrowLeft, Upload } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { WarningDialog } from "@/components/dialogs/WarningDialog";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ export function RegionMapPage() {
   const search = useSearch({ strict: false });
   const versionId = (search as { versionId?: string })?.versionId || null;
   const navigate = useNavigate();
+  const { t } = useTranslation(["dialogs", "common"]);
 
   const [region, setRegion] = useState<IRegion | null>(null);
   const [childrenRegions, setChildrenRegions] = useState<IRegion[]>([]);
@@ -438,7 +440,7 @@ export function RegionMapPage() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Alterar Imagem</p>
+                <p>{t("common:tooltips.change_image")}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -507,10 +509,18 @@ export function RegionMapPage() {
       <WarningDialog
         open={showChangeImageWarning}
         onOpenChange={setShowChangeImageWarning}
-        title="Trocar imagem do mapa?"
-        description={`Existem ${markers.length} ${markers.length === 1 ? "elemento colocado" : "elementos colocados"} neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.`}
-        cancelText="Cancelar"
-        confirmText="Continuar e escolher imagem"
+        title={t("dialogs:change_map_image.title")}
+        description={
+          markers.length === 1
+            ? t("dialogs:change_map_image.description_singular", {
+                count: markers.length,
+              })
+            : t("dialogs:change_map_image.description_plural", {
+                count: markers.length,
+              })
+        }
+        cancelText={t("dialogs:change_map_image.cancel")}
+        confirmText={t("dialogs:change_map_image.confirm")}
         onConfirm={proceedWithImageChange}
       />
     </div>

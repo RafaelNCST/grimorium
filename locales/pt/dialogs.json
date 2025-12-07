@@ -27,5 +27,19 @@
   },
   "plot_arc_events": {
     "events_count": "{{completedCount}}/{{totalCount}} eventos"
+  },
+  "delete_book": {
+    "title": "Confirmar Exclusão",
+    "description": "Esta ação não pode ser desfeita. Para confirmar a exclusão, digite o nome do livro: <strong>{{bookTitle}}</strong>",
+    "placeholder": "Digite \"{{bookTitle}}\" para confirmar",
+    "cancel": "Cancelar",
+    "confirm": "Excluir Livro"
+  },
+  "change_map_image": {
+    "title": "Trocar imagem do mapa?",
+    "description_singular": "Existe {{count}} elemento colocado neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.",
+    "description_plural": "Existem {{count}} elementos colocados neste mapa. Ao trocar a imagem do mapa, todos os elementos serão removidos e você precisará posicioná-los novamente no novo mapa.",
+    "cancel": "Cancelar",
+    "confirm": "Continuar e escolher imagem"
   }
 }

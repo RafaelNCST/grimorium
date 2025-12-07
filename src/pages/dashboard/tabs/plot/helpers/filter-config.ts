@@ -9,17 +9,17 @@ const STATUS_COLOR_MAP: Record<
   PlotArcStatus,
   { inactiveClasses: string; activeClasses: string }
 > = {
-  finalizado: {
+  finished: {
     inactiveClasses:
       "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:!bg-emerald-500 hover:!text-black hover:!border-emerald-500",
     activeClasses: "!bg-emerald-500 !text-black !border-emerald-500",
   },
-  atual: {
+  current: {
     inactiveClasses:
       "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
     activeClasses: "!bg-blue-500 !text-black !border-blue-500",
   },
-  planejamento: {
+  planning: {
     inactiveClasses:
       "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:!bg-amber-500 hover:!text-black hover:!border-amber-500",
     activeClasses: "!bg-amber-500 !text-black !border-amber-500",
@@ -36,17 +36,17 @@ const SIZE_COLOR_MAP: Record<
       "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400 hover:!bg-violet-500 hover:!text-black hover:!border-violet-500",
     activeClasses: "!bg-violet-500 !text-black !border-violet-500",
   },
-  pequeno: {
+  small: {
     inactiveClasses:
       "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:!bg-blue-500 hover:!text-black hover:!border-blue-500",
     activeClasses: "!bg-blue-500 !text-black !border-blue-500",
   },
-  médio: {
+  medium: {
     inactiveClasses:
       "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:!bg-indigo-500 hover:!text-black hover:!border-indigo-500",
     activeClasses: "!bg-indigo-500 !text-black !border-indigo-500",
   },
-  grande: {
+  large: {
     inactiveClasses:
       "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 hover:!bg-purple-500 hover:!text-black hover:!border-purple-500",
     activeClasses: "!bg-purple-500 !text-black !border-purple-500",

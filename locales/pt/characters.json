@@ -1,4 +1,5 @@
 {
+  "tab_title": "Personagens",
   "page": {
     "title": "Personagens",
     "description": "Gerencie os personagens da sua história",
@@ -18,5 +19,58 @@
     "no_results_description": "Tente ajustar sua busca ou criar um novo personagem",
     "no_role_characters": "Nenhum personagem {{role}}",
     "no_role_characters_description": "Você ainda não criou personagens com este papel"
+  },
+  "alignments": {
+    "good": "Bem",
+    "neutral": "Neutro",
+    "chaotic": "Caótico"
+  },
+  "relationship_types": {
+    "friend": "Amigo",
+    "rival": "Rival",
+    "mentor": "Mentor",
+    "apprentice": "Aprendiz",
+    "enemy": "Inimigo",
+    "love_interest": "Interesse Amoroso",
+    "ally": "Aliado",
+    "acquaintance": "Conhecido",
+    "leader": "Líder",
+    "subordinate": "Subordinado",
+    "family_love": "Amor Familiar",
+    "romantic_relationship": "Relacionamento Amoroso",
+    "best_friend": "Melhor Amigo",
+    "hatred": "Ódio",
+    "neutral": "Neutro",
+    "devotion": "Devoção"
+  },
+  "family_relations": {
+    "father": "Pai",
+    "mother": "Mãe",
+    "spouse": "Cônjuge",
+    "child": "Filho/Filha",
+    "sibling": "Irmão/Irmã",
+    "half_sibling": "Meio-irmão/Meio-irmã",
+    "uncle_aunt": "Tio/Tia",
+    "cousin": "Primo/Prima",
+    "grandparent": "Avô/Avó"
+  },
+  "family_relation_labels": {
+    "father_of": "Pai de {{name}}",
+    "mother_of": "Mãe de {{name}}",
+    "spouse_of": "Cônjuge de {{name}}",
+    "child_of": "Filho(a) de {{name}}",
+    "sibling_of": "Irmão(ã) de {{name}}",
+    "half_sibling_of": "Meio-irmão(ã) de {{name}}",
+    "uncle_aunt_of": "Tio(a) de {{name}}",
+    "cousin_of": "Primo(a) de {{name}}",
+    "grandparent_of": "Avô(ó) de {{name}}"
+  },
+  "roles": {
+    "protagonist": "Protagonista",
+    "co_protagonist": "Co-protagonista",
+    "antagonist": "Antagonista",
+    "villain": "Vilão",
+    "secondary": "Secundário",
+    "extra": "Figurante"
   }
 }

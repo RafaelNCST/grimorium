@@ -73,6 +73,7 @@ export function MetricsCard({
   isCustomizing = false,
 }: MetricsCardProps) {
   const { t } = useTranslation("overview");
+  const { t: tTooltips } = useTranslation("tooltips");
 
   // Load visibility state from localStorage or use defaults
   const [row1Visible, setRow1Visible] = useState(() => {
@@ -250,8 +251,8 @@ export function MetricsCard({
                 }}
                 title={
                   row1Visible
-                    ? "Esconder no modo visualização"
-                    : "Mostrar no modo visualização"
+                    ? tTooltips("visibility.hide_in_view_mode")
+                    : tTooltips("visibility.show_in_view_mode")
                 }
               >
                 {row1Visible ? (
@@ -317,8 +318,8 @@ export function MetricsCard({
                 }}
                 title={
                   row2Visible
-                    ? "Esconder no modo visualização"
-                    : "Mostrar no modo visualização"
+                    ? tTooltips("visibility.hide_in_view_mode")
+                    : tTooltips("visibility.show_in_view_mode")
                 }
               >
                 {row2Visible ? (
@@ -384,8 +385,8 @@ export function MetricsCard({
                 }}
                 title={
                   row3Visible
-                    ? "Esconder no modo visualização"
-                    : "Mostrar no modo visualização"
+                    ? tTooltips("visibility.hide_in_view_mode")
+                    : tTooltips("visibility.show_in_view_mode")
                 }
               >
                 {row3Visible ? (

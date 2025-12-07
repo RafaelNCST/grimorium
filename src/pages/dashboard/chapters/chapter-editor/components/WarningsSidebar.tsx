@@ -40,7 +40,7 @@ interface WarningsSidebarProps {
 }
 
 export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
-  const { t } = useTranslation(["empty-states"]);
+  const { t } = useTranslation(["chapter-editor", "empty-states"]);
   const {
     warnings,
     stats,
@@ -77,7 +77,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Avisos</h2>
+            <h2 className="text-lg font-semibold">{t("chapter-editor:warnings.title")}</h2>
             {stats.total > 0 && (
               <span className="px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full">
                 {stats.total}
@@ -98,13 +98,13 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
               <Button variant="ghost" size="sm" className="gap-2">
                 <Filter className="w-3 h-3" />
                 {selectedType === "all"
-                  ? "Todos"
+                  ? t("chapter-editor:warnings.all")
                   : WARNING_TYPE_LABELS[selectedType]}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={() => setSelectedType("all")}>
-                Todos
+                {t("chapter-editor:warnings.all")}
                 {stats.total > 0 && (
                   <span className="ml-auto text-xs text-muted-foreground">
                     {stats.total}
@@ -144,7 +144,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Excluir todos os avisos</p>
+                <p>{t("chapter-editor:warnings.clear_all_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -160,8 +160,8 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
               </h3>
               <p className="text-xs text-muted-foreground/70">
                 {selectedType === "all"
-                  ? "Não há avisos no momento"
-                  : `Não há avisos de ${WARNING_TYPE_LABELS[selectedType].toLowerCase()}`}
+                  ? t("chapter-editor:warnings.no_warnings")
+                  : t("chapter-editor:warnings.no_warnings_of_type", { type: WARNING_TYPE_LABELS[selectedType].toLowerCase() })}
               </p>
             </div>
           ) : (
@@ -219,26 +219,26 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
         {stats.total > 0 && (
           <div className="px-4 py-3 border-t border-border bg-muted/30">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Total de avisos: {stats.total}</span>
+              <span>{t("chapter-editor:warnings.total_warnings", { count: stats.total })}</span>
               <div className="flex items-center gap-3">
                 {stats.bySeverity.error > 0 && (
                   <span className="text-red-600 dark:text-red-400">
                     {stats.bySeverity.error}{" "}
-                    {stats.bySeverity.error === 1 ? "crítico" : "críticos"}
+                    {stats.bySeverity.error === 1 ? t("chapter-editor:warnings.critical") : t("chapter-editor:warnings.critical_plural")}
                   </span>
                 )}
                 {stats.bySeverity.warning > 0 && (
                   <span className="text-yellow-600 dark:text-yellow-400">
                     {stats.bySeverity.warning}{" "}
                     {stats.bySeverity.warning === 1
-                      ? "importante"
-                      : "importantes"}
+                      ? t("chapter-editor:warnings.important")
+                      : t("chapter-editor:warnings.important_plural")}
                   </span>
                 )}
                 {stats.bySeverity.info > 0 && (
                   <span className="text-blue-600 dark:text-blue-400">
                     {stats.bySeverity.info}{" "}
-                    {stats.bySeverity.info === 1 ? "informação" : "informações"}
+                    {stats.bySeverity.info === 1 ? t("chapter-editor:warnings.info") : t("chapter-editor:warnings.info_plural")}
                   </span>
                 )}
               </div>

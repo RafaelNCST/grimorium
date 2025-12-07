@@ -24,21 +24,21 @@ export function StatusSelector({
 
   const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = [
     {
-      value: "planejamento",
+      value: "planning",
       label: t("statuses.planning"),
       icon: Pencil,
       backgroundColor: "amber-500/10",
       borderColor: "amber-500/30",
     },
     {
-      value: "atual",
+      value: "current",
       label: t("statuses.current"),
       icon: Clock,
       backgroundColor: "blue-500/10",
       borderColor: "blue-500/30",
     },
     {
-      value: "finalizado",
+      value: "finished",
       label: t("statuses.finished"),
       icon: CheckCircle2,
       backgroundColor: "green-500/10",
@@ -46,16 +46,16 @@ export function StatusSelector({
     },
   ];
 
-  // Filter out "atual" option if there's already a current arc
+  // Filter out "current" option if there's already a current arc
   const availableOptions = STATUS_OPTIONS.map((option) => ({
     ...option,
-    disabled: option.value === "atual" && hasCurrentArc,
+    disabled: option.value === "current" && hasCurrentArc,
   }));
 
   const handleChange = (newValue: PlotArcStatus | PlotArcStatus[]) => {
     const val = Array.isArray(newValue) ? newValue[0] : newValue;
-    // Don't allow selecting "atual" if there's already a current arc
-    if (val === "atual" && hasCurrentArc) return;
+    // Don't allow selecting "current" if there's already a current arc
+    if (val === "current" && hasCurrentArc) return;
     onChange(val || "");
   };
 

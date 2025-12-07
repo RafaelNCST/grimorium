@@ -136,7 +136,7 @@ export function ChapterEditorView({
   renderAnnotatedText,
   getAnnotationComments,
 }: ChapterEditorViewProps) {
-  const { t } = useTranslation(["forms"]);
+  const { t } = useTranslation(["forms", "chapter-editor", "chapters", "common"]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,17 +165,17 @@ export function ChapterEditorView({
                     {statusConfig[chapter.status].label}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {getWordCount()} palavras
+                    {t("chapter-editor:toolbar.word_count", { count: getWordCount() })}
                   </span>
                   <Badge variant="outline" className="text-xs">
-                    {chapter.comments.length} comentários
+                    {t("chapter-editor:toolbar.comments_count", { count: chapter.comments.length })}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {chapter.entityLinks.length} links
+                    {t("chapter-editor:toolbar.links_count", { count: chapter.entityLinks.length })}
                   </Badge>
                   {isAutoSaving && (
                     <span className="text-sm text-muted-foreground">
-                      Salvando...
+                      {t("common:actions.saving")}
                     </span>
                   )}
                 </div>
@@ -185,7 +185,7 @@ export function ChapterEditorView({
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={onShowSummaryModal}>
                 <FileText className="w-4 h-4 mr-2" />
-                Resumo
+                {t("chapter-editor:toolbar.summary_button")}
               </Button>
 
               <Select
@@ -198,16 +198,16 @@ export function ChapterEditorView({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">Rascunho</SelectItem>
-                  <SelectItem value="in-progress">Em andamento</SelectItem>
-                  <SelectItem value="review">Em revisão</SelectItem>
-                  <SelectItem value="finished">Finalizado</SelectItem>
+                  <SelectItem value="draft">{t("chapters:status.draft")}</SelectItem>
+                  <SelectItem value="in-progress">{t("chapters:status.in_progress")}</SelectItem>
+                  <SelectItem value="review">{t("chapters:status.review")}</SelectItem>
+                  <SelectItem value="finished">{t("chapters:status.finished")}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Button onClick={onSave} className="btn-magical">
                 <Save className="w-4 h-4 mr-2" />
-                Salvar
+                {t("common:actions.save")}
               </Button>
             </div>
           </div>
@@ -224,21 +224,21 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="bold"
                     onClick={() => onExecCommand("bold")}
-                    aria-label="Negrito"
+                    aria-label={t("chapter-editor:formatting.bold_aria_label")}
                   >
                     <Bold className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="italic"
                     onClick={() => onExecCommand("italic")}
-                    aria-label="Itálico"
+                    aria-label={t("chapter-editor:formatting.italic_aria_label")}
                   >
                     <Italic className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="underline"
                     onClick={() => onExecCommand("underline")}
-                    aria-label="Sublinhado"
+                    aria-label={t("chapter-editor:formatting.underline_aria_label")}
                   >
                     <Underline className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -251,28 +251,28 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="left"
                     onClick={() => onExecCommand("justifyLeft")}
-                    aria-label="Alinhar à esquerda"
+                    aria-label={t("chapter-editor:formatting.align_left_aria_label")}
                   >
                     <AlignLeft className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="center"
                     onClick={() => onExecCommand("justifyCenter")}
-                    aria-label="Centralizar"
+                    aria-label={t("chapter-editor:formatting.align_center_aria_label")}
                   >
                     <AlignCenter className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="right"
                     onClick={() => onExecCommand("justifyRight")}
-                    aria-label="Alinhar à direita"
+                    aria-label={t("chapter-editor:formatting.align_right_aria_label")}
                   >
                     <AlignRight className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="justify"
                     onClick={() => onExecCommand("justifyFull")}
-                    aria-label="Justificar"
+                    aria-label={t("chapter-editor:formatting.justify_aria_label")}
                   >
                     <AlignJustify className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -285,14 +285,14 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="ul"
                     onClick={() => onExecCommand("insertUnorderedList")}
-                    aria-label="Lista com marcadores"
+                    aria-label={t("chapter-editor:formatting.unordered_list_aria_label")}
                   >
                     <List className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="ol"
                     onClick={() => onExecCommand("insertOrderedList")}
-                    aria-label="Lista numerada"
+                    aria-label={t("chapter-editor:formatting.ordered_list_aria_label")}
                   >
                     <ListOrdered className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -372,11 +372,11 @@ export function ChapterEditorView({
             <div className="px-6 py-2 bg-muted/30">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  Texto selecionado: "{selectedText}"
+                  {t("chapter-editor:toolbar.selected_text", { selectedText })}
                 </span>
                 <Button variant="outline" size="sm" onClick={onShowLinkModal}>
                   <Link className="w-4 h-4 mr-1" />
-                  Linkar
+                  {t("chapter-editor:link.link_button")}
                 </Button>
                 <Button
                   variant="outline"
@@ -384,7 +384,7 @@ export function ChapterEditorView({
                   onClick={onShowCommentModal}
                 >
                   <MessageCircle className="w-4 h-4 mr-1" />
-                  Comentar
+                  {t("chapter-editor:toolbar.comment_button")}
                 </Button>
               </div>
             </div>
@@ -421,7 +421,7 @@ export function ChapterEditorView({
           <div className="w-80 border-l border-border p-4 bg-muted/20">
             <div className="mb-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">Comentários</h3>
+                <h3 className="font-semibold">{t("chapter-editor:comments.comments_label")}</h3>
                 <Button variant="ghost" size="sm" onClick={onCloseSidebar}>
                   ✕
                 </Button>
@@ -443,14 +443,14 @@ export function ChapterEditorView({
                             />
                             <div className="flex gap-2">
                               <Button size="sm" onClick={onSaveEditedComment}>
-                                Salvar
+                                {t("common:actions.save")}
                               </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={onCancelEditComment}
                               >
-                                Cancelar
+                                {t("common:actions.cancel")}
                               </Button>
                             </div>
                           </div>
@@ -501,7 +501,7 @@ export function ChapterEditorView({
                   disabled={!newComment.trim()}
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Comentário
+                  {t("chapter-editor:comments.add_comment")}
                 </Button>
               </div>
             </div>
@@ -514,7 +514,7 @@ export function ChapterEditorView({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-96">
             <CardHeader>
-              <CardTitle>Criar Link: "{selectedText}"</CardTitle>
+              <CardTitle>{t("chapter-editor:link.create_link_with_text", { selectedText })}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(mockEntities).map(([type, entities]) => (
@@ -536,7 +536,7 @@ export function ChapterEditorView({
                 </div>
               ))}
               <Button variant="outline" onClick={onHideLinkModal}>
-                Cancelar
+                {t("common:actions.cancel")}
               </Button>
             </CardContent>
           </Card>
@@ -548,21 +548,21 @@ export function ChapterEditorView({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-96">
             <CardHeader>
-              <CardTitle>Adicionar Comentário</CardTitle>
+              <CardTitle>{t("chapter-editor:comments.add_comment")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={newComment}
                 onChange={(e) => onNewCommentChange(e.target.value)}
-                placeholder="Digite seu comentário..."
+                placeholder={t("forms:placeholders.type_your_comment")}
                 rows={3}
               />
               <div className="flex gap-2">
                 <Button onClick={onAddComment} className="flex-1">
-                  Adicionar
+                  {t("common:actions.add")}
                 </Button>
                 <Button variant="outline" onClick={onHideCommentModal}>
-                  Cancelar
+                  {t("common:actions.cancel")}
                 </Button>
               </div>
             </CardContent>
@@ -575,7 +575,7 @@ export function ChapterEditorView({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-[600px]">
             <CardHeader>
-              <CardTitle>Resumo do Capítulo</CardTitle>
+              <CardTitle>{t("chapter-editor:toolbar.summary_modal_title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
@@ -587,7 +587,7 @@ export function ChapterEditorView({
               />
               <div className="flex gap-2">
                 <Button onClick={onHideSummaryModal} className="flex-1">
-                  Fechar
+                  {t("chapter-editor:toolbar.close_button")}
                 </Button>
               </div>
             </CardContent>

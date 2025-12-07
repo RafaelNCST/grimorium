@@ -14,6 +14,7 @@ import {
   BookOpen,
   FileType,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,15 +39,17 @@ export function StatsDetailModal({
   onOpenChange,
   metrics,
 }: StatsDetailModalProps) {
+  const { t } = useTranslation("chapter-editor");
+
   const formatSessionTime = (minutes: number): string => {
-    if (minutes < 1) return "menos de 1 minuto";
-    if (minutes < 60) return `${minutes} minuto${minutes > 1 ? "s" : ""}`;
+    if (minutes < 1) return t("stats_detail.time_less_than_minute");
+    if (minutes < 60) return `${minutes} ${minutes > 1 ? t("stats_detail.time_minutes") : t("stats_detail.time_minute")}`;
 
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
 
-    if (mins === 0) return `${hours} hora${hours > 1 ? "s" : ""}`;
-    return `${hours} hora${hours > 1 ? "s" : ""} e ${mins} minuto${mins > 1 ? "s" : ""}`;
+    if (mins === 0) return `${hours} ${hours > 1 ? t("stats_detail.time_hours") : t("stats_detail.time_hour")}`;
+    return `${hours} ${hours > 1 ? t("stats_detail.time_hours") : t("stats_detail.time_hour")} ${t("stats_detail.time_and")} ${mins} ${mins > 1 ? t("stats_detail.time_minutes") : t("stats_detail.time_minute")}`;
   };
 
   return (
@@ -55,10 +58,10 @@ export function StatsDetailModal({
         <div className="px-6 pt-6 pb-4">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              Estatísticas do Capítulo
+              {t("stats_detail.title")}
             </DialogTitle>
             <DialogDescription>
-              Visão detalhada de todas as métricas de escrita
+              {t("stats_detail.description")}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -67,32 +70,32 @@ export function StatsDetailModal({
           {/* Métricas Básicas */}
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Métricas Básicas
+              {t("stats_detail.basic_metrics")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <MetricCard
                 icon={Type}
-                label="Palavras"
+                label={t("stats_detail.words")}
                 value={metrics.wordCount.toLocaleString()}
-                description="Total de palavras escritas no capítulo"
+                description={t("stats_detail.words_description")}
               />
               <MetricCard
                 icon={FileText}
-                label="Caracteres"
+                label={t("stats_detail.characters")}
                 value={metrics.characterCount.toLocaleString()}
-                description="Caracteres sem espaços"
+                description={t("stats_detail.characters_description")}
               />
               <MetricCard
                 icon={FileText}
-                label="Caracteres (com espaços)"
+                label={t("stats_detail.characters_with_spaces")}
                 value={metrics.characterCountWithSpaces.toLocaleString()}
-                description="Contagem incluindo espaços"
+                description={t("stats_detail.characters_with_spaces_description")}
               />
               <MetricCard
                 icon={BookOpen}
-                label="Páginas Estimadas"
+                label={t("stats_detail.estimated_pages")}
                 value={metrics.estimatedPages.toString()}
-                description="Baseado em 250 palavras por página"
+                description={t("stats_detail.estimated_pages_description")}
               />
             </div>
           </div>
@@ -102,32 +105,32 @@ export function StatsDetailModal({
           {/* Estrutura do Texto */}
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Estrutura do Texto
+              {t("stats_detail.text_structure")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <MetricCard
                 icon={AlignLeft}
-                label="Parágrafos"
+                label={t("stats_detail.paragraphs")}
                 value={metrics.paragraphCount.toLocaleString()}
-                description="Total de parágrafos no capítulo"
+                description={t("stats_detail.paragraphs_description")}
               />
               <MetricCard
                 icon={List}
-                label="Sentenças"
+                label={t("stats_detail.sentences")}
                 value={metrics.sentenceCount.toLocaleString()}
-                description="Frases terminadas em . ! ?"
+                description={t("stats_detail.sentences_description")}
               />
               <MetricCard
                 icon={MessageCircle}
-                label="Diálogos/Falas"
+                label={t("stats_detail.dialogues")}
                 value={metrics.dialogueCount.toLocaleString()}
-                description="Estimativa de falas (aspas e travessões)"
+                description={t("stats_detail.dialogues_description")}
               />
               <MetricCard
                 icon={Type}
-                label="Palavras por Sentença"
+                label={t("stats_detail.words_per_sentence")}
                 value={metrics.averageWordsPerSentence.toString()}
-                description="Média que indica complexidade do texto"
+                description={t("stats_detail.words_per_sentence_description")}
               />
             </div>
           </div>
@@ -137,20 +140,20 @@ export function StatsDetailModal({
           {/* Tempo e Leitura */}
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Tempo e Leitura
+              {t("stats_detail.time_and_reading")}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <MetricCard
                 icon={Clock}
-                label="Tempo de Sessão"
+                label={t("stats_detail.session_time")}
                 value={formatSessionTime(metrics.sessionDuration)}
-                description="Tempo total na sessão atual de escrita"
+                description={t("stats_detail.session_time_description")}
               />
               <MetricCard
                 icon={FileType}
-                label="Tempo de Leitura"
+                label={t("stats_detail.reading_time")}
                 value={`~${metrics.estimatedReadingTime} min`}
-                description="Tempo estimado para ler o capítulo (225 ppm)"
+                description={t("stats_detail.reading_time_description")}
               />
             </div>
           </div>
@@ -159,7 +162,7 @@ export function StatsDetailModal({
         {/* Fixed Footer */}
         <div className="flex justify-end gap-2 px-6 py-4 border-t bg-background rounded-b-lg">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Fechar
+            {t("stats_detail.close")}
           </Button>
         </div>
       </DialogContent>

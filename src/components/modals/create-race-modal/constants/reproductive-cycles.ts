@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 
@@ -29,12 +30,13 @@ export interface RaceReproductiveCycleOption {
   requiresDescription?: boolean;
 }
 
-export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
+export const getRaceReproductiveCycles = (
+  t: TFunction
+): RaceReproductiveCycleOption[] => [
   {
     value: "sexual",
-    label: "Sexuado",
-    description:
-      "Reprodução que requer dois indivíduos de sexos diferentes para gerar descendentes",
+    label: t("races:reproductive_cycles.sexual.label"),
+    description: t("races:reproductive_cycles.sexual.description"),
     icon: Heart,
     color: "text-pink-600 dark:text-pink-400",
     bgColor: "bg-pink-50 dark:bg-pink-950",
@@ -42,9 +44,8 @@ export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
   },
   {
     value: "asexual",
-    label: "Assexuado",
-    description:
-      "Reprodução por divisão celular ou brotamento, sem necessidade de parceiro",
+    label: t("races:reproductive_cycles.asexual.label"),
+    description: t("races:reproductive_cycles.asexual.description"),
     icon: Copy,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-950",
@@ -52,9 +53,8 @@ export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
   },
   {
     value: "hermaphrodite",
-    label: "Hermafrodita",
-    description:
-      "Indivíduos possuem órgãos reprodutores de ambos os sexos, podendo se autofecundar ou cruzar",
+    label: t("races:reproductive_cycles.hermaphrodite.label"),
+    description: t("races:reproductive_cycles.hermaphrodite.description"),
     icon: Merge,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -62,9 +62,8 @@ export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
   },
   {
     value: "parthenogenic",
-    label: "Partenogênico",
-    description:
-      "Desenvolvimento de um embrião sem fecundação por um macho, gerando clones genéticos",
+    label: t("races:reproductive_cycles.parthenogenic.label"),
+    description: t("races:reproductive_cycles.parthenogenic.description"),
     icon: Split,
     color: "text-teal-600 dark:text-teal-400",
     bgColor: "bg-teal-50 dark:bg-teal-950",
@@ -72,9 +71,8 @@ export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
   },
   {
     value: "viviparous",
-    label: "Vivíparo",
-    description:
-      "Filhotes se desenvolvem dentro do corpo do progenitor e nascem completamente formados",
+    label: t("races:reproductive_cycles.viviparous.label"),
+    description: t("races:reproductive_cycles.viviparous.description"),
     icon: Baby,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -82,8 +80,8 @@ export const RACE_REPRODUCTIVE_CYCLES: RaceReproductiveCycleOption[] = [
   },
   {
     value: "other",
-    label: "Outro",
-    description: "Ciclo reprodutivo personalizado ou único desta raça",
+    label: t("races:reproductive_cycles.other.label"),
+    description: t("races:reproductive_cycles.other.description"),
     icon: HelpCircle,
     color: "text-violet-600 dark:text-violet-400",
     bgColor: "bg-violet-50 dark:bg-violet-950",
@@ -113,8 +111,10 @@ const convertBorderToTailwindAlpha = (borderColor: string): string => {
   return "gray-500/30";
 };
 
-export const REPRODUCTIVE_CYCLE_OPTIONS: GridSelectOption<RaceReproductiveCycle>[] =
-  RACE_REPRODUCTIVE_CYCLES.map((cycle) => ({
+export const getReproductiveCycleOptions = (
+  t: TFunction
+): GridSelectOption<RaceReproductiveCycle>[] =>
+  getRaceReproductiveCycles(t).map((cycle) => ({
     value: cycle.value,
     label: cycle.label,
     description: cycle.description,

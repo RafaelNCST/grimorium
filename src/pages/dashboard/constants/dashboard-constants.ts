@@ -47,22 +47,38 @@ export function getGenreTranslationKey(genreId: string): string {
   return genre?.translationKey || genreId;
 }
 
-// Visual styles aligned with create book modal translations
-export const VISUAL_STYLES_CONSTANT = ["Realista", "Cartoon", "Anime"];
+// Visual style structure: id is saved to database (english lowercase), translationKey is for UI display
+export interface VisualStyleConfig {
+  id: string; // Saved to database (english, lowercase)
+  translationKey: string; // Used for i18n display
+}
 
+export const VISUAL_STYLES_CONSTANT: VisualStyleConfig[] = [
+  { id: "realistic", translationKey: "create-book:style.realistic" },
+  { id: "cartoon", translationKey: "create-book:style.cartoon" },
+  { id: "anime", translationKey: "create-book:style.anime" },
+];
+
+// Helper to get translation key from visual style id
+export function getVisualStyleTranslationKey(styleId: string): string {
+  const style = VISUAL_STYLES_CONSTANT.find((s) => s.id === styleId);
+  return style?.translationKey || styleId;
+}
+
+// Tab labels - the label field is the key, and will be prefixed with "tabs." for translation
 export const DEFAULT_TABS_CONSTANT: TabConfig[] = [
   {
     id: "overview",
-    label: "Visão Geral",
+    label: "overview",
     icon: BookOpen,
     visible: true,
     isDefault: true,
   },
-  { id: "characters", label: "Personagens", icon: Users, visible: true },
-  { id: "world", label: "Mundo", icon: MapPin, visible: true },
-  { id: "factions", label: "Facções", icon: Building, visible: true },
-  { id: "plot", label: "Enredo", icon: Target, visible: true },
-  { id: "magic", label: "Sistema de Poder", icon: Zap, visible: true },
-  { id: "species", label: "Raças", icon: Dna, visible: true },
-  { id: "items", label: "Itens", icon: Package, visible: true },
+  { id: "characters", label: "characters", icon: Users, visible: true },
+  { id: "world", label: "world", icon: MapPin, visible: true },
+  { id: "factions", label: "factions", icon: Building, visible: true },
+  { id: "plot", label: "plot", icon: Target, visible: true },
+  { id: "magic", label: "magic", icon: Zap, visible: true },
+  { id: "species", label: "species", icon: Dna, visible: true },
+  { id: "items", label: "items", icon: Package, visible: true },
 ];

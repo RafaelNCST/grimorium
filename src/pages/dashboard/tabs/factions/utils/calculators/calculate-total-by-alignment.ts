@@ -1,17 +1,17 @@
 import { IFaction } from "@/types/faction-types";
 
 interface TotalByAlignment {
-  bem: number;
-  neutro: number;
-  caotico: number;
+  good: number;
+  neutral: number;
+  chaotic: number;
 }
 
 export function calculateTotalByAlignment(
   factions: IFaction[]
 ): TotalByAlignment {
   return {
-    bem: factions.filter((f) => f.alignment === "Bem").length,
-    neutro: factions.filter((f) => f.alignment === "Neutro").length,
-    caotico: factions.filter((f) => f.alignment === "Caótico").length,
+    good: factions.filter((f) => f.alignment === "good").length,
+    neutral: factions.filter((f) => f.alignment === "neutral").length,
+    chaotic: factions.filter((f) => f.alignment === "chaotic").length,
   };
 }

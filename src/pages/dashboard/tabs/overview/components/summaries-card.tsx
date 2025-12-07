@@ -78,6 +78,8 @@ export function SummariesCard({
   onSaveSummaries,
 }: SummariesCardProps) {
   const { t } = useTranslation("overview");
+  const { t: tCommon } = useTranslation("common");
+  const { t: tTooltips } = useTranslation("tooltips");
 
   // Load visibility state from localStorage or use defaults
   const [authorSummaryVisible, setAuthorSummaryVisible] = useState(() => {
@@ -162,8 +164,8 @@ export function SummariesCard({
                   }}
                   title={
                     authorSummaryVisible
-                      ? "Esconder no modo visualização"
-                      : "Mostrar no modo visualização"
+                      ? tTooltips("visibility.hide_in_view_mode")
+                      : tTooltips("visibility.show_in_view_mode")
                   }
                 >
                   {authorSummaryVisible ? (
@@ -219,8 +221,8 @@ export function SummariesCard({
                   }}
                   title={
                     storySummaryVisible
-                      ? "Esconder no modo visualização"
-                      : "Mostrar no modo visualização"
+                      ? tTooltips("visibility.hide_in_view_mode")
+                      : tTooltips("visibility.show_in_view_mode")
                   }
                 >
                   {storySummaryVisible ? (

@@ -7,6 +7,7 @@ import {
   EyeOff,
   Eye,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,8 @@ export function TopBar({
   onCustomizingToggle,
   onHeaderHiddenChange,
 }: PropsTopBar) {
-  const { t } = useLanguageStore();
+  const { t: tStore } = useLanguageStore();
+  const { t } = useTranslation(["common"]);
 
   return (
     <div
@@ -56,10 +58,12 @@ export function TopBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-sm font-medium">Voltar para biblioteca</p>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.back_to_library")}
+            </p>
           </TooltipContent>
         </Tooltip>
-        <h1 className="text-2xl font-bold">{t("book.dashboard")}</h1>
+        <h1 className="text-2xl font-bold">{tStore("book.dashboard")}</h1>
       </div>
 
       <div className="flex items-center gap-2">
@@ -75,7 +79,9 @@ export function TopBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-sm font-medium">Excluir livro</p>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.delete_book")}
+            </p>
           </TooltipContent>
         </Tooltip>
 
@@ -91,7 +97,9 @@ export function TopBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-sm font-medium">Capítulos</p>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.chapters")}
+            </p>
           </TooltipContent>
         </Tooltip>
 
@@ -107,7 +115,9 @@ export function TopBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-sm font-medium">Anotações</p>
+            <p className="text-sm font-medium">
+              {t("common:tooltips.notes")}
+            </p>
           </TooltipContent>
         </Tooltip>
 
@@ -124,7 +134,9 @@ export function TopBar({
           </TooltipTrigger>
           <TooltipContent>
             <p className="text-sm font-medium">
-              {isCustomizing ? "Sair do modo personalizar" : "Personalizar"}
+              {isCustomizing
+                ? t("common:tooltips.exit_customize_mode")
+                : t("common:tooltips.customize")}
             </p>
           </TooltipContent>
         </Tooltip>
@@ -146,7 +158,9 @@ export function TopBar({
           </TooltipTrigger>
           <TooltipContent>
             <p className="text-sm font-medium">
-              {isHeaderHidden ? "Mostrar cabeçalho" : "Ocultar cabeçalho"}
+              {isHeaderHidden
+                ? t("common:tooltips.show_header")
+                : t("common:tooltips.hide_header")}
             </p>
           </TooltipContent>
         </Tooltip>

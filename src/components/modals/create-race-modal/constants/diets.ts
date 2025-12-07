@@ -10,6 +10,7 @@ import {
   HelpCircle,
   type LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 
@@ -35,11 +36,11 @@ export interface RaceDietOption {
   requiresElement?: boolean;
 }
 
-export const RACE_DIETS: RaceDietOption[] = [
+export const getRaceDiets = (t: TFunction): RaceDietOption[] => [
   {
     value: "herbivore",
-    label: "Herbívoro",
-    description: "Alimenta-se de plantas",
+    label: t("races:diets.herbivore.label"),
+    description: t("races:diets.herbivore.description"),
     icon: Leaf,
     color: "text-green-600 dark:text-green-400",
     bgColor: "bg-green-50 dark:bg-green-950",
@@ -47,8 +48,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "carnivore",
-    label: "Carnívoro",
-    description: "Alimenta-se de carne",
+    label: t("races:diets.carnivore.label"),
+    description: t("races:diets.carnivore.description"),
     icon: Beef,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950",
@@ -56,8 +57,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "omnivore",
-    label: "Onívoro",
-    description: "Alimenta-se de tudo",
+    label: t("races:diets.omnivore.label"),
+    description: t("races:diets.omnivore.description"),
     icon: Utensils,
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950",
@@ -65,8 +66,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "insectivore",
-    label: "Insetívoro",
-    description: "Alimenta-se de insetos",
+    label: t("races:diets.insectivore.label"),
+    description: t("races:diets.insectivore.description"),
     icon: Bug,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950",
@@ -74,8 +75,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "frugivore",
-    label: "Frugívoro",
-    description: "Alimenta-se de frutas e sementes",
+    label: t("races:diets.frugivore.label"),
+    description: t("races:diets.frugivore.description"),
     icon: Apple,
     color: "text-pink-600 dark:text-pink-400",
     bgColor: "bg-pink-50 dark:bg-pink-950",
@@ -83,8 +84,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "detritivore",
-    label: "Detritívoro",
-    description: "Alimenta-se de matéria não viva e detritos",
+    label: t("races:diets.detritivore.label"),
+    description: t("races:diets.detritivore.description"),
     icon: Trash2,
     color: "text-slate-600 dark:text-slate-400",
     bgColor: "bg-slate-50 dark:bg-slate-950",
@@ -92,8 +93,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "spiritual",
-    label: "Espiritual",
-    description: "Alimenta-se de energia espiritual",
+    label: t("races:diets.spiritual.label"),
+    description: t("races:diets.spiritual.description"),
     icon: Ghost,
     color: "text-indigo-600 dark:text-indigo-400",
     bgColor: "bg-indigo-50 dark:bg-indigo-950",
@@ -101,8 +102,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "blood",
-    label: "Hematófago",
-    description: "Se alimenta de sangue",
+    label: t("races:diets.blood.label"),
+    description: t("races:diets.blood.description"),
     icon: Droplet,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950",
@@ -110,8 +111,8 @@ export const RACE_DIETS: RaceDietOption[] = [
   },
   {
     value: "other",
-    label: "Outro",
-    description: "Fonte de alimento personalizada",
+    label: t("races:diets.other.label"),
+    description: t("races:diets.other.description"),
     icon: HelpCircle,
     color: "text-violet-600 dark:text-violet-400",
     bgColor: "bg-violet-50 dark:bg-violet-950",
@@ -141,13 +142,12 @@ const convertBorderToTailwindAlpha = (borderColor: string): string => {
   return "gray-500/30";
 };
 
-export const DIET_OPTIONS: GridSelectOption<RaceDiet>[] = RACE_DIETS.map(
-  (diet) => ({
+export const getDietOptions = (t: TFunction): GridSelectOption<RaceDiet>[] =>
+  getRaceDiets(t).map((diet) => ({
     value: diet.value,
     label: diet.label,
     description: diet.description,
     icon: diet.icon,
     backgroundColor: convertToTailwindAlpha(diet.bgColor),
     borderColor: convertBorderToTailwindAlpha(diet.borderColor),
-  })
-);
+  }));

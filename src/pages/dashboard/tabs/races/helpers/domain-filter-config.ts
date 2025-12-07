@@ -1,5 +1,7 @@
+import { TFunction } from "i18next";
+
 import { FilterRow, BADGE_COLORS } from "@/components/entity-list";
-import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
+import { getRaceDomains } from "@/components/modals/create-race-modal/constants/domains";
 
 import { DomainType } from "../types/race-types";
 
@@ -7,28 +9,34 @@ import { DomainType } from "../types/race-types";
  * Creates filter configuration for race domains
  */
 export function createDomainFilterRows(
-  domainStats: Record<DomainType, number>
+  domainStats: Record<DomainType, number>,
+  t: TFunction
 ): FilterRow<DomainType>[] {
   const domains: DomainType[] = [
-    "Aquático",
-    "Terrestre",
-    "Aéreo",
-    "Subterrâneo",
-    "Elevado",
-    "Dimensional",
-    "Espiritual",
-    "Cósmico",
+    "aquatic",
+    "terrestrial",
+    "aerial",
+    "underground",
+    "elevated",
+    "dimensional",
+    "spiritual",
+    "cosmic",
   ];
+
+  const raceDomains = getRaceDomains(t);
 
   return [
     {
       id: "domains",
-      items: domains.map((domain) => ({
-        value: domain,
-        label: domain,
-        count: domainStats[domain],
-        colorConfig: getDomainColorConfig(domain),
-      })),
+      items: domains.map((domain) => {
+        const domainData = raceDomains.find((d) => d.value === domain);
+        return {
+          value: domain,
+          label: domainData?.label || domain,
+          count: domainStats[domain],
+          colorConfig: getDomainColorConfig(domain),
+        };
+      }),
     },
   ];
 }
@@ -38,14 +46,14 @@ export function createDomainFilterRows(
  */
 export function getDomainColorConfig(domain: DomainType) {
   const colorMap: Record<DomainType, keyof typeof BADGE_COLORS> = {
-    Aquático: "blue",
-    Terrestre: "green",
-    Aéreo: "cyan",
-    Subterrâneo: "orange",
-    Elevado: "teal",
-    Dimensional: "purple",
-    Espiritual: "violet",
-    Cósmico: "indigo",
+    aquatic: "blue",
+    terrestrial: "green",
+    aerial: "cyan",
+    underground: "orange",
+    elevated: "teal",
+    dimensional: "purple",
+    spiritual: "violet",
+    cosmic: "indigo",
   };
 
   return BADGE_COLORS[colorMap[domain]];
@@ -54,8 +62,9 @@ export function getDomainColorConfig(domain: DomainType) {
 /**
  * Gets domain display data (icon and color config)
  */
-export function getDomainDisplayData(domain: DomainType) {
-  const domainData = RACE_DOMAINS.find((d) => d.label === domain);
+export function getDomainDisplayData(domain: DomainType, t: TFunction) {
+  const raceDomains = getRaceDomains(t);
+  const domainData = raceDomains.find((d) => d.value === domain);
   const colorConfig = getDomainColorConfig(domain);
 
   return {

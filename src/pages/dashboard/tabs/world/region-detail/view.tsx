@@ -179,7 +179,12 @@ export function RegionDetailView({
   onAdvancedSectionToggle,
   onTimelineSectionToggle,
 }: RegionDetailViewProps) {
-  const { t } = useTranslation(["region-detail", "world", "empty-states"]);
+  const { t } = useTranslation([
+    "region-detail",
+    "world",
+    "empty-states",
+    "common",
+  ]);
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   // State for controlling the create era dialog from the empty state button
@@ -1343,7 +1348,7 @@ export function RegionDetailView({
             extraSections={[
               {
                 id: "timeline",
-                title: "Linha do Tempo da Região",
+                title: t("empty-states:timeline.timeline_title"),
                 content: (
                   <RegionTimeline
                     regionId={region.id}
@@ -1372,7 +1377,7 @@ export function RegionDetailView({
                 emptyIcon: Clock,
                 emptyTitle: t("empty-states:timeline.no_timeline_defined"),
                 emptyDescription: t("empty-states:timeline.use_edit_mode_to_add_eras"),
-                addButtonLabel: "Criar Primeira Era",
+                addButtonLabel: t("empty-states:timeline.create_first_era"),
                 onAddClick: () => setIsCreateEraDialogOpen(true),
               },
               // Chapter Metrics section (only visible in view mode)
@@ -1380,7 +1385,7 @@ export function RegionDetailView({
                 ? [
                     {
                       id: "chapter-metrics",
-                      title: "Métricas de capítulo",
+                      title: t("empty-states:timeline.chapter_metrics_title"),
                       content: (
                         <EntityChapterMetricsSection
                           bookId={bookId}
@@ -1442,7 +1447,7 @@ export function RegionDetailView({
                               }}
                             >
                               <Trash2 className="w-3 h-3 mr-1" />
-                              Excluir
+                              {t("common:actions.delete")}
                             </Button>
                           </div>
                         )}

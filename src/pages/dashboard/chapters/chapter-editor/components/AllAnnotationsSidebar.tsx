@@ -107,7 +107,7 @@ export function AllAnnotationsSidebar({
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="font-medium">
                             {annotation.notes.length}{" "}
-                            {annotation.notes.length === 1 ? "nota" : "notas"}
+                            {annotation.notes.length === 1 ? t("chapter-editor:annotations_sidebar.note") : t("chapter-editor:annotations_sidebar.notes")}
                           </span>
                           {hasImportantNotes && (
                             <Tooltip>
@@ -152,7 +152,7 @@ export function AllAnnotationsSidebar({
                       </div>
                     ) : (
                       <p className="text-xs text-muted-foreground italic">
-                        Sem notas ainda
+                        {t("chapter-editor:annotations_sidebar.no_notes_yet")}
                       </p>
                     )}
                   </Card>
@@ -166,7 +166,7 @@ export function AllAnnotationsSidebar({
         {annotations.length > 0 && (
           <div className="px-4 py-3 border-t border-border bg-muted/30">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Total de anotações: {annotations.length}</span>
+              <span>{t("chapter-editor:annotations_sidebar.total_annotations", { count: annotations.length })}</span>
               <div className="flex items-center gap-3">
                 {(() => {
                   const importantCount = annotations.filter((a) =>
@@ -180,12 +180,12 @@ export function AllAnnotationsSidebar({
                     <>
                       {importantCount > 0 && (
                         <span className="text-amber-600 dark:text-amber-400">
-                          {importantCount} importantes
+                          {importantCount} {t("chapter-editor:annotations_sidebar.important_plural")}
                         </span>
                       )}
                       {totalNotes > 0 && (
                         <span>
-                          {totalNotes} {totalNotes === 1 ? "nota" : "notas"}
+                          {totalNotes} {totalNotes === 1 ? t("chapter-editor:annotations_sidebar.note") : t("chapter-editor:annotations_sidebar.notes")}
                         </span>
                       )}
                     </>

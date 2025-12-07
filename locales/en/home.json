@@ -24,6 +24,8 @@
     "text_empty": "No books found"
   },
   "book_card": {
-    "view_details": "View details"
+    "view_details": "View details",
+    "chapters": "chapters",
+    "modified": "Modified"
   }
 }

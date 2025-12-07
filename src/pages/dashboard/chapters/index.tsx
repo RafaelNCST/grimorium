@@ -67,19 +67,19 @@ interface Chapter {
   mentionedRaces?: EntityMention[];
 }
 
-const statusConfig: Record<
-  ChapterStatus,
-  { label: string; color: string; icon: any }
-> = {
-  draft: { label: "Rascunho", color: "bg-gray-500", icon: null },
-  "in-progress": { label: "Em andamento", color: "bg-blue-500", icon: null },
-  review: { label: "Em revisão", color: "bg-amber-600", icon: null },
-  finished: { label: "Finalizado", color: "bg-emerald-600", icon: null },
-  published: { label: "Lançado", color: "bg-purple-500", icon: null },
-};
+// Status configuration function that uses i18n
+const getStatusConfig = (
+  t: (key: string) => string
+): Record<ChapterStatus, { label: string; color: string; icon: any }> => ({
+  draft: { label: t("chapters:status.draft"), color: "bg-gray-500", icon: null },
+  "in-progress": { label: t("chapters:status.in_progress"), color: "bg-blue-500", icon: null },
+  review: { label: t("chapters:status.review"), color: "bg-amber-600", icon: null },
+  finished: { label: t("chapters:status.finished"), color: "bg-emerald-600", icon: null },
+  published: { label: t("chapters:status.published"), color: "bg-purple-500", icon: null },
+});
 
 export function ChaptersPage() {
-  const { t } = useTranslation(["empty-states", "forms"]);
+  const { t } = useTranslation(["empty-states", "forms", "chapters"]);
   const { dashboardId } = useParams({
     from: "/dashboard/$dashboardId/chapters/",
   });
@@ -100,6 +100,9 @@ export function ChaptersPage() {
   const { goals: globalGoals, updateGoals } = useGlobalGoals();
   const { settings: warningsSettings, updateSettings: updateWarningsSettings } =
     useWarningsSettings();
+
+  // Get translated status config
+  const statusConfig = getStatusConfig(t);
 
   // Load plot arcs and chapters
   useEffect(() => {
@@ -363,7 +366,7 @@ export function ChaptersPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Carregando capítulos...</p>
+        <p className="text-muted-foreground">{t("chapters:loading")}</p>
       </div>
     );
   }
@@ -380,7 +383,7 @@ export function ChaptersPage() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-semibold">Capítulos</h1>
+        <h1 className="text-xl font-semibold">{t("chapters:page.title")}</h1>
 
         <div className="flex-1" />
 
@@ -390,7 +393,7 @@ export function ChaptersPage() {
           className="gap-2"
         >
           <Target className="h-4 w-4" />
-          Metas
+          {t("chapters:page.goals_button")}
         </Button>
 
         <Button
@@ -399,7 +402,7 @@ export function ChaptersPage() {
           className="gap-2"
         >
           <Bell className="h-4 w-4" />
-          Gerenciar Avisos
+          {t("chapters:page.warnings_button")}
         </Button>
 
         <Button
@@ -408,7 +411,7 @@ export function ChaptersPage() {
           className="gap-2 animate-glow"
         >
           <Plus className="h-4 w-4" />
-          Novo Capítulo
+          {t("chapters:page.new_chapter")}
         </Button>
       </div>
 
@@ -441,7 +444,7 @@ export function ChaptersPage() {
                     value="all"
                     className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
                   >
-                    Todos ({chapters.length})
+                    {t("chapters:page.total_badge")} ({chapters.length})
                   </TabsTrigger>
                   <TabsTrigger
                     value="draft"
@@ -595,10 +598,9 @@ export function ChaptersPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Capítulo</AlertDialogTitle>
+            <AlertDialogTitle>{t("chapters:delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este capítulo? Esta ação não pode
-              ser desfeita.
+              {t("chapters:delete.description")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -608,7 +610,7 @@ export function ChaptersPage() {
                 setShowDeleteDialog(false);
               }}
             >
-              Cancelar
+              {t("chapters:delete.cancel")}
             </AlertDialogCancel>
             <Button
               variant="destructive"
@@ -617,7 +619,7 @@ export function ChaptersPage() {
                 chapterToDelete && handleDeleteChapter(chapterToDelete)
               }
             >
-              Excluir
+              {t("chapters:delete.confirm")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

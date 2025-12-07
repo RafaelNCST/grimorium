@@ -2,6 +2,7 @@ import {
   WarningDialog,
   WarningDialogProps,
 } from "@/components/dialogs/WarningDialog";
+import { useTranslation } from "react-i18next";
 
 interface UnsavedChangesDialogProps {
   open: boolean;
@@ -15,18 +16,20 @@ export function UnsavedChangesDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = "Descartar alterações?",
-  description = "Você tem alterações não salvas. Se sair agora, todas as mudanças serão perdidas.",
+  title,
+  description,
 }: UnsavedChangesDialogProps) {
+  const { t } = useTranslation("common");
+
   return (
     <WarningDialog
       open={open}
       onOpenChange={onOpenChange}
       onConfirm={onConfirm}
-      title={title}
-      description={description}
-      cancelText="Continuar Editando"
-      confirmText="Descartar Alterações"
+      title={title ?? t("unsaved_changes.title")}
+      description={description ?? t("unsaved_changes.description")}
+      cancelText={t("unsaved_changes.cancel")}
+      confirmText={t("unsaved_changes.confirm")}
     />
   );
 }

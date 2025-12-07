@@ -1,5 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { TabsTrigger } from "@/components/ui/tabs";
@@ -30,6 +31,7 @@ export function SortableTab({
   isLast = false,
   isDragging: isDraggingProp = false,
 }: PropsSortableTab) {
+  const { t } = useTranslation("tooltips");
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({
       id: tab.id,
@@ -76,7 +78,7 @@ export function SortableTab({
           />
         )}
         <tab.icon className="w-4 h-4" />
-        <span className="flex-1 text-sm">{tab.label}</span>
+        <span className="flex-1 text-sm">{t(`tabs.${tab.label}`)}</span>
         {!tab.isDefault && (
           <Button
             variant="ghost"
@@ -103,7 +105,7 @@ export function SortableTab({
       className="flex pointer-events-auto cursor-pointer items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
     >
       <tab.icon className="w-5 h-5 @[860px]:w-4 @[860px]:h-4 shrink-0" />
-      <span className="hidden @[860px]:inline truncate">{tab.label}</span>
+      <span className="hidden @[860px]:inline truncate">{t(`tabs.${tab.label}`)}</span>
     </TabsTrigger>
   );
 }

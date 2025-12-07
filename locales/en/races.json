@@ -1,4 +1,5 @@
 {
+  "tab_title": "Species",
   "title": "Races",
   "description": "Manage the races, beasts and species that inhabit your world",
   "new_race_button": "New Race",
@@ -10,7 +11,8 @@
   "not_found": "No races found",
   "filters": {
     "all": "All",
-    "domain": "Domain"
+    "domain": "Domain",
+    "total": "Total"
   },
   "domains": {
     "Aquático": "Aquatic",
@@ -20,6 +22,238 @@
     "Elevado": "Elevated",
     "Dimensional": "Dimensional",
     "Espiritual": "Spiritual",
-    "Cósmico": "Cosmic"
+    "Cósmico": "Cosmic",
+    "aquatic": {
+      "label": "Aquatic"
+    },
+    "terrestrial": {
+      "label": "Terrestrial"
+    },
+    "aerial": {
+      "label": "Aerial"
+    },
+    "underground": {
+      "label": "Underground"
+    },
+    "elevated": {
+      "label": "Elevated"
+    },
+    "dimensional": {
+      "label": "Dimensional"
+    },
+    "spiritual": {
+      "label": "Spiritual"
+    },
+    "cosmic": {
+      "label": "Cosmic"
+    }
+  },
+  "diets": {
+    "herbivore": {
+      "label": "Herbivore",
+      "description": "Feeds on plants"
+    },
+    "carnivore": {
+      "label": "Carnivore",
+      "description": "Feeds on meat"
+    },
+    "omnivore": {
+      "label": "Omnivore",
+      "description": "Feeds on everything"
+    },
+    "insectivore": {
+      "label": "Insectivore",
+      "description": "Feeds on insects"
+    },
+    "frugivore": {
+      "label": "Frugivore",
+      "description": "Feeds on fruits and seeds"
+    },
+    "detritivore": {
+      "label": "Detritivore",
+      "description": "Feeds on non-living matter and detritus"
+    },
+    "spiritual": {
+      "label": "Spiritual",
+      "description": "Feeds on spiritual energy"
+    },
+    "blood": {
+      "label": "Hematophage",
+      "description": "Feeds on blood"
+    },
+    "other": {
+      "label": "Other",
+      "description": "Custom food source"
+    }
+  },
+  "habits": {
+    "nocturnal": {
+      "label": "Nocturnal",
+      "description": "Active during the night"
+    },
+    "diurnal": {
+      "label": "Diurnal",
+      "description": "Active during the day"
+    },
+    "crepuscular": {
+      "label": "Crepuscular",
+      "description": "Active at dawn and dusk"
+    },
+    "catemeral": {
+      "label": "Cathemeral",
+      "description": "Active at varied times"
+    },
+    "lunar": {
+      "label": "Lunar",
+      "description": "Active according to moon phases"
+    },
+    "solar": {
+      "label": "Solar",
+      "description": "Active in intense sunlight"
+    },
+    "transcendental": {
+      "label": "Transcendental",
+      "description": "Unaffected by time and space"
+    },
+    "infernal": {
+      "label": "Infernal",
+      "description": "Active in regions without sunlight"
+    }
+  },
+  "moral_tendencies": {
+    "chaotic": {
+      "label": "Chaotic",
+      "description": "This race typically has chaotic members who follow their own desires"
+    },
+    "neutral": {
+      "label": "Neutral",
+      "description": "This race is typically balanced in its actions, being neither good nor evil necessarily"
+    },
+    "honorable": {
+      "label": "Honorable",
+      "description": "This race typically has members who follow codes of honor and moral principles"
+    },
+    "extreme_chaotic": {
+      "label": "Extreme Chaotic",
+      "description": "This race only has chaotic individuals who follow their own desires"
+    },
+    "extreme_honorable": {
+      "label": "Extreme Honorable",
+      "description": "This race only has individuals who rigidly follow codes of honor"
+    },
+    "extreme_neutral": {
+      "label": "Extreme Neutral",
+      "description": "This race has individuals with extremely opposed morals, ranging from absolute chaotic to inflexible honorable"
+    }
+  },
+  "physical_capacities": {
+    "powerless": {
+      "label": "Powerless",
+      "description": "An average member would be easily defeated by a common human"
+    },
+    "weaker": {
+      "label": "Weaker",
+      "description": "An average member is weaker than a common human"
+    },
+    "comparable": {
+      "label": "Comparable",
+      "description": "An average member has strength similar to a common human"
+    },
+    "stronger": {
+      "label": "Stronger",
+      "description": "An average member is stronger than a common human"
+    },
+    "invincible": {
+      "label": "Invincible",
+      "description": "An average member could easily eliminate a common human"
+    }
+  },
+  "reproductive_cycles": {
+    "sexual": {
+      "label": "Sexual",
+      "description": "Reproduction that requires two individuals of different sexes to generate offspring"
+    },
+    "asexual": {
+      "label": "Asexual",
+      "description": "Reproduction by cell division or budding, without need for a partner"
+    },
+    "hermaphrodite": {
+      "label": "Hermaphrodite",
+      "description": "Individuals possess reproductive organs of both sexes, being able to self-fertilize or cross-breed"
+    },
+    "parthenogenic": {
+      "label": "Parthenogenic",
+      "description": "Development of an embryo without fertilization by a male, generating genetic clones"
+    },
+    "viviparous": {
+      "label": "Viviparous",
+      "description": "Offspring develop inside the parent's body and are born fully formed"
+    },
+    "other": {
+      "label": "Other",
+      "description": "Custom or unique reproductive cycle of this race"
+    }
+  },
+  "communications": {
+    "speech": {
+      "label": "Speech",
+      "description": "Verbal communication"
+    },
+    "telepathy": {
+      "label": "Telepathy",
+      "description": "Mental communication"
+    },
+    "pheromones": {
+      "label": "Pheromones",
+      "description": "Chemical communication"
+    },
+    "gestures": {
+      "label": "Gestures",
+      "description": "Body communication"
+    },
+    "other": {
+      "label": "Other",
+      "description": "Custom communication form"
+    }
+  },
+  "types": {
+    "aquatic": {
+      "label": "Aquatic"
+    },
+    "terrestrial": {
+      "label": "Terrestrial"
+    },
+    "flying": {
+      "label": "Flying"
+    },
+    "spatial": {
+      "label": "Spatial"
+    },
+    "ethereal": {
+      "label": "Ethereal"
+    }
+  },
+  "relationships": {
+    "predation": {
+      "description": "This race hunts the other"
+    },
+    "prey": {
+      "description": "This race is prey to the other"
+    },
+    "parasitism": {
+      "description": "This race benefits by harming the other"
+    },
+    "commensalism": {
+      "description": "This race benefits without affecting the other"
+    },
+    "mutualism": {
+      "description": "Both races benefit"
+    },
+    "competition": {
+      "description": "Both races compete for resources"
+    },
+    "neutralism": {
+      "description": "Neither race affects the other"
+    }
   }
 }

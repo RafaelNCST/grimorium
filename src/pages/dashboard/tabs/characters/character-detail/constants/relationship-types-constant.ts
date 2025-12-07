@@ -1,6 +1,6 @@
 export interface IRelationshipType {
   value: string;
-  label: string;
+  translationKey: string;
   emoji: string;
   color: string;
 }
@@ -8,97 +8,97 @@ export interface IRelationshipType {
 export const RELATIONSHIP_TYPES_CONSTANT: IRelationshipType[] = [
   {
     value: "friend",
-    label: "Amigo",
+    translationKey: "relationship_types.friend",
     emoji: "👥",
     color: "bg-green-500/10 text-green-600",
   },
   {
     value: "rival",
-    label: "Rival",
+    translationKey: "relationship_types.rival",
     emoji: "⚔️",
     color: "bg-orange-500/10 text-orange-600",
   },
   {
     value: "mentor",
-    label: "Mentor",
+    translationKey: "relationship_types.mentor",
     emoji: "🎓",
     color: "bg-blue-500/10 text-blue-600",
   },
   {
     value: "apprentice",
-    label: "Aprendiz",
+    translationKey: "relationship_types.apprentice",
     emoji: "📖",
     color: "bg-cyan-500/10 text-cyan-600",
   },
   {
     value: "enemy",
-    label: "Inimigo",
+    translationKey: "relationship_types.enemy",
     emoji: "💀",
     color: "bg-red-500/10 text-red-600",
   },
   {
     value: "love_interest",
-    label: "Interesse Amoroso",
+    translationKey: "relationship_types.love_interest",
     emoji: "❤️",
     color: "bg-pink-500/10 text-pink-600",
   },
   {
     value: "ally",
-    label: "Aliado",
+    translationKey: "relationship_types.ally",
     emoji: "🛡️",
     color: "bg-indigo-500/10 text-indigo-600",
   },
   {
     value: "acquaintance",
-    label: "Conhecido",
+    translationKey: "relationship_types.acquaintance",
     emoji: "✨",
     color: "bg-gray-500/10 text-gray-600",
   },
   {
     value: "leader",
-    label: "Líder",
+    translationKey: "relationship_types.leader",
     emoji: "👑",
     color: "bg-purple-500/10 text-purple-600",
   },
   {
     value: "subordinate",
-    label: "Subordinado",
+    translationKey: "relationship_types.subordinate",
     emoji: "🫡",
     color: "bg-slate-500/10 text-slate-600",
   },
   {
     value: "family_love",
-    label: "Amor Familiar",
+    translationKey: "relationship_types.family_love",
     emoji: "🏠",
     color: "bg-pink-400/10 text-pink-500",
   },
   {
     value: "romantic_relationship",
-    label: "Relacionamento Amoroso",
+    translationKey: "relationship_types.romantic_relationship",
     emoji: "💕",
     color: "bg-fuchsia-500/10 text-fuchsia-600",
   },
   {
     value: "best_friend",
-    label: "Melhor Amigo",
+    translationKey: "relationship_types.best_friend",
     emoji: "🤝",
     color: "bg-teal-500/10 text-teal-600",
   },
   {
     value: "hatred",
-    label: "Ódio",
+    translationKey: "relationship_types.hatred",
     emoji: "🔥",
     color: "bg-red-700/10 text-red-700",
   },
   {
     value: "neutral",
-    label: "Neutro",
+    translationKey: "relationship_types.neutral",
     emoji: "😐",
     color: "bg-gray-400/10 text-gray-500",
   },
   {
     value: "devotion",
-    label: "Devoção",
+    translationKey: "relationship_types.devotion",
     emoji: "✨",
     color: "bg-violet-500/10 text-violet-600",
   },

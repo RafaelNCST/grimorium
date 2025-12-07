@@ -2,7 +2,7 @@ import { Users, Crown, Sword, UserCheck, type LucideIcon } from "lucide-react";
 
 export interface IRole {
   value: string;
-  label: string;
+  translationKey: string;
   icon: LucideIcon;
   color: string;
 }
@@ -10,37 +10,37 @@ export interface IRole {
 export const ROLES_CONSTANT: IRole[] = [
   {
     value: "protagonista",
-    label: "Protagonista",
+    translationKey: "roles.protagonist",
     icon: Crown,
     color: "bg-accent text-accent-foreground",
   },
   {
     value: "co-protagonista",
-    label: "Co-protagonista",
+    translationKey: "roles.co_protagonist",
     icon: UserCheck,
     color: "bg-accent/80 text-accent-foreground",
   },
   {
     value: "antagonista",
-    label: "Antagonista",
+    translationKey: "roles.antagonist",
     icon: Sword,
     color: "bg-destructive text-destructive-foreground",
   },
   {
     value: "vilao",
-    label: "Vilão",
+    translationKey: "roles.villain",
     icon: Sword,
     color: "bg-destructive text-destructive-foreground",
   },
   {
     value: "secundario",
-    label: "Secundário",
+    translationKey: "roles.secondary",
     icon: Users,
     color: "bg-secondary text-secondary-foreground",
   },
   {
     value: "figurante",
-    label: "Figurante",
+    translationKey: "roles.extra",
     icon: Users,
     color: "bg-muted text-muted-foreground",
   },

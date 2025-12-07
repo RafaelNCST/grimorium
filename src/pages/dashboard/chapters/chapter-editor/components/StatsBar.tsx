@@ -140,12 +140,12 @@ export function StatsBar({
                   <Type className="w-4 h-4" />
                   <span>
                     <strong className={wordColor}>{metrics.wordCount}</strong>{" "}
-                    palavras
+                    {t("stats_bar.words")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Total de palavras no capítulo</p>
+                <p>{t("stats_bar.words_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -158,12 +158,12 @@ export function StatsBar({
                     <strong className={characterColor}>
                       {metrics.characterCount}
                     </strong>{" "}
-                    caracteres
+                    {t("stats_bar.characters")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Caracteres sem espaços</p>
+                <p>{t("stats_bar.characters_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -176,12 +176,12 @@ export function StatsBar({
                     <strong className="text-foreground">
                       {metrics.paragraphCount}
                     </strong>{" "}
-                    parágrafos
+                    {t("stats_bar.paragraphs")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Total de parágrafos</p>
+                <p>{t("stats_bar.paragraphs_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -194,12 +194,12 @@ export function StatsBar({
                     <strong className="text-foreground">
                       {metrics.sentenceCount}
                     </strong>{" "}
-                    sentenças
+                    {t("stats_bar.sentences")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Total de sentenças</p>
+                <p>{t("stats_bar.sentences_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -212,12 +212,12 @@ export function StatsBar({
                     <strong className="text-foreground">
                       {metrics.dialogueCount}
                     </strong>{" "}
-                    falas
+                    {t("stats_bar.dialogues")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Diálogos estimados (aspas e travessões)</p>
+                <p>{t("stats_bar.dialogues_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -230,12 +230,12 @@ export function StatsBar({
                     <strong className={sessionTimeColor}>
                       {formatSessionTime(metrics.sessionDuration)}
                     </strong>{" "}
-                    de escrita
+                    {t("stats_bar.session_time")}
                   </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Tempo na sessão atual</p>
+                <p>{t("stats_bar.session_time_tooltip")}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -247,7 +247,7 @@ export function StatsBar({
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Info className="w-3 h-3" />
-                    <span>Detalhes</span>
+                    <span>{t("stats_bar.details")}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>

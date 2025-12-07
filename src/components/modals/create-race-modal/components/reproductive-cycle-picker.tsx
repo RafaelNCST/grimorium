@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 
-import { REPRODUCTIVE_CYCLE_OPTIONS } from "../constants/reproductive-cycles";
+import { getRaceReproductiveCycles } from "../constants/reproductive-cycles";
 
 interface PropsReproductiveCyclePicker {
   value: string;
@@ -24,13 +24,14 @@ export function ReproductiveCyclePicker({
 }: PropsReproductiveCyclePicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
+  const reproductiveCycleOptions = getRaceReproductiveCycles(t);
 
   return (
     <FormSelectGrid
       value={value}
       onChange={onChange}
       label={hideLabel ? "" : t("modal.reproductive_cycle")}
-      options={REPRODUCTIVE_CYCLE_OPTIONS}
+      options={reproductiveCycleOptions}
       columns={3}
       showExpandedContent={isOther}
       expandedContent={

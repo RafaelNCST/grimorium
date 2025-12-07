@@ -9,6 +9,7 @@ import {
   Eclipse,
   type LucideIcon,
 } from "lucide-react";
+import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 
@@ -32,11 +33,11 @@ export interface RaceHabitOption {
   borderColor: string;
 }
 
-export const RACE_HABITS: RaceHabitOption[] = [
+export const getRaceHabits = (t: TFunction): RaceHabitOption[] => [
   {
     value: "nocturnal",
-    label: "Noturno",
-    description: "Ativo durante a noite",
+    label: t("races:habits.nocturnal.label"),
+    description: t("races:habits.nocturnal.description"),
     icon: Moon,
     color: "text-indigo-600 dark:text-indigo-400",
     bgColor: "bg-indigo-50 dark:bg-indigo-950",
@@ -44,8 +45,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "diurnal",
-    label: "Diurno",
-    description: "Ativo durante o dia",
+    label: t("races:habits.diurnal.label"),
+    description: t("races:habits.diurnal.description"),
     icon: Sun,
     color: "text-yellow-600 dark:text-yellow-400",
     bgColor: "bg-yellow-50 dark:bg-yellow-950",
@@ -53,8 +54,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "crepuscular",
-    label: "Crepuscular",
-    description: "Ativo ao amanhecer e entardecer",
+    label: t("races:habits.crepuscular.label"),
+    description: t("races:habits.crepuscular.description"),
     icon: Sunset,
     color: "text-orange-600 dark:text-orange-400",
     bgColor: "bg-orange-50 dark:bg-orange-950",
@@ -62,8 +63,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "catemeral",
-    label: "Catemeral",
-    description: "Ativo em horários variados",
+    label: t("races:habits.catemeral.label"),
+    description: t("races:habits.catemeral.description"),
     icon: Clock,
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-50 dark:bg-blue-950",
@@ -71,8 +72,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "lunar",
-    label: "Lunar",
-    description: "Ativo conforme fases da lua",
+    label: t("races:habits.lunar.label"),
+    description: t("races:habits.lunar.description"),
     icon: MoonStar,
     color: "text-slate-600 dark:text-slate-400",
     bgColor: "bg-slate-50 dark:bg-slate-950",
@@ -80,8 +81,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "solar",
-    label: "Solar",
-    description: "Ativo em luz solar intensa",
+    label: t("races:habits.solar.label"),
+    description: t("races:habits.solar.description"),
     icon: SunDim,
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-50 dark:bg-amber-950",
@@ -89,8 +90,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "transcendental",
-    label: "Transcendental",
-    description: "Não afetado por tempo e espaço",
+    label: t("races:habits.transcendental.label"),
+    description: t("races:habits.transcendental.description"),
     icon: Infinity,
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -98,8 +99,8 @@ export const RACE_HABITS: RaceHabitOption[] = [
   },
   {
     value: "infernal",
-    label: "Ínfero",
-    description: "Ativo em regiões sem luz solar",
+    label: t("races:habits.infernal.label"),
+    description: t("races:habits.infernal.description"),
     icon: Eclipse,
     color: "text-red-600 dark:text-red-400",
     bgColor: "bg-red-50 dark:bg-red-950",
@@ -128,13 +129,12 @@ const convertBorderToTailwindAlpha = (borderColor: string): string => {
   return "gray-500/30";
 };
 
-export const HABITS_OPTIONS: GridSelectOption<RaceHabit>[] = RACE_HABITS.map(
-  (habit) => ({
+export const getHabitsOptions = (t: TFunction): GridSelectOption<RaceHabit>[] =>
+  getRaceHabits(t).map((habit) => ({
     value: habit.value,
     label: habit.label,
     description: habit.description,
     icon: habit.icon,
     backgroundColor: convertToTailwindAlpha(habit.bgColor),
     borderColor: convertBorderToTailwindAlpha(habit.borderColor),
-  })
-);
+  }));

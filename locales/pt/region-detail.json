@@ -107,5 +107,17 @@
   },
   "upload": {
     "click": "Clique para enviar"
+  },
+  "seasons": {
+    "spring": "Primavera",
+    "spring_description": "Estação do renascimento",
+    "summer": "Verão",
+    "summer_description": "Estação do calor",
+    "autumn": "Outono",
+    "autumn_description": "Estação da colheita",
+    "winter": "Inverno",
+    "winter_description": "Estação do frio",
+    "custom": "Outra",
+    "custom_description": "Estação personalizada"
   }
 }

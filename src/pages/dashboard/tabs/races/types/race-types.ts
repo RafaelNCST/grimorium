@@ -1,12 +1,19 @@
 export type DomainType =
-  | "Aquático"
+  | "aquatic"
+  | "terrestrial"
+  | "aerial"
+  | "underground"
+  | "elevated"
+  | "dimensional"
+  | "spiritual"
+  | "cosmic";
+
+export type RaceType =
+  | "Aquática"
   | "Terrestre"
-  | "Aéreo"
-  | "Subterrâneo"
-  | "Elevado"
-  | "Dimensional"
-  | "Espiritual"
-  | "Cósmico";
+  | "Voadora"
+  | "Espacial"
+  | "Espiritual";
 
 export interface IRace {
   id: string;
@@ -72,14 +79,14 @@ export interface IRaceWithSpeciesName extends IRace {
 }
 
 export interface IDomainStats {
-  Aquático: number;
-  Terrestre: number;
-  Aéreo: number;
-  Subterrâneo: number;
-  Elevado: number;
-  Dimensional: number;
-  Espiritual: number;
-  Cósmico: number;
+  aquatic: number;
+  terrestrial: number;
+  aerial: number;
+  underground: number;
+  elevated: number;
+  dimensional: number;
+  spiritual: number;
+  cosmic: number;
 }
 
 // Legacy type alias for backwards compatibility

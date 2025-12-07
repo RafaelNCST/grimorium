@@ -3,7 +3,7 @@ import React from "react";
 import { ArrowLeft, Edit2, Trash2, Menu, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { RACE_DOMAINS } from "@/components/modals/create-race-modal/constants/domains";
+import { getRaceDomains } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +59,7 @@ export function RaceDetailHeader({
   const { t } = useTranslation("race-detail");
 
   const getDomainData = (domainLabel: string) =>
-    RACE_DOMAINS.find((d) => d.label === domainLabel);
+    getRaceDomains(t).find((d) => d.label === domainLabel);
 
   return (
     <div className="relative w-full mb-8">

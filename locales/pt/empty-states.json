@@ -45,7 +45,10 @@
   "timeline": {
     "no_timeline_defined": "Nenhuma linha do tempo definida",
     "use_edit_mode_to_add_eras": "Use o modo de edição para adicionar eras",
-    "era_has_no_events": "Esta era ainda não possui eventos"
+    "era_has_no_events": "Esta era ainda não possui eventos",
+    "create_first_era": "Criar Primeira Era",
+    "timeline_title": "Linha do Tempo da Região",
+    "chapter_metrics_title": "Métricas de capítulo"
   },
   "relationships": {
     "no_relationship_defined": "Nenhum relacionamento definido",
@@ -65,6 +68,10 @@
     "no_character_registered": "Nenhum personagem cadastrado",
     "no_faction_registered": "Nenhuma facção cadastrada",
     "no_race_registered": "Nenhuma raça cadastrada",
-    "no_item_registered": "Nenhum item cadastrado"
+    "no_item_registered": "Nenhum item cadastrado",
+    "not_enough": "Não há {{entityName}} suficientes",
+    "need_to_register_more": "Você precisa cadastrar mais {{entityName}} antes de adicionar aqui.",
+    "all_added": "Todos os {{entityName}} disponíveis foram adicionados",
+    "to_add_more_register_new": "Para adicionar mais, primeiro cadastre novos {{entityName}}."
   }
 }

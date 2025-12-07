@@ -12,7 +12,18 @@
   "tooltips": {
     "quick_navigation": "Navegação Rápida",
     "edit": "Editar",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "hide_section": "Ocultar seção",
+    "show_section": "Mostrar seção",
+    "delete_book": "Excluir livro",
+    "back_to_library": "Voltar para biblioteca",
+    "chapters": "Capítulos",
+    "notes": "Anotações",
+    "customize": "Personalizar",
+    "exit_customize_mode": "Sair do modo personalizar",
+    "show_header": "Mostrar cabeçalho",
+    "hide_header": "Ocultar cabeçalho",
+    "change_image": "Alterar Imagem"
   },
   "title_bar": {
     "home": "Página Principal",
@@ -47,7 +58,10 @@
     "saving": "Salvando...",
     "deleting": "Excluindo...",
     "make_main": "Tornar Principal",
-    "unsaved_changes": "Alterações não salvas"
+    "unsaved_changes": "Alterações não salvas",
+    "back_to": "Voltar para {{name}}",
+    "add": "Adicionar",
+    "save_changes": "Salvar Alterações"
   },
   "version": {
     "main_badge": "Principal",
@@ -60,7 +74,17 @@
     "cancel": "Cancelar",
     "confirm": "Excluir"
   },
+  "unsaved_changes": {
+    "title": "Descartar alterações?",
+    "description": "Você tem alterações não salvas. Se sair agora, todas as mudanças serão perdidas.",
+    "cancel": "Continuar Editando",
+    "confirm": "Descartar Alterações"
+  },
   "sidebar": {
     "viewing_currently": "Visualizando atualmente"
+  },
+  "button": {
+    "hide": "Esconder",
+    "read_more": "Ler mais"
   }
 }

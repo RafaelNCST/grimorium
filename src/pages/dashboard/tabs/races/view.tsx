@@ -44,10 +44,10 @@ export function SpeciesView({
   onDomainToggle,
   onClearFilters,
 }: SpeciesViewProps) {
-  const { t } = useTranslation(["loading", "empty-states", "dialogs"]);
+  const { t } = useTranslation(["loading", "empty-states", "dialogs", "races"]);
 
   // Configure filter rows
-  const filterRows = createDomainFilterRows(domainStats);
+  const filterRows = createDomainFilterRows(domainStats, t);
 
   return (
     <>
@@ -61,11 +61,10 @@ export function SpeciesView({
           description: t("dialogs:create_race.empty_state_description"),
         }}
         header={{
-          title: "Raças",
-          description:
-            "Gerencie as raças, bestas e espécies que habitam o seu mundo",
+          title: t("races:title"),
+          description: t("races:description"),
           primaryAction: {
-            label: "Nova Raça",
+            label: t("races:new_race_button"),
             onClick: () => onSetIsCreateRaceOpen(true),
             variant: "magical",
             icon: Plus,
@@ -74,7 +73,7 @@ export function SpeciesView({
         }}
         filters={{
           totalCount: allRaces.length,
-          totalLabel: "Total",
+          totalLabel: t("races:filters.total"),
           selectedFilters: selectedDomains,
           filterRows,
           onFilterToggle: onDomainToggle,
@@ -83,7 +82,7 @@ export function SpeciesView({
         search={{
           value: searchQuery,
           onChange: onSearchChange,
-          placeholder: "Buscar raça por nome...",
+          placeholder: t("races:search_placeholder"),
           maxWidth: "max-w-[50%]",
         }}
         showNoResultsState={races.length === 0 && allRaces.length > 0}

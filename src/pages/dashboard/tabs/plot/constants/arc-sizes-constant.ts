@@ -27,7 +27,7 @@ export const ARC_SIZES_CONSTANT: IArcSizeConstant[] = [
     descriptionKey: "sizes.mini_description",
   },
   {
-    value: "pequeno",
+    value: "small",
     icon: Feather,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:
@@ -38,7 +38,7 @@ export const ARC_SIZES_CONSTANT: IArcSizeConstant[] = [
     descriptionKey: "sizes.small_description",
   },
   {
-    value: "médio",
+    value: "medium",
     icon: Book,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:
@@ -49,7 +49,7 @@ export const ARC_SIZES_CONSTANT: IArcSizeConstant[] = [
     descriptionKey: "sizes.medium_description",
   },
   {
-    value: "grande",
+    value: "large",
     icon: Library,
     color: "bg-card text-muted-foreground border-border",
     hoverColor:

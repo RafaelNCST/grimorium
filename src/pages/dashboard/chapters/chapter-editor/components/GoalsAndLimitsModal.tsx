@@ -14,6 +14,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,6 +53,7 @@ export function GoalsAndLimitsModal({
   limits,
   onSave,
 }: GoalsAndLimitsModalProps) {
+  const { t } = useTranslation("chapter-editor");
   const [localGoals, setLocalGoals] = useState<ChapterGoals>(goals);
   const [localLimits, setLocalLimits] = useState<ChapterLimits>(limits);
 
@@ -64,10 +66,9 @@ export function GoalsAndLimitsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!w-[850px] min-w-[850px] max-w-[850px] h-[700px] min-h-[700px] max-h-[700px] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Metas e Limites</DialogTitle>
+          <DialogTitle className="text-2xl">{t("goals_and_limits.title")}</DialogTitle>
           <DialogDescription>
-            Configure metas e limites para este capítulo. Avisos serão criados
-            quando os valores configurados forem atingidos.
+            {t("goals_and_limits.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -81,14 +82,14 @@ export function GoalsAndLimitsModal({
               className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
             >
               <Target className="w-4 h-4" />
-              Metas
+              {t("goals_and_limits.tabs.goals")}
             </TabsTrigger>
             <TabsTrigger
               value="limits"
               className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
             >
               <AlertTriangle className="w-4 h-4" />
-              Limites
+              {t("goals_and_limits.tabs.limits")}
             </TabsTrigger>
           </TabsList>
 
@@ -99,9 +100,8 @@ export function GoalsAndLimitsModal({
           >
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Metas</strong> são objetivos
-                que você deseja alcançar. Um aviso será criado quando você
-                atingir a porcentagem configurada.
+                <strong className="text-foreground">{t("goals_and_limits.goals_info_strong")}</strong>{" "}
+                {t("goals_and_limits.goals_info")}
               </p>
             </div>
 
@@ -119,9 +119,9 @@ export function GoalsAndLimitsModal({
                 localGoals.words?.warnAt100 ??
                 DEFAULT_CHAPTER_GOALS.words!.warnAt100
               }
-              label="Meta de Palavras"
-              description="Defina quantas palavras deseja escrever"
-              unit="palavras"
+              label={t("goals_and_limits.words_goal")}
+              description={t("goals_and_limits.words_goal_description")}
+              unit={t("goals_and_limits.unit_words")}
               onEnabledChange={(enabled) =>
                 setLocalGoals({
                   ...localGoals,
@@ -165,9 +165,9 @@ export function GoalsAndLimitsModal({
                 localGoals.characters?.warnAt100 ??
                 DEFAULT_CHAPTER_GOALS.characters!.warnAt100
               }
-              label="Meta de Caracteres"
-              description="Defina quantos caracteres deseja escrever"
-              unit="caracteres"
+              label={t("goals_and_limits.characters_goal")}
+              description={t("goals_and_limits.characters_goal_description")}
+              unit={t("goals_and_limits.unit_characters")}
               onEnabledChange={(enabled) =>
                 setLocalGoals({
                   ...localGoals,
@@ -202,9 +202,8 @@ export function GoalsAndLimitsModal({
           >
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Limites</strong> são valores
-                máximos recomendados. Um aviso será criado quando você
-                ultrapassar a porcentagem configurada.
+                <strong className="text-foreground">{t("goals_and_limits.limits_info_strong")}</strong>{" "}
+                {t("goals_and_limits.limits_info")}
               </p>
             </div>
 
@@ -222,9 +221,9 @@ export function GoalsAndLimitsModal({
                 localLimits.words?.warnAt100 ??
                 DEFAULT_CHAPTER_LIMITS.words!.warnAt100
               }
-              label="Limite de Palavras"
-              description="Máximo de palavras recomendado para o capítulo"
-              unit="palavras"
+              label={t("goals_and_limits.words_limit")}
+              description={t("goals_and_limits.words_limit_description")}
+              unit={t("goals_and_limits.unit_words")}
               onEnabledChange={(enabled) =>
                 setLocalLimits({
                   ...localLimits,
@@ -268,9 +267,9 @@ export function GoalsAndLimitsModal({
                 localLimits.characters?.warnAt100 ??
                 DEFAULT_CHAPTER_LIMITS.characters!.warnAt100
               }
-              label="Limite de Caracteres"
-              description="Máximo de caracteres recomendado para o capítulo"
-              unit="caracteres"
+              label={t("goals_and_limits.characters_limit")}
+              description={t("goals_and_limits.characters_limit_description")}
+              unit={t("goals_and_limits.unit_characters")}
               onEnabledChange={(enabled) =>
                 setLocalLimits({
                   ...localLimits,
@@ -344,10 +343,10 @@ export function GoalsAndLimitsModal({
 
         <div className="flex justify-end gap-2 pt-4 border-t mt-auto">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t("goals_and_limits.cancel")}
           </Button>
           <Button variant="magical" onClick={handleSave}>
-            Salvar Configurações
+            {t("goals_and_limits.save")}
           </Button>
         </div>
       </DialogContent>
@@ -382,6 +381,7 @@ function GoalConfig({
   onWarnAt90Change,
   onWarnAt100Change,
 }: GoalConfigProps) {
+  const { t } = useTranslation("chapter-editor");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -395,7 +395,7 @@ function GoalConfig({
       {enabled && (
         <div className="space-y-4 pl-4 border-l-2 border-primary/20">
           <div>
-            <Label>Meta ({unit})</Label>
+            <Label>{t("goals_and_limits.goal_label")} ({unit})</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 type="number"
@@ -434,7 +434,7 @@ function GoalConfig({
           </div>
 
           <div>
-            <Label className="mb-3 block">Avisar quando atingir:</Label>
+            <Label className="mb-3 block">{t("goals_and_limits.warn_at")}</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -448,7 +448,7 @@ function GoalConfig({
                   htmlFor={`${label}-90`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  90% da meta
+                  {t("goals_and_limits.warn_at_90")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -463,7 +463,7 @@ function GoalConfig({
                   htmlFor={`${label}-100`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  100% da meta (atingida)
+                  {t("goals_and_limits.warn_at_100")}
                 </label>
               </div>
             </div>
@@ -501,6 +501,7 @@ function LimitConfig({
   onWarnAt90Change,
   onWarnAt100Change,
 }: LimitConfigProps) {
+  const { t } = useTranslation("chapter-editor");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -514,7 +515,7 @@ function LimitConfig({
       {enabled && (
         <div className="space-y-4 pl-4 border-l-2 border-amber-500/20">
           <div>
-            <Label>Limite máximo ({unit})</Label>
+            <Label>{t("goals_and_limits.limit_label")} ({unit})</Label>
             <div className="flex items-center gap-2 mt-1">
               <Input
                 type="number"
@@ -553,7 +554,7 @@ function LimitConfig({
           </div>
 
           <div>
-            <Label className="mb-3 block">Avisar quando atingir:</Label>
+            <Label className="mb-3 block">{t("goals_and_limits.warn_at")}</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -567,7 +568,7 @@ function LimitConfig({
                   htmlFor={`${label}-limit-90`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  90% do limite
+                  {t("goals_and_limits.warn_at_90_limit")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -582,7 +583,7 @@ function LimitConfig({
                   htmlFor={`${label}-limit-100`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  100% do limite (ultrapassado)
+                  {t("goals_and_limits.warn_at_100_limit")}
                 </label>
               </div>
             </div>
@@ -614,6 +615,7 @@ function SessionLimitConfig({
   onWarnAt90Change,
   onWarnAt100Change,
 }: SessionLimitConfigProps) {
+  const { t } = useTranslation("chapter-editor");
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
 
@@ -623,10 +625,10 @@ function SessionLimitConfig({
         <div>
           <Label className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            Limite de Sessão
+            {t("goals_and_limits.session_limit")}
           </Label>
           <p className="text-sm text-muted-foreground">
-            Tempo máximo recomendado de escrita contínua
+            {t("goals_and_limits.session_limit_description")}
           </p>
         </div>
         <Switch checked={enabled} onCheckedChange={onEnabledChange} />
@@ -636,7 +638,7 @@ function SessionLimitConfig({
         <div className="space-y-4 pl-4 border-l-2 border-amber-500/20">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Horas</Label>
+              <Label>{t("goals_and_limits.hours")}</Label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
                   type="number"
@@ -680,7 +682,7 @@ function SessionLimitConfig({
               </div>
             </div>
             <div>
-              <Label>Minutos</Label>
+              <Label>{t("goals_and_limits.minutes")}</Label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
                   type="number"
@@ -726,7 +728,7 @@ function SessionLimitConfig({
           </div>
 
           <div>
-            <Label className="mb-3 block">Avisar quando atingir:</Label>
+            <Label className="mb-3 block">{t("goals_and_limits.warn_at")}</Label>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Checkbox
@@ -740,7 +742,7 @@ function SessionLimitConfig({
                   htmlFor="session-limit-90"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  90% do tempo limite
+                  {t("goals_and_limits.warn_at_90_time")}
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -755,7 +757,7 @@ function SessionLimitConfig({
                   htmlFor="session-limit-100"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  100% do tempo limite (ultrapassado)
+                  {t("goals_and_limits.warn_at_100_time")}
                 </label>
               </div>
             </div>

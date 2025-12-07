@@ -23,7 +23,7 @@ export default function FileEditor() {
     from: "/dashboard/$dashboardId/file/$fileId",
   });
   const navigate = useNavigate();
-  const { t } = useTranslation(["errors", "forms"]);
+  const { t } = useTranslation(["errors", "forms", "common"]);
   const [file, setFile] = useState<NoteFile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState("");
@@ -101,7 +101,7 @@ export default function FileEditor() {
             }
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
+            {t("common:actions.back")}
           </Button>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function FileEditor() {
                 <>
                   <Button onClick={handleSave} disabled={!hasUnsavedChanges}>
                     <Save className="w-4 h-4 mr-2" />
-                    Salvar
+                    {t("common:actions.save")}
                   </Button>
                   <Button
                     variant="outline"
@@ -164,21 +164,21 @@ export default function FileEditor() {
                       setHasUnsavedChanges(false);
                     }}
                   >
-                    Cancelar
+                    {t("common:actions.cancel")}
                   </Button>
                 </>
               ) : (
                 <>
                   <Button onClick={() => setIsEditing(true)}>
                     <Edit2 className="w-4 h-4 mr-2" />
-                    Editar
+                    {t("common:actions.edit")}
                   </Button>
                   <Button
                     variant="destructive"
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Excluir
+                    {t("common:actions.delete")}
                   </Button>
                 </>
               )}
@@ -201,19 +201,20 @@ export default function FileEditor() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogTitle>
+              {t("common:delete_confirmation.title", { type: "arquivo" })}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-muted-foreground">
-              Tem certeza que deseja excluir o arquivo "{file.name}"? Esta ação
-              não pode ser desfeita.
+              {t("common:delete_confirmation.message", { name: file.name })}
             </p>
             <div className="flex justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteDialog(false)}
               >
-                Cancelar
+                {t("common:delete_confirmation.cancel")}
               </Button>
               <Button
                 variant="destructive"
@@ -221,7 +222,7 @@ export default function FileEditor() {
                 className="animate-glow-red"
                 onClick={handleDelete}
               >
-                Excluir
+                {t("common:delete_confirmation.confirm")}
               </Button>
             </div>
           </div>

@@ -36,6 +36,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 
 import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
+import { getRaceRelationshipTypes } from "../constants/race-relationship-types";
 import { type IRaceRelationship } from "../types/race-detail-types";
 
 interface IRace {
@@ -77,17 +78,6 @@ const RACE_RELATIONSHIP_COLOR_MAP: Record<
   adoration: { bg: "pink-500/10", border: "pink-500/20" },
 };
 
-const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
-  { value: "predation", translationKey: "predation", icon: Skull },
-  { value: "prey", translationKey: "prey", icon: Fish },
-  { value: "parasitism", translationKey: "parasitism", icon: Sparkles },
-  { value: "commensalism", translationKey: "commensalism", icon: Shield },
-  { value: "mutualism", translationKey: "mutualism", icon: Handshake },
-  { value: "competition", translationKey: "competition", icon: Swords },
-  { value: "neutralism", translationKey: "neutralism", icon: Equal },
-  { value: "adoration", translationKey: "adoration", icon: Heart },
-];
-
 export function RaceRelationshipsSection({
   relationships,
   allRaces,
@@ -98,6 +88,16 @@ export function RaceRelationshipsSection({
   onAddDialogOpenChange,
 }: RaceRelationshipsSectionProps) {
   const { t } = useTranslation("race-detail");
+
+  // Get relationship types using the getter function and add custom "adoration" type
+  const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
+    ...getRaceRelationshipTypes(t).map(type => ({
+      value: type.value,
+      translationKey: type.translationKey,
+      icon: type.icon,
+    })),
+    { value: "adoration", translationKey: "adoration", icon: Heart },
+  ];
 
   // Support both controlled and uncontrolled modes for the add dialog
   const [internalIsAddDialogOpen, setInternalIsAddDialogOpen] = useState(false);

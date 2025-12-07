@@ -50,14 +50,6 @@ const eventTypeIcons: Record<ITimelineEvent["eventType"], string> = {
   other: "📍",
 };
 
-const eventTypeNames: Record<ITimelineEvent["eventType"], string> = {
-  creation: "Criação",
-  battle: "Batalha",
-  discovery: "Descoberta",
-  loss: "Perda",
-  transformation: "Transformação",
-  other: "Outro",
-};
 
 interface PropsItemTimelineView {
   itemName: string;
@@ -90,7 +82,7 @@ export function ItemTimelineView({
   onDeleteEvent,
   onNewEventChange,
 }: PropsItemTimelineView) {
-  const { t } = useTranslation("forms");
+  const { t } = useTranslation(["forms", "common", "tooltips"]);
 
   return (
     <div className="bg-background">
@@ -99,23 +91,23 @@ export function ItemTimelineView({
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar para {itemName}
+              {t("common:actions.back_to", { name: itemName })}
             </Button>
           </div>
 
           <Button onClick={onCreateModalOpen} className="btn-magical">
             <Plus className="w-4 h-4 mr-2" />
-            Novo Evento
+            {t("forms:buttons.new_event")}
           </Button>
         </div>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
             <Clock className="w-8 h-8" />
-            Timeline de {itemName}
+            {t("common:title_bar.item_timeline")} - {itemName}
           </h1>
           <p className="text-muted-foreground">
-            Acompanhe a jornada histórica do item através do tempo
+            {t("tooltips:instructions.mark_events_as_you_write")}
           </p>
         </div>
 
@@ -186,7 +178,7 @@ export function ItemTimelineView({
                     <div className="mt-3">
                       <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-secondary rounded-full">
                         {eventTypeIcons[event.eventType]}
-                        {eventTypeNames[event.eventType]}
+                        {t(`forms:event_types.${event.eventType}`)}
                       </span>
                     </div>
                   </CardContent>
@@ -200,47 +192,47 @@ export function ItemTimelineView({
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>
-                {editingEvent ? "Editar Evento" : "Novo Evento da Timeline"}
+                {editingEvent ? t("forms:buttons.edit_event") : t("forms:buttons.new_timeline_event")}
               </DialogTitle>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title">{t("labels.event_title")} *</Label>
+                <Label htmlFor="title">{t("forms:labels.event_title")} *</Label>
                 <Input
                   id="title"
                   value={newEvent.title || ""}
                   onChange={(e) => onNewEventChange("title", e.target.value)}
-                  placeholder="Ex: Forjado por Merlim"
+                  placeholder={t("forms:placeholders.item_event_title")}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Descrição *</Label>
+                <Label htmlFor="description">{t("forms:labels.description")} *</Label>
                 <Textarea
                   id="description"
                   value={newEvent.description || ""}
                   onChange={(e) =>
                     onNewEventChange("description", e.target.value)
                   }
-                  placeholder="Descreva o que aconteceu neste momento..."
+                  placeholder={t("forms:placeholders.item_event_description")}
                   rows={4}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date">Data/Período</Label>
+                  <Label htmlFor="date">{t("forms:labels.date_period")}</Label>
                   <Input
                     id="date"
                     value={newEvent.date || ""}
                     onChange={(e) => onNewEventChange("date", e.target.value)}
-                    placeholder={t("placeholders.event_title_example")}
+                    placeholder={t("forms:placeholders.event_title_example")}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="eventType">{t("labels.event_type")}</Label>
+                  <Label htmlFor="eventType">{t("forms:labels.event_type")}</Label>
                   <select
                     className="w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md"
                     value={newEvent.eventType}
@@ -251,10 +243,10 @@ export function ItemTimelineView({
                       )
                     }
                   >
-                    {Object.entries(eventTypeNames).map(([key, label]) => (
+                    {(Object.keys(eventTypeIcons) as Array<keyof typeof eventTypeIcons>).map((key) => (
                       <option key={key} value={key}>
-                        {eventTypeIcons[key as keyof typeof eventTypeIcons]}{" "}
-                        {label}
+                        {eventTypeIcons[key]}{" "}
+                        {t(`forms:event_types.${key}`)}
                       </option>
                     ))}
                   </select>
@@ -263,26 +255,26 @@ export function ItemTimelineView({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Local</Label>
+                  <Label htmlFor="location">{t("forms:labels.location")}</Label>
                   <Input
                     id="location"
                     value={newEvent.location || ""}
                     onChange={(e) =>
                       onNewEventChange("location", e.target.value)
                     }
-                    placeholder="Ex: Camelot, Forjas Celestiais..."
+                    placeholder={t("forms:placeholders.item_event_location")}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="character">{t("labels.involved_character")}</Label>
+                  <Label htmlFor="character">{t("forms:labels.involved_character")}</Label>
                   <Input
                     id="character"
                     value={newEvent.character || ""}
                     onChange={(e) =>
                       onNewEventChange("character", e.target.value)
                     }
-                    placeholder="Ex: Rei Arthur, Merlim..."
+                    placeholder={t("forms:placeholders.item_event_character")}
                   />
                 </div>
               </div>
@@ -290,14 +282,14 @@ export function ItemTimelineView({
 
             <DialogFooter>
               <Button variant="outline" onClick={onCreateModalClose}>
-                Cancelar
+                {t("forms:buttons.cancel")}
               </Button>
               <Button
                 onClick={editingEvent ? onUpdateEvent : onCreateEvent}
                 className="btn-magical"
                 disabled={!newEvent.title || !newEvent.description}
               >
-                {editingEvent ? "Atualizar" : "Criar"} Evento
+                {editingEvent ? t("common:actions.edit") : t("common:actions.create")} {t("forms:buttons.new_event").split(" ")[1]}
               </Button>
             </DialogFooter>
           </DialogContent>

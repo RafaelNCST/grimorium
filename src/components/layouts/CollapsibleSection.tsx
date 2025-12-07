@@ -9,6 +9,7 @@ import {
   Plus,
   type LucideIcon,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,6 +206,8 @@ export function CollapsibleSection({
   onSecondaryClick,
   blockedEntityName,
 }: CollapsibleSectionProps) {
+  const { t } = useTranslation(["empty-states", "common"]);
+
   // Renderizar conteúdo do estado vazio
   const renderEmptyState = () => {
     // Estado 1: Vazio em visualização
@@ -254,10 +257,11 @@ export function CollapsibleSection({
     if (emptyState === "blocked-no-data" && isEditMode) {
       return (
         <InfoAlert>
-          <p className="font-medium">Não há {blockedEntityName} suficientes</p>
+          <p className="font-medium">
+            {t("empty-states:entities.not_enough", { entityName: blockedEntityName })}
+          </p>
           <p className="text-xs mt-1">
-            Você precisa cadastrar mais {blockedEntityName} antes de adicionar
-            aqui.
+            {t("empty-states:entities.need_to_register_more", { entityName: blockedEntityName })}
           </p>
         </InfoAlert>
       );
@@ -269,10 +273,10 @@ export function CollapsibleSection({
         <div className="space-y-4">
           <InfoAlert>
             <p className="font-medium">
-              Todos os {blockedEntityName} disponíveis foram adicionados
+              {t("empty-states:entities.all_added", { entityName: blockedEntityName })}
             </p>
             <p className="text-xs mt-1">
-              Para adicionar mais, primeiro cadastre novos {blockedEntityName}.
+              {t("empty-states:entities.to_add_more_register_new", { entityName: blockedEntityName })}
             </p>
           </InfoAlert>
           {children && <div>{children}</div>}
@@ -324,8 +328,8 @@ export function CollapsibleSection({
                     <TooltipContent>
                       <p>
                         {isVisible !== false
-                          ? "Ocultar seção"
-                          : "Mostrar seção"}
+                          ? t("common:tooltips.hide_section")
+                          : t("common:tooltips.show_section")}
                       </p>
                     </TooltipContent>
                   </Tooltip>

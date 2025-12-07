@@ -115,7 +115,7 @@ export function HomePage() {
         chapters: 0,
         lastModified: now,
         createdAt: now,
-        status: "Em planejamento" as const,
+        status: "planning" as const,
         storySummary: bookData.synopsis || "",
         authorSummary: bookData.authorSummary || "",
       };

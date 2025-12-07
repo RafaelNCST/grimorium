@@ -13,7 +13,7 @@ export const ARC_SIZE_OPTIONS: GridSelectOption<PlotArcSize>[] = [
     borderColor: "violet-500/30",
   },
   {
-    value: "pequeno",
+    value: "small",
     label: "sizes.small",
     description: "sizes.small_description",
     icon: Feather,
@@ -21,7 +21,7 @@ export const ARC_SIZE_OPTIONS: GridSelectOption<PlotArcSize>[] = [
     borderColor: "blue-500/30",
   },
   {
-    value: "médio",
+    value: "medium",
     label: "sizes.medium",
     description: "sizes.medium_description",
     icon: Book,
@@ -29,7 +29,7 @@ export const ARC_SIZE_OPTIONS: GridSelectOption<PlotArcSize>[] = [
     borderColor: "indigo-500/30",
   },
   {
-    value: "grande",
+    value: "large",
     label: "sizes.large",
     description: "sizes.large_description",
     icon: Library,

@@ -27,6 +27,8 @@ export type FactionInfluence =
   | "superior"
   | "dominant";
 
+export type FactionAlignment = "good" | "chaotic" | "neutral";
+
 export type FactionReputation =
   | "unknown"
   | "hated"

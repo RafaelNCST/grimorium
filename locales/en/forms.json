@@ -21,7 +21,15 @@
     "known_name": "Known Name",
     "scientific_name": "Scientific Name",
     "description": "Description",
-    "version_name": "Version Name"
+    "version_name": "Version Name",
+    "date_period": "Date/Period",
+    "location": "Location",
+    "reason": "Reason",
+    "how_it_ended": "How It Ended",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "start": "Start",
+    "end": "End"
   },
   "placeholders": {
     "search_character": "Search character...",
@@ -33,6 +41,7 @@
     "chapter_summary": "Write a summary of what happens in this chapter...",
     "event_title_example": "E.g.: Age of the Gods, Year 1542...",
     "add_comment": "Add a new comment...",
+    "type_your_comment": "Type your comment...",
     "known_name_example": "E.g.: Elves, Dragons, Humans...",
     "scientific_name_example": "E.g.: Homo elvensis (optional)",
     "version_name_example": "E.g.: Pre-War Version",
@@ -41,6 +50,35 @@
   "buttons": {
     "cancel": "Cancel",
     "create_species": "Create Species",
-    "create_version": "Create Version"
+    "create_version": "Create Version",
+    "new_event": "New Event",
+    "edit_event": "Edit Event",
+    "new_timeline_event": "New Timeline Event",
+    "add_member": "Add Member",
+    "manage_titles": "Manage Titles",
+    "add_diplomatic_relation": "Add Diplomatic Relation",
+    "create_first_era": "Create First Era",
+    "new_era": "New Era",
+    "create_era": "Create Era",
+    "create_event": "Create Event",
+    "edit_era": "Edit Era",
+    "save_changes": "Save Changes"
+  },
+  "placeholders": {
+    "item_event_title": "E.g.: Forged by Merlin",
+    "item_event_description": "Describe what happened at this moment...",
+    "item_event_location": "E.g.: Camelot, Celestial Forges...",
+    "item_event_character": "E.g.: King Arthur, Merlin...",
+    "region_event_description": "For three nights, the sky turned red...",
+    "region_event_reason": "The forbidden ritual performed by wizards...",
+    "region_event_outcome": "The heroes managed to close the portals..."
+  },
+  "event_types": {
+    "creation": "Creation",
+    "battle": "Battle",
+    "discovery": "Discovery",
+    "loss": "Loss",
+    "transformation": "Transformation",
+    "other": "Other"
   }
 }
