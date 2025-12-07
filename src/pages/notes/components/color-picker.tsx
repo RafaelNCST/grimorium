@@ -92,7 +92,8 @@ function ColorButton({
         >
           {isSelected && (
             <Check
-              className={cn("text-white", isSmall ? "w-3 h-3" : "w-4 h-4")}
+              className={cn("text-purple-600 dark:text-purple-400 drop-shadow-lg", isSmall ? "w-3 h-3" : "w-5 h-5")}
+              strokeWidth={3}
             />
           )}
         </button>
