@@ -217,12 +217,8 @@ export function MapMarkerDetails({
                           >
                             {markerColor === color.value && (
                               <Check
-                                className={cn(
-                                  "w-4 h-4",
-                                  color.value === "#ffffff"
-                                    ? "text-black"
-                                    : "text-white"
-                                )}
+                                className="w-5 h-5 text-purple-600 dark:text-purple-400 drop-shadow-lg"
+                                strokeWidth={3}
                               />
                             )}
                           </button>
