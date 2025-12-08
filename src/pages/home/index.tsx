@@ -28,7 +28,7 @@ export function HomePage() {
   const { dashboard } = useAppSettingsStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [daysSinceLastChapter, setDaysSinceLastChapter] = useState(0);
 
   // Load books from database on mount
@@ -228,6 +228,7 @@ export function HomePage() {
 
   return (
     <HomeView
+      isLoading={isLoading}
       filteredBooks={filteredBooks}
       searchTerm={searchTerm}
       totalBooks={books.length}
