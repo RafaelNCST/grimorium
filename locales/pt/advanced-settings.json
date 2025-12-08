@@ -29,6 +29,7 @@
     "subscription": {
       "title": "Assinatura",
       "description": "Gerencie seu plano e benefícios",
+      "currently_you_are": "Atualmente você é",
       "tier_free": "Camponês",
       "tier_premium": "Realeza",
       "status_active": "Ativo",

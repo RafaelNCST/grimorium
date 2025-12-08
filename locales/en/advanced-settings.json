@@ -29,6 +29,7 @@
     "subscription": {
       "title": "Subscription",
       "description": "Manage your plan and benefits",
+      "currently_you_are": "Currently you are",
       "tier_free": "Peasant",
       "tier_premium": "Royalty",
       "status_active": "Active",

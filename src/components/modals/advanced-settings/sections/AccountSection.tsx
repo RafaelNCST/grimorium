@@ -224,15 +224,17 @@ export function AccountSection() {
             <div className="space-y-3 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 {isPremium && <Crown className="w-5 h-5 text-amber-600" />}
-                <h4 className="font-bold text-lg">
-                  {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
-                </h4>
-                {isActive && (
-                  <Badge variant="default" className="bg-green-600 hover:bg-green-600 text-white">
-                    <Check className="w-3 h-3 mr-1" />
-                    {t("account.subscription.status_active")}
-                  </Badge>
-                )}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm text-white">
+                    {t("account.subscription.currently_you_are")}
+                  </span>
+                  <h4 className={cn(
+                    "font-bold text-lg",
+                    isPremium ? "text-purple-600 dark:text-purple-400" : "text-green-600 dark:text-green-400"
+                  )}>
+                    {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
+                  </h4>
+                </div>
               </div>
 
               {isPremium && user.subscription.renewalDate && (

@@ -68,14 +68,15 @@ export function AboutSection() {
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          className="w-full justify-start h-auto p-4"
+        <div
+          className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
           onClick={() => openExternal(GITHUB_ISSUES_URL)}
         >
-          <Bug className="w-5 h-5 mr-3 text-destructive" />
-          <div className="flex-1 text-left">
-            <div className="font-medium text-sm flex items-center gap-2">
+          <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
+            <Bug className="w-5 h-5 text-destructive" />
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-sm flex items-center gap-2 mb-0.5">
               {t("about.bug_report.button")}
               <ExternalLink className="w-3 h-3" />
             </div>
@@ -83,7 +84,7 @@ export function AboutSection() {
               {t("about.bug_report.help")}
             </div>
           </div>
-        </Button>
+        </div>
 
         <div className="rounded-lg bg-muted/50 border p-3">
           <p className="text-xs text-muted-foreground">
@@ -105,14 +106,15 @@ export function AboutSection() {
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          className="w-full justify-start h-auto p-4"
+        <div
+          className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
           onClick={() => openExternal(GITHUB_DISCUSSIONS_URL)}
         >
-          <Lightbulb className="w-5 h-5 mr-3 text-amber-500" />
-          <div className="flex-1 text-left">
-            <div className="font-medium text-sm flex items-center gap-2">
+          <div className="rounded-lg bg-amber-500/10 p-2 flex-shrink-0">
+            <Lightbulb className="w-5 h-5 text-amber-500" />
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-sm flex items-center gap-2 mb-0.5">
               {t("about.suggestions.button")}
               <ExternalLink className="w-3 h-3" />
             </div>
@@ -120,7 +122,7 @@ export function AboutSection() {
               {t("about.suggestions.help")}
             </div>
           </div>
-        </Button>
+        </div>
       </div>
 
       {/* Additional Info */}
