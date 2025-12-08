@@ -93,21 +93,10 @@
   "delete": {
     "arc": {
       "title": "Delete Narrative Arc",
-      "step1": {
-        "message": "You are about to delete the arc \"{{arcName}}\". This action is permanent and cannot be undone.",
-        "input_label": "Type the arc name to confirm:",
-        "input_placeholder": "Arc name",
-        "name_mismatch": "The name does not match the arc",
-        "cancel": "Cancel",
-        "continue": "Continue"
-      },
-      "step2": {
-        "title": "Final Confirmation",
-        "message": "This will permanently delete the arc \"{{arcName}}\" and all its {{eventCount}} events. This action cannot be undone.",
-        "message_no_events": "This will permanently delete the arc \"{{arcName}}\". This action cannot be undone.",
-        "cancel": "Cancel",
-        "confirm": "Delete Permanently"
-      }
+      "message": "Are you sure you want to delete \"{{entityName}}\"?",
+      "message_with_events": "This will permanently delete \"{{entityName}}\" and all {{eventCount}} events.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "empty_states": {

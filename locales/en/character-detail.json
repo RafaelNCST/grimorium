@@ -183,29 +183,17 @@
   "delete": {
     "version": {
       "title": "Delete Version",
-      "message": "Are you sure you want to delete the version '{{versionName}}'? This action cannot be undone.",
+      "message": "Are you sure you want to delete the version \"{{versionName}}\"?",
       "cancel": "Cancel",
       "confirm": "Delete Version",
       "success": "Version deleted successfully"
     },
     "character": {
       "title": "Delete Character",
-      "step1": {
-        "message": "This action will permanently delete the character '{{characterName}}' and all its versions.",
-        "input_label": "Type the full character name to confirm:",
-        "input_placeholder": "Type the character name",
-        "name_mismatch": "The entered name does not match the character name",
-        "cancel": "Cancel",
-        "continue": "Continue"
-      },
-      "step2": {
-        "title": "Final Confirmation",
-        "message": "You are about to permanently delete the character '{{characterName}}' and all its {{totalVersions}} versions. This action cannot be undone.",
-        "message_single": "You are about to permanently delete the character '{{characterName}}' and its version. This action cannot be undone.",
-        "cancel": "No, cancel",
-        "confirm": "Yes, permanently delete",
-        "success": "Character deleted successfully"
-      }
+      "message": "Are you sure you want to delete \"{{entityName}}\"?",
+      "message_with_versions": "This will permanently delete \"{{entityName}}\" and all {{totalVersions}} versions.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "navigation": {

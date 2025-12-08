@@ -79,26 +79,18 @@
     }
   },
   "delete": {
-    "cancel": "Cancel",
-    "region": {
-      "title": "Delete Region",
-      "step1": {
-        "description": "You are about to permanently delete region \"{{name}}\".",
-        "warning": "⚠️ This action is irreversible and all data from this region will be lost."
-      },
-      "step2": {
-        "confirm": "I understand this action is permanent and irreversible",
-        "confirm_button": "Delete Region",
-        "success": "Region deleted successfully"
-      }
-    },
     "version": {
       "title": "Delete Version",
-      "description": "You are about to delete version \"{{name}}\" from region \"{{regionName}}\".",
-      "info": "You will still have {{remaining}} version(s) after deletion.",
-      "confirm": "I understand this action is permanent",
-      "confirm_button": "Delete Version",
-      "success": "Version deleted successfully"
+      "message": "Are you sure you want to delete the version \"{{versionName}}\"?",
+      "cancel": "Cancel",
+      "confirm": "Delete Version"
+    },
+    "region": {
+      "title": "Delete Region",
+      "message": "Are you sure you want to delete \"{{entityName}}\"?",
+      "message_with_versions": "This will permanently delete \"{{entityName}}\" and all {{totalVersions}} versions.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   },
   "actions": {

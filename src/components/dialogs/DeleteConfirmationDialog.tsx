@@ -106,9 +106,9 @@ export function DeleteConfirmationDialog({
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting}
-            className="bg-destructive hover:bg-destructive/90"
+            variant="destructive"
           >
-            {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isDeleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {isDeleting ? t("actions.deleting") : displayConfirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -12,9 +13,6 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 /**
  * Generic version interface - any entity version must have these properties
@@ -45,11 +43,10 @@ export interface DeleteEntityModalProps<T extends IEntityVersion> {
 }
 
 /**
- * DeleteEntityModal - Generic two-step delete confirmation modal with version support
+ * DeleteEntityModal - Generic delete confirmation modal with version support
  *
  * Features:
- * - Simple one-step flow for version deletion
- * - Two-step flow for main entity deletion (type name + final confirmation)
+ * - Simple one-step confirmation flow for both entities and versions
  * - Fully configurable via i18n
  * - Type-safe with generics
  *
@@ -80,21 +77,10 @@ export interface DeleteEntityModalProps<T extends IEntityVersion> {
  *     },
  *     "{entityType}": {
  *       "title": "Excluir {EntityType}",
- *       "step1": {
- *         "message": "Você está prestes a excluir \"{{entityName}}\"...",
- *         "input_label": "Digite o nome para confirmar:",
- *         "input_placeholder": "Digite o nome...",
- *         "name_mismatch": "O nome não corresponde",
- *         "cancel": "Cancelar",
- *         "continue": "Continuar"
- *       },
- *       "step2": {
- *         "title": "Confirmação Final",
- *         "message": "Isso excluirá \"{{entityName}}\" e todas as {{totalVersions}} versões...",
- *         "message_single": "Isso excluirá \"{{entityName}}\" permanentemente.",
- *         "cancel": "Cancelar",
- *         "confirm": "Excluir Permanentemente"
- *       }
+ *       "message": "Tem certeza que deseja excluir \"{{entityName}}\"?",
+ *       "message_with_versions": "Isso excluirá \"{{entityName}}\" e todas as {{totalVersions}} versões permanentemente.",
+ *       "cancel": "Cancelar",
+ *       "confirm": "Excluir"
  *     }
  *   }
  * }
@@ -112,51 +98,20 @@ export function DeleteEntityModal<T extends IEntityVersion>({
   i18nNamespace,
 }: DeleteEntityModalProps<T>) {
   const { t } = useTranslation(i18nNamespace);
-  const [step, setStep] = useState<1 | 2>(1);
-  const [nameInput, setNameInput] = useState("");
 
   // Check if this is a version deletion (non-main) or entity deletion (main)
   const isVersionDeletion = currentVersion && !currentVersion.isMain;
 
-  // Reset state when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      setStep(1);
-      setNameInput("");
-    }
-  }, [isOpen]);
-
-  // Validate name input (case-sensitive exact match)
-  const isNameValid = nameInput.trim() === entityName;
-
   const handleConfirm = () => {
-    if (isVersionDeletion) {
-      // Simple version deletion
-      onConfirmDelete();
-      onClose();
-    } else {
-      // Entity deletion - check step
-      if (step === 1) {
-        if (!isNameValid) {
-          return;
-        }
-        // Move to step 2
-        setStep(2);
-      } else {
-        // Final confirmation - delete entity
-        onConfirmDelete();
-        onClose();
-      }
-    }
+    onConfirmDelete();
+    onClose();
   };
 
   const handleCancel = () => {
     onClose();
-    setStep(1);
-    setNameInput("");
   };
 
-  // Version Deletion Flow (Simple)
+  // Version Deletion Flow
   if (isVersionDeletion) {
     return (
       <AlertDialog open={isOpen} onOpenChange={handleCancel}>
@@ -166,10 +121,12 @@ export function DeleteEntityModal<T extends IEntityVersion>({
         >
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
               <AlertDialogTitle>{t("delete.version.title")}</AlertDialogTitle>
             </div>
-            <AlertDialogDescription className="text-left pt-4">
+            <AlertDialogDescription className="text-left pt-4 text-foreground font-medium">
               {t("delete.version.message", { versionName: versionName || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -177,131 +134,56 @@ export function DeleteEntityModal<T extends IEntityVersion>({
             <AlertDialogCancel onClick={handleCancel}>
               {t("delete.version.cancel")}
             </AlertDialogCancel>
-            <Button
+            <AlertDialogAction
               variant="destructive"
-              size="lg"
               className="animate-glow-red"
               onClick={handleConfirm}
             >
               {t("delete.version.confirm")}
-            </Button>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     );
   }
 
-  // Entity Deletion Flow (2 Steps)
+  // Entity Deletion Flow
   return (
     <AlertDialog open={isOpen} onOpenChange={handleCancel}>
       <AlertDialogContent
         onOverlayClick={handleCancel}
         onEscapeKeyDown={handleCancel}
       >
-        {step === 1 ? (
-          <>
-            <AlertDialogHeader>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-                <AlertDialogTitle>
-                  {t(`delete.${entityType}.title`)}
-                </AlertDialogTitle>
-              </div>
-              <AlertDialogDescription className="text-left pt-4 space-y-4">
-                <p>{t(`delete.${entityType}.step1.message`, { entityName })}</p>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="entity-name-input"
-                    className="text-foreground font-medium"
-                  >
-                    {t(`delete.${entityType}.step1.input_label`)}
-                  </Label>
-                  <Input
-                    id="entity-name-input"
-                    type="text"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    placeholder={t(
-                      `delete.${entityType}.step1.input_placeholder`
-                    )}
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck="false"
-                    className={`font-mono ${
-                      nameInput.length > 0 && !isNameValid
-                        ? "border-destructive focus-visible:ring-destructive"
-                        : ""
-                    }`}
-                  />
-                  <div className="h-4">
-                    {nameInput.length > 0 && !isNameValid && (
-                      <p className="text-xs text-destructive">
-                        {t(`delete.${entityType}.step1.name_mismatch`)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancel}>
-                {t(`delete.${entityType}.step1.cancel`)}
-              </AlertDialogCancel>
-              <Button
-                onClick={handleConfirm}
-                disabled={!isNameValid}
-                variant="magical"
-                size="lg"
-                className={`animate-glow ${
-                  !isNameValid ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {t(`delete.${entityType}.step1.continue`)}
-              </Button>
-            </AlertDialogFooter>
-          </>
-        ) : (
-          <>
-            <AlertDialogHeader>
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-destructive" />
-                <AlertDialogTitle>
-                  {t(`delete.${entityType}.step2.title`)}
-                </AlertDialogTitle>
-              </div>
-              <AlertDialogDescription className="text-left pt-4">
-                {totalVersions > 1 ? (
-                  <p className="font-medium text-foreground">
-                    {t(`delete.${entityType}.step2.message`, {
-                      entityName,
-                      totalVersions,
-                    })}
-                  </p>
-                ) : (
-                  <p className="font-medium text-foreground">
-                    {t(`delete.${entityType}.step2.message_single`, {
-                      entityName,
-                    })}
-                  </p>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancel}>
-                {t(`delete.${entityType}.step2.cancel`)}
-              </AlertDialogCancel>
-              <Button
-                variant="destructive"
-                size="lg"
-                className="animate-glow-red"
-                onClick={handleConfirm}
-              >
-                {t(`delete.${entityType}.step2.confirm`)}
-              </Button>
-            </AlertDialogFooter>
-          </>
-        )}
+        <AlertDialogHeader>
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+            </div>
+            <AlertDialogTitle>
+              {t(`delete.${entityType}.title`)}
+            </AlertDialogTitle>
+          </div>
+          <AlertDialogDescription className="text-left pt-4 text-foreground font-medium">
+            {totalVersions > 1
+              ? t(`delete.${entityType}.message_with_versions`, {
+                  entityName,
+                  totalVersions,
+                })
+              : t(`delete.${entityType}.message`, { entityName })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleCancel}>
+            {t(`delete.${entityType}.cancel`)}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            className="animate-glow-red"
+            onClick={handleConfirm}
+          >
+            {t(`delete.${entityType}.confirm`)}
+          </AlertDialogAction>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

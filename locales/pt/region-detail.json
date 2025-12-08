@@ -79,26 +79,18 @@
     }
   },
   "delete": {
-    "cancel": "Cancelar",
-    "region": {
-      "title": "Excluir Região",
-      "step1": {
-        "description": "Você está prestes a excluir permanentemente a região \"{{name}}\".",
-        "warning": "⚠️ Esta ação é irreversível e todos os dados desta região serão perdidos."
-      },
-      "step2": {
-        "confirm": "Eu entendo que esta ação é permanente e irreversível",
-        "confirm_button": "Excluir Região",
-        "success": "Região excluída com sucesso"
-      }
-    },
     "version": {
       "title": "Excluir Versão",
-      "description": "Você está prestes a excluir a versão \"{{name}}\" da região \"{{regionName}}\".",
-      "info": "Você ainda terá {{remaining}} versão(ões) após a exclusão.",
-      "confirm": "Eu entendo que esta ação é permanente",
-      "confirm_button": "Excluir Versão",
-      "success": "Versão excluída com sucesso"
+      "message": "Tem certeza que deseja excluir a versão \"{{versionName}}\"?",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Versão"
+    },
+    "region": {
+      "title": "Excluir Região",
+      "message": "Tem certeza que deseja excluir \"{{entityName}}\"?",
+      "message_with_versions": "Isso excluirá \"{{entityName}}\" e todas as {{totalVersions}} versões permanentemente.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir"
     }
   },
   "actions": {

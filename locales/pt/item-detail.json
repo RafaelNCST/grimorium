@@ -98,29 +98,16 @@
   "delete": {
     "version": {
       "title": "Excluir Versão",
-      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita",
+      "message": "Tem certeza que deseja excluir a versão \"{{versionName}}\"?",
       "cancel": "Cancelar",
-      "confirm": "Excluir Versão",
-      "success": "Versão excluída com sucesso"
+      "confirm": "Excluir Versão"
     },
     "item": {
       "title": "Excluir Item",
-      "step1": {
-        "message": "Esta ação excluirá o item '{{itemName}}' e todas as suas versões permanentemente",
-        "input_label": "Digite o nome completo do item para confirmar:",
-        "input_placeholder": "Digite o nome do item",
-        "name_mismatch": "O nome digitado não corresponde ao nome do item",
-        "cancel": "Cancelar",
-        "continue": "Continuar"
-      },
-      "step2": {
-        "title": "Confirmação Final",
-        "message": "Você está prestes a excluir permanentemente o item '{{itemName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita",
-        "message_single": "Você está prestes a excluir permanentemente o item '{{itemName}}' e sua versão. Esta ação não pode ser desfeita",
-        "cancel": "Não, cancelar",
-        "confirm": "Sim, excluir permanentemente",
-        "success": "Item excluído com sucesso"
-      }
+      "message": "Tem certeza que deseja excluir \"{{entityName}}\"?",
+      "message_with_versions": "Isso excluirá \"{{entityName}}\" e todas as {{totalVersions}} versões permanentemente.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir"
     }
   },
   "navigation": {

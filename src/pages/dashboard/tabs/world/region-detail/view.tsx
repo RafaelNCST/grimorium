@@ -405,7 +405,6 @@ export function RegionDetailView({
             ) : (
               <DisplayImage
                 icon={Map}
-                text={t("world:region_map.no_image")}
                 height="h-[28rem]"
                 width="w-full"
                 shape="rounded"

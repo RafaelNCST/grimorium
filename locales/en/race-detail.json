@@ -175,27 +175,16 @@
   "delete": {
     "version": {
       "title": "Delete Version",
-      "message": "Are you sure you want to delete version '{{versionName}}'? This action cannot be undone.",
+      "message": "Are you sure you want to delete the version \"{{versionName}}\"?",
       "cancel": "Cancel",
-      "confirm": "Delete"
+      "confirm": "Delete Version"
     },
     "race": {
       "title": "Delete Race",
-      "step1": {
-        "message": "You are about to permanently delete race '{{raceName}}'. This action cannot be undone.",
-        "input_label": "Type the race name to confirm:",
-        "input_placeholder": "Type the exact race name",
-        "name_mismatch": "Name doesn't match",
-        "cancel": "Cancel",
-        "continue": "Continue"
-      },
-      "step2": {
-        "title": "Final Confirmation",
-        "message": "You are about to delete '{{raceName}}' and all its {{totalVersions}} versions. This action is IRREVERSIBLE.",
-        "message_single": "You are about to delete '{{raceName}}'. This action is IRREVERSIBLE.",
-        "cancel": "Cancel",
-        "confirm": "Delete Permanently"
-      }
+      "message": "Are you sure you want to delete \"{{entityName}}\"?",
+      "message_with_versions": "This will permanently delete \"{{entityName}}\" and all {{totalVersions}} versions.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     }
   }
 }

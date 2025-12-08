@@ -146,27 +146,16 @@
   "delete": {
     "version": {
       "title": "Excluir Versão",
-      "message": "Tem certeza que deseja excluir a versão '{{versionName}}'? Esta ação não pode ser desfeita",
+      "message": "Tem certeza que deseja excluir a versão \"{{versionName}}\"?",
       "cancel": "Cancelar",
       "confirm": "Excluir Versão"
     },
     "region": {
       "title": "Excluir Região",
-      "step1": {
-        "message": "Esta ação excluirá a região '{{regionName}}' e todas as suas versões permanentemente",
-        "input_label": "Digite o nome completo da região para confirmar:",
-        "input_placeholder": "Digite o nome da região",
-        "name_mismatch": "O nome digitado não corresponde ao nome da região",
-        "cancel": "Cancelar",
-        "continue": "Continuar"
-      },
-      "step2": {
-        "title": "Confirmação Final",
-        "message": "Você está prestes a excluir permanentemente a região '{{regionName}}' e todas as suas {{totalVersions}} versões. Esta ação não pode ser desfeita",
-        "message_single": "Você está prestes a excluir permanentemente a região '{{regionName}}' e sua versão. Esta ação não pode ser desfeita",
-        "cancel": "Não, cancelar",
-        "confirm": "Sim, excluir permanentemente"
-      }
+      "message": "Tem certeza que deseja excluir \"{{entityName}}\"?",
+      "message_with_versions": "Isso excluirá \"{{entityName}}\" e todas as {{totalVersions}} versões permanentemente.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir"
     }
   },
   "region_card": {
