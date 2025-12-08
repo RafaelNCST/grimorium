@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import { InboxInitializer } from "@/components/inbox-initializer";
+import { SplashScreen } from "@/components/splash-screen";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,18 +24,26 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const App = () => (
-  <WarningsSettingsProvider>
-    <GlobalGoalsProvider>
-      <TooltipProvider>
-        <InboxInitializer />
-        <Toaster />
-        <Sonner />
-        <RouterProvider router={router} />
-        <ResetDatabaseButton />
-      </TooltipProvider>
-    </GlobalGoalsProvider>
-  </WarningsSettingsProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onLoadingComplete={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <WarningsSettingsProvider>
+      <GlobalGoalsProvider>
+        <TooltipProvider>
+          <InboxInitializer />
+          <Toaster />
+          <Sonner />
+          <RouterProvider router={router} />
+          <ResetDatabaseButton />
+        </TooltipProvider>
+      </GlobalGoalsProvider>
+    </WarningsSettingsProvider>
+  );
+};
 
 export default App;

@@ -4,7 +4,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { IBookFormData } from "@/components/modals/create-book-modal";
 import {
-  getAllBooks,
   createBook as createBookDB,
   updateLastOpened,
 } from "@/lib/db/books.service";
@@ -28,52 +27,9 @@ export function HomePage() {
   const { dashboard } = useAppSettingsStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [daysSinceLastChapter, setDaysSinceLastChapter] = useState(0);
 
-  // Load books from database on mount
-  useEffect(() => {
-    const loadBooks = async () => {
-      try {
-        console.log("[HomePage] Starting to load books from database...");
-        console.log(
-          "[HomePage] Current books in store before load:",
-          books.length
-        );
-
-        const booksFromDB = await getAllBooks();
-
-        console.log("[HomePage] Books loaded from database:", {
-          count: booksFromDB.length,
-          books: booksFromDB,
-        });
-
-        // Check for data inconsistency
-        if (books.length > 0 && booksFromDB.length === 0) {
-          console.warn(
-            "[HomePage] Data inconsistency detected! Books exist in store but not in database.",
-            {
-              storeBooks: books,
-            }
-          );
-        }
-
-        setBooks(booksFromDB);
-        console.log("[HomePage] Books set in store successfully");
-      } catch (error) {
-        console.error("[HomePage] Error loading books:", error);
-        console.error("[HomePage] Error details:", {
-          message: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
-        });
-      } finally {
-        setIsLoading(false);
-        console.log("[HomePage] Loading completed");
-      }
-    };
-
-    loadBooks();
-  }, [setBooks]);
+  // Books are already loaded by SplashScreen, no need to load again
 
   const filteredBooks = useMemo(
     () => getFilteredBooks(),
@@ -228,7 +184,6 @@ export function HomePage() {
 
   return (
     <HomeView
-      isLoading={isLoading}
       filteredBooks={filteredBooks}
       searchTerm={searchTerm}
       totalBooks={books.length}
