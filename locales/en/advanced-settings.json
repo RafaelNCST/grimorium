@@ -7,13 +7,16 @@
     "account": "My Account",
     "dashboard": "Dashboard",
     "notifications": "Notifications",
-    "data": "Data",
+    "data_privacy": "Data & privacy",
     "about": "About"
   },
   "account": {
     "profile": {
       "title": "Profile",
       "description": "Manage your personal information",
+      "avatar_options": "Photo Options",
+      "upload_photo": "Upload Photo",
+      "remove_photo": "Remove Photo",
       "change_avatar": "Change Photo",
       "avatar_help": "PNG, JPG or GIF. Max 2MB.",
       "display_name": "Display Name",
@@ -47,13 +50,6 @@
       "title": "Language",
       "description": "Choose your app language",
       "select_label": "Preferred language"
-    },
-    "legal": {
-      "title": "Legal",
-      "privacy_policy": "Privacy Policy",
-      "privacy_policy_description": "How your data is collected and used",
-      "terms_of_use": "Terms of Use",
-      "terms_of_use_description": "Rules and conditions for using the app"
     },
     "auth": {
       "title": "Authentication",
@@ -91,6 +87,29 @@
     }
   },
   "data": {
+    "legal": {
+      "title": "Legal Documents",
+      "description": "Access our privacy policy and terms of use",
+      "privacy_policy": "Privacy Policy",
+      "privacy_policy_description": "How your data is collected and used",
+      "terms_of_use": "Terms of Use",
+      "terms_of_use_description": "Rules and conditions for using the app"
+    },
+    "privacy": {
+      "title": "Privacy and Data Collection",
+      "description": "Help us improve Grimorium by sharing anonymous usage data",
+      "usage_data_label": "Help improve the app",
+      "usage_data_description": "Allow Grimorium to collect anonymous usage data to improve the experience for all users",
+      "usage_data_enabled": "Usage data collection enabled. Thank you for helping!",
+      "usage_data_disabled": "Usage data collection disabled",
+      "what_we_collect": "What we collect:",
+      "collect_item_1": "Which screens and features you use most",
+      "collect_item_2": "Average app usage time",
+      "collect_item_3": "Navigation patterns between features",
+      "collect_item_4": "Information about errors and crashes",
+      "privacy_guarantee_title": "Privacy guarantee:",
+      "privacy_guarantee_description": "We never collect the content of your books, characters, chapters, or any personally identifiable information. Only aggregated and anonymous usage data."
+    },
     "backup": {
       "title": "Backup and Restore",
       "description": "Protect your data by exporting a complete backup",

@@ -48,7 +48,7 @@ export function DashboardSection() {
   ];
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full max-w-full">
       <div>
         <h3 className="text-base font-semibold mb-1">
           {t("dashboard.default_tabs.title")}

@@ -7,13 +7,16 @@
     "account": "Minha Conta",
     "dashboard": "Dashboard",
     "notifications": "Notificações",
-    "data": "Dados",
+    "data_privacy": "Dados e privacidade",
     "about": "Sobre"
   },
   "account": {
     "profile": {
       "title": "Perfil",
       "description": "Gerencie suas informações pessoais",
+      "avatar_options": "Opções de Foto",
+      "upload_photo": "Enviar Foto",
+      "remove_photo": "Remover Foto",
       "change_avatar": "Trocar Foto",
       "avatar_help": "PNG, JPG ou GIF. Máximo 2MB.",
       "display_name": "Nome de Exibição",
@@ -47,13 +50,6 @@
       "title": "Idioma",
       "description": "Escolha o idioma do aplicativo",
       "select_label": "Idioma preferido"
-    },
-    "legal": {
-      "title": "Legal",
-      "privacy_policy": "Política de Privacidade",
-      "privacy_policy_description": "Como seus dados são coletados e usados",
-      "terms_of_use": "Termos de Uso",
-      "terms_of_use_description": "Regras e condições de uso do aplicativo"
     },
     "auth": {
       "title": "Autenticação",
@@ -91,6 +87,29 @@
     }
   },
   "data": {
+    "legal": {
+      "title": "Documentos Legais",
+      "description": "Acesse nossa política de privacidade e termos de uso",
+      "privacy_policy": "Política de Privacidade",
+      "privacy_policy_description": "Como seus dados são coletados e usados",
+      "terms_of_use": "Termos de Uso",
+      "terms_of_use_description": "Regras e condições de uso do aplicativo"
+    },
+    "privacy": {
+      "title": "Privacidade e Coleta de Dados",
+      "description": "Ajude-nos a melhorar o Grimorium compartilhando dados de uso anônimos",
+      "usage_data_label": "Ajudar a aprimorar o aplicativo",
+      "usage_data_description": "Permitir que o Grimorium colete dados anônimos de uso para melhorar a experiência de todos os usuários",
+      "usage_data_enabled": "Coleta de dados de uso ativada. Obrigado por ajudar!",
+      "usage_data_disabled": "Coleta de dados de uso desativada",
+      "what_we_collect": "O que coletamos:",
+      "collect_item_1": "Quais telas e recursos você mais utiliza",
+      "collect_item_2": "Tempo médio de uso do aplicativo",
+      "collect_item_3": "Padrões de navegação entre funcionalidades",
+      "collect_item_4": "Informações sobre erros e crashes",
+      "privacy_guarantee_title": "Garantia de privacidade:",
+      "privacy_guarantee_description": "Nunca coletamos o conteúdo dos seus livros, personagens, capítulos ou qualquer informação pessoal identificável. Apenas dados agregados e anônimos de uso."
+    },
     "backup": {
       "title": "Backup e Restauração",
       "description": "Proteja seus dados exportando um backup completo",

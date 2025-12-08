@@ -9,12 +9,11 @@ import {
   CreditCard,
   LogOut,
   Mail,
-  Shield,
-  FileText,
   Calendar,
   Check,
-  AlertCircle,
   Camera,
+  X,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +36,7 @@ import {
 
 export function AccountSection() {
   const { t } = useTranslation("advanced-settings");
-  const { user, logout, updateDisplayName } = useUserAccountStore();
+  const { user, logout, updateDisplayName, updateAvatar } = useUserAccountStore();
   const { language, setLanguage } = useLanguageStore();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
 
@@ -65,8 +64,34 @@ export function AccountSection() {
     }
   };
 
+  const handleAvatarClick = () => {
+    // Abrir seletor de arquivo imediatamente
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // TODO: Implementar upload real do arquivo com Tauri
+        // Por enquanto, criando uma URL temporária
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const url = event.target?.result as string;
+          updateAvatar(url);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  const handleRemoveAvatar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateAvatar("");
+  };
+
   return (
-    <div className="space-y-8 w-full">
+    <div className="space-y-8 w-full max-w-full">
       {/* Profile Section */}
       <div className="space-y-4">
         <div>
@@ -81,18 +106,45 @@ export function AccountSection() {
         <div className="space-y-4">
           {/* Avatar with Name and Email */}
           <div className="flex items-center gap-4">
-            <div className="relative group cursor-pointer flex-shrink-0">
-              <div className="w-20 h-20 rounded-full bg-primary/[0.15] flex items-center justify-center text-primary font-bold text-2xl transition-opacity group-hover:opacity-50">
-                {user.displayName.charAt(0).toUpperCase()}
+            <div className="relative group flex-shrink-0">
+              <div
+                className="relative cursor-pointer"
+                onClick={handleAvatarClick}
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.displayName}
+                    className="w-20 h-20 rounded-full object-cover transition-opacity group-hover:opacity-50"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-primary/[0.15] flex items-center justify-center transition-opacity group-hover:opacity-50 select-none">
+                    <User className="w-10 h-10 text-primary" />
+                  </div>
+                )}
+                {isPremium && (
+                  <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 transition-opacity group-hover:opacity-50 z-10">
+                    <Crown className="w-4 h-4 text-white" />
+                  </div>
+                )}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                  <Camera className="w-8 h-8 text-primary" />
+                </div>
               </div>
-              {isPremium && (
-                <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 transition-opacity group-hover:opacity-50">
-                  <Crown className="w-4 h-4 text-white" />
+
+              {/* Botão X para remover foto - aparece embaixo do avatar quando tem foto */}
+              {user.avatarUrl && (
+                <div className="absolute top-[84px] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="h-6 w-6 rounded-full shadow-lg"
+                    onClick={handleRemoveAvatar}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
               )}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="w-8 h-8 text-primary" />
-              </div>
             </div>
 
             <div className="flex-1 space-y-3">
@@ -282,54 +334,6 @@ export function AccountSection() {
               <SelectItem value="en">🇺🇸 English</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-      </div>
-
-      {/* Legal Links */}
-      <Separator />
-      <div className="space-y-4">
-        <h3 className="text-base font-semibold">
-          {t("account.legal.title")}
-        </h3>
-
-        <div className="space-y-2">
-          <Button
-            variant="ghost"
-            className="w-full justify-start h-auto p-3 text-left"
-            onClick={() => {
-              // TODO: Implement privacy policy
-              console.log("Privacy Policy");
-            }}
-          >
-            <Shield className="w-4 h-4 mr-3 text-muted-foreground flex-shrink-0" />
-            <div className="flex-1">
-              <div className="font-medium text-sm">
-                {t("account.legal.privacy_policy")}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {t("account.legal.privacy_policy_description")}
-              </div>
-            </div>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-start h-auto p-3 text-left"
-            onClick={() => {
-              // TODO: Implement terms of use
-              console.log("Terms of Use");
-            }}
-          >
-            <FileText className="w-4 h-4 mr-3 text-muted-foreground flex-shrink-0" />
-            <div className="flex-1">
-              <div className="font-medium text-sm">
-                {t("account.legal.terms_of_use")}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {t("account.legal.terms_of_use_description")}
-              </div>
-            </div>
-          </Button>
         </div>
       </div>
 

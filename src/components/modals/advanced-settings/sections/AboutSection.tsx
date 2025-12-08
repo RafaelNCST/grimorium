@@ -23,7 +23,7 @@ export function AboutSection() {
   };
 
   return (
-    <div className="space-y-8 w-full">
+    <div className="space-y-8 w-full max-w-full">
       {/* App Info */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">

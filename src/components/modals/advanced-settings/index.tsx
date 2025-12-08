@@ -10,7 +10,7 @@ import {
   User,
   LayoutDashboard,
   Bell,
-  Database,
+  Shield,
   Info,
   Edit2,
   Crown,
@@ -50,7 +50,7 @@ export function AdvancedSettingsModal({
     { id: "account", labelKey: "sections.account", icon: User },
     { id: "dashboard", labelKey: "sections.dashboard", icon: LayoutDashboard },
     { id: "notifications", labelKey: "sections.notifications", icon: Bell },
-    { id: "data", labelKey: "sections.data", icon: Database },
+    { id: "data", labelKey: "sections.data_privacy", icon: Shield },
     { id: "about", labelKey: "sections.about", icon: Info },
   ];
 
@@ -92,7 +92,7 @@ export function AdvancedSettingsModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="p-0 gap-0 overflow-hidden"
+        className="p-0 gap-0 overflow-hidden !w-[1200px] !max-w-[1200px] !min-w-[1200px]"
         style={{
           width: '1200px',
           maxWidth: '1200px',
@@ -110,9 +110,17 @@ export function AdvancedSettingsModal({
               <div className="flex items-start gap-3">
                 {/* Avatar */}
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                    {user.displayName.charAt(0).toUpperCase()}
-                  </div>
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.displayName}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center select-none">
+                      <User className="w-6 h-6 text-primary" />
+                    </div>
+                  )}
                   {isPremium && (
                     <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1">
                       <Crown className="w-3 h-3 text-white" />
@@ -226,7 +234,7 @@ export function AdvancedSettingsModal({
             {/* Header */}
             <div className="h-14 border-b px-6 flex items-center flex-shrink-0">
               <h2 className="text-lg font-semibold">
-                {t(`sections.${activeSection}`)}
+                {t(sections.find(s => s.id === activeSection)?.labelKey || `sections.${activeSection}`)}
               </h2>
             </div>
 

@@ -16,7 +16,7 @@ export function NotificationsSection() {
   const { notifications, setSoundEnabled } = useAppSettingsStore();
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full max-w-full">
       <div>
         <h3 className="text-base font-semibold mb-1">
           {t("notifications.sound.title")}
