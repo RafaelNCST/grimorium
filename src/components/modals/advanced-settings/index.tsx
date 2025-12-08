@@ -14,6 +14,7 @@ import {
   Info,
   Edit2,
   Crown,
+  Wheat,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -218,13 +219,27 @@ export function AdvancedSettingsModal({
             <div className="p-3 border-t bg-background/50 flex-shrink-0">
               <div
                 className={cn(
-                  "px-3 py-2 rounded-md text-center text-xs font-semibold",
+                  "px-4 py-3 rounded-lg text-center border transition-colors",
                   isPremium
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white"
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-500/30 dark:from-purple-400/20 dark:to-purple-500/20 dark:border-purple-400/30"
+                    : "bg-gradient-to-br from-green-500/20 to-green-600/20 border-green-500/30 dark:from-green-400/20 dark:to-green-500/20 dark:border-green-400/30"
                 )}
               >
-                {isPremium ? "👑 Realeza" : "Camponês"}
+                <div className="flex items-center justify-center gap-2">
+                  {isPremium ? (
+                    <Crown className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  ) : (
+                    <Wheat className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  )}
+                  <span className={cn(
+                    "text-sm font-bold",
+                    isPremium
+                      ? "text-purple-700 dark:text-purple-300"
+                      : "text-green-700 dark:text-green-300"
+                  )}>
+                    {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
