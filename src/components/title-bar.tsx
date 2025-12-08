@@ -6,8 +6,8 @@ import { Inbox, Minus, Settings, Square, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
+import { AdvancedSettingsModal } from "@/components/modals/advanced-settings";
 import { InboxNotificationModal } from "@/components/modals/inbox-notification-modal";
-import { SettingsModal } from "@/components/modals/settings-modal";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -391,8 +391,8 @@ export const TitleBar = () => {
         onClose={() => setIsInboxOpen(false)}
       />
 
-      {/* Settings Modal */}
-      <SettingsModal
+      {/* Advanced Settings Modal */}
+      <AdvancedSettingsModal
         open={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />

@@ -1,0 +1,156 @@
+{
+  "user_profile": {
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "sections": {
+    "account": "My Account",
+    "dashboard": "Dashboard",
+    "notifications": "Notifications",
+    "data": "Data",
+    "about": "About"
+  },
+  "account": {
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your personal information",
+      "change_avatar": "Change Photo",
+      "avatar_help": "PNG, JPG or GIF. Max 2MB.",
+      "display_name": "Display Name",
+      "edit_name": "Edit",
+      "email": "Email",
+      "email_help": "Email cannot be changed",
+      "password": "Password",
+      "change_password": "Change Password"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "description": "Manage your plan and benefits",
+      "tier_free": "Peasant",
+      "tier_premium": "Royalty",
+      "status_active": "Active",
+      "renewal_date": "Next billing",
+      "free_description": "Free access with basic features",
+      "upgrade_button": "Upgrade to Royalty"
+    },
+    "payment": {
+      "title": "Payment",
+      "description": "Manage payment method and billing",
+      "method": "Method",
+      "method_credit_card": "Credit Card",
+      "method_pix": "PIX",
+      "method_paypal": "PayPal",
+      "card_number": "Card",
+      "manage_button": "Manage Payment"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose your app language",
+      "select_label": "Preferred language"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy_policy": "Privacy Policy",
+      "privacy_policy_description": "How your data is collected and used",
+      "terms_of_use": "Terms of Use",
+      "terms_of_use_description": "Rules and conditions for using the app"
+    },
+    "auth": {
+      "title": "Authentication",
+      "description": "Manage your account and access",
+      "provider_google": "Connected via Google",
+      "provider_email": "Connected via Email",
+      "logout_button": "Sign Out",
+      "logout_confirm": "Are you sure you want to sign out? You'll need to log in again."
+    }
+  },
+  "dashboard": {
+    "default_tabs": {
+      "title": "Default Tabs for New Books",
+      "description": "Choose which tabs will be visible when creating a new book",
+      "note": "The 'Overview' tab will always be visible and cannot be disabled. You can customize tabs for each book individually later."
+    },
+    "tabs": {
+      "overview": "Overview",
+      "characters": "Characters",
+      "world": "World",
+      "factions": "Factions",
+      "plot": "Plot",
+      "magic": "Magic",
+      "species": "Species",
+      "items": "Items"
+    }
+  },
+  "notifications": {
+    "sound": {
+      "title": "Sounds and Audio",
+      "description": "Configure how notifications behave",
+      "label": "Notification Sounds",
+      "help": "Play sounds when receiving system notifications",
+      "note": "Sounds help draw your attention to important warnings about goals and writing progress."
+    }
+  },
+  "data": {
+    "backup": {
+      "title": "Backup and Restore",
+      "description": "Protect your data by exporting a complete backup",
+      "export_button": "Export Backup",
+      "export_description": "Save all books and settings to a file",
+      "export_success": "Backup exported successfully!",
+      "export_error": "Error exporting backup",
+      "import_button": "Import Backup",
+      "import_description": "Restore data from a previous backup",
+      "import_success": "Backup imported successfully!",
+      "import_error": "Error importing backup",
+      "note": "We recommend making regular backups to avoid losing your work. The file will be saved in JSON format."
+    },
+    "clear": {
+      "title": "Clear Application Data",
+      "description": "Remove all local data and reset the app",
+      "warning_title": "Warning: This action is irreversible!",
+      "warning_description": "All your books, characters, chapters, and settings will be permanently deleted.",
+      "button": "Clear All Data",
+      "dialog": {
+        "title": "Confirm Data Clearing",
+        "description": "You are about to delete ALL application data. This action cannot be undone.",
+        "confirmation": "Are you absolutely sure you want to continue?",
+        "cancel": "Cancel",
+        "confirm": "Yes, Clear Everything"
+      },
+      "success": "Data cleared successfully",
+      "error": "Error clearing data"
+    }
+  },
+  "about": {
+    "app": {
+      "tagline": "Your tool for creating fantasy worlds",
+      "version_label": "Version",
+      "release_label": "Status",
+      "release_status": "Private Beta"
+    },
+    "bug_report": {
+      "title": "Report Bug",
+      "description": "Found a problem? Help us improve!",
+      "button": "Report Bug on GitHub",
+      "help": "Open issues page in repository",
+      "note": "When reporting a bug, include as many details as possible: what you were doing, what you expected to happen, and what actually happened."
+    },
+    "suggestions": {
+      "title": "Suggestions and Feedback",
+      "description": "Have ideas to improve Grimorium?",
+      "button": "Make Suggestion on GitHub",
+      "help": "Share ideas and feedback with the community"
+    },
+    "info": {
+      "title": "Technical Information",
+      "technology": "Technology",
+      "platform": "Platform",
+      "license": "License"
+    },
+    "footer": {
+      "made_with": "Made with",
+      "for_writers": "for fantasy writers",
+      "rights": "All rights reserved."
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import enAdvancedSettings from "../../locales/en/advanced-settings.json";
 import enChapterCard from "../../locales/en/chapter-card.json";
 import enChapterEditor from "../../locales/en/chapter-editor.json";
 import enChapterMetrics from "../../locales/en/chapter-metrics.json";
@@ -40,6 +41,7 @@ import enSettings from "../../locales/en/settings.json";
 import enTooltips from "../../locales/en/tooltips.json";
 import enWarningsSettings from "../../locales/en/warnings-settings.json";
 import enWorld from "../../locales/en/world.json";
+import ptAdvancedSettings from "../../locales/pt/advanced-settings.json";
 import ptChapterCard from "../../locales/pt/chapter-card.json";
 import ptChapterEditor from "../../locales/pt/chapter-editor.json";
 import ptChapterMetrics from "../../locales/pt/chapter-metrics.json";
@@ -82,6 +84,7 @@ import ptWorld from "../../locales/pt/world.json";
 
 const resources = {
   en: {
+    "advanced-settings": enAdvancedSettings,
     common: enCommon,
     home: enHome,
     inbox: enInbox,
@@ -123,6 +126,7 @@ const resources = {
     world: enWorld,
   },
   pt: {
+    "advanced-settings": ptAdvancedSettings,
     common: ptCommon,
     home: ptHome,
     inbox: ptInbox,

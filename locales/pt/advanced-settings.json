@@ -1,0 +1,156 @@
+{
+  "user_profile": {
+    "cancel": "Cancelar",
+    "save": "Salvar"
+  },
+  "sections": {
+    "account": "Minha Conta",
+    "dashboard": "Dashboard",
+    "notifications": "Notificações",
+    "data": "Dados",
+    "about": "Sobre"
+  },
+  "account": {
+    "profile": {
+      "title": "Perfil",
+      "description": "Gerencie suas informações pessoais",
+      "change_avatar": "Trocar Foto",
+      "avatar_help": "PNG, JPG ou GIF. Máximo 2MB.",
+      "display_name": "Nome de Exibição",
+      "edit_name": "Editar",
+      "email": "Email",
+      "email_help": "O email não pode ser alterado",
+      "password": "Senha",
+      "change_password": "Alterar Senha"
+    },
+    "subscription": {
+      "title": "Assinatura",
+      "description": "Gerencie seu plano e benefícios",
+      "tier_free": "Camponês",
+      "tier_premium": "Realeza",
+      "status_active": "Ativo",
+      "renewal_date": "Próxima cobrança",
+      "free_description": "Acesso gratuito com funcionalidades básicas",
+      "upgrade_button": "Evoluir para Realeza"
+    },
+    "payment": {
+      "title": "Pagamento",
+      "description": "Gerenciar forma de pagamento e cobranças",
+      "method": "Método",
+      "method_credit_card": "Cartão de Crédito",
+      "method_pix": "PIX",
+      "method_paypal": "PayPal",
+      "card_number": "Cartão",
+      "manage_button": "Gerenciar Pagamento"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Escolha o idioma do aplicativo",
+      "select_label": "Idioma preferido"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy_policy": "Política de Privacidade",
+      "privacy_policy_description": "Como seus dados são coletados e usados",
+      "terms_of_use": "Termos de Uso",
+      "terms_of_use_description": "Regras e condições de uso do aplicativo"
+    },
+    "auth": {
+      "title": "Autenticação",
+      "description": "Gerenciar sua conta e acesso",
+      "provider_google": "Conectado via Google",
+      "provider_email": "Conectado via E-mail",
+      "logout_button": "Sair da Conta",
+      "logout_confirm": "Tem certeza que deseja sair? Você precisará fazer login novamente."
+    }
+  },
+  "dashboard": {
+    "default_tabs": {
+      "title": "Tabs Padrão em Novos Livros",
+      "description": "Escolha quais tabs estarão visíveis ao criar um novo livro",
+      "note": "A tab 'Visão Geral' sempre estará visível e não pode ser desativada. Você pode personalizar as tabs de cada livro individualmente depois."
+    },
+    "tabs": {
+      "overview": "Visão Geral",
+      "characters": "Personagens",
+      "world": "Mundo",
+      "factions": "Facções",
+      "plot": "Enredo",
+      "magic": "Magia",
+      "species": "Espécies",
+      "items": "Itens"
+    }
+  },
+  "notifications": {
+    "sound": {
+      "title": "Sons e Áudio",
+      "description": "Configure como as notificações se comportam",
+      "label": "Sons de Notificação",
+      "help": "Reproduzir sons ao receber notificações do sistema",
+      "note": "Os sons ajudam a chamar sua atenção para avisos importantes de metas e progresso de escrita."
+    }
+  },
+  "data": {
+    "backup": {
+      "title": "Backup e Restauração",
+      "description": "Proteja seus dados exportando um backup completo",
+      "export_button": "Exportar Backup",
+      "export_description": "Salvar todos os livros e configurações em um arquivo",
+      "export_success": "Backup exportado com sucesso!",
+      "export_error": "Erro ao exportar backup",
+      "import_button": "Importar Backup",
+      "import_description": "Restaurar dados de um backup anterior",
+      "import_success": "Backup importado com sucesso!",
+      "import_error": "Erro ao importar backup",
+      "note": "Recomendamos fazer backups regulares para não perder seu trabalho. O arquivo será salvo em formato JSON."
+    },
+    "clear": {
+      "title": "Limpar Dados do Aplicativo",
+      "description": "Remover todos os dados locais e resetar o app",
+      "warning_title": "Atenção: Esta ação é irreversível!",
+      "warning_description": "Todos os seus livros, personagens, capítulos e configurações serão permanentemente deletados.",
+      "button": "Limpar Todos os Dados",
+      "dialog": {
+        "title": "Confirmar Limpeza de Dados",
+        "description": "Você está prestes a deletar TODOS os dados do aplicativo. Esta ação não pode ser desfeita.",
+        "confirmation": "Tem certeza absoluta que deseja continuar?",
+        "cancel": "Cancelar",
+        "confirm": "Sim, Limpar Tudo"
+      },
+      "success": "Dados limpos com sucesso",
+      "error": "Erro ao limpar dados"
+    }
+  },
+  "about": {
+    "app": {
+      "tagline": "Sua ferramenta para criar mundos de fantasia",
+      "version_label": "Versão",
+      "release_label": "Status",
+      "release_status": "Beta Privado"
+    },
+    "bug_report": {
+      "title": "Reportar Bug",
+      "description": "Encontrou um problema? Nos ajude a melhorar!",
+      "button": "Reportar Bug no GitHub",
+      "help": "Abrir página de issues no repositório",
+      "note": "Ao reportar um bug, inclua o máximo de detalhes possível: o que você estava fazendo, o que esperava que acontecesse, e o que aconteceu de fato."
+    },
+    "suggestions": {
+      "title": "Sugestões e Feedback",
+      "description": "Tem ideias para melhorar o Grimorium?",
+      "button": "Fazer Sugestão no GitHub",
+      "help": "Compartilhar ideias e feedback com a comunidade"
+    },
+    "info": {
+      "title": "Informações Técnicas",
+      "technology": "Tecnologia",
+      "platform": "Plataforma",
+      "license": "Licença"
+    },
+    "footer": {
+      "made_with": "Feito com",
+      "for_writers": "para escritores de fantasia",
+      "rights": "Todos os direitos reservados."
+    }
+  }
+}

@@ -70,7 +70,9 @@
       "Bash(Stop-Process -Force -Id 11500)",
       "Bash(Stop-Process -Force -Id 31564)",
       "Bash(Stop-Process -Force -Id 8448)",
-      "Bash(Format-Table -AutoSize)"
+      "Bash(Format-Table -AutoSize)",
+      "Bash(Stop-Process -Force -Id 36264)",
+      "Bash(Stop-Process -Force -Id 32128)"
     ],
     "deny": [
       "Bash(git push --force:*)",
