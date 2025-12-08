@@ -362,6 +362,10 @@ export function PlotArcDetailView({
   const StatusIcon = statusConfig?.icon;
   const SizeIcon = sizeConfig?.icon;
 
+  // Get active colors from constants
+  const statusColorClass = statusConfig?.activeColor.replace("ring-2 ring-emerald-500/50", "").replace("ring-2 ring-blue-500/50", "").replace("ring-2 ring-amber-500/50", "").trim() || "bg-gray-500/20 text-gray-600 border-gray-500/30";
+  const sizeColorClass = sizeConfig?.activeColor.replace(/ring-2 ring-\w+-500\/50/g, "").trim() || "bg-gray-500/20 text-gray-600 border-gray-500/30";
+
   // Use editForm when editing, otherwise use arc
   const activeArc = isEditing ? editForm : arc;
   const currentEvents = isEditing ? editForm.events || arc.events : arc.events;
@@ -391,35 +395,6 @@ export function PlotArcDetailView({
   const selectedRegions: DisplayEntityItem[] = regions
     .filter((r) => activeArc.importantRegions?.includes(r.id))
     .map((r) => ({ id: r.id, name: r.name, image: r.image }));
-
-  // Get status and size colors
-  const getStatusColor = (status: PlotArcStatus) => {
-    switch (status) {
-      case "finalizado":
-        return "bg-emerald-500/20 text-emerald-600 border-emerald-500/30";
-      case "atual":
-        return "bg-blue-500/20 text-blue-600 border-blue-500/30";
-      case "planejamento":
-        return "bg-amber-500/20 text-amber-600 border-amber-500/30";
-      default:
-        return "bg-gray-500/20 text-gray-600 border-gray-500/30";
-    }
-  };
-
-  const getSizeColor = (size: PlotArcSize) => {
-    switch (size) {
-      case "mini":
-        return "bg-violet-500/20 text-violet-600 border-violet-500/30";
-      case "pequeno":
-        return "bg-blue-500/20 text-blue-600 border-blue-500/30";
-      case "médio":
-        return "bg-indigo-500/20 text-indigo-600 border-indigo-500/30";
-      case "grande":
-        return "bg-purple-500/20 text-purple-600 border-purple-500/30";
-      default:
-        return "bg-gray-500/20 text-gray-600 border-gray-500/30";
-    }
-  };
 
   return (
     <div className="bg-background">
@@ -582,20 +557,16 @@ export function PlotArcDetailView({
                     <h2 className="text-3xl font-bold mb-3">{arc.name}</h2>
                     <div className="flex flex-wrap gap-2 mb-4">
                       <Badge
-                        className={`${getStatusColor(arc.status)} pointer-events-none`}
+                        className={`${statusColorClass} pointer-events-none`}
                       >
                         {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
-                        {t(
-                          `plot:statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
-                        )}
+                        {statusConfig ? t(`plot:${statusConfig.translationKey}`) : arc.status}
                       </Badge>
                       <Badge
-                        className={`${getSizeColor(arc.size)} pointer-events-none`}
+                        className={`${sizeColorClass} pointer-events-none`}
                       >
                         {SizeIcon && <SizeIcon className="w-3 h-3 mr-1" />}
-                        {t(
-                          `plot:sizes.${arc.size === "mini" ? "mini" : arc.size === "pequeno" ? "small" : arc.size === "médio" ? "medium" : "large"}`
-                        )}
+                        {sizeConfig ? t(`plot:${sizeConfig.translationKey}`) : arc.size}
                       </Badge>
                     </div>
                   </div>
