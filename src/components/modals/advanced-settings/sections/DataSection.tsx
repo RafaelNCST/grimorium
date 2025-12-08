@@ -87,11 +87,6 @@ export function DataSection() {
   const handleUsageDataToggle = (checked: boolean) => {
     setAllowUsageData(checked);
     // TODO: Implementar persistência da preferência
-    toast.success(
-      checked
-        ? t("data.privacy.usage_data_enabled")
-        : t("data.privacy.usage_data_disabled")
-    );
   };
 
   const openExternal = (url: string) => {
@@ -113,15 +108,14 @@ export function DataSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="w-full justify-start h-auto p-4 hover:border-primary/50 transition-colors"
+          <div
+            className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
             onClick={() => openExternal("#privacy-policy")}
           >
-            <div className="rounded-lg bg-primary/10 p-2 mr-3 flex-shrink-0">
+            <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
               <Shield className="w-5 h-5 text-primary" />
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1">
               <div className="font-semibold text-sm mb-0.5">
                 {t("data.legal.privacy_policy")}
               </div>
@@ -129,17 +123,16 @@ export function DataSection() {
                 {t("data.legal.privacy_policy_description")}
               </div>
             </div>
-          </Button>
+          </div>
 
-          <Button
-            variant="outline"
-            className="w-full justify-start h-auto p-4 hover:border-primary/50 transition-colors"
+          <div
+            className="rounded-lg border bg-card p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer flex items-start gap-3"
             onClick={() => openExternal("#terms-of-use")}
           >
-            <div className="rounded-lg bg-primary/10 p-2 mr-3 flex-shrink-0">
+            <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
               <FileText className="w-5 h-5 text-primary" />
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1">
               <div className="font-semibold text-sm mb-0.5">
                 {t("data.legal.terms_of_use")}
               </div>
@@ -147,7 +140,7 @@ export function DataSection() {
                 {t("data.legal.terms_of_use_description")}
               </div>
             </div>
-          </Button>
+          </div>
         </div>
       </div>
 
@@ -226,20 +219,22 @@ export function DataSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            className="w-full justify-start h-auto p-4 hover:border-primary/50 transition-colors"
-            onClick={handleExportBackup}
-            disabled={isExporting}
+          <div
+            className={`rounded-lg border bg-card p-4 flex items-start gap-3 transition-colors duration-200 ${
+              isExporting
+                ? 'opacity-60 cursor-not-allowed'
+                : 'hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer'
+            }`}
+            onClick={isExporting ? undefined : handleExportBackup}
           >
-            <div className={`rounded-lg p-2 mr-3 flex-shrink-0 ${isExporting ? 'bg-muted' : 'bg-blue-500/10'}`}>
+            <div className={`rounded-lg p-2 flex-shrink-0 ${isExporting ? 'bg-muted' : 'bg-blue-500/10'}`}>
               {isExporting ? (
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               ) : (
                 <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               )}
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1">
               <div className="font-semibold text-sm mb-0.5">
                 {t("data.backup.export_button")}
               </div>
@@ -247,22 +242,24 @@ export function DataSection() {
                 {t("data.backup.export_description")}
               </div>
             </div>
-          </Button>
+          </div>
 
-          <Button
-            variant="outline"
-            className="w-full justify-start h-auto p-4 hover:border-primary/50 transition-colors"
-            onClick={handleImportBackup}
-            disabled={isImporting}
+          <div
+            className={`rounded-lg border bg-card p-4 flex items-start gap-3 transition-colors duration-200 ${
+              isImporting
+                ? 'opacity-60 cursor-not-allowed'
+                : 'hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer'
+            }`}
+            onClick={isImporting ? undefined : handleImportBackup}
           >
-            <div className={`rounded-lg p-2 mr-3 flex-shrink-0 ${isImporting ? 'bg-muted' : 'bg-green-500/10'}`}>
+            <div className={`rounded-lg p-2 flex-shrink-0 ${isImporting ? 'bg-muted' : 'bg-green-500/10'}`}>
               {isImporting ? (
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               ) : (
                 <Upload className="w-5 h-5 text-green-600 dark:text-green-400" />
               )}
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1">
               <div className="font-semibold text-sm mb-0.5">
                 {t("data.backup.import_button")}
               </div>
@@ -270,7 +267,7 @@ export function DataSection() {
                 {t("data.backup.import_description")}
               </div>
             </div>
-          </Button>
+          </div>
         </div>
 
         <div className="rounded-lg bg-muted/50 border p-4">
@@ -337,7 +334,7 @@ export function DataSection() {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleClearData}
-              className="bg-destructive hover:bg-destructive/90"
+              variant="destructive"
             >
               {t("data.clear.dialog.confirm")}
             </AlertDialogAction>
