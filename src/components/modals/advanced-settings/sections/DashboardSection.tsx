@@ -67,7 +67,7 @@ export function DashboardSection() {
           return (
             <div
               key={tabId}
-              className="flex items-center space-x-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors"
+              className="flex items-center space-x-3 rounded-lg border p-4 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
             >
               <Checkbox
                 id={`tab-${tabId}`}
