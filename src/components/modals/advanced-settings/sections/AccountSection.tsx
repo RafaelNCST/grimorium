@@ -14,7 +14,9 @@ import {
   Calendar,
   Check,
   AlertCircle,
+  Camera,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -35,10 +37,13 @@ import {
 
 export function AccountSection() {
   const { t } = useTranslation("advanced-settings");
-  const { user, logout } = useUserAccountStore();
+  const { user, logout, updateDisplayName } = useUserAccountStore();
   const { language, setLanguage } = useLanguageStore();
+  const [displayName, setDisplayName] = useState(user?.displayName || "");
 
   if (!user) return null;
+
+  const hasNameChanged = displayName !== user.displayName && displayName.trim() !== "";
 
   const isPremium = user.subscription.tier === "realeza";
   const isActive = user.subscription.status === "active";
@@ -52,6 +57,12 @@ export function AccountSection() {
         day: "numeric",
       }
     );
+  };
+
+  const handleSaveName = () => {
+    if (displayName.trim() && hasNameChanged) {
+      updateDisplayName(displayName.trim());
+    }
   };
 
   return (
@@ -68,58 +79,57 @@ export function AccountSection() {
         </div>
 
         <div className="space-y-4">
-          {/* Avatar */}
+          {/* Avatar with Name and Email */}
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl">
+            <div className="relative group cursor-pointer flex-shrink-0">
+              <div className="w-20 h-20 rounded-full bg-primary/[0.15] flex items-center justify-center text-primary font-bold text-2xl transition-opacity group-hover:opacity-50">
                 {user.displayName.charAt(0).toUpperCase()}
               </div>
               {isPremium && (
-                <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5">
+                <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 transition-opacity group-hover:opacity-50">
                   <Crown className="w-4 h-4 text-white" />
                 </div>
               )}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-8 h-8 text-primary" />
+              </div>
             </div>
-            <div className="flex-1">
-              <Button variant="secondary" size="sm">
-                {t("account.profile.change_avatar")}
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                {t("account.profile.avatar_help")}
-              </p>
-            </div>
-          </div>
 
-          {/* Display Name */}
-          <div>
-            <Label className="text-sm font-medium mb-2 block">
-              {t("account.profile.display_name")}
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                value={user.displayName}
-                readOnly
-                className="flex-1 bg-muted cursor-default"
-              />
-              <Button variant="secondary" size="sm">
-                {t("account.profile.edit_name")}
-              </Button>
-            </div>
-          </div>
+            <div className="flex-1 space-y-3">
+              {/* Display Name */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  {t("account.profile.display_name")}
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="flex-1"
+                    maxLength={50}
+                  />
+                  <Button
+                    variant="magical"
+                    size="sm"
+                    onClick={handleSaveName}
+                    disabled={!hasNameChanged}
+                  >
+                    {t("user_profile.save")}
+                  </Button>
+                </div>
+              </div>
 
-          {/* Email */}
-          <div>
-            <Label className="text-sm font-medium mb-2 block">
-              {t("account.profile.email")}
-            </Label>
-            <Input
-              value={user.email}
-              readOnly
-              className="bg-muted cursor-default"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              {t("account.profile.email_help")}
-            </p>
+              {/* Email */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  {t("account.profile.email")}
+                </Label>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/50 border text-sm">
+                  <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-muted-foreground">{user.email}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Password */}
