@@ -39,6 +39,7 @@ import enRaces from "../../locales/en/races.json";
 import enRegionDetail from "../../locales/en/region-detail.json";
 import enSettings from "../../locales/en/settings.json";
 import enTooltips from "../../locales/en/tooltips.json";
+import enUpgrade from "../../locales/en/upgrade.json";
 import enWarningsSettings from "../../locales/en/warnings-settings.json";
 import enWorld from "../../locales/en/world.json";
 import ptAdvancedSettings from "../../locales/pt/advanced-settings.json";
@@ -79,6 +80,7 @@ import ptRaces from "../../locales/pt/races.json";
 import ptRegionDetail from "../../locales/pt/region-detail.json";
 import ptSettings from "../../locales/pt/settings.json";
 import ptTooltips from "../../locales/pt/tooltips.json";
+import ptUpgrade from "../../locales/pt/upgrade.json";
 import ptWarningsSettings from "../../locales/pt/warnings-settings.json";
 import ptWorld from "../../locales/pt/world.json";
 
@@ -122,6 +124,7 @@ const resources = {
     "region-detail": enRegionDetail,
     settings: enSettings,
     tooltips: enTooltips,
+    upgrade: enUpgrade,
     "warnings-settings": enWarningsSettings,
     world: enWorld,
   },
@@ -164,6 +167,7 @@ const resources = {
     "region-detail": ptRegionDetail,
     settings: ptSettings,
     tooltips: ptTooltips,
+    upgrade: ptUpgrade,
     "warnings-settings": ptWarningsSettings,
     world: ptWorld,
   },

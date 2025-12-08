@@ -1,0 +1,34 @@
+{
+  "title": "Become Royalty",
+  "subtitle": "Unlock Grimorium's full potential",
+  "benefits": {
+    "title": "What you get",
+    "unlimited_books": {
+      "title": "Unlimited Books",
+      "description": "Create and edit as many books as you want, without any limitations"
+    },
+    "unlimited_chapters": {
+      "title": "Unlimited Chapters",
+      "description": "Write chapters without limits and develop epic stories"
+    },
+    "priority_support": {
+      "title": "Priority Support",
+      "description": "Your suggestions and bugs have priority in the support queue"
+    },
+    "early_access": {
+      "title": "Early Access",
+      "description": "Be the first to test new features and functionalities"
+    }
+  },
+  "pricing": {
+    "title": "Choose your plan",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "per_month": "/month",
+    "per_year": "/year",
+    "save_20": "Save 17%",
+    "monthly_equivalent": "$8.33/month"
+  },
+  "cta_button": "Upgrade to Royalty",
+  "footer_note": "Cancel anytime. No hidden fees."
+}

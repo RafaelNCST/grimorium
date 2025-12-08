@@ -22,9 +22,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguageStore } from "@/stores/language-store";
 import { useUserAccountStore } from "@/stores/user-account-store";
+import { UpgradeModal } from "@/components/modals/upgrade-modal";
 
 import {
   Select,
@@ -39,6 +41,7 @@ export function AccountSection() {
   const { user, logout, updateDisplayName, updateAvatar } = useUserAccountStore();
   const { language, setLanguage } = useLanguageStore();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   if (!user) return null;
 
@@ -219,16 +222,16 @@ export function AccountSection() {
         >
           <div className="flex items-start justify-between">
             <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {isPremium && <Crown className="w-5 h-5 text-amber-600" />}
                 <h4 className="font-bold text-lg">
                   {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
                 </h4>
                 {isActive && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
-                    <Check className="w-3 h-3" />
+                  <Badge variant="default" className="bg-green-600 hover:bg-green-600 text-white">
+                    <Check className="w-3 h-3 mr-1" />
                     {t("account.subscription.status_active")}
-                  </span>
+                  </Badge>
                 )}
               </div>
 
@@ -250,7 +253,12 @@ export function AccountSection() {
             </div>
 
             {!isPremium && (
-              <Button variant="magical" size="sm" className="ml-4">
+              <Button
+                variant="magical"
+                size="sm"
+                className="ml-4"
+                onClick={() => setShowUpgradeModal(true)}
+              >
                 <Crown className="w-4 h-4 mr-2" />
                 {t("account.subscription.upgrade_button")}
               </Button>
@@ -377,6 +385,9 @@ export function AccountSection() {
           {t("account.auth.logout_button")}
         </Button>
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 }

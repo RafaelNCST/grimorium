@@ -1,0 +1,34 @@
+{
+  "title": "Torne-se Realeza",
+  "subtitle": "Desbloqueie todo o potencial do Grimorium",
+  "benefits": {
+    "title": "O que você ganha",
+    "unlimited_books": {
+      "title": "Livros Ilimitados",
+      "description": "Crie e edite quantos livros quiser, sem nenhuma limitação"
+    },
+    "unlimited_chapters": {
+      "title": "Capítulos Ilimitados",
+      "description": "Escreva capítulos sem limites e desenvolva histórias épicas"
+    },
+    "priority_support": {
+      "title": "Suporte Prioritário",
+      "description": "Suas sugestões e bugs têm prioridade na fila de atendimento"
+    },
+    "early_access": {
+      "title": "Acesso Antecipado",
+      "description": "Seja o primeiro a testar novos recursos e funcionalidades"
+    }
+  },
+  "pricing": {
+    "title": "Escolha seu plano",
+    "monthly": "Mensal",
+    "annual": "Anual",
+    "per_month": "/mês",
+    "per_year": "/ano",
+    "save_20": "Economize 17%",
+    "monthly_equivalent": "$8.33/mês"
+  },
+  "cta_button": "Evoluir para Realeza",
+  "footer_note": "Cancele a qualquer momento. Sem taxas ocultas."
+}
