@@ -5,7 +5,7 @@ import { DBBook } from "./types";
 import { getDB } from "./index";
 
 // Convert Book store type to DBBook
-function bookToDBBook(book: Book): DBBook {
+function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
   return {
     id: book.id,
     title: book.title,
@@ -35,7 +35,7 @@ function bookToDBBook(book: Book): DBBook {
     sticky_notes: undefined,
     checklist_items: undefined,
     sections_config: undefined,
-    tabs_config: undefined,
+    tabs_config: tabsConfig,
   };
 }
 
@@ -99,15 +99,10 @@ export async function getBookById(id: string): Promise<Book | null> {
   return result.length > 0 ? dbBookToBook(result[0]) : null;
 }
 
-export async function createBook(book: Book): Promise<void> {
-  console.log("[books.service] createBook called with:", book);
-
+export async function createBook(book: Book, tabsConfig?: string): Promise<void> {
   try {
     const db = await getDB();
-    console.log("[books.service] Database connection obtained");
-
-    const dbBook = bookToDBBook(book);
-    console.log("[books.service] Converted to DBBook:", dbBook);
+    const dbBook = bookToDBBook(book, tabsConfig);
 
     await db.execute(
       `INSERT INTO books (
@@ -150,8 +145,6 @@ export async function createBook(book: Book): Promise<void> {
         dbBook.tabs_config,
       ]
     );
-
-    console.log("[books.service] Book inserted successfully!");
   } catch (error) {
     console.error("[books.service] Error creating book:", error);
     throw error;

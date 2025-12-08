@@ -9,6 +9,7 @@ import {
   updateLastOpened,
 } from "@/lib/db/books.service";
 import { getChapterMetadataByBookId } from "@/lib/db/chapters.service";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useBookStore } from "@/stores/book-store";
 
 import { getLastEditedBook } from "./utils/get-last-edited-book";
@@ -24,6 +25,7 @@ export function HomePage() {
     books,
     setBooks,
   } = useBookStore();
+  const { dashboard } = useAppSettingsStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [_isLoading, setIsLoading] = useState(true);
@@ -144,8 +146,6 @@ export function HomePage() {
 
   const handleCreateBook = useCallback(
     async (bookData: IBookFormData) => {
-      console.log("Starting book creation with data:", bookData);
-
       const now = Date.now();
       const newBook = {
         id: now.toString(),
@@ -161,34 +161,48 @@ export function HomePage() {
         authorSummary: bookData.authorSummary || "",
       };
 
-      console.log("New book object:", newBook);
+      // Prepare tabs config from app settings
+      // Map dashboard tab IDs to the TabConfig format expected by the database
+      const allTabs = [
+        { id: "overview", label: "overview" },
+        { id: "characters", label: "characters" },
+        { id: "world", label: "world" },
+        { id: "factions", label: "factions" },
+        { id: "plot", label: "plot" },
+        { id: "magic", label: "magic" },
+        { id: "species", label: "species" },
+        { id: "items", label: "items" },
+      ];
+
+      const tabsConfigArray = allTabs.map((tab) => ({
+        id: tab.id,
+        label: tab.label,
+        visible: dashboard.defaultVisibleTabs.includes(tab.id),
+      }));
+
+      const tabsConfig = JSON.stringify(tabsConfigArray);
 
       try {
-        console.log("Attempting to save to database...");
-        // Save to database
-        await createBookDB(newBook);
-        console.log("Book saved to database successfully!");
+        // Save to database with default tabs configuration
+        await createBookDB(newBook, tabsConfig);
 
         // Update store
         addBook(newBook);
-        console.log("Book added to store!");
 
         setShowCreateModal(false);
 
-        console.log("Navigating to dashboard...");
         navigate({
           to: "/dashboard/$dashboardId",
           params: { dashboardId: newBook.id },
         });
       } catch (error) {
         console.error("Error creating book:", error);
-        console.error("Error details:", JSON.stringify(error, null, 2));
         alert(
           `Erro ao criar livro: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     },
-    [addBook, navigate]
+    [addBook, navigate, dashboard.defaultVisibleTabs]
   );
 
   const handleBookSelect = useCallback(
