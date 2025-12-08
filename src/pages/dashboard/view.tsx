@@ -287,15 +287,14 @@ export function DashboardView({
               >
                 {t("dialogs:delete_book.cancel")}
               </AlertDialogCancel>
-              <Button
+              <AlertDialogAction
                 variant="destructive"
-                size="lg"
                 className="animate-glow-red"
                 onClick={onDelete}
                 disabled={deleteInput !== book.title}
               >
                 {t("dialogs:delete_book.confirm")}
-              </Button>
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
