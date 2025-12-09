@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 import {
   Plus,
@@ -21,7 +21,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { type IHierarchyTitle } from "@/types/faction-types";
 
@@ -47,6 +52,8 @@ export function ManageTitlesModal({
   const [editingTitle, setEditingTitle] = useState<IHierarchyTitle | null>(
     null
   );
+  const [hasScroll, setHasScroll] = useState(false);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Formulário para adicionar/editar
   const [formName, setFormName] = useState("");
@@ -121,25 +128,54 @@ export function ManageTitlesModal({
     }
   };
 
-  const handleOrderInputChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 1 && num <= 100) {
-      setFormOrder(num);
-    } else if (value === "") {
-      setFormOrder(1);
+  const handleOrderInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers
+    if (value === "" || /^\d+$/.test(value)) {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 1 && num <= 100) {
+        setFormOrder(num);
+      } else if (value === "") {
+        setFormOrder(1);
+      }
     }
   };
 
   // Filtrar apenas títulos customizados (não "Membros")
-  const customTitles = titles
-    .filter((t) => !t.isMembersTitle)
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+  const customTitles = useMemo(
+    () =>
+      titles
+        .filter((t) => !t.isMembersTitle)
+        .sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [titles]
+  );
 
   const isFormValid = formName.trim().length > 0;
+
+  // Detectar se há scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasScroll(scrollHeight > clientHeight);
+      }
+    };
+
+    checkScroll();
+
+    // Observar mudanças no tamanho do conteúdo
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [customTitles, viewMode, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh]">
+        <TooltipProvider delayDuration={300}>
         <DialogHeader>
           <DialogTitle>
             {viewMode === "list" && t("hierarchy.manage_titles")}
@@ -167,9 +203,15 @@ export function ManageTitlesModal({
             </Button>
 
             {/* Lista de Títulos */}
-            <ScrollArea className="h-[300px] pr-3">
+            <div
+              ref={scrollContainerRef}
+              className={cn(
+                "h-[300px] overflow-y-auto custom-scrollbar",
+                hasScroll && "pr-1.5"
+              )}
+            >
               {customTitles.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-12 text-muted-foreground">
+                <div className="flex flex-col items-center justify-center h-[300px] py-12 text-muted-foreground">
                   <Crown className="w-12 h-12 mb-3 opacity-50" />
                   <p className="text-sm font-medium">
                     {t("hierarchy.no_titles_yet")}
@@ -218,7 +260,7 @@ export function ManageTitlesModal({
                   })}
                 </div>
               )}
-            </ScrollArea>
+            </div>
 
             {/* Botão Fechar */}
             <Button variant="secondary" className="w-full" onClick={onClose}>
@@ -245,33 +287,50 @@ export function ManageTitlesModal({
             {/* Ordem (Contador 1-100) */}
             <div className="space-y-2">
               <Label>{t("hierarchy.title_order")}</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleOrderChange(-1)}
-                  disabled={formOrder <= 1}
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
+              <div className="flex items-center gap-1">
                 <Input
-                  type="number"
+                  type="text"
                   value={formOrder}
-                  onChange={(e) => handleOrderInputChange(e.target.value)}
-                  className="w-20 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  min={1}
-                  max={100}
+                  onChange={handleOrderInputChange}
+                  className="w-16 h-10 text-center font-mono font-semibold text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  placeholder="1"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleOrderChange(1)}
-                  disabled={formOrder >= 100}
-                >
-                  <ChevronUp className="w-4 h-4" />
-                </Button>
+                <div className="flex flex-col gap-0.5">
+                  <Tooltip delayDuration={300} disableHoverableContent>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOrderChange(1)}
+                        disabled={formOrder >= 100}
+                        className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <ChevronUp className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t("hierarchy.increment_order")}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip delayDuration={300} disableHoverableContent>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOrderChange(-1)}
+                        disabled={formOrder <= 1}
+                        className="h-4 w-5 p-0 hover:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                      >
+                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t("hierarchy.decrement_order")}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 {t("hierarchy.order_hint")}
@@ -283,22 +342,28 @@ export function ManageTitlesModal({
               <Label>{t("hierarchy.title_color")}</Label>
               <div className="grid grid-cols-6 gap-2">
                 {HIERARCHY_TITLE_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setFormColor(color.value)}
-                    className={cn(
-                      "w-10 h-10 rounded-lg border flex items-center justify-center transition-all hover:opacity-60",
-                      color.pickerBg,
-                      formColor === color.value
-                        ? "opacity-60 border-foreground"
-                        : "border-border"
-                    )}
-                  >
-                    {formColor === color.value && (
-                      <Check className="w-5 h-5 text-white" />
-                    )}
-                  </button>
+                  <Tooltip key={color.value} delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setFormColor(color.value)}
+                        className={cn(
+                          "w-10 h-10 rounded-lg border flex items-center justify-center transition-all hover:opacity-60",
+                          color.pickerBg,
+                          formColor === color.value
+                            ? "opacity-60 border-foreground"
+                            : "border-border"
+                        )}
+                      >
+                        {formColor === color.value && (
+                          <Check className="w-5 h-5 text-white" />
+                        )}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t(`hierarchy.colors.${color.value}`)}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
             </div>
@@ -328,6 +393,7 @@ export function ManageTitlesModal({
             </div>
           </div>
         )}
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );
