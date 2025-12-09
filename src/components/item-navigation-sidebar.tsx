@@ -48,7 +48,7 @@ export function ItemNavigationSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Package className="w-5 h-5 text-muted-foreground" />
-          <h2 className="font-semibold">Itens</h2>
+          <h2 className="font-semibold">{t("items:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({items.length})
           </span>

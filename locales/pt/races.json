@@ -255,5 +255,8 @@
     "neutralism": {
       "description": "Nenhuma raça afeta a outra"
     }
+  },
+  "sidebar": {
+    "title": "Raças"
   }
 }

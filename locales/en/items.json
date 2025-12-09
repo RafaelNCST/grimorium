@@ -35,5 +35,8 @@
     "no_category_items_description": "You haven't created items in this category yet",
     "no_status_items": "No {{status}} items",
     "no_status_items_description": "You haven't created items with this status yet"
+  },
+  "sidebar": {
+    "title": "Items"
   }
 }

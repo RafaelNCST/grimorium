@@ -220,5 +220,8 @@
     "event_updated": "Event updated successfully!",
     "era_deleted": "Era deleted successfully!",
     "event_deleted": "Event deleted successfully!"
+  },
+  "sidebar": {
+    "title": "Regions"
   }
 }

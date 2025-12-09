@@ -54,7 +54,7 @@ export function CharacterNavigationSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-muted-foreground" />
-          <h2 className="font-semibold">Personagens</h2>
+          <h2 className="font-semibold">{t("characters:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({characters.length})
           </span>

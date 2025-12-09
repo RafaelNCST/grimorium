@@ -35,5 +35,8 @@
     "no_category_items_description": "Você ainda não criou itens nesta categoria",
     "no_status_items": "Nenhum item {{status}}",
     "no_status_items_description": "Você ainda não criou itens com este status"
+  },
+  "sidebar": {
+    "title": "Itens"
   }
 }

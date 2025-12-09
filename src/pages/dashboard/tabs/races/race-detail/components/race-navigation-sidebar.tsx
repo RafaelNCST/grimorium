@@ -45,7 +45,7 @@ export function RaceNavigationSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Dna className="w-5 h-5 text-muted-foreground" />
-          <h2 className="font-semibold">{t("sidebar.title")}</h2>
+          <h2 className="font-semibold">{t("races:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({allRaces.length})
           </span>

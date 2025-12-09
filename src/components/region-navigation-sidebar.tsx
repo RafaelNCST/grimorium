@@ -51,7 +51,7 @@ export function RegionNavigationSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Map className="w-5 h-5 text-muted-foreground" />
-          <h2 className="font-semibold">Regiões</h2>
+          <h2 className="font-semibold">{t("world:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({regions.length})
           </span>

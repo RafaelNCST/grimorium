@@ -220,5 +220,8 @@
     "event_updated": "Evento atualizado com sucesso!",
     "era_deleted": "Era excluída com sucesso!",
     "event_deleted": "Evento excluído com sucesso!"
+  },
+  "sidebar": {
+    "title": "Regiões"
   }
 }

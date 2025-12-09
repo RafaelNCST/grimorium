@@ -72,5 +72,8 @@
     "villain": "Vilão",
     "secondary": "Secundário",
     "extra": "Figurante"
+  },
+  "sidebar": {
+    "title": "Personagens"
   }
 }

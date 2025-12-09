@@ -255,5 +255,8 @@
     "neutralism": {
       "description": "Neither race affects the other"
     }
+  },
+  "sidebar": {
+    "title": "Races"
   }
 }
