@@ -4,6 +4,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { GlobalGoals, ChapterStatus } from "@/types/global-goals";
 
 import { ChapterMetrics } from "../types/metrics";
@@ -104,6 +106,7 @@ export function useGlobalGoalsMonitor({
   chapterId,
   onWarning,
 }: UseGlobalGoalsMonitorProps) {
+  const { t } = useTranslation("chapter-editor");
   const configKeyRef = useRef<string>("");
   const warningsShownRef = useRef<WarningTracker>({});
 
@@ -154,8 +157,11 @@ export function useGlobalGoalsMonitor({
         needsSave = true;
         onWarning(
           "info",
-          `Quase lá! 90% da meta de palavras`,
-          `Você já escreveu ${metrics.wordCount} de ${globalGoals.words.target} palavras. Continue assim!`
+          t("warnings.messages.goals.word_goal_90_title"),
+          t("warnings.messages.goals.word_goal_90_message", {
+            current: metrics.wordCount,
+            target: globalGoals.words.target
+          })
         );
       }
 
@@ -169,8 +175,10 @@ export function useGlobalGoalsMonitor({
         needsSave = true;
         onWarning(
           "info",
-          "🎉 Meta de palavras atingida!",
-          `Parabéns! Você atingiu sua meta de ${globalGoals.words.target} palavras!`
+          t("warnings.messages.goals.word_goal_100_title"),
+          t("warnings.messages.goals.word_goal_100_message", {
+            target: globalGoals.words.target
+          })
         );
       }
     }
@@ -199,8 +207,11 @@ export function useGlobalGoalsMonitor({
         );
         onWarning(
           "info",
-          `90% do tempo meta de sessão`,
-          `Você está escrevendo há ${metrics.sessionDuration} minutos. Restam ~${remainingMinutes} minutos para a meta.`
+          t("warnings.messages.goals.session_goal_90_title"),
+          t("warnings.messages.goals.session_goal_90_message", {
+            current: metrics.sessionDuration,
+            remaining: remainingMinutes
+          })
         );
       }
 
@@ -214,8 +225,10 @@ export function useGlobalGoalsMonitor({
         needsSave = true;
         onWarning(
           "info",
-          "⏰ Meta de tempo atingida!",
-          `Parabéns! Você está escrevendo há ${metrics.sessionDuration} minutos e atingiu sua meta!`
+          t("warnings.messages.goals.session_goal_100_title"),
+          t("warnings.messages.goals.session_goal_100_message", {
+            duration: metrics.sessionDuration
+          })
         );
       }
     }

@@ -39,11 +39,12 @@ export interface Warning {
 
 /**
  * Mapeamento de labels para tipos de avisos
+ * @deprecated Use useTranslation("chapter-editor") with "warnings.types.{type}" instead
  */
 export const WARNING_TYPE_LABELS: Record<WarningType, string> = {
-  typography: "Tipografia",
-  goals: "Metas",
-  time: "Tempo",
+  typography: "Typography",
+  goals: "Goals",
+  time: "Time",
 };
 
 /**
@@ -65,12 +66,13 @@ export const WARNING_TYPE_ICONS: Record<WarningType, string> = {
 };
 
 /**
- * Labels de severidade em português
+ * Labels de severidade
+ * @deprecated Use useTranslation("chapter-editor") with "warnings.severities.{severity}" instead
  */
 export const WARNING_SEVERITY_LABELS: Record<WarningSeverity, string> = {
-  info: "Informação",
-  warning: "Importante",
-  error: "Crítico",
+  info: "Information",
+  warning: "Important",
+  error: "Critical",
 };
 
 /**

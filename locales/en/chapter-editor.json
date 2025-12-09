@@ -167,7 +167,44 @@
     "important": "important",
     "important_plural": "important",
     "info": "information",
-    "info_plural": "information"
+    "info_plural": "information",
+    "types": {
+      "typography": "Typography",
+      "goals": "Goals",
+      "time": "Time"
+    },
+    "severities": {
+      "info": "Information",
+      "warning": "Important",
+      "error": "Critical"
+    },
+    "date_time_format": "at",
+    "messages": {
+      "goals": {
+        "word_goal_90_title": "Almost there! 90% of word goal",
+        "word_goal_90_message": "You've already written {{current}} of {{target}} words. Keep it up!",
+        "word_goal_100_title": "🎉 Word goal achieved!",
+        "word_goal_100_message": "Congratulations! You've reached your goal of {{target}} words!",
+        "session_goal_90_title": "90% of session time goal",
+        "session_goal_90_message": "You've been writing for {{current}} minutes. About {{remaining}} minutes remaining to reach the goal.",
+        "session_goal_100_title": "⏰ Time goal achieved!",
+        "session_goal_100_message": "Congratulations! You've been writing for {{duration}} minutes and reached your goal!"
+      },
+      "time": {
+        "two_hours_title": "You've been writing for 2 hours",
+        "two_hours_message": "How about taking a break? Drink some water and rest your eyes!",
+        "five_hours_title": "You've been writing for 5 hours!",
+        "five_hours_message": "Stop and rest! It's important to take care of your health and well-being."
+      },
+      "typography": {
+        "words_5k_title": "Chapter with 5,000 words",
+        "words_5k_message": "Your chapter is getting large. Consider reviewing the structure.",
+        "words_10k_title": "Chapter with 10,000 words",
+        "words_10k_message": "Your chapter is very large. Consider splitting into multiple chapters.",
+        "words_15k_title": "Chapter with 15,000 words!",
+        "words_15k_message": "Your chapter is extremely large. It's recommended to split into multiple chapters."
+      }
+    }
   },
   "search": {
     "placeholder": "Search...",
@@ -235,6 +272,106 @@
     "links_count": "{{count}} links",
     "summary_button": "Summary",
     "summary_modal_title": "Chapter Summary",
-    "close_button": "Close"
+    "close_button": "Close",
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Y)",
+    "chapter_status_label": "Chapter status:",
+    "arc_label": "Arc:",
+    "create_arcs_hint": "Create arcs in the Plot tab"
+  },
+  "dialogue_formats": {
+    "title": "Dialogue Formats",
+    "description": "Select the formats used in your text (minimum 1 required):",
+    "double_quotes": "Double quotes",
+    "single_quotes": "Single quotes",
+    "em_dash": "Em dash",
+    "example_double": "\"Hello,\" said John.",
+    "example_single": "'Wait,' he replied.",
+    "example_dash": "— Hello — said John.",
+    "select_all": "Select all",
+    "close": "Close",
+    "example_prefix": "Ex:"
+  },
+  "header_bar": {
+    "back": "Back",
+    "export": "Export",
+    "export_as_word": "Export as Word",
+    "export_as_pdf": "Export as PDF",
+    "annotations": "Annotations",
+    "arc": "Arc",
+    "warnings": "Warnings",
+    "chapter_title": "Chapter {{number}}: {{title}}"
+  },
+  "formatting_tooltips": {
+    "bold": "Bold (Ctrl+B)",
+    "italic": "Italic (Ctrl+I)",
+    "align_left": "Align left",
+    "align_center": "Center",
+    "align_right": "Align right",
+    "justify": "Justify"
+  },
+  "cursor_colors": {
+    "default": "Default",
+    "primary": "Primary",
+    "blue": "Blue",
+    "green": "Green",
+    "purple": "Purple",
+    "orange": "Orange"
+  },
+  "editor_settings_modal": {
+    "title": "Editor Settings",
+    "description": "Customize your writing experience for greater comfort during long sessions",
+    "auto_scroll": {
+      "title": "Auto Scroll",
+      "description": "Controls where the cursor is positioned while writing",
+      "none": "None",
+      "near_end": "Near end",
+      "center": "Always centered"
+    },
+    "visual_elements": {
+      "title": "Visual Elements",
+      "description": "Disable elements that might distract you while writing",
+      "annotation_highlights": "Annotation Highlights",
+      "annotation_highlights_description": "Show colored background on annotations",
+      "spell_check": "Spell Check",
+      "spell_check_description": "Show grammar error underlines",
+      "summary_section_description": "Show summary and entities section in editor",
+      "entity_links": "Automatic Entity Links",
+      "entity_links_description": "Automatically underlines mentioned entities in the text"
+    },
+    "typography": {
+      "title": "Typography",
+      "description": "Adjust text appearance for better readability",
+      "font_family": "Text Font",
+      "font_family_description": "Font applied to entire chapter",
+      "font_size": "Font Size",
+      "increase_size": "Increase size",
+      "decrease_size": "Decrease size",
+      "pt": "pt",
+      "font_size_description": "Size applied to entire chapter (1-100pt)",
+      "line_height": "Line Height",
+      "line_height_description": "Smaller: 1.0 (compact) - Default: 1.6 - Larger: 2.5 (spacious)"
+    },
+    "visual_theme": {
+      "description": "Adjust editor colors for greater comfort",
+      "reduce_eye_strain": "Reduce eye strain",
+      "reduce_eye_strain_description": "Soft yellowish tone to reduce visual fatigue"
+    },
+    "cursor_color": {
+      "title": "Cursor Color",
+      "description": "Choose a color that is comfortable for your eyes"
+    },
+    "blacklisted_entities": {
+      "title": "Non-Linked Entities",
+      "description": "Entities you chose not to auto-link in this chapter",
+      "entity_types": {
+        "character": "Character",
+        "region": "Location",
+        "item": "Item",
+        "faction": "Faction",
+        "race": "Race"
+      }
+    },
+    "close": "Close"
   }
 }

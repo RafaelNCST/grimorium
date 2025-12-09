@@ -78,5 +78,9 @@
     "loss": "Perda",
     "transformation": "Transformação",
     "other": "Outro"
+  },
+  "tooltips": {
+    "increment_chapter": "Incrementar",
+    "decrement_chapter": "Decrementar"
   }
 }

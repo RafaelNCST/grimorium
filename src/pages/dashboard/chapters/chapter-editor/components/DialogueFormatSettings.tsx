@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,31 +24,10 @@ interface DialogueFormatSettingsProps {
 
 interface FormatOption {
   id: keyof DialogueFormats;
-  label: string;
+  labelKey: string;
   symbol: string;
-  example: string;
+  exampleKey: string;
 }
-
-const formatOptions: FormatOption[] = [
-  {
-    id: "doubleQuotes",
-    label: "Aspas duplas",
-    symbol: '" "',
-    example: '"Olá," disse João.',
-  },
-  {
-    id: "singleQuotes",
-    label: "Aspas simples",
-    symbol: "' '",
-    example: "'Espere,' ele respondeu.",
-  },
-  {
-    id: "emDash",
-    label: "Travessão",
-    symbol: "—",
-    example: "— Olá — disse João.",
-  },
-];
 
 export function DialogueFormatSettings({
   open,
@@ -55,7 +35,29 @@ export function DialogueFormatSettings({
   onOpenChange,
   onApply,
 }: DialogueFormatSettingsProps) {
+  const { t } = useTranslation("chapter-editor");
   const [localFormats, setLocalFormats] = useState<DialogueFormats>(formats);
+
+  const formatOptions: FormatOption[] = [
+    {
+      id: "doubleQuotes",
+      labelKey: "dialogue_formats.double_quotes",
+      symbol: '" "',
+      exampleKey: "dialogue_formats.example_double",
+    },
+    {
+      id: "singleQuotes",
+      labelKey: "dialogue_formats.single_quotes",
+      symbol: "' '",
+      exampleKey: "dialogue_formats.example_single",
+    },
+    {
+      id: "emDash",
+      labelKey: "dialogue_formats.em_dash",
+      symbol: "—",
+      exampleKey: "dialogue_formats.example_dash",
+    },
+  ];
 
   // Update local state when formats prop changes
   useEffect(() => {
@@ -102,13 +104,13 @@ export function DialogueFormatSettings({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <span>Formatos de Diálogo</span>
+            <span>{t("dialogue_formats.title")}</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <p className="text-sm text-muted-foreground">
-            Selecione os formatos usados no seu texto (mínimo 1 obrigatório):
+            {t("dialogue_formats.description")}
           </p>
 
           <div className="space-y-3">
@@ -135,10 +137,10 @@ export function DialogueFormatSettings({
                       <span className="font-mono text-primary">
                         {option.symbol}
                       </span>
-                      <span>{option.label}</span>
+                      <span>{t(option.labelKey)}</span>
                     </label>
                     <p className="text-xs text-muted-foreground font-mono">
-                      Ex: {option.example}
+                      {t("dialogue_formats.example_prefix")} {t(option.exampleKey)}
                     </p>
                   </div>
                 </div>
@@ -160,7 +162,7 @@ export function DialogueFormatSettings({
                 htmlFor="select-all"
                 className="text-sm font-medium leading-none cursor-pointer"
               >
-                Selecionar todos
+                {t("dialogue_formats.select_all")}
               </label>
             </div>
           </div>
@@ -168,7 +170,7 @@ export function DialogueFormatSettings({
 
         <DialogFooter>
           <Button variant="secondary" onClick={handleApply}>
-            Fechar
+            {t("dialogue_formats.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -20,6 +20,7 @@ import React, {
 } from "react";
 
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 
@@ -29,7 +30,6 @@ import {
   WarningSeverity,
   WarningStats,
   WarningAction,
-  WARNING_TYPE_LABELS,
 } from "../types/warnings";
 
 const WARNINGS_STORAGE_KEY = "grimorium_chapter_warnings";
@@ -67,6 +67,7 @@ export function WarningsProvider({
   children,
   showWarningToasts: initialShowToasts = true,
 }: WarningsProviderProps) {
+  const { t } = useTranslation("chapter-editor");
   const { settings } = useWarningsSettings();
 
   // Carrega avisos do localStorage na inicialização
@@ -154,7 +155,7 @@ export function WarningsProvider({
 
       // Mostra toast apenas se notificações estiverem habilitadas
       if (showWarningToasts && settings.notificationsEnabled) {
-        const typeLabel = WARNING_TYPE_LABELS[type];
+        const typeLabel = t(`warnings.types.${type}`);
         const toastMessage = `${typeLabel}: ${title}`;
 
         switch (severity) {

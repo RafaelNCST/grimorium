@@ -127,7 +127,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Incrementar</p>
+                      <p>{t("tooltips.increment_chapter")}</p>
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip delayDuration={300} disableHoverableContent>
@@ -144,7 +144,7 @@ export const FormChapterNameWithNumber = React.forwardRef<
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Decrementar</p>
+                      <p>{t("tooltips.decrement_chapter")}</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>

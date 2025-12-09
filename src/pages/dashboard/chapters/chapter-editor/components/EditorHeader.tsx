@@ -114,7 +114,7 @@ export function EditorHeader({
                 className="gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Voltar
+                {t("header_bar.back")}
               </Button>
             </div>
 
@@ -136,7 +136,7 @@ export function EditorHeader({
                 <TooltipContent>
                   {previousChapter ? (
                     <p>
-                      Capítulo {previousChapter.number}: {previousChapter.title}
+                      {t("header_bar.chapter_title", { number: previousChapter.number, title: previousChapter.title })}
                     </p>
                   ) : (
                     <p>{t("empty-states:chapters.no_previous_chapter")}</p>
@@ -167,8 +167,7 @@ export function EditorHeader({
                 ) : (
                   <div className="cursor-pointer px-3 py-2">
                     <h1 className="text-lg font-semibold whitespace-nowrap">
-                      Capítulo {chapterNumber}:{" "}
-                      {title || t("chapter.title_placeholder")}
+                      {t("header_bar.chapter_title", { number: chapterNumber, title: title || t("chapter.title_placeholder") })}
                     </h1>
                   </div>
                 )}
@@ -190,7 +189,7 @@ export function EditorHeader({
                 <TooltipContent>
                   {nextChapter ? (
                     <p>
-                      Capítulo {nextChapter.number}: {nextChapter.title}
+                      {t("header_bar.chapter_title", { number: nextChapter.number, title: nextChapter.title })}
                     </p>
                   ) : (
                     <p>{t("empty-states:chapters.no_next_chapter")}</p>
@@ -206,15 +205,15 @@ export function EditorHeader({
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">
                       <Download className="w-4 h-4 mr-2" />
-                      Exportar
+                      {t("header_bar.export")}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onExport("word")}>
-                      Exportar como Word
+                      {t("header_bar.export_as_word")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onExport("pdf")}>
-                      Exportar como PDF
+                      {t("header_bar.export_as_pdf")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -232,7 +231,7 @@ export function EditorHeader({
                 )}
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Anotações
+                {t("header_bar.annotations")}
               </Button>
 
               {hasPlotArc && onShowPlotArcEvents && (
@@ -248,7 +247,7 @@ export function EditorHeader({
                   )}
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Arco
+                  {t("header_bar.arc")}
                 </Button>
               )}
 
@@ -265,7 +264,7 @@ export function EditorHeader({
                   )}
                 >
                   <AlertCircle className="w-4 h-4 mr-2" />
-                  Avisos
+                  {t("header_bar.warnings")}
                   {warningsCount > 0 && (
                     <span className="ml-1.5 flex items-center justify-center min-w-[18px] min-h-[18px] px-1.5 text-[10px] font-semibold bg-primary text-white rounded-full">
                       {warningsCount > 99 ? "99+" : warningsCount}

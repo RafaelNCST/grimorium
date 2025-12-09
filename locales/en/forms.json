@@ -80,5 +80,9 @@
     "loss": "Loss",
     "transformation": "Transformation",
     "other": "Other"
+  },
+  "tooltips": {
+    "increment_chapter": "Increment",
+    "decrement_chapter": "Decrement"
   }
 }

@@ -30,7 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { useWarnings } from "../context/WarningsContext";
-import { WarningType, WARNING_TYPE_LABELS } from "../types/warnings";
+import { WarningType } from "../types/warnings";
 
 import { WarningItem } from "./WarningItem";
 
@@ -52,6 +52,9 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
   } = useWarnings();
 
   const [selectedType, setSelectedType] = useState<WarningType | "all">("all");
+
+  // Lista de tipos de avisos para iteração
+  const warningTypes: WarningType[] = ["typography", "goals", "time"];
 
   // Filtra avisos por tipo selecionado
   const filteredWarnings =
@@ -99,7 +102,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
                 <Filter className="w-3 h-3" />
                 {selectedType === "all"
                   ? t("chapter-editor:warnings.all")
-                  : WARNING_TYPE_LABELS[selectedType]}
+                  : t(`chapter-editor:warnings.types.${selectedType}`)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -112,13 +115,13 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {(Object.keys(WARNING_TYPE_LABELS) as WarningType[]).map(
+              {warningTypes.map(
                 (type) => (
                   <DropdownMenuItem
                     key={type}
                     onClick={() => setSelectedType(type)}
                   >
-                    {WARNING_TYPE_LABELS[type]}
+                    {t(`chapter-editor:warnings.types.${type}`)}
                     {stats.byType[type] > 0 && (
                       <span className="ml-auto text-xs text-muted-foreground">
                         {stats.byType[type]}
@@ -161,7 +164,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
               <p className="text-xs text-muted-foreground/70">
                 {selectedType === "all"
                   ? t("chapter-editor:warnings.no_warnings")
-                  : t("chapter-editor:warnings.no_warnings_of_type", { type: WARNING_TYPE_LABELS[selectedType].toLowerCase() })}
+                  : t("chapter-editor:warnings.no_warnings_of_type", { type: t(`chapter-editor:warnings.types.${selectedType}`).toLowerCase() })}
               </p>
             </div>
           ) : (
@@ -169,7 +172,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
               {/* Avisos agrupados por tipo quando "Todos" está selecionado */}
               {selectedType === "all" ? (
                 <>
-                  {(Object.keys(WARNING_TYPE_LABELS) as WarningType[]).map(
+                  {warningTypes.map(
                     (type) => {
                       const typeWarnings = getWarningsByType(type);
                       if (typeWarnings.length === 0) return null;
@@ -178,7 +181,7 @@ export function WarningsSidebar({ isOpen, onClose }: WarningsSidebarProps) {
                         <div key={type} className="space-y-2">
                           <div className="flex items-center gap-2 px-1">
                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                              {WARNING_TYPE_LABELS[type]}
+                              {t(`chapter-editor:warnings.types.${type}`)}
                             </h3>
                             <div className="flex-1 h-px bg-border" />
                             <span className="text-xs text-muted-foreground">

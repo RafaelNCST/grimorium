@@ -4,6 +4,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { ChapterMetrics } from "../types/metrics";
 
 interface UseTypographyWarningsMonitorProps {
@@ -74,6 +76,7 @@ export function useTypographyWarningsMonitor({
   chapterId,
   onWarning,
 }: UseTypographyWarningsMonitorProps) {
+  const { t } = useTranslation("chapter-editor");
   const warningsShownRef = useRef<TypographyWarningTracker>(
     loadTypographyWarningTracker(chapterId)
   );
@@ -98,8 +101,8 @@ export function useTypographyWarningsMonitor({
       needsSave = true;
       onWarning(
         "info",
-        "Capítulo com 5.000 palavras",
-        "Seu capítulo está ficando grande. Considere revisar a estrutura."
+        t("warnings.messages.typography.words_5k_title"),
+        t("warnings.messages.typography.words_5k_message")
       );
     }
 
@@ -109,8 +112,8 @@ export function useTypographyWarningsMonitor({
       needsSave = true;
       onWarning(
         "warning",
-        "Capítulo com 10.000 palavras",
-        "Seu capítulo está muito grande. Considere dividir em múltiplos capítulos."
+        t("warnings.messages.typography.words_10k_title"),
+        t("warnings.messages.typography.words_10k_message")
       );
     }
 
@@ -120,8 +123,8 @@ export function useTypographyWarningsMonitor({
       needsSave = true;
       onWarning(
         "error",
-        "Capítulo com 15.000 palavras!",
-        "Seu capítulo está extremamente grande. É recomendado dividir em múltiplos capítulos."
+        t("warnings.messages.typography.words_15k_title"),
+        t("warnings.messages.typography.words_15k_message")
       );
     }
 

@@ -4,6 +4,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { ChapterMetrics } from "../types/metrics";
 
 interface UseTimeWarningsMonitorProps {
@@ -67,6 +69,7 @@ export function useTimeWarningsMonitor({
   hasSessionTimeGoal,
   onWarning,
 }: UseTimeWarningsMonitorProps) {
+  const { t } = useTranslation("chapter-editor");
   const warningsShownRef = useRef<TimeWarningTracker>(loadTimeWarningTracker());
 
   useEffect(() => {
@@ -87,8 +90,8 @@ export function useTimeWarningsMonitor({
       needsSave = true;
       onWarning(
         "warning",
-        "Você está escrevendo há 2 horas",
-        "Que tal fazer uma pausa? Beba água e descanse os olhos!"
+        t("warnings.messages.time.two_hours_title"),
+        t("warnings.messages.time.two_hours_message")
       );
     }
 
@@ -98,8 +101,8 @@ export function useTimeWarningsMonitor({
       needsSave = true;
       onWarning(
         "error",
-        "Você está escrevendo há 5 horas!",
-        "Pare e descanse! É importante cuidar da sua saúde e bem-estar."
+        t("warnings.messages.time.five_hours_title"),
+        t("warnings.messages.time.five_hours_message")
       );
     }
 

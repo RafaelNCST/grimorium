@@ -157,7 +157,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Negrito (Ctrl+B)</p>
+                <p>{t("formatting_tooltips.bold")}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -175,7 +175,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Itálico (Ctrl+I)</p>
+                <p>{t("formatting_tooltips.italic")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -197,7 +197,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Alinhar à esquerda</p>
+                <p>{t("formatting_tooltips.align_left")}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -216,7 +216,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Centralizar</p>
+                <p>{t("formatting_tooltips.align_center")}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -234,7 +234,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Alinhar à direita</p>
+                <p>{t("formatting_tooltips.align_right")}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -253,7 +253,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Justificar</p>
+                <p>{t("formatting_tooltips.justify")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -273,7 +273,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Desfazer (Ctrl+Z)</p>
+                <p>{t("toolbar.undo")}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>
@@ -289,7 +289,7 @@ export function FormattingToolbar({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Refazer (Ctrl+Y)</p>
+                <p>{t("toolbar.redo")}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -299,7 +299,7 @@ export function FormattingToolbar({
             {/* Status */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground font-medium">
-                Status do capítulo:
+                {t("toolbar.chapter_status_label")}
               </span>
               <Select
                 value={status}
@@ -314,11 +314,11 @@ export function FormattingToolbar({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="in-progress">Em Andamento</SelectItem>
-                  <SelectItem value="draft">Rascunho</SelectItem>
-                  <SelectItem value="review">Em Revisão</SelectItem>
-                  <SelectItem value="finished">Finalizado</SelectItem>
-                  <SelectItem value="published">Publicado</SelectItem>
+                  <SelectItem value="in-progress">{t("status.in-progress")}</SelectItem>
+                  <SelectItem value="draft">{t("status.draft")}</SelectItem>
+                  <SelectItem value="review">{t("status.review")}</SelectItem>
+                  <SelectItem value="finished">{t("status.finished")}</SelectItem>
+                  <SelectItem value="published">{t("status.published")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -326,7 +326,7 @@ export function FormattingToolbar({
             {/* Arc */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground font-medium">
-                Arco:
+                {t("toolbar.arc_label")}
               </span>
               <button
                 onClick={() => setIsArcModalOpen(true)}
@@ -441,7 +441,7 @@ export function FormattingToolbar({
                   {t("empty-states:plot_arc.no_arc_registered")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Crie arcos na aba Enredo
+                  {t("toolbar.create_arcs_hint")}
                 </p>
               </div>
             ) : (

@@ -12,7 +12,7 @@
 import React from "react";
 
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { enUS, ptBR } from "date-fns/locale";
 import {
   X,
   Type,
@@ -22,6 +22,7 @@ import {
   Info,
   AlertCircle,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,6 @@ import { cn } from "@/lib/utils";
 import {
   Warning,
   WARNING_SEVERITY_COLORS,
-  WARNING_SEVERITY_LABELS,
 } from "../types/warnings";
 
 interface WarningItemProps {
@@ -63,15 +63,19 @@ const SEVERITY_ICON_MAP: Record<
 };
 
 export function WarningItem({ warning, onRemove, onClick }: WarningItemProps) {
+  const { t, i18n } = useTranslation("chapter-editor");
   const TypeIcon = TYPE_ICON_MAP[warning.type];
   const SeverityIcon = SEVERITY_ICON_MAP[warning.severity];
 
-  const formattedDate = format(new Date(warning.createdAt), "dd/MM/yyyy", {
-    locale: ptBR,
+  const locale = i18n.language === "pt" ? ptBR : enUS;
+  const dateFormat = i18n.language === "pt" ? "dd/MM/yyyy" : "MM/dd/yyyy";
+
+  const formattedDate = format(new Date(warning.createdAt), dateFormat, {
+    locale,
   });
 
   const formattedTime = format(new Date(warning.createdAt), "HH:mm", {
-    locale: ptBR,
+    locale,
   });
 
   return (
@@ -120,13 +124,13 @@ export function WarningItem({ warning, onRemove, onClick }: WarningItemProps) {
       <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
         {/* Data e hora */}
         <span className="flex items-center gap-1">
-          {formattedDate} às {formattedTime}
+          {formattedDate} {t("warnings.date_time_format")} {formattedTime}
         </span>
 
         {/* Indicador de severidade */}
         <div className="flex items-center gap-1">
           <SeverityIcon className="w-3 h-3" />
-          <span>{WARNING_SEVERITY_LABELS[warning.severity]}</span>
+          <span>{t(`warnings.severities.${warning.severity}`)}</span>
         </div>
       </div>
     </div>

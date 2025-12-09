@@ -167,7 +167,44 @@
     "important": "importante",
     "important_plural": "importantes",
     "info": "informação",
-    "info_plural": "informações"
+    "info_plural": "informações",
+    "types": {
+      "typography": "Tipografia",
+      "goals": "Metas",
+      "time": "Tempo"
+    },
+    "severities": {
+      "info": "Informação",
+      "warning": "Importante",
+      "error": "Crítico"
+    },
+    "date_time_format": "às",
+    "messages": {
+      "goals": {
+        "word_goal_90_title": "Quase lá! 90% da meta de palavras",
+        "word_goal_90_message": "Você já escreveu {{current}} de {{target}} palavras. Continue assim!",
+        "word_goal_100_title": "🎉 Meta de palavras atingida!",
+        "word_goal_100_message": "Parabéns! Você atingiu sua meta de {{target}} palavras!",
+        "session_goal_90_title": "90% do tempo meta de sessão",
+        "session_goal_90_message": "Você está escrevendo há {{current}} minutos. Restam ~{{remaining}} minutos para a meta.",
+        "session_goal_100_title": "⏰ Meta de tempo atingida!",
+        "session_goal_100_message": "Parabéns! Você está escrevendo há {{duration}} minutos e atingiu sua meta!"
+      },
+      "time": {
+        "two_hours_title": "Você está escrevendo há 2 horas",
+        "two_hours_message": "Que tal fazer uma pausa? Beba água e descanse os olhos!",
+        "five_hours_title": "Você está escrevendo há 5 horas!",
+        "five_hours_message": "Pare e descanse! É importante cuidar da sua saúde e bem-estar."
+      },
+      "typography": {
+        "words_5k_title": "Capítulo com 5.000 palavras",
+        "words_5k_message": "Seu capítulo está ficando grande. Considere revisar a estrutura.",
+        "words_10k_title": "Capítulo com 10.000 palavras",
+        "words_10k_message": "Seu capítulo está muito grande. Considere dividir em múltiplos capítulos.",
+        "words_15k_title": "Capítulo com 15.000 palavras!",
+        "words_15k_message": "Seu capítulo está extremamente grande. É recomendado dividir em múltiplos capítulos."
+      }
+    }
   },
   "search": {
     "placeholder": "Pesquisar...",
@@ -235,6 +272,106 @@
     "links_count": "{{count}} links",
     "summary_button": "Resumo",
     "summary_modal_title": "Resumo do Capítulo",
-    "close_button": "Fechar"
+    "close_button": "Fechar",
+    "undo": "Desfazer (Ctrl+Z)",
+    "redo": "Refazer (Ctrl+Y)",
+    "chapter_status_label": "Status do capítulo:",
+    "arc_label": "Arco:",
+    "create_arcs_hint": "Crie arcos na aba Enredo"
+  },
+  "dialogue_formats": {
+    "title": "Formatos de Diálogo",
+    "description": "Selecione os formatos usados no seu texto (mínimo 1 obrigatório):",
+    "double_quotes": "Aspas duplas",
+    "single_quotes": "Aspas simples",
+    "em_dash": "Travessão",
+    "example_double": "\"Olá,\" disse João.",
+    "example_single": "'Espere,' ele respondeu.",
+    "example_dash": "— Olá — disse João.",
+    "select_all": "Selecionar todos",
+    "close": "Fechar",
+    "example_prefix": "Ex:"
+  },
+  "header_bar": {
+    "back": "Voltar",
+    "export": "Exportar",
+    "export_as_word": "Exportar como Word",
+    "export_as_pdf": "Exportar como PDF",
+    "annotations": "Anotações",
+    "arc": "Arco",
+    "warnings": "Avisos",
+    "chapter_title": "Capítulo {{number}}: {{title}}"
+  },
+  "formatting_tooltips": {
+    "bold": "Negrito (Ctrl+B)",
+    "italic": "Itálico (Ctrl+I)",
+    "align_left": "Alinhar à esquerda",
+    "align_center": "Centralizar",
+    "align_right": "Alinhar à direita",
+    "justify": "Justificar"
+  },
+  "cursor_colors": {
+    "default": "Padrão",
+    "primary": "Primária",
+    "blue": "Azul",
+    "green": "Verde",
+    "purple": "Roxo",
+    "orange": "Laranja"
+  },
+  "editor_settings_modal": {
+    "title": "Configurações do Editor",
+    "description": "Personalize sua experiência de escrita para maior conforto em longas sessões",
+    "auto_scroll": {
+      "title": "Auto Scroll",
+      "description": "Controla onde o cursor fica posicionado durante a escrita",
+      "none": "Nenhum",
+      "near_end": "Perto do fim",
+      "center": "Sempre no meio"
+    },
+    "visual_elements": {
+      "title": "Elementos Visuais",
+      "description": "Desative elementos que possam distrair durante a escrita",
+      "annotation_highlights": "Destaque de Anotações",
+      "annotation_highlights_description": "Mostra fundo colorido nas anotações",
+      "spell_check": "Corretor Ortográfico",
+      "spell_check_description": "Mostra sublinhados de erros gramaticais",
+      "summary_section_description": "Mostra seção de resumo e entidades no editor",
+      "entity_links": "Links Automáticos de Entidades",
+      "entity_links_description": "Sublinha automaticamente entidades mencionadas no texto"
+    },
+    "typography": {
+      "title": "Tipografia",
+      "description": "Ajuste a aparência do texto para melhor legibilidade",
+      "font_family": "Fonte do Texto",
+      "font_family_description": "Fonte aplicada a todo o capítulo",
+      "font_size": "Tamanho da Fonte",
+      "increase_size": "Aumentar tamanho",
+      "decrease_size": "Diminuir tamanho",
+      "pt": "pt",
+      "font_size_description": "Tamanho aplicado a todo o capítulo (1-100pt)",
+      "line_height": "Altura da Linha",
+      "line_height_description": "Menor: 1.0 (compacto) - Padrão: 1.6 - Maior: 2.5 (espaçoso)"
+    },
+    "visual_theme": {
+      "description": "Ajuste as cores do editor para maior conforto",
+      "reduce_eye_strain": "Diminuir cansaço visual",
+      "reduce_eye_strain_description": "Tom amarelado suave para reduzir fadiga visual"
+    },
+    "cursor_color": {
+      "title": "Cor do Cursor",
+      "description": "Escolha uma cor que seja confortável para seus olhos"
+    },
+    "blacklisted_entities": {
+      "title": "Entidades Não Linkadas",
+      "description": "Entidades que você escolheu não auto-linkar neste capítulo",
+      "entity_types": {
+        "character": "Personagem",
+        "region": "Local",
+        "item": "Item",
+        "faction": "Facção",
+        "race": "Raça"
+      }
+    },
+    "close": "Fechar"
   }
 }
