@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { getPlotArcsByBookId, createPlotArc } from "@/lib/db/plot.service";
+import { usePlotStore } from "@/stores/plot-store";
 import type {
   IPlotArc,
   IPlotArcFormData,
@@ -19,43 +19,34 @@ interface PropsPlotTab {
   bookId: string;
 }
 
+const EMPTY_ARRAY: IPlotArc[] = [];
+
 export function PlotTab({ bookId }: PropsPlotTab) {
   const navigate = useNavigate();
 
-  const [arcs, setArcs] = useState<IPlotArc[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Store selectors
+  const arcs = usePlotStore((state) => state.getArcs(bookId) || EMPTY_ARRAY);
+  const isLoading = usePlotStore((state) => state.isLoading(bookId));
+
+  // Store actions
+  const fetchPlotArcs = usePlotStore((state) => state.fetchPlotArcs);
+  const addPlotArc = usePlotStore((state) => state.addPlotArc);
+
+  // Local UI state
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<PlotArcStatus[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<PlotArcSize[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Load data from database
+  // Load data on mount
   useEffect(() => {
-    let mounted = true;
-
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const loadedArcs = await getPlotArcsByBookId(bookId);
-
-        if (mounted) {
-          setArcs(loadedArcs);
-        }
-      } catch (error) {
-        console.error("Failed to load plot data:", error);
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [bookId]);
+    if (!hasInitialized) {
+      fetchPlotArcs(bookId).then(() => {
+        setHasInitialized(true);
+      });
+    }
+  }, [bookId, hasInitialized, fetchPlotArcs]);
 
   const filteredArcs = useMemo(
     () =>
@@ -141,15 +132,14 @@ export function PlotTab({ bookId }: PropsPlotTab) {
       };
 
       try {
-        await createPlotArc(bookId, newArc);
-        setArcs((prev) => [...prev, newArc]);
+        await addPlotArc(bookId, newArc);
         setShowCreateModal(false);
       } catch (error) {
         console.error("Failed to create plot arc:", error);
         throw error;
       }
     },
-    [arcs.length, bookId]
+    [arcs.length, bookId, addPlotArc]
   );
 
   return (

@@ -12,17 +12,12 @@ import {
 } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
-import { getChapterMetadataByBookId } from "@/lib/db/chapters.service";
-import { getPlotArcsByBookId } from "@/lib/db/plot.service";
+import { useOverviewStore } from "@/stores/overview-store";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
-import { useOverviewPersistence } from "./hooks/useOverviewPersistence";
 import {
   PropsOverviewTab,
   IStickyNote,
-  IGoals,
-  IStoryProgress,
-  ISection,
   IChecklistItem,
 } from "./types/overview-types";
 import { OverviewView } from "./view";
@@ -59,23 +54,70 @@ const restrictToNotesBoard: Modifier = ({
   };
 };
 
+const EMPTY_ARRAY: IStickyNote[] = [];
+const EMPTY_CHECKLIST: IChecklistItem[] = [];
+
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const { t } = useTranslation("overview");
-  const [goals, setGoals] = useState<IGoals>({
-    wordsPerDay: 0,
-    chaptersPerWeek: 0,
-  });
+
+  // Store selectors
+  const goals = useOverviewStore((state) => state.getGoals(bookId));
+  const storyProgress = useOverviewStore((state) =>
+    state.getStoryProgress(bookId)
+  );
+  const stickyNotes = useOverviewStore(
+    (state) => state.getStickyNotes(bookId) || EMPTY_ARRAY
+  );
+  const checklistItems = useOverviewStore(
+    (state) => state.getChecklistItems(bookId) || EMPTY_CHECKLIST
+  );
+  const sections = useOverviewStore((state) => state.getSections(bookId));
+  const authorSummary = useOverviewStore((state) =>
+    state.getAuthorSummary(bookId)
+  );
+  const storySummary = useOverviewStore((state) =>
+    state.getStorySummary(bookId)
+  );
+  const overviewStats = useOverviewStore((state) =>
+    state.getOverviewStats(bookId)
+  );
+  const allArcsProgress = useOverviewStore((state) =>
+    state.getAllArcsProgress(bookId)
+  );
+  const isLoading = useOverviewStore((state) => state.isLoading(bookId));
+
+  // Store actions
+  const fetchOverview = useOverviewStore((state) => state.fetchOverview);
+  const setGoals = useOverviewStore((state) => state.setGoals);
+  const setStickyNotes = useOverviewStore((state) => state.setStickyNotes);
+  const setChecklistItems = useOverviewStore((state) => state.setChecklistItems);
+  const setSections = useOverviewStore((state) => state.setSections);
+  const setAuthorSummary = useOverviewStore((state) => state.setAuthorSummary);
+  const setStorySummary = useOverviewStore((state) => state.setStorySummary);
+  const addStickyNote = useOverviewStore((state) => state.addStickyNote);
+  const updateStickyNote = useOverviewStore((state) => state.updateStickyNote);
+  const deleteStickyNote = useOverviewStore((state) => state.deleteStickyNote);
+  const bringNoteToFront = useOverviewStore((state) => state.bringNoteToFront);
+  const sendNoteToBack = useOverviewStore((state) => state.sendNoteToBack);
+  const addChecklistItem = useOverviewStore((state) => state.addChecklistItem);
+  const updateChecklistItem = useOverviewStore(
+    (state) => state.updateChecklistItem
+  );
+  const deleteChecklistItem = useOverviewStore(
+    (state) => state.deleteChecklistItem
+  );
+  const toggleChecklistItem = useOverviewStore(
+    (state) => state.toggleChecklistItem
+  );
+  const toggleSectionVisibility = useOverviewStore(
+    (state) => state.toggleSectionVisibility
+  );
+  const moveSectionUp = useOverviewStore((state) => state.moveSectionUp);
+  const moveSectionDown = useOverviewStore((state) => state.moveSectionDown);
+
+  // Local UI state
   const [isEditingGoals, setIsEditingGoals] = useState(false);
-  const [storyProgress, setStoryProgress] = useState<IStoryProgress>({
-    estimatedArcs: 0,
-    estimatedChapters: 0,
-    completedArcs: 0,
-    currentArcProgress: 0,
-  });
-  const [authorSummary, setAuthorSummary] = useState(book.authorSummary || "");
-  const [storySummary, setStorySummary] = useState(book.storySummary || "");
   const [isEditingSummaries, setIsEditingSummaries] = useState(false);
-  const [stickyNotes, setStickyNotes] = useState<IStickyNote[]>([]);
   const [newNote, setNewNote] = useState("");
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -83,205 +125,44 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     null
   );
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
-  const [checklistItems, setChecklistItems] = useState<IChecklistItem[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>(
     NOTE_COLORS_CONSTANT[0]
   );
   const [notesBoardHeight, setNotesBoardHeight] = useState(400);
   const [hasInitialized, setHasInitialized] = useState(false);
-  const [overviewStats, setOverviewStats] = useState<{
-    totalWords: number;
-    totalCharacters: number;
-    totalChapters: number;
-    lastChapterNumber: number;
-    lastChapterName: string;
-    averagePerWeek: number;
-    averagePerMonth: number;
-    chaptersInProgress: number;
-    chaptersFinished: number;
-    chaptersDraft: number;
-    chaptersPlanning: number;
-    averageWordsPerChapter: number;
-    averageCharactersPerChapter: number;
-  }>({
-    totalWords: 0,
-    totalCharacters: 0,
-    totalChapters: 0,
-    lastChapterNumber: 0,
-    lastChapterName: "",
-    averagePerWeek: 0,
-    averagePerMonth: 0,
-    chaptersInProgress: 0,
-    chaptersFinished: 0,
-    chaptersDraft: 0,
-    chaptersPlanning: 0,
-    averageWordsPerChapter: 0,
-    averageCharactersPerChapter: 0,
-  });
-  const [sections, setSections] = useState<ISection[]>([
-    {
-      id: "stats",
-      type: "stats",
-      title: "Estatísticas",
-      visible: true,
-      component: null,
-    },
-    {
-      id: "progress",
-      type: "progress",
-      title: "Progressão da História",
-      visible: true,
-      component: null,
-    },
-    {
-      id: "summaries",
-      type: "summaries",
-      title: "Resumos",
-      visible: true,
-      component: null,
-    },
-    {
-      id: "notes-board",
-      type: "notes-board",
-      title: "Quadro de Lembretes",
-      visible: true,
-      component: null,
-    },
-    {
-      id: "checklist",
-      type: "checklist",
-      title: "Lista de Tarefas",
-      visible: true,
-      component: null,
-    },
-  ]);
 
-  // Calculate overview stats based on real chapters
+  // Load data on mount
   useEffect(() => {
-    const calculateStats = async () => {
-      try {
-        const chapters = await getChapterMetadataByBookId(bookId);
-
-        if (chapters.length === 0) {
-          // No chapters, keep default values (already set in state)
-          return;
-        }
-
-        // Line 1 - General metrics
-        const totalWords = chapters.reduce((sum, ch) => sum + ch.wordCount, 0);
-        const totalCharacters = chapters.reduce((sum, ch) => sum + ch.characterCount, 0);
-        const totalChapters = chapters.length;
-
-        // Find last finished chapter (highest chapter number with status "finished")
-        const finishedChapters = chapters.filter((ch) => ch.status === "finished");
-        const lastFinishedChapter = finishedChapters.length > 0
-          ? finishedChapters.reduce((prev, current) => {
-              const prevNum = parseInt(prev.chapterNumber) || 0;
-              const currentNum = parseInt(current.chapterNumber) || 0;
-              return currentNum > prevNum ? current : prev;
-            })
-          : null;
-
-        const lastChapterNumber = lastFinishedChapter
-          ? parseInt(lastFinishedChapter.chapterNumber) || 0
-          : 0;
-        const lastChapterName = lastFinishedChapter?.title || "";
-
-        // Line 2 - Averages
-        const averageWordsPerChapter = totalChapters > 0
-          ? Math.round(totalWords / totalChapters)
-          : 0;
-        const averageCharactersPerChapter = totalChapters > 0
-          ? Math.round(totalCharacters / totalChapters)
-          : 0;
-
-        // Calculate average finished chapters per week/month
-        let averagePerWeek = 0;
-        let averagePerMonth = 0;
-
-        if (finishedChapters.length >= 2) {
-          // Sort by last edited date
-          const sortedFinished = [...finishedChapters].sort((a, b) => {
-            const dateA = new Date(a.lastEdited).getTime();
-            const dateB = new Date(b.lastEdited).getTime();
-            return dateA - dateB;
-          });
-
-          const firstDate = new Date(sortedFinished[0].lastEdited);
-          const lastDate = new Date(sortedFinished[sortedFinished.length - 1].lastEdited);
-
-          // Calculate difference in days
-          const diffMs = lastDate.getTime() - firstDate.getTime();
-          const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-          // Only calculate if there's a meaningful time period (at least 1 day)
-          if (diffDays >= 1) {
-            const weeks = diffDays / 7;
-            const months = diffDays / 30;
-
-            averagePerWeek = weeks > 0 ? parseFloat((finishedChapters.length / weeks).toFixed(1)) : 0;
-            averagePerMonth = months > 0 ? parseFloat((finishedChapters.length / months).toFixed(1)) : 0;
-          }
-        }
-
-        // Line 3 - Status counts
-        const chaptersInProgress = chapters.filter((ch) => ch.status === "in-progress").length;
-        const chaptersFinished = chapters.filter((ch) => ch.status === "finished").length;
-        const chaptersDraft = chapters.filter((ch) => ch.status === "draft").length;
-        const chaptersPlanning = chapters.filter((ch) => ch.status === "planning").length;
-
-        setOverviewStats({
-          totalWords,
-          totalCharacters,
-          totalChapters,
-          lastChapterNumber,
-          lastChapterName,
-          averagePerWeek,
-          averagePerMonth,
-          chaptersInProgress,
-          chaptersFinished,
-          chaptersDraft,
-          chaptersPlanning,
-          averageWordsPerChapter,
-          averageCharactersPerChapter,
-        });
-      } catch (error) {
-        console.error("Failed to calculate overview stats:", error);
-      }
-    };
-
-    if (hasInitialized) {
-      calculateStats();
+    if (!hasInitialized) {
+      fetchOverview(bookId).then(() => {
+        setHasInitialized(true);
+      });
     }
-  }, [bookId, hasInitialized]);
+  }, [bookId, hasInitialized, fetchOverview]);
 
-  // Calculate overall progress as average of all arcs' progress
-  const [allArcsProgress, setAllArcsProgress] = useState<number[]>([]);
-
+  // Set default note if no notes exist after loading
   useEffect(() => {
-    const loadArcsProgress = async () => {
-      try {
-        const arcs = await getPlotArcsByBookId(bookId);
-        const progressValues = arcs.map((arc) => {
-          // Finished arcs = 100%, others use their actual progress
-          return arc.status === "finished" ? 100 : arc.progress;
-        });
-        setAllArcsProgress(progressValues);
-      } catch (error) {
-        console.error("Failed to load arcs progress:", error);
-      }
-    };
-
-    if (hasInitialized) {
-      loadArcsProgress();
+    if (hasInitialized && stickyNotes.length === 0) {
+      const defaultNote: IStickyNote = {
+        id: "default-note",
+        content: t("notes_board.default_note"),
+        color: NOTE_COLORS_CONSTANT[0],
+        x: 10,
+        y: 10,
+        zIndex: 10,
+      };
+      setStickyNotes(bookId, [defaultNote]);
     }
-  }, [bookId, hasInitialized]);
+  }, [hasInitialized, stickyNotes.length, t, bookId, setStickyNotes]);
 
   const storyProgressPercentage = useMemo(() => {
     if (allArcsProgress.length === 0) return 0;
 
     // Calculate average progress across all arcs
-    const totalProgress = allArcsProgress.reduce((sum, progress) => sum + progress, 0);
+    const totalProgress = allArcsProgress.reduce(
+      (sum, progress) => sum + progress,
+      0
+    );
     const averageProgress = totalProgress / allArcsProgress.length;
 
     return Math.round(averageProgress);
@@ -296,132 +177,26 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
     useSensor(KeyboardSensor)
   );
 
-  // Persistence hook
-  const { loadOverviewData } = useOverviewPersistence(
-    {
-      bookId,
-      goals,
-      storyProgress,
-      stickyNotes,
-      checklistItems,
-      sections,
-      authorSummary,
-      storySummary,
+  const handleToggleSectionVisibility = useCallback(
+    (sectionId: string) => {
+      toggleSectionVisibility(bookId, sectionId);
     },
-    {
-      setGoals,
-      setStoryProgress,
-      setStickyNotes,
-      setChecklistItems,
-      setSections,
-    }
+    [bookId, toggleSectionVisibility]
   );
 
-  // Load data on mount
-  useEffect(() => {
-    if (!hasInitialized) {
-      loadOverviewData().then(() => {
-        setHasInitialized(true);
-      });
-    }
-  }, [hasInitialized, loadOverviewData]);
+  const handleMoveSectionUp = useCallback(
+    (sectionId: string) => {
+      moveSectionUp(bookId, sectionId);
+    },
+    [bookId, moveSectionUp]
+  );
 
-  // Set default note if no notes exist after loading
-  useEffect(() => {
-    if (hasInitialized && stickyNotes.length === 0) {
-      const defaultNote: IStickyNote = {
-        id: "default-note",
-        content: t("notes_board.default_note"),
-        color: NOTE_COLORS_CONSTANT[0],
-        x: 10,
-        y: 10,
-        zIndex: 10,
-      };
-      setStickyNotes([defaultNote]);
-    }
-  }, [hasInitialized, stickyNotes.length, t]);
-
-  // Calculate story progress based on real plot arcs
-  useEffect(() => {
-    const calculateProgressFromArcs = async () => {
-      try {
-        const arcs = await getPlotArcsByBookId(bookId);
-
-        if (arcs.length === 0) {
-          // No arcs, keep default values
-          setStoryProgress({
-            estimatedArcs: 0,
-            estimatedChapters: 0,
-            completedArcs: 0,
-            currentArcProgress: 0,
-          });
-          return;
-        }
-
-        // Count arcs with status "finished"
-        const completedArcs = arcs.filter((arc) => arc.status === "finished").length;
-
-        // Find current arc (status "current")
-        const currentArc = arcs.find((arc) => arc.status === "current");
-        const currentArcProgress = currentArc ? currentArc.progress : 0;
-
-        // Calculate estimated chapters (you can adjust this logic if needed)
-        const estimatedChapters = arcs.reduce((sum, arc) => {
-          // This is a placeholder - adjust based on your arc size logic
-          return sum + 10; // or use arc.events.length, etc.
-        }, 0);
-
-        setStoryProgress({
-          estimatedArcs: arcs.length,
-          estimatedChapters,
-          completedArcs,
-          currentArcProgress,
-        });
-      } catch (error) {
-        console.error("Failed to calculate story progress:", error);
-      }
-    };
-
-    if (hasInitialized) {
-      calculateProgressFromArcs();
-    }
-  }, [bookId, hasInitialized]);
-
-  const handleToggleSectionVisibility = useCallback((sectionId: string) => {
-    setSections((sections) =>
-      sections.map((section) =>
-        section.id === sectionId
-          ? { ...section, visible: !section.visible }
-          : section
-      )
-    );
-  }, []);
-
-  const handleMoveSectionUp = useCallback((sectionId: string) => {
-    setSections((sections) => {
-      const index = sections.findIndex((section) => section.id === sectionId);
-      if (index <= 0) return sections;
-
-      const newSections = [...sections];
-      const temp = newSections[index];
-      newSections[index] = newSections[index - 1];
-      newSections[index - 1] = temp;
-      return newSections;
-    });
-  }, []);
-
-  const handleMoveSectionDown = useCallback((sectionId: string) => {
-    setSections((sections) => {
-      const index = sections.findIndex((section) => section.id === sectionId);
-      if (index < 0 || index >= sections.length - 1) return sections;
-
-      const newSections = [...sections];
-      const temp = newSections[index];
-      newSections[index] = newSections[index + 1];
-      newSections[index + 1] = temp;
-      return newSections;
-    });
-  }, []);
+  const handleMoveSectionDown = useCallback(
+    (sectionId: string) => {
+      moveSectionDown(bookId, sectionId);
+    },
+    [bookId, moveSectionDown]
+  );
 
   const handleSaveGoals = useCallback(() => {
     setIsEditingGoals(false);
@@ -447,87 +222,74 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         y: 10,
         zIndex: maxZIndex + 1,
       };
-      setStickyNotes((prev) => [...prev, newStickyNote]);
+      addStickyNote(bookId, newStickyNote);
       setNewNote("");
     }
-  }, [newNote, selectedColor, stickyNotes]);
+  }, [newNote, selectedColor, stickyNotes, bookId, addStickyNote]);
 
-  const handleDeleteNote = useCallback((id: string) => {
-    setStickyNotes((notes) => notes.filter((note) => note.id !== id));
-  }, []);
+  const handleDeleteNote = useCallback(
+    (id: string) => {
+      deleteStickyNote(bookId, id);
+    },
+    [bookId, deleteStickyNote]
+  );
 
-  const handleEditNote = useCallback((id: string, newContent: string) => {
-    setStickyNotes((notes) =>
-      notes.map((note) =>
-        note.id === id ? { ...note, content: newContent } : note
-      )
-    );
-  }, []);
+  const handleEditNote = useCallback(
+    (id: string, newContent: string) => {
+      updateStickyNote(bookId, id, { content: newContent });
+    },
+    [bookId, updateStickyNote]
+  );
 
-  const handleColorChange = useCallback((id: string, color: string) => {
-    setStickyNotes((notes) =>
-      notes.map((note) => (note.id === id ? { ...note, color } : note))
-    );
-  }, []);
+  const handleColorChange = useCallback(
+    (id: string, color: string) => {
+      updateStickyNote(bookId, id, { color });
+    },
+    [bookId, updateStickyNote]
+  );
 
-  const handleBringToFront = useCallback((id: string) => {
-    setStickyNotes((notes) => {
-      // Find highest z-index among all notes
-      const maxZIndex = notes.reduce(
-        (max, note) => Math.max(max, note.zIndex),
-        0
-      );
+  const handleBringToFront = useCallback(
+    (id: string) => {
+      bringNoteToFront(bookId, id);
+    },
+    [bookId, bringNoteToFront]
+  );
 
-      // Set the selected note's z-index to be higher than all others
-      return notes.map((note) =>
-        note.id === id ? { ...note, zIndex: maxZIndex + 1 } : note
-      );
-    });
-  }, []);
+  const handleSendToBack = useCallback(
+    (id: string) => {
+      sendNoteToBack(bookId, id);
+    },
+    [bookId, sendNoteToBack]
+  );
 
-  const handleSendToBack = useCallback((id: string) => {
-    setStickyNotes((notes) => {
-      // Find lowest z-index among all notes
-      const minZIndex = notes.reduce(
-        (min, note) => Math.min(min, note.zIndex),
-        Infinity
-      );
-
-      // Set the selected note's z-index to be lower than all others
-      return notes.map((note) =>
-        note.id === id ? { ...note, zIndex: minZIndex - 1 } : note
-      );
-    });
-  }, []);
-
-  const handleNoteDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-    if (active && active.id.toString().startsWith("note-")) {
-      const noteId = active.id.toString().replace("note-", "");
-      setStickyNotes((notes) => {
-        const note = notes.find((n) => n.id === noteId);
+  const handleNoteDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const { active } = event;
+      if (active && active.id.toString().startsWith("note-")) {
+        const noteId = active.id.toString().replace("note-", "");
+        const note = stickyNotes.find((n) => n.id === noteId);
         if (note) {
           setActiveNoteId(noteId);
           setDraggedNoteData(note);
         }
-        return notes;
-      });
-    }
-  }, []);
+      }
+    },
+    [stickyNotes]
+  );
 
   const handleNoteDragMove = useCallback((_event: DragMoveEvent) => {
     // No need to update position during drag - transform handles visual movement
   }, []);
 
-  const handleNoteDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, delta } = event;
+  const handleNoteDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, delta } = event;
 
-    if (active && active.id.toString().startsWith("note-")) {
-      const noteId = active.id.toString().replace("note-", "");
+      if (active && active.id.toString().startsWith("note-")) {
+        const noteId = active.id.toString().replace("note-", "");
 
-      setStickyNotes((notes) => {
-        const note = notes.find((n) => n.id === noteId);
-        if (!note) return notes;
+        const note = stickyNotes.find((n) => n.id === noteId);
+        if (!note) return;
 
         const boardElement = document.getElementById("notes-drop-area");
         const noteElement = document.querySelector(
@@ -535,7 +297,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         ) as HTMLElement;
 
         if (!boardElement || !noteElement) {
-          return notes;
+          return;
         }
 
         // Get actual dimensions
@@ -554,42 +316,79 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
         const newX = Math.max(padding, Math.min(maxX, note.x + delta.x));
         const newY = Math.max(padding, Math.min(maxY, note.y + delta.y));
 
-        return notes.map((n) =>
-          n.id === noteId ? { ...n, x: newX, y: newY } : n
-        );
-      });
-    }
+        updateStickyNote(bookId, noteId, { x: newX, y: newY });
+      }
 
-    setActiveNoteId(null);
-    setDraggedNoteData(null);
-  }, []);
+      setActiveNoteId(null);
+      setDraggedNoteData(null);
+    },
+    [stickyNotes, bookId, updateStickyNote]
+  );
 
-  const handleAddChecklistItem = useCallback((text: string) => {
-    const newItem: IChecklistItem = {
-      id: Date.now().toString(),
-      text,
-      checked: false,
-    };
-    setChecklistItems((prev) => [...prev, newItem]);
-  }, []);
+  const handleAddChecklistItem = useCallback(
+    (text: string) => {
+      const newItem: IChecklistItem = {
+        id: Date.now().toString(),
+        text,
+        checked: false,
+      };
+      addChecklistItem(bookId, newItem);
+    },
+    [bookId, addChecklistItem]
+  );
 
-  const handleToggleChecklistItem = useCallback((id: string) => {
-    setChecklistItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item
-      )
-    );
-  }, []);
+  const handleToggleChecklistItem = useCallback(
+    (id: string) => {
+      toggleChecklistItem(bookId, id);
+    },
+    [bookId, toggleChecklistItem]
+  );
 
-  const handleEditChecklistItem = useCallback((id: string, text: string) => {
-    setChecklistItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, text } : item))
-    );
-  }, []);
+  const handleEditChecklistItem = useCallback(
+    (id: string, text: string) => {
+      updateChecklistItem(bookId, id, { text });
+    },
+    [bookId, updateChecklistItem]
+  );
 
-  const handleDeleteChecklistItem = useCallback((id: string) => {
-    setChecklistItems((items) => items.filter((item) => item.id !== id));
-  }, []);
+  const handleDeleteChecklistItem = useCallback(
+    (id: string) => {
+      deleteChecklistItem(bookId, id);
+    },
+    [bookId, deleteChecklistItem]
+  );
+
+  const handleGoalsChange = useCallback(
+    (newGoals: typeof goals) => {
+      setGoals(bookId, newGoals);
+    },
+    [bookId, setGoals]
+  );
+
+  const handleSectionsChange = useCallback(
+    (newSections: typeof sections) => {
+      setSections(bookId, newSections);
+    },
+    [bookId, setSections]
+  );
+
+  const handleAuthorSummaryChange = useCallback(
+    (summary: string) => {
+      setAuthorSummary(bookId, summary);
+    },
+    [bookId, setAuthorSummary]
+  );
+
+  const handleStorySummaryChange = useCallback(
+    (summary: string) => {
+      setStorySummary(bookId, summary);
+    },
+    [bookId, setStorySummary]
+  );
+
+  if (!hasInitialized || isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <OverviewView
@@ -616,15 +415,15 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       selectedColor={selectedColor}
       notesBoardHeight={notesBoardHeight}
       dragModifiers={[restrictToNotesBoard]}
-      onGoalsChange={setGoals}
+      onGoalsChange={handleGoalsChange}
       onEditingGoalsChange={setIsEditingGoals}
-      onAuthorSummaryChange={setAuthorSummary}
-      onStorySummaryChange={setStorySummary}
+      onAuthorSummaryChange={handleAuthorSummaryChange}
+      onStorySummaryChange={handleStorySummaryChange}
       onEditingSummariesChange={setIsEditingSummaries}
       onNewNoteChange={setNewNote}
       onEditingNoteChange={setEditingNote}
       onEditContentChange={setEditContent}
-      onSectionsChange={setSections}
+      onSectionsChange={handleSectionsChange}
       onActiveNoteIdChange={setActiveNoteId}
       onDraggedNoteDataChange={setDraggedNoteData}
       onSelectedColorChange={setSelectedColor}
