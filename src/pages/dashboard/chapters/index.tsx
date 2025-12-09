@@ -541,7 +541,7 @@ export function ChaptersPage() {
                   value={searchTerm}
                   onChange={setSearchTerm}
                   placeholder={t("chapters:page.search_placeholder")}
-                  maxWidth="max-w-md"
+                  maxWidth="max-w-[50%]"
                   className="mt-4"
                 />
 
