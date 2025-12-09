@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
@@ -37,7 +38,7 @@ import {
   hasChaptersInLocalStorage,
 } from "@/lib/db/migrate-chapters";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
-import { type ChapterData } from "@/stores/chapters-store";
+import { type ChapterData, useChaptersStore } from "@/stores/chapters-store";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { ChapterCard } from "./components/chapter-card";
@@ -85,6 +86,12 @@ export function ChaptersPage() {
   });
   const navigate = useNavigate();
 
+  // Store actions (não usar selectors aqui para evitar re-renders)
+  const setCachedChapters = useChaptersStore((state) => state.setCachedChapters);
+  const removeCachedChapter = useChaptersStore(
+    (state) => state.removeCachedChapter
+  );
+
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeTab, setActiveTab] = useState<ChapterStatus | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,6 +104,13 @@ export function ChaptersPage() {
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Use ref to track if we've already loaded to prevent infinite loops
+  // Track by dashboardId to reload when switching books
+  const hasLoadedRef = useRef<Record<string, boolean>>({});
+
+  // Track if we've done initial cache check
+  const hasCheckedCacheRef = useRef(false);
+
   const { goals: globalGoals, updateGoals } = useGlobalGoals();
   const { settings: warningsSettings, updateSettings: updateWarningsSettings } =
     useWarningsSettings();
@@ -104,65 +118,146 @@ export function ChaptersPage() {
   // Get translated status config
   const statusConfig = getStatusConfig(t);
 
-  // Load plot arcs and chapters
+  // Subscribe to cache changes and reload when returning to page
+  // This ensures edited chapters are reflected in the list
+  useEffect(() => {
+    const cachedData = useChaptersStore.getState().getAllChapters();
+
+    if (cachedData.length > 0) {
+      console.log(
+        "[ChaptersPage] Recarregando cache atualizado, capítulos:",
+        cachedData.length
+      );
+
+      // Map cached data
+      const mappedFromCache: Chapter[] = cachedData.map((ch) => ({
+        id: ch.id,
+        number: parseFloat(ch.chapterNumber),
+        title: ch.title,
+        status: ch.status,
+        wordCount: ch.wordCount,
+        characterCount: ch.characterCount,
+        characterCountWithSpaces: ch.characterCountWithSpaces || 0,
+        lastEdited: new Date(ch.lastEdited),
+        summary: ch.summary,
+        plotArc: ch.plotArcId
+          ? plotArcs.find((arc) => arc.id === ch.plotArcId)
+            ? {
+                id: ch.plotArcId,
+                name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name,
+              }
+            : undefined
+          : undefined,
+        mentionedCharacters: ch.mentionedCharacters || [],
+        mentionedRegions: ch.mentionedRegions || [],
+        mentionedItems: ch.mentionedItems || [],
+        mentionedFactions: ch.mentionedFactions || [],
+        mentionedRaces: ch.mentionedRaces || [],
+      }));
+
+      setChapters(mappedFromCache);
+      setIsLoading(false);
+      hasLoadedRef.current[dashboardId] = true;
+    } else if (!hasLoadedRef.current[dashboardId]) {
+      // No cache and not loaded yet, show loading
+      setIsLoading(true);
+      setChapters([]);
+    }
+
+    hasCheckedCacheRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dashboardId]); // Only dashboardId, we want this to run on every mount
+
+  // Load plot arcs and fresh data from database if needed
   useEffect(() => {
     const loadData = async () => {
-      try {
-        setIsLoading(true);
+      // Always load plot arcs
+      const arcs = await getPlotArcsByBookId(dashboardId);
+      setPlotArcs(arcs);
 
-        // Primeiro, carregar arcos (se necessário para o mapeamento)
-        const arcs = await getPlotArcsByBookId(dashboardId);
-        setPlotArcs(arcs);
+      // Check if we need to load from database
+      const cachedData = useChaptersStore.getState().getAllChapters();
 
-        // Verificar se há dados no localStorage para migrar
-        if (hasChaptersInLocalStorage()) {
-          console.log(
-            "[ChaptersPage] Detectados capítulos no localStorage, migrando..."
-          );
-          await migrateChaptersFromLocalStorage(dashboardId);
+      // Only load from database if no cache
+      if (cachedData.length === 0) {
+        try {
+          setIsLoading(true);
+
+          // Verificar se há dados no localStorage para migrar
+          if (hasChaptersInLocalStorage()) {
+            console.log(
+              "[ChaptersPage] Detectados capítulos no localStorage, migrando..."
+            );
+            await migrateChaptersFromLocalStorage(dashboardId);
+          }
+
+          // Carregar metadados do banco
+          const metadata = await getChapterMetadataByBookId(dashboardId);
+
+          console.log("[ChaptersPage] Capítulos carregados:", metadata.length);
+
+          // Mapear para formato da UI
+          const mappedChapters: Chapter[] = metadata.map((ch) => ({
+            id: ch.id,
+            number: parseFloat(ch.chapterNumber),
+            title: ch.title,
+            status: ch.status,
+            wordCount: ch.wordCount,
+            characterCount: ch.characterCount,
+            characterCountWithSpaces: ch.characterCountWithSpaces,
+            lastEdited: new Date(ch.lastEdited),
+            summary: ch.summary,
+            plotArc: ch.plotArcId
+              ? arcs.find((arc) => arc.id === ch.plotArcId)
+                ? {
+                    id: ch.plotArcId,
+                    name: arcs.find((arc) => arc.id === ch.plotArcId)!.name,
+                  }
+                : undefined
+              : undefined,
+            mentionedCharacters: ch.mentionedCharacters,
+            mentionedRegions: ch.mentionedRegions,
+            mentionedItems: ch.mentionedItems,
+            mentionedFactions: ch.mentionedFactions,
+            mentionedRaces: ch.mentionedRaces,
+          }));
+
+          setChapters(mappedChapters);
+
+          // Salvar no cache do store
+          const chaptersForCache: ChapterData[] = metadata.map((ch) => ({
+            id: ch.id,
+            chapterNumber: ch.chapterNumber,
+            title: ch.title,
+            status: ch.status,
+            plotArcId: ch.plotArcId,
+            summary: ch.summary || "",
+            content: "", // Não carregamos o conteúdo aqui
+            wordCount: ch.wordCount,
+            characterCount: ch.characterCount,
+            characterCountWithSpaces: ch.characterCountWithSpaces,
+            lastEdited: ch.lastEdited,
+            mentionedCharacters: ch.mentionedCharacters || [],
+            mentionedRegions: ch.mentionedRegions || [],
+            mentionedItems: ch.mentionedItems || [],
+            mentionedFactions: ch.mentionedFactions || [],
+            mentionedRaces: ch.mentionedRaces || [],
+            annotations: [],
+          }));
+
+          setCachedChapters(chaptersForCache);
+          hasLoadedRef.current[dashboardId] = true;
+        } catch (error) {
+          console.error("[ChaptersPage] Erro ao carregar capítulos:", error);
+        } finally {
+          setIsLoading(false);
         }
-
-        // Carregar metadados do banco
-        const metadata = await getChapterMetadataByBookId(dashboardId);
-
-        console.log("[ChaptersPage] Capítulos carregados:", metadata.length);
-
-        // Mapear para formato da UI
-        const mappedChapters: Chapter[] = metadata.map((ch) => ({
-          id: ch.id,
-          number: parseFloat(ch.chapterNumber),
-          title: ch.title,
-          status: ch.status,
-          wordCount: ch.wordCount,
-          characterCount: ch.characterCount,
-          characterCountWithSpaces: ch.characterCountWithSpaces,
-          lastEdited: new Date(ch.lastEdited),
-          summary: ch.summary,
-          plotArc: ch.plotArcId
-            ? arcs.find((arc) => arc.id === ch.plotArcId)
-              ? {
-                  id: ch.plotArcId,
-                  name: arcs.find((arc) => arc.id === ch.plotArcId)!.name,
-                }
-              : undefined
-            : undefined,
-          mentionedCharacters: ch.mentionedCharacters,
-          mentionedRegions: ch.mentionedRegions,
-          mentionedItems: ch.mentionedItems,
-          mentionedFactions: ch.mentionedFactions,
-          mentionedRaces: ch.mentionedRaces,
-        }));
-
-        setChapters(mappedChapters);
-      } catch (error) {
-        console.error("[ChaptersPage] Erro ao carregar capítulos:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     loadData();
-  }, [dashboardId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dashboardId]); // Only depend on dashboardId to prevent infinite loops
 
   const getFilteredChapters = (status: ChapterStatus | "all") =>
     chapters
@@ -178,6 +273,7 @@ export function ChaptersPage() {
     try {
       await deleteChapterFromDB(chapterId);
       setChapters((prev) => prev.filter((ch) => ch.id !== chapterId));
+      removeCachedChapter(chapterId); // Remover do cache
       setChapterToDelete(null);
       setShowDeleteDialog(false);
     } catch (error) {
@@ -236,6 +332,13 @@ export function ChaptersPage() {
       };
 
       setChapters((prev) => [...prev, newChapter]);
+
+      // Adicionar ao cache
+      const cachedChapters = useChaptersStore.getState().getAllChapters();
+      useChaptersStore
+        .getState()
+        .setCachedChapters([...cachedChapters, newChapterData]);
+
       setShowCreateModal(false);
     } catch (error) {
       console.error("[ChaptersPage] Erro ao criar capítulo:", error);
@@ -366,7 +469,7 @@ export function ChaptersPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">{t("chapters:loading")}</p>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { useTranslation } from "react-i18next";
 
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useOverviewStore } from "@/stores/overview-store";
 
 import { NOTE_COLORS_CONSTANT } from "./constants/note-colors";
@@ -387,7 +388,11 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   );
 
   if (!hasInitialized || isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return (

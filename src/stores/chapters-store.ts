@@ -63,6 +63,7 @@ interface ChaptersState {
   setCachedChapter: (chapter: ChapterData) => void;
   setCachedChapters: (chapters: ChapterData[]) => void;
   setCachedNavigationData: (navigationData: ChapterNavigationData[]) => void;
+  updateCachedChapter: (id: string, updates: Partial<ChapterData>) => void;
   removeCachedChapter: (id: string) => void;
   clearCache: () => void;
 
@@ -134,6 +135,24 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
       return { chapters: updatedChapters };
     });
   },
+
+  // Atualizar parcialmente um capítulo no cache
+  updateCachedChapter: (id, updates) =>
+    set((state) => {
+      const existingChapter = state.chapters[id];
+      if (!existingChapter) return state;
+
+      return {
+        chapters: {
+          ...state.chapters,
+          [id]: {
+            ...existingChapter,
+            ...updates,
+            lastEdited: new Date().toISOString(),
+          },
+        },
+      };
+    }),
 
   // Remover capítulo do cache
   removeCachedChapter: (id) =>
