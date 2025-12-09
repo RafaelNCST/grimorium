@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -86,13 +86,13 @@ export function ChaptersPage() {
   });
   const navigate = useNavigate();
 
-  // Store actions (não usar selectors aqui para evitar re-renders)
+  // Store selectors - pegar o objeto chapters diretamente (referência estável)
+  const chaptersCache = useChaptersStore((state) => state.chapters);
   const setCachedChapters = useChaptersStore((state) => state.setCachedChapters);
   const removeCachedChapter = useChaptersStore(
     (state) => state.removeCachedChapter
   );
 
-  const [chapters, setChapters] = useState<Chapter[]>([]);
   const [activeTab, setActiveTab] = useState<ChapterStatus | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -108,9 +108,6 @@ export function ChaptersPage() {
   // Track by dashboardId to reload when switching books
   const hasLoadedRef = useRef<Record<string, boolean>>({});
 
-  // Track if we've done initial cache check
-  const hasCheckedCacheRef = useRef(false);
-
   const { goals: globalGoals, updateGoals } = useGlobalGoals();
   const { settings: warningsSettings, updateSettings: updateWarningsSettings } =
     useWarningsSettings();
@@ -118,55 +115,42 @@ export function ChaptersPage() {
   // Get translated status config
   const statusConfig = getStatusConfig(t);
 
-  // Subscribe to cache changes and reload when returning to page
-  // This ensures edited chapters are reflected in the list
-  useEffect(() => {
-    const cachedData = useChaptersStore.getState().getAllChapters();
+  // Convert cached chapters to UI format - REATIVO às mudanças do store
+  const chapters = useMemo(() => {
+    const cachedChapters = Object.values(chaptersCache);
 
-    if (cachedData.length > 0) {
-      console.log(
-        "[ChaptersPage] Recarregando cache atualizado, capítulos:",
-        cachedData.length
-      );
+    if (cachedChapters.length === 0) return [];
 
-      // Map cached data
-      const mappedFromCache: Chapter[] = cachedData.map((ch) => ({
-        id: ch.id,
-        number: parseFloat(ch.chapterNumber),
-        title: ch.title,
-        status: ch.status,
-        wordCount: ch.wordCount,
-        characterCount: ch.characterCount,
-        characterCountWithSpaces: ch.characterCountWithSpaces || 0,
-        lastEdited: new Date(ch.lastEdited),
-        summary: ch.summary,
-        plotArc: ch.plotArcId
-          ? plotArcs.find((arc) => arc.id === ch.plotArcId)
-            ? {
-                id: ch.plotArcId,
-                name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name,
-              }
-            : undefined
-          : undefined,
-        mentionedCharacters: ch.mentionedCharacters || [],
-        mentionedRegions: ch.mentionedRegions || [],
-        mentionedItems: ch.mentionedItems || [],
-        mentionedFactions: ch.mentionedFactions || [],
-        mentionedRaces: ch.mentionedRaces || [],
-      }));
+    console.log(
+      "[ChaptersPage] Convertendo cache atualizado, capítulos:",
+      cachedChapters.length
+    );
 
-      setChapters(mappedFromCache);
-      setIsLoading(false);
-      hasLoadedRef.current[dashboardId] = true;
-    } else if (!hasLoadedRef.current[dashboardId]) {
-      // No cache and not loaded yet, show loading
-      setIsLoading(true);
-      setChapters([]);
-    }
-
-    hasCheckedCacheRef.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dashboardId]); // Only dashboardId, we want this to run on every mount
+    return cachedChapters.map((ch) => ({
+      id: ch.id,
+      number: parseFloat(ch.chapterNumber),
+      title: ch.title,
+      status: ch.status,
+      wordCount: ch.wordCount,
+      characterCount: ch.characterCount,
+      characterCountWithSpaces: ch.characterCountWithSpaces || 0,
+      lastEdited: new Date(ch.lastEdited),
+      summary: ch.summary,
+      plotArc: ch.plotArcId
+        ? plotArcs.find((arc) => arc.id === ch.plotArcId)
+          ? {
+              id: ch.plotArcId,
+              name: plotArcs.find((arc) => arc.id === ch.plotArcId)!.name,
+            }
+          : undefined
+        : undefined,
+      mentionedCharacters: ch.mentionedCharacters || [],
+      mentionedRegions: ch.mentionedRegions || [],
+      mentionedItems: ch.mentionedItems || [],
+      mentionedFactions: ch.mentionedFactions || [],
+      mentionedRaces: ch.mentionedRaces || [],
+    }));
+  }, [chaptersCache, plotArcs]);
 
   // Load plot arcs and fresh data from database if needed
   useEffect(() => {
@@ -176,10 +160,9 @@ export function ChaptersPage() {
       setPlotArcs(arcs);
 
       // Check if we need to load from database
-      const cachedData = useChaptersStore.getState().getAllChapters();
-
-      // Only load from database if no cache
-      if (cachedData.length === 0) {
+      // Only load from database if no cache AND not already loaded
+      const hasCachedChapters = Object.keys(chaptersCache).length > 0;
+      if (!hasCachedChapters && !hasLoadedRef.current[dashboardId]) {
         try {
           setIsLoading(true);
 
@@ -196,35 +179,7 @@ export function ChaptersPage() {
 
           console.log("[ChaptersPage] Capítulos carregados:", metadata.length);
 
-          // Mapear para formato da UI
-          const mappedChapters: Chapter[] = metadata.map((ch) => ({
-            id: ch.id,
-            number: parseFloat(ch.chapterNumber),
-            title: ch.title,
-            status: ch.status,
-            wordCount: ch.wordCount,
-            characterCount: ch.characterCount,
-            characterCountWithSpaces: ch.characterCountWithSpaces,
-            lastEdited: new Date(ch.lastEdited),
-            summary: ch.summary,
-            plotArc: ch.plotArcId
-              ? arcs.find((arc) => arc.id === ch.plotArcId)
-                ? {
-                    id: ch.plotArcId,
-                    name: arcs.find((arc) => arc.id === ch.plotArcId)!.name,
-                  }
-                : undefined
-              : undefined,
-            mentionedCharacters: ch.mentionedCharacters,
-            mentionedRegions: ch.mentionedRegions,
-            mentionedItems: ch.mentionedItems,
-            mentionedFactions: ch.mentionedFactions,
-            mentionedRaces: ch.mentionedRaces,
-          }));
-
-          setChapters(mappedChapters);
-
-          // Salvar no cache do store
+          // Salvar no cache do store (o useMemo acima converterá para UI)
           const chaptersForCache: ChapterData[] = metadata.map((ch) => ({
             id: ch.id,
             chapterNumber: ch.chapterNumber,
@@ -252,6 +207,10 @@ export function ChaptersPage() {
         } finally {
           setIsLoading(false);
         }
+      } else if (hasCachedChapters) {
+        // Se já tem cache, marcar como carregado e remover loading
+        setIsLoading(false);
+        hasLoadedRef.current[dashboardId] = true;
       }
     };
 
@@ -272,8 +231,7 @@ export function ChaptersPage() {
   const handleDeleteChapter = async (chapterId: string) => {
     try {
       await deleteChapterFromDB(chapterId);
-      setChapters((prev) => prev.filter((ch) => ch.id !== chapterId));
-      removeCachedChapter(chapterId); // Remover do cache
+      removeCachedChapter(chapterId); // Remover do cache (UI se atualiza automaticamente)
       setChapterToDelete(null);
       setShowDeleteDialog(false);
     } catch (error) {
@@ -308,36 +266,11 @@ export function ChaptersPage() {
       // Salvar no banco
       await createChapter(dashboardId, newChapterData);
 
-      // Find plot arc for display
-      const plotArc = data.plotArcId
-        ? plotArcs.find((arc) => arc.id === data.plotArcId)
-        : undefined;
-
-      const newChapter: Chapter = {
-        id: newChapterId,
-        number: parseFloat(data.chapterNumber),
-        title: data.name,
-        status: data.status,
-        wordCount: 0,
-        characterCount: 0,
-        characterCountWithSpaces: 0,
-        lastEdited: new Date(),
-        summary: data.summary,
-        plotArc: plotArc ? { id: plotArc.id, name: plotArc.name } : undefined,
-        mentionedCharacters: data.mentionedCharacters || [],
-        mentionedRegions: data.mentionedRegions || [],
-        mentionedItems: data.mentionedItems || [],
-        mentionedFactions: data.mentionedFactions || [],
-        mentionedRaces: data.mentionedRaces || [],
-      };
-
-      setChapters((prev) => [...prev, newChapter]);
-
-      // Adicionar ao cache
-      const cachedChapters = useChaptersStore.getState().getAllChapters();
+      // Adicionar ao cache (UI se atualiza automaticamente via useMemo)
+      const currentCache = useChaptersStore.getState().getAllChapters();
       useChaptersStore
         .getState()
-        .setCachedChapters([...cachedChapters, newChapterData]);
+        .setCachedChapters([...currentCache, newChapterData]);
 
       setShowCreateModal(false);
     } catch (error) {

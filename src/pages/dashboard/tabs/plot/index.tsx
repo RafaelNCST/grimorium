@@ -39,7 +39,7 @@ export function PlotTab({ bookId }: PropsPlotTab) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Load data on mount
+  // Load data on mount (APENAS na primeira vez)
   useEffect(() => {
     if (!hasInitialized) {
       fetchPlotArcs(bookId).then(() => {

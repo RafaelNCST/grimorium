@@ -10,10 +10,10 @@ import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   getPlotArcsByBookId,
   getPlotArcById,
-  updatePlotArc,
   deletePlotArc,
 } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
+import { usePlotStore } from "@/stores/plot-store";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { PlotArcDetailView } from "./view";
@@ -24,6 +24,11 @@ export function PlotArcDetail() {
     from: "/dashboard/$dashboardId/tabs/plot/$plotId",
   });
   const router = useRouter();
+
+  // Store actions
+  const updatePlotArcInCache = usePlotStore(
+    (state) => state.updatePlotArcInCache
+  );
 
   // Data state
   const [arc, setArc] = useState<IPlotArc | null>(null);
@@ -260,7 +265,7 @@ export function PlotArcDetail() {
     async (events: IPlotEvent[]) => {
       if (!arc) return;
       try {
-        await updatePlotArc(arc.id, { events });
+        await updatePlotArcInCache(arc.id, { events });
         setArc((prev) => {
           if (!prev) return prev;
           return { ...prev, events };
@@ -273,7 +278,7 @@ export function PlotArcDetail() {
         console.error("Failed to reorder events:", error);
       }
     },
-    [arc, isEditing]
+    [arc, isEditing, updatePlotArcInCache]
   );
 
   const handleAddEvent = useCallback(
@@ -293,7 +298,7 @@ export function PlotArcDetail() {
           : 0;
 
       try {
-        await updatePlotArc(arc.id, { events: updatedEvents, progress });
+        await updatePlotArcInCache(arc.id, { events: updatedEvents, progress });
         setArc((prev) => {
           if (!prev) return prev;
           return { ...prev, events: updatedEvents, progress };
@@ -305,7 +310,7 @@ export function PlotArcDetail() {
         console.error("Failed to add event:", error);
       }
     },
-    [arc, editForm.events, isEditing]
+    [arc, editForm.events, isEditing, updatePlotArcInCache]
   );
 
   const handleToggleEventCompletion = useCallback(
@@ -324,7 +329,7 @@ export function PlotArcDetail() {
           : 0;
 
       try {
-        await updatePlotArc(arc.id, { events: updatedEvents, progress });
+        await updatePlotArcInCache(arc.id, { events: updatedEvents, progress });
         setArc((prev) => {
           if (!prev) return prev;
           return { ...prev, events: updatedEvents, progress };
@@ -336,7 +341,7 @@ export function PlotArcDetail() {
         console.error("Failed to toggle event completion:", error);
       }
     },
-    [arc, editForm.events, isEditing]
+    [arc, editForm.events, isEditing, updatePlotArcInCache]
   );
 
   // Save handler
@@ -362,7 +367,7 @@ export function PlotArcDetail() {
 
     try {
       const updatedData = { ...editForm, fieldVisibility };
-      await updatePlotArc(arc.id, updatedData);
+      await updatePlotArcInCache(arc.id, updatedData);
       setArc({ ...arc, ...updatedData } as IPlotArc);
       setOriginalData({ ...arc, ...updatedData } as IPlotArc);
       setOriginalFieldVisibility(fieldVisibility);
@@ -373,7 +378,7 @@ export function PlotArcDetail() {
       console.error("Failed to update plot arc:", error);
       toast.error(t("plot:toast.update_failed"));
     }
-  }, [arc, editForm, fieldVisibility, t]);
+  }, [arc, editForm, fieldVisibility, t, updatePlotArcInCache]);
 
   // Delete handlers
   const handleDeleteArc = useCallback(async () => {
@@ -401,7 +406,7 @@ export function PlotArcDetail() {
           : 0;
 
       try {
-        await updatePlotArc(arc.id, { events: updatedEvents, progress });
+        await updatePlotArcInCache(arc.id, { events: updatedEvents, progress });
         setArc((prev) => {
           if (!prev) return prev;
           return { ...prev, events: updatedEvents, progress };
@@ -417,7 +422,7 @@ export function PlotArcDetail() {
         toast.error(t("plot:toast.delete_failed"));
       }
     }
-  }, [eventToDelete, arc, editForm.events, isEditing, t]);
+  }, [eventToDelete, arc, editForm.events, isEditing, t, updatePlotArcInCache]);
 
   const handleEventDeleteRequest = useCallback((eventId: string) => {
     setEventToDelete(eventId);

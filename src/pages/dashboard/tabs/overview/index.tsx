@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 
 import {
   DragStartEvent,
@@ -131,8 +131,9 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   );
   const [notesBoardHeight, setNotesBoardHeight] = useState(400);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const mountCountRef = useRef(0);
 
-  // Load data on mount
+  // Load data on mount (APENAS na primeira vez)
   useEffect(() => {
     if (!hasInitialized) {
       fetchOverview(bookId).then(() => {
@@ -140,6 +141,22 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
       });
     }
   }, [bookId, hasInitialized, fetchOverview]);
+
+  // Recalculate stats silently every time we return to this tab
+  // Não causa loading, apenas atualiza os dados do cache
+  useEffect(() => {
+    mountCountRef.current += 1;
+
+    // Apenas recalcular se já foi inicializado E não é o primeiro mount
+    if (hasInitialized && mountCountRef.current > 1) {
+      console.log("[OverviewTab] Recalculando stats silenciosamente ao retornar");
+      Promise.all([
+        useOverviewStore.getState().calculateStats(bookId),
+        useOverviewStore.getState().calculateArcsProgress(bookId),
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId, hasInitialized]); // Re-executar quando bookId muda ou quando volta
 
   // Set default note if no notes exist after loading
   useEffect(() => {
