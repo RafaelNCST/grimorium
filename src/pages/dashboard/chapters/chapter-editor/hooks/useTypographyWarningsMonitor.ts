@@ -79,18 +79,21 @@ export function useTypographyWarningsMonitor({
   const { t } = useTranslation("chapter-editor");
   const currentChapterIdRef = useRef<string>(chapterId);
   const isTransitioningRef = useRef<boolean>(false);
-  const warningsShownRef = useRef<TypographyWarningTracker>(
-    loadTypographyWarningTracker(chapterId)
-  );
+  const warningsShownRef = useRef<TypographyWarningTracker>({});
+  const isInitializedRef = useRef<boolean>(false);
 
-  // Recarrega avisos quando o capítulo mudar
+  // Inicializa e recarrega avisos quando o capítulo mudar
   useEffect(() => {
-    if (currentChapterIdRef.current !== chapterId) {
-      // Marca que estamos em transição
-      isTransitioningRef.current = true;
+    // Inicialização ou mudança de capítulo
+    if (!isInitializedRef.current || currentChapterIdRef.current !== chapterId) {
+      // Marca que estamos em transição (exceto na primeira inicialização)
+      if (isInitializedRef.current) {
+        isTransitioningRef.current = true;
+      }
 
       currentChapterIdRef.current = chapterId;
       warningsShownRef.current = loadTypographyWarningTracker(chapterId);
+      isInitializedRef.current = true;
 
       // Aguarda um pouco para as métricas serem recalculadas
       setTimeout(() => {

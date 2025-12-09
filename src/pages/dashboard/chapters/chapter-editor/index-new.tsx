@@ -127,8 +127,8 @@ function ChapterEditorContent() {
   // Stats modal state
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
 
-  // Session timer hook
-  const { sessionMinutes } = useSessionTimer();
+  // Session timer hook (GLOBAL - não reseta ao trocar de capítulo)
+  const { sessionMinutes, sessionId } = useSessionTimer();
 
   // Calculate chapter metrics
   const metrics = useChapterMetrics({
@@ -150,12 +150,12 @@ function ChapterEditorContent() {
     },
   });
 
-  // Monitor time warnings
+  // Monitor time warnings (GLOBAL para toda a sessão)
   useTimeWarningsMonitor({
     metrics,
     enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
     hasSessionTimeGoal: globalGoals.sessionTime.enabled,
-    chapterId: editorChaptersId,
+    sessionId: sessionId,
     onWarning: (severity, title, message) => {
       addWarning("time", severity, title, message);
     },
