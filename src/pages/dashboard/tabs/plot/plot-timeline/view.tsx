@@ -102,11 +102,11 @@ function SortableArcCard({
   // Get icon color based on status
   const getStatusIconColor = (status: PlotArcStatus) => {
     switch (status) {
-      case "finalizado":
+      case "finished":
         return "text-emerald-500";
-      case "atual":
+      case "current":
         return "text-blue-500";
-      case "planejamento":
+      case "planning":
         return "text-amber-500";
       default:
         return "text-muted-foreground";
@@ -130,13 +130,15 @@ function SortableArcCard({
     >
       {/* Timeline Position Number */}
       <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 z-20">
-        <span className="text-2xl font-bold text-white">{index + 1}</span>
+        <span className={`text-2xl font-bold ${arc.status === "current" ? "text-purple-400" : "text-white"}`}>
+          {index + 1}
+        </span>
       </div>
 
       {/* Arc Card */}
       <Card
         className={`card-magical cursor-pointer relative z-10 h-[340px] flex flex-col ${
-          isHighlighted ? "ring-2 ring-primary shadow-xl" : ""
+          arc.status === "current" ? "ring-2 ring-purple-500 shadow-xl" : isHighlighted ? "ring-2 ring-primary shadow-xl" : ""
         } ${!isDragging && !isHighlighted ? "hover:scale-105" : ""}`}
         onClick={handleCardClick}
       >
@@ -157,17 +159,14 @@ function SortableArcCard({
                 <Badge
                   className={`${getStatusColor(arc.status)} pointer-events-none`}
                 >
-                  {t(
-                    `statuses.${arc.status === "atual" ? "current" : arc.status === "finalizado" ? "finished" : "planning"}`
-                  )}
+                  {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
+                  {t(statusConfig?.translationKey || "statuses.planning")}
                 </Badge>
                 <Badge
                   className={`${getSizeColor(arc.size)} pointer-events-none`}
                 >
                   {SizeIcon && <SizeIcon className="w-3 h-3 mr-1" />}
-                  {t(
-                    `sizes.${arc.size === "mini" ? "mini" : arc.size === "pequeno" ? "small" : arc.size === "médio" ? "medium" : "large"}`
-                  )}
+                  {t(sizeConfig?.translationKey || "sizes.medium")}
                 </Badge>
               </div>
             </div>
@@ -436,9 +435,9 @@ export function PlotTimelineView({
                 {ARC_STATUSES_CONSTANT.map((status) => {
                   const Icon = status.icon;
                   const iconColor =
-                    status.value === "finalizado"
+                    status.value === "finished"
                       ? "text-emerald-500"
-                      : status.value === "atual"
+                      : status.value === "current"
                         ? "text-blue-500"
                         : "text-amber-500";
                   return (
@@ -451,9 +450,7 @@ export function PlotTimelineView({
                           {t(status.translationKey)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {t(
-                            `timeline.legend_${status.value === "atual" ? "current" : status.value === "finalizado" ? "finished" : "planning"}`
-                          )}
+                          {t(`timeline.legend_${status.value}`)}
                         </p>
                       </div>
                     </div>
