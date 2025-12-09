@@ -7,6 +7,7 @@ import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import {
   getChapterById,
   updateChapter as updateChapterInDB,
+  getChapterNavigationDataByBookId,
 } from "@/lib/db/chapters.service";
 import {
   getPlotArcsByBookId,
@@ -53,8 +54,13 @@ function ChapterEditorContent() {
   const editorChaptersId = params["editor-chapters-id"];
   const navigate = useNavigate();
 
-  const { setCachedChapter, getChapter, getPreviousChapter, getNextChapter } =
-    useChaptersStore();
+  const {
+    setCachedChapter,
+    setCachedNavigationData,
+    getChapter,
+    getPreviousChapter,
+    getNextChapter
+  } = useChaptersStore();
 
   const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
 
@@ -149,6 +155,7 @@ function ChapterEditorContent() {
     metrics,
     enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
     hasSessionTimeGoal: globalGoals.sessionTime.enabled,
+    chapterId: editorChaptersId,
     onWarning: (severity, title, message) => {
       addWarning("time", severity, title, message);
     },
@@ -179,6 +186,26 @@ function ChapterEditorContent() {
 
   // Ref for TextEditor to access undo/redo
   const textEditorRef = useRef<TextEditorRef>(null);
+
+  // Carrega dados de navegação uma única vez (apenas na montagem)
+  // Isso popula o cache com dados mínimos de TODOS os capítulos do livro
+  // Garantindo que as setas de navegação sempre funcionem
+  useEffect(() => {
+    const loadNavigationData = async () => {
+      try {
+        if (dashboardId) {
+          const navData = await getChapterNavigationDataByBookId(dashboardId);
+          setCachedNavigationData(navData);
+        }
+      } catch (error) {
+        console.error("[ChapterEditor] Erro ao carregar dados de navegação:", error);
+      }
+    };
+
+    loadNavigationData();
+    // Executa apenas uma vez na montagem
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Reload chapter when editorChaptersId changes (navigation between chapters)
   useEffect(() => {

@@ -88,6 +88,14 @@ export interface ChapterMetadata {
   mentionedRaces: EntityMention[];
 }
 
+// Tipo ultra-leve para navegação (apenas o essencial)
+// Usado para popular o cache de navegação sem carregar dados pesados
+export interface ChapterNavigationData {
+  id: string;
+  chapterNumber: string;
+  title: string;
+}
+
 // Funções auxiliares de conversão
 function entityMentionToDBEntity(
   chapterId: string,
@@ -209,6 +217,26 @@ export async function getChapterMetadataByBookId(
       mentionedRaces: chapterMentions.races,
     };
   });
+}
+
+// Buscar dados mínimos para navegação (ultra-leve, otimizado para 1000+ capítulos)
+// Retorna apenas id, chapterNumber e title - sem conteúdo, menções ou outros dados pesados
+export async function getChapterNavigationDataByBookId(
+  bookId: string
+): Promise<ChapterNavigationData[]> {
+  const db = await getDB();
+
+  // Query extremamente leve - apenas 3 campos
+  const chapters = await db.select<Pick<DBChapter, "id" | "chapter_number" | "title">[]>(
+    "SELECT id, chapter_number, title FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
+    [bookId]
+  );
+
+  return chapters.map((ch) => ({
+    id: ch.id,
+    chapterNumber: ch.chapter_number,
+    title: ch.title,
+  }));
 }
 
 // Buscar capítulo completo (com conteúdo)

@@ -17,6 +17,7 @@ import React, {
   useMemo,
   ReactNode,
   useEffect,
+  useRef,
 } from "react";
 
 import { toast } from "sonner";
@@ -76,6 +77,11 @@ export function WarningsProvider({
   const { t } = useTranslation("chapter-editor");
   const { settings } = useWarningsSettings();
 
+  // Ref para rastrear o capítulo atual e evitar avisos durante transição
+  const currentChapterIdRef = useRef<string>(chapterId);
+  const isLoadingChapterRef = useRef<boolean>(false);
+  const recentWarningsRef = useRef<Map<string, number>>(new Map());
+
   // Carrega avisos do localStorage na inicialização e quando o capítulo mudar
   const [warnings, setWarnings] = useState<Warning[]>(() => {
     try {
@@ -93,6 +99,18 @@ export function WarningsProvider({
 
   // Recarrega avisos quando o capítulo mudar
   useEffect(() => {
+    // Se o capítulo não mudou, não faz nada
+    if (currentChapterIdRef.current === chapterId) {
+      return;
+    }
+
+    // Marca que estamos carregando um novo capítulo
+    isLoadingChapterRef.current = true;
+    currentChapterIdRef.current = chapterId;
+
+    // Limpa o mapa de avisos recentes ao trocar de capítulo
+    recentWarningsRef.current.clear();
+
     try {
       const storageKey = getStorageKey(chapterId);
       const stored = localStorage.getItem(storageKey);
@@ -105,6 +123,12 @@ export function WarningsProvider({
       console.error("Erro ao carregar avisos do localStorage:", error);
       setWarnings([]);
     }
+
+    // Delay maior para garantir que todos os hooks carregaram seus trackers
+    // e processaram as métricas iniciais do novo capítulo
+    setTimeout(() => {
+      isLoadingChapterRef.current = false;
+    }, 500);
   }, [chapterId]);
 
   // Salva avisos no localStorage sempre que mudarem
@@ -164,6 +188,32 @@ export function WarningsProvider({
         return "";
       }
 
+      // Se estamos em transição de capítulo, não adiciona avisos
+      if (isLoadingChapterRef.current) {
+        return "";
+      }
+
+      // Verifica se um aviso idêntico foi criado recentemente (últimos 2 segundos)
+      // Isso previne loops infinitos de avisos
+      const warningKey = `${type}-${title}-${message}`;
+      const now = Date.now();
+      const lastWarningTime = recentWarningsRef.current.get(warningKey);
+
+      if (lastWarningTime && now - lastWarningTime < 2000) {
+        // Aviso duplicado muito recente, ignora
+        return "";
+      }
+
+      // Registra este aviso
+      recentWarningsRef.current.set(warningKey, now);
+
+      // Limpa avisos antigos do mapa (mais de 5 segundos)
+      recentWarningsRef.current.forEach((time, key) => {
+        if (now - time > 5000) {
+          recentWarningsRef.current.delete(key);
+        }
+      });
+
       const newWarning: Warning = {
         id: `warning-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type,
@@ -206,7 +256,7 @@ export function WarningsProvider({
 
       return newWarning.id;
     },
-    [showWarningToasts, settings.enabled, settings.notificationsEnabled]
+    [showWarningToasts, settings.enabled, settings.notificationsEnabled, t]
   );
 
   /**

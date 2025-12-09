@@ -109,26 +109,36 @@ export function useGlobalGoalsMonitor({
   const { t } = useTranslation("chapter-editor");
   const configKeyRef = useRef<string>("");
   const warningsShownRef = useRef<WarningTracker>({});
+  const currentChapterIdRef = useRef<string>(chapterId);
+  const isTransitioningRef = useRef<boolean>(false);
 
-  // Inicializa ou reseta o rastreador quando a configuração ou capítulo muda
+  // Recarrega avisos quando o capítulo ou configuração mudar
   useEffect(() => {
     const newConfigKey = generateGoalsConfigKey(globalGoals);
+    const chapterChanged = currentChapterIdRef.current !== chapterId;
 
-    // Se a configuração mudou, reseta os avisos
-    if (configKeyRef.current !== newConfigKey) {
+    // Atualiza o tracker apenas se o capítulo mudou OU a configuração mudou
+    if (chapterChanged || configKeyRef.current !== newConfigKey) {
+      // Marca que estamos em transição
+      isTransitioningRef.current = true;
+
       configKeyRef.current = newConfigKey;
+      currentChapterIdRef.current = chapterId;
       warningsShownRef.current = loadWarningTracker(chapterId, newConfigKey);
-    }
-  }, [globalGoals, chapterId]);
 
-  // Recarrega avisos quando o capítulo mudar
-  useEffect(() => {
-    const configKey = generateGoalsConfigKey(globalGoals);
-    configKeyRef.current = configKey;
-    warningsShownRef.current = loadWarningTracker(chapterId, configKey);
+      // Aguarda um pouco para as métricas serem recalculadas
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 1000);
+    }
   }, [chapterId, globalGoals]);
 
   useEffect(() => {
+    // Não executa durante transição de capítulo
+    if (isTransitioningRef.current) {
+      return;
+    }
+
     // Verifica se as metas se aplicam ao status atual do capítulo
     if (!globalGoals.appliesTo.includes(chapterStatus)) {
       return;
@@ -239,11 +249,19 @@ export function useGlobalGoalsMonitor({
     }
   }, [metrics, globalGoals, chapterStatus, chapterId, onWarning]);
 
-  // Reseta avisos quando o capítulo é esvaziado ou reiniciado
+  // Reseta avisos quando o capítulo ATUAL é esvaziado
+  // IMPORTANTE: Só reseta se NÃO estamos em transição entre capítulos
+  // Isso garante que cada capítulo mantenha seu próprio histórico de avisos isolado
   useEffect(() => {
-    if (metrics.wordCount < 100) {
+    // Não reseta durante navegação entre capítulos
+    if (isTransitioningRef.current) {
+      return;
+    }
+
+    // Reseta apenas se o capítulo atual está vazio
+    if (metrics.characterCount < 100) {
       warningsShownRef.current = {};
       saveWarningTracker(chapterId, configKeyRef.current, {});
     }
-  }, [metrics.wordCount, chapterId]);
+  }, [metrics.characterCount, chapterId]);
 }

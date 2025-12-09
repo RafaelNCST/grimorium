@@ -77,16 +77,34 @@ export function useTypographyWarningsMonitor({
   onWarning,
 }: UseTypographyWarningsMonitorProps) {
   const { t } = useTranslation("chapter-editor");
+  const currentChapterIdRef = useRef<string>(chapterId);
+  const isTransitioningRef = useRef<boolean>(false);
   const warningsShownRef = useRef<TypographyWarningTracker>(
     loadTypographyWarningTracker(chapterId)
   );
 
   // Recarrega avisos quando o capítulo mudar
   useEffect(() => {
-    warningsShownRef.current = loadTypographyWarningTracker(chapterId);
+    if (currentChapterIdRef.current !== chapterId) {
+      // Marca que estamos em transição
+      isTransitioningRef.current = true;
+
+      currentChapterIdRef.current = chapterId;
+      warningsShownRef.current = loadTypographyWarningTracker(chapterId);
+
+      // Aguarda um pouco para as métricas serem recalculadas
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 1000);
+    }
   }, [chapterId]);
 
   useEffect(() => {
+    // Não executa durante transição de capítulo
+    if (isTransitioningRef.current) {
+      return;
+    }
+
     // Não exibe avisos se:
     // 1. O sistema de avisos está desativado
     // 2. Há uma meta de palavras ativada
@@ -133,11 +151,19 @@ export function useTypographyWarningsMonitor({
     }
   }, [metrics.wordCount, enabled, hasWordGoal, chapterId, onWarning]);
 
-  // Reseta avisos quando o capítulo é esvaziado ou reiniciado
+  // Reseta avisos quando o capítulo ATUAL é esvaziado
+  // IMPORTANTE: Só reseta se NÃO estamos em transição entre capítulos
+  // Isso garante que cada capítulo mantenha seu próprio histórico de avisos isolado
   useEffect(() => {
-    if (metrics.wordCount < 100) {
+    // Não reseta durante navegação entre capítulos
+    if (isTransitioningRef.current) {
+      return;
+    }
+
+    // Reseta apenas se o capítulo atual está vazio
+    if (metrics.characterCount < 100) {
       warningsShownRef.current = {};
       saveTypographyWarningTracker(chapterId, {});
     }
-  }, [metrics.wordCount, chapterId]);
+  }, [metrics.characterCount, chapterId]);
 }

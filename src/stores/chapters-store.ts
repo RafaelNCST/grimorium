@@ -48,6 +48,13 @@ export interface ChapterData {
   entityLinks?: EntityLink[]; // Persistent entity links
 }
 
+// Tipo para dados mínimos de navegação
+export interface ChapterNavigationData {
+  id: string;
+  chapterNumber: string;
+  title: string;
+}
+
 interface ChaptersState {
   // Cache em memória (não persistido)
   chapters: Record<string, ChapterData>;
@@ -55,6 +62,7 @@ interface ChaptersState {
   // Ações do store (agora apenas cache local)
   setCachedChapter: (chapter: ChapterData) => void;
   setCachedChapters: (chapters: ChapterData[]) => void;
+  setCachedNavigationData: (navigationData: ChapterNavigationData[]) => void;
   removeCachedChapter: (id: string) => void;
   clearCache: () => void;
 
@@ -90,6 +98,41 @@ export const useChaptersStore = create<ChaptersState>()((set, get) => ({
       {} as Record<string, ChapterData>
     );
     set({ chapters: chaptersMap });
+  },
+
+  // Definir dados mínimos de navegação no cache (ultra-leve)
+  // Cria entradas no cache apenas com id, chapterNumber e title
+  // Ideal para popular o cache com 1000+ capítulos sem impacto de performance
+  setCachedNavigationData: (navigationData) => {
+    set((state) => {
+      const updatedChapters = { ...state.chapters };
+
+      navigationData.forEach((navData) => {
+        // Só adiciona se ainda não existe no cache
+        // Evita sobrescrever dados completos que já foram carregados
+        if (!updatedChapters[navData.id]) {
+          updatedChapters[navData.id] = {
+            id: navData.id,
+            chapterNumber: navData.chapterNumber,
+            title: navData.title,
+            status: "draft",
+            summary: "",
+            content: "",
+            wordCount: 0,
+            characterCount: 0,
+            lastEdited: new Date().toISOString(),
+            mentionedCharacters: [],
+            mentionedRegions: [],
+            mentionedItems: [],
+            mentionedFactions: [],
+            mentionedRaces: [],
+            annotations: [],
+          } as ChapterData;
+        }
+      });
+
+      return { chapters: updatedChapters };
+    });
   },
 
   // Remover capítulo do cache
