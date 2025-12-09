@@ -140,14 +140,34 @@ function ChapterEditorContent() {
   const { addWarning } = useWarnings();
   const { settings: warningsSettings } = useWarningsSettings();
 
+  const handleGoalWarning = useCallback(
+    (severity: "info" | "warning" | "error", title: string, message: string) => {
+      addWarning("goals", severity, title, message);
+    },
+    [addWarning]
+  );
+
+  const handleTimeWarning = useCallback(
+    (severity: "info" | "warning" | "error", title: string, message: string) => {
+      addWarning("time", severity, title, message);
+    },
+    [addWarning]
+  );
+
+  const handleTypographyWarning = useCallback(
+    (severity: "info" | "warning" | "error", title: string, message: string) => {
+      addWarning("typography", severity, title, message);
+    },
+    [addWarning]
+  );
+
   useGlobalGoalsMonitor({
     metrics,
     globalGoals,
     chapterStatus: chapter.status,
     chapterId: editorChaptersId,
-    onWarning: (severity, title, message) => {
-      addWarning("goals", severity, title, message);
-    },
+    sessionId: sessionId,
+    onWarning: handleGoalWarning,
   });
 
   // Monitor time warnings (GLOBAL para toda a sessão)
@@ -156,9 +176,7 @@ function ChapterEditorContent() {
     enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
     hasSessionTimeGoal: globalGoals.sessionTime.enabled,
     sessionId: sessionId,
-    onWarning: (severity, title, message) => {
-      addWarning("time", severity, title, message);
-    },
+    onWarning: handleTimeWarning,
   });
 
   // Monitor typography warnings
@@ -168,9 +186,7 @@ function ChapterEditorContent() {
       warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
     hasWordGoal: globalGoals.words.enabled,
     chapterId: editorChaptersId,
-    onWarning: (severity, title, message) => {
-      addWarning("typography", severity, title, message);
-    },
+    onWarning: handleTypographyWarning,
   });
 
   // Sync showWarningToasts setting with warnings context

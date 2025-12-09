@@ -29,6 +29,7 @@ import {
   CHAPTER_STATUS_TRANSLATION_KEYS,
   ChapterStatus,
   MIN_WORD_GOAL,
+  MIN_SESSION_TIME_GOAL,
 } from "@/types/global-goals";
 
 interface GlobalGoalsModalProps {
@@ -206,7 +207,6 @@ export function GlobalGoalsModal({
             <SessionTimeGoalConfig
               enabled={localGoals.sessionTime.enabled}
               targetMinutes={localGoals.sessionTime.targetMinutes}
-              warnAt90={localGoals.sessionTime.warnAt90}
               warnAt100={localGoals.sessionTime.warnAt100}
               silent={localGoals.sessionTime.silent}
               t={t}
@@ -219,16 +219,9 @@ export function GlobalGoalsModal({
               onTargetMinutesChange={(targetMinutes) =>
                 setLocalGoals({
                   ...localGoals,
-                  sessionTime: { ...localGoals.sessionTime, targetMinutes },
-                })
-              }
-              onWarnAt90Change={(warnAt90) =>
-                setLocalGoals({
-                  ...localGoals,
                   sessionTime: {
                     ...localGoals.sessionTime,
-                    warnAt90,
-                    silent: warnAt90 ? false : localGoals.sessionTime.silent,
+                    targetMinutes: Math.max(MIN_SESSION_TIME_GOAL, targetMinutes)
                   },
                 })
               }
@@ -248,7 +241,6 @@ export function GlobalGoalsModal({
                   sessionTime: {
                     ...localGoals.sessionTime,
                     silent,
-                    warnAt90: silent ? false : localGoals.sessionTime.warnAt90,
                     warnAt100: silent
                       ? false
                       : localGoals.sessionTime.warnAt100,
@@ -417,13 +409,11 @@ function GoalConfig({
 interface SessionTimeGoalConfigProps {
   enabled: boolean;
   targetMinutes: number;
-  warnAt90: boolean;
   warnAt100: boolean;
   silent: boolean;
   t: (key: string, options?: any) => string;
   onEnabledChange: (enabled: boolean) => void;
   onTargetMinutesChange: (minutes: number) => void;
-  onWarnAt90Change: (warnAt90: boolean) => void;
   onWarnAt100Change: (warnAt100: boolean) => void;
   onSilentChange: (silent: boolean) => void;
 }
@@ -431,13 +421,11 @@ interface SessionTimeGoalConfigProps {
 function SessionTimeGoalConfig({
   enabled,
   targetMinutes,
-  warnAt90,
   warnAt100,
   silent,
   t,
   onEnabledChange,
   onTargetMinutesChange,
-  onWarnAt90Change,
   onWarnAt100Change,
   onSilentChange,
 }: SessionTimeGoalConfigProps) {
@@ -471,7 +459,8 @@ function SessionTimeGoalConfig({
                   onChange={(e) => {
                     const value = Number(e.target.value);
                     if (!isNaN(value) && value >= 0 && value <= 23) {
-                      onTargetMinutesChange(value * 60 + mins);
+                      const newTotal = value * 60 + mins;
+                      onTargetMinutesChange(newTotal);
                     }
                   }}
                   min={0}
@@ -499,7 +488,7 @@ function SessionTimeGoalConfig({
                       onTargetMinutesChange(Math.max(0, hours - 1) * 60 + mins)
                     }
                     className="h-5 px-2"
-                    disabled={hours <= 0}
+                    disabled={targetMinutes <= MIN_SESSION_TIME_GOAL}
                   >
                     <ChevronDown className="h-3 w-3" />
                   </Button>
@@ -515,7 +504,8 @@ function SessionTimeGoalConfig({
                   onChange={(e) => {
                     const value = Number(e.target.value);
                     if (!isNaN(value) && value >= 0 && value <= 59) {
-                      onTargetMinutesChange(hours * 60 + value);
+                      const newTotal = hours * 60 + value;
+                      onTargetMinutesChange(newTotal);
                     }
                   }}
                   min={0}
@@ -543,7 +533,7 @@ function SessionTimeGoalConfig({
                       onTargetMinutesChange(hours * 60 + Math.max(0, mins - 1))
                     }
                     className="h-5 px-2"
-                    disabled={mins <= 0}
+                    disabled={targetMinutes <= MIN_SESSION_TIME_GOAL}
                   >
                     <ChevronDown className="h-3 w-3" />
                   </Button>
@@ -555,21 +545,6 @@ function SessionTimeGoalConfig({
           <div>
             <Label className="mb-3 block">{t("goal_config.warn_label")}</Label>
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="session-time-90"
-                  checked={warnAt90}
-                  onCheckedChange={(checked) =>
-                    onWarnAt90Change(checked === true)
-                  }
-                />
-                <label
-                  htmlFor="session-time-90"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {t("session_time_config.warn_90")}
-                </label>
-              </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="session-time-100"

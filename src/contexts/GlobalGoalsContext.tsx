@@ -11,6 +11,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useMemo,
   ReactNode,
 } from "react";
 
@@ -87,12 +88,15 @@ export function GlobalGoalsProvider({ children }: GlobalGoalsProviderProps) {
     [goals.appliesTo]
   );
 
-  const value: GlobalGoalsContextValue = {
-    goals,
-    updateGoals,
-    resetGoals,
-    isGoalApplicableToStatus,
-  };
+  const value = useMemo<GlobalGoalsContextValue>(
+    () => ({
+      goals,
+      updateGoals,
+      resetGoals,
+      isGoalApplicableToStatus,
+    }),
+    [goals, updateGoals, resetGoals, isGoalApplicableToStatus]
+  );
 
   return (
     <GlobalGoalsContext.Provider value={value}>

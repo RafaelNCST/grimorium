@@ -5,6 +5,9 @@
 
 import { useState, useEffect, useRef } from "react";
 
+// Contador global para garantir IDs únicos mesmo com reutilização de componentes
+let sessionCounter = 0;
+
 /**
  * Rastreia o tempo de sessão em minutos
  * @returns tempo em minutos desde que o editor foi aberto e ID único da sessão
@@ -14,11 +17,19 @@ export function useSessionTimer() {
   const startTimeRef = useRef<Date>(new Date());
   const intervalRef = useRef<NodeJS.Timeout>();
 
-  // ID único da sessão (gerado uma vez na montagem do hook)
+  // ID único da sessão gerado a cada montagem do componente
   // Usado para armazenar avisos de tempo globalmente (não por capítulo)
-  const sessionIdRef = useRef<string>(`session-${Date.now()}`);
+  // IMPORTANTE: Incrementa contador global para garantir unicidade
+  const [sessionId] = useState(() => {
+    sessionCounter++;
+    return `session-${Date.now()}-${sessionCounter}`;
+  });
 
   useEffect(() => {
+    // Reseta o tempo de início quando o componente monta
+    startTimeRef.current = new Date();
+    setSessionMinutes(0);
+
     // Atualiza a cada 30 segundos (para não sobrecarregar)
     intervalRef.current = setInterval(() => {
       const now = new Date();
@@ -44,7 +55,7 @@ export function useSessionTimer() {
 
   return {
     sessionMinutes,
-    sessionId: sessionIdRef.current,
+    sessionId,
     resetSession,
   };
 }

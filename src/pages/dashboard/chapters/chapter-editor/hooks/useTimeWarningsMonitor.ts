@@ -3,7 +3,7 @@
  * Avisos de tempo são GLOBAIS para toda a sessão (não por capítulo)
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import { useTranslation } from "react-i18next";
 
@@ -75,10 +75,19 @@ export function useTimeWarningsMonitor({
 }: UseTimeWarningsMonitorProps) {
   const { t } = useTranslation("chapter-editor");
 
-  // Carrega avisos apenas uma vez para a sessão (não muda entre capítulos)
-  const warningsShownRef = useRef<TimeWarningTracker>(
+  // Estados para controlar a sessão
+  const [currentSessionId, setCurrentSessionId] = useState(sessionId);
+  const [warningsShown, setWarningsShown] = useState<TimeWarningTracker>(() =>
     loadTimeWarningTracker(sessionId)
   );
+
+  // Recarrega avisos quando a sessão mudar (nova sessão = novo ID)
+  useEffect(() => {
+    if (currentSessionId !== sessionId) {
+      setCurrentSessionId(sessionId);
+      setWarningsShown(loadTimeWarningTracker(sessionId));
+    }
+  }, [sessionId, currentSessionId]);
 
   useEffect(() => {
     // Não exibe avisos se:
@@ -86,36 +95,43 @@ export function useTimeWarningsMonitor({
     // 2. Há uma meta de tempo de sessão ativada
     if (!enabled || hasSessionTimeGoal) return;
 
-    const shown = warningsShownRef.current;
-    let needsSave = false;
-
     // Converte minutos para horas
     const hours = metrics.sessionDuration / 60;
 
-    // Aviso aos 2 horas (120 minutos) - Importante
-    if (hours >= 2 && !shown.twoHours) {
-      shown.twoHours = true;
-      needsSave = true;
-      onWarning(
-        "warning",
-        t("warnings.messages.time.two_hours_title"),
-        t("warnings.messages.time.two_hours_message")
-      );
-    }
+    // Usa a versão funcional do setState para sempre ter o estado mais recente
+    setWarningsShown((currentShown) => {
+      let needsUpdate = false;
+      const newShown = { ...currentShown };
 
-    // Aviso aos 5 horas (300 minutos) - Crítico
-    if (hours >= 5 && !shown.fiveHours) {
-      shown.fiveHours = true;
-      needsSave = true;
-      onWarning(
-        "error",
-        t("warnings.messages.time.five_hours_title"),
-        t("warnings.messages.time.five_hours_message")
-      );
-    }
+      // Aviso aos 2 horas (120 minutos) - Importante
+      if (hours >= 2 && !newShown.twoHours) {
+        newShown.twoHours = true;
+        needsUpdate = true;
+        onWarning(
+          "warning",
+          t("warnings.messages.time.two_hours_title"),
+          t("warnings.messages.time.two_hours_message")
+        );
+      }
 
-    if (needsSave) {
-      saveTimeWarningTracker(sessionId, shown);
-    }
+      // Aviso aos 5 horas (300 minutos) - Crítico
+      if (hours >= 5 && !newShown.fiveHours) {
+        newShown.fiveHours = true;
+        needsUpdate = true;
+        onWarning(
+          "error",
+          t("warnings.messages.time.five_hours_title"),
+          t("warnings.messages.time.five_hours_message")
+        );
+      }
+
+      if (needsUpdate) {
+        saveTimeWarningTracker(sessionId, newShown);
+        return newShown;
+      }
+
+      // Retorna o estado atual sem mudanças
+      return currentShown;
+    });
   }, [metrics.sessionDuration, enabled, hasSessionTimeGoal, sessionId, onWarning, t]);
 }

@@ -32,7 +32,6 @@ export interface WordGoal {
 export interface SessionTimeGoal {
   enabled: boolean;
   targetMinutes: number;
-  warnAt90: boolean;
   warnAt100: boolean;
   silent: boolean;
 }
@@ -64,7 +63,6 @@ export const DEFAULT_WORD_GOAL: WordGoal = {
 export const DEFAULT_SESSION_TIME_GOAL: SessionTimeGoal = {
   enabled: false,
   targetMinutes: 60, // 1 hora
-  warnAt90: true,
   warnAt100: true,
   silent: false,
 };
@@ -83,6 +81,7 @@ export const DEFAULT_GLOBAL_GOALS: GlobalGoals = {
  * Constantes de validação
  */
 export const MIN_WORD_GOAL = 1000;
+export const MIN_SESSION_TIME_GOAL = 5; // Mínimo de 5 minutos
 
 /**
  * Translation keys for chapter statuses
