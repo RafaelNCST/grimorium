@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Check, Sparkles, Clock, CheckCircle2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { ARC_STATUSES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-statuses-constant";
 import type { IPlotArc } from "@/types/plot-types";
 
 export interface FormPlotArcButtonProps {
@@ -60,81 +61,52 @@ export const FormPlotArcButton = React.forwardRef<
 
     const selectedArc = availableArcs.find((arc) => arc.id === value);
 
-    const getStatusIcon = (status: string) => {
-      switch (status) {
-        case "atual":
-          return Sparkles;
-        case "planejamento":
-          return Clock;
-        case "finalizado":
-          return CheckCircle2;
-        default:
-          return Sparkles;
-      }
-    };
-
-    const getStatusIconColor = (status: string) => {
-      switch (status) {
-        case "atual":
-          return "text-blue-600 dark:text-blue-400";
-        case "planejamento":
-          return "text-amber-600 dark:text-amber-400";
-        case "finalizado":
-          return "text-emerald-600 dark:text-emerald-400";
-        default:
-          return "text-primary";
-      }
+    // Map status values to their display colors (matching PlotArcCard)
+    const STATUS_DISPLAY_COLORS: Record<string, string> = {
+      finished:
+        "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+      current:
+        "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+      planning:
+        "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
     };
 
     const getStatusButtonColor = (status: string) => {
       switch (status) {
-        case "atual":
+        case "current":
           return "border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10";
-        case "planejamento":
+        case "planning":
           return "border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10";
-        case "finalizado":
+        case "finished":
           return "border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10";
         default:
           return "border-primary/30 bg-primary/5 hover:bg-primary/10";
       }
     };
 
-    const getStatusBadgeColor = (status: string) => {
-      switch (status) {
-        case "atual":
-          return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30";
-        case "planejamento":
-          return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30";
-        case "finalizado":
-          return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
-        default:
-          return "bg-muted text-muted-foreground border-border";
-      }
-    };
-
-    const getStatusLabel = (status: string) => {
-      switch (status) {
-        case "atual":
-          return "Atual";
-        case "planejamento":
-          return "Planejamento";
-        case "finalizado":
-          return "Finalizado";
-        default:
-          return status;
-      }
-    };
-
     const getStatusActiveRing = (status: string) => {
       switch (status) {
-        case "atual":
+        case "current":
           return "ring-2 ring-blue-500/20";
-        case "planejamento":
+        case "planning":
           return "ring-2 ring-amber-500/20";
-        case "finalizado":
+        case "finished":
           return "ring-2 ring-emerald-500/20";
         default:
           return "ring-2 ring-primary/20";
+      }
+    };
+
+    const getStatusIconColor = (status: string) => {
+      switch (status) {
+        case "current":
+          return "text-blue-600 dark:text-blue-400";
+        case "planning":
+          return "text-amber-600 dark:text-amber-400";
+        case "finished":
+          return "text-emerald-600 dark:text-emerald-400";
+        default:
+          return "text-primary";
       }
     };
 
@@ -163,24 +135,38 @@ export const FormPlotArcButton = React.forwardRef<
               )}
             >
               <div className="flex items-center gap-3 h-full">
-                {React.createElement(getStatusIcon(selectedArc.status), {
-                  className: cn(
-                    "w-5 h-5 shrink-0",
-                    getStatusIconColor(selectedArc.status)
-                  ),
-                })}
+                {(() => {
+                  const statusData = ARC_STATUSES_CONSTANT.find(
+                    (s) => s.value === selectedArc.status
+                  );
+                  return statusData
+                    ? React.createElement(statusData.icon, {
+                        className: cn(
+                          "w-5 h-5 shrink-0",
+                          getStatusIconColor(selectedArc.status)
+                        ),
+                      })
+                    : null;
+                })()}
                 <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
                   <h4 className="font-semibold text-sm truncate">
                     {selectedArc.name}
                   </h4>
-                  <span
-                    className={cn(
-                      "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
-                      getStatusBadgeColor(selectedArc.status)
-                    )}
-                  >
-                    {getStatusLabel(selectedArc.status)}
-                  </span>
+                  {(() => {
+                    const statusData = ARC_STATUSES_CONSTANT.find(
+                      (s) => s.value === selectedArc.status
+                    );
+                    return statusData ? (
+                      <span
+                        className={cn(
+                          "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
+                          STATUS_DISPLAY_COLORS[selectedArc.status]
+                        )}
+                      >
+                        {t(`plot:${statusData.translationKey}`)}
+                      </span>
+                    ) : null;
+                  })()}
                 </div>
               </div>
             </button>
@@ -192,7 +178,16 @@ export const FormPlotArcButton = React.forwardRef<
               className="w-full h-[3.5rem] border-2 border-dashed hover:border-primary/50 hover:bg-primary/5 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+                {(() => {
+                  const currentStatusData = ARC_STATUSES_CONSTANT.find(
+                    (s) => s.value === "current"
+                  );
+                  return currentStatusData
+                    ? React.createElement(currentStatusData.icon, {
+                        className: "h-5 w-5 text-primary",
+                      })
+                    : null;
+                })()}
                 <span className="font-medium">{selectArcLabel}</span>
               </div>
             </Button>
@@ -204,7 +199,16 @@ export const FormPlotArcButton = React.forwardRef<
           <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+                {(() => {
+                  const currentStatusData = ARC_STATUSES_CONSTANT.find(
+                    (s) => s.value === "current"
+                  );
+                  return currentStatusData
+                    ? React.createElement(currentStatusData.icon, {
+                        className: "h-5 w-5 text-primary",
+                      })
+                    : null;
+                })()}
                 {dialogTitle}
               </DialogTitle>
               <DialogDescription>{dialogDescription}</DialogDescription>
@@ -247,7 +251,16 @@ export const FormPlotArcButton = React.forwardRef<
               {/* Arc Options */}
               {availableArcs.length === 0 ? (
                 <div className="p-6 text-center border-2 border-dashed border-border rounded-lg bg-muted/20">
-                  <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  {(() => {
+                    const currentStatusData = ARC_STATUSES_CONSTANT.find(
+                      (s) => s.value === "current"
+                    );
+                    return currentStatusData
+                      ? React.createElement(currentStatusData.icon, {
+                          className: "w-8 h-8 text-muted-foreground mx-auto mb-2",
+                        })
+                      : null;
+                  })()}
                   <p className="text-sm text-muted-foreground">
                     {t("empty-states:plot_arc.no_arc_registered")}
                   </p>
@@ -256,78 +269,87 @@ export const FormPlotArcButton = React.forwardRef<
                   </p>
                 </div>
               ) : (
-                availableArcs.map((arc) => (
-                  <button
-                    key={arc.id}
-                    type="button"
-                    onClick={() => handleSelect(arc.id)}
-                    className={cn(
-                      "w-full text-left p-4 rounded-lg border-2 transition-colors duration-200",
-                      "hover:bg-white/5 dark:hover:bg-white/10",
-                      value === arc.id
-                        ? cn(
-                            getStatusButtonColor(arc.status),
-                            getStatusActiveRing(arc.status)
-                          )
-                        : "border-border bg-card"
-                    )}
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Selection Indicator */}
-                      <div
-                        className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mt-0.5 shrink-0",
-                          value === arc.id
-                            ? cn(
-                                "border-current",
-                                getStatusIconColor(arc.status),
-                                arc.status === "atual" &&
-                                  "bg-blue-600 dark:bg-blue-400",
-                                arc.status === "planejamento" &&
-                                  "bg-amber-600 dark:bg-amber-400",
-                                arc.status === "finalizado" &&
-                                  "bg-emerald-600 dark:bg-emerald-400"
-                              )
-                            : "border-muted-foreground/30"
-                        )}
-                      >
-                        {value === arc.id && (
-                          <Check className="w-3 h-3 text-white dark:text-background" />
-                        )}
-                      </div>
+                availableArcs.map((arc) => {
+                  const statusData = ARC_STATUSES_CONSTANT.find(
+                    (s) => s.value === arc.status
+                  );
 
-                      {/* Arc Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            {React.createElement(getStatusIcon(arc.status), {
-                              className: cn(
-                                "w-4 h-4 shrink-0",
-                                getStatusIconColor(arc.status)
-                              ),
-                            })}
-                            <h4 className="font-semibold text-sm truncate">
-                              {arc.name}
-                            </h4>
-                          </div>
-                          <span
-                            className={cn(
-                              "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
-                              getStatusBadgeColor(arc.status)
-                            )}
-                          >
-                            {getStatusLabel(arc.status)}
-                          </span>
+                  return (
+                    <button
+                      key={arc.id}
+                      type="button"
+                      onClick={() => handleSelect(arc.id)}
+                      className={cn(
+                        "w-full text-left p-4 rounded-lg border-2 transition-colors duration-200",
+                        "hover:bg-white/5 dark:hover:bg-white/10",
+                        value === arc.id
+                          ? cn(
+                              getStatusButtonColor(arc.status),
+                              getStatusActiveRing(arc.status)
+                            )
+                          : "border-border bg-card"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Selection Indicator */}
+                        <div
+                          className={cn(
+                            "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mt-0.5 shrink-0",
+                            value === arc.id
+                              ? cn(
+                                  "border-current",
+                                  getStatusIconColor(arc.status),
+                                  arc.status === "current" &&
+                                    "bg-blue-600 dark:bg-blue-400",
+                                  arc.status === "planning" &&
+                                    "bg-amber-600 dark:bg-amber-400",
+                                  arc.status === "finished" &&
+                                    "bg-emerald-600 dark:bg-emerald-400"
+                                )
+                              : "border-muted-foreground/30"
+                          )}
+                        >
+                          {value === arc.id && (
+                            <Check className="w-3 h-3 text-white dark:text-background" />
+                          )}
                         </div>
-                        {arc.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                            {arc.description}
-                          </p>
-                        )}
+
+                        {/* Arc Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              {statusData &&
+                                React.createElement(statusData.icon, {
+                                  className: cn(
+                                    "w-4 h-4 shrink-0",
+                                    getStatusIconColor(arc.status)
+                                  ),
+                                })}
+                              <h4 className="font-semibold text-sm truncate">
+                                {arc.name}
+                              </h4>
+                            </div>
+                            {statusData && (
+                              <span
+                                className={cn(
+                                  "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
+                                  STATUS_DISPLAY_COLORS[arc.status]
+                                )}
+                              >
+                                {t(`plot:${statusData.translationKey}`)}
+                              </span>
+                            )}
+                          </div>
+                          {arc.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                              {arc.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))
+                    </button>
+                  );
+                })
               )}
             </div>
           </DialogContent>

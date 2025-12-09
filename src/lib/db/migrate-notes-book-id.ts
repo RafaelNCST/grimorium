@@ -7,7 +7,7 @@
  * 3. If no books exist, deletes existing notes
  */
 
-import { Database } from "@tauri-apps/plugin-sql";
+import Database from "@tauri-apps/plugin-sql";
 
 export async function migrateNotesBookId() {
   try {

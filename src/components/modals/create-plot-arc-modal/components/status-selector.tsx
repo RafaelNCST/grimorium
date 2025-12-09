@@ -1,4 +1,3 @@
-import { CheckCircle2, Clock, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -7,6 +6,7 @@ import {
 } from "@/components/forms/FormSimpleGrid";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { Label } from "@/components/ui/label";
+import { ARC_STATUSES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-statuses-constant";
 import type { PlotArcStatus } from "@/types/plot-types";
 
 interface PropsStatusSelector {
@@ -22,29 +22,21 @@ export function StatusSelector({
 }: PropsStatusSelector) {
   const { t } = useTranslation("create-plot-arc");
 
-  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = [
-    {
-      value: "planning",
-      label: t("statuses.planning"),
-      icon: Pencil,
-      backgroundColor: "amber-500/10",
-      borderColor: "amber-500/30",
-    },
-    {
-      value: "current",
-      label: t("statuses.current"),
-      icon: Clock,
-      backgroundColor: "blue-500/10",
-      borderColor: "blue-500/30",
-    },
-    {
-      value: "finished",
-      label: t("statuses.finished"),
-      icon: CheckCircle2,
-      backgroundColor: "green-500/10",
-      borderColor: "green-500/30",
-    },
-  ];
+  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = ARC_STATUSES_CONSTANT.map((status) => ({
+    value: status.value,
+    label: t(`statuses.${status.value}`),
+    icon: status.icon,
+    backgroundColor: status.value === "finished"
+      ? "emerald-500/10"
+      : status.value === "current"
+        ? "blue-500/10"
+        : "amber-500/10",
+    borderColor: status.value === "finished"
+      ? "emerald-500/30"
+      : status.value === "current"
+        ? "blue-500/30"
+        : "amber-500/30",
+  }));
 
   // Filter out "current" option if there's already a current arc
   const availableOptions = STATUS_OPTIONS.map((option) => ({

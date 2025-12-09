@@ -9,10 +9,6 @@ import {
   AlignJustify,
   Undo,
   Redo,
-  MessageSquare,
-  Sparkles,
-  Clock,
-  CheckCircle2,
   Check,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -25,7 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -41,6 +36,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { ARC_STATUSES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-statuses-constant";
 import type { IPlotArc } from "@/types/plot-types";
 
 import { useFormatState } from "../hooks/useFormatState";
@@ -91,81 +87,52 @@ export function FormattingToolbar({
   // Use format state hook to detect active formatting
   const formatState = useFormatState();
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "atual":
-        return Sparkles;
-      case "planejamento":
-        return Clock;
-      case "finalizado":
-        return CheckCircle2;
-      default:
-        return Sparkles;
-    }
-  };
-
-  const getStatusIconColor = (status: string) => {
-    switch (status) {
-      case "atual":
-        return "text-blue-600 dark:text-blue-400";
-      case "planejamento":
-        return "text-amber-600 dark:text-amber-400";
-      case "finalizado":
-        return "text-emerald-600 dark:text-emerald-400";
-      default:
-        return "text-primary";
-    }
+  // Map status values to their display colors (matching PlotArcCard)
+  const STATUS_DISPLAY_COLORS: Record<string, string> = {
+    finished:
+      "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+    current:
+      "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+    planning:
+      "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
   };
 
   const getStatusButtonColor = (status: string) => {
     switch (status) {
-      case "atual":
+      case "current":
         return "border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10";
-      case "planejamento":
+      case "planning":
         return "border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10";
-      case "finalizado":
+      case "finished":
         return "border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10";
       default:
         return "border-primary/30 bg-primary/5 hover:bg-primary/10";
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "atual":
-        return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30";
-      case "planejamento":
-        return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30";
-      case "finalizado":
-        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30";
-      default:
-        return "bg-muted text-muted-foreground border-border";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "atual":
-        return "Atual";
-      case "planejamento":
-        return "Planejamento";
-      case "finalizado":
-        return "Finalizado";
-      default:
-        return status;
-    }
-  };
-
   const getStatusActiveRing = (status: string) => {
     switch (status) {
-      case "atual":
+      case "current":
         return "ring-2 ring-blue-500/20";
-      case "planejamento":
+      case "planning":
         return "ring-2 ring-amber-500/20";
-      case "finalizado":
+      case "finished":
         return "ring-2 ring-emerald-500/20";
       default:
         return "ring-2 ring-primary/20";
+    }
+  };
+
+  const getStatusIconColor = (status: string) => {
+    switch (status) {
+      case "current":
+        return "text-blue-600 dark:text-blue-400";
+      case "planning":
+        return "text-amber-600 dark:text-amber-400";
+      case "finished":
+        return "text-emerald-600 dark:text-emerald-400";
+      default:
+        return "text-primary";
     }
   };
 
@@ -374,12 +341,19 @@ export function FormattingToolbar({
                 <div className="flex items-center gap-2">
                   {selectedArc ? (
                     <>
-                      {React.createElement(getStatusIcon(selectedArc.status), {
-                        className: cn(
-                          "w-4 h-4",
-                          getStatusIconColor(selectedArc.status)
-                        ),
-                      })}
+                      {(() => {
+                        const statusData = ARC_STATUSES_CONSTANT.find(
+                          (s) => s.value === selectedArc.status
+                        );
+                        return statusData
+                          ? React.createElement(statusData.icon, {
+                              className: cn(
+                                "w-4 h-4",
+                                getStatusIconColor(selectedArc.status)
+                              ),
+                            })
+                          : null;
+                      })()}
                       <span>{selectedArc.name}</span>
                     </>
                   ) : (
@@ -399,7 +373,16 @@ export function FormattingToolbar({
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              {(() => {
+                const currentStatusData = ARC_STATUSES_CONSTANT.find(
+                  (s) => s.value === "current"
+                );
+                return currentStatusData
+                  ? React.createElement(currentStatusData.icon, {
+                      className: "h-5 w-5 text-primary",
+                    })
+                  : null;
+              })()}
               {t("arc.dialog_title")}
             </DialogTitle>
             <DialogDescription>{t("arc.dialog_description")}</DialogDescription>
@@ -444,7 +427,16 @@ export function FormattingToolbar({
             {/* Arc Options */}
             {availableArcs.length === 0 ? (
               <div className="p-6 text-center border-2 border-dashed border-border rounded-lg bg-muted/20">
-                <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                {(() => {
+                  const currentStatusData = ARC_STATUSES_CONSTANT.find(
+                    (s) => s.value === "current"
+                  );
+                  return currentStatusData
+                    ? React.createElement(currentStatusData.icon, {
+                        className: "w-8 h-8 text-muted-foreground mx-auto mb-2",
+                      })
+                    : null;
+                })()}
                 <p className="text-sm text-muted-foreground">
                   {t("empty-states:plot_arc.no_arc_registered")}
                 </p>
@@ -455,6 +447,9 @@ export function FormattingToolbar({
             ) : (
               availableArcs.map((arc) => {
                 const isSelected = plotArcId === arc.id;
+                const statusData = ARC_STATUSES_CONSTANT.find(
+                  (s) => s.value === arc.status
+                );
 
                 return (
                   <button
@@ -483,11 +478,11 @@ export function FormattingToolbar({
                             ? cn(
                                 "border-current",
                                 getStatusIconColor(arc.status),
-                                arc.status === "atual" &&
+                                arc.status === "current" &&
                                   "bg-blue-600 dark:bg-blue-400",
-                                arc.status === "planejamento" &&
+                                arc.status === "planning" &&
                                   "bg-amber-600 dark:bg-amber-400",
-                                arc.status === "finalizado" &&
+                                arc.status === "finished" &&
                                   "bg-emerald-600 dark:bg-emerald-400"
                               )
                             : "border-muted-foreground/30"
@@ -502,24 +497,27 @@ export function FormattingToolbar({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
-                            {React.createElement(getStatusIcon(arc.status), {
-                              className: cn(
-                                "w-4 h-4 shrink-0",
-                                getStatusIconColor(arc.status)
-                              ),
-                            })}
+                            {statusData &&
+                              React.createElement(statusData.icon, {
+                                className: cn(
+                                  "w-4 h-4 shrink-0",
+                                  getStatusIconColor(arc.status)
+                                ),
+                              })}
                             <h4 className="font-semibold text-sm truncate">
                               {arc.name}
                             </h4>
                           </div>
-                          <span
-                            className={cn(
-                              "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
-                              getStatusBadgeColor(arc.status)
-                            )}
-                          >
-                            {getStatusLabel(arc.status)}
-                          </span>
+                          {statusData && (
+                            <span
+                              className={cn(
+                                "text-xs px-2 py-0.5 rounded-full border font-medium shrink-0",
+                                STATUS_DISPLAY_COLORS[arc.status]
+                              )}
+                            >
+                              {t(`plot:${statusData.translationKey}`)}
+                            </span>
+                          )}
                         </div>
                         {arc.description && (
                           <p className="text-xs text-muted-foreground line-clamp-2 mt-1">

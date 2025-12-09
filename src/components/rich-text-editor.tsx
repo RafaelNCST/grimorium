@@ -9,6 +9,7 @@ import {
   Heading2,
   Heading3,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,8 +26,10 @@ export function RichTextEditor({
   content,
   onChange,
   readOnly = false,
-  placeholder = "Comece a escrever...",
+  placeholder,
 }: PropsRichTextEditor) {
+  const { t } = useTranslation("chapter-editor");
+  const defaultPlaceholder = placeholder || t("editor.placeholder");
   const editorRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -164,7 +167,7 @@ export function RichTextEditor({
           fontSize: "16px",
           lineHeight: "1.6",
         }}
-        data-placeholder={placeholder}
+        data-placeholder={defaultPlaceholder}
         suppressContentEditableWarning
       />
 

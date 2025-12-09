@@ -23,7 +23,7 @@
  * - halfSiblings: string[]
  */
 
-import { Database } from "@tauri-apps/plugin-sql";
+import Database from "@tauri-apps/plugin-sql";
 
 import { type ICharacter } from "@/types/character-types";
 
