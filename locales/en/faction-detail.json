@@ -34,7 +34,8 @@
     "timeline": "Faction Timeline",
     "diplomacy": "Diplomacy",
     "hierarchy": "Hierarchy",
-    "territory": "Territory"
+    "territory": "Territory",
+    "chapter_metrics": "Chapter Metrics"
   },
   "fields": {
     "image": "Image",

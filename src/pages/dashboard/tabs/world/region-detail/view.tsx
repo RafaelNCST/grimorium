@@ -1384,7 +1384,7 @@ export function RegionDetailView({
                 ? [
                     {
                       id: "chapter-metrics",
-                      title: t("empty-states:timeline.chapter_metrics_title"),
+                      title: t("chapter-metrics:entity_section.title"),
                       content: (
                         <EntityChapterMetricsSection
                           bookId={bookId}

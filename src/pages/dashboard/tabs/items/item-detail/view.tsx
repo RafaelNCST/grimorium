@@ -888,7 +888,7 @@ export const ItemDetailView = React.memo(
                   ? [
                       {
                         id: "chapter-metrics",
-                        title: "Métricas de capítulo",
+                        title: t("chapter-metrics:entity_section.title"),
                         content: (
                           <EntityChapterMetricsSection
                             bookId={item.bookId}

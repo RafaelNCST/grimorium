@@ -69,7 +69,7 @@ export function EntityChapterMetricsSection({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : !metrics || metrics.totalMentions === 0 ? (
-        <InfoAlert>{t("entity_section.no_mentions")}</InfoAlert>
+        <InfoAlert>{t(`entity_section.no_mentions.${entityType}`)}</InfoAlert>
       ) : (
         <div className="space-y-6">
           {/* Total Mentions - Destacado */}

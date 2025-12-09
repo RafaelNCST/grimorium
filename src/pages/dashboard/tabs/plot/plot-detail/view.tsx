@@ -994,7 +994,7 @@ export function PlotArcDetailView({
           {/* Chapter Metrics Section - Only visible in view mode */}
           {!isEditing && (
             <CollapsibleSection
-              title="Métricas de capítulo"
+              title={t("chapter-metrics:plot_section.title")}
               isOpen={chapterMetricsSectionOpen}
               onToggle={() =>
                 setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)

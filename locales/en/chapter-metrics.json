@@ -1,7 +1,13 @@
 {
   "entity_section": {
     "title": "Chapter Metrics",
-    "no_mentions": "This entity has not been mentioned in any chapter yet.",
+    "no_mentions": {
+      "character": "This character has not been mentioned in any chapter yet.",
+      "region": "This region has not been mentioned in any chapter yet.",
+      "item": "This item has not been mentioned in any chapter yet.",
+      "faction": "This faction has not been mentioned in any chapter yet.",
+      "race": "This race has not been mentioned in any chapter yet."
+    },
     "total_mentions": "Total mentions",
     "chapter_singular": "chapter",
     "chapter_plural": "chapters",
