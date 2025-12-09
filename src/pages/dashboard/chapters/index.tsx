@@ -102,7 +102,12 @@ export function ChaptersPage() {
   const [showWarningsSettingsModal, setShowWarningsSettingsModal] =
     useState(false);
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Inicializar loading com base no cache - se já tem cache, não mostrar loading
+  const [isLoading, setIsLoading] = useState(() => {
+    const hasCache = Object.keys(chaptersCache).length > 0;
+    return !hasCache; // Se tem cache, não está loading
+  });
 
   // Use ref to track if we've already loaded to prevent infinite loops
   // Track by dashboardId to reload when switching books
@@ -151,6 +156,14 @@ export function ChaptersPage() {
       mentionedRaces: ch.mentionedRaces || [],
     }));
   }, [chaptersCache, plotArcs]);
+
+  // Remover loading quando houver cache
+  useEffect(() => {
+    if (Object.keys(chaptersCache).length > 0 && isLoading) {
+      setIsLoading(false);
+      hasLoadedRef.current[dashboardId] = true;
+    }
+  }, [chaptersCache, dashboardId, isLoading]);
 
   // Load plot arcs and fresh data from database if needed
   useEffect(() => {
