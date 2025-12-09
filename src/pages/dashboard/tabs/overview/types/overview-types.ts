@@ -54,7 +54,7 @@ export interface IOverviewStats {
   chaptersInProgress: number;
   chaptersFinished: number;
   chaptersDraft: number;
-  chaptersPlanning: number;
+  chaptersReview: number;
   averageWordsPerChapter: number;
   averageCharactersPerChapter: number;
 }

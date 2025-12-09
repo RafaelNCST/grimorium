@@ -122,7 +122,7 @@ const DEFAULT_OVERVIEW_STATS: IOverviewStats = {
   chaptersInProgress: 0,
   chaptersFinished: 0,
   chaptersDraft: 0,
-  chaptersPlanning: 0,
+  chaptersReview: 0,
   averageWordsPerChapter: 0,
   averageCharactersPerChapter: 0,
 };
@@ -812,25 +812,27 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
       );
       const totalChapters = chapters.length;
 
-      const finishedChapters = chapters.filter((ch) => ch.status === "finished");
-      const lastFinishedChapter =
-        finishedChapters.length > 0
-          ? finishedChapters.reduce((prev, current) => {
+      const publishedChapters = chapters.filter((ch) => ch.status === "published");
+      const lastPublishedChapter =
+        publishedChapters.length > 0
+          ? publishedChapters.reduce((prev, current) => {
               const prevNum = parseInt(prev.chapterNumber) || 0;
               const currentNum = parseInt(current.chapterNumber) || 0;
               return currentNum > prevNum ? current : prev;
             })
           : null;
 
-      const lastChapterNumber = lastFinishedChapter
-        ? parseInt(lastFinishedChapter.chapterNumber) || 0
+      const lastChapterNumber = lastPublishedChapter
+        ? parseInt(lastPublishedChapter.chapterNumber) || 0
         : 0;
-      const lastChapterName = lastFinishedChapter?.title || "";
+      const lastChapterName = lastPublishedChapter?.title || "";
+
+      const finishedChapters = chapters.filter((ch) => ch.status === "finished");
 
       const averageWordsPerChapter =
-        totalChapters > 0 ? Math.round(totalWords / totalChapters) : 0;
+        totalChapters > 0 ? totalWords / totalChapters : 0;
       const averageCharactersPerChapter =
-        totalChapters > 0 ? Math.round(totalCharacters / totalChapters) : 0;
+        totalChapters > 0 ? totalCharacters / totalChapters : 0;
 
       let averagePerWeek = 0;
       let averagePerMonth = 0;
@@ -854,14 +856,8 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
           const weeks = diffDays / 7;
           const months = diffDays / 30;
 
-          averagePerWeek =
-            weeks > 0
-              ? parseFloat((finishedChapters.length / weeks).toFixed(1))
-              : 0;
-          averagePerMonth =
-            months > 0
-              ? parseFloat((finishedChapters.length / months).toFixed(1))
-              : 0;
+          averagePerWeek = weeks > 0 ? finishedChapters.length / weeks : 0;
+          averagePerMonth = months > 0 ? finishedChapters.length / months : 0;
         }
       }
 
@@ -874,8 +870,8 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
       const chaptersDraft = chapters.filter(
         (ch) => ch.status === "draft"
       ).length;
-      const chaptersPlanning = chapters.filter(
-        (ch) => ch.status === "planning"
+      const chaptersReview = chapters.filter(
+        (ch) => ch.status === "review"
       ).length;
 
       set((state) => {
@@ -898,7 +894,7 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
                 chaptersInProgress,
                 chaptersFinished,
                 chaptersDraft,
-                chaptersPlanning,
+                chaptersReview,
                 averageWordsPerChapter,
                 averageCharactersPerChapter,
               },

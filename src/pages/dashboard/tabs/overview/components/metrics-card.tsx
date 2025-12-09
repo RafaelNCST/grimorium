@@ -109,8 +109,7 @@ export function MetricsCard({
     {
       icon: Type,
       label: t("stats.total_words"),
-      value:
-        stats.totalWords > 0 ? `${(stats.totalWords / 1000).toFixed(1)}k` : "0",
+      value: stats.totalWords.toLocaleString(),
       delay: "0s",
       colorClass: "text-primary",
       bgColorClass: "bg-primary/10",
@@ -118,10 +117,7 @@ export function MetricsCard({
     {
       icon: Hash,
       label: t("stats.total_characters"),
-      value:
-        stats.totalCharacters > 0
-          ? `${(stats.totalCharacters / 1000).toFixed(0)}k`
-          : "0",
+      value: stats.totalCharacters.toLocaleString(),
       delay: "0.05s",
       colorClass: "text-primary",
       bgColorClass: "bg-primary/10",
@@ -136,10 +132,10 @@ export function MetricsCard({
     },
     {
       icon: Target,
-      label: t("stats.last_released_chapter"),
+      label: t("stats.last_published_chapter"),
       value:
         stats.lastChapterNumber > 0
-          ? `Cap. ${stats.lastChapterNumber}`
+          ? `${t("stats.chapter_prefix")} ${stats.lastChapterNumber}`
           : t("stats.no_chapter"),
       subtitle: stats.lastChapterName,
       delay: "0.15s",
@@ -153,7 +149,7 @@ export function MetricsCard({
     {
       icon: TrendingUp,
       label: t("stats.average_per_week"),
-      value: stats.averagePerWeek,
+      value: Math.floor(stats.averagePerWeek).toLocaleString(),
       delay: "0.2s",
       colorClass: "text-green-600 dark:text-green-500",
       bgColorClass: "bg-green-500/10",
@@ -161,7 +157,7 @@ export function MetricsCard({
     {
       icon: Calendar,
       label: t("stats.average_per_month"),
-      value: stats.averagePerMonth,
+      value: Math.floor(stats.averagePerMonth).toLocaleString(),
       delay: "0.25s",
       colorClass: "text-green-600 dark:text-green-500",
       bgColorClass: "bg-green-500/10",
@@ -169,7 +165,7 @@ export function MetricsCard({
     {
       icon: Type,
       label: t("stats.average_words_per_chapter"),
-      value: stats.averageWordsPerChapter,
+      value: Math.floor(stats.averageWordsPerChapter).toLocaleString(),
       delay: "0.3s",
       colorClass: "text-green-600 dark:text-green-500",
       bgColorClass: "bg-green-500/10",
@@ -177,7 +173,7 @@ export function MetricsCard({
     {
       icon: Hash,
       label: t("stats.average_characters_per_chapter"),
-      value: stats.averageCharactersPerChapter,
+      value: Math.floor(stats.averageCharactersPerChapter).toLocaleString(),
       delay: "0.35s",
       colorClass: "text-green-600 dark:text-green-500",
       bgColorClass: "bg-green-500/10",
@@ -212,8 +208,8 @@ export function MetricsCard({
     },
     {
       icon: ClipboardList,
-      label: t("stats.chapters_planning"),
-      value: stats.chaptersPlanning,
+      label: t("stats.chapters_review"),
+      value: stats.chaptersReview,
       delay: "0.55s",
       colorClass: "text-amber-600 dark:text-amber-500",
       bgColorClass: "bg-amber-500/10",
