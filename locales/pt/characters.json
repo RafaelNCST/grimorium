@@ -1,5 +1,8 @@
 {
   "tab_title": "Personagens",
+  "header": {
+    "title": "personagens"
+  },
   "page": {
     "title": "Personagens",
     "description": "Gerencie os personagens da sua história",

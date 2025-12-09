@@ -1,5 +1,8 @@
 {
   "tab_title": "Characters",
+  "header": {
+    "title": "characters"
+  },
   "page": {
     "title": "Characters",
     "description": "Manage your story's characters",

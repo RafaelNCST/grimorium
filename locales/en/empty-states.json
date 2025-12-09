@@ -68,6 +68,10 @@
     "no_character_registered": "No character registered",
     "no_faction_registered": "No faction registered",
     "no_race_registered": "No race registered",
-    "no_item_registered": "No item registered"
+    "no_item_registered": "No item registered",
+    "not_enough": "Not enough {{entityName}}",
+    "need_to_register_more": "You need to register more {{entityName}} before adding here.",
+    "all_added": "All available {{entityName}} have been added",
+    "to_add_more_register_new": "To add more, first register new {{entityName}}."
   }
 }

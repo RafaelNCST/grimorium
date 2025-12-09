@@ -1,5 +1,11 @@
 {
   "tab_title": "Factions",
+  "header": {
+    "title": "factions"
+  },
+  "sidebar": {
+    "title": "Factions"
+  },
   "page": {
     "title": "Factions",
     "description": "Manage the factions, kingdoms, sects and groups of your world",

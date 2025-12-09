@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { X, Search, Shield } from "lucide-react";
+import { X, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntitySearchBar } from "@/components/entity-list/EntitySearchBar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IFaction {
@@ -29,7 +29,7 @@ export function FactionNavigationSidebar({
   currentFactionId,
   onFactionSelect,
 }: PropsFactionNavigationSidebar) {
-  const { t } = useTranslation(["empty-states", "forms", "common"]);
+  const { t } = useTranslation(["empty-states", "factions", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Separate current faction from others
@@ -54,7 +54,7 @@ export function FactionNavigationSidebar({
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
           <Shield className="w-5 h-5 text-muted-foreground" />
-          <h2 className="font-semibold">Facções</h2>
+          <h2 className="font-semibold">{t("factions:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({factions.length})
           </span>
@@ -71,15 +71,12 @@ export function FactionNavigationSidebar({
 
       {/* Search */}
       <div className="p-4 border-b border-border bg-card">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("forms:placeholders.search_faction")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+        <EntitySearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder={t("factions:page.search_placeholder")}
+          maxWidth="w-full"
+        />
       </div>
 
       {/* Current Faction */}
