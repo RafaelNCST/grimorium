@@ -32,7 +32,11 @@ import {
   WarningAction,
 } from "../types/warnings";
 
-const WARNINGS_STORAGE_KEY = "grimorium_chapter_warnings";
+/**
+ * Gera uma chave de armazenamento única para cada capítulo
+ */
+const getStorageKey = (chapterId: string) =>
+  `grimorium_chapter_warnings_${chapterId}`;
 
 interface WarningsContextValue {
   warnings: Warning[];
@@ -60,20 +64,23 @@ const WarningsContext = createContext<WarningsContextValue | undefined>(
 
 interface WarningsProviderProps {
   children: ReactNode;
+  chapterId: string;
   showWarningToasts?: boolean;
 }
 
 export function WarningsProvider({
   children,
+  chapterId,
   showWarningToasts: initialShowToasts = true,
 }: WarningsProviderProps) {
   const { t } = useTranslation("chapter-editor");
   const { settings } = useWarningsSettings();
 
-  // Carrega avisos do localStorage na inicialização
+  // Carrega avisos do localStorage na inicialização e quando o capítulo mudar
   const [warnings, setWarnings] = useState<Warning[]>(() => {
     try {
-      const stored = localStorage.getItem(WARNINGS_STORAGE_KEY);
+      const storageKey = getStorageKey(chapterId);
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         return JSON.parse(stored);
       }
@@ -84,14 +91,31 @@ export function WarningsProvider({
   });
   const [showWarningToasts, setShowWarningToasts] = useState(initialShowToasts);
 
+  // Recarrega avisos quando o capítulo mudar
+  useEffect(() => {
+    try {
+      const storageKey = getStorageKey(chapterId);
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        setWarnings(JSON.parse(stored));
+      } else {
+        setWarnings([]);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar avisos do localStorage:", error);
+      setWarnings([]);
+    }
+  }, [chapterId]);
+
   // Salva avisos no localStorage sempre que mudarem
   useEffect(() => {
     try {
-      localStorage.setItem(WARNINGS_STORAGE_KEY, JSON.stringify(warnings));
+      const storageKey = getStorageKey(chapterId);
+      localStorage.setItem(storageKey, JSON.stringify(warnings));
     } catch (error) {
       console.error("Erro ao salvar avisos no localStorage:", error);
     }
-  }, [warnings]);
+  }, [warnings, chapterId]);
 
   /**
    * Calcula estatísticas dos avisos

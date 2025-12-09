@@ -970,8 +970,13 @@ function ChapterEditorContent() {
 }
 
 export function ChapterEditorNew() {
+  const params = useParams({
+    from: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
+  });
+  const editorChaptersId = params["editor-chapters-id"];
+
   return (
-    <WarningsProvider showWarningToasts>
+    <WarningsProvider chapterId={editorChaptersId} showWarningToasts>
       <ChapterEditorContent />
     </WarningsProvider>
   );
