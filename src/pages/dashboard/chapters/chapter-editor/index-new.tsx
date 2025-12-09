@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
-import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import {
   getChapterById,
   updateChapter as updateChapterInDB,
@@ -29,13 +27,8 @@ import { StatsBar } from "./components/StatsBar";
 import { StatsDetailModal } from "./components/StatsDetailModal";
 import { SummarySection } from "./components/SummarySection";
 import { TextEditor, type TextEditorRef } from "./components/TextEditor";
-import { WarningsSidebar } from "./components/WarningsSidebar";
-import { WarningsProvider, useWarnings } from "./context/WarningsContext";
 import { useChapterMetrics } from "./hooks/useChapterMetrics";
-import { useGlobalGoalsMonitor } from "./hooks/useGlobalGoalsMonitor";
 import { useSessionTimer } from "./hooks/useSessionTimer";
-import { useTimeWarningsMonitor } from "./hooks/useTimeWarningsMonitor";
-import { useTypographyWarningsMonitor } from "./hooks/useTypographyWarningsMonitor";
 import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
 import type {
@@ -63,9 +56,6 @@ function ChapterEditorContent() {
   } = useChaptersStore();
 
   const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
-
-  const { stats: warningStats, setShowWarningToasts } = useWarnings();
-  const { goals: globalGoals } = useGlobalGoals();
 
   // Load chapter from store or create default
   const initialChapter = getChapter(editorChaptersId) || {
@@ -116,9 +106,6 @@ function ChapterEditorContent() {
     null
   );
 
-  // Warnings state
-  const [showWarningsSidebar, setShowWarningsSidebar] = useState(false);
-
   // Plot Arc Events state
   const [showPlotArcEventsSidebar, setShowPlotArcEventsSidebar] =
     useState(false);
@@ -135,64 +122,6 @@ function ChapterEditorContent() {
     content: chapter.content,
     sessionDuration: sessionMinutes,
   });
-
-  // Monitor global goals
-  const { addWarning } = useWarnings();
-  const { settings: warningsSettings } = useWarningsSettings();
-
-  const handleGoalWarning = useCallback(
-    (severity: "info" | "warning" | "error", title: string, message: string) => {
-      addWarning("goals", severity, title, message);
-    },
-    [addWarning]
-  );
-
-  const handleTimeWarning = useCallback(
-    (severity: "info" | "warning" | "error", title: string, message: string) => {
-      addWarning("time", severity, title, message);
-    },
-    [addWarning]
-  );
-
-  const handleTypographyWarning = useCallback(
-    (severity: "info" | "warning" | "error", title: string, message: string) => {
-      addWarning("typography", severity, title, message);
-    },
-    [addWarning]
-  );
-
-  useGlobalGoalsMonitor({
-    metrics,
-    globalGoals,
-    chapterStatus: chapter.status,
-    chapterId: editorChaptersId,
-    sessionId: sessionId,
-    onWarning: handleGoalWarning,
-  });
-
-  // Monitor time warnings (GLOBAL para toda a sessão)
-  useTimeWarningsMonitor({
-    metrics,
-    enabled: warningsSettings.timeWarningsEnabled && warningsSettings.enabled,
-    hasSessionTimeGoal: globalGoals.sessionTime.enabled,
-    sessionId: sessionId,
-    onWarning: handleTimeWarning,
-  });
-
-  // Monitor typography warnings
-  useTypographyWarningsMonitor({
-    metrics,
-    enabled:
-      warningsSettings.typographyWarningsEnabled && warningsSettings.enabled,
-    hasWordGoal: globalGoals.words.enabled,
-    chapterId: editorChaptersId,
-    onWarning: handleTypographyWarning,
-  });
-
-  // Sync showWarningToasts setting with warnings context
-  useEffect(() => {
-    setShowWarningToasts(editorSettings.showWarningToasts);
-  }, [editorSettings.showWarningToasts, setShowWarningToasts]);
 
   // Keep a ref to the latest chapter to avoid re-creating save functions
   const chapterRef = useRef(chapter);
@@ -725,7 +654,6 @@ function ChapterEditorContent() {
     setShowAnnotationsSidebar(false);
     setSelectedAnnotationId(null);
     setShowAllAnnotationsSidebar(false);
-    setShowWarningsSidebar(false);
     // Toggle plot arc events sidebar
     setShowPlotArcEventsSidebar(!showPlotArcEventsSidebar);
   };
@@ -755,7 +683,6 @@ function ChapterEditorContent() {
   const hasSidebarOpen =
     showAnnotationsSidebar ||
     showAllAnnotationsSidebar ||
-    showWarningsSidebar ||
     showPlotArcEventsSidebar;
 
   return (
@@ -770,9 +697,7 @@ function ChapterEditorContent() {
           chapterNumber={chapter.chapterNumber}
           title={chapter.title}
           showAllAnnotationsSidebar={showAllAnnotationsSidebar}
-          showWarningsSidebar={showWarningsSidebar}
           showPlotArcEventsSidebar={showPlotArcEventsSidebar}
-          warningsCount={warningStats.total}
           hasPlotArc={!!currentPlotArc}
           previousChapter={
             previousChapter
@@ -803,22 +728,10 @@ function ChapterEditorContent() {
             // Close specific annotation sidebar if open
             setShowAnnotationsSidebar(false);
             setSelectedAnnotationId(null);
-            // Close warnings sidebar
-            setShowWarningsSidebar(false);
             // Close plot arc events sidebar
             setShowPlotArcEventsSidebar(false);
             // Toggle all annotations sidebar
             setShowAllAnnotationsSidebar(!showAllAnnotationsSidebar);
-          }}
-          onShowWarnings={() => {
-            // Close annotation sidebars if open
-            setShowAnnotationsSidebar(false);
-            setSelectedAnnotationId(null);
-            setShowAllAnnotationsSidebar(false);
-            // Close plot arc events sidebar
-            setShowPlotArcEventsSidebar(false);
-            // Toggle warnings sidebar
-            setShowWarningsSidebar(!showWarningsSidebar);
           }}
           onShowPlotArcEvents={handleShowPlotArcEvents}
           onShowSettings={() => setShowSettingsModal(true)}
@@ -954,12 +867,6 @@ function ChapterEditorContent() {
         />
       )}
 
-      {/* Warnings Sidebar */}
-      <WarningsSidebar
-        isOpen={showWarningsSidebar}
-        onClose={() => setShowWarningsSidebar(false)}
-      />
-
       {/* Plot Arc Events Sidebar */}
       {showPlotArcEventsSidebar && currentPlotArc && (
         <PlotArcEventsSidebar
@@ -974,8 +881,6 @@ function ChapterEditorContent() {
         metrics={metrics}
         isSaving={isSaving}
         onOpenDetails={() => setShowStatsDetailModal(true)}
-        globalGoals={globalGoals}
-        chapterStatus={chapter.status}
       />
 
       {/* Editor Settings Modal */}
@@ -1013,14 +918,5 @@ function ChapterEditorContent() {
 }
 
 export function ChapterEditorNew() {
-  const params = useParams({
-    from: "/dashboard/$dashboardId/chapters/$editor-chapters-id",
-  });
-  const editorChaptersId = params["editor-chapters-id"];
-
-  return (
-    <WarningsProvider chapterId={editorChaptersId} showWarningToasts>
-      <ChapterEditorContent />
-    </WarningsProvider>
-  );
+  return <ChapterEditorContent />;
 }

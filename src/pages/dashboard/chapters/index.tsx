@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { FileText, Plus, ArrowLeft, Target, Bell } from "lucide-react";
+import { FileText, Plus, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntitySearchBar } from "@/components/entity-list";
@@ -11,8 +11,6 @@ import {
   type IChapterFormData,
   type EntityMention,
 } from "@/components/modals/create-chapter-modal";
-import { GlobalGoalsModal } from "@/components/modals/global-goals-modal";
-import { WarningsSettingsModal } from "@/components/modals/warnings-settings-modal";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -25,8 +23,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
-import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import {
   getChapterMetadataByBookId,
   createChapter,
@@ -98,9 +94,6 @@ export function ChaptersPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showGoalsModal, setShowGoalsModal] = useState(false);
-  const [showWarningsSettingsModal, setShowWarningsSettingsModal] =
-    useState(false);
   const [plotArcs, setPlotArcs] = useState<IPlotArc[]>([]);
 
   // Inicializar loading com base no cache - se já tem cache, não mostrar loading
@@ -112,10 +105,6 @@ export function ChaptersPage() {
   // Use ref to track if we've already loaded to prevent infinite loops
   // Track by dashboardId to reload when switching books
   const hasLoadedRef = useRef<Record<string, boolean>>({});
-
-  const { goals: globalGoals, updateGoals } = useGlobalGoals();
-  const { settings: warningsSettings, updateSettings: updateWarningsSettings } =
-    useWarningsSettings();
 
   // Get translated status config
   const statusConfig = getStatusConfig(t);
@@ -437,24 +426,6 @@ export function ChaptersPage() {
         <div className="flex-1" />
 
         <Button
-          onClick={() => setShowGoalsModal(true)}
-          variant="secondary"
-          className="gap-2"
-        >
-          <Target className="h-4 w-4" />
-          {t("chapters:page.goals_button")}
-        </Button>
-
-        <Button
-          onClick={() => setShowWarningsSettingsModal(true)}
-          variant="secondary"
-          className="gap-2"
-        >
-          <Bell className="h-4 w-4" />
-          {t("chapters:page.warnings_button")}
-        </Button>
-
-        <Button
           onClick={() => setShowCreateModal(true)}
           variant="magical"
           className="gap-2 animate-glow"
@@ -625,22 +596,6 @@ export function ChaptersPage() {
         existingChapters={chapters.map((ch) => ({
           chapterNumber: String(ch.number),
         }))}
-      />
-
-      {/* Global Goals Modal */}
-      <GlobalGoalsModal
-        open={showGoalsModal}
-        onOpenChange={setShowGoalsModal}
-        goals={globalGoals}
-        onSave={updateGoals}
-      />
-
-      {/* Warnings Settings Modal */}
-      <WarningsSettingsModal
-        open={showWarningsSettingsModal}
-        onOpenChange={setShowWarningsSettingsModal}
-        settings={warningsSettings}
-        onSave={updateWarningsSettings}
       />
 
       {/* Delete Single Chapter Dialog */}

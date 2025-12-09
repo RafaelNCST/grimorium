@@ -6,8 +6,6 @@ import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-butto
 import { InboxInitializer } from "@/components/inbox-initializer";
 import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { GlobalGoalsProvider } from "@/contexts/GlobalGoalsContext";
-import { WarningsSettingsProvider } from "@/contexts/WarningsSettingsContext";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -30,15 +28,11 @@ const App = () => {
   }
 
   return (
-    <WarningsSettingsProvider>
-      <GlobalGoalsProvider>
-        <TooltipProvider>
-          <InboxInitializer />
-          <RouterProvider router={router} />
-          <ResetDatabaseButton />
-        </TooltipProvider>
-      </GlobalGoalsProvider>
-    </WarningsSettingsProvider>
+    <TooltipProvider>
+      <InboxInitializer />
+      <RouterProvider router={router} />
+      <ResetDatabaseButton />
+    </TooltipProvider>
   );
 };
 

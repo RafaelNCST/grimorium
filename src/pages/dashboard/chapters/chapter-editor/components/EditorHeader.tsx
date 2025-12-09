@@ -26,16 +26,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
 import { cn } from "@/lib/utils";
 
 interface EditorHeaderProps {
   chapterNumber: string;
   title: string;
   showAllAnnotationsSidebar?: boolean;
-  showWarningsSidebar?: boolean;
   showPlotArcEventsSidebar?: boolean;
-  warningsCount?: number;
   hasPlotArc?: boolean;
   previousChapter?: { id: string; number: string; title: string };
   nextChapter?: { id: string; number: string; title: string };
@@ -43,7 +40,6 @@ interface EditorHeaderProps {
   onChapterNumberChange: (value: string) => void;
   onTitleChange: (value: string) => void;
   onShowAllAnnotations: () => void;
-  onShowWarnings: () => void;
   onShowPlotArcEvents?: () => void;
   onShowSettings: () => void;
   onNavigateToPrevious?: () => void;
@@ -55,9 +51,7 @@ export function EditorHeader({
   chapterNumber,
   title,
   showAllAnnotationsSidebar = false,
-  showWarningsSidebar = false,
   showPlotArcEventsSidebar = false,
-  warningsCount = 0,
   hasPlotArc = false,
   previousChapter,
   nextChapter,
@@ -65,7 +59,6 @@ export function EditorHeader({
   onChapterNumberChange,
   onTitleChange,
   onShowAllAnnotations,
-  onShowWarnings,
   onShowPlotArcEvents,
   onShowSettings,
   onNavigateToPrevious,
@@ -73,7 +66,6 @@ export function EditorHeader({
   onExport,
 }: EditorHeaderProps) {
   const { t } = useTranslation(["chapter-editor", "empty-states", "tooltips"]);
-  const { settings: warningsSettings } = useWarningsSettings();
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const titleContainerRef = useRef<HTMLDivElement>(null);
 
@@ -248,28 +240,6 @@ export function EditorHeader({
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
                   {t("header_bar.arc")}
-                </Button>
-              )}
-
-              {warningsSettings.enabled && (
-                <Button
-                  variant="ghost-bright"
-                  size="sm"
-                  onClick={onShowWarnings}
-                  className={cn(
-                    "border border-transparent transition-all duration-200 relative",
-                    showWarningsSidebar
-                      ? "bg-primary/10 border-primary text-primary"
-                      : "hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
-                  )}
-                >
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  {t("header_bar.warnings")}
-                  {warningsCount > 0 && (
-                    <span className="ml-1.5 flex items-center justify-center min-w-[18px] min-h-[18px] px-1.5 text-[10px] font-semibold bg-primary text-white rounded-full">
-                      {warningsCount > 99 ? "99+" : warningsCount}
-                    </span>
-                  )}
                 </Button>
               )}
 
