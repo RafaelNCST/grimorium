@@ -16,7 +16,6 @@ import {
   X,
   Save,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 import {
@@ -166,7 +165,6 @@ export function RegionTimeline({
 
   const handleCreateEra = () => {
     if (!newEra.name.trim()) {
-      toast.error(t("forms:validation.era_name_required"));
       return;
     }
 
@@ -179,12 +177,10 @@ export function RegionTimeline({
     onTimelineChange([...timeline, era]);
     setNewEra({ name: "", description: "", startDate: "", endDate: "" });
     setShowCreateEraModal(false);
-    toast.success(t("world:timeline.era_created"));
   };
 
   const handleCreateEvent = () => {
     if (!newEvent.name.trim() || !selectedEraId) {
-      toast.error(t("forms:validation.event_name_and_era_required"));
       return;
     }
 
@@ -220,7 +216,6 @@ export function RegionTimeline({
     });
     setSelectedEraId("");
     setShowCreateEventModal(false);
-    toast.success(t("world:timeline.event_created"));
   };
 
   const openEventDetails = (event: ITimelineEvent, edit: boolean = false) => {
@@ -256,7 +251,6 @@ export function RegionTimeline({
 
   const handleUpdateEra = () => {
     if (!editEra.name.trim() || !editingEra) {
-      toast.error(t("forms:validation.era_name_required"));
       return;
     }
 
@@ -269,12 +263,10 @@ export function RegionTimeline({
     setEditEra({ name: "", description: "", startDate: "", endDate: "" });
     setEditingEra(null);
     setShowEditEraModal(false);
-    toast.success(t("world:timeline.era_updated"));
   };
 
   const handleUpdateEvent = () => {
     if (!newEvent.name.trim() || !selectedEvent) {
-      toast.error(t("forms:validation.event_name_required"));
       return;
     }
 
@@ -307,12 +299,10 @@ export function RegionTimeline({
     setSelectedEvent(null);
     setEditingEvent(false);
     setShowEventModal(false);
-    toast.success(t("world:timeline.event_updated"));
   };
 
   const handleDeleteEra = (eraId: string) => {
     onTimelineChange(timeline.filter((era) => era.id !== eraId));
-    toast.success(t("world:timeline.era_deleted"));
   };
 
   const handleDeleteEvent = (eventId: string) => {
@@ -325,7 +315,6 @@ export function RegionTimeline({
     setSelectedEvent(null);
     setEditingEvent(false);
     setShowEventModal(false);
-    toast.success(t("world:timeline.event_deleted"));
   };
 
   const getCharacterName = (id: string) =>

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { type Entity } from "@/mocks/local/editor-data";
 
@@ -109,13 +108,11 @@ export function ChapterEditor() {
     setTimeout(() => {
       setChapter((prev) => ({ ...prev, lastSaved: new Date() }));
       setIsAutoSaving(false);
-      toast.success("Capítulo salvo automaticamente");
     }, 1000);
   };
 
   const handleSave = () => {
     handleAutoSave();
-    toast.success("Capítulo salvo com sucesso!");
   };
 
   const handleBack = () => {
@@ -199,7 +196,6 @@ export function ChapterEditor() {
     setShowLinkModal(false);
     setSelectedText("");
     setSelectedRange(null);
-    toast.success("Link adicionado com sucesso!");
   };
 
   const addComment = () => {
@@ -241,7 +237,6 @@ export function ChapterEditor() {
     setSelectedText("");
     setSelectedRange(null);
     setSelectedAnnotation(null);
-    toast.success("Comentário adicionado!");
   };
 
   const addCommentToAnnotation = () => {
@@ -260,7 +255,6 @@ export function ChapterEditor() {
     }));
 
     setNewComment("");
-    toast.success("Comentário adicionado!");
   };
 
   const editComment = (commentId: string) => {
@@ -285,7 +279,6 @@ export function ChapterEditor() {
 
     setEditingComment(null);
     setEditCommentText("");
-    toast.success("Comentário editado!");
   };
 
   const deleteComment = (commentId: string) => {
@@ -293,7 +286,6 @@ export function ChapterEditor() {
       ...prev,
       comments: prev.comments.filter((comment) => comment.id !== commentId),
     }));
-    toast.success("Comentário excluído!");
   };
 
   const closeSidebar = () => {

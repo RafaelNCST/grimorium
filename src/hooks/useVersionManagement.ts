@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 export interface IVersion<T> {
   id: string;
@@ -98,7 +97,6 @@ export function useVersionManagement<T>({
         console.warn(
           `[useVersionManagement] Version ${currentVersionId} not found, falling back to main version`
         );
-        toast.warning(t("errors:not_found.version_showing_main"));
         selectedVersion = versions.find((v) => v.isMain);
       }
     } else {
@@ -123,7 +121,6 @@ export function useVersionManagement<T>({
       const version = versions.find((v) => v.id === versionId);
       if (!version) {
         console.error(`[useVersionManagement] Version ${versionId} not found`);
-        toast.error(t("errors:not_found.version"));
         return;
       }
 
@@ -143,7 +140,6 @@ export function useVersionManagement<T>({
         setCurrentVersion(version);
       } catch (error) {
         console.error("[useVersionManagement] Error changing version:", error);
-        toast.error("Erro ao trocar de versão");
 
         // Rollback to previous version
         if (currentVersion) {
@@ -169,10 +165,8 @@ export function useVersionManagement<T>({
       try {
         const newVersion = await onVersionCreate(data, currentEntityData);
         setCurrentVersion(newVersion);
-        toast.success(`Versão "${data.name}" criada com sucesso!`);
       } catch (error) {
         console.error("[useVersionManagement] Error creating version:", error);
-        toast.error("Erro ao criar versão");
       }
     },
     [onVersionCreate]
@@ -199,11 +193,8 @@ export function useVersionManagement<T>({
             description: data.description ?? currentVersion.description,
           });
         }
-
-        toast.success("Versão atualizada com sucesso!");
       } catch (error) {
         console.error("[useVersionManagement] Error updating version:", error);
-        toast.error("Erro ao atualizar versão");
       }
     },
     [onVersionUpdate, currentVersion]
@@ -223,7 +214,6 @@ export function useVersionManagement<T>({
 
       // Don't allow deleting main version
       if (versionToDelete?.isMain) {
-        toast.error("Não é possível excluir a versão principal");
         return;
       }
 
@@ -237,11 +227,8 @@ export function useVersionManagement<T>({
             setCurrentVersion(mainVersion);
           }
         }
-
-        toast.success("Versão excluída com sucesso!");
       } catch (error) {
         console.error("[useVersionManagement] Error deleting version:", error);
-        toast.error("Erro ao excluir versão");
       }
     },
     [versions, onVersionDelete, currentVersion]
@@ -259,13 +246,11 @@ export function useVersionManagement<T>({
 
       try {
         await onVersionActivate(versionId);
-        toast.success("Versão ativada como principal!");
       } catch (error) {
         console.error(
           "[useVersionManagement] Error activating version:",
           error
         );
-        toast.error("Erro ao ativar versão");
       }
     },
     [onVersionActivate]

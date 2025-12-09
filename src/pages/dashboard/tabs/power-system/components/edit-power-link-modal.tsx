@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,11 +40,9 @@ export function EditPowerLinkModal({
     try {
       setIsSubmitting(true);
       await onSave(link.id, customLabel);
-      toast.success(t("notifications.link_updated"));
       onClose();
     } catch (error) {
       console.error("Error updating link:", error);
-      toast.error(t("notifications.error_generic"));
     } finally {
       setIsSubmitting(false);
     }

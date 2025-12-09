@@ -18,7 +18,6 @@ import {
   Info
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import {
   AlertDialog,
@@ -47,10 +46,8 @@ export function DataSection() {
     try {
       // TODO: Implementar exportação real de backup
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast.success(t("data.backup.export_success"));
     } catch (error) {
-      toast.error(t("data.backup.export_error"));
+      console.error(error);
     } finally {
       setIsExporting(false);
     }
@@ -61,10 +58,8 @@ export function DataSection() {
     try {
       // TODO: Implementar importação real de backup
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast.success(t("data.backup.import_success"));
     } catch (error) {
-      toast.error(t("data.backup.import_error"));
+      console.error(error);
     } finally {
       setIsImporting(false);
     }
@@ -75,12 +70,11 @@ export function DataSection() {
       // TODO: Implementar limpeza real de dados
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success(t("data.clear.success"));
       setShowClearDialog(false);
 
       // TODO: Reiniciar app ou redirecionar
     } catch (error) {
-      toast.error(t("data.clear.error"));
+      console.error(error);
     }
   };
 

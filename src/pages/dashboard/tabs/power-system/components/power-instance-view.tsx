@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -52,7 +51,6 @@ export function PowerInstanceView({
       // Load the power link
       const powerLink = await getPowerLinkById(linkId);
       if (!powerLink) {
-        toast.error("Link not found");
         onBack();
         return;
       }
@@ -64,7 +62,6 @@ export function PowerInstanceView({
         // Load page + all sections + blocks
         const powerPage = await getPowerPageById(powerLink.pageId);
         if (!powerPage) {
-          toast.error("Page not found");
           onBack();
           return;
         }
@@ -86,7 +83,6 @@ export function PowerInstanceView({
         // Load only this specific section + blocks
         const powerSection = await getPowerSectionById(powerLink.sectionId);
         if (!powerSection) {
-          toast.error("Section not found");
           onBack();
           return;
         }
@@ -101,7 +97,6 @@ export function PowerInstanceView({
       }
     } catch (error) {
       console.error("Error loading power instance:", error);
-      toast.error("Error loading power data");
     } finally {
       setIsLoading(false);
     }

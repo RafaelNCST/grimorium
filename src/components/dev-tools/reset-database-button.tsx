@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Trash2, Database, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +28,6 @@ export function ResetDatabaseButton() {
       setDbPath(path);
       setShowDialog(true);
     } catch (error) {
-      toast.error("Erro ao obter caminho do banco de dados");
       console.error(error);
     }
   };
@@ -39,16 +37,12 @@ export function ResetDatabaseButton() {
     try {
       const result = await resetDatabase();
       console.log(result);
-      toast.success("Banco de dados resetado com sucesso!", {
-        description: "A página será recarregada em 2 segundos",
-      });
 
       // Reload page after 2 seconds
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      toast.error("Erro ao resetar banco de dados");
       console.error(error);
       setIsResetting(false);
     }

@@ -16,7 +16,6 @@ import {
   Save,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 import {
@@ -132,7 +131,6 @@ export function FactionTimeline({
 
   const handleCreateEra = () => {
     if (!newEra.name.trim()) {
-      toast.error(t("timeline.era_name_required"));
       return;
     }
 
@@ -145,12 +143,10 @@ export function FactionTimeline({
     onTimelineChange([...timeline, era]);
     setNewEra({ name: "", description: "", startDate: "", endDate: "" });
     setShowCreateEraModal(false);
-    toast.success(t("timeline.era_created"));
   };
 
   const handleCreateEvent = () => {
     if (!newEvent.name.trim() || !selectedEraId) {
-      toast.error(t("timeline.event_name_era_required"));
       return;
     }
 
@@ -186,7 +182,6 @@ export function FactionTimeline({
     });
     setSelectedEraId("");
     setShowCreateEventModal(false);
-    toast.success(t("timeline.event_created"));
   };
 
   const openEventDetails = (
@@ -225,7 +220,6 @@ export function FactionTimeline({
 
   const handleUpdateEra = () => {
     if (!editEra.name.trim() || !editingEra) {
-      toast.error(t("timeline.era_name_required"));
       return;
     }
 
@@ -238,12 +232,10 @@ export function FactionTimeline({
     setEditEra({ name: "", description: "", startDate: "", endDate: "" });
     setEditingEra(null);
     setShowEditEraModal(false);
-    toast.success(t("timeline.era_updated"));
   };
 
   const handleUpdateEvent = () => {
     if (!newEvent.name.trim() || !selectedEvent) {
-      toast.error(t("timeline.event_name_required"));
       return;
     }
 
@@ -276,12 +268,10 @@ export function FactionTimeline({
     setSelectedEvent(null);
     setEditingEvent(false);
     setShowEventModal(false);
-    toast.success(t("timeline.event_updated"));
   };
 
   const handleDeleteEra = (eraId: string) => {
     onTimelineChange(timeline.filter((era) => era.id !== eraId));
-    toast.success(t("timeline.era_deleted"));
   };
 
   const handleDeleteEvent = (eventId: string) => {
@@ -294,7 +284,6 @@ export function FactionTimeline({
     setSelectedEvent(null);
     setEditingEvent(false);
     setShowEventModal(false);
-    toast.success(t("timeline.event_deleted"));
   };
 
   const getCharacterName = (id: string) =>

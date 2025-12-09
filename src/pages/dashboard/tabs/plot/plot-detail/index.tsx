@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { useParams, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
@@ -361,7 +360,6 @@ export function PlotArcDetail() {
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
-      toast.error(t("plot:validation.fill_required_fields"));
       return;
     }
 
@@ -373,10 +371,8 @@ export function PlotArcDetail() {
       setOriginalFieldVisibility(fieldVisibility);
       setValidationErrors({});
       setIsEditing(false);
-      toast.success(t("plot:toast.arc_updated"));
     } catch (error) {
       console.error("Failed to update plot arc:", error);
-      toast.error(t("plot:toast.update_failed"));
     }
   }, [arc, editForm, fieldVisibility, t, updatePlotArcInCache]);
 
@@ -385,11 +381,9 @@ export function PlotArcDetail() {
     if (!arc) return;
     try {
       await deletePlotArc(arc.id);
-      toast.success(t("plot:toast.arc_deleted"));
       router.history.back();
     } catch (error) {
       console.error("Failed to delete plot arc:", error);
-      toast.error(t("plot:toast.delete_failed"));
     }
   }, [arc, router, t]);
 
@@ -416,10 +410,8 @@ export function PlotArcDetail() {
         }
         setEventToDelete(null);
         setShowDeleteEventDialog(false);
-        toast.success(t("plot:toast.event_deleted"));
       } catch (error) {
         console.error("Failed to delete event:", error);
-        toast.error(t("plot:toast.delete_failed"));
       }
     }
   }, [eventToDelete, arc, editForm.events, isEditing, t, updatePlotArcInCache]);

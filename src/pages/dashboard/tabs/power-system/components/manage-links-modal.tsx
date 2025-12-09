@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { Check, UserCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -79,7 +78,6 @@ export function ManageLinksModal({
       setHierarchyLinkedCharacterIds(hierarchyIds);
     } catch (error) {
       console.error("Error loading data:", error);
-      toast.error(t("notifications.error_generic"));
     } finally {
       setIsLoading(false);
     }
@@ -127,8 +125,6 @@ export function ManageLinksModal({
               await getLinkedCharacterIdsInSectionHierarchy(sectionId);
           }
           setHierarchyLinkedCharacterIds(hierarchyIds);
-
-          toast.success(t("notifications.link_removed"));
         }
       } else {
         // Create new link
@@ -144,8 +140,6 @@ export function ManageLinksModal({
             await getLinkedCharacterIdsInSectionHierarchy(sectionId);
         }
         setHierarchyLinkedCharacterIds(hierarchyIds);
-
-        toast.success(t("notifications.link_added"));
       }
 
       if (onLinksChanged) {
@@ -153,7 +147,6 @@ export function ManageLinksModal({
       }
     } catch (error) {
       console.error("Error toggling link:", error);
-      toast.error(t("notifications.error_generic"));
     } finally {
       setIsProcessing(null);
     }

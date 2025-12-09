@@ -14,7 +14,6 @@ import {
   Hash,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
 import {
@@ -122,7 +121,6 @@ export function ChapterCard({
       }
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      toast.error(t("export.error_pdf"));
     }
   };
 
@@ -162,7 +160,6 @@ export function ChapterCard({
       }
     } catch (error) {
       console.error("Error exporting Word:", error);
-      toast.error(t("export.error_word"));
     }
   };
 

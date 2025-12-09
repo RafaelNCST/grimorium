@@ -5,8 +5,6 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import { InboxInitializer } from "@/components/inbox-initializer";
 import { SplashScreen } from "@/components/splash-screen";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GlobalGoalsProvider } from "@/contexts/GlobalGoalsContext";
 import { WarningsSettingsProvider } from "@/contexts/WarningsSettingsContext";
@@ -36,8 +34,6 @@ const App = () => {
       <GlobalGoalsProvider>
         <TooltipProvider>
           <InboxInitializer />
-          <Toaster />
-          <Sonner />
           <RouterProvider router={router} />
           <ResetDatabaseButton />
         </TooltipProvider>

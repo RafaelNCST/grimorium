@@ -3,7 +3,6 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { TitleBar } from "@/components/title-bar";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const RootLayout = () => (
@@ -14,7 +13,6 @@ const RootLayout = () => (
         <Outlet />
       </div>
     </div>
-    <Toaster />
     <Sonner />
     <TanStackRouterDevtools />
   </TooltipProvider>

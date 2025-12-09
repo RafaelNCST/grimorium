@@ -1,4 +1,3 @@
-import { toast } from "sonner";
 import { create } from "zustand";
 
 import {
@@ -93,7 +92,6 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
       }));
     } catch (error) {
       console.error("Error fetching power systems:", error);
-      toast.error("Failed to fetch power systems");
       // On error, mark as not loading
       set((state) => ({
         cache: {
@@ -141,7 +139,6 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
       return systemId;
     } catch (error) {
       console.error("Error adding power system:", error);
-      toast.error("Failed to create power system");
       throw error;
     }
   },
@@ -184,7 +181,6 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
       });
     } catch (error) {
       console.error("Error updating power system:", error);
-      toast.error("Failed to update power system");
       throw error;
     }
   },
@@ -210,7 +206,6 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
       });
     } catch (error) {
       console.error("Error deleting power system:", error);
-      toast.error("Failed to delete power system");
       throw error;
     }
   },
