@@ -7,7 +7,7 @@
     "title": "No races created",
     "description": "Start by creating your first race to populate your world"
   },
-  "search_placeholder": "Search races...",
+  "search_placeholder": "Search Race",
   "not_found": "No races found",
   "filters": {
     "all": "All",

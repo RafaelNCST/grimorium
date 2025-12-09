@@ -74,7 +74,8 @@
       "Bash(Stop-Process -Force -Id 36264)",
       "Bash(Stop-Process -Force -Id 32128)",
       "Bash(Format-Table Id, ProcessName, Path -AutoSize)",
-      "Bash(Stop-Process -Force -Id 40304)"
+      "Bash(Stop-Process -Force -Id 40304)",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Name node\")"
     ],
     "deny": [
       "Bash(git push --force:*)",

@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-import { X, Search, Map } from "lucide-react";
+import { X, Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntitySearchBar } from "@/components/entity-list";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IRegion {
@@ -28,7 +28,7 @@ export function RegionNavigationSidebar({
   currentRegionId,
   onRegionSelect,
 }: PropsRegionNavigationSidebar) {
-  const { t } = useTranslation(["empty-states", "forms", "common"]);
+  const { t } = useTranslation(["empty-states", "world", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Separate current region from others
@@ -68,15 +68,12 @@ export function RegionNavigationSidebar({
 
       {/* Search */}
       <div className="p-4 border-b border-border bg-card">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("forms:placeholders.search_region")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+        <EntitySearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder={t("world:search_placeholder")}
+          maxWidth="w-full"
+        />
       </div>
 
       {/* Current Region */}

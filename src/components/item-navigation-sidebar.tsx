@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { X, Search, Package } from "lucide-react";
+import { X, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntitySearchBar } from "@/components/entity-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IItem {
@@ -29,7 +29,7 @@ export function ItemNavigationSidebar({
   currentItemId,
   onItemSelect,
 }: PropsItemNavigationSidebar) {
-  const { t } = useTranslation(["empty-states", "forms", "common"]);
+  const { t } = useTranslation(["empty-states", "items", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const currentItem = items.find((item) => item.id === currentItemId);
@@ -64,15 +64,12 @@ export function ItemNavigationSidebar({
       </div>
 
       <div className="p-4 border-b border-border bg-card">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("forms:placeholders.search_item")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+        <EntitySearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder={t("items:page.search_placeholder")}
+          maxWidth="w-full"
+        />
       </div>
 
       {currentItem && (

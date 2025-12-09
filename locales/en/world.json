@@ -8,7 +8,7 @@
     "title": "No regions created",
     "description": "Start by creating your first region to build your world"
   },
-  "search_placeholder": "Search regions...",
+  "search_placeholder": "Search Region",
   "not_found": "No regions found",
   "filters": {
     "all": "All",

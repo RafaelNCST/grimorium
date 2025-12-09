@@ -5,6 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { FileText, Plus, ArrowLeft, Target, Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntitySearchBar } from "@/components/entity-list";
 import {
   CreateChapterModal,
   type IChapterFormData,
@@ -22,7 +23,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGlobalGoals } from "@/contexts/GlobalGoalsContext";
 import { useWarningsSettings } from "@/contexts/WarningsSettingsContext";
@@ -488,12 +488,12 @@ export function ChaptersPage() {
                 </TabsList>
 
                 {/* Search */}
-                <Input
-                  type="text"
-                  placeholder={t("forms:search.chapters")}
+                <EntitySearchBar
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-1/2 mt-4"
+                  onChange={setSearchTerm}
+                  placeholder={t("chapters:page.search_placeholder")}
+                  maxWidth="max-w-md"
+                  className="mt-4"
                 />
 
                 <TabsContent

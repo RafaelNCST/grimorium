@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { Search, X, Dna } from "lucide-react";
+import { X, Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { EntitySearchBar } from "@/components/entity-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
@@ -24,7 +24,7 @@ export function RaceNavigationSidebar({
   allRaces,
   onRaceSelect,
 }: RaceNavigationSidebarProps) {
-  const { t } = useTranslation("race-detail");
+  const { t } = useTranslation(["race-detail", "races"]);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Separate current race from others
@@ -62,15 +62,12 @@ export function RaceNavigationSidebar({
 
       {/* Search */}
       <div className="p-4 border-b border-border bg-card">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder={t("sidebar.search_placeholder")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
+        <EntitySearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={t("races:search_placeholder")}
+          maxWidth="w-full"
+        />
       </div>
 
       {/* Current Race */}

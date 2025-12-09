@@ -5,7 +5,7 @@
     "description": "Manage the factions, kingdoms, sects and groups of your world",
     "new_faction": "New Faction",
     "total_badge": "Total",
-    "search_placeholder": "Search factions..."
+    "search_placeholder": "Search Faction"
   },
   "empty_state": {
     "no_factions": "No factions created",
