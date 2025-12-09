@@ -1,4 +1,5 @@
 import { Settings, ChevronUp, ChevronDown, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +57,8 @@ export function EditorSettingsModal({
   mentionedEntities,
   onRemoveFromBlacklist,
 }: EditorSettingsModalProps) {
+  const { t } = useTranslation("dialogs");
+
   const updateSetting = <K extends keyof EditorSettings>(
     key: K,
     value: EditorSettings[K]

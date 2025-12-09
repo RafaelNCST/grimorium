@@ -34,6 +34,7 @@ export function createDomainFilterRows(
           value: domain,
           label: domainData?.label || domain,
           count: domainStats[domain],
+          icon: domainData?.icon,
           colorConfig: getDomainColorConfig(domain),
         };
       }),

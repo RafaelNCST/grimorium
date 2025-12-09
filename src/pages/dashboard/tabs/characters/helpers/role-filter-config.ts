@@ -1,3 +1,5 @@
+import { Crown, Skull, Swords, Users, User } from "lucide-react";
+
 import { FilterRow } from "@/components/entity-list";
 
 export interface RoleStats {
@@ -28,6 +30,7 @@ export function createRoleFilterRows(
           value: "protagonist",
           label: t("characters:page.protagonist_badge"),
           count: stats.protagonist,
+          icon: Crown,
           colorConfig: {
             color: "yellow",
             inactiveClasses:
@@ -39,6 +42,7 @@ export function createRoleFilterRows(
           value: "antagonist",
           label: t("characters:page.antagonist_badge"),
           count: stats.antagonist,
+          icon: Swords,
           colorConfig: {
             color: "orange",
             inactiveClasses:
@@ -50,6 +54,7 @@ export function createRoleFilterRows(
           value: "villain",
           label: t("characters:page.villain_badge"),
           count: stats.villain,
+          icon: Skull,
           colorConfig: {
             color: "red",
             inactiveClasses:
@@ -61,6 +66,7 @@ export function createRoleFilterRows(
           value: "secondary",
           label: t("characters:page.secondary_badge"),
           count: stats.secondary,
+          icon: Users,
           colorConfig: {
             color: "blue",
             inactiveClasses:
@@ -72,6 +78,7 @@ export function createRoleFilterRows(
           value: "extra",
           label: t("characters:page.extra_badge"),
           count: stats.extra,
+          icon: User,
           colorConfig: {
             color: "gray",
             inactiveClasses:

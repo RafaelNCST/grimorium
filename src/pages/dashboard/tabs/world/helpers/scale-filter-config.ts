@@ -1,6 +1,25 @@
+import {
+  MapPin,
+  Mountain,
+  Globe,
+  Sparkles,
+  Infinity,
+  Layers,
+} from "lucide-react";
+
 import { FilterRow, BADGE_COLORS } from "@/components/entity-list";
 
 import { RegionScale } from "../types/region-types";
+
+// Map scale values to their icons
+const SCALE_ICONS: Record<RegionScale, typeof MapPin> = {
+  local: MapPin,
+  continental: Mountain,
+  planetary: Globe,
+  galactic: Sparkles,
+  universal: Infinity,
+  multiversal: Layers,
+};
 
 /**
  * Creates filter configuration for region scales
@@ -25,6 +44,7 @@ export function createScaleFilterRows(
         value: scale,
         label: t(`scales.${scale}`),
         count: scaleStats[scale],
+        icon: SCALE_ICONS[scale],
         colorConfig: getScaleColorConfig(scale),
       })),
     },

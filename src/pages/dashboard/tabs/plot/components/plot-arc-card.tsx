@@ -1,13 +1,34 @@
 import { Clock, CheckCircle2, Circle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Badge } from "@/components/ui/badge";
 import { EntityCardWrapper } from "@/components/ui/entity-card-wrapper";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Progress } from "@/components/ui/progress";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
 import { ARC_SIZES_CONSTANT } from "../constants/arc-sizes-constant";
 import { ARC_STATUSES_CONSTANT } from "../constants/arc-statuses-constant";
+
+// Map status values to their display colors (matching filter badges)
+const STATUS_DISPLAY_COLORS: Record<string, string> = {
+  finished:
+    "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+  current:
+    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  planning:
+    "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
+};
+
+// Map size values to their display colors (matching filter badges)
+const SIZE_DISPLAY_COLORS: Record<string, string> = {
+  mini: "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400",
+  small:
+    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  medium:
+    "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
+  large:
+    "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
+};
 
 interface PropsPlotArcCard {
   arc: IPlotArc;
@@ -47,34 +68,20 @@ export function PlotArcCard({ arc, onClick }: PropsPlotArcCard) {
             {/* Status and Size badges */}
             <div className="flex flex-wrap gap-2">
               {statusData && (
-                <EntityTagBadge
-                  config={{
-                    value: statusData.value,
-                    icon: statusData.icon,
-                    translationKey: statusData.translationKey,
-                    colorClass:
-                      statusData.activeColor.split(" ")[1] ||
-                      "text-muted-foreground",
-                    bgColorClass:
-                      statusData.activeColor.split(" ")[0] || "bg-muted",
-                  }}
-                  label={t(statusData.translationKey)}
-                />
+                <Badge
+                  className={`pointer-events-none ${STATUS_DISPLAY_COLORS[arc.status]}`}
+                >
+                  <statusData.icon className="w-3.5 h-3.5 mr-1.5" />
+                  {t(statusData.translationKey)}
+                </Badge>
               )}
               {sizeData && (
-                <EntityTagBadge
-                  config={{
-                    value: sizeData.value,
-                    icon: sizeData.icon,
-                    translationKey: sizeData.translationKey,
-                    colorClass:
-                      sizeData.activeColor.split(" ")[1] ||
-                      "text-muted-foreground",
-                    bgColorClass:
-                      sizeData.activeColor.split(" ")[0] || "bg-muted",
-                  }}
-                  label={t(sizeData.translationKey)}
-                />
+                <Badge
+                  className={`pointer-events-none ${SIZE_DISPLAY_COLORS[arc.size]}`}
+                >
+                  <sizeData.icon className="w-3.5 h-3.5 mr-1.5" />
+                  {t(sizeData.translationKey)}
+                </Badge>
               )}
             </div>
           </div>

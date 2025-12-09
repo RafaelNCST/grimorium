@@ -74,6 +74,27 @@ import type {
 import { DeleteArcConfirmationDialog } from "./components/delete-arc-confirmation-dialog";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 
+// Map status values to their display colors (matching filter badges)
+const STATUS_DISPLAY_COLORS: Record<string, string> = {
+  finished:
+    "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
+  current:
+    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  planning:
+    "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
+};
+
+// Map size values to their display colors (matching filter badges)
+const SIZE_DISPLAY_COLORS: Record<string, string> = {
+  mini: "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400",
+  small:
+    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  medium:
+    "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
+  large:
+    "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400",
+};
+
 interface PropsPlotArcDetailView {
   arc: IPlotArc;
   isEditing: boolean;
@@ -362,10 +383,6 @@ export function PlotArcDetailView({
   const StatusIcon = statusConfig?.icon;
   const SizeIcon = sizeConfig?.icon;
 
-  // Get active colors from constants
-  const statusColorClass = statusConfig?.activeColor.replace("ring-2 ring-emerald-500/50", "").replace("ring-2 ring-blue-500/50", "").replace("ring-2 ring-amber-500/50", "").trim() || "bg-gray-500/20 text-gray-600 border-gray-500/30";
-  const sizeColorClass = sizeConfig?.activeColor.replace(/ring-2 ring-\w+-500\/50/g, "").trim() || "bg-gray-500/20 text-gray-600 border-gray-500/30";
-
   // Use editForm when editing, otherwise use arc
   const activeArc = isEditing ? editForm : arc;
   const currentEvents = isEditing ? editForm.events || arc.events : arc.events;
@@ -557,15 +574,15 @@ export function PlotArcDetailView({
                     <h2 className="text-3xl font-bold mb-3">{arc.name}</h2>
                     <div className="flex flex-wrap gap-2 mb-4">
                       <Badge
-                        className={`${statusColorClass} pointer-events-none`}
+                        className={`pointer-events-none ${STATUS_DISPLAY_COLORS[arc.status]}`}
                       >
-                        {StatusIcon && <StatusIcon className="w-3 h-3 mr-1" />}
+                        {StatusIcon && <StatusIcon className="w-3.5 h-3.5 mr-1.5" />}
                         {statusConfig ? t(`plot:${statusConfig.translationKey}`) : arc.status}
                       </Badge>
                       <Badge
-                        className={`${sizeColorClass} pointer-events-none`}
+                        className={`pointer-events-none ${SIZE_DISPLAY_COLORS[arc.size]}`}
                       >
-                        {SizeIcon && <SizeIcon className="w-3 h-3 mr-1" />}
+                        {SizeIcon && <SizeIcon className="w-3.5 h-3.5 mr-1.5" />}
                         {sizeConfig ? t(`plot:${sizeConfig.translationKey}`) : arc.size}
                       </Badge>
                     </div>
