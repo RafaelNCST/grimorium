@@ -8,7 +8,7 @@ import {
   Handshake,
   Users2,
   Settings,
-  StickyNote,
+  NotebookPen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -1669,7 +1669,7 @@ export function FactionDetailView({
             extraActions={[
               {
                 label: t("faction-detail:header.notes"),
-                icon: StickyNote,
+                icon: NotebookPen,
                 onClick: () =>
                   navigate({
                     to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",

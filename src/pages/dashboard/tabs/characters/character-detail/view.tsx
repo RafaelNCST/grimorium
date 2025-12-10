@@ -5,8 +5,8 @@ import {
   AlertCircle,
   Calendar,
   Heart,
+  NotebookPen,
   Shield,
-  StickyNote,
   Trash2,
   User,
   Users,
@@ -1439,7 +1439,7 @@ export function CharacterDetailView({
             extraActions={[
               {
                 label: t("character-detail:header.notes"),
-                icon: StickyNote,
+                icon: NotebookPen,
                 onClick: () =>
                   navigate({
                     to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",

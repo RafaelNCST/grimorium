@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, StickyNote } from "lucide-react";
+import { Dna, Users, NotebookPen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -1282,7 +1282,7 @@ export function RaceDetailView({
             extraActions={[
               {
                 label: t("race-detail:buttons.notes"),
-                icon: StickyNote,
+                icon: NotebookPen,
                 onClick: () =>
                   navigate({
                     to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",

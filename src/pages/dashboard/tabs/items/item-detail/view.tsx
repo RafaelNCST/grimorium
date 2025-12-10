@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Info, Package, StickyNote } from "lucide-react";
+import { AlertCircle, Info, Package, NotebookPen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -833,7 +833,7 @@ export const ItemDetailView = React.memo(
               extraActions={[
                 {
                   label: t("item-detail:header.notes"),
-                  icon: StickyNote,
+                  icon: NotebookPen,
                   onClick: () =>
                     navigate({
                       to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
