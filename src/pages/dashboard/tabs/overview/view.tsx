@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import { StickyNote as StickyNoteIcon, Plus, GripHorizontal } from "lucide-react";
+import { Plus, GripHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormTextarea } from "@/components/forms";
@@ -123,7 +123,7 @@ export function OverviewView(props: PropsOverviewView) {
   const renderProgressSection = () => (
     <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">{t("story_progress.title")}</CardTitle>
+        <CardTitle>{t("story_progress.title")}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-3">
@@ -168,10 +168,7 @@ export function OverviewView(props: PropsOverviewView) {
     <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="flex items-center gap-2">
-            <StickyNoteIcon className="w-5 h-5" />
-            {t("notes_board.title")}
-          </CardTitle>
+          <CardTitle>{t("notes_board.title")}</CardTitle>
           <CardDescription>{t("notes_board.description")}</CardDescription>
         </div>
       </CardHeader>

@@ -8,8 +8,8 @@
   },
   "stats": {
     "chapters": "Chapters",
-    "average_per_week": "Average/Week of Chapters",
-    "average_per_month": "Average/Month of Chapters",
+    "average_per_week": "Average Chapters Per Week",
+    "average_per_month": "Average Chapters Per Month",
     "last_published_chapter": "Last Published Chapter",
     "chapter_prefix": "Chapter",
     "total_words": "Total Words",
@@ -18,8 +18,8 @@
     "chapters_finished": "Chapters Finished",
     "chapters_draft": "Chapters Draft",
     "chapters_review": "Chapters in Review",
-    "average_words_per_chapter": "Average Words/Chapter",
-    "average_characters_per_chapter": "Average Characters/Chapter",
+    "average_words_per_chapter": "Average Words Per Chapter",
+    "average_characters_per_chapter": "Average Characters Per Chapter",
     "chapters_unit": "Chapters",
     "no_chapter": "No chapters yet"
   },

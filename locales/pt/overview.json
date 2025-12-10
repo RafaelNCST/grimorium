@@ -8,8 +8,8 @@
   },
   "stats": {
     "chapters": "Capítulos",
-    "average_per_week": "Média/Semana de Capítulos",
-    "average_per_month": "Média/Mês de Capítulos",
+    "average_per_week": "Média de Capítulos por Semana",
+    "average_per_month": "Média de Capítulos por Mês",
     "last_published_chapter": "Último Capítulo Publicado",
     "chapter_prefix": "Capítulo",
     "total_words": "Total de Palavras",
@@ -18,8 +18,8 @@
     "chapters_finished": "Capítulos Finalizados",
     "chapters_draft": "Capítulos em Rascunho",
     "chapters_review": "Capítulos em Revisão",
-    "average_words_per_chapter": "Média de Palavras/Capítulo",
-    "average_characters_per_chapter": "Média de Caracteres/Capítulo",
+    "average_words_per_chapter": "Média de Palavras por Capítulo",
+    "average_characters_per_chapter": "Média de Caracteres por Capítulo",
     "chapters_unit": "Capítulos",
     "no_chapter": "Nenhum capítulo ainda"
   },

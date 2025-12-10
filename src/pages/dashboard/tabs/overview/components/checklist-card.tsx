@@ -56,10 +56,7 @@ export function ChecklistCard({
     <Card className="card-magical w-full h-fit animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <div>
-          <CardTitle className="flex items-center gap-2">
-            <ListChecks className="w-5 h-5" />
-            {t("checklist.title")}
-          </CardTitle>
+          <CardTitle>{t("checklist.title")}</CardTitle>
           <CardDescription>{t("checklist.description")}</CardDescription>
         </div>
       </CardHeader>
