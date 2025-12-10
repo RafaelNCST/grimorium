@@ -17,7 +17,15 @@
     "no_chapter_found": "Nenhum capítulo encontrado",
     "no_chapter_created": "Nenhum capítulo criado",
     "no_previous_chapter": "Nenhum capítulo anterior",
-    "no_next_chapter": "Nenhum capítulo seguinte"
+    "no_next_chapter": "Nenhum capítulo seguinte",
+    "empty": {
+      "title": "Nenhum capítulo ainda",
+      "description": "Crie seu primeiro capítulo para começar a escrever sua história"
+    },
+    "not-found": {
+      "title": "Nenhum capítulo encontrado",
+      "description": "Tente ajustar sua busca ou filtros"
+    }
   },
   "plot_arc": {
     "no_arc": "Nenhum arco",
