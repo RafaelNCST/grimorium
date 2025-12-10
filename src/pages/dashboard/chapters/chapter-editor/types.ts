@@ -1,5 +1,3 @@
-import type { EntityLink } from "./types/entity-link";
-
 export type ChapterStatus =
   | "in-progress"
   | "draft"
@@ -67,9 +65,4 @@ export interface ChapterData {
   mentionedFactions: EntityMention[];
   mentionedRaces: EntityMention[];
   annotations: Annotation[];
-  entityLinks?: EntityLink[]; // Persistent entity links
-  blacklistedEntityIds?: string[]; // Entity IDs that user chose not to auto-link
-  // Editor formatting settings (individual per chapter)
-  fontSize?: number;
-  fontFamily?: string;
 }

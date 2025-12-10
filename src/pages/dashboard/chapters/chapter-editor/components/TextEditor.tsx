@@ -11,18 +11,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
-import { useEntityAutoLink } from "../hooks/useEntityAutoLink";
 import { useTextSearch } from "../hooks/useTextSearch";
 import { useUndoRedo } from "../hooks/useUndoRedo";
 import { CURSOR_COLORS } from "../types/editor-settings";
 
 import { ContextMenu } from "./ContextMenu";
-import { EntityHoverCard } from "./EntityHoverCard";
 import { SearchBar } from "./SearchBar";
 
 import type { Annotation } from "../types";
 import type { EditorSettings } from "../types/editor-settings";
-import type { MentionedEntities, EntityLink } from "../types/entity-link";
 
 export interface TextEditorRef {
   undo: () => void;
@@ -50,14 +47,6 @@ interface TextEditorProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
-  // Entity linking
-  mentionedEntities?: MentionedEntities;
-  bookId?: string; // For navigation to entity details
-  chapterId?: string; // Current chapter ID for back navigation
-  entityLinks?: EntityLink[]; // Persistent entity links
-  onEntityLinksChange?: (links: EntityLink[]) => void;
-  blacklistedEntityIds?: string[]; // Entity IDs blacklisted from auto-linking
-  onBlacklistedEntityIdsChange?: (ids: string[]) => void;
 }
 
 export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
@@ -80,13 +69,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       onRedo: externalOnRedo,
       canUndo: externalCanUndo,
       canRedo: externalCanRedo,
-      mentionedEntities,
-      bookId,
-      chapterId,
-      entityLinks,
-      onEntityLinksChange,
-      blacklistedEntityIds,
-      onBlacklistedEntityIdsChange,
     },
     ref
   ) => {
@@ -103,15 +85,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const isTypingRef = useRef(false);
     const localAnnotationUpdateRef = useRef(false);
     const isImmediateActionRef = useRef(false); // Track if next save should be immediate
-
-    // Entity hover card state
-    const [hoveredEntityLink, setHoveredEntityLink] = useState<{
-      entityLink: EntityLink;
-      x: number;
-      y: number;
-    } | null>(null);
-    const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const isOverCardRef = useRef(false);
 
     // Undo/Redo functionality
     // Initialize with empty state (will be populated on first edit)
@@ -131,39 +104,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       editorRef,
       enabled: true,
     });
-
-    // Entity auto-linking
-    const entityAutoLink = useEntityAutoLink({
-      editorRef,
-      mentionedEntities: mentionedEntities || {
-        characters: [],
-        regions: [],
-        items: [],
-        factions: [],
-        races: [],
-      },
-      enabled: !!mentionedEntities && settings?.showEntityLinks !== false,
-      initialLinks: entityLinks,
-      blacklistedEntityIds,
-      onBlacklistChange: onBlacklistedEntityIdsChange,
-    });
-
-    // Notify parent when active links change
-    useEffect(() => {
-      if (onEntityLinksChange) {
-        onEntityLinksChange(entityAutoLink.activeLinks);
-      }
-    }, [entityAutoLink.activeLinks, onEntityLinksChange]);
-
-    // Cleanup hover timeout on unmount
-    useEffect(
-      () => () => {
-        if (hoverTimeoutRef.current) {
-          clearTimeout(hoverTimeoutRef.current);
-        }
-      },
-      []
-    );
 
     // Expose undo/redo through ref
     useImperativeHandle(ref, () => ({
@@ -274,13 +214,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       // Use provided annotations or default to prop
       const currentAnnotations = annotationsToRender || annotations;
 
-      // Combine annotations, search results, and entity links
+      // Combine annotations and search results
       const allHighlights: Array<{
         start: number;
         end: number;
-        type: "annotation" | "search" | "search-current" | "entity-link";
+        type: "annotation" | "search" | "search-current";
         id?: string;
-        entityLink?: EntityLink;
       }> = [];
 
       // Add annotations
@@ -299,16 +238,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           start: result.start,
           end: result.end,
           type: index === search.currentIndex ? "search-current" : "search",
-        });
-      });
-
-      // Add entity links
-      entityAutoLink.activeLinks.forEach((link) => {
-        allHighlights.push({
-          start: link.startOffset,
-          end: link.endOffset,
-          type: "entity-link",
-          entityLink: link,
         });
       });
 
@@ -339,46 +268,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             : "annotation-highlight";
 
           result += `<span class="${className}" data-annotation-id="${highlight.id}">${escapeHtml(highlightedText)}</span>`;
-        } else if (highlight.type === "entity-link" && highlight.entityLink) {
-          // Check if this entity link overlaps with any annotation - if so, skip it
-          const hasAnnotationOverlap = currentAnnotations.some(
-            (ann) =>
-              (ann.startOffset <= highlight.start &&
-                ann.endOffset >= highlight.end) ||
-              (highlight.start < ann.endOffset &&
-                highlight.end > ann.startOffset)
-          );
-
-          if (hasAnnotationOverlap) {
-            return; // Skip rendering entity link if there's an annotation
-          }
-
-          const { entity } = highlight.entityLink;
-          const linkData = JSON.stringify({
-            text: highlight.entityLink.text,
-            entityId: entity.id,
-            entityName: entity.name,
-            entityType: highlight.entityLink.entityType,
-            entityImage: entity.image,
-            age: entity.age,
-            gender: entity.gender,
-            role: entity.role,
-            status: entity.status,
-            description: entity.description,
-            category: entity.category,
-            basicDescription: entity.basicDescription,
-            summary: entity.summary,
-            factionType: entity.factionType,
-            scientificName: entity.scientificName,
-            domain: entity.domain,
-            scale: entity.scale,
-            parentId: entity.parentId,
-            parentName: entity.parentName,
-            startOffset: highlight.entityLink.startOffset,
-            endOffset: highlight.entityLink.endOffset,
-          });
-
-          result += `<span class="entity-link" data-entity-link='${escapeHtml(linkData)}'>${escapeHtml(highlightedText)}</span>`;
         } else if (highlight.type === "search-current") {
           result += `<span class="search-highlight search-current" data-search-result="true">${escapeHtml(highlightedText)}</span>`;
         } else {
@@ -548,7 +437,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       selectedAnnotationId,
       search.results,
       search.currentIndex,
-      entityAutoLink.activeLinks,
     ]);
 
     // Scroll to annotation when requested
@@ -1207,22 +1095,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement;
 
-      // Check if clicked on an entity link (only if enabled)
-      const entityLinkSpan = target.closest(".entity-link");
-      if (entityLinkSpan && bookId && settings?.showEntityLinks !== false) {
-        e.preventDefault();
-        const linkDataStr = entityLinkSpan.getAttribute("data-entity-link");
-        if (linkDataStr) {
-          try {
-            const linkData = JSON.parse(linkDataStr);
-            handleEntityLinkClick(linkData.entityType, linkData.entityId);
-          } catch (err) {
-            console.error("Failed to parse entity link data:", err);
-          }
-        }
-        return;
-      }
-
       // Check if clicked on an annotation
       const annotationSpan = target.closest(".annotation-highlight");
       if (annotationSpan) {
@@ -1231,127 +1103,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           e.preventDefault();
           onAnnotationClick(annotationId);
         }
-      }
-    };
-
-    // Handle entity link navigation (super-view mode)
-    const handleEntityLinkClick = (entityType: string, entityId: string) => {
-      if (!bookId || !chapterId) return;
-
-      const routes: Record<string, string> = {
-        character: `/dashboard/$dashboardId/super-views/character/$characterId`,
-        region: `/dashboard/$dashboardId/super-views/region/$regionId`,
-        item: `/dashboard/$dashboardId/super-views/item/$itemId`,
-        faction: `/dashboard/$dashboardId/super-views/faction/$factionId`,
-        race: `/dashboard/$dashboardId/super-views/race/$raceId`,
-      };
-
-      const route = routes[entityType];
-      if (!route) {
-        console.error(`Unknown entity type: ${entityType}`);
-        return;
-      }
-
-      // Build params dynamically based on entity type
-      const params: Record<string, string> = {
-        dashboardId: bookId,
-      };
-
-      if (entityType === "character") params.characterId = entityId;
-      else if (entityType === "region") params.regionId = entityId;
-      else if (entityType === "item") params.itemId = entityId;
-      else if (entityType === "faction") params.factionId = entityId;
-      else if (entityType === "race") params.raceId = entityId;
-
-      navigate({
-        to: route as any,
-        params: params as any,
-        search: { from: chapterId },
-      });
-    };
-
-    // Handle hover over entity links
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-      // Skip if entity links are disabled
-      if (settings?.showEntityLinks === false) {
-        return;
-      }
-
-      const target = e.target as HTMLElement;
-
-      // Check if hovering over entity link (even if inside annotation)
-      const entityLinkSpan = target.closest(".entity-link");
-
-      if (entityLinkSpan) {
-        // Clear any pending timeout
-        if (hoverTimeoutRef.current) {
-          clearTimeout(hoverTimeoutRef.current);
-          hoverTimeoutRef.current = null;
-        }
-
-        const linkDataStr = entityLinkSpan.getAttribute("data-entity-link");
-        if (linkDataStr) {
-          try {
-            const linkData = JSON.parse(linkDataStr);
-            const rect = entityLinkSpan.getBoundingClientRect();
-
-            // Only update if it's a different link (check both entity and position)
-            if (
-              !hoveredEntityLink ||
-              hoveredEntityLink.entityLink.entity.id !== linkData.entityId ||
-              hoveredEntityLink.entityLink.startOffset !==
-                linkData.startOffset ||
-              hoveredEntityLink.entityLink.endOffset !== linkData.endOffset
-            ) {
-              setHoveredEntityLink({
-                entityLink: {
-                  text: linkData.text,
-                  entity: {
-                    id: linkData.entityId,
-                    name: linkData.entityName,
-                    image: linkData.entityImage,
-                    // Character fields
-                    age: linkData.age,
-                    gender: linkData.gender,
-                    role: linkData.role,
-                    status: linkData.status,
-                    description: linkData.description,
-                    // Item fields
-                    category: linkData.category,
-                    basicDescription: linkData.basicDescription,
-                    // Faction fields
-                    summary: linkData.summary,
-                    factionType: linkData.factionType,
-                    // Race fields
-                    scientificName: linkData.scientificName,
-                    domain: linkData.domain,
-                    // Region fields
-                    scale: linkData.scale,
-                    parentId: linkData.parentId,
-                    parentName: linkData.parentName,
-                  },
-                  entityType: linkData.entityType,
-                  startOffset: linkData.startOffset,
-                  endOffset: linkData.endOffset,
-                },
-                x: rect.left + rect.width / 2,
-                y: rect.top - 10,
-              });
-            }
-          } catch (err) {
-            console.error("Failed to parse entity link data:", err);
-          }
-        }
-      } else if (hoveredEntityLink && !isOverCardRef.current) {
-        // Clear hover after a delay if mouse is not over card
-        if (hoverTimeoutRef.current) {
-          clearTimeout(hoverTimeoutRef.current);
-        }
-        hoverTimeoutRef.current = setTimeout(() => {
-          if (!isOverCardRef.current) {
-            setHoveredEntityLink(null);
-          }
-        }, 100);
       }
     };
 
@@ -1457,7 +1208,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               onPaste={handlePaste}
               onMouseUp={handleMouseUp}
               onClick={handleClick}
-              onMouseMove={handleMouseMove}
               onKeyDown={handleKeyDown}
               onContextMenu={handleContextMenu}
               className={cn(
@@ -1482,16 +1232,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
                 "[&_.search-highlight]:transition-colors",
                 "[&_.search-current]:bg-yellow-400 [&_.search-current]:dark:bg-yellow-400/60",
                 "[&_.search-current]:font-medium",
-                "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50",
-                // Entity link styles (conditional)
-                settings?.showEntityLinks !== false && [
-                  "[&_.entity-link]:border-b-2",
-                  "[&_.entity-link]:border-primary/40",
-                  "[&_.entity-link]:cursor-pointer",
-                  "[&_.entity-link]:transition-all",
-                  "[&_.entity-link]:duration-150",
-                  "[&_.entity-link:hover]:border-primary/70",
-                ]
+                "[&_.search-current]:ring-2 [&_.search-current]:ring-yellow-600/50"
               )}
               style={
                 {
@@ -1554,57 +1295,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           />
         )}
 
-        {/* Entity Hover Card */}
-        {hoveredEntityLink && settings?.showEntityLinks !== false && (
-          <div
-            className="fixed z-50"
-            style={{
-              left: `${hoveredEntityLink.x}px`,
-              top: `${hoveredEntityLink.y}px`,
-              transform: "translate(-50%, -100%)",
-            }}
-            onMouseEnter={() => {
-              // Mark that mouse is over the card
-              isOverCardRef.current = true;
-              // Clear any pending timeout
-              if (hoverTimeoutRef.current) {
-                clearTimeout(hoverTimeoutRef.current);
-                hoverTimeoutRef.current = null;
-              }
-            }}
-            onMouseLeave={() => {
-              // Mark that mouse left the card
-              isOverCardRef.current = false;
-              // Close after a short delay
-              hoverTimeoutRef.current = setTimeout(() => {
-                setHoveredEntityLink(null);
-              }, 100);
-            }}
-          >
-            <EntityHoverCard
-              entityLink={hoveredEntityLink.entityLink}
-              onViewDetails={() => {
-                isOverCardRef.current = false;
-                handleEntityLinkClick(
-                  hoveredEntityLink.entityLink.entityType,
-                  hoveredEntityLink.entityLink.entity.id
-                );
-                setHoveredEntityLink(null);
-              }}
-              onRemoveLink={() => {
-                isOverCardRef.current = false;
-                entityAutoLink.addToBlacklist(
-                  hoveredEntityLink.entityLink.entity.id
-                );
-                setHoveredEntityLink(null);
-              }}
-              onClose={() => {
-                isOverCardRef.current = false;
-                setHoveredEntityLink(null);
-              }}
-            />
-          </div>
-        )}
       </>
     );
   }

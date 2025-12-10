@@ -13,7 +13,8 @@
     "contains_important_notes": "Contains important notes"
   },
   "editor": {
-    "settings": "Editor Settings"
+    "settings": "Editor Settings",
+    "blacklist": "Non-Linked Entities (Individual)"
   },
   "visibility": {
     "hide_in_view_mode": "Hide in view mode",

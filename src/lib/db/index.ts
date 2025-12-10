@@ -603,8 +603,6 @@ async function runMigrations(database: Database): Promise<void> {
       word_count INTEGER DEFAULT 0,
       character_count INTEGER DEFAULT 0,
       character_count_with_spaces INTEGER DEFAULT 0,
-      paragraph_count INTEGER DEFAULT 0,
-      dialogue_count INTEGER DEFAULT 0,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       last_edited INTEGER NOT NULL,
@@ -655,6 +653,15 @@ async function runMigrations(database: Database): Promise<void> {
       created_at INTEGER NOT NULL
     );
 
+    -- ENTIDADES BLOQUEADAS (BLACKLIST) EM CAPÍTULOS
+    CREATE TABLE IF NOT EXISTS chapter_blacklisted_entities (
+      id TEXT PRIMARY KEY,
+      chapter_id TEXT NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
+      entity_id TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      UNIQUE(chapter_id, entity_id)
+    );
+
     -- ÍNDICES PARA CAPÍTULOS
     CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id);
     CREATE INDEX IF NOT EXISTS idx_chapters_status ON chapters(status);
@@ -665,6 +672,9 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_chapter_annotations_chapter ON chapter_annotations(chapter_id);
     CREATE INDEX IF NOT EXISTS idx_chapter_annotation_notes_annotation ON chapter_annotation_notes(annotation_id);
     CREATE INDEX IF NOT EXISTS idx_chapter_entity_links_chapter ON chapter_entity_links(chapter_id);
+    CREATE INDEX IF NOT EXISTS idx_chapter_entity_links_composite ON chapter_entity_links(chapter_id, entity_type);
+    CREATE INDEX IF NOT EXISTS idx_chapter_annotations_range ON chapter_annotations(chapter_id, start_offset, end_offset);
+    CREATE INDEX IF NOT EXISTS idx_chapter_blacklisted_entities_chapter ON chapter_blacklisted_entities(chapter_id);
   `;
 
     await database.execute(schema);

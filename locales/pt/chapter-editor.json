@@ -373,5 +373,12 @@
       }
     },
     "close": "Fechar"
+  },
+  "blacklist_modal": {
+    "title": "Entidades Não Linkadas",
+    "description": "Gerencie as entidades que você escolheu não auto-linkar neste capítulo (individual por capítulo)",
+    "empty_state": "Nenhuma entidade bloqueada neste capítulo",
+    "remove_button": "Remover da blacklist",
+    "close_button": "Fechar"
   }
 }

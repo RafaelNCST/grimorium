@@ -373,5 +373,12 @@
       }
     },
     "close": "Close"
+  },
+  "blacklist_modal": {
+    "title": "Non-Linked Entities",
+    "description": "Manage entities you chose not to auto-link in this chapter (individual per chapter)",
+    "empty_state": "No blocked entities in this chapter",
+    "remove_button": "Remove from blacklist",
+    "close_button": "Close"
   }
 }

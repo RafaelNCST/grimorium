@@ -42,10 +42,6 @@ interface EditorSettingsModalProps {
   onOpenChange: (open: boolean) => void;
   settings: EditorSettings;
   onSettingsChange: (settings: EditorSettings) => void;
-  // Blacklist management
-  blacklistedEntityIds?: string[];
-  mentionedEntities?: MentionedEntities;
-  onRemoveFromBlacklist?: (entityId: string) => void;
 }
 
 export function EditorSettingsModal({
@@ -53,9 +49,6 @@ export function EditorSettingsModal({
   onOpenChange,
   settings,
   onSettingsChange,
-  blacklistedEntityIds = [],
-  mentionedEntities,
-  onRemoveFromBlacklist,
 }: EditorSettingsModalProps) {
   const { t } = useTranslation(["chapter-editor", "dialogs"]);
 
@@ -186,21 +179,6 @@ export function EditorSettingsModal({
                 />
               </div>
 
-              {/* Entity Links */}
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>{t("editor_settings_modal.visual_elements.entity_links")}</Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t("editor_settings_modal.visual_elements.entity_links_description")}
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.showEntityLinks}
-                  onCheckedChange={(checked) =>
-                    updateSetting("showEntityLinks", checked)
-                  }
-                />
-              </div>
             </div>
           </div>
 
@@ -409,85 +387,6 @@ export function EditorSettingsModal({
               </div>
             </div>
           </div>
-
-          {/* Blacklisted Entities Section */}
-          {blacklistedEntityIds.length > 0 && mentionedEntities && (
-            <>
-              <Separator />
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-base font-semibold">
-                    {t("editor_settings_modal.blacklisted_entities.title")}
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t("editor_settings_modal.blacklisted_entities.description")}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {blacklistedEntityIds.map((entityId) => {
-                    // Find entity in mentioned entities
-                    const allEntities = [
-                      ...mentionedEntities.characters.map((e) => ({
-                        ...e,
-                        type: t("editor_settings_modal.blacklisted_entities.entity_types.character"),
-                      })),
-                      ...mentionedEntities.regions.map((e) => ({
-                        ...e,
-                        type: t("editor_settings_modal.blacklisted_entities.entity_types.region"),
-                      })),
-                      ...mentionedEntities.items.map((e) => ({
-                        ...e,
-                        type: t("editor_settings_modal.blacklisted_entities.entity_types.item"),
-                      })),
-                      ...mentionedEntities.factions.map((e) => ({
-                        ...e,
-                        type: t("editor_settings_modal.blacklisted_entities.entity_types.faction"),
-                      })),
-                      ...mentionedEntities.races.map((e) => ({
-                        ...e,
-                        type: t("editor_settings_modal.blacklisted_entities.entity_types.race"),
-                      })),
-                    ];
-
-                    const entity = allEntities.find((e) => e.id === entityId);
-                    if (!entity) return null;
-
-                    return (
-                      <div
-                        key={entityId}
-                        className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
-                      >
-                        <div className="flex items-center gap-3">
-                          {entity.image && (
-                            <img
-                              src={entity.image}
-                              alt={entity.name}
-                              className="w-8 h-8 rounded-full object-cover"
-                            />
-                          )}
-                          <div>
-                            <p className="font-medium text-sm">{entity.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {entity.type}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRemoveFromBlacklist?.(entityId)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
         {/* Footer - Fixed at bottom */}
