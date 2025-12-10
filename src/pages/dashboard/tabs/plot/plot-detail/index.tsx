@@ -9,9 +9,9 @@ import { getItemsByBookId } from "@/lib/db/items.service";
 import {
   getPlotArcsByBookId,
   getPlotArcById,
-  deletePlotArc,
 } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
+import { canFinishArc } from "@/lib/utils/arc-validation";
 import { usePlotStore } from "@/stores/plot-store";
 import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 
@@ -27,6 +27,9 @@ export function PlotArcDetail() {
   // Store actions
   const updatePlotArcInCache = usePlotStore(
     (state) => state.updatePlotArcInCache
+  );
+  const deletePlotArcFromCache = usePlotStore(
+    (state) => state.deletePlotArcFromCache
   );
 
   // Data state
@@ -56,6 +59,11 @@ export function PlotArcDetail() {
   const [showDeleteEventDialog, setShowDeleteEventDialog] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
     useState(false);
+  const [showFinishWarningDialog, setShowFinishWarningDialog] = useState(false);
+  const [finishWarningReason, setFinishWarningReason] = useState<{
+    hasNoEvents: boolean;
+    hasNoCompletedEvents: boolean;
+  }>({ hasNoEvents: false, hasNoCompletedEvents: false });
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   // Section state
@@ -380,12 +388,12 @@ export function PlotArcDetail() {
   const handleDeleteArc = useCallback(async () => {
     if (!arc) return;
     try {
-      await deletePlotArc(arc.id);
+      await deletePlotArcFromCache(dashboardId, arc.id);
       router.history.back();
     } catch (error) {
       console.error("Failed to delete plot arc:", error);
     }
-  }, [arc, router, t]);
+  }, [arc, dashboardId, deletePlotArcFromCache, router]);
 
   const handleDeleteEvent = useCallback(async () => {
     if (eventToDelete && arc) {
@@ -450,6 +458,51 @@ export function PlotArcDetail() {
     }));
   }, []);
 
+  // Finish/Activate arc handlers
+  const handleFinishOrActivateArc = useCallback(async () => {
+    if (!arc) return;
+
+    // If arc is already finished, activate it (set to planning)
+    if (arc.status === "finished") {
+      try {
+        await updatePlotArcInCache(arc.id, { status: "planning" });
+        setArc((prev) => {
+          if (!prev) return prev;
+          return { ...prev, status: "planning" };
+        });
+      } catch (error) {
+        console.error("Failed to activate arc:", error);
+      }
+      return;
+    }
+
+    // If arc is not finished, check if it can be finished
+    const validation = canFinishArc(arc);
+    if (!validation.canFinish) {
+      setFinishWarningReason({
+        hasNoEvents: validation.hasNoEvents,
+        hasNoCompletedEvents: validation.hasNoCompletedEvents,
+      });
+      setShowFinishWarningDialog(true);
+      return;
+    }
+
+    // Arc can be finished
+    try {
+      await updatePlotArcInCache(arc.id, { status: "finished" });
+      setArc((prev) => {
+        if (!prev) return prev;
+        return { ...prev, status: "finished" };
+      });
+    } catch (error) {
+      console.error("Failed to finish arc:", error);
+    }
+  }, [arc, updatePlotArcInCache]);
+
+  const handleFinishWarningDialogChange = useCallback((open: boolean) => {
+    setShowFinishWarningDialog(open);
+  }, []);
+
   // Show nothing while loading to avoid flash
   if (isLoading) {
     return null;
@@ -482,6 +535,8 @@ export function PlotArcDetail() {
       showDeleteArcDialog={showDeleteArcDialog}
       showDeleteEventDialog={showDeleteEventDialog}
       showUnsavedChangesDialog={showUnsavedChangesDialog}
+      showFinishWarningDialog={showFinishWarningDialog}
+      finishWarningReason={finishWarningReason}
       eventChainSectionOpen={eventChainSectionOpen}
       advancedSectionOpen={advancedSectionOpen}
       validationErrors={validationErrors}
@@ -500,6 +555,8 @@ export function PlotArcDetail() {
       onDeleteArcDialogChange={handleDeleteArcDialogChange}
       onDeleteEventDialogChange={handleDeleteEventDialogChange}
       onUnsavedChangesDialogChange={handleUnsavedChangesDialogChange}
+      onFinishWarningDialogChange={handleFinishWarningDialogChange}
+      onFinishOrActivateArc={handleFinishOrActivateArc}
       onEditFormChange={handleEditFormChange}
       validateField={validateField}
       onToggleEventCompletion={handleToggleEventCompletion}

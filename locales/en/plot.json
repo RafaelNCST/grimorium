@@ -128,7 +128,9 @@
     "delete": "Delete",
     "delete_arc": "Delete Arc",
     "add": "Add",
-    "back": "Back"
+    "back": "Back",
+    "finish_arc": "Finish Arc",
+    "activate_arc": "Activate Arc"
   },
   "toast": {
     "arc_updated": "Arc updated successfully!",
@@ -158,5 +160,12 @@
     "no_items_selected": "No items selected",
     "arc_message": "Arc Message",
     "world_impact": "World Impact"
+  },
+  "finish_arc": {
+    "cannot_finish_title": "Cannot Finish Arc",
+    "no_events_message": "This arc needs at least 1 event to be finished.",
+    "no_completed_events_message": "This arc needs at least 1 completed event to be finished.",
+    "understand": "Understood",
+    "finished_badge": "This arc is finished"
   }
 }

@@ -27,6 +27,7 @@ import {
   Save,
   X,
   Check,
+  RotateCcw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -42,6 +43,7 @@ import { FormInput } from "@/components/forms/FormInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
+import { EventModal } from "@/components/modals/create-plot-arc-modal/components/event-modal";
 import { StatusSelector } from "@/components/modals/create-plot-arc-modal/components/status-selector";
 import { ARC_SIZE_OPTIONS } from "@/components/modals/create-plot-arc-modal/constants/arc-size-options";
 import {
@@ -56,12 +58,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ARC_SIZES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-sizes-constant";
 import { ARC_STATUSES_CONSTANT } from "@/pages/dashboard/tabs/plot/constants/arc-statuses-constant";
 import type {
@@ -72,6 +78,7 @@ import type {
 } from "@/types/plot-types";
 
 import { DeleteArcConfirmationDialog } from "./components/delete-arc-confirmation-dialog";
+import { FinishArcWarningDialog } from "./components/finish-arc-warning-dialog";
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 
 // Map status values to their display colors (matching filter badges)
@@ -102,6 +109,11 @@ interface PropsPlotArcDetailView {
   showDeleteArcDialog: boolean;
   showDeleteEventDialog: boolean;
   showUnsavedChangesDialog: boolean;
+  showFinishWarningDialog: boolean;
+  finishWarningReason: {
+    hasNoEvents: boolean;
+    hasNoCompletedEvents: boolean;
+  };
   eventChainSectionOpen: boolean;
   advancedSectionOpen: boolean;
   validationErrors: Record<string, string>;
@@ -120,6 +132,8 @@ interface PropsPlotArcDetailView {
   onDeleteArcDialogChange: (open: boolean) => void;
   onDeleteEventDialogChange: (open: boolean) => void;
   onUnsavedChangesDialogChange: (open: boolean) => void;
+  onFinishWarningDialogChange: (open: boolean) => void;
+  onFinishOrActivateArc: () => void;
   onEditFormChange: <K extends keyof IPlotArc>(
     field: K,
     value: IPlotArc[K]
@@ -142,6 +156,7 @@ interface PropsPlotArcDetailView {
 interface PropsSortableEvent {
   event: IPlotEvent;
   isEditing: boolean;
+  arcStatus: PlotArcStatus;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (event: IPlotEvent) => void;
@@ -150,6 +165,7 @@ interface PropsSortableEvent {
 function SortableEvent({
   event,
   isEditing,
+  arcStatus,
   onToggle,
   onDelete,
   onEdit,
@@ -182,7 +198,7 @@ function SortableEvent({
       {...(isEditing ? listeners : {})}
       className={`flex items-start gap-3 p-3 rounded-lg border border-border bg-card ${isEditing ? "cursor-grab active:cursor-grabbing" : "hover:bg-muted/30"}`}
     >
-      {!isEditing && (
+      {!isEditing && arcStatus !== "finished" && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -198,6 +214,15 @@ function SortableEvent({
             <Circle className="w-5 h-5" />
           )}
         </button>
+      )}
+      {!isEditing && arcStatus === "finished" && (
+        <div className="mt-1 text-emerald-500">
+          {event.completed ? (
+            <CheckCircle2 className="w-5 h-5" />
+          ) : (
+            <Circle className="w-5 h-5" />
+          )}
+        </div>
       )}
 
       <div className="flex-1 min-w-0">
@@ -260,6 +285,8 @@ export function PlotArcDetailView({
   showDeleteArcDialog,
   showDeleteEventDialog,
   showUnsavedChangesDialog,
+  showFinishWarningDialog,
+  finishWarningReason,
   eventChainSectionOpen,
   advancedSectionOpen,
   validationErrors,
@@ -278,6 +305,8 @@ export function PlotArcDetailView({
   onDeleteArcDialogChange,
   onDeleteEventDialogChange,
   onUnsavedChangesDialogChange,
+  onFinishWarningDialogChange,
+  onFinishOrActivateArc,
   onEditFormChange,
   validateField,
   onToggleEventCompletion,
@@ -293,11 +322,9 @@ export function PlotArcDetailView({
   items = [],
   regions = [],
 }: PropsPlotArcDetailView) {
-  const { t } = useTranslation(["plot", "create-plot-arc"]);
-  const [isAddingEvent, setIsAddingEvent] = useState(false);
+  const { t } = useTranslation(["plot", "create-plot-arc", "tooltips"]);
+  const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);
-  const [newEventName, setNewEventName] = useState("");
-  const [newEventDescription, setNewEventDescription] = useState("");
   const [chapterMetricsSectionOpen, setChapterMetricsSectionOpen] =
     useState(false);
 
@@ -325,54 +352,41 @@ export function PlotArcDetailView({
     }
   };
 
-  const handleAddEvent = () => {
-    if (!newEventName.trim() || !newEventDescription.trim()) return;
-
-    onAddEvent({
-      name: newEventName.trim(),
-      description: newEventDescription.trim(),
-      completed: false,
-    });
-
-    setNewEventName("");
-    setNewEventDescription("");
-    setIsAddingEvent(false);
+  const handleEventModalConfirm = (name: string, description: string) => {
+    if (editingEvent) {
+      // Editing existing event
+      const currentEvents = isEditing
+        ? editForm.events || arc.events
+        : arc.events;
+      const updatedEvents = currentEvents.map((e) =>
+        e.id === editingEvent.id
+          ? {
+              ...e,
+              name: name,
+              description: description,
+            }
+          : e
+      );
+      onReorderEvents(updatedEvents);
+      setEditingEvent(null);
+    } else {
+      // Adding new event
+      onAddEvent({
+        name: name,
+        description: description,
+        completed: false,
+      });
+    }
+    setShowEventModal(false);
   };
 
   const handleStartEdit = (event: IPlotEvent) => {
     setEditingEvent(event);
-    setNewEventName(event.name);
-    setNewEventDescription(event.description);
-    setIsAddingEvent(false);
+    setShowEventModal(true);
   };
 
-  const handleEditEvent = () => {
-    if (!editingEvent || !newEventName.trim() || !newEventDescription.trim())
-      return;
-
-    const currentEvents = isEditing
-      ? editForm.events || arc.events
-      : arc.events;
-    const updatedEvents = currentEvents.map((e) =>
-      e.id === editingEvent.id
-        ? {
-            ...e,
-            name: newEventName.trim(),
-            description: newEventDescription.trim(),
-          }
-        : e
-    );
-
-    onReorderEvents(updatedEvents);
-    setNewEventName("");
-    setNewEventDescription("");
-    setEditingEvent(null);
-  };
-
-  const handleCancelEdit = () => {
-    setNewEventName("");
-    setNewEventDescription("");
-    setIsAddingEvent(false);
+  const handleEventModalClose = () => {
+    setShowEventModal(false);
     setEditingEvent(null);
   };
 
@@ -414,9 +428,10 @@ export function PlotArcDetailView({
     .map((r) => ({ id: r.id, name: r.name, image: r.image }));
 
   return (
-    <div className="bg-background">
-      {/* Fixed Header */}
-      <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
+    <TooltipProvider>
+      <div className="bg-background">
+        {/* Fixed Header */}
+        <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
         <div className="flex items-center justify-between gap-4">
           {/* Left side - Back button */}
           {!isEditing && (
@@ -462,9 +477,44 @@ export function PlotArcDetailView({
               </>
             ) : (
               <div className="flex gap-2">
-                <Button variant="ghost" size="icon" onClick={onEdit}>
-                  <Edit2 className="w-4 h-4" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={arc.status === "finished" ? "ghost" : "magical"}
+                      size="icon"
+                      onClick={onFinishOrActivateArc}
+                      className={arc.status === "finished" ? "" : "animate-glow"}
+                    >
+                      {arc.status === "finished" ? (
+                        <RotateCcw className="w-4 h-4" />
+                      ) : (
+                        <Check className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {arc.status === "finished"
+                      ? t("tooltips:plot_arc.activate_arc")
+                      : t("tooltips:plot_arc.finish_arc")}
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={onEdit}
+                      disabled={arc.status === "finished"}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {arc.status === "finished"
+                      ? t("tooltips:plot_arc.arc_is_finished")
+                      : t("plot:header.edit")}
+                  </TooltipContent>
+                </Tooltip>
                 <Button
                   variant="ghost-destructive"
                   size="icon"
@@ -585,6 +635,15 @@ export function PlotArcDetailView({
                         {SizeIcon && <SizeIcon className="w-3.5 h-3.5 mr-1.5" />}
                         {sizeConfig ? t(`plot:${sizeConfig.translationKey}`) : arc.size}
                       </Badge>
+                      {arc.status === "finished" && (
+                        <Badge
+                          variant="outline"
+                          className="pointer-events-none bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                        >
+                          <Check className="w-3.5 h-3.5 mr-1.5" />
+                          {t("plot:finish_arc.finished_badge")}
+                        </Badge>
+                      )}
                     </div>
                   </div>
 
@@ -629,74 +688,14 @@ export function PlotArcDetailView({
             isOpen={eventChainSectionOpen}
             onToggle={onEventChainSectionToggle}
           >
-            {/* Add/Edit Event Form */}
-            {isEditing && (isAddingEvent || editingEvent) && (
-              <div className="mb-4 p-4 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
-                <div className="space-y-2">
-                  <Label>{t("create-plot-arc:modal.event_name")} *</Label>
-                  <Input
-                    value={newEventName}
-                    onChange={(e) => setNewEventName(e.target.value)}
-                    placeholder={t(
-                      "create-plot-arc:modal.event_name_placeholder"
-                    )}
-                    maxLength={100}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>
-                    {t("create-plot-arc:modal.event_description")} *
-                  </Label>
-                  <Textarea
-                    value={newEventDescription}
-                    onChange={(e) => setNewEventDescription(e.target.value)}
-                    placeholder={t(
-                      "create-plot-arc:modal.event_description_placeholder"
-                    )}
-                    rows={3}
-                    maxLength={500}
-                    className="resize-none"
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCancelEdit}
-                    className="flex-1"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    {t("plot:button.cancel")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="magical"
-                    size="sm"
-                    onClick={editingEvent ? handleEditEvent : handleAddEvent}
-                    disabled={
-                      !newEventName.trim() || !newEventDescription.trim()
-                    }
-                    className="flex-1 animate-glow"
-                  >
-                    <Check className="w-4 h-4 mr-2" />
-                    {editingEvent
-                      ? t("plot:button.save")
-                      : t("plot:button.add")}
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* Add Event Button */}
-            {isEditing && !isAddingEvent && !editingEvent && (
+            {isEditing && (
               <div className="mb-4">
                 <Button
-                  variant="outline"
+                  variant="magical"
                   size="sm"
-                  onClick={() => setIsAddingEvent(true)}
+                  onClick={() => setShowEventModal(true)}
+                  className="w-full animate-glow-purple"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   {t("create-plot-arc:modal.add_event")}
@@ -721,6 +720,7 @@ export function PlotArcDetailView({
                         key={event.id}
                         event={event}
                         isEditing={isEditing}
+                        arcStatus={arc.status}
                         onToggle={onToggleEventCompletion}
                         onDelete={onEventDeleteRequest}
                         onEdit={handleStartEdit}
@@ -1055,6 +1055,23 @@ export function PlotArcDetailView({
         onOpenChange={onUnsavedChangesDialogChange}
         onConfirm={onConfirmCancel}
       />
-    </div>
+
+      {/* Finish Arc Warning Dialog */}
+      <FinishArcWarningDialog
+        isOpen={showFinishWarningDialog}
+        onClose={() => onFinishWarningDialogChange(false)}
+        hasNoEvents={finishWarningReason.hasNoEvents}
+        hasNoCompletedEvents={finishWarningReason.hasNoCompletedEvents}
+      />
+
+      {/* Event Modal */}
+      <EventModal
+        open={showEventModal}
+        onClose={handleEventModalClose}
+        onConfirm={handleEventModalConfirm}
+        event={editingEvent}
+      />
+      </div>
+    </TooltipProvider>
   );
 }

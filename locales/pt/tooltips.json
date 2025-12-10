@@ -38,5 +38,10 @@
     "magic": "Sistema de Poder",
     "species": "Raças",
     "items": "Itens"
+  },
+  "plot_arc": {
+    "finish_arc": "Finalizar arco (requer pelo menos 1 evento completado)",
+    "activate_arc": "Reativar arco para status de planejamento",
+    "arc_is_finished": "Este arco está finalizado e não pode ser editado"
   }
 }

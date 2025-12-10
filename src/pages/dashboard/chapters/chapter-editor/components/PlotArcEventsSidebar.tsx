@@ -10,6 +10,7 @@ import {
   Target,
   Lightbulb,
   Globe,
+  Check,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -108,6 +109,15 @@ export function PlotArcEventsSidebar({
                   {t(`plot:${sizeConfig.translationKey}`)}
                 </Badge>
               )}
+              {arc.status === "finished" && (
+                <Badge
+                  variant="outline"
+                  className="pointer-events-none bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1.5" />
+                  {t("plot:finish_arc.finished_badge")}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -196,6 +206,7 @@ export function PlotArcEventsSidebar({
                     <EventItem
                       key={event.id}
                       event={event}
+                      isArcFinished={arc.status === "finished"}
                       onToggle={onToggleEventCompletion}
                     />
                   ))}
@@ -218,10 +229,11 @@ export function PlotArcEventsSidebar({
 
 interface EventItemProps {
   event: IPlotEvent;
+  isArcFinished: boolean;
   onToggle: (eventId: string) => void;
 }
 
-function EventItem({ event, onToggle }: EventItemProps) {
+function EventItem({ event, isArcFinished, onToggle }: EventItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -232,19 +244,29 @@ function EventItem({ event, onToggle }: EventItemProps) {
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="flex items-start gap-3">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(event.id);
-          }}
-          className="mt-0.5 text-emerald-500 hover:text-emerald-600 transition-colors shrink-0"
-        >
-          {event.completed ? (
-            <CheckCircle2 className="w-5 h-5" />
-          ) : (
-            <Circle className="w-5 h-5" />
-          )}
-        </button>
+        {!isArcFinished ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(event.id);
+            }}
+            className="mt-0.5 text-emerald-500 hover:text-emerald-600 transition-colors shrink-0"
+          >
+            {event.completed ? (
+              <CheckCircle2 className="w-5 h-5" />
+            ) : (
+              <Circle className="w-5 h-5" />
+            )}
+          </button>
+        ) : (
+          <div className="mt-0.5 text-emerald-500 shrink-0">
+            {event.completed ? (
+              <CheckCircle2 className="w-5 h-5" />
+            ) : (
+              <Circle className="w-5 h-5" />
+            )}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">

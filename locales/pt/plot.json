@@ -128,7 +128,9 @@
     "delete": "Excluir",
     "delete_arc": "Excluir Arco",
     "add": "Adicionar",
-    "back": "Voltar"
+    "back": "Voltar",
+    "finish_arc": "Finalizar Arco",
+    "activate_arc": "Ativar Arco"
   },
   "toast": {
     "arc_updated": "Arco atualizado com sucesso!",
@@ -158,5 +160,12 @@
     "no_items_selected": "Nenhum item selecionado",
     "arc_message": "Mensagem do Arco",
     "world_impact": "Impacto no Mundo"
+  },
+  "finish_arc": {
+    "cannot_finish_title": "Não é Possível Finalizar o Arco",
+    "no_events_message": "Este arco precisa ter pelo menos 1 evento para ser finalizado.",
+    "no_completed_events_message": "Este arco precisa ter pelo menos 1 evento completado para ser finalizado.",
+    "understand": "Entendi",
+    "finished_badge": "Este arco está finalizado"
   }
 }

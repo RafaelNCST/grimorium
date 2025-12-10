@@ -13,30 +13,30 @@ interface PropsStatusSelector {
   value: PlotArcStatus | "";
   onChange: (value: PlotArcStatus | "") => void;
   hasCurrentArc: boolean;
+  error?: string;
 }
 
 export function StatusSelector({
   value,
   onChange,
   hasCurrentArc,
+  error,
 }: PropsStatusSelector) {
   const { t } = useTranslation("create-plot-arc");
 
-  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = ARC_STATUSES_CONSTANT.map((status) => ({
-    value: status.value,
-    label: t(`statuses.${status.value}`),
-    icon: status.icon,
-    backgroundColor: status.value === "finished"
-      ? "emerald-500/10"
-      : status.value === "current"
+  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = ARC_STATUSES_CONSTANT
+    .filter((status) => status.value !== "finished") // Exclude finished status from creation
+    .map((status) => ({
+      value: status.value,
+      label: t(`statuses.${status.value}`),
+      icon: status.icon,
+      backgroundColor: status.value === "current"
         ? "blue-500/10"
         : "amber-500/10",
-    borderColor: status.value === "finished"
-      ? "emerald-500/30"
-      : status.value === "current"
+      borderColor: status.value === "current"
         ? "blue-500/30"
         : "amber-500/30",
-  }));
+    }));
 
   // Filter out "current" option if there's already a current arc
   const availableOptions = STATUS_OPTIONS.map((option) => ({
@@ -66,6 +66,7 @@ export function StatusSelector({
         label=""
         columns={3}
       />
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

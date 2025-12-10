@@ -38,5 +38,10 @@
     "magic": "Power System",
     "species": "Races",
     "items": "Items"
+  },
+  "plot_arc": {
+    "finish_arc": "Finish arc (requires at least 1 completed event)",
+    "activate_arc": "Reactivate arc to planning status",
+    "arc_is_finished": "This arc is finished and cannot be edited"
   }
 }
