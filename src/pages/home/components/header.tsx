@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import { useUserAccountStore } from "@/stores/user-account-store";
 
 import { getColorClass } from "../utils/get-color-class";
 
@@ -36,6 +37,7 @@ export function Header({
   onOpenCreateModal,
 }: HeaderProps) {
   const { t, i18n } = useTranslation("home");
+  const { user } = useUserAccountStore();
 
   const formattedLastEditedDate = formatDate(lastEditedDate, i18n.language);
 
@@ -54,6 +56,7 @@ export function Header({
             <br />
             <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">
               {t("header.title_second_part")}
+              {user?.displayName && `, ${user.displayName}`}
             </span>
           </h1>
           <div className="animate-fade-in-up space-y-1">
