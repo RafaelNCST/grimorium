@@ -1,0 +1,93 @@
+{
+  "page": {
+    "title": "Gallery",
+    "search_placeholder": "Search images",
+    "upload_image": "Upload Image",
+    "delete_mode": "Delete Mode",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "clear_filters": "Clear Filters"
+  },
+  "upload_modal": {
+    "title": "Upload Image",
+    "edit_title": "Edit Image",
+    "title_label": "Title",
+    "title_placeholder": "Character portrait",
+    "description_label": "Description",
+    "description_placeholder": "A detailed portrait showing the character in their iconic battle armor",
+    "optional": "optional",
+    "select_image": "Select Image",
+    "change_image": "Change Image",
+    "links_label": "Link to Entities",
+    "manage_links": "Manage Links",
+    "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "max_size_error": "Image size must be less than {{size}}MB",
+    "format_error": "Invalid format. Accepted: JPG, PNG, WEBP, GIF",
+    "title_required": "Title is required"
+  },
+  "lightbox": {
+    "previous": "Previous",
+    "next": "Next",
+    "close": "Close",
+    "download": "Download",
+    "edit": "Edit",
+    "delete": "Delete",
+    "unlink": "Unlink",
+    "zoom_in": "Zoom In",
+    "zoom_out": "Zoom Out",
+    "reset_zoom": "Reset Zoom",
+    "metadata": "Metadata",
+    "title_label": "Title",
+    "description_label": "Description",
+    "filename": "Filename",
+    "size": "Size",
+    "dimensions": "Dimensions",
+    "format": "Format",
+    "linked_entities": "Linked Entities",
+    "no_links": "No linked entities"
+  },
+  "filters": {
+    "sort_label": "Sort",
+    "sort_recent": "Recent",
+    "sort_alphabetical": "A-Z",
+    "sort_manual": "Manual Order",
+    "characters": "Characters",
+    "regions": "Regions",
+    "factions": "Factions",
+    "races": "Races",
+    "items": "Items",
+    "arcs": "Arcs"
+  },
+  "card": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "links_count": "{{count}} link(s)"
+  },
+  "empty_state": {
+    "title": "No images yet",
+    "description": "Upload your first image and it will appear here!",
+    "no_results": "No images found",
+    "no_results_description": "Try adjusting filters or search term"
+  },
+  "delete": {
+    "title": "Delete Image",
+    "message": "Are you sure you want to delete \"{{imageName}}\"? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "validation": {
+    "title_required": "Title is required",
+    "title_max_length": "Title must be at most 200 characters"
+  },
+  "entity_gallery": {
+    "title": "{{entityName}} Gallery",
+    "subtitle": "{{count}} image(s) linked",
+    "upload_image": "Upload Image",
+    "empty_state_title": "No linked images",
+    "empty_state_description": "Upload your first image for {{entityName}} and it will be automatically linked."
+  }
+}

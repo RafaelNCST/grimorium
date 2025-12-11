@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Trash2, Database, Loader2 } from "lucide-react";
+import { Trash2, Database } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -108,7 +108,7 @@ export function ResetDatabaseButton() {
             >
               {isResetting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                   Resetando...
                 </>
               ) : (

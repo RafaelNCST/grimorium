@@ -77,7 +77,21 @@
       "Bash(Stop-Process -Force -Id 40304)",
       "Bash(powershell.exe -Command \"Stop-Process -Force -Name node\")",
       "Bash(powershell.exe -Command \"Stop-Process -Force -Id 31264\")",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 8080 | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Force -Id $_}\")",
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Force -Id $_}\")",
+      "Bash(Stop-Process -Force -Id 7296)",
+      "Bash(powershell.exe -Command \"Stop-Process -Name node -Force\")",
+      "Bash(powershell.exe -Command \"$conn = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue; if ($conn) { Stop-Process -Force -Id $conn.OwningProcess }\")",
+      "Bash(Stop-Process -Force -Id 37212)",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 37212\")",
+      "Bash(Start-Sleep -Seconds 2)",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 21088\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 19384\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 42244\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 10436\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 42704\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 31592\")"
     ],
     "deny": [
       "Bash(git push --force:*)",

@@ -1,0 +1,409 @@
+import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { stat, readFile } from "@tauri-apps/plugin-fs";
+import { Upload, X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+
+import { ManageEntityLinksModal } from "@/components/modals/manage-entity-links-modal";
+
+import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
+import {
+  generateThumbnail,
+  getImageDimensions,
+  formatFileSize,
+  getExtensionFromMimeType,
+  getMimeTypeFromExtension,
+  bytesToDataURL,
+} from "../utils/image-utils";
+import {
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB,
+  SUPPORTED_IMAGE_EXTENSIONS,
+} from "../constants/gallery-constants";
+import { copyImageToGallery, ensureGalleryDirectory } from "@/lib/db/gallery.service";
+
+interface UploadImageModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onUpload: (data: {
+    title: string;
+    description?: string;
+    thumbnailBase64: string;
+    originalPath: string;
+    originalFilename: string;
+    fileSize: number;
+    width: number;
+    height: number;
+    mimeType: string;
+    links: IGalleryLink[];
+  }) => void;
+  editingItem?: IGalleryItem | null;
+  bookId: string;
+  preSelectedLinks?: IGalleryLink[];
+  disableLinksManagement?: boolean;
+}
+
+export function UploadImageModal({
+  open,
+  onOpenChange,
+  onUpload,
+  editingItem = null,
+  bookId,
+  preSelectedLinks = [],
+  disableLinksManagement = false,
+}: UploadImageModalProps) {
+  const { t } = useTranslation("gallery");
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [links, setLinks] = useState<IGalleryLink[]>(preSelectedLinks);
+  const [showManageLinksModal, setShowManageLinksModal] = useState(false);
+
+  // Image state
+  const [selectedImagePath, setSelectedImagePath] = useState<string>("");
+  const [selectedImageDataURL, setSelectedImageDataURL] = useState<string>("");
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageMetadata, setImageMetadata] = useState<{
+    filename: string;
+    size: number;
+    mimeType: string;
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const [error, setError] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Load editing item data when modal opens
+  useEffect(() => {
+    if (open && editingItem) {
+      setTitle(editingItem.title);
+      setDescription(editingItem.description || "");
+      setLinks(editingItem.links);
+      setImagePreview(editingItem.thumbnailBase64);
+      setImageMetadata({
+        filename: editingItem.originalFilename,
+        size: editingItem.fileSize,
+        mimeType: editingItem.mimeType,
+        width: editingItem.width,
+        height: editingItem.height,
+      });
+      setSelectedImagePath(editingItem.originalPath);
+    }
+  }, [open, editingItem]);
+
+  const handleSelectImage = useCallback(async () => {
+    try {
+      const selected = await openDialog({
+        multiple: false,
+        filters: [
+          {
+            name: "Images",
+            extensions: SUPPORTED_IMAGE_EXTENSIONS,
+          },
+        ],
+      });
+
+      if (!selected || typeof selected !== "string") {
+        return;
+      }
+
+      // Get file stats using Tauri FS API
+      const fileStats = await stat(selected);
+
+      // Check file size
+      if (fileStats.size > MAX_FILE_SIZE_BYTES) {
+        setError(t("upload_modal.max_size_error", { size: MAX_FILE_SIZE_MB }));
+        return;
+      }
+
+      // Get filename and extension
+      const filename = selected.split(/[\\/]/).pop() || "image";
+      const extension = filename.split(".").pop()?.toLowerCase() || "";
+
+      // Determine MIME type from extension
+      const mimeType = getMimeTypeFromExtension(extension);
+
+      // Read file content as bytes
+      const fileBytes = await readFile(selected);
+
+      // Convert bytes to data URL
+      const imageDataURL = bytesToDataURL(fileBytes, mimeType);
+
+      // Get image dimensions
+      const dimensions = await getImageDimensions(imageDataURL);
+
+      // Generate thumbnail preview
+      const thumbnail = await generateThumbnail(imageDataURL);
+
+      setSelectedImagePath(selected);
+      setSelectedImageDataURL(imageDataURL);
+      setImagePreview(thumbnail);
+      setImageMetadata({
+        filename,
+        size: fileStats.size,
+        mimeType,
+        width: dimensions.width,
+        height: dimensions.height,
+      });
+      setError("");
+    } catch (err) {
+      console.error("Error selecting image:", err);
+      setError("Failed to load image. Please try again.");
+    }
+  }, [t]);
+
+  const handleUpload = useCallback(async () => {
+    if (!title.trim()) {
+      setError(t("upload_modal.title_required"));
+      return;
+    }
+
+    if (!imageMetadata) {
+      setError("Please select an image first.");
+      return;
+    }
+
+    setIsUploading(true);
+    setError("");
+
+    try {
+      let finalPath = selectedImagePath;
+      let finalThumbnail = imagePreview;
+
+      // Only copy file if a new image was selected (different from editing)
+      if (selectedImageDataURL && (!editingItem || selectedImagePath !== editingItem.originalPath)) {
+        // Ensure gallery directory exists
+        await ensureGalleryDirectory();
+
+        // Generate unique filename
+        const itemId = crypto.randomUUID();
+        const extension = getExtensionFromMimeType(imageMetadata.mimeType);
+        const uniqueFilename = `image_${itemId}_${crypto.randomUUID()}.${extension}`;
+        const relativePath = `gallery/${uniqueFilename}`;
+
+        // Copy file to AppData/gallery/
+        await copyImageToGallery(selectedImagePath, relativePath);
+
+        // Generate thumbnail
+        finalThumbnail = await generateThumbnail(selectedImageDataURL);
+        finalPath = relativePath;
+      }
+
+      // Call onUpload with all data
+      onUpload({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        thumbnailBase64: finalThumbnail,
+        originalPath: finalPath,
+        originalFilename: imageMetadata.filename,
+        fileSize: imageMetadata.size,
+        width: imageMetadata.width,
+        height: imageMetadata.height,
+        mimeType: imageMetadata.mimeType,
+        links,
+      });
+
+      // Reset form
+      handleClose();
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      setError("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  }, [
+    title,
+    description,
+    selectedImagePath,
+    selectedImageDataURL,
+    imagePreview,
+    imageMetadata,
+    links,
+    onUpload,
+    editingItem,
+    t,
+  ]);
+
+  const handleClose = useCallback(() => {
+    setTitle("");
+    setDescription("");
+    setLinks(preSelectedLinks);
+    setSelectedImagePath("");
+    setSelectedImageDataURL("");
+    setImagePreview("");
+    setImageMetadata(null);
+    setError("");
+    setIsUploading(false);
+    setShowManageLinksModal(false);
+    onOpenChange(false);
+  }, [preSelectedLinks, onOpenChange]);
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingItem ? t("upload_modal.edit_title") : t("upload_modal.title")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Image Selection */}
+            <div className="space-y-2">
+              <Label>{t("upload_modal.select_image")}</Label>
+              <div className="relative w-full h-64 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary transition-colors overflow-hidden bg-muted">
+                {imagePreview ? (
+                  <>
+                    {/* Image container - clicável para trocar */}
+                    <div
+                      className="relative group cursor-pointer w-full h-full"
+                      onClick={handleSelectImage}
+                    >
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-contain"
+                      />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                        <Upload className="h-12 w-12 text-white" />
+                      </div>
+                    </div>
+
+                    {/* File info - on top */}
+                    {imageMetadata && (
+                      <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded flex items-center gap-2">
+                        <span className="font-medium truncate max-w-[200px]">
+                          {imageMetadata.filename}
+                        </span>
+                        <span className="text-white/80">•</span>
+                        <span className="text-white/80">
+                          {formatFileSize(imageMetadata.size)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Delete button - mais sobressaído */}
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 z-20 shadow-lg bg-destructive/90 hover:bg-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImagePreview("");
+                        setSelectedImagePath("");
+                        setSelectedImageDataURL("");
+                        setImageMetadata(null);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={handleSelectImage}
+                  >
+                    <Upload className="h-8 w-8 text-muted-foreground" />
+                    <span className="text-sm">{t("upload_modal.select_image")}</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Title */}
+            <FormInput
+              id="title"
+              label={t("upload_modal.title_label")}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={t("upload_modal.title_placeholder")}
+              maxLength={100}
+              showCharCount
+              required
+              showOptionalLabel={false}
+            />
+
+            {/* Description */}
+            <FormTextarea
+              id="description"
+              label={t("upload_modal.description_label")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("upload_modal.description_placeholder")}
+              maxLength={500}
+              showCharCount
+              className="min-h-[120px]"
+            />
+
+            {/* Links */}
+            {!disableLinksManagement && (
+              <div className="space-y-2">
+                <Label>{t("upload_modal.links_label")}</Label>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => setShowManageLinksModal(true)}
+                >
+                  {t("upload_modal.manage_links")} ({links.length})
+                </Button>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+                {error}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={handleClose} disabled={isUploading}>
+              {t("upload_modal.cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="magical"
+              onClick={handleUpload}
+              disabled={isUploading || !imagePreview || !title.trim()}
+              className="animate-glow"
+            >
+              {isUploading
+                ? (editingItem ? t("upload_modal.saving") : t("upload_modal.uploading"))
+                : (editingItem ? t("upload_modal.save") : t("upload_modal.upload"))
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage Links Modal */}
+      <ManageEntityLinksModal
+        open={showManageLinksModal}
+        onOpenChange={setShowManageLinksModal}
+        links={links}
+        onLinksChange={setLinks}
+        bookId={bookId}
+      />
+    </>
+  );
+}

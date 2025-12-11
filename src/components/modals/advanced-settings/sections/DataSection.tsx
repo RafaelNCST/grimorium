@@ -11,7 +11,6 @@ import {
   Upload,
   Trash2,
   AlertTriangle,
-  Loader2,
   Shield,
   FileText,
   BarChart3,
@@ -223,7 +222,7 @@ export function DataSection() {
           >
             <div className={`rounded-lg p-2 flex-shrink-0 ${isExporting ? 'bg-muted' : 'bg-blue-500/10'}`}>
               {isExporting ? (
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                <div className="w-5 h-5 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               ) : (
                 <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               )}
@@ -248,7 +247,7 @@ export function DataSection() {
           >
             <div className={`rounded-lg p-2 flex-shrink-0 ${isImporting ? 'bg-muted' : 'bg-green-500/10'}`}>
               {isImporting ? (
-                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                <div className="w-5 h-5 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               ) : (
                 <Upload className="w-5 h-5 text-green-600 dark:text-green-400" />
               )}

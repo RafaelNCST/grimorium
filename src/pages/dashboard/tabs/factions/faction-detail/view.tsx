@@ -9,6 +9,7 @@ import {
   Users2,
   Settings,
   NotebookPen,
+  Image,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -1681,6 +1682,21 @@ export function FactionDetailView({
                     search: { entityName: faction.name },
                   }),
                 tooltip: t("faction-detail:header.notes"),
+              },
+              {
+                label: t("faction-detail:header.gallery"),
+                icon: Image,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "faction",
+                      entityId: faction.id,
+                    },
+                    search: { entityName: faction.name },
+                  }),
+                tooltip: t("faction-detail:header.gallery"),
               },
             ]}
             // Mode

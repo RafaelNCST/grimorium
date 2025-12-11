@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Loader2 } from "lucide-react";
+import { } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormInput } from "@/components/forms/FormInput";
@@ -114,7 +114,7 @@ export function CreateVersionDialog({
               {t("forms:buttons.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting || !name.trim()}>
-              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting && <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />}
               {t("forms:buttons.create_version")}
             </Button>
           </DialogFooter>

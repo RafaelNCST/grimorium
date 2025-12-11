@@ -1,11 +1,11 @@
-import { Loader2 } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   className?: string;
   text?: string;
+  borderWidth?: "thin" | "normal" | "thick" | "ultra";
+  speed?: "slow" | "normal" | "fast";
 }
 
 const sizeClasses = {
@@ -13,19 +13,37 @@ const sizeClasses = {
   md: "h-6 w-6",
   lg: "h-8 w-8",
   xl: "h-12 w-12",
+  "2xl": "h-16 w-16",
+};
+
+const borderWidthClasses = {
+  thin: "border-2",
+  normal: "border-2",
+  thick: "border-4",
+  ultra: "border-8",
+};
+
+const speedClasses = {
+  slow: "animate-spin-slow",
+  normal: "animate-spin",
+  fast: "animate-spin",
 };
 
 export function LoadingSpinner({
-  size = "lg",
+  size = "xl",
   className,
   text,
+  borderWidth = "thick",
+  speed = "slow",
 }: LoadingSpinnerProps) {
   return (
     <div className="flex flex-col items-center gap-4">
-      <Loader2
+      <div
         className={cn(
-          "animate-spin text-primary",
+          "rounded-full border-transparent border-t-primary",
           sizeClasses[size],
+          borderWidthClasses[borderWidth],
+          speedClasses[speed],
           className
         )}
       />

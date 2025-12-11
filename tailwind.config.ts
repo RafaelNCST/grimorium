@@ -105,7 +105,7 @@ export default {
             transform: "translateY(20px)",
           },
           to: {
-            opacity: "1", 
+            opacity: "1",
             transform: "translateY(0)",
           },
         },
@@ -125,6 +125,14 @@ export default {
             backgroundPosition: "200% 0",
           },
         },
+        "spin-slow": {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -132,6 +140,7 @@ export default {
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
         "glow": "glow 2s ease-in-out infinite alternate",
         "shimmer": "shimmer 2s linear infinite",
+        "spin-slow": "spin-slow 1.5s linear infinite",
       },
     },
   },

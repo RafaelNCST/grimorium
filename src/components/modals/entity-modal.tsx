@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 
-import { type LucideIcon, Plus, Save, Loader2, X } from "lucide-react";
+import { type LucideIcon, Plus, Save, X } from "lucide-react";
 
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 import { Button } from "@/components/ui/button";
@@ -114,7 +114,7 @@ export function EntityModal({
             onClick={footer.onSubmit}
           >
             {footer.isSubmitting ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />
             ) : footer.editMode ? (
               <Save className="w-4 h-4 mr-2" />
             ) : (

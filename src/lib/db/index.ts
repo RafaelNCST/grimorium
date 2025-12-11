@@ -590,6 +590,42 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_note_links_note ON note_links(note_id);
     CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
 
+    -- GALERIA (IMAGENS)
+    CREATE TABLE IF NOT EXISTS gallery_items (
+      id TEXT PRIMARY KEY,
+      book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT,
+      thumbnail_base64 TEXT NOT NULL,
+      original_path TEXT NOT NULL,
+      original_filename TEXT NOT NULL,
+      file_size INTEGER NOT NULL,
+      width INTEGER,
+      height INTEGER,
+      mime_type TEXT NOT NULL,
+      order_index INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS gallery_links (
+      id TEXT PRIMARY KEY,
+      gallery_item_id TEXT NOT NULL REFERENCES gallery_items(id) ON DELETE CASCADE,
+      entity_id TEXT NOT NULL,
+      entity_type TEXT NOT NULL,
+      book_id TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      UNIQUE(gallery_item_id, entity_id, entity_type)
+    );
+
+    -- ÍNDICES PARA GALERIA
+    CREATE INDEX IF NOT EXISTS idx_gallery_items_book_id ON gallery_items(book_id);
+    CREATE INDEX IF NOT EXISTS idx_gallery_items_updated_at ON gallery_items(updated_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_gallery_items_order ON gallery_items(book_id, order_index);
+    CREATE INDEX IF NOT EXISTS idx_gallery_links_item_id ON gallery_links(gallery_item_id);
+    CREATE INDEX IF NOT EXISTS idx_gallery_links_entity ON gallery_links(entity_id, entity_type);
+    CREATE INDEX IF NOT EXISTS idx_gallery_links_entity_type ON gallery_links(entity_type);
+
     -- CAPÍTULOS
     CREATE TABLE IF NOT EXISTS chapters (
       id TEXT PRIMARY KEY,

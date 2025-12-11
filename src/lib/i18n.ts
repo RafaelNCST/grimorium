@@ -23,6 +23,7 @@ import enExportPreview from "../../locales/en/export-preview.json";
 import enFactionDetail from "../../locales/en/faction-detail.json";
 import enFactions from "../../locales/en/factions.json";
 import enForms from "../../locales/en/forms.json";
+import enGallery from "../../locales/en/gallery.json";
 import enGlobalGoals from "../../locales/en/global-goals.json";
 import enHome from "../../locales/en/home.json";
 import enInbox from "../../locales/en/inbox.json";
@@ -64,6 +65,7 @@ import ptExportPreview from "../../locales/pt/export-preview.json";
 import ptFactionDetail from "../../locales/pt/faction-detail.json";
 import ptFactions from "../../locales/pt/factions.json";
 import ptForms from "../../locales/pt/forms.json";
+import ptGallery from "../../locales/pt/gallery.json";
 import ptGlobalGoals from "../../locales/pt/global-goals.json";
 import ptHome from "../../locales/pt/home.json";
 import ptInbox from "../../locales/pt/inbox.json";
@@ -110,6 +112,7 @@ const resources = {
     "faction-detail": enFactionDetail,
     factions: enFactions,
     forms: enForms,
+    gallery: enGallery,
     "global-goals": enGlobalGoals,
     "item-detail": enItemDetail,
     items: enItems,
@@ -153,6 +156,7 @@ const resources = {
     "faction-detail": ptFactionDetail,
     factions: ptFactions,
     forms: ptForms,
+    gallery: ptGallery,
     "global-goals": ptGlobalGoals,
     "item-detail": ptItemDetail,
     items: ptItems,

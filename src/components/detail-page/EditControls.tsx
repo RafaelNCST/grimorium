@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Edit, Save, X, Loader2 } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -93,7 +93,7 @@ export function EditControls({
               disabled={isSaving || !hasChanges}
             >
               {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               ) : (
                 <Save className="h-4 w-4" />
               )}

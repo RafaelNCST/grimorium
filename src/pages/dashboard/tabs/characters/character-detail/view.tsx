@@ -5,6 +5,7 @@ import {
   AlertCircle,
   Calendar,
   Heart,
+  Image,
   NotebookPen,
   Shield,
   Trash2,
@@ -1451,6 +1452,21 @@ export function CharacterDetailView({
                     search: { entityName: character.name },
                   }),
                 tooltip: t("character-detail:header.notes"),
+              },
+              {
+                label: t("character-detail:header.gallery"),
+                icon: Image,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "character",
+                      entityId: character.id,
+                    },
+                    search: { entityName: character.name },
+                  }),
+                tooltip: t("character-detail:header.gallery"),
               },
             ]}
             editLabel={t("character-detail:header.edit")}

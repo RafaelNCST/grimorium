@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 
-import { FileText, Loader2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -397,7 +397,7 @@ export function ExportPreviewModal({
             <div className="flex-1 overflow-y-auto bg-muted/20 p-4 flex items-start justify-center">
               {isLoading ? (
                 <div className="flex flex-col items-center gap-4 mt-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                   <p className="text-sm text-muted-foreground">
                     {t("preview.loading_content")}
                   </p>
@@ -414,7 +414,7 @@ export function ExportPreviewModal({
                   {isGeneratingPreview && pdfPreviewUrl && (
                     <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
                       <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                         <p className="text-sm text-muted-foreground">
                           {t("preview.updating_preview")}
                         </p>
@@ -445,7 +445,7 @@ export function ExportPreviewModal({
                               minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
                             }}
                           >
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                             <p className="text-sm text-muted-foreground">
                               {t("preview.loading_pdf")}
                             </p>
@@ -466,7 +466,7 @@ export function ExportPreviewModal({
                                       height: `${PAGE_FORMATS[config.pageFormat].height * scale}px`
                                     }}
                                   >
-                                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                    <div className="w-6 h-6 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                                   </div>
                                 }
                               />
@@ -486,7 +486,7 @@ export function ExportPreviewModal({
                         minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
                       }}
                     >
-                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
                       <p className="text-sm text-muted-foreground">
                         {t("preview.generating_preview")}
                       </p>

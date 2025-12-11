@@ -409,6 +409,33 @@ export interface DBNoteLink {
   created_at: number;
 }
 
+// Gallery
+export interface DBGalleryItem {
+  id: string;
+  book_id: string;
+  title: string;
+  description?: string;
+  thumbnail_base64: string;
+  original_path: string;
+  original_filename: string;
+  file_size: number;
+  width?: number;
+  height?: number;
+  mime_type: string;
+  order_index: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DBGalleryLink {
+  id: string;
+  gallery_item_id: string;
+  entity_id: string;
+  entity_type: string; // 'character', 'region', 'faction', 'race', 'item', 'arc'
+  book_id: string;
+  created_at: number;
+}
+
 // Helper types for queries
 export interface CharacterWithRelationships extends DBCharacter {
   relationships?: DBRelationship[];

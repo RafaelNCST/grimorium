@@ -19,6 +19,7 @@ import { Route as DashboarddashboardIdSuperViewsItemitemIdRouteImport } from './
 import { Route as DashboarddashboardIdSuperViewsFactionfactionIdRouteImport } from './routes/dashboard$dashboardId/super-views/faction$factionId'
 import { Route as DashboarddashboardIdSuperViewsCharactercharacterIdRouteImport } from './routes/dashboard$dashboardId/super-views/character$characterId'
 import { Route as DashboardDashboardIdNotesIndexRouteImport } from './routes/dashboard/$dashboardId/notes/index'
+import { Route as DashboardDashboardIdGalleryIndexRouteImport } from './routes/dashboard/$dashboardId/gallery/index'
 import { Route as DashboardDashboardIdChaptersIndexRouteImport } from './routes/dashboard/$dashboardId/chapters/index'
 import { Route as DashboardDashboardIdNotesFileNotesIdRouteImport } from './routes/dashboard/$dashboardId/notes/$fileNotesId'
 import { Route as DashboardDashboardIdNotesEditorNotesIdRouteImport } from './routes/dashboard/$dashboardId/notes/$editorNotesId'
@@ -40,6 +41,7 @@ import { Route as DashboardDashboardIdTabsCharacterCharacterIdIndexRouteImport }
 import { Route as DashboardDashboardIdTabsWorldRegionIdMapRouteImport } from './routes/dashboard/$dashboardId/tabs/world/$regionId/map'
 import { Route as DashboardDashboardIdTabsItemItemIdTimelineRouteImport } from './routes/dashboard/$dashboardId/tabs/item/$itemId/timeline'
 import { Route as DashboardDashboardIdNotesEntityEntityTypeEntityIdRouteImport } from './routes/dashboard/$dashboardId/notes/entity.$entityType.$entityId'
+import { Route as DashboardDashboardIdGalleryEntityEntityTypeEntityIdRouteImport } from './routes/dashboard/$dashboardId/gallery/entity.$entityType.$entityId'
 import { Route as DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRouteImport } from './routes/dashboard/$dashboardId/tabs/character/$characterId/power.$linkId'
 
 const SplatRoute = SplatRouteImport.update({
@@ -96,6 +98,12 @@ const DashboardDashboardIdNotesIndexRoute =
   DashboardDashboardIdNotesIndexRouteImport.update({
     id: '/dashboard/$dashboardId/notes/',
     path: '/dashboard/$dashboardId/notes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DashboardDashboardIdGalleryIndexRoute =
+  DashboardDashboardIdGalleryIndexRouteImport.update({
+    id: '/dashboard/$dashboardId/gallery/',
+    path: '/dashboard/$dashboardId/gallery/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardDashboardIdChaptersIndexRoute =
@@ -224,6 +232,12 @@ const DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute =
     path: '/dashboard/$dashboardId/notes/entity/$entityType/$entityId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute =
+  DashboardDashboardIdGalleryEntityEntityTypeEntityIdRouteImport.update({
+    id: '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId',
+    path: '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRoute =
   DashboardDashboardIdTabsCharacterCharacterIdPowerLinkIdRouteImport.update({
     id: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId',
@@ -245,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
+  '/dashboard/$dashboardId/gallery': typeof DashboardDashboardIdGalleryIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
   '/dashboard/$dashboardId/super-views/character/$characterId': typeof DashboardDashboardIdSuperViewsCharacterCharacterIdRoute
   '/dashboard/$dashboardId/super-views/faction/$factionId': typeof DashboardDashboardIdSuperViewsFactionFactionIdRoute
@@ -257,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
   '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
+  '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId': typeof DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/notes/entity/$entityType/$entityId': typeof DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/world/$regionId/map': typeof DashboardDashboardIdTabsWorldRegionIdMapRoute
@@ -279,6 +295,7 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters': typeof DashboardDashboardIdChaptersIndexRoute
+  '/dashboard/$dashboardId/gallery': typeof DashboardDashboardIdGalleryIndexRoute
   '/dashboard/$dashboardId/notes': typeof DashboardDashboardIdNotesIndexRoute
   '/dashboard/$dashboardId/super-views/character/$characterId': typeof DashboardDashboardIdSuperViewsCharacterCharacterIdRoute
   '/dashboard/$dashboardId/super-views/faction/$factionId': typeof DashboardDashboardIdSuperViewsFactionFactionIdRoute
@@ -291,6 +308,7 @@ export interface FileRoutesByTo {
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
   '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
+  '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId': typeof DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/notes/entity/$entityType/$entityId': typeof DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/world/$regionId/map': typeof DashboardDashboardIdTabsWorldRegionIdMapRoute
@@ -314,6 +332,7 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/notes/$editorNotesId': typeof DashboardDashboardIdNotesEditorNotesIdRoute
   '/dashboard/$dashboardId/notes/$fileNotesId': typeof DashboardDashboardIdNotesFileNotesIdRoute
   '/dashboard/$dashboardId/chapters/': typeof DashboardDashboardIdChaptersIndexRoute
+  '/dashboard/$dashboardId/gallery/': typeof DashboardDashboardIdGalleryIndexRoute
   '/dashboard/$dashboardId/notes/': typeof DashboardDashboardIdNotesIndexRoute
   '/dashboard/$dashboardId/super-views/character/$characterId': typeof DashboardDashboardIdSuperViewsCharacterCharacterIdRoute
   '/dashboard/$dashboardId/super-views/faction/$factionId': typeof DashboardDashboardIdSuperViewsFactionFactionIdRoute
@@ -326,6 +345,7 @@ export interface FileRoutesById {
   '/dashboard/$dashboardId/tabs/plot/plot-timeline': typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
   '/dashboard/$dashboardId/tabs/power-system/$systemId': typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   '/dashboard/$dashboardId/tabs/race/$raceId': typeof DashboardDashboardIdTabsRaceRaceIdRoute
+  '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId': typeof DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/notes/entity/$entityType/$entityId': typeof DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute
   '/dashboard/$dashboardId/tabs/item/$itemId/timeline': typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   '/dashboard/$dashboardId/tabs/world/$regionId/map': typeof DashboardDashboardIdTabsWorldRegionIdMapRoute
@@ -350,6 +370,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$editorNotesId'
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
+    | '/dashboard/$dashboardId/gallery'
     | '/dashboard/$dashboardId/notes'
     | '/dashboard/$dashboardId/super-views/character/$characterId'
     | '/dashboard/$dashboardId/super-views/faction/$factionId'
@@ -362,6 +383,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
     | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
+    | '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/notes/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/world/$regionId/map'
@@ -384,6 +406,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$editorNotesId'
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters'
+    | '/dashboard/$dashboardId/gallery'
     | '/dashboard/$dashboardId/notes'
     | '/dashboard/$dashboardId/super-views/character/$characterId'
     | '/dashboard/$dashboardId/super-views/faction/$factionId'
@@ -396,6 +419,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
     | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
+    | '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/notes/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/world/$regionId/map'
@@ -418,6 +442,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/notes/$editorNotesId'
     | '/dashboard/$dashboardId/notes/$fileNotesId'
     | '/dashboard/$dashboardId/chapters/'
+    | '/dashboard/$dashboardId/gallery/'
     | '/dashboard/$dashboardId/notes/'
     | '/dashboard/$dashboardId/super-views/character/$characterId'
     | '/dashboard/$dashboardId/super-views/faction/$factionId'
@@ -430,6 +455,7 @@ export interface FileRouteTypes {
     | '/dashboard/$dashboardId/tabs/plot/plot-timeline'
     | '/dashboard/$dashboardId/tabs/power-system/$systemId'
     | '/dashboard/$dashboardId/tabs/race/$raceId'
+    | '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/notes/entity/$entityType/$entityId'
     | '/dashboard/$dashboardId/tabs/item/$itemId/timeline'
     | '/dashboard/$dashboardId/tabs/world/$regionId/map'
@@ -453,6 +479,7 @@ export interface RootRouteChildren {
   DashboardDashboardIdNotesEditorNotesIdRoute: typeof DashboardDashboardIdNotesEditorNotesIdRoute
   DashboardDashboardIdNotesFileNotesIdRoute: typeof DashboardDashboardIdNotesFileNotesIdRoute
   DashboardDashboardIdChaptersIndexRoute: typeof DashboardDashboardIdChaptersIndexRoute
+  DashboardDashboardIdGalleryIndexRoute: typeof DashboardDashboardIdGalleryIndexRoute
   DashboardDashboardIdNotesIndexRoute: typeof DashboardDashboardIdNotesIndexRoute
   DashboardDashboardIdSuperViewsCharacterCharacterIdRoute: typeof DashboardDashboardIdSuperViewsCharacterCharacterIdRoute
   DashboardDashboardIdSuperViewsFactionFactionIdRoute: typeof DashboardDashboardIdSuperViewsFactionFactionIdRoute
@@ -465,6 +492,7 @@ export interface RootRouteChildren {
   DashboardDashboardIdTabsPlotPlotTimelineRoute: typeof DashboardDashboardIdTabsPlotPlotTimelineRoute
   DashboardDashboardIdTabsPowerSystemSystemIdRoute: typeof DashboardDashboardIdTabsPowerSystemSystemIdRoute
   DashboardDashboardIdTabsRaceRaceIdRoute: typeof DashboardDashboardIdTabsRaceRaceIdRoute
+  DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute: typeof DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute
   DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute: typeof DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute
   DashboardDashboardIdTabsItemItemIdTimelineRoute: typeof DashboardDashboardIdTabsItemItemIdTimelineRoute
   DashboardDashboardIdTabsWorldRegionIdMapRoute: typeof DashboardDashboardIdTabsWorldRegionIdMapRoute
@@ -544,6 +572,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/$dashboardId/notes'
       fullPath: '/dashboard/$dashboardId/notes'
       preLoaderRoute: typeof DashboardDashboardIdNotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/$dashboardId/gallery/': {
+      id: '/dashboard/$dashboardId/gallery/'
+      path: '/dashboard/$dashboardId/gallery'
+      fullPath: '/dashboard/$dashboardId/gallery'
+      preLoaderRoute: typeof DashboardDashboardIdGalleryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/$dashboardId/chapters/': {
@@ -693,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIdNotesEntityEntityTypeEntityIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId': {
+      id: '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
+      path: '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
+      fullPath: '/dashboard/$dashboardId/gallery/entity/$entityType/$entityId'
+      preLoaderRoute: typeof DashboardDashboardIdGalleryEntityEntityTypeEntityIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId': {
       id: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
       path: '/dashboard/$dashboardId/tabs/character/$characterId/power/$linkId'
@@ -725,6 +767,7 @@ const rootRouteChildren: RootRouteChildren = {
     DashboardDashboardIdNotesFileNotesIdRoute,
   DashboardDashboardIdChaptersIndexRoute:
     DashboardDashboardIdChaptersIndexRoute,
+  DashboardDashboardIdGalleryIndexRoute: DashboardDashboardIdGalleryIndexRoute,
   DashboardDashboardIdNotesIndexRoute: DashboardDashboardIdNotesIndexRoute,
   DashboardDashboardIdSuperViewsCharacterCharacterIdRoute:
     DashboardDashboardIdSuperViewsCharacterCharacterIdRoute,
@@ -748,6 +791,8 @@ const rootRouteChildren: RootRouteChildren = {
     DashboardDashboardIdTabsPowerSystemSystemIdRoute,
   DashboardDashboardIdTabsRaceRaceIdRoute:
     DashboardDashboardIdTabsRaceRaceIdRoute,
+  DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute:
+    DashboardDashboardIdGalleryEntityEntityTypeEntityIdRoute,
   DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute:
     DashboardDashboardIdNotesEntityEntityTypeEntityIdRoute,
   DashboardDashboardIdTabsItemItemIdTimelineRoute:

@@ -1,0 +1,93 @@
+{
+  "page": {
+    "title": "Galeria",
+    "search_placeholder": "Buscar imagens",
+    "upload_image": "Enviar Imagem",
+    "delete_mode": "Modo de Exclusão",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "clear_filters": "Limpar Filtros"
+  },
+  "upload_modal": {
+    "title": "Enviar Imagem",
+    "edit_title": "Editar Imagem",
+    "title_label": "Título",
+    "title_placeholder": "Retrato do personagem",
+    "description_label": "Descrição",
+    "description_placeholder": "Um retrato detalhado mostrando o personagem em sua armadura de batalha icônica",
+    "optional": "opcional",
+    "select_image": "Selecionar Imagem",
+    "change_image": "Trocar Imagem",
+    "links_label": "Vincular a Entidades",
+    "manage_links": "Gerenciar Vínculos",
+    "cancel": "Cancelar",
+    "upload": "Enviar",
+    "uploading": "Enviando...",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "max_size_error": "O tamanho da imagem deve ser menor que {{size}}MB",
+    "format_error": "Formato inválido. Aceitos: JPG, PNG, WEBP, GIF",
+    "title_required": "O título é obrigatório"
+  },
+  "lightbox": {
+    "previous": "Anterior",
+    "next": "Próxima",
+    "close": "Fechar",
+    "download": "Baixar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "unlink": "Desvincular",
+    "zoom_in": "Aumentar Zoom",
+    "zoom_out": "Diminuir Zoom",
+    "reset_zoom": "Resetar Zoom",
+    "metadata": "Metadados",
+    "title_label": "Título",
+    "description_label": "Descrição",
+    "filename": "Nome do arquivo",
+    "size": "Tamanho",
+    "dimensions": "Dimensões",
+    "format": "Formato",
+    "linked_entities": "Entidades Vinculadas",
+    "no_links": "Nenhuma entidade vinculada"
+  },
+  "filters": {
+    "sort_label": "Ordenar",
+    "sort_recent": "Recentes",
+    "sort_alphabetical": "A-Z",
+    "sort_manual": "Ordem Manual",
+    "characters": "Personagens",
+    "regions": "Regiões",
+    "factions": "Facções",
+    "races": "Raças",
+    "items": "Itens",
+    "arcs": "Arcos"
+  },
+  "card": {
+    "edit": "Editar",
+    "delete": "Excluir",
+    "links_count": "{{count}} vínculo(s)"
+  },
+  "empty_state": {
+    "title": "Nenhuma imagem ainda",
+    "description": "Envie sua primeira imagem e ela aparecerá aqui!",
+    "no_results": "Nenhuma imagem encontrada",
+    "no_results_description": "Tente ajustar os filtros ou termo de busca"
+  },
+  "delete": {
+    "title": "Excluir Imagem",
+    "message": "Tem certeza que deseja excluir \"{{imageName}}\"? Esta ação não pode ser desfeita.",
+    "cancel": "Cancelar",
+    "confirm": "Excluir"
+  },
+  "validation": {
+    "title_required": "O título é obrigatório",
+    "title_max_length": "O título deve ter no máximo 200 caracteres"
+  },
+  "entity_gallery": {
+    "title": "Galeria de {{entityName}}",
+    "subtitle": "{{count}} imagem(ns) vinculada(s)",
+    "upload_image": "Enviar Imagem",
+    "empty_state_title": "Nenhuma imagem vinculada",
+    "empty_state_description": "Envie sua primeira imagem para {{entityName}} e ela será automaticamente vinculada."
+  }
+}

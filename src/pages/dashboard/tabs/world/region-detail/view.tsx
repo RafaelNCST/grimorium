@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Map, AlertCircle, Trash2, Clock, NotebookPen } from "lucide-react";
+import { Map, AlertCircle, Trash2, Clock, NotebookPen, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -1319,6 +1319,21 @@ export function RegionDetailView({
                     search: { entityName: region.name },
                   }),
                 tooltip: t("region-detail:header.notes"),
+              },
+              {
+                label: t("region-detail:header.gallery"),
+                icon: Image,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "region",
+                      entityId: region.id,
+                    },
+                    search: { entityName: region.name },
+                  }),
+                tooltip: t("region-detail:header.gallery"),
               },
               {
                 label: t("region-detail:header.view_map"),

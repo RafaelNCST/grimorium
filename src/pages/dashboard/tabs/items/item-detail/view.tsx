@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Info, Package, NotebookPen } from "lucide-react";
+import { AlertCircle, Info, Package, NotebookPen, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -845,6 +845,21 @@ export const ItemDetailView = React.memo(
                       search: { entityName: item.name },
                     }),
                   tooltip: t("item-detail:header.notes"),
+                },
+                {
+                  label: t("item-detail:header.gallery"),
+                  icon: Image,
+                  onClick: () =>
+                    navigate({
+                      to: "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId",
+                      params: {
+                        dashboardId: item.bookId,
+                        entityType: "item",
+                        entityId: item.id,
+                      },
+                      search: { entityName: item.name },
+                    }),
+                  tooltip: t("item-detail:header.gallery"),
                 },
               ]}
               hasRequiredFieldsEmpty={!isValid}

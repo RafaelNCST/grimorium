@@ -10,7 +10,6 @@ import {
   Moon,
   Check,
   X,
-  Loader2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -155,7 +154,7 @@ function NoteDetailViewComponent({
           {/* Save indicator */}
           {isSaving && (
             <div className="flex items-center gap-1 text-muted-foreground text-sm">
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <div className="h-3 w-3 animate-spin rounded-full border-b-2 border-primary" />
               <span>{t("autosave.saving")}</span>
             </div>
           )}

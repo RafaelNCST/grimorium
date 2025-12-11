@@ -431,6 +431,13 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     });
   }, [navigate, bookId]);
 
+  const handleNavigateToGallery = useCallback(() => {
+    navigate({
+      to: "/dashboard/$dashboardId/gallery",
+      params: { dashboardId: bookId },
+    });
+  }, [navigate, bookId]);
+
   const handleNavigateToNotes = useCallback(() => {
     navigate({
       to: "/notes",
@@ -494,6 +501,7 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onDelete={handleDelete}
       onDeleteBook={handleDeleteBook}
       onNavigateToChapters={handleNavigateToChapters}
+      onNavigateToGallery={handleNavigateToGallery}
       onNavigateToNotes={handleNavigateToNotes}
       onShowDeleteDialog={handleShowDeleteDialog}
       onDeleteInputChange={handleDeleteInputChange}

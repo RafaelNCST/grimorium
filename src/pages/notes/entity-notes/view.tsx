@@ -4,6 +4,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type {
   INote,
   INoteLink,
@@ -62,7 +63,7 @@ function EntityNotesViewComponent({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <LoadingSpinner />
       </div>
     );
   }

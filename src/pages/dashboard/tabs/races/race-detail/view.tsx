@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, NotebookPen } from "lucide-react";
+import { Dna, Users, NotebookPen, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -1294,6 +1294,21 @@ export function RaceDetailView({
                     search: { entityName: race.name },
                   }),
                 tooltip: t("race-detail:buttons.notes"),
+              },
+              {
+                label: t("race-detail:buttons.gallery"),
+                icon: Image,
+                onClick: () =>
+                  navigate({
+                    to: "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId",
+                    params: {
+                      dashboardId: bookId,
+                      entityType: "race",
+                      entityId: race.id,
+                    },
+                    search: { entityName: race.name },
+                  }),
+                tooltip: t("race-detail:buttons.gallery"),
               },
             ]}
             // Mode

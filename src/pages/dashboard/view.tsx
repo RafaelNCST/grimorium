@@ -89,6 +89,7 @@ interface PropsDashboardView {
   onDelete: () => void;
   onDeleteBook: () => void;
   onNavigateToChapters: () => void;
+  onNavigateToGallery: () => void;
   onNavigateToNotes: () => void;
   onShowDeleteDialog: (show: boolean) => void;
   onDeleteInputChange: (value: string) => void;
@@ -133,6 +134,7 @@ export function DashboardView({
   onCancel,
   onDelete,
   onNavigateToChapters,
+  onNavigateToGallery,
   onNavigateToNotes,
   onShowDeleteDialog,
   onDeleteInputChange,
@@ -157,6 +159,7 @@ export function DashboardView({
                 onBack={onBack}
                 onShowDeleteDialog={onShowDeleteDialog}
                 onNavigateToChapters={onNavigateToChapters}
+                onNavigateToGallery={onNavigateToGallery}
                 onNavigateToNotes={onNavigateToNotes}
                 onCustomizingToggle={onCustomizingToggle}
                 onHeaderHiddenChange={onHeaderHiddenChange}

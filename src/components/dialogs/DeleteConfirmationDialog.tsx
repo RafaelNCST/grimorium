@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -108,7 +108,7 @@ export function DeleteConfirmationDialog({
             disabled={isDeleting}
             variant="destructive"
           >
-            {isDeleting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+            {isDeleting && <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />}
             {isDeleting ? t("actions.deleting") : displayConfirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
