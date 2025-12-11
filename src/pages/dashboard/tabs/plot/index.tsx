@@ -24,9 +24,9 @@ const EMPTY_ARRAY: IPlotArc[] = [];
 export function PlotTab({ bookId }: PropsPlotTab) {
   const navigate = useNavigate();
 
-  // Store selectors
-  const arcs = usePlotStore((state) => state.getArcs(bookId) || EMPTY_ARRAY);
-  const isLoading = usePlotStore((state) => state.isLoading(bookId));
+  // Store selectors - acesso direto ao cache para evitar re-renders
+  const arcs = usePlotStore((state) => state.cache[bookId]?.arcs ?? EMPTY_ARRAY);
+  const isLoading = usePlotStore((state) => state.cache[bookId]?.isLoading ?? false);
 
   // Store actions
   const fetchPlotArcs = usePlotStore((state) => state.fetchPlotArcs);

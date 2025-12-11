@@ -57,35 +57,93 @@ const restrictToNotesBoard: Modifier = ({
 
 const EMPTY_ARRAY: IStickyNote[] = [];
 const EMPTY_CHECKLIST: IChecklistItem[] = [];
+const EMPTY_PROGRESS: number[] = [];
+const DEFAULT_GOALS = { wordsPerDay: 0, chaptersPerWeek: 0 };
+const DEFAULT_STORY_PROGRESS = {
+  estimatedArcs: 0,
+  estimatedChapters: 0,
+  completedArcs: 0,
+  currentArcProgress: 0,
+};
+const DEFAULT_OVERVIEW_STATS = {
+  totalWords: 0,
+  totalCharacters: 0,
+  totalChapters: 0,
+  lastChapterNumber: 0,
+  lastChapterName: "",
+  averagePerWeek: 0,
+  averagePerMonth: 0,
+  chaptersInProgress: 0,
+  chaptersFinished: 0,
+  chaptersDraft: 0,
+  chaptersReview: 0,
+  averageWordsPerChapter: 0,
+  averageCharactersPerChapter: 0,
+};
+const DEFAULT_SECTIONS = [
+  {
+    id: "stats",
+    type: "stats" as const,
+    title: "Estatísticas",
+    visible: true,
+    component: null,
+  },
+  {
+    id: "progress",
+    type: "progress" as const,
+    title: "Progressão da História",
+    visible: true,
+    component: null,
+  },
+  {
+    id: "summaries",
+    type: "summaries" as const,
+    title: "Resumos",
+    visible: true,
+    component: null,
+  },
+  {
+    id: "notes-board",
+    type: "notes-board" as const,
+    title: "Quadro de Lembretes",
+    visible: true,
+    component: null,
+  },
+  {
+    id: "checklist",
+    type: "checklist" as const,
+    title: "Lista de Tarefas",
+    visible: true,
+    component: null,
+  },
+];
 
 export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const { t } = useTranslation("overview");
 
-  // Store selectors
-  const goals = useOverviewStore((state) => state.getGoals(bookId));
-  const storyProgress = useOverviewStore((state) =>
-    state.getStoryProgress(bookId)
-  );
+  // Store selectors - acesso direto ao cache para evitar re-renders
+  const goals = useOverviewStore((state) => state.cache[bookId]?.goals ?? DEFAULT_GOALS);
+  const storyProgress = useOverviewStore((state) => state.cache[bookId]?.storyProgress ?? DEFAULT_STORY_PROGRESS);
   const stickyNotes = useOverviewStore(
-    (state) => state.getStickyNotes(bookId) || EMPTY_ARRAY
+    (state) => state.cache[bookId]?.stickyNotes ?? EMPTY_ARRAY
   );
   const checklistItems = useOverviewStore(
-    (state) => state.getChecklistItems(bookId) || EMPTY_CHECKLIST
+    (state) => state.cache[bookId]?.checklistItems ?? EMPTY_CHECKLIST
   );
-  const sections = useOverviewStore((state) => state.getSections(bookId));
+  const sections = useOverviewStore((state) => state.cache[bookId]?.sections ?? DEFAULT_SECTIONS);
   const authorSummary = useOverviewStore((state) =>
-    state.getAuthorSummary(bookId)
+    state.cache[bookId]?.authorSummary ?? ""
   );
   const storySummary = useOverviewStore((state) =>
-    state.getStorySummary(bookId)
+    state.cache[bookId]?.storySummary ?? ""
   );
   const overviewStats = useOverviewStore((state) =>
-    state.getOverviewStats(bookId)
+    state.cache[bookId]?.overviewStats ?? DEFAULT_OVERVIEW_STATS
   );
   const allArcsProgress = useOverviewStore((state) =>
-    state.getAllArcsProgress(bookId)
+    state.cache[bookId]?.allArcsProgress ?? EMPTY_PROGRESS
   );
-  const isLoading = useOverviewStore((state) => state.isLoading(bookId));
+  const isLoading = useOverviewStore((state) => state.cache[bookId]?.isLoading ?? false);
 
   // Store actions
   const fetchOverview = useOverviewStore((state) => state.fetchOverview);
