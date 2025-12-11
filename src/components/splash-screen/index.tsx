@@ -138,9 +138,18 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
 
         {/* Loading dots indicator */}
         <div className="flex gap-2">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: "300ms" }} />
+          <div
+            className="w-2 h-2 rounded-full bg-primary animate-pulse"
+            style={{ animationDelay: "0ms" }}
+          />
+          <div
+            className="w-2 h-2 rounded-full bg-primary animate-pulse"
+            style={{ animationDelay: "150ms" }}
+          />
+          <div
+            className="w-2 h-2 rounded-full bg-primary animate-pulse"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
       </div>
     </div>

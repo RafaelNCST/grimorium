@@ -60,7 +60,8 @@ export const FormChapterNameWithNumber = React.forwardRef<
   ) => {
     const { t } = useTranslation(["forms"]);
     const hasError = Boolean(error);
-    const defaultPlaceholder = namePlaceholder || t("forms:labels.chapter_name");
+    const defaultPlaceholder =
+      namePlaceholder || t("forms:labels.chapter_name");
 
     // Increment by 1
     const handleIncrement = () => {

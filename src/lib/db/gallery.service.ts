@@ -6,15 +6,12 @@ import {
   BaseDirectory,
 } from "@tauri-apps/plugin-fs";
 
-import {
-  EntityType,
-  IGalleryItem,
-  IGalleryLink,
-} from "@/types/gallery-types";
+import { GALLERY_DIRECTORY } from "@/pages/gallery/constants/gallery-constants";
+import { EntityType, IGalleryItem, IGalleryLink } from "@/types/gallery-types";
 
 import { DBGalleryItem, DBGalleryLink } from "./types";
+
 import { getDB } from "./index";
-import { GALLERY_DIRECTORY } from "@/pages/gallery/constants/gallery-constants";
 
 // ========================================
 // Converters
@@ -288,32 +285,32 @@ export async function updateGalleryItem(
   const updateValues: unknown[] = [];
 
   if (updates.title !== undefined) {
-    updateFields.push("title = $" + (updateValues.length + 1));
+    updateFields.push(`title = $${updateValues.length + 1}`);
     updateValues.push(updates.title);
   }
 
   if (updates.description !== undefined) {
-    updateFields.push("description = $" + (updateValues.length + 1));
+    updateFields.push(`description = $${updateValues.length + 1}`);
     updateValues.push(updates.description);
   }
 
   if (updates.thumbnailBase64 !== undefined) {
-    updateFields.push("thumbnail_base64 = $" + (updateValues.length + 1));
+    updateFields.push(`thumbnail_base64 = $${updateValues.length + 1}`);
     updateValues.push(updates.thumbnailBase64);
   }
 
   if (updates.originalPath !== undefined) {
-    updateFields.push("original_path = $" + (updateValues.length + 1));
+    updateFields.push(`original_path = $${updateValues.length + 1}`);
     updateValues.push(updates.originalPath);
   }
 
   if (updates.orderIndex !== undefined) {
-    updateFields.push("order_index = $" + (updateValues.length + 1));
+    updateFields.push(`order_index = $${updateValues.length + 1}`);
     updateValues.push(updates.orderIndex);
   }
 
   // Always update updated_at
-  updateFields.push("updated_at = $" + (updateValues.length + 1));
+  updateFields.push(`updated_at = $${updateValues.length + 1}`);
   updateValues.push(updated_at);
 
   // Add id as the last parameter
@@ -356,9 +353,7 @@ export async function deleteGalleryItems(ids: string[]): Promise<void> {
 /**
  * Get gallery links for an item
  */
-export async function getGalleryLinks(
-  itemId: string
-): Promise<IGalleryLink[]> {
+export async function getGalleryLinks(itemId: string): Promise<IGalleryLink[]> {
   const db = await getDB();
   const result = await db.select<DBGalleryLink[]>(
     "SELECT * FROM gallery_links WHERE gallery_item_id = $1",
@@ -487,7 +482,9 @@ export async function getGalleryItemsByEntityTypes(
   const db = await getDB();
 
   // Build placeholders for IN clause
-  const placeholders = entityTypes.map((_, index) => `$${index + 1}`).join(", ");
+  const placeholders = entityTypes
+    .map((_, index) => `$${index + 1}`)
+    .join(", ");
 
   const links = await db.select<DBGalleryLink[]>(
     `SELECT DISTINCT gallery_item_id FROM gallery_links WHERE entity_type IN (${placeholders})`,

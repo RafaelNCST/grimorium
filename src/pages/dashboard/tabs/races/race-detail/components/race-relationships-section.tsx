@@ -35,8 +35,8 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 
-import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
 import { getRaceRelationshipTypes } from "../constants/race-relationship-types";
+import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
 import { type IRaceRelationship } from "../types/race-detail-types";
 
 interface IRace {
@@ -91,7 +91,7 @@ export function RaceRelationshipsSection({
 
   // Get relationship types using the getter function and add custom "adoration" type
   const RACE_RELATIONSHIP_TYPES: RelationshipTypeConfig[] = [
-    ...getRaceRelationshipTypes(t).map(type => ({
+    ...getRaceRelationshipTypes(t).map((type) => ({
       value: type.value,
       translationKey: type.translationKey,
       icon: type.icon,

@@ -136,9 +136,7 @@ export function TopBar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p className="text-sm font-medium">
-              {t("common:tooltips.notes")}
-            </p>
+            <p className="text-sm font-medium">{t("common:tooltips.notes")}</p>
           </TooltipContent>
         </Tooltip>
 

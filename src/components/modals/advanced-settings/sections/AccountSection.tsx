@@ -4,6 +4,8 @@
  * Gerenciamento de perfil, assinatura, pagamento e autenticação
  */
 
+import { useState } from "react";
+
 import {
   Crown,
   CreditCard,
@@ -15,19 +17,13 @@ import {
   X,
   User,
 } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { UpgradeModal } from "@/components/modals/upgrade-modal";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { useLanguageStore } from "@/stores/language-store";
-import { useUserAccountStore } from "@/stores/user-account-store";
-import { UpgradeModal } from "@/components/modals/upgrade-modal";
-
 import {
   Select,
   SelectContent,
@@ -35,23 +31,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { useLanguageStore } from "@/stores/language-store";
+import { useUserAccountStore } from "@/stores/user-account-store";
 
 export function AccountSection() {
   const { t } = useTranslation("advanced-settings");
-  const { user, logout, updateDisplayName, updateAvatar } = useUserAccountStore();
+  const { user, logout, updateDisplayName, updateAvatar } =
+    useUserAccountStore();
   const { language, setLanguage } = useLanguageStore();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   if (!user) return null;
 
-  const hasNameChanged = displayName !== user.displayName && displayName.trim() !== "";
+  const hasNameChanged =
+    displayName !== user.displayName && displayName.trim() !== "";
 
   const isPremium = user.subscription.tier === "realeza";
   const isActive = user.subscription.status === "active";
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString(
       language === "pt" ? "pt-BR" : "en-US",
       {
         year: "numeric",
@@ -59,7 +61,6 @@ export function AccountSection() {
         day: "numeric",
       }
     );
-  };
 
   const handleSaveName = () => {
     if (displayName.trim() && hasNameChanged) {
@@ -228,11 +229,17 @@ export function AccountSection() {
                   <span className="text-sm text-white">
                     {t("account.subscription.currently_you_are")}
                   </span>
-                  <h4 className={cn(
-                    "font-bold text-lg",
-                    isPremium ? "text-purple-600 dark:text-purple-400" : "text-green-600 dark:text-green-400"
-                  )}>
-                    {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
+                  <h4
+                    className={cn(
+                      "font-bold text-lg",
+                      isPremium
+                        ? "text-purple-600 dark:text-purple-400"
+                        : "text-green-600 dark:text-green-400"
+                    )}
+                  >
+                    {isPremium
+                      ? t("account.subscription.tier_premium")
+                      : t("account.subscription.tier_free")}
                   </h4>
                 </div>
               </div>
@@ -375,9 +382,7 @@ export function AccountSection() {
           variant="destructive"
           className="w-full"
           onClick={() => {
-            if (
-              window.confirm(t("account.auth.logout_confirm"))
-            ) {
+            if (window.confirm(t("account.auth.logout_confirm"))) {
               logout();
               // TODO: Redirect to login page
             }
@@ -389,7 +394,10 @@ export function AccountSection() {
       </div>
 
       {/* Upgrade Modal */}
-      <UpgradeModal open={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 }

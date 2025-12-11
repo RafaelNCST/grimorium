@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 
-import { Check, Search } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import {
+  Check,
+  Search,
   Users,
   Globe,
   Building2,
   Dna,
   Package,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -96,9 +97,7 @@ export function ManageEntityLinksModal({
   useEffect(() => {
     if (!open) return;
 
-    const booksToFetch = bookId
-      ? books.filter((b) => b.id === bookId)
-      : books;
+    const booksToFetch = bookId ? books.filter((b) => b.id === bookId) : books;
 
     if (booksToFetch.length === 0) return;
 

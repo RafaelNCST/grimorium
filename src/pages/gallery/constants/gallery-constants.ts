@@ -8,7 +8,13 @@ export const THUMBNAIL_MAX_HEIGHT = 400;
 export const THUMBNAIL_QUALITY = 0.8;
 
 // Supported image formats
-export const SUPPORTED_IMAGE_FORMATS = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+export const SUPPORTED_IMAGE_FORMATS = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+];
 export const SUPPORTED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif"];
 
 // Grid layout

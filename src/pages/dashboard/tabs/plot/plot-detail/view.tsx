@@ -85,8 +85,7 @@ import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 const STATUS_DISPLAY_COLORS: Record<string, string> = {
   finished:
     "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
-  current:
-    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  current: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
   planning:
     "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
 };
@@ -94,8 +93,7 @@ const STATUS_DISPLAY_COLORS: Record<string, string> = {
 // Map size values to their display colors (matching filter badges)
 const SIZE_DISPLAY_COLORS: Record<string, string> = {
   mini: "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400",
-  small:
-    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  small: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
   medium:
     "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
   large:
@@ -362,8 +360,8 @@ export function PlotArcDetailView({
         e.id === editingEvent.id
           ? {
               ...e,
-              name: name,
-              description: description,
+              name,
+              description,
             }
           : e
       );
@@ -372,8 +370,8 @@ export function PlotArcDetailView({
     } else {
       // Adding new event
       onAddEvent({
-        name: name,
-        description: description,
+        name,
+        description,
         completed: false,
       });
     }
@@ -432,645 +430,663 @@ export function PlotArcDetailView({
       <div className="bg-background">
         {/* Fixed Header */}
         <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
-        <div className="flex items-center justify-between gap-4">
-          {/* Left side - Back button */}
-          {!isEditing && (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={onBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t("plot:header.back")}
-              </Button>
-            </div>
-          )}
-
-          {/* Right side - Action buttons */}
-          <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
-            {isEditing ? (
-              <>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={onCancel}>
-                    <X className="w-4 h-4 mr-2" />
-                    {t("plot:header.cancel")}
-                  </Button>
-                  <Button
-                    variant="magical"
-                    className="animate-glow"
-                    onClick={onSave}
-                    disabled={!hasChanges || hasRequiredFieldsEmpty}
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {t("plot:header.save")}
-                  </Button>
-                </div>
-                {hasRequiredFieldsEmpty && (
-                  <p className="text-xs text-destructive">
-                    {missingFields.length > 0 && (
-                      <>
-                        {t("plot:validation.missing_fields")}:{" "}
-                        {missingFields
-                          .map((field) => t(`plot:fields.${field}`))
-                          .join(", ")}
-                      </>
-                    )}
-                  </p>
-                )}
-              </>
-            ) : (
-              <div className="flex gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={arc.status === "finished" ? "ghost" : "magical"}
-                      size="icon"
-                      onClick={onFinishOrActivateArc}
-                      className={arc.status === "finished" ? "" : "animate-glow"}
-                    >
-                      {arc.status === "finished" ? (
-                        <RotateCcw className="w-4 h-4" />
-                      ) : (
-                        <Check className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {arc.status === "finished"
-                      ? t("tooltips:plot_arc.activate_arc")
-                      : t("tooltips:plot_arc.finish_arc")}
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={onEdit}
-                      disabled={arc.status === "finished"}
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {arc.status === "finished"
-                      ? t("tooltips:plot_arc.arc_is_finished")
-                      : t("plot:header.edit")}
-                  </TooltipContent>
-                </Tooltip>
-                <Button
-                  variant="ghost-destructive"
-                  size="icon"
-                  onClick={() => onDeleteArcDialogChange(true)}
-                >
-                  <Trash2 className="w-4 h-4" />
+          <div className="flex items-center justify-between gap-4">
+            {/* Left side - Back button */}
+            {!isEditing && (
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" onClick={onBack}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  {t("plot:header.back")}
                 </Button>
               </div>
+            )}
+
+            {/* Right side - Action buttons */}
+            <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
+              {isEditing ? (
+                <>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" onClick={onCancel}>
+                      <X className="w-4 h-4 mr-2" />
+                      {t("plot:header.cancel")}
+                    </Button>
+                    <Button
+                      variant="magical"
+                      className="animate-glow"
+                      onClick={onSave}
+                      disabled={!hasChanges || hasRequiredFieldsEmpty}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {t("plot:header.save")}
+                    </Button>
+                  </div>
+                  {hasRequiredFieldsEmpty && (
+                    <p className="text-xs text-destructive">
+                      {missingFields.length > 0 && (
+                        <>
+                          {t("plot:validation.missing_fields")}:{" "}
+                          {missingFields
+                            .map((field) => t(`plot:fields.${field}`))
+                            .join(", ")}
+                        </>
+                      )}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className="flex gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={
+                          arc.status === "finished" ? "ghost" : "magical"
+                        }
+                        size="icon"
+                        onClick={onFinishOrActivateArc}
+                        className={
+                          arc.status === "finished" ? "" : "animate-glow"
+                        }
+                      >
+                        {arc.status === "finished" ? (
+                          <RotateCcw className="w-4 h-4" />
+                        ) : (
+                          <Check className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {arc.status === "finished"
+                        ? t("tooltips:plot_arc.activate_arc")
+                        : t("tooltips:plot_arc.finish_arc")}
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onEdit}
+                        disabled={arc.status === "finished"}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {arc.status === "finished"
+                        ? t("tooltips:plot_arc.arc_is_finished")
+                        : t("plot:header.edit")}
+                    </TooltipContent>
+                  </Tooltip>
+                  <Button
+                    variant="ghost-destructive"
+                    size="icon"
+                    onClick={() => onDeleteArcDialogChange(true)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Spacer for fixed header */}
+        <div className="h-[72px]" />
+
+        <div className="container mx-auto py-8 px-4 max-w-7xl">
+          <div className="space-y-6">
+            {/* Basic Information Section */}
+            <Card className="card-magical">
+              <CardHeader>
+                <CardTitle>{t("plot:detail.basic_info")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isEditing ? (
+                  <div className="space-y-6">
+                    {/* Arc Name */}
+                    <FormInput
+                      label={t("create-plot-arc:modal.arc_name")}
+                      placeholder={t(
+                        "create-plot-arc:modal.arc_name_placeholder"
+                      )}
+                      value={editForm.name || ""}
+                      onChange={(e) => onEditFormChange("name", e.target.value)}
+                      onBlur={(e) => validateField("name", e.target.value)}
+                      maxLength={200}
+                      required
+                      showCharCount
+                      error={validationErrors.name}
+                      labelClassName="text-primary"
+                    />
+
+                    {/* Arc Summary */}
+                    <FormTextarea
+                      label={t("create-plot-arc:modal.arc_summary")}
+                      placeholder={t(
+                        "create-plot-arc:modal.arc_summary_placeholder"
+                      )}
+                      value={editForm.description || ""}
+                      onChange={(e) =>
+                        onEditFormChange("description", e.target.value)
+                      }
+                      onBlur={(e) =>
+                        validateField("description", e.target.value)
+                      }
+                      maxLength={1000}
+                      rows={4}
+                      showCharCount
+                      showOptionalLabel={false}
+                      error={validationErrors.description}
+                      labelClassName="text-primary"
+                      className="resize-none"
+                    />
+
+                    {/* Arc Focus */}
+                    <FormTextarea
+                      label={t("create-plot-arc:modal.arc_focus")}
+                      placeholder={t(
+                        "create-plot-arc:modal.arc_focus_placeholder"
+                      )}
+                      value={editForm.focus || ""}
+                      onChange={(e) =>
+                        onEditFormChange("focus", e.target.value)
+                      }
+                      onBlur={(e) => validateField("focus", e.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      showCharCount
+                      showOptionalLabel={false}
+                      error={validationErrors.focus}
+                      labelClassName="text-primary"
+                      className="resize-none"
+                    />
+
+                    {/* Status Selector */}
+                    <StatusSelector
+                      value={editForm.status as PlotArcStatus | ""}
+                      onChange={(value) => onEditFormChange("status", value)}
+                      hasCurrentArc={hasCurrentArc}
+                      error={validationErrors.status}
+                    />
+
+                    {/* Size Selector */}
+                    <FormSelectGrid
+                      value={editForm.size || ""}
+                      onChange={(value) =>
+                        onEditFormChange("size", value as PlotArcSize)
+                      }
+                      label={t("create-plot-arc:modal.arc_size")}
+                      required
+                      columns={2}
+                      options={translatedSizeOptions}
+                      error={validationErrors.size}
+                      alertText={t("create-plot-arc:modal.arc_size_intro")}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Arc Title and Badges */}
+                    <div>
+                      <h2 className="text-3xl font-bold mb-3">{arc.name}</h2>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <Badge
+                          className={`pointer-events-none ${STATUS_DISPLAY_COLORS[arc.status]}`}
+                        >
+                          {StatusIcon && (
+                            <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
+                          )}
+                          {statusConfig
+                            ? t(`plot:${statusConfig.translationKey}`)
+                            : arc.status}
+                        </Badge>
+                        <Badge
+                          className={`pointer-events-none ${SIZE_DISPLAY_COLORS[arc.size]}`}
+                        >
+                          {SizeIcon && (
+                            <SizeIcon className="w-3.5 h-3.5 mr-1.5" />
+                          )}
+                          {sizeConfig
+                            ? t(`plot:${sizeConfig.translationKey}`)
+                            : arc.size}
+                        </Badge>
+                        {arc.status === "finished" && (
+                          <Badge
+                            variant="outline"
+                            className="pointer-events-none bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                          >
+                            <Check className="w-3.5 h-3.5 mr-1.5" />
+                            {t("plot:finish_arc.finished_badge")}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Summary */}
+                    <div>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        {t("plot:fields.summary")}
+                      </Label>
+                      <p className="mt-1 text-foreground whitespace-pre-wrap">
+                        {arc.description}
+                      </p>
+                    </div>
+
+                    {/* Focus */}
+                    <div>
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        {t("create-plot-arc:modal.arc_focus")}
+                      </Label>
+                      <p className="mt-1 text-foreground">{arc.focus}</p>
+                    </div>
+
+                    {/* Progress */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium">
+                          {t("plot:detail.progress")}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {arc.progress.toFixed(0)}%
+                        </span>
+                      </div>
+                      <Progress value={arc.progress} className="h-3" />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Event Chain Section - Collapsible */}
+            <CollapsibleSection
+              title={t("plot:detail.event_chain")}
+              isOpen={eventChainSectionOpen}
+              onToggle={onEventChainSectionToggle}
+            >
+              {/* Add Event Button */}
+              {isEditing && (
+                <div className="mb-4">
+                  <Button
+                    variant="magical"
+                    size="sm"
+                    onClick={() => setShowEventModal(true)}
+                    className="w-full animate-glow-purple"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t("create-plot-arc:modal.add_event")}
+                  </Button>
+                </div>
+              )}
+
+              {/* Events List */}
+              {currentEvents.length > 0 ? (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={currentEvents.map((e) => e.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {currentEvents.map((event) => (
+                        <SortableEvent
+                          key={event.id}
+                          event={event}
+                          isEditing={isEditing}
+                          arcStatus={arc.status}
+                          onToggle={onToggleEventCompletion}
+                          onDelete={onEventDeleteRequest}
+                          onEdit={handleStartEdit}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
+                  <p className="text-sm">{t("plot:detail.no_events")}</p>
+                </div>
+              )}
+            </CollapsibleSection>
+
+            {/* Advanced Section - Collapsible - Hide entirely if all fields are hidden in view mode */}
+            {(isEditing ||
+              fieldVisibility.importantCharacters !== false ||
+              fieldVisibility.importantFactions !== false ||
+              fieldVisibility.importantItems !== false ||
+              fieldVisibility.importantRegions !== false ||
+              fieldVisibility.arcMessage !== false ||
+              fieldVisibility.worldImpact !== false) && (
+              <CollapsibleSection
+                title={t("plot:detail.advanced_section")}
+                isOpen={advancedSectionOpen}
+                onToggle={onAdvancedSectionToggle}
+              >
+                {/* Relationships Section - Only show if editing or at least one field is visible */}
+                {(isEditing ||
+                  fieldVisibility.importantCharacters !== false ||
+                  fieldVisibility.importantFactions !== false ||
+                  fieldVisibility.importantItems !== false ||
+                  fieldVisibility.importantRegions !== false) && (
+                  <div className="space-y-6">
+                    <SectionTitle>
+                      {t("plot:detail.relationships_section")}
+                    </SectionTitle>
+
+                    {/* Important Characters */}
+                    {isEditing ? (
+                      <FieldWithVisibilityToggle
+                        fieldName="importantCharacters"
+                        label={t("plot:fields.important_characters")}
+                        fieldVisibility={fieldVisibility}
+                        isEditing={isEditing}
+                        onFieldVisibilityToggle={onFieldVisibilityToggle}
+                      >
+                        <FormEntityMultiSelectAuto
+                          entityType="character"
+                          bookId={bookId}
+                          placeholder={t(
+                            "create-plot-arc:modal.select_character"
+                          )}
+                          emptyText={t(
+                            "create-plot-arc:modal.no_characters_available"
+                          )}
+                          noSelectionText={t(
+                            "create-plot-arc:modal.no_characters_selected"
+                          )}
+                          searchPlaceholder={t(
+                            "create-plot-arc:modal.search_character"
+                          )}
+                          value={editForm.importantCharacters || []}
+                          onChange={(value) =>
+                            onEditFormChange("importantCharacters", value)
+                          }
+                        />
+                      </FieldWithVisibilityToggle>
+                    ) : (
+                      fieldVisibility.importantCharacters !== false && (
+                        <DisplayEntityList
+                          label={t("plot:fields.important_characters")}
+                          entities={selectedCharacters}
+                        />
+                      )
+                    )}
+
+                    {/* Important Factions */}
+                    {isEditing ? (
+                      <FieldWithVisibilityToggle
+                        fieldName="importantFactions"
+                        label={t("plot:fields.important_factions")}
+                        fieldVisibility={fieldVisibility}
+                        isEditing={isEditing}
+                        onFieldVisibilityToggle={onFieldVisibilityToggle}
+                      >
+                        <FormEntityMultiSelectAuto
+                          entityType="faction"
+                          bookId={bookId}
+                          placeholder={t(
+                            "create-plot-arc:modal.select_faction"
+                          )}
+                          emptyText={t(
+                            "create-plot-arc:modal.no_factions_available"
+                          )}
+                          noSelectionText={t(
+                            "create-plot-arc:modal.no_factions_selected"
+                          )}
+                          searchPlaceholder={t(
+                            "create-plot-arc:modal.search_faction"
+                          )}
+                          value={editForm.importantFactions || []}
+                          onChange={(value) =>
+                            onEditFormChange("importantFactions", value)
+                          }
+                        />
+                      </FieldWithVisibilityToggle>
+                    ) : (
+                      fieldVisibility.importantFactions !== false && (
+                        <DisplayEntityList
+                          label={t("plot:fields.important_factions")}
+                          entities={selectedFactions}
+                        />
+                      )
+                    )}
+
+                    {/* Important Items */}
+                    {isEditing ? (
+                      <FieldWithVisibilityToggle
+                        fieldName="importantItems"
+                        label={t("plot:fields.important_items")}
+                        fieldVisibility={fieldVisibility}
+                        isEditing={isEditing}
+                        onFieldVisibilityToggle={onFieldVisibilityToggle}
+                      >
+                        <FormEntityMultiSelectAuto
+                          entityType="item"
+                          bookId={bookId}
+                          placeholder={t("create-plot-arc:modal.select_item")}
+                          emptyText={t(
+                            "create-plot-arc:modal.no_items_available"
+                          )}
+                          noSelectionText={t(
+                            "create-plot-arc:modal.no_items_selected"
+                          )}
+                          searchPlaceholder={t(
+                            "create-plot-arc:modal.search_item"
+                          )}
+                          value={editForm.importantItems || []}
+                          onChange={(value) =>
+                            onEditFormChange("importantItems", value)
+                          }
+                        />
+                      </FieldWithVisibilityToggle>
+                    ) : (
+                      fieldVisibility.importantItems !== false && (
+                        <DisplayEntityList
+                          label={t("plot:fields.important_items")}
+                          entities={selectedItems}
+                        />
+                      )
+                    )}
+
+                    {/* Important Regions */}
+                    {isEditing ? (
+                      <FieldWithVisibilityToggle
+                        fieldName="importantRegions"
+                        label={t("plot:fields.important_regions")}
+                        fieldVisibility={fieldVisibility}
+                        isEditing={isEditing}
+                        onFieldVisibilityToggle={onFieldVisibilityToggle}
+                      >
+                        <FormEntityMultiSelectAuto
+                          entityType="region"
+                          bookId={bookId}
+                          placeholder={t("create-plot-arc:modal.select_region")}
+                          emptyText={t(
+                            "create-plot-arc:modal.no_regions_available"
+                          )}
+                          noSelectionText={t(
+                            "create-plot-arc:modal.no_regions_selected"
+                          )}
+                          searchPlaceholder={t(
+                            "create-plot-arc:modal.search_region"
+                          )}
+                          value={editForm.importantRegions || []}
+                          onChange={(value) =>
+                            onEditFormChange("importantRegions", value)
+                          }
+                        />
+                      </FieldWithVisibilityToggle>
+                    ) : (
+                      fieldVisibility.importantRegions !== false && (
+                        <DisplayEntityList
+                          label={t("plot:fields.important_regions")}
+                          entities={selectedRegions}
+                        />
+                      )
+                    )}
+                  </div>
+                )}
+
+                {/* Separator - Only show if both sections are visible */}
+                {(isEditing ||
+                  fieldVisibility.importantCharacters !== false ||
+                  fieldVisibility.importantFactions !== false ||
+                  fieldVisibility.importantItems !== false ||
+                  fieldVisibility.importantRegions !== false) &&
+                  (isEditing ||
+                    fieldVisibility.arcMessage !== false ||
+                    fieldVisibility.worldImpact !== false) && (
+                    <Separator className="my-6" />
+                  )}
+
+                {/* Narrative Section - Only show if editing or at least one field is visible */}
+                {(isEditing ||
+                  fieldVisibility.arcMessage !== false ||
+                  fieldVisibility.worldImpact !== false) && (
+                  <div className="space-y-6">
+                    <SectionTitle>
+                      {t("plot:detail.narrative_section")}
+                    </SectionTitle>
+
+                    {/* Arc Message */}
+                    <FieldWithVisibilityToggle
+                      fieldName="arcMessage"
+                      label={t("plot:fields.arc_message")}
+                      fieldVisibility={fieldVisibility}
+                      isEditing={isEditing}
+                      onFieldVisibilityToggle={onFieldVisibilityToggle}
+                    >
+                      {isEditing ? (
+                        <FormTextarea
+                          placeholder={t(
+                            "create-plot-arc:modal.arc_message_placeholder"
+                          )}
+                          value={editForm.arcMessage || ""}
+                          onChange={(e) =>
+                            onEditFormChange("arcMessage", e.target.value)
+                          }
+                          maxLength={500}
+                          rows={3}
+                          showCharCount
+                          className="resize-none"
+                        />
+                      ) : (
+                        <DisplayTextarea value={arc.arcMessage} />
+                      )}
+                    </FieldWithVisibilityToggle>
+
+                    {/* World Impact */}
+                    <FieldWithVisibilityToggle
+                      fieldName="worldImpact"
+                      label={t("plot:fields.world_impact")}
+                      fieldVisibility={fieldVisibility}
+                      isEditing={isEditing}
+                      onFieldVisibilityToggle={onFieldVisibilityToggle}
+                    >
+                      {isEditing ? (
+                        <FormTextarea
+                          placeholder={t(
+                            "create-plot-arc:modal.world_impact_placeholder"
+                          )}
+                          value={editForm.worldImpact || ""}
+                          onChange={(e) =>
+                            onEditFormChange("worldImpact", e.target.value)
+                          }
+                          maxLength={500}
+                          rows={3}
+                          showCharCount
+                          className="resize-none"
+                        />
+                      ) : (
+                        <DisplayTextarea value={arc.worldImpact} />
+                      )}
+                    </FieldWithVisibilityToggle>
+                  </div>
+                )}
+              </CollapsibleSection>
+            )}
+
+            {/* Chapter Metrics Section - Only visible in view mode */}
+            {!isEditing && (
+              <CollapsibleSection
+                title={t("chapter-metrics:plot_section.title")}
+                isOpen={chapterMetricsSectionOpen}
+                onToggle={() =>
+                  setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)
+                }
+              >
+                <PlotArcChapterMetricsSection
+                  bookId={bookId}
+                  plotArcId={arc.id}
+                  onChapterClick={(chapterId) =>
+                    (window.location.href = `/dashboard/chapters/${chapterId}`)
+                  }
+                />
+              </CollapsibleSection>
             )}
           </div>
         </div>
-      </header>
 
-      {/* Spacer for fixed header */}
-      <div className="h-[72px]" />
+        {/* Delete Arc Dialog */}
+        <DeleteArcConfirmationDialog
+          isOpen={showDeleteArcDialog}
+          onClose={() => onDeleteArcDialogChange(false)}
+          arcName={arc.name}
+          eventCount={arc.events.length}
+          onConfirmDelete={onDeleteArc}
+        />
 
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
-        <div className="space-y-6">
-          {/* Basic Information Section */}
-          <Card className="card-magical">
-            <CardHeader>
-              <CardTitle>{t("plot:detail.basic_info")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <div className="space-y-6">
-                  {/* Arc Name */}
-                  <FormInput
-                    label={t("create-plot-arc:modal.arc_name")}
-                    placeholder={t(
-                      "create-plot-arc:modal.arc_name_placeholder"
-                    )}
-                    value={editForm.name || ""}
-                    onChange={(e) => onEditFormChange("name", e.target.value)}
-                    onBlur={(e) => validateField("name", e.target.value)}
-                    maxLength={200}
-                    required
-                    showCharCount
-                    error={validationErrors.name}
-                    labelClassName="text-primary"
-                  />
-
-                  {/* Arc Summary */}
-                  <FormTextarea
-                    label={t("create-plot-arc:modal.arc_summary")}
-                    placeholder={t(
-                      "create-plot-arc:modal.arc_summary_placeholder"
-                    )}
-                    value={editForm.description || ""}
-                    onChange={(e) =>
-                      onEditFormChange("description", e.target.value)
-                    }
-                    onBlur={(e) => validateField("description", e.target.value)}
-                    maxLength={1000}
-                    rows={4}
-                    showCharCount
-                    showOptionalLabel={false}
-                    error={validationErrors.description}
-                    labelClassName="text-primary"
-                    className="resize-none"
-                  />
-
-                  {/* Arc Focus */}
-                  <FormTextarea
-                    label={t("create-plot-arc:modal.arc_focus")}
-                    placeholder={t(
-                      "create-plot-arc:modal.arc_focus_placeholder"
-                    )}
-                    value={editForm.focus || ""}
-                    onChange={(e) => onEditFormChange("focus", e.target.value)}
-                    onBlur={(e) => validateField("focus", e.target.value)}
-                    maxLength={500}
-                    rows={3}
-                    showCharCount
-                    showOptionalLabel={false}
-                    error={validationErrors.focus}
-                    labelClassName="text-primary"
-                    className="resize-none"
-                  />
-
-                  {/* Status Selector */}
-                  <StatusSelector
-                    value={editForm.status as PlotArcStatus | ""}
-                    onChange={(value) => onEditFormChange("status", value)}
-                    hasCurrentArc={hasCurrentArc}
-                    error={validationErrors.status}
-                  />
-
-                  {/* Size Selector */}
-                  <FormSelectGrid
-                    value={editForm.size || ""}
-                    onChange={(value) =>
-                      onEditFormChange("size", value as PlotArcSize)
-                    }
-                    label={t("create-plot-arc:modal.arc_size")}
-                    required
-                    columns={2}
-                    options={translatedSizeOptions}
-                    error={validationErrors.size}
-                    alertText={t("create-plot-arc:modal.arc_size_intro")}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {/* Arc Title and Badges */}
-                  <div>
-                    <h2 className="text-3xl font-bold mb-3">{arc.name}</h2>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <Badge
-                        className={`pointer-events-none ${STATUS_DISPLAY_COLORS[arc.status]}`}
-                      >
-                        {StatusIcon && <StatusIcon className="w-3.5 h-3.5 mr-1.5" />}
-                        {statusConfig ? t(`plot:${statusConfig.translationKey}`) : arc.status}
-                      </Badge>
-                      <Badge
-                        className={`pointer-events-none ${SIZE_DISPLAY_COLORS[arc.size]}`}
-                      >
-                        {SizeIcon && <SizeIcon className="w-3.5 h-3.5 mr-1.5" />}
-                        {sizeConfig ? t(`plot:${sizeConfig.translationKey}`) : arc.size}
-                      </Badge>
-                      {arc.status === "finished" && (
-                        <Badge
-                          variant="outline"
-                          className="pointer-events-none bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                        >
-                          <Check className="w-3.5 h-3.5 mr-1.5" />
-                          {t("plot:finish_arc.finished_badge")}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      {t("plot:fields.summary")}
-                    </Label>
-                    <p className="mt-1 text-foreground whitespace-pre-wrap">
-                      {arc.description}
-                    </p>
-                  </div>
-
-                  {/* Focus */}
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      {t("create-plot-arc:modal.arc_focus")}
-                    </Label>
-                    <p className="mt-1 text-foreground">{arc.focus}</p>
-                  </div>
-
-                  {/* Progress */}
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">
-                        {t("plot:detail.progress")}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        {arc.progress.toFixed(0)}%
-                      </span>
-                    </div>
-                    <Progress value={arc.progress} className="h-3" />
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Event Chain Section - Collapsible */}
-          <CollapsibleSection
-            title={t("plot:detail.event_chain")}
-            isOpen={eventChainSectionOpen}
-            onToggle={onEventChainSectionToggle}
-          >
-            {/* Add Event Button */}
-            {isEditing && (
-              <div className="mb-4">
-                <Button
-                  variant="magical"
-                  size="sm"
-                  onClick={() => setShowEventModal(true)}
-                  className="w-full animate-glow-purple"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("create-plot-arc:modal.add_event")}
-                </Button>
-              </div>
-            )}
-
-            {/* Events List */}
-            {currentEvents.length > 0 ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
+        {/* Delete Event Dialog */}
+        <AlertDialog
+          open={showDeleteEventDialog}
+          onOpenChange={onDeleteEventDialogChange}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("plot:detail.confirm_delete_event")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("plot:detail.confirm_delete_event_description")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("plot:button.cancel")}</AlertDialogCancel>
+              <Button
+                onClick={onDeleteEvent}
+                variant="destructive"
+                size="lg"
+                className="animate-glow-red"
               >
-                <SortableContext
-                  items={currentEvents.map((e) => e.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {currentEvents.map((event) => (
-                      <SortableEvent
-                        key={event.id}
-                        event={event}
-                        isEditing={isEditing}
-                        arcStatus={arc.status}
-                        onToggle={onToggleEventCompletion}
-                        onDelete={onEventDeleteRequest}
-                        onEdit={handleStartEdit}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground border border-dashed border-border rounded-lg">
-                <p className="text-sm">{t("plot:detail.no_events")}</p>
-              </div>
-            )}
-          </CollapsibleSection>
+                {t("plot:button.delete")}
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-          {/* Advanced Section - Collapsible - Hide entirely if all fields are hidden in view mode */}
-          {(isEditing ||
-            fieldVisibility.importantCharacters !== false ||
-            fieldVisibility.importantFactions !== false ||
-            fieldVisibility.importantItems !== false ||
-            fieldVisibility.importantRegions !== false ||
-            fieldVisibility.arcMessage !== false ||
-            fieldVisibility.worldImpact !== false) && (
-            <CollapsibleSection
-              title={t("plot:detail.advanced_section")}
-              isOpen={advancedSectionOpen}
-              onToggle={onAdvancedSectionToggle}
-            >
-              {/* Relationships Section - Only show if editing or at least one field is visible */}
-              {(isEditing ||
-                fieldVisibility.importantCharacters !== false ||
-                fieldVisibility.importantFactions !== false ||
-                fieldVisibility.importantItems !== false ||
-                fieldVisibility.importantRegions !== false) && (
-                <div className="space-y-6">
-                  <SectionTitle>
-                    {t("plot:detail.relationships_section")}
-                  </SectionTitle>
+        {/* Unsaved Changes Dialog */}
+        <UnsavedChangesDialog
+          open={showUnsavedChangesDialog}
+          onOpenChange={onUnsavedChangesDialogChange}
+          onConfirm={onConfirmCancel}
+        />
 
-                  {/* Important Characters */}
-                  {isEditing ? (
-                    <FieldWithVisibilityToggle
-                      fieldName="importantCharacters"
-                      label={t("plot:fields.important_characters")}
-                      fieldVisibility={fieldVisibility}
-                      isEditing={isEditing}
-                      onFieldVisibilityToggle={onFieldVisibilityToggle}
-                    >
-                      <FormEntityMultiSelectAuto
-                        entityType="character"
-                        bookId={bookId}
-                        placeholder={t(
-                          "create-plot-arc:modal.select_character"
-                        )}
-                        emptyText={t(
-                          "create-plot-arc:modal.no_characters_available"
-                        )}
-                        noSelectionText={t(
-                          "create-plot-arc:modal.no_characters_selected"
-                        )}
-                        searchPlaceholder={t(
-                          "create-plot-arc:modal.search_character"
-                        )}
-                        value={editForm.importantCharacters || []}
-                        onChange={(value) =>
-                          onEditFormChange("importantCharacters", value)
-                        }
-                      />
-                    </FieldWithVisibilityToggle>
-                  ) : (
-                    fieldVisibility.importantCharacters !== false && (
-                      <DisplayEntityList
-                        label={t("plot:fields.important_characters")}
-                        entities={selectedCharacters}
-                      />
-                    )
-                  )}
+        {/* Finish Arc Warning Dialog */}
+        <FinishArcWarningDialog
+          isOpen={showFinishWarningDialog}
+          onClose={() => onFinishWarningDialogChange(false)}
+          hasNoEvents={finishWarningReason.hasNoEvents}
+          hasNoCompletedEvents={finishWarningReason.hasNoCompletedEvents}
+        />
 
-                  {/* Important Factions */}
-                  {isEditing ? (
-                    <FieldWithVisibilityToggle
-                      fieldName="importantFactions"
-                      label={t("plot:fields.important_factions")}
-                      fieldVisibility={fieldVisibility}
-                      isEditing={isEditing}
-                      onFieldVisibilityToggle={onFieldVisibilityToggle}
-                    >
-                      <FormEntityMultiSelectAuto
-                        entityType="faction"
-                        bookId={bookId}
-                        placeholder={t("create-plot-arc:modal.select_faction")}
-                        emptyText={t(
-                          "create-plot-arc:modal.no_factions_available"
-                        )}
-                        noSelectionText={t(
-                          "create-plot-arc:modal.no_factions_selected"
-                        )}
-                        searchPlaceholder={t(
-                          "create-plot-arc:modal.search_faction"
-                        )}
-                        value={editForm.importantFactions || []}
-                        onChange={(value) =>
-                          onEditFormChange("importantFactions", value)
-                        }
-                      />
-                    </FieldWithVisibilityToggle>
-                  ) : (
-                    fieldVisibility.importantFactions !== false && (
-                      <DisplayEntityList
-                        label={t("plot:fields.important_factions")}
-                        entities={selectedFactions}
-                      />
-                    )
-                  )}
-
-                  {/* Important Items */}
-                  {isEditing ? (
-                    <FieldWithVisibilityToggle
-                      fieldName="importantItems"
-                      label={t("plot:fields.important_items")}
-                      fieldVisibility={fieldVisibility}
-                      isEditing={isEditing}
-                      onFieldVisibilityToggle={onFieldVisibilityToggle}
-                    >
-                      <FormEntityMultiSelectAuto
-                        entityType="item"
-                        bookId={bookId}
-                        placeholder={t("create-plot-arc:modal.select_item")}
-                        emptyText={t(
-                          "create-plot-arc:modal.no_items_available"
-                        )}
-                        noSelectionText={t(
-                          "create-plot-arc:modal.no_items_selected"
-                        )}
-                        searchPlaceholder={t(
-                          "create-plot-arc:modal.search_item"
-                        )}
-                        value={editForm.importantItems || []}
-                        onChange={(value) =>
-                          onEditFormChange("importantItems", value)
-                        }
-                      />
-                    </FieldWithVisibilityToggle>
-                  ) : (
-                    fieldVisibility.importantItems !== false && (
-                      <DisplayEntityList
-                        label={t("plot:fields.important_items")}
-                        entities={selectedItems}
-                      />
-                    )
-                  )}
-
-                  {/* Important Regions */}
-                  {isEditing ? (
-                    <FieldWithVisibilityToggle
-                      fieldName="importantRegions"
-                      label={t("plot:fields.important_regions")}
-                      fieldVisibility={fieldVisibility}
-                      isEditing={isEditing}
-                      onFieldVisibilityToggle={onFieldVisibilityToggle}
-                    >
-                      <FormEntityMultiSelectAuto
-                        entityType="region"
-                        bookId={bookId}
-                        placeholder={t("create-plot-arc:modal.select_region")}
-                        emptyText={t(
-                          "create-plot-arc:modal.no_regions_available"
-                        )}
-                        noSelectionText={t(
-                          "create-plot-arc:modal.no_regions_selected"
-                        )}
-                        searchPlaceholder={t(
-                          "create-plot-arc:modal.search_region"
-                        )}
-                        value={editForm.importantRegions || []}
-                        onChange={(value) =>
-                          onEditFormChange("importantRegions", value)
-                        }
-                      />
-                    </FieldWithVisibilityToggle>
-                  ) : (
-                    fieldVisibility.importantRegions !== false && (
-                      <DisplayEntityList
-                        label={t("plot:fields.important_regions")}
-                        entities={selectedRegions}
-                      />
-                    )
-                  )}
-                </div>
-              )}
-
-              {/* Separator - Only show if both sections are visible */}
-              {(isEditing ||
-                fieldVisibility.importantCharacters !== false ||
-                fieldVisibility.importantFactions !== false ||
-                fieldVisibility.importantItems !== false ||
-                fieldVisibility.importantRegions !== false) &&
-                (isEditing ||
-                  fieldVisibility.arcMessage !== false ||
-                  fieldVisibility.worldImpact !== false) && (
-                  <Separator className="my-6" />
-                )}
-
-              {/* Narrative Section - Only show if editing or at least one field is visible */}
-              {(isEditing ||
-                fieldVisibility.arcMessage !== false ||
-                fieldVisibility.worldImpact !== false) && (
-                <div className="space-y-6">
-                  <SectionTitle>
-                    {t("plot:detail.narrative_section")}
-                  </SectionTitle>
-
-                  {/* Arc Message */}
-                  <FieldWithVisibilityToggle
-                    fieldName="arcMessage"
-                    label={t("plot:fields.arc_message")}
-                    fieldVisibility={fieldVisibility}
-                    isEditing={isEditing}
-                    onFieldVisibilityToggle={onFieldVisibilityToggle}
-                  >
-                    {isEditing ? (
-                      <FormTextarea
-                        placeholder={t(
-                          "create-plot-arc:modal.arc_message_placeholder"
-                        )}
-                        value={editForm.arcMessage || ""}
-                        onChange={(e) =>
-                          onEditFormChange("arcMessage", e.target.value)
-                        }
-                        maxLength={500}
-                        rows={3}
-                        showCharCount
-                        className="resize-none"
-                      />
-                    ) : (
-                      <DisplayTextarea value={arc.arcMessage} />
-                    )}
-                  </FieldWithVisibilityToggle>
-
-                  {/* World Impact */}
-                  <FieldWithVisibilityToggle
-                    fieldName="worldImpact"
-                    label={t("plot:fields.world_impact")}
-                    fieldVisibility={fieldVisibility}
-                    isEditing={isEditing}
-                    onFieldVisibilityToggle={onFieldVisibilityToggle}
-                  >
-                    {isEditing ? (
-                      <FormTextarea
-                        placeholder={t(
-                          "create-plot-arc:modal.world_impact_placeholder"
-                        )}
-                        value={editForm.worldImpact || ""}
-                        onChange={(e) =>
-                          onEditFormChange("worldImpact", e.target.value)
-                        }
-                        maxLength={500}
-                        rows={3}
-                        showCharCount
-                        className="resize-none"
-                      />
-                    ) : (
-                      <DisplayTextarea value={arc.worldImpact} />
-                    )}
-                  </FieldWithVisibilityToggle>
-                </div>
-              )}
-            </CollapsibleSection>
-          )}
-
-          {/* Chapter Metrics Section - Only visible in view mode */}
-          {!isEditing && (
-            <CollapsibleSection
-              title={t("chapter-metrics:plot_section.title")}
-              isOpen={chapterMetricsSectionOpen}
-              onToggle={() =>
-                setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)
-              }
-            >
-              <PlotArcChapterMetricsSection
-                bookId={bookId}
-                plotArcId={arc.id}
-                onChapterClick={(chapterId) =>
-                  window.location.href = `/dashboard/chapters/${chapterId}`
-                }
-              />
-            </CollapsibleSection>
-          )}
-        </div>
-      </div>
-
-      {/* Delete Arc Dialog */}
-      <DeleteArcConfirmationDialog
-        isOpen={showDeleteArcDialog}
-        onClose={() => onDeleteArcDialogChange(false)}
-        arcName={arc.name}
-        eventCount={arc.events.length}
-        onConfirmDelete={onDeleteArc}
-      />
-
-      {/* Delete Event Dialog */}
-      <AlertDialog
-        open={showDeleteEventDialog}
-        onOpenChange={onDeleteEventDialogChange}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("plot:detail.confirm_delete_event")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("plot:detail.confirm_delete_event_description")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("plot:button.cancel")}</AlertDialogCancel>
-            <Button
-              onClick={onDeleteEvent}
-              variant="destructive"
-              size="lg"
-              className="animate-glow-red"
-            >
-              {t("plot:button.delete")}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Unsaved Changes Dialog */}
-      <UnsavedChangesDialog
-        open={showUnsavedChangesDialog}
-        onOpenChange={onUnsavedChangesDialogChange}
-        onConfirm={onConfirmCancel}
-      />
-
-      {/* Finish Arc Warning Dialog */}
-      <FinishArcWarningDialog
-        isOpen={showFinishWarningDialog}
-        onClose={() => onFinishWarningDialogChange(false)}
-        hasNoEvents={finishWarningReason.hasNoEvents}
-        hasNoCompletedEvents={finishWarningReason.hasNoCompletedEvents}
-      />
-
-      {/* Event Modal */}
-      <EventModal
-        open={showEventModal}
-        onClose={handleEventModalClose}
-        onConfirm={handleEventModalConfirm}
-        event={editingEvent}
-      />
+        {/* Event Modal */}
+        <EventModal
+          open={showEventModal}
+          onClose={handleEventModalClose}
+          onConfirm={handleEventModalConfirm}
+          event={editingEvent}
+        />
       </div>
     </TooltipProvider>
   );

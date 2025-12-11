@@ -4,6 +4,8 @@
  * Modal para exibir os benefícios e preços do plano Realeza
  */
 
+import { useState } from "react";
+
 import {
   Crown,
   Check,
@@ -13,7 +15,6 @@ import {
   Zap,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";

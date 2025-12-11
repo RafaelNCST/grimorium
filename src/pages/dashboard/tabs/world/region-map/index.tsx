@@ -447,7 +447,10 @@ export function RegionMapPage() {
         <h1 className="text-lg font-semibold">{region.name}</h1>
         {mapImagePath && (
           <TooltipProvider delayDuration={300}>
-            <Tooltip open={showChangeImageTooltip} onOpenChange={setShowChangeImageTooltip}>
+            <Tooltip
+              open={showChangeImageTooltip}
+              onOpenChange={setShowChangeImageTooltip}
+            >
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleChangeImage}

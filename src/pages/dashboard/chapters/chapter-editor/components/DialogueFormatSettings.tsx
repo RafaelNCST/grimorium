@@ -140,7 +140,8 @@ export function DialogueFormatSettings({
                       <span>{t(option.labelKey)}</span>
                     </label>
                     <p className="text-xs text-muted-foreground font-mono">
-                      {t("dialogue_formats.example_prefix")} {t(option.exampleKey)}
+                      {t("dialogue_formats.example_prefix")}{" "}
+                      {t(option.exampleKey)}
                     </p>
                   </div>
                 </div>

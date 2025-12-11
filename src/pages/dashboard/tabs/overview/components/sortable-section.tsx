@@ -68,11 +68,7 @@ export function SortableSection({
           !section.visible
             ? "opacity-50 border-2 border-dashed border-muted-foreground/30 rounded-lg"
             : ""
-        } ${
-          isCustomizing
-            ? "rounded-lg pt-12"
-            : ""
-        }`}
+        } ${isCustomizing ? "rounded-lg pt-12" : ""}`}
       >
         {children}
       </div>

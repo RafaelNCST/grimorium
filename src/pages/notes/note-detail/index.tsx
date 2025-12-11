@@ -196,7 +196,9 @@ export function NoteDetailPage() {
   if (!note) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
-        <p className="text-muted-foreground">{t("errors:not_found.annotation")}</p>
+        <p className="text-muted-foreground">
+          {t("errors:not_found.annotation")}
+        </p>
       </div>
     );
   }

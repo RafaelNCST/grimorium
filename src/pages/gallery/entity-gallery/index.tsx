@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useParams, useSearch, useNavigate } from "@tanstack/react-router";
 
 import { useGalleryStore } from "@/stores/gallery-store";
-import { IGalleryItem, IGalleryLink, GallerySortOrder, EntityType } from "@/types/gallery-types";
+import {
+  IGalleryItem,
+  IGalleryLink,
+  GallerySortOrder,
+  EntityType,
+} from "@/types/gallery-types";
 
 import { EntityGalleryView } from "./view";
 
@@ -40,13 +46,15 @@ export function EntityGalleryPage() {
   }, [dashboardId, fetchGalleryItems]);
 
   // Filter items by entity
-  const filteredByEntity = useMemo(() => {
-    return items.filter((item) =>
-      item.links.some(
-        (link) => link.entityId === entityId && link.entityType === entityType
-      )
-    );
-  }, [items, entityId, entityType]);
+  const filteredByEntity = useMemo(
+    () =>
+      items.filter((item) =>
+        item.links.some(
+          (link) => link.entityId === entityId && link.entityType === entityType
+        )
+      ),
+    [items, entityId, entityType]
+  );
 
   // Filter and sort items
   const filteredAndSortedItems = useMemo(() => {
@@ -163,7 +171,18 @@ export function EntityGalleryPage() {
 
       setIsUploadModalOpen(false);
     },
-    [dashboardId, entityId, entityType, entityName, items.length, addGalleryItem, updateGalleryItemInCache, updateGalleryLinksInCache, editingItem, selectedItem]
+    [
+      dashboardId,
+      entityId,
+      entityType,
+      entityName,
+      items.length,
+      addGalleryItem,
+      updateGalleryItemInCache,
+      updateGalleryLinksInCache,
+      editingItem,
+      selectedItem,
+    ]
   );
 
   const handleModalClose = useCallback((open: boolean) => {
@@ -190,12 +209,18 @@ export function EntityGalleryPage() {
     const route = routeMap[entityType];
     if (route) {
       // Create params object with the correct parameter name
-      const paramName = entityType === "character" ? "characterId"
-        : entityType === "item" ? "itemId"
-        : entityType === "race" ? "raceId"
-        : entityType === "faction" ? "factionId"
-        : entityType === "region" ? "regionId"
-        : "plotId";
+      const paramName =
+        entityType === "character"
+          ? "characterId"
+          : entityType === "item"
+            ? "itemId"
+            : entityType === "race"
+              ? "raceId"
+              : entityType === "faction"
+                ? "factionId"
+                : entityType === "region"
+                  ? "regionId"
+                  : "plotId";
 
       navigate({
         to: route as any,
@@ -255,8 +280,8 @@ export function EntityGalleryPage() {
   const hasActiveFilters = searchTerm.length > 0;
 
   // Pre-selected link for upload modal
-  const preSelectedLinks = useMemo<IGalleryLink[]>(() => {
-    return [
+  const preSelectedLinks = useMemo<IGalleryLink[]>(
+    () => [
       {
         id: crypto.randomUUID(),
         entityId,
@@ -265,8 +290,9 @@ export function EntityGalleryPage() {
         entityName: entityName || undefined,
         createdAt: new Date().toISOString(),
       },
-    ];
-  }, [entityId, entityType, dashboardId, entityName]);
+    ],
+    [entityId, entityType, dashboardId, entityName]
+  );
 
   return (
     <EntityGalleryView

@@ -33,8 +33,7 @@ import type { IPlotArc, IPlotEvent } from "@/types/plot-types";
 const STATUS_DISPLAY_COLORS: Record<string, string> = {
   finished:
     "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
-  current:
-    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  current: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
   planning:
     "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
 };
@@ -42,8 +41,7 @@ const STATUS_DISPLAY_COLORS: Record<string, string> = {
 // Map size values to their display colors (matching PlotArcCard badges)
 const SIZE_DISPLAY_COLORS: Record<string, string> = {
   mini: "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400",
-  small:
-    "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
+  small: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
   medium:
     "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
   large:
@@ -61,7 +59,13 @@ export function PlotArcEventsSidebar({
   onClose,
   onToggleEventCompletion,
 }: PlotArcEventsSidebarProps) {
-  const { t } = useTranslation(["chapter-editor", "plot", "empty-states", "dialogs", "tooltips"]);
+  const { t } = useTranslation([
+    "chapter-editor",
+    "plot",
+    "empty-states",
+    "dialogs",
+    "tooltips",
+  ]);
 
   const statusConfig = ARC_STATUSES_CONSTANT.find(
     (s) => s.value === arc.status
@@ -130,7 +134,10 @@ export function PlotArcEventsSidebar({
               Progresso
             </span>
             <span className="text-sm text-muted-foreground">
-              {t("dialogs:plot_arc_events.events_count", { completedCount, totalCount })}
+              {t("dialogs:plot_arc_events.events_count", {
+                completedCount,
+                totalCount,
+              })}
             </span>
           </div>
           <Progress value={arc.progress} className="h-2" />

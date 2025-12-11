@@ -47,14 +47,13 @@ const BOOK_STATUS_OPTIONS: BookStatus[] = [
 const LEGACY_STATUS_MAP: Record<string, BookStatus> = {
   "Em planejamento": "planning",
   "Em lançamento": "releasing",
-  "Hiato": "hiatus",
-  "Completo": "complete",
+  Hiato: "hiatus",
+  Completo: "complete",
 };
 
 // Helper to normalize status values (handles both old Portuguese and new English values)
-const normalizeStatus = (status: string): BookStatus => {
-  return (LEGACY_STATUS_MAP[status] as BookStatus) || (status as BookStatus);
-};
+const normalizeStatus = (status: string): BookStatus =>
+  (LEGACY_STATUS_MAP[status] as BookStatus) || (status as BookStatus);
 
 const STATUS_CONFIG: Record<BookStatus, IEntityTagConfig> = {
   planning: {
@@ -363,7 +362,9 @@ export function Header({
               <h2 className="text-3xl font-bold">{book.title}</h2>
               <EntityTagBadge
                 config={STATUS_CONFIG[normalizeStatus(book.status)]}
-                label={t(STATUS_CONFIG[normalizeStatus(book.status)].translationKey)}
+                label={t(
+                  STATUS_CONFIG[normalizeStatus(book.status)].translationKey
+                )}
               />
             </div>
 
@@ -395,7 +396,9 @@ export function Header({
                     onClick={() => setShowFullSynopsis(!showFullSynopsis)}
                     className="text-primary hover:underline text-sm mt-1"
                   >
-                    {showFullSynopsis ? tCommon("button.hide") : tCommon("button.read_more")}
+                    {showFullSynopsis
+                      ? tCommon("button.hide")
+                      : tCommon("button.read_more")}
                   </button>
                 )}
               </div>

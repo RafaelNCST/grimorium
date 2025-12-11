@@ -207,7 +207,9 @@ export function StickyNote({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-sm font-medium">
-                  {isEditing ? t("notes_board.save") : t("notes_board.edit_note")}
+                  {isEditing
+                    ? t("notes_board.save")
+                    : t("notes_board.edit_note")}
                 </p>
               </TooltipContent>
             </Tooltip>

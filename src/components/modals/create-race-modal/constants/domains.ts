@@ -1,3 +1,4 @@
+import { TFunction } from "i18next";
 import {
   Waves,
   Mountain,
@@ -9,7 +10,6 @@ import {
   Orbit,
   type LucideIcon,
 } from "lucide-react";
-import { TFunction } from "i18next";
 
 export type RaceDomain =
   | "aquatic"

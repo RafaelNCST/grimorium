@@ -98,7 +98,9 @@ export function EditorSettingsModal({
             {/* Auto Scroll */}
             <div className="space-y-3">
               <div>
-                <Label className="text-base font-semibold">{t("editor_settings_modal.auto_scroll.title")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("editor_settings_modal.auto_scroll.title")}
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   {t("editor_settings_modal.auto_scroll.description")}
                 </p>
@@ -113,9 +115,15 @@ export function EditorSettingsModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="off">{t("editor_settings_modal.auto_scroll.none")}</SelectItem>
-                  <SelectItem value="near-end">{t("editor_settings_modal.auto_scroll.near_end")}</SelectItem>
-                  <SelectItem value="center">{t("editor_settings_modal.auto_scroll.center")}</SelectItem>
+                  <SelectItem value="off">
+                    {t("editor_settings_modal.auto_scroll.none")}
+                  </SelectItem>
+                  <SelectItem value="near-end">
+                    {t("editor_settings_modal.auto_scroll.near_end")}
+                  </SelectItem>
+                  <SelectItem value="center">
+                    {t("editor_settings_modal.auto_scroll.center")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -134,9 +142,15 @@ export function EditorSettingsModal({
               {/* Annotation Highlights */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("editor_settings_modal.visual_elements.annotation_highlights")}</Label>
+                  <Label>
+                    {t(
+                      "editor_settings_modal.visual_elements.annotation_highlights"
+                    )}
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    {t("editor_settings_modal.visual_elements.annotation_highlights_description")}
+                    {t(
+                      "editor_settings_modal.visual_elements.annotation_highlights_description"
+                    )}
                   </p>
                 </div>
                 <Switch
@@ -150,9 +164,13 @@ export function EditorSettingsModal({
               {/* Spell Check */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("editor_settings_modal.visual_elements.spell_check")}</Label>
+                  <Label>
+                    {t("editor_settings_modal.visual_elements.spell_check")}
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    {t("editor_settings_modal.visual_elements.spell_check_description")}
+                    {t(
+                      "editor_settings_modal.visual_elements.spell_check_description"
+                    )}
                   </p>
                 </div>
                 <Switch
@@ -166,9 +184,13 @@ export function EditorSettingsModal({
               {/* Summary Section */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>{t("dialogs:editor_settings.summary_and_entities")}</Label>
+                  <Label>
+                    {t("dialogs:editor_settings.summary_and_entities")}
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    {t("editor_settings_modal.visual_elements.summary_section_description")}
+                    {t(
+                      "editor_settings_modal.visual_elements.summary_section_description"
+                    )}
                   </p>
                 </div>
                 <Switch
@@ -178,7 +200,6 @@ export function EditorSettingsModal({
                   }
                 />
               </div>
-
             </div>
           </div>
 
@@ -187,7 +208,9 @@ export function EditorSettingsModal({
           {/* Typography Section */}
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold">{t("editor_settings_modal.typography.title")}</Label>
+              <Label className="text-base font-semibold">
+                {t("editor_settings_modal.typography.title")}
+              </Label>
               <p className="text-sm text-muted-foreground">
                 {t("editor_settings_modal.typography.description")}
               </p>
@@ -196,7 +219,9 @@ export function EditorSettingsModal({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Font Family */}
               <div className="space-y-2">
-                <Label>{t("editor_settings_modal.typography.font_family")}</Label>
+                <Label>
+                  {t("editor_settings_modal.typography.font_family")}
+                </Label>
                 <Select
                   value={settings.fontFamily}
                   onValueChange={(value) => updateSetting("fontFamily", value)}
@@ -217,7 +242,9 @@ export function EditorSettingsModal({
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  {t("editor_settings_modal.typography.font_family_description")}
+                  {t(
+                    "editor_settings_modal.typography.font_family_description"
+                  )}
                 </p>
               </div>
 
@@ -254,7 +281,11 @@ export function EditorSettingsModal({
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{t("editor_settings_modal.typography.increase_size")}</p>
+                          <p>
+                            {t(
+                              "editor_settings_modal.typography.increase_size"
+                            )}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                       <Tooltip delayDuration={300} disableHoverableContent>
@@ -271,11 +302,17 @@ export function EditorSettingsModal({
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{t("editor_settings_modal.typography.decrease_size")}</p>
+                          <p>
+                            {t(
+                              "editor_settings_modal.typography.decrease_size"
+                            )}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <span className="text-sm text-muted-foreground">{t("editor_settings_modal.typography.pt")}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t("editor_settings_modal.typography.pt")}
+                    </span>
                   </div>
                 </TooltipProvider>
                 <p className="text-xs text-muted-foreground">
@@ -287,7 +324,9 @@ export function EditorSettingsModal({
             {/* Line Height */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label>{t("editor_settings_modal.typography.line_height")}</Label>
+                <Label>
+                  {t("editor_settings_modal.typography.line_height")}
+                </Label>
                 <span className="text-sm text-muted-foreground">
                   {settings.lineHeight}
                 </span>
@@ -313,7 +352,9 @@ export function EditorSettingsModal({
             {/* Theme */}
             <div className="space-y-3">
               <div>
-                <Label className="text-base font-semibold">{t("dialogs:editor_settings.visual_theme")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("dialogs:editor_settings.visual_theme")}
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   {t("editor_settings_modal.visual_theme.description")}
                 </p>
@@ -321,9 +362,13 @@ export function EditorSettingsModal({
 
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="space-y-0.5">
-                  <Label>{t("editor_settings_modal.visual_theme.reduce_eye_strain")}</Label>
+                  <Label>
+                    {t("editor_settings_modal.visual_theme.reduce_eye_strain")}
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    {t("editor_settings_modal.visual_theme.reduce_eye_strain_description")}
+                    {t(
+                      "editor_settings_modal.visual_theme.reduce_eye_strain_description"
+                    )}
                   </p>
                 </div>
                 <Switch
@@ -338,7 +383,9 @@ export function EditorSettingsModal({
             {/* Cursor Color */}
             <div className="space-y-3">
               <div>
-                <Label className="text-base font-semibold">{t("editor_settings_modal.cursor_color.title")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("editor_settings_modal.cursor_color.title")}
+                </Label>
                 <p className="text-sm text-muted-foreground">
                   {t("editor_settings_modal.cursor_color.description")}
                 </p>

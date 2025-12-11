@@ -314,11 +314,17 @@ export function FormattingToolbar({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="in-progress">{t("status.in-progress")}</SelectItem>
+                  <SelectItem value="in-progress">
+                    {t("status.in-progress")}
+                  </SelectItem>
                   <SelectItem value="draft">{t("status.draft")}</SelectItem>
                   <SelectItem value="review">{t("status.review")}</SelectItem>
-                  <SelectItem value="finished">{t("status.finished")}</SelectItem>
-                  <SelectItem value="published">{t("status.published")}</SelectItem>
+                  <SelectItem value="finished">
+                    {t("status.finished")}
+                  </SelectItem>
+                  <SelectItem value="published">
+                    {t("status.published")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

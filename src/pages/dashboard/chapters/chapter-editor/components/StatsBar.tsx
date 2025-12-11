@@ -80,7 +80,9 @@ export function StatsBar({
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4" />
                   <span>
-                    <strong className="text-foreground">{metrics.wordCount}</strong>{" "}
+                    <strong className="text-foreground">
+                      {metrics.wordCount}
+                    </strong>{" "}
                     {t("stats_bar.words")}
                   </span>
                 </div>

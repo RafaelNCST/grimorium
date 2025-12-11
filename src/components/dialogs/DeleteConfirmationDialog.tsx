@@ -108,7 +108,9 @@ export function DeleteConfirmationDialog({
             disabled={isDeleting}
             variant="destructive"
           >
-            {isDeleting && <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />}
+            {isDeleting && (
+              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+            )}
             {isDeleting ? t("actions.deleting") : displayConfirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -246,7 +246,9 @@ export async function getChapterNavigationDataByBookId(
   const db = await getDB();
 
   // Query extremamente leve - apenas 3 campos
-  const chapters = await db.select<Pick<DBChapter, "id" | "chapter_number" | "title">[]>(
+  const chapters = await db.select<
+    Pick<DBChapter, "id" | "chapter_number" | "title">[]
+  >(
     "SELECT id, chapter_number, title FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
     [bookId]
   );
@@ -454,7 +456,6 @@ export async function createChapter(
       }
     }
   }
-
 }
 
 // Atualizar capítulo
@@ -602,7 +603,6 @@ export async function updateChapter(
       }
     }
   }
-
 }
 
 // Deletar capítulo

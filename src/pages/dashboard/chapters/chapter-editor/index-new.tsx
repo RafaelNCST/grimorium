@@ -52,7 +52,7 @@ function ChapterEditorContent() {
     setCachedNavigationData,
     getChapter,
     getPreviousChapter,
-    getNextChapter
+    getNextChapter,
   } = useChaptersStore();
 
   const { getBookSettings, updateBookSettings } = useBookEditorSettingsStore();
@@ -143,7 +143,10 @@ function ChapterEditorContent() {
           setCachedNavigationData(navData);
         }
       } catch (error) {
-        console.error("[ChapterEditor] Erro ao carregar dados de navegação:", error);
+        console.error(
+          "[ChapterEditor] Erro ao carregar dados de navegação:",
+          error
+        );
       }
     };
 
@@ -663,10 +666,15 @@ function ChapterEditorContent() {
 
     const completedCount = updatedEvents.filter((e) => e.completed).length;
     const progress =
-      updatedEvents.length > 0 ? (completedCount / updatedEvents.length) * 100 : 0;
+      updatedEvents.length > 0
+        ? (completedCount / updatedEvents.length) * 100
+        : 0;
 
     try {
-      await updatePlotArc(currentPlotArc.id, { events: updatedEvents, progress });
+      await updatePlotArc(currentPlotArc.id, {
+        events: updatedEvents,
+        progress,
+      });
       setCurrentPlotArc((prev) => {
         if (!prev) return prev;
         return { ...prev, events: updatedEvents, progress };

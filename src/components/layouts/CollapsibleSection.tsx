@@ -258,10 +258,14 @@ export function CollapsibleSection({
       return (
         <InfoAlert>
           <p className="font-medium">
-            {t("empty-states:entities.not_enough", { entityName: blockedEntityName })}
+            {t("empty-states:entities.not_enough", {
+              entityName: blockedEntityName,
+            })}
           </p>
           <p className="text-xs mt-1">
-            {t("empty-states:entities.need_to_register_more", { entityName: blockedEntityName })}
+            {t("empty-states:entities.need_to_register_more", {
+              entityName: blockedEntityName,
+            })}
           </p>
         </InfoAlert>
       );
@@ -273,10 +277,14 @@ export function CollapsibleSection({
         <div className="space-y-4">
           <InfoAlert>
             <p className="font-medium">
-              {t("empty-states:entities.all_added", { entityName: blockedEntityName })}
+              {t("empty-states:entities.all_added", {
+                entityName: blockedEntityName,
+              })}
             </p>
             <p className="text-xs mt-1">
-              {t("empty-states:entities.to_add_more_register_new", { entityName: blockedEntityName })}
+              {t("empty-states:entities.to_add_more_register_new", {
+                entityName: blockedEntityName,
+              })}
             </p>
           </InfoAlert>
           {children && <div>{children}</div>}

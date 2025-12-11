@@ -43,12 +43,14 @@ export function StatsDetailModal({
 
   const formatSessionTime = (minutes: number): string => {
     if (minutes < 1) return t("stats_detail.time_less_than_minute");
-    if (minutes < 60) return `${minutes} ${minutes > 1 ? t("stats_detail.time_minutes") : t("stats_detail.time_minute")}`;
+    if (minutes < 60)
+      return `${minutes} ${minutes > 1 ? t("stats_detail.time_minutes") : t("stats_detail.time_minute")}`;
 
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
 
-    if (mins === 0) return `${hours} ${hours > 1 ? t("stats_detail.time_hours") : t("stats_detail.time_hour")}`;
+    if (mins === 0)
+      return `${hours} ${hours > 1 ? t("stats_detail.time_hours") : t("stats_detail.time_hour")}`;
     return `${hours} ${hours > 1 ? t("stats_detail.time_hours") : t("stats_detail.time_hour")} ${t("stats_detail.time_and")} ${mins} ${mins > 1 ? t("stats_detail.time_minutes") : t("stats_detail.time_minute")}`;
   };
 
@@ -89,7 +91,9 @@ export function StatsDetailModal({
                 icon={FileText}
                 label={t("stats_detail.characters_with_spaces")}
                 value={metrics.characterCountWithSpaces.toLocaleString()}
-                description={t("stats_detail.characters_with_spaces_description")}
+                description={t(
+                  "stats_detail.characters_with_spaces_description"
+                )}
               />
               <MetricCard
                 icon={BookOpen}

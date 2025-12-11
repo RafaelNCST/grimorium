@@ -1,3 +1,4 @@
+import { TFunction } from "i18next";
 import {
   MessageSquare,
   Brain,
@@ -6,7 +7,6 @@ import {
   HelpCircle,
   LucideIcon,
 } from "lucide-react";
-import { TFunction } from "i18next";
 
 export type RaceCommunication =
   | "speech"

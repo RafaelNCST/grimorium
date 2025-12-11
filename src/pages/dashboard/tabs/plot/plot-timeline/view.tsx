@@ -130,7 +130,9 @@ function SortableArcCard({
     >
       {/* Timeline Position Number */}
       <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 z-20">
-        <span className={`text-2xl font-bold ${arc.status === "current" ? "text-purple-400" : "text-white"}`}>
+        <span
+          className={`text-2xl font-bold ${arc.status === "current" ? "text-purple-400" : "text-white"}`}
+        >
           {index + 1}
         </span>
       </div>
@@ -138,7 +140,11 @@ function SortableArcCard({
       {/* Arc Card */}
       <Card
         className={`card-magical cursor-pointer relative z-10 h-[340px] flex flex-col ${
-          arc.status === "current" ? "ring-2 ring-purple-500 shadow-xl" : isHighlighted ? "ring-2 ring-primary shadow-xl" : ""
+          arc.status === "current"
+            ? "ring-2 ring-purple-500 shadow-xl"
+            : isHighlighted
+              ? "ring-2 ring-primary shadow-xl"
+              : ""
         } ${!isDragging && !isHighlighted ? "hover:scale-105" : ""}`}
         onClick={handleCardClick}
       >

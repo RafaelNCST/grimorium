@@ -69,9 +69,7 @@ export function Header({
               <span className="text-gray-200"> {t("header.subtext")}</span>
             </p>
             <div className="text-sm text-gray-300">
-              <span className="text-gray-400">
-                {t("header.last_edited")}:{" "}
-              </span>
+              <span className="text-gray-400">{t("header.last_edited")}: </span>
               <span className="font-medium">
                 {lastEditedBook || t("header.no_book")}
                 {formattedLastEditedDate && ` - ${formattedLastEditedDate}`}

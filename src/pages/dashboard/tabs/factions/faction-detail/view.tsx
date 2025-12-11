@@ -176,7 +176,11 @@ export function FactionDetailView({
   onActiveDiplomacyTabChange,
   hasChanges,
 }: FactionDetailViewProps) {
-  const { t } = useTranslation(["faction-detail", "create-faction", "empty-states"]);
+  const { t } = useTranslation([
+    "faction-detail",
+    "create-faction",
+    "empty-states",
+  ]);
 
   // State for controlling dialogs from empty state buttons
   const [isCreateEraDialogOpen, setIsCreateEraDialogOpen] =
@@ -1486,7 +1490,9 @@ export function FactionDetailView({
       })(),
       emptyIcon: Handshake,
       emptyTitle: t("empty-states:diplomacy.no_diplomatic_relation_defined"),
-      emptyDescription: t("empty-states:diplomacy.use_edit_mode_to_add_relations"),
+      emptyDescription: t(
+        "empty-states:diplomacy.use_edit_mode_to_add_relations"
+      ),
       addButtonLabel: t("forms:buttons.add_diplomatic_relation"),
       onAddClick: () => setIsAddDiplomacyDialogOpen(true),
       blockedEntityName: t("factions:header.title").toLowerCase(),
@@ -1537,7 +1543,9 @@ export function FactionDetailView({
       })(),
       emptyIcon: Users2,
       emptyTitle: t("empty-states:hierarchy.no_hierarchy_defined"),
-      emptyDescription: t("empty-states:hierarchy.use_edit_mode_to_add_members"),
+      emptyDescription: t(
+        "empty-states:hierarchy.use_edit_mode_to_add_members"
+      ),
       addButtonLabel: t("forms:buttons.add_member"),
       onAddClick: () => setIsAddMemberDialogOpen(true),
       secondaryButtonLabel: t("forms:buttons.manage_titles"),

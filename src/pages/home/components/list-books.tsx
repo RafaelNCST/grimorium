@@ -1,8 +1,4 @@
-import {
-  Book as BookIcon,
-  Search,
-  Library,
-} from "lucide-react";
+import { Book as BookIcon, Search, Library } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { BookCard } from "@/components/common/book-card";

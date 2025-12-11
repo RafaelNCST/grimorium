@@ -1294,7 +1294,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
             onItalic={handleItalic}
           />
         )}
-
       </>
     );
   }

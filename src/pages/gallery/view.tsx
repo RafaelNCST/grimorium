@@ -1,16 +1,15 @@
-import { useTranslation } from "react-i18next";
 import { Upload, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-import { GalleryGrid } from "./components/gallery-grid";
-import { GalleryFilters } from "./components/gallery-filters";
-import { GalleryEmptyState } from "./components/gallery-empty-state";
-import { UploadImageModal } from "./components/upload-image-modal";
-import { ImageLightbox } from "./components/image-lightbox";
-
 import { IGalleryItem, IGalleryLink, EntityType } from "@/types/gallery-types";
+
+import { GalleryEmptyState } from "./components/gallery-empty-state";
+import { GalleryFilters } from "./components/gallery-filters";
+import { GalleryGrid } from "./components/gallery-grid";
+import { ImageLightbox } from "./components/image-lightbox";
+import { UploadImageModal } from "./components/upload-image-modal";
 
 interface GalleryViewProps {
   items: IGalleryItem[];
@@ -131,9 +130,7 @@ export function GalleryView({
 
           {/* Grid */}
           {items.length === 0 ? (
-            <GalleryEmptyState
-              hasFilters={hasActiveFilters}
-            />
+            <GalleryEmptyState hasFilters={hasActiveFilters} />
           ) : (
             <GalleryGrid
               items={items}

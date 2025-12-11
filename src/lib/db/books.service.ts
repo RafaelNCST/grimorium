@@ -99,7 +99,10 @@ export async function getBookById(id: string): Promise<Book | null> {
   return result.length > 0 ? dbBookToBook(result[0]) : null;
 }
 
-export async function createBook(book: Book, tabsConfig?: string): Promise<void> {
+export async function createBook(
+  book: Book,
+  tabsConfig?: string
+): Promise<void> {
   try {
     const db = await getDB();
     const dbBook = bookToDBBook(book, tabsConfig);

@@ -679,7 +679,10 @@ export function RaceDetailView({
                 hideLabel
               />
             ) : (
-              <DisplaySelectGrid value={race.habits} options={getRaceHabits(t)} />
+              <DisplaySelectGrid
+                value={race.habits}
+                options={getRaceHabits(t)}
+              />
             )}
           </FieldWithVisibilityToggle>
 

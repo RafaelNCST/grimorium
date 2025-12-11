@@ -173,7 +173,9 @@ export function NotesView({
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="fileName">{t("file_manager.file_name_label")}</Label>
+                  <Label htmlFor="fileName">
+                    {t("file_manager.file_name_label")}
+                  </Label>
                   <Input
                     id="fileName"
                     value={newFileName}
@@ -203,11 +205,15 @@ export function NotesView({
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{t("file_manager.create_folder_title")}</DialogTitle>
+                <DialogTitle>
+                  {t("file_manager.create_folder_title")}
+                </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="folderName">{t("file_manager.folder_name_label")}</Label>
+                  <Label htmlFor="folderName">
+                    {t("file_manager.folder_name_label")}
+                  </Label>
                   <Input
                     id="folderName"
                     value={newFolderName}
@@ -391,7 +397,9 @@ export function NotesView({
         {getCurrentItems().length === 0 && (
           <div className="col-span-full text-center py-12">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">{t("file_manager.empty_state_title")}</p>
+            <p className="text-muted-foreground">
+              {t("file_manager.empty_state_title")}
+            </p>
             <p className="text-sm text-muted-foreground">
               {t("file_manager.empty_state_description")}
             </p>
@@ -411,8 +419,12 @@ export function NotesView({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {itemToDelete?.type === "folder"
-                ? t("file_manager.confirm_delete_folder", { name: itemToDelete.name })
-                : t("file_manager.confirm_delete_file", { name: itemToDelete?.name })}
+                ? t("file_manager.confirm_delete_folder", {
+                    name: itemToDelete.name,
+                  })
+                : t("file_manager.confirm_delete_file", {
+                    name: itemToDelete?.name,
+                  })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -24,19 +24,17 @@ export function StatusSelector({
 }: PropsStatusSelector) {
   const { t } = useTranslation("create-plot-arc");
 
-  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] = ARC_STATUSES_CONSTANT
-    .filter((status) => status.value !== "finished") // Exclude finished status from creation
-    .map((status) => ({
-      value: status.value,
-      label: t(`statuses.${status.value}`),
-      icon: status.icon,
-      backgroundColor: status.value === "current"
-        ? "blue-500/10"
-        : "amber-500/10",
-      borderColor: status.value === "current"
-        ? "blue-500/30"
-        : "amber-500/30",
-    }));
+  const STATUS_OPTIONS: SimpleGridSelectOption<PlotArcStatus>[] =
+    ARC_STATUSES_CONSTANT.filter((status) => status.value !== "finished") // Exclude finished status from creation
+      .map((status) => ({
+        value: status.value,
+        label: t(`statuses.${status.value}`),
+        icon: status.icon,
+        backgroundColor:
+          status.value === "current" ? "blue-500/10" : "amber-500/10",
+        borderColor:
+          status.value === "current" ? "blue-500/30" : "amber-500/30",
+      }));
 
   // Filter out "current" option if there's already a current arc
   const availableOptions = STATUS_OPTIONS.map((option) => ({

@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useGalleryStore } from "@/stores/gallery-store";
-import { IGalleryItem, IGalleryLink, GallerySortOrder, EntityType } from "@/types/gallery-types";
+import {
+  IGalleryItem,
+  IGalleryLink,
+  GallerySortOrder,
+  EntityType,
+} from "@/types/gallery-types";
 
 import { GalleryView } from "./view";
 
 export function GalleryPage() {
-  const { dashboardId } = useParams({ from: "/dashboard/$dashboardId/gallery/" });
+  const { dashboardId } = useParams({
+    from: "/dashboard/$dashboardId/gallery/",
+  });
   const navigate = useNavigate();
 
   const {
@@ -147,7 +155,15 @@ export function GalleryPage() {
 
       setIsUploadModalOpen(false);
     },
-    [dashboardId, items.length, addGalleryItem, updateGalleryItemInCache, updateGalleryLinksInCache, editingItem, selectedItem]
+    [
+      dashboardId,
+      items.length,
+      addGalleryItem,
+      updateGalleryItemInCache,
+      updateGalleryLinksInCache,
+      editingItem,
+      selectedItem,
+    ]
   );
 
   const handleModalClose = useCallback((open: boolean) => {

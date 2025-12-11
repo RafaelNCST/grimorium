@@ -53,9 +53,8 @@ export function PlotArcChapterMetricsSection({
   }
 
   // Format numbers with thousands separator
-  const formatNumber = (num: number): string => {
-    return new Intl.NumberFormat("pt-BR").format(num);
-  };
+  const formatNumber = (num: number): string =>
+    new Intl.NumberFormat("pt-BR").format(num);
 
   return (
     <div className="space-y-4">

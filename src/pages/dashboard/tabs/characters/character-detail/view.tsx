@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
+import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayEntityList,
@@ -159,7 +159,6 @@ interface CharacterDetailViewProps {
   mockCharacters: ICharacter[];
   regions: Array<{ id: string; name: string; image?: string }>;
   races: Array<{ id: string; name: string; image?: string }>;
-  mockFactions: Array<{ id: string; name: string }>;
   roles: ICharacterRole[];
   alignments: IAlignment[];
   genders: IGenderModal[];
@@ -1210,7 +1209,9 @@ export function CharacterDetailView({
       })(),
       emptyIcon: Users,
       emptyTitle: tEmpty("relationships.no_relationship_defined"),
-      emptyDescription: tEmpty("relationships.use_edit_mode_to_add_relationships"),
+      emptyDescription: tEmpty(
+        "relationships.use_edit_mode_to_add_relationships"
+      ),
       addButtonLabel: t("character-detail:relationships.add_relationship"),
       onAddClick: () => {
         setIsAddRelationshipDialogOpen(true);

@@ -74,7 +74,9 @@ export function MapImageUploader({
           className="animate-glow"
         >
           <Upload className="w-4 h-4 mr-2" />
-          {isUploading ? t("dialogs:upload.loading") : t("dialogs:upload.upload_button")}
+          {isUploading
+            ? t("dialogs:upload.loading")
+            : t("dialogs:upload.upload_button")}
         </Button>
       </div>
     </div>

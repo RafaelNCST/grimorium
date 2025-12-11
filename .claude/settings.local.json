@@ -95,7 +95,8 @@
       "Bash(if grep -rq \"from.*ui/$component\\|import.*$component\" \"C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\" --include=\"*.tsx\" --include=\"*.ts\")",
       "Bash(then)",
       "Bash(else)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(powershell.exe -Command \"Remove-Item ''C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\routes\\dashboard\\`$dashboardId\\tabs\\organization\\`$orgId.tsx''\")"
     ],
     "deny": [
       "Bash(git push --force:*)",

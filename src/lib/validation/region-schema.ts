@@ -1,5 +1,5 @@
-import { z } from "zod";
 import i18next from "i18next";
+import { z } from "zod";
 
 export const RegionSchema = z.object({
   // Campos obrigatórios

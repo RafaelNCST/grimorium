@@ -1,5 +1,5 @@
-import { useTranslation } from "react-i18next";
 import { Image } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface GalleryEmptyStateProps {
   hasFilters?: boolean;

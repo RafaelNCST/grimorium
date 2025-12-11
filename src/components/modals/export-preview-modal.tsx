@@ -2,9 +2,9 @@ import { useState, useMemo, useEffect } from "react";
 
 import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -81,8 +81,16 @@ interface ExportPreviewModalProps {
   chapterId: string;
   chapterTitle: string;
   chapterNumber: string;
-  onExportPDF: (config: ExportConfig, content: string, pages: PageContent[]) => void;
-  onExportWord: (config: ExportConfig, content: string, pages: PageContent[]) => void;
+  onExportPDF: (
+    config: ExportConfig,
+    content: string,
+    pages: PageContent[]
+  ) => void;
+  onExportWord: (
+    config: ExportConfig,
+    content: string,
+    pages: PageContent[]
+  ) => void;
 }
 
 export function ExportPreviewModal({
@@ -274,7 +282,9 @@ export function ExportPreviewModal({
 
               {/* Margins */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">{t("settings.margins")}</Label>
+                <Label className="text-base font-semibold">
+                  {t("settings.margins")}
+                </Label>
                 <Select
                   value={config.margins}
                   onValueChange={(value) =>
@@ -388,7 +398,10 @@ export function ExportPreviewModal({
             {pdfPreviewUrl && !isLoading && (
               <div className="flex-shrink-0 flex items-center justify-center px-4 py-3 border-b border-border bg-card/50">
                 <span className="text-sm text-muted-foreground">
-                  {numPages} {numPages === 1 ? t("preview.page_singular") : t("preview.page_plural")}
+                  {numPages}{" "}
+                  {numPages === 1
+                    ? t("preview.page_singular")
+                    : t("preview.page_plural")}
                 </span>
               </div>
             )}
@@ -407,7 +420,10 @@ export function ExportPreviewModal({
                   className="relative flex-shrink-0"
                   style={{
                     width: `${containerDimensions.width}px`,
-                    minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`,
+                    minHeight:
+                      documentHeight > 0
+                        ? `${documentHeight}px`
+                        : `${containerDimensions.estimatedHeight}px`,
                   }}
                 >
                   {/* Loading overlay during regeneration - covers the fixed container */}
@@ -432,8 +448,10 @@ export function ExportPreviewModal({
                           setNumPages(numPages);
                           // Calculate and lock document height after first load
                           setTimeout(() => {
-                            const pageHeight = PAGE_FORMATS[config.pageFormat].height;
-                            const totalHeight = (pageHeight * scale * numPages) + (numPages * 80); // 80px gap per page
+                            const pageHeight =
+                              PAGE_FORMATS[config.pageFormat].height;
+                            const totalHeight =
+                              pageHeight * scale * numPages + numPages * 80; // 80px gap per page
                             setDocumentHeight(totalHeight);
                           }, 100);
                         }}
@@ -442,7 +460,10 @@ export function ExportPreviewModal({
                             className="flex flex-col items-center gap-4 justify-center"
                             style={{
                               width: `${containerDimensions.width}px`,
-                              minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
+                              minHeight:
+                                documentHeight > 0
+                                  ? `${documentHeight}px`
+                                  : `${containerDimensions.estimatedHeight}px`,
                             }}
                           >
                             <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
@@ -453,7 +474,10 @@ export function ExportPreviewModal({
                         }
                       >
                         {Array.from(new Array(numPages), (_, index) => (
-                          <div key={`page_${index + 1}`} className="flex flex-col gap-2">
+                          <div
+                            key={`page_${index + 1}`}
+                            className="flex flex-col gap-2"
+                          >
                             <div className="shadow-xl bg-white border border-border">
                               <Page
                                 pageNumber={index + 1}
@@ -463,7 +487,7 @@ export function ExportPreviewModal({
                                     className="flex items-center justify-center p-8 bg-white"
                                     style={{
                                       width: `${PAGE_FORMATS[config.pageFormat].width * scale}px`,
-                                      height: `${PAGE_FORMATS[config.pageFormat].height * scale}px`
+                                      height: `${PAGE_FORMATS[config.pageFormat].height * scale}px`,
                                     }}
                                   >
                                     <div className="w-6 h-6 animate-spin rounded-full border-2 border-transparent border-t-primary" />
@@ -472,7 +496,10 @@ export function ExportPreviewModal({
                               />
                             </div>
                             <div className="text-center text-xs text-muted-foreground">
-                              {t("preview.page_of", { current: index + 1, total: numPages })}
+                              {t("preview.page_of", {
+                                current: index + 1,
+                                total: numPages,
+                              })}
                             </div>
                           </div>
                         ))}
@@ -483,7 +510,10 @@ export function ExportPreviewModal({
                       className="flex flex-col items-center gap-4 justify-center"
                       style={{
                         width: `${containerDimensions.width}px`,
-                        minHeight: documentHeight > 0 ? `${documentHeight}px` : `${containerDimensions.estimatedHeight}px`
+                        minHeight:
+                          documentHeight > 0
+                            ? `${documentHeight}px`
+                            : `${containerDimensions.estimatedHeight}px`,
                       }}
                     >
                       <div className="w-8 h-8 animate-spin rounded-full border-2 border-transparent border-t-primary" />
@@ -496,7 +526,7 @@ export function ExportPreviewModal({
                       className="flex flex-col items-center justify-center"
                       style={{
                         width: `${containerDimensions.width}px`,
-                        minHeight: `${containerDimensions.estimatedHeight}px`
+                        minHeight: `${containerDimensions.estimatedHeight}px`,
                       }}
                     >
                       <p className="text-sm text-muted-foreground">

@@ -105,7 +105,9 @@ export function SortableTab({
       className="flex pointer-events-auto cursor-pointer items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
     >
       <tab.icon className="w-5 h-5 @[860px]:w-4 @[860px]:h-4 shrink-0" />
-      <span className="hidden @[860px]:inline truncate">{t(`tabs.${tab.label}`)}</span>
+      <span className="hidden @[860px]:inline truncate">
+        {t(`tabs.${tab.label}`)}
+      </span>
     </TabsTrigger>
   );
 }

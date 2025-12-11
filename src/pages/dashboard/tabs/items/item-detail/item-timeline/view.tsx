@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   ArrowLeft,
@@ -11,6 +10,7 @@ import {
   User,
   Calendar,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +49,6 @@ const eventTypeIcons: Record<ITimelineEvent["eventType"], string> = {
   transformation: "✨",
   other: "📍",
 };
-
 
 interface PropsItemTimelineView {
   itemName: string;
@@ -192,7 +191,9 @@ export function ItemTimelineView({
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>
-                {editingEvent ? t("forms:buttons.edit_event") : t("forms:buttons.new_timeline_event")}
+                {editingEvent
+                  ? t("forms:buttons.edit_event")
+                  : t("forms:buttons.new_timeline_event")}
               </DialogTitle>
             </DialogHeader>
 
@@ -208,7 +209,9 @@ export function ItemTimelineView({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">{t("forms:labels.description")} *</Label>
+                <Label htmlFor="description">
+                  {t("forms:labels.description")} *
+                </Label>
                 <Textarea
                   id="description"
                   value={newEvent.description || ""}
@@ -232,7 +235,9 @@ export function ItemTimelineView({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="eventType">{t("forms:labels.event_type")}</Label>
+                  <Label htmlFor="eventType">
+                    {t("forms:labels.event_type")}
+                  </Label>
                   <select
                     className="w-full h-10 px-3 py-2 text-sm border border-input bg-background rounded-md"
                     value={newEvent.eventType}
@@ -243,10 +248,13 @@ export function ItemTimelineView({
                       )
                     }
                   >
-                    {(Object.keys(eventTypeIcons) as Array<keyof typeof eventTypeIcons>).map((key) => (
+                    {(
+                      Object.keys(eventTypeIcons) as Array<
+                        keyof typeof eventTypeIcons
+                      >
+                    ).map((key) => (
                       <option key={key} value={key}>
-                        {eventTypeIcons[key]}{" "}
-                        {t(`forms:event_types.${key}`)}
+                        {eventTypeIcons[key]} {t(`forms:event_types.${key}`)}
                       </option>
                     ))}
                   </select>
@@ -267,7 +275,9 @@ export function ItemTimelineView({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="character">{t("forms:labels.involved_character")}</Label>
+                  <Label htmlFor="character">
+                    {t("forms:labels.involved_character")}
+                  </Label>
                   <Input
                     id="character"
                     value={newEvent.character || ""}
@@ -289,7 +299,10 @@ export function ItemTimelineView({
                 className="btn-magical"
                 disabled={!newEvent.title || !newEvent.description}
               >
-                {editingEvent ? t("common:actions.edit") : t("common:actions.create")} {t("forms:buttons.new_event").split(" ")[1]}
+                {editingEvent
+                  ? t("common:actions.edit")
+                  : t("common:actions.create")}{" "}
+                {t("forms:buttons.new_event").split(" ")[1]}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -91,7 +91,9 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const fetchOverview = useOverviewStore((state) => state.fetchOverview);
   const setGoals = useOverviewStore((state) => state.setGoals);
   const setStickyNotes = useOverviewStore((state) => state.setStickyNotes);
-  const setChecklistItems = useOverviewStore((state) => state.setChecklistItems);
+  const setChecklistItems = useOverviewStore(
+    (state) => state.setChecklistItems
+  );
   const setSections = useOverviewStore((state) => state.setSections);
   const setAuthorSummary = useOverviewStore((state) => state.setAuthorSummary);
   const setStorySummary = useOverviewStore((state) => state.setStorySummary);
@@ -149,13 +151,14 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
     // Apenas recalcular se já foi inicializado E não é o primeiro mount
     if (hasInitialized && mountCountRef.current > 1) {
-      console.log("[OverviewTab] Recalculando stats silenciosamente ao retornar");
+      console.log(
+        "[OverviewTab] Recalculando stats silenciosamente ao retornar"
+      );
       Promise.all([
         useOverviewStore.getState().calculateStats(bookId),
         useOverviewStore.getState().calculateArcsProgress(bookId),
       ]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId, hasInitialized]); // Re-executar quando bookId muda ou quando volta
 
   // Set default note if no notes exist after loading

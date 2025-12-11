@@ -25,8 +25,8 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useUserAccountStore } from "@/stores/user-account-store";
 
-import { AccountSection } from "./sections/AccountSection";
 import { AboutSection } from "./sections/AboutSection";
+import { AccountSection } from "./sections/AccountSection";
 import { DashboardSection } from "./sections/DashboardSection";
 import { DataSection } from "./sections/DataSection";
 import { NotificationsSection } from "./sections/NotificationsSection";
@@ -43,7 +43,8 @@ export function AdvancedSettingsModal({
 }: AdvancedSettingsModalProps) {
   const { t } = useTranslation("advanced-settings");
   const { user, updateDisplayName } = useUserAccountStore();
-  const [activeSection, setActiveSection] = useState<SettingsSection>("account");
+  const [activeSection, setActiveSection] =
+    useState<SettingsSection>("account");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(user?.displayName || "");
 
@@ -95,12 +96,12 @@ export function AdvancedSettingsModal({
       <DialogContent
         className="p-0 gap-0 overflow-hidden !w-[1200px] !max-w-[1200px] !min-w-[1200px]"
         style={{
-          width: '1200px',
-          maxWidth: '1200px',
-          minWidth: '1200px',
-          height: '800px',
-          maxHeight: '800px',
-          minHeight: '800px'
+          width: "1200px",
+          maxWidth: "1200px",
+          minWidth: "1200px",
+          height: "800px",
+          maxHeight: "800px",
+          minHeight: "800px",
         }}
       >
         <div className="flex h-full w-full overflow-hidden">
@@ -231,13 +232,17 @@ export function AdvancedSettingsModal({
                   ) : (
                     <Wheat className="w-4 h-4 text-green-600 dark:text-green-400" />
                   )}
-                  <span className={cn(
-                    "text-sm font-bold",
-                    isPremium
-                      ? "text-purple-700 dark:text-purple-300"
-                      : "text-green-700 dark:text-green-300"
-                  )}>
-                    {isPremium ? t("account.subscription.tier_premium") : t("account.subscription.tier_free")}
+                  <span
+                    className={cn(
+                      "text-sm font-bold",
+                      isPremium
+                        ? "text-purple-700 dark:text-purple-300"
+                        : "text-green-700 dark:text-green-300"
+                    )}
+                  >
+                    {isPremium
+                      ? t("account.subscription.tier_premium")
+                      : t("account.subscription.tier_free")}
                   </span>
                 </div>
               </div>
@@ -249,7 +254,10 @@ export function AdvancedSettingsModal({
             {/* Header */}
             <div className="h-14 border-b px-6 flex items-center flex-shrink-0">
               <h2 className="text-lg font-semibold">
-                {t(sections.find(s => s.id === activeSection)?.labelKey || `sections.${activeSection}`)}
+                {t(
+                  sections.find((s) => s.id === activeSection)?.labelKey ||
+                    `sections.${activeSection}`
+                )}
               </h2>
             </div>
 

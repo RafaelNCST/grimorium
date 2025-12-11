@@ -7,7 +7,6 @@ import {
 } from "@/lib/db/books.service";
 import { getChapterMetadataByBookId } from "@/lib/db/chapters.service";
 import { getPlotArcsByBookId } from "@/lib/db/plot.service";
-
 import type {
   IGoals,
   IStoryProgress,
@@ -565,7 +564,9 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
           ...state.cache,
           [bookId]: {
             ...cached,
-            stickyNotes: cached.stickyNotes.filter((note) => note.id !== noteId),
+            stickyNotes: cached.stickyNotes.filter(
+              (note) => note.id !== noteId
+            ),
           },
         },
       };
@@ -812,7 +813,9 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
       );
       const totalChapters = chapters.length;
 
-      const publishedChapters = chapters.filter((ch) => ch.status === "published");
+      const publishedChapters = chapters.filter(
+        (ch) => ch.status === "published"
+      );
       const lastPublishedChapter =
         publishedChapters.length > 0
           ? publishedChapters.reduce((prev, current) => {
@@ -827,7 +830,9 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
         : 0;
       const lastChapterName = lastPublishedChapter?.title || "";
 
-      const finishedChapters = chapters.filter((ch) => ch.status === "finished");
+      const finishedChapters = chapters.filter(
+        (ch) => ch.status === "finished"
+      );
 
       const averageWordsPerChapter =
         totalChapters > 0 ? totalWords / totalChapters : 0;
@@ -910,9 +915,9 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
   calculateArcsProgress: async (bookId: string) => {
     try {
       const arcs = await getPlotArcsByBookId(bookId);
-      const progressValues = arcs.map((arc) => {
-        return arc.status === "finished" ? 100 : arc.progress;
-      });
+      const progressValues = arcs.map((arc) =>
+        arc.status === "finished" ? 100 : arc.progress
+      );
 
       set((state) => {
         const cached = state.cache[bookId];
@@ -948,13 +953,16 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
         return;
       }
 
-      const completedArcs = arcs.filter((arc) => arc.status === "finished").length;
+      const completedArcs = arcs.filter(
+        (arc) => arc.status === "finished"
+      ).length;
       const currentArc = arcs.find((arc) => arc.status === "current");
       const currentArcProgress = currentArc ? currentArc.progress : 0;
 
-      const estimatedChapters = arcs.reduce((sum) => {
-        return sum + 10; // Placeholder
-      }, 0);
+      const estimatedChapters = arcs.reduce(
+        (sum) => sum + 10, // Placeholder
+        0
+      );
 
       set((state) => {
         const cached = state.cache[bookId];

@@ -49,9 +49,7 @@ export function DeleteImageDialog({
             <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
-            <AlertDialogTitle>
-              {t("delete.title")}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-left pt-4 text-foreground font-medium">
             {t("delete.message", { imageName })}

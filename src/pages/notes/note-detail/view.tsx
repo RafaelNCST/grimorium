@@ -2,15 +2,7 @@ import { memo, useMemo } from "react";
 
 import { format } from "date-fns";
 import { ptBR, enUS } from "date-fns/locale";
-import {
-  ArrowLeft,
-  Trash2,
-  Link,
-  Sun,
-  Moon,
-  Check,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Trash2, Link, Sun, Moon, Check, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -339,4 +331,3 @@ function NoteDetailViewComponent({
 }
 
 export const NoteDetailView = memo(NoteDetailViewComponent);
-

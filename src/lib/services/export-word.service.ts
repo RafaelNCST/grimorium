@@ -65,7 +65,9 @@ export async function generateChapterWord(
   const titleSize = getFontSize(config.titleSize);
 
   // Split content into paragraphs
-  const paragraphs = content.split("\n").filter((p) => p.trim().length > 0 || p === "");
+  const paragraphs = content
+    .split("\n")
+    .filter((p) => p.trim().length > 0 || p === "");
 
   // Create title paragraph
   const titleParagraph = new Paragraph({

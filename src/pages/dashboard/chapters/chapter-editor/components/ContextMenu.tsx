@@ -217,7 +217,9 @@ export function ContextMenu({
               className="w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-muted transition-colors"
             >
               <ExternalLink className="h-4 w-4" />
-              {t("context_menu.view_entity_details", { entityName: entityLink.entity.name })}
+              {t("context_menu.view_entity_details", {
+                entityName: entityLink.entity.name,
+              })}
             </button>
           )}
 

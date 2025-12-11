@@ -1,9 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { stat, readFile } from "@tauri-apps/plugin-fs";
 import { Upload, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { ManageEntityLinksModal } from "@/components/modals/manage-entity-links-modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,13 +17,17 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-
-import { FormInput } from "@/components/forms/FormInput";
-import { FormTextarea } from "@/components/forms/FormTextarea";
-
-import { ManageEntityLinksModal } from "@/components/modals/manage-entity-links-modal";
-
+import {
+  copyImageToGallery,
+  ensureGalleryDirectory,
+} from "@/lib/db/gallery.service";
 import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
+
+import {
+  MAX_FILE_SIZE_BYTES,
+  MAX_FILE_SIZE_MB,
+  SUPPORTED_IMAGE_EXTENSIONS,
+} from "../constants/gallery-constants";
 import {
   generateThumbnail,
   getImageDimensions,
@@ -28,12 +36,6 @@ import {
   getMimeTypeFromExtension,
   bytesToDataURL,
 } from "../utils/image-utils";
-import {
-  MAX_FILE_SIZE_BYTES,
-  MAX_FILE_SIZE_MB,
-  SUPPORTED_IMAGE_EXTENSIONS,
-} from "../constants/gallery-constants";
-import { copyImageToGallery, ensureGalleryDirectory } from "@/lib/db/gallery.service";
 
 interface UploadImageModalProps {
   open: boolean;
@@ -185,7 +187,10 @@ export function UploadImageModal({
       let finalThumbnail = imagePreview;
 
       // Only copy file if a new image was selected (different from editing)
-      if (selectedImageDataURL && (!editingItem || selectedImagePath !== editingItem.originalPath)) {
+      if (
+        selectedImageDataURL &&
+        (!editingItem || selectedImagePath !== editingItem.originalPath)
+      ) {
         // Ensure gallery directory exists
         await ensureGalleryDirectory();
 
@@ -258,7 +263,9 @@ export function UploadImageModal({
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingItem ? t("upload_modal.edit_title") : t("upload_modal.title")}
+              {editingItem
+                ? t("upload_modal.edit_title")
+                : t("upload_modal.title")}
             </DialogTitle>
           </DialogHeader>
 
@@ -322,7 +329,9 @@ export function UploadImageModal({
                     onClick={handleSelectImage}
                   >
                     <Upload className="h-8 w-8 text-muted-foreground" />
-                    <span className="text-sm">{t("upload_modal.select_image")}</span>
+                    <span className="text-sm">
+                      {t("upload_modal.select_image")}
+                    </span>
                   </button>
                 )}
               </div>
@@ -377,7 +386,12 @@ export function UploadImageModal({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={handleClose} disabled={isUploading}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleClose}
+              disabled={isUploading}
+            >
               {t("upload_modal.cancel")}
             </Button>
             <Button
@@ -388,9 +402,12 @@ export function UploadImageModal({
               className="animate-glow"
             >
               {isUploading
-                ? (editingItem ? t("upload_modal.saving") : t("upload_modal.uploading"))
-                : (editingItem ? t("upload_modal.save") : t("upload_modal.upload"))
-              }
+                ? editingItem
+                  ? t("upload_modal.saving")
+                  : t("upload_modal.uploading")
+                : editingItem
+                  ? t("upload_modal.save")
+                  : t("upload_modal.upload")}
             </Button>
           </DialogFooter>
         </DialogContent>

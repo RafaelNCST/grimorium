@@ -1,16 +1,9 @@
+import { Upload, ArrowLeft, Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Upload, ArrowLeft } from "lucide-react";
 
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Button } from "@/components/ui/button";
-
-import { GalleryGrid } from "../components/gallery-grid";
-import { UploadImageModal } from "../components/upload-image-modal";
-import { ImageLightbox } from "../components/image-lightbox";
-
-import { IGalleryItem, IGalleryLink, GallerySortOrder, EntityType } from "@/types/gallery-types";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Select,
   SelectContent,
@@ -18,6 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  IGalleryItem,
+  IGalleryLink,
+  GallerySortOrder,
+  EntityType,
+} from "@/types/gallery-types";
+
+import { GalleryGrid } from "../components/gallery-grid";
+import { ImageLightbox } from "../components/image-lightbox";
+import { UploadImageModal } from "../components/upload-image-modal";
 
 interface EntityGalleryViewProps {
   items: IGalleryItem[];
@@ -159,11 +162,15 @@ export function EntityGalleryView({
                   <SelectValue placeholder={t("filters.sort_label")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">{t("filters.sort_recent")}</SelectItem>
+                  <SelectItem value="recent">
+                    {t("filters.sort_recent")}
+                  </SelectItem>
                   <SelectItem value="alphabetical">
                     {t("filters.sort_alphabetical")}
                   </SelectItem>
-                  <SelectItem value="manual">{t("filters.sort_manual")}</SelectItem>
+                  <SelectItem value="manual">
+                    {t("filters.sort_manual")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -219,7 +226,7 @@ export function EntityGalleryView({
         editingItem={editingItem}
         bookId={bookId}
         preSelectedLinks={preSelectedLinks}
-        disableLinksManagement={true}
+        disableLinksManagement
       />
 
       {/* Lightbox */}

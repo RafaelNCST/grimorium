@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
 import { ArrowLeft, Edit2, Trash2, Save, Link } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import { RichTextEditor } from "@/components/rich-text-editor";

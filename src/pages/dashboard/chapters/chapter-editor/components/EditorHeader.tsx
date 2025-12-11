@@ -128,7 +128,10 @@ export function EditorHeader({
                 <TooltipContent>
                   {previousChapter ? (
                     <p>
-                      {t("header_bar.chapter_title", { number: previousChapter.number, title: previousChapter.title })}
+                      {t("header_bar.chapter_title", {
+                        number: previousChapter.number,
+                        title: previousChapter.title,
+                      })}
                     </p>
                   ) : (
                     <p>{t("empty-states:chapters.no_previous_chapter")}</p>
@@ -159,7 +162,10 @@ export function EditorHeader({
                 ) : (
                   <div className="cursor-pointer px-3 py-2">
                     <h1 className="text-lg font-semibold whitespace-nowrap">
-                      {t("header_bar.chapter_title", { number: chapterNumber, title: title || t("chapter.title_placeholder") })}
+                      {t("header_bar.chapter_title", {
+                        number: chapterNumber,
+                        title: title || t("chapter.title_placeholder"),
+                      })}
                     </h1>
                   </div>
                 )}
@@ -181,7 +187,10 @@ export function EditorHeader({
                 <TooltipContent>
                   {nextChapter ? (
                     <p>
-                      {t("header_bar.chapter_title", { number: nextChapter.number, title: nextChapter.title })}
+                      {t("header_bar.chapter_title", {
+                        number: nextChapter.number,
+                        title: nextChapter.title,
+                      })}
                     </p>
                   ) : (
                     <p>{t("empty-states:chapters.no_next_chapter")}</p>

@@ -6,10 +6,7 @@ import { useTranslation } from "react-i18next";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
-import {
-  getPlotArcsByBookId,
-  getPlotArcById,
-} from "@/lib/db/plot.service";
+import { getPlotArcsByBookId, getPlotArcById } from "@/lib/db/plot.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { canFinishArc } from "@/lib/utils/arc-validation";
 import { usePlotStore } from "@/stores/plot-store";

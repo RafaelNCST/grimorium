@@ -12,7 +12,8 @@ import { Separator } from "@/components/ui/separator";
 
 const APP_VERSION = "0.0.0"; // TODO: Pegar do package.json ou ambiente
 const GITHUB_ISSUES_URL = "https://github.com/seu-usuario/grimorium/issues";
-const GITHUB_DISCUSSIONS_URL = "https://github.com/seu-usuario/grimorium/discussions";
+const GITHUB_DISCUSSIONS_URL =
+  "https://github.com/seu-usuario/grimorium/discussions";
 
 export function AboutSection() {
   const { t } = useTranslation("advanced-settings");

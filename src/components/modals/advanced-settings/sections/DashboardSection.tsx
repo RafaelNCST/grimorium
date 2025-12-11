@@ -21,7 +21,10 @@ import { Label } from "@/components/ui/label";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { DashboardTabId } from "@/types/app-settings";
 
-const TAB_ICONS: Record<DashboardTabId, React.ComponentType<{ className?: string }>> = {
+const TAB_ICONS: Record<
+  DashboardTabId,
+  React.ComponentType<{ className?: string }>
+> = {
   overview: BookOpen,
   characters: Users,
   world: MapPin,

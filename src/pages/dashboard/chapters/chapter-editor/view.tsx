@@ -136,7 +136,12 @@ export function ChapterEditorView({
   renderAnnotatedText,
   getAnnotationComments,
 }: ChapterEditorViewProps) {
-  const { t } = useTranslation(["forms", "chapter-editor", "chapters", "common"]);
+  const { t } = useTranslation([
+    "forms",
+    "chapter-editor",
+    "chapters",
+    "common",
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,13 +170,19 @@ export function ChapterEditorView({
                     {statusConfig[chapter.status].label}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {t("chapter-editor:toolbar.word_count", { count: getWordCount() })}
+                    {t("chapter-editor:toolbar.word_count", {
+                      count: getWordCount(),
+                    })}
                   </span>
                   <Badge variant="outline" className="text-xs">
-                    {t("chapter-editor:toolbar.comments_count", { count: chapter.comments.length })}
+                    {t("chapter-editor:toolbar.comments_count", {
+                      count: chapter.comments.length,
+                    })}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {t("chapter-editor:toolbar.links_count", { count: chapter.entityLinks.length })}
+                    {t("chapter-editor:toolbar.links_count", {
+                      count: chapter.entityLinks.length,
+                    })}
                   </Badge>
                   {isAutoSaving && (
                     <span className="text-sm text-muted-foreground">
@@ -198,10 +209,18 @@ export function ChapterEditorView({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">{t("chapters:status.draft")}</SelectItem>
-                  <SelectItem value="in-progress">{t("chapters:status.in_progress")}</SelectItem>
-                  <SelectItem value="review">{t("chapters:status.review")}</SelectItem>
-                  <SelectItem value="finished">{t("chapters:status.finished")}</SelectItem>
+                  <SelectItem value="draft">
+                    {t("chapters:status.draft")}
+                  </SelectItem>
+                  <SelectItem value="in-progress">
+                    {t("chapters:status.in_progress")}
+                  </SelectItem>
+                  <SelectItem value="review">
+                    {t("chapters:status.review")}
+                  </SelectItem>
+                  <SelectItem value="finished">
+                    {t("chapters:status.finished")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -231,14 +250,18 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="italic"
                     onClick={() => onExecCommand("italic")}
-                    aria-label={t("chapter-editor:formatting.italic_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.italic_aria_label"
+                    )}
                   >
                     <Italic className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="underline"
                     onClick={() => onExecCommand("underline")}
-                    aria-label={t("chapter-editor:formatting.underline_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.underline_aria_label"
+                    )}
                   >
                     <Underline className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -251,28 +274,36 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="left"
                     onClick={() => onExecCommand("justifyLeft")}
-                    aria-label={t("chapter-editor:formatting.align_left_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.align_left_aria_label"
+                    )}
                   >
                     <AlignLeft className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="center"
                     onClick={() => onExecCommand("justifyCenter")}
-                    aria-label={t("chapter-editor:formatting.align_center_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.align_center_aria_label"
+                    )}
                   >
                     <AlignCenter className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="right"
                     onClick={() => onExecCommand("justifyRight")}
-                    aria-label={t("chapter-editor:formatting.align_right_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.align_right_aria_label"
+                    )}
                   >
                     <AlignRight className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="justify"
                     onClick={() => onExecCommand("justifyFull")}
-                    aria-label={t("chapter-editor:formatting.justify_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.justify_aria_label"
+                    )}
                   >
                     <AlignJustify className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -285,14 +316,18 @@ export function ChapterEditorView({
                   <ToggleGroupItem
                     value="ul"
                     onClick={() => onExecCommand("insertUnorderedList")}
-                    aria-label={t("chapter-editor:formatting.unordered_list_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.unordered_list_aria_label"
+                    )}
                   >
                     <List className="w-4 h-4" />
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="ol"
                     onClick={() => onExecCommand("insertOrderedList")}
-                    aria-label={t("chapter-editor:formatting.ordered_list_aria_label")}
+                    aria-label={t(
+                      "chapter-editor:formatting.ordered_list_aria_label"
+                    )}
                   >
                     <ListOrdered className="w-4 h-4" />
                   </ToggleGroupItem>
@@ -421,7 +456,9 @@ export function ChapterEditorView({
           <div className="w-80 border-l border-border p-4 bg-muted/20">
             <div className="mb-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">{t("chapter-editor:comments.comments_label")}</h3>
+                <h3 className="font-semibold">
+                  {t("chapter-editor:comments.comments_label")}
+                </h3>
                 <Button variant="ghost" size="sm" onClick={onCloseSidebar}>
                   ✕
                 </Button>
@@ -514,7 +551,11 @@ export function ChapterEditorView({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-96">
             <CardHeader>
-              <CardTitle>{t("chapter-editor:link.create_link_with_text", { selectedText })}</CardTitle>
+              <CardTitle>
+                {t("chapter-editor:link.create_link_with_text", {
+                  selectedText,
+                })}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(mockEntities).map(([type, entities]) => (
@@ -575,7 +616,9 @@ export function ChapterEditorView({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-[600px]">
             <CardHeader>
-              <CardTitle>{t("chapter-editor:toolbar.summary_modal_title")}</CardTitle>
+              <CardTitle>
+                {t("chapter-editor:toolbar.summary_modal_title")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea

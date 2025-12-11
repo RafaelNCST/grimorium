@@ -21,7 +21,6 @@ import {
   type ExportConfig,
   type PageContent,
 } from "@/components/modals/export-preview-modal";
-import { generateChapterPDF } from "@/lib/services/export-pdf.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { generateChapterPDF } from "@/lib/services/export-pdf.service";
 
 type ChapterStatus =
   | "draft"
@@ -131,7 +131,9 @@ export function ChapterCard({
   ) => {
     try {
       // Generate Word blob
-      const { generateChapterWord } = await import("@/lib/services/export-word.service");
+      const { generateChapterWord } = await import(
+        "@/lib/services/export-word.service"
+      );
       const blob = await generateChapterWord(
         chapter.number.toString(),
         chapter.title,
@@ -246,7 +248,8 @@ export function ChapterCard({
             className="w-full justify-between rounded-none hover:bg-white/5 dark:hover:bg-white/10 hover:text-foreground transition-colors duration-200 px-6 py-3"
           >
             <span className="text-sm font-medium">
-              {t(isDetailsExpanded ? "details.hide" : "details.show")} {t("details.label")}
+              {t(isDetailsExpanded ? "details.hide" : "details.show")}{" "}
+              {t("details.label")}
             </span>
             {isDetailsExpanded ? (
               <ChevronUp className="w-4 h-4" />
@@ -259,7 +262,9 @@ export function ChapterCard({
             <div className="px-6 py-4 space-y-4">
               {/* Plot Arc Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">{t("plot_arc.title")}</h4>
+                <h4 className="text-sm font-medium mb-2">
+                  {t("plot_arc.title")}
+                </h4>
                 {chapter.plotArc ? (
                   <Badge
                     variant="secondary"
@@ -277,7 +282,9 @@ export function ChapterCard({
 
               {/* Metrics Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">{t("metrics.title")}</h4>
+                <h4 className="text-sm font-medium mb-2">
+                  {t("metrics.title")}
+                </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -292,7 +299,9 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Hash className="w-3.5 h-3.5" />
-                      <span className="text-xs">{t("metrics.characters_no_spaces")}</span>
+                      <span className="text-xs">
+                        {t("metrics.characters_no_spaces")}
+                      </span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.characterCount.toLocaleString()}
@@ -302,7 +311,9 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Hash className="w-3.5 h-3.5" />
-                      <span className="text-xs">{t("metrics.characters_with_spaces")}</span>
+                      <span className="text-xs">
+                        {t("metrics.characters_with_spaces")}
+                      </span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.characterCountWithSpaces.toLocaleString()}
@@ -312,7 +323,9 @@ export function ChapterCard({
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Clock className="w-3.5 h-3.5" />
-                      <span className="text-xs">{t("metrics.last_edited")}</span>
+                      <span className="text-xs">
+                        {t("metrics.last_edited")}
+                      </span>
                     </div>
                     <span className="text-sm font-semibold text-foreground">
                       {chapter.lastEdited.toLocaleDateString()}
@@ -323,7 +336,9 @@ export function ChapterCard({
 
               {/* Summary Section */}
               <div>
-                <h4 className="text-sm font-medium mb-2">{t("summary.title")}</h4>
+                <h4 className="text-sm font-medium mb-2">
+                  {t("summary.title")}
+                </h4>
                 {chapter.summary ? (
                   <p className="text-sm text-muted-foreground">
                     {chapter.summary}

@@ -1,3 +1,4 @@
+import { TFunction } from "i18next";
 import {
   Zap,
   Scale,
@@ -7,7 +8,6 @@ import {
   RotateCcw,
   LucideIcon,
 } from "lucide-react";
-import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 

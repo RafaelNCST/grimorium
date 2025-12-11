@@ -107,7 +107,9 @@ export function AllAnnotationsSidebar({
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="font-medium">
                             {annotation.notes.length}{" "}
-                            {annotation.notes.length === 1 ? t("chapter-editor:annotations_sidebar.note") : t("chapter-editor:annotations_sidebar.notes")}
+                            {annotation.notes.length === 1
+                              ? t("chapter-editor:annotations_sidebar.note")
+                              : t("chapter-editor:annotations_sidebar.notes")}
                           </span>
                           {hasImportantNotes && (
                             <Tooltip>
@@ -115,7 +117,11 @@ export function AllAnnotationsSidebar({
                                 <Star className="w-3 h-3 text-amber-500 fill-current" />
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>{t("tooltips:annotations.contains_important_notes")}</p>
+                                <p>
+                                  {t(
+                                    "tooltips:annotations.contains_important_notes"
+                                  )}
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           )}
@@ -166,7 +172,11 @@ export function AllAnnotationsSidebar({
         {annotations.length > 0 && (
           <div className="px-4 py-3 border-t border-border bg-muted/30">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{t("chapter-editor:annotations_sidebar.total_annotations", { count: annotations.length })}</span>
+              <span>
+                {t("chapter-editor:annotations_sidebar.total_annotations", {
+                  count: annotations.length,
+                })}
+              </span>
               <div className="flex items-center gap-3">
                 {(() => {
                   const importantCount = annotations.filter((a) =>
@@ -180,12 +190,18 @@ export function AllAnnotationsSidebar({
                     <>
                       {importantCount > 0 && (
                         <span className="text-amber-600 dark:text-amber-400">
-                          {importantCount} {t("chapter-editor:annotations_sidebar.important_plural")}
+                          {importantCount}{" "}
+                          {t(
+                            "chapter-editor:annotations_sidebar.important_plural"
+                          )}
                         </span>
                       )}
                       {totalNotes > 0 && (
                         <span>
-                          {totalNotes} {totalNotes === 1 ? t("chapter-editor:annotations_sidebar.note") : t("chapter-editor:annotations_sidebar.notes")}
+                          {totalNotes}{" "}
+                          {totalNotes === 1
+                            ? t("chapter-editor:annotations_sidebar.note")
+                            : t("chapter-editor:annotations_sidebar.notes")}
                         </span>
                       )}
                     </>

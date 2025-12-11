@@ -14,7 +14,7 @@ import {
   Shield,
   FileText,
   BarChart3,
-  Info
+  Info,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -29,9 +29,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 export function DataSection() {
   const { t } = useTranslation("advanced-settings");
@@ -157,7 +157,10 @@ export function DataSection() {
             <div className="flex-1 space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="usage-data" className="text-sm font-semibold cursor-pointer">
+                  <Label
+                    htmlFor="usage-data"
+                    className="text-sm font-semibold cursor-pointer"
+                  >
                     {t("data.privacy.usage_data_label")}
                   </Label>
                   <Switch
@@ -175,7 +178,9 @@ export function DataSection() {
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p className="font-medium">{t("data.privacy.what_we_collect")}</p>
+                    <p className="font-medium">
+                      {t("data.privacy.what_we_collect")}
+                    </p>
                     <ul className="list-disc list-inside space-y-0.5 ml-1">
                       <li>{t("data.privacy.collect_item_1")}</li>
                       <li>{t("data.privacy.collect_item_2")}</li>
@@ -215,12 +220,14 @@ export function DataSection() {
           <div
             className={`rounded-lg border bg-card p-4 flex items-start gap-3 transition-colors duration-200 ${
               isExporting
-                ? 'opacity-60 cursor-not-allowed'
-                : 'hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer'
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
             }`}
             onClick={isExporting ? undefined : handleExportBackup}
           >
-            <div className={`rounded-lg p-2 flex-shrink-0 ${isExporting ? 'bg-muted' : 'bg-blue-500/10'}`}>
+            <div
+              className={`rounded-lg p-2 flex-shrink-0 ${isExporting ? "bg-muted" : "bg-blue-500/10"}`}
+            >
               {isExporting ? (
                 <div className="w-5 h-5 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               ) : (
@@ -240,12 +247,14 @@ export function DataSection() {
           <div
             className={`rounded-lg border bg-card p-4 flex items-start gap-3 transition-colors duration-200 ${
               isImporting
-                ? 'opacity-60 cursor-not-allowed'
-                : 'hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer'
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-white/5 dark:hover:bg-white/10 cursor-pointer"
             }`}
             onClick={isImporting ? undefined : handleImportBackup}
           >
-            <div className={`rounded-lg p-2 flex-shrink-0 ${isImporting ? 'bg-muted' : 'bg-green-500/10'}`}>
+            <div
+              className={`rounded-lg p-2 flex-shrink-0 ${isImporting ? "bg-muted" : "bg-green-500/10"}`}
+            >
               {isImporting ? (
                 <div className="w-5 h-5 animate-spin rounded-full border-2 border-transparent border-t-primary" />
               ) : (
@@ -325,10 +334,7 @@ export function DataSection() {
             <AlertDialogCancel>
               {t("data.clear.dialog.cancel")}
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleClearData}
-              variant="destructive"
-            >
+            <AlertDialogAction onClick={handleClearData} variant="destructive">
               {t("data.clear.dialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -257,7 +257,8 @@ export const FormPlotArcButton = React.forwardRef<
                     );
                     return currentStatusData
                       ? React.createElement(currentStatusData.icon, {
-                          className: "w-8 h-8 text-muted-foreground mx-auto mb-2",
+                          className:
+                            "w-8 h-8 text-muted-foreground mx-auto mb-2",
                         })
                       : null;
                   })()}

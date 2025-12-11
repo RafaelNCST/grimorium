@@ -1,3 +1,4 @@
+import { TFunction } from "i18next";
 import {
   Leaf,
   Beef,
@@ -10,7 +11,6 @@ import {
   HelpCircle,
   type LucideIcon,
 } from "lucide-react";
-import { TFunction } from "i18next";
 
 import { GridSelectOption } from "@/components/forms/FormSelectGrid";
 

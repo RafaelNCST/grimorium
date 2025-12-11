@@ -10,5 +10,7 @@ export const getRaceRelationshipTypeData = (
   t: TFunction
 ): RaceRelationshipTypeConfig => {
   const relationshipTypes = getRaceRelationshipTypes(t);
-  return relationshipTypes.find((rt) => rt.value === type) || relationshipTypes[0];
+  return (
+    relationshipTypes.find((rt) => rt.value === type) || relationshipTypes[0]
+  );
 };

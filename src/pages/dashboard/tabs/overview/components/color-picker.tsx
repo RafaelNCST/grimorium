@@ -123,7 +123,10 @@ function ColorButton({
           style={{ backgroundColor: option.hex }}
         >
           {isSelected && (
-            <Check className="w-5 h-5 text-purple-600 dark:text-purple-400 drop-shadow-lg" strokeWidth={3} />
+            <Check
+              className="w-5 h-5 text-purple-600 dark:text-purple-400 drop-shadow-lg"
+              strokeWidth={3}
+            />
           )}
         </button>
       </TooltipTrigger>

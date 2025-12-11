@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 import { readFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 import {
   ArrowLeft,
@@ -13,23 +12,25 @@ import {
   Link as LinkIcon,
   Unlink,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
-import { formatFileSize, bytesToDataURL } from "../utils/image-utils";
-import { DeleteImageDialog } from "./delete-image-dialog";
-
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { getCharacterById } from "@/lib/db/characters.service";
-import { getRegionById } from "@/lib/db/regions.service";
 import { getFactionById } from "@/lib/db/factions.service";
-import { getRaceById } from "@/lib/db/races.service";
 import { getItemById } from "@/lib/db/items.service";
 import { getPlotArcById } from "@/lib/db/plot.service";
+import { getRaceById } from "@/lib/db/races.service";
+import { getRegionById } from "@/lib/db/regions.service";
+import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
+
+import { formatFileSize, bytesToDataURL } from "../utils/image-utils";
+
+import { DeleteImageDialog } from "./delete-image-dialog";
 
 interface ImageLightboxProps {
   item: IGalleryItem;
@@ -72,7 +73,11 @@ export function ImageLightbox({
 
         // Convert bytes to data URL
         const dataUrl = bytesToDataURL(fileBytes, item.mimeType);
-        console.log("Image loaded successfully, size:", fileBytes.length, "bytes");
+        console.log(
+          "Image loaded successfully, size:",
+          fileBytes.length,
+          "bytes"
+        );
         setImageSrc(dataUrl);
       } catch (error) {
         console.error("Error loading image source:", error);
@@ -261,9 +266,7 @@ export function ImageLightbox({
             <div className="p-6 space-y-6">
               {/* Title */}
               <div>
-                <h2 className="text-lg font-semibold">
-                  {item.title}
-                </h2>
+                <h2 className="text-lg font-semibold">{item.title}</h2>
               </div>
 
               {/* Action buttons */}
@@ -374,44 +377,62 @@ export function ImageLightbox({
                   <div className="space-y-3">
                     {(() => {
                       // Group links by entity type
-                      const groupedLinks = item.links.reduce((acc, link) => {
-                        if (!acc[link.entityType]) {
-                          acc[link.entityType] = [];
-                        }
-                        acc[link.entityType].push(link);
-                        return acc;
-                      }, {} as Record<string, IGalleryLink[]>);
-
-                      return Object.entries(groupedLinks).map(([entityType, links]) => {
-                        const entityTypeLabel = (() => {
-                          switch (entityType) {
-                            case "character": return t("filters.characters");
-                            case "region": return t("filters.regions");
-                            case "faction": return t("filters.factions");
-                            case "race": return t("filters.races");
-                            case "item": return t("filters.items");
-                            case "arc": return t("filters.arcs");
-                            default: return entityType;
+                      const groupedLinks = item.links.reduce(
+                        (acc, link) => {
+                          if (!acc[link.entityType]) {
+                            acc[link.entityType] = [];
                           }
-                        })();
+                          acc[link.entityType].push(link);
+                          return acc;
+                        },
+                        {} as Record<string, IGalleryLink[]>
+                      );
 
-                        return (
-                          <div key={entityType} className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-xs text-muted-foreground">
-                              {entityTypeLabel}:
-                            </span>
-                            {links.map((link) => {
-                              const displayName = entityNames[link.entityId] || link.entityName || link.entityId;
+                      return Object.entries(groupedLinks).map(
+                        ([entityType, links]) => {
+                          const entityTypeLabel = (() => {
+                            switch (entityType) {
+                              case "character":
+                                return t("filters.characters");
+                              case "region":
+                                return t("filters.regions");
+                              case "faction":
+                                return t("filters.factions");
+                              case "race":
+                                return t("filters.races");
+                              case "item":
+                                return t("filters.items");
+                              case "arc":
+                                return t("filters.arcs");
+                              default:
+                                return entityType;
+                            }
+                          })();
 
-                              return (
-                                <Badge key={link.id} variant="secondary">
-                                  {displayName}
-                                </Badge>
-                              );
-                            })}
-                          </div>
-                        );
-                      });
+                          return (
+                            <div
+                              key={entityType}
+                              className="flex flex-wrap items-center gap-1.5"
+                            >
+                              <span className="text-xs text-muted-foreground">
+                                {entityTypeLabel}:
+                              </span>
+                              {links.map((link) => {
+                                const displayName =
+                                  entityNames[link.entityId] ||
+                                  link.entityName ||
+                                  link.entityId;
+
+                                return (
+                                  <Badge key={link.id} variant="secondary">
+                                    {displayName}
+                                  </Badge>
+                                );
+                              })}
+                            </div>
+                          );
+                        }
+                      );
                     })()}
                   </div>
                 )}

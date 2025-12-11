@@ -6,9 +6,7 @@ export const Route = createFileRoute(
   "/dashboard/$dashboardId/gallery/entity/$entityType/$entityId"
 )({
   component: EntityGalleryPage,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      entityName: (search.entityName as string) || "",
-    };
-  },
+  validateSearch: (search: Record<string, unknown>) => ({
+    entityName: (search.entityName as string) || "",
+  }),
 });

@@ -67,7 +67,9 @@ export function CharacterSuperViewPage() {
   if (!character) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">{t("errors:not_found.character")}</p>
+        <p className="text-muted-foreground">
+          {t("errors:not_found.character")}
+        </p>
       </div>
     );
   }

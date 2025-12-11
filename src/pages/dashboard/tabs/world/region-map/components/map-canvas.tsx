@@ -476,7 +476,10 @@ export function MapCanvas({
         onTransformed={(ref, state) => {
           setCurrentScale(state.scale);
           // Save only scale to localStorage
-          localStorage.setItem(`map-scale-${imagePath}`, state.scale.toString());
+          localStorage.setItem(
+            `map-scale-${imagePath}`,
+            state.scale.toString()
+          );
         }}
         onPanningStart={() => setIsPanning(true)}
         onPanningStop={() => setIsPanning(false)}

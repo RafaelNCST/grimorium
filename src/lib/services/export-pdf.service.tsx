@@ -27,10 +27,10 @@ const MARGIN_PRESETS = {
 
 const getFontFamily = (fontValue: string): string => {
   const fontMap: Record<string, string> = {
-    "Inter": "Helvetica", // Inter não disponível no PDF, usa Helvetica como fallback
+    Inter: "Helvetica", // Inter não disponível no PDF, usa Helvetica como fallback
     "Times New Roman": "Times-Roman",
     "Courier New": "Courier",
-    "Arial": "Helvetica",
+    Arial: "Helvetica",
     "sans-serif": "Helvetica",
   };
   return fontMap[fontValue] || "Times-Roman";
@@ -93,7 +93,9 @@ const ChapterPDF = ({
   const styles = createStyles(config);
 
   // Split content into paragraphs for better rendering
-  const paragraphs = content.split('\n').filter(p => p.trim().length > 0 || p === '');
+  const paragraphs = content
+    .split("\n")
+    .filter((p) => p.trim().length > 0 || p === "");
 
   return (
     <Document>
@@ -109,7 +111,7 @@ const ChapterPDF = ({
         {/* Content - render paragraphs separately for better flow */}
         {paragraphs.map((paragraph, index) => (
           <Text key={index} style={styles.paragraph}>
-            {paragraph || ' '}
+            {paragraph || " "}
           </Text>
         ))}
 

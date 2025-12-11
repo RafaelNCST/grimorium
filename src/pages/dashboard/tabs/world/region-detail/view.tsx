@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Map, AlertCircle, Trash2, Clock, NotebookPen, Image } from "lucide-react";
+import {
+  Map,
+  AlertCircle,
+  Trash2,
+  Clock,
+  NotebookPen,
+  Image,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -1390,7 +1397,9 @@ export function RegionDetailView({
                     : null,
                 emptyIcon: Clock,
                 emptyTitle: t("empty-states:timeline.no_timeline_defined"),
-                emptyDescription: t("empty-states:timeline.use_edit_mode_to_add_eras"),
+                emptyDescription: t(
+                  "empty-states:timeline.use_edit_mode_to_add_eras"
+                ),
                 addButtonLabel: t("empty-states:timeline.create_first_era"),
                 onAddClick: () => setIsCreateEraDialogOpen(true),
               },

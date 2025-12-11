@@ -1,5 +1,6 @@
-import { WarningDialog } from "@/components/dialogs/WarningDialog";
 import { useTranslation } from "react-i18next";
+
+import { WarningDialog } from "@/components/dialogs/WarningDialog";
 
 interface UnsavedChangesDialogProps {
   open: boolean;

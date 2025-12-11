@@ -68,11 +68,31 @@ interface Chapter {
 const getStatusConfig = (
   t: (key: string) => string
 ): Record<ChapterStatus, { label: string; color: string; icon: any }> => ({
-  draft: { label: t("chapters:status.draft"), color: "bg-gray-500", icon: null },
-  "in-progress": { label: t("chapters:status.in_progress"), color: "bg-blue-500", icon: null },
-  review: { label: t("chapters:status.review"), color: "bg-amber-600", icon: null },
-  finished: { label: t("chapters:status.finished"), color: "bg-emerald-600", icon: null },
-  published: { label: t("chapters:status.published"), color: "bg-purple-500", icon: null },
+  draft: {
+    label: t("chapters:status.draft"),
+    color: "bg-gray-500",
+    icon: null,
+  },
+  "in-progress": {
+    label: t("chapters:status.in_progress"),
+    color: "bg-blue-500",
+    icon: null,
+  },
+  review: {
+    label: t("chapters:status.review"),
+    color: "bg-amber-600",
+    icon: null,
+  },
+  finished: {
+    label: t("chapters:status.finished"),
+    color: "bg-emerald-600",
+    icon: null,
+  },
+  published: {
+    label: t("chapters:status.published"),
+    color: "bg-purple-500",
+    icon: null,
+  },
 });
 
 export function ChaptersPage() {
@@ -84,7 +104,9 @@ export function ChaptersPage() {
 
   // Store selectors - pegar o objeto chapters diretamente (referência estável)
   const chaptersCache = useChaptersStore((state) => state.chapters);
-  const setCachedChapters = useChaptersStore((state) => state.setCachedChapters);
+  const setCachedChapters = useChaptersStore(
+    (state) => state.setCachedChapters
+  );
   const removeCachedChapter = useChaptersStore(
     (state) => state.removeCachedChapter
   );
@@ -523,7 +545,7 @@ export function ChaptersPage() {
                 >
                   <VirtualizedChapterList
                     chapters={getFilteredChapters("all")}
-                    showStatus={true}
+                    showStatus
                   />
                 </TabsContent>
 

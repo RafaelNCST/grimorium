@@ -96,7 +96,9 @@ export function BookCard({
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>{visualStyle}</span>
-          <span>{chapters} {t("book_card.chapters", { count: chapters })}</span>
+          <span>
+            {chapters} {t("book_card.chapters", { count: chapters })}
+          </span>
         </div>
 
         {formattedLastModified && (

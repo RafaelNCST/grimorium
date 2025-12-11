@@ -28,7 +28,6 @@ import {
 import { getRacesByBookId } from "@/lib/db/races.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { CharacterSchema } from "@/lib/validation/character-schema";
-import { mockFactions } from "@/mocks/global";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
@@ -1144,7 +1143,6 @@ export function CharacterDetail() {
         mockCharacters={allCharacters}
         regions={regions}
         races={races}
-        mockFactions={mockFactions}
         roles={CHARACTER_ROLES_CONSTANT}
         alignments={ALIGNMENTS_CONSTANT}
         genders={GENDERS_CONSTANT_MODAL}

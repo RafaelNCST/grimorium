@@ -138,10 +138,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
     }
   },
 
-  updatePlotArcInCache: async (
-    arcId: string,
-    updates: Partial<IPlotArc>
-  ) => {
+  updatePlotArcInCache: async (arcId: string, updates: Partial<IPlotArc>) => {
     try {
       await updatePlotArc(arcId, updates);
 

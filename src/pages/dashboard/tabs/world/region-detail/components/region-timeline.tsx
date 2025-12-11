@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   Plus,
@@ -16,6 +15,7 @@ import {
   X,
   Save,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
 import {
@@ -390,8 +390,12 @@ export function RegionTimeline({
                               {era.events.length > 0 && (
                                 <Badge variant="outline" className="text-xs">
                                   {era.events.length === 1
-                                    ? t("world:timeline.event_count", { count: era.events.length })
-                                    : t("world:timeline.event_count_plural", { count: era.events.length })}
+                                    ? t("world:timeline.event_count", {
+                                        count: era.events.length,
+                                      })
+                                    : t("world:timeline.event_count_plural", {
+                                        count: era.events.length,
+                                      })}
                                 </Badge>
                               )}
                             </div>
@@ -559,9 +563,26 @@ export function RegionTimeline({
                                             <div className="flex items-center gap-1">
                                               <Users className="w-3 h-3 text-muted-foreground" />
                                               <span className="text-xs text-muted-foreground">
-                                                {event.charactersInvolved.length === 1
-                                                  ? t("world:timeline.character_count", { count: event.charactersInvolved.length })
-                                                  : t("world:timeline.character_count_plural", { count: event.charactersInvolved.length })}
+                                                {event.charactersInvolved
+                                                  .length === 1
+                                                  ? t(
+                                                      "world:timeline.character_count",
+                                                      {
+                                                        count:
+                                                          event
+                                                            .charactersInvolved
+                                                            .length,
+                                                      }
+                                                    )
+                                                  : t(
+                                                      "world:timeline.character_count_plural",
+                                                      {
+                                                        count:
+                                                          event
+                                                            .charactersInvolved
+                                                            .length,
+                                                      }
+                                                    )}
                                               </span>
                                             </div>
                                           )}
@@ -570,9 +591,24 @@ export function RegionTimeline({
                                             <div className="flex items-center gap-1">
                                               <Building className="w-3 h-3 text-muted-foreground" />
                                               <span className="text-xs text-muted-foreground">
-                                                {event.factionsInvolved.length === 1
-                                                  ? t("world:timeline.faction_count", { count: event.factionsInvolved.length })
-                                                  : t("world:timeline.faction_count_plural", { count: event.factionsInvolved.length })}
+                                                {event.factionsInvolved
+                                                  .length === 1
+                                                  ? t(
+                                                      "world:timeline.faction_count",
+                                                      {
+                                                        count:
+                                                          event.factionsInvolved
+                                                            .length,
+                                                      }
+                                                    )
+                                                  : t(
+                                                      "world:timeline.faction_count_plural",
+                                                      {
+                                                        count:
+                                                          event.factionsInvolved
+                                                            .length,
+                                                      }
+                                                    )}
                                               </span>
                                             </div>
                                           )}
@@ -580,9 +616,24 @@ export function RegionTimeline({
                                             <div className="flex items-center gap-1">
                                               <Swords className="w-3 h-3 text-muted-foreground" />
                                               <span className="text-xs text-muted-foreground">
-                                                {event.racesInvolved.length === 1
-                                                  ? t("world:timeline.race_count", { count: event.racesInvolved.length })
-                                                  : t("world:timeline.race_count_plural", { count: event.racesInvolved.length })}
+                                                {event.racesInvolved.length ===
+                                                1
+                                                  ? t(
+                                                      "world:timeline.race_count",
+                                                      {
+                                                        count:
+                                                          event.racesInvolved
+                                                            .length,
+                                                      }
+                                                    )
+                                                  : t(
+                                                      "world:timeline.race_count_plural",
+                                                      {
+                                                        count:
+                                                          event.racesInvolved
+                                                            .length,
+                                                      }
+                                                    )}
                                               </span>
                                             </div>
                                           )}
@@ -590,9 +641,24 @@ export function RegionTimeline({
                                             <div className="flex items-center gap-1">
                                               <Package className="w-3 h-3 text-muted-foreground" />
                                               <span className="text-xs text-muted-foreground">
-                                                {event.itemsInvolved.length === 1
-                                                  ? t("world:timeline.item_count", { count: event.itemsInvolved.length })
-                                                  : t("world:timeline.item_count_plural", { count: event.itemsInvolved.length })}
+                                                {event.itemsInvolved.length ===
+                                                1
+                                                  ? t(
+                                                      "world:timeline.item_count",
+                                                      {
+                                                        count:
+                                                          event.itemsInvolved
+                                                            .length,
+                                                      }
+                                                    )
+                                                  : t(
+                                                      "world:timeline.item_count_plural",
+                                                      {
+                                                        count:
+                                                          event.itemsInvolved
+                                                            .length,
+                                                      }
+                                                    )}
                                               </span>
                                             </div>
                                           )}
@@ -612,7 +678,9 @@ export function RegionTimeline({
                                 <div className="bg-muted/20 rounded-lg p-6 border border-dashed border-muted-foreground/30">
                                   <Clock className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
                                   <p className="text-sm text-muted-foreground">
-                                    {t("empty-states:timeline.era_has_no_events")}
+                                    {t(
+                                      "empty-states:timeline.era_has_no_events"
+                                    )}
                                   </p>
                                 </div>
                               </div>
@@ -656,7 +724,9 @@ export function RegionTimeline({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              {editingEvent ? t("forms:buttons.edit_event") : selectedEvent?.name}
+              {editingEvent
+                ? t("forms:buttons.edit_event")
+                : selectedEvent?.name}
             </DialogTitle>
             <DialogDescription>
               {editingEvent
@@ -687,7 +757,9 @@ export function RegionTimeline({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-event-desc">{t("forms:labels.description")} *</Label>
+                  <Label htmlFor="edit-event-desc">
+                    {t("forms:labels.description")} *
+                  </Label>
                   <Textarea
                     id="edit-event-desc"
                     value={newEvent.description}
@@ -697,7 +769,9 @@ export function RegionTimeline({
                         description: e.target.value,
                       }))
                     }
-                    placeholder={t("forms:placeholders.region_event_description")}
+                    placeholder={t(
+                      "forms:placeholders.region_event_description"
+                    )}
                     rows={4}
                     maxLength={500}
                     className="resize-none"
@@ -709,7 +783,9 @@ export function RegionTimeline({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-event-reason">{t("forms:labels.reason")}</Label>
+                    <Label htmlFor="edit-event-reason">
+                      {t("forms:labels.reason")}
+                    </Label>
                     <Textarea
                       id="edit-event-reason"
                       value={newEvent.reason}
@@ -729,7 +805,9 @@ export function RegionTimeline({
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="edit-event-outcome">{t("forms:labels.how_it_ended")}</Label>
+                    <Label htmlFor="edit-event-outcome">
+                      {t("forms:labels.how_it_ended")}
+                    </Label>
                     <Textarea
                       id="edit-event-outcome"
                       value={newEvent.outcome}
@@ -752,7 +830,9 @@ export function RegionTimeline({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-event-start">{t("forms:labels.start_date")}</Label>
+                    <Label htmlFor="edit-event-start">
+                      {t("forms:labels.start_date")}
+                    </Label>
                     <Input
                       id="edit-event-start"
                       value={newEvent.startDate}
@@ -770,7 +850,9 @@ export function RegionTimeline({
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="edit-event-end">{t("forms:labels.end_date")}</Label>
+                    <Label htmlFor="edit-event-end">
+                      {t("forms:labels.end_date")}
+                    </Label>
                     <Input
                       id="edit-event-end"
                       value={newEvent.endDate}
@@ -877,7 +959,9 @@ export function RegionTimeline({
             ) : (
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-2">{t("forms:labels.description")}</h4>
+                  <h4 className="font-semibold mb-2">
+                    {t("forms:labels.description")}
+                  </h4>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {selectedEvent.description}
                   </p>
@@ -885,13 +969,17 @@ export function RegionTimeline({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-semibold mb-2">{t("forms:labels.reason")}</h4>
+                    <h4 className="font-semibold mb-2">
+                      {t("forms:labels.reason")}
+                    </h4>
                     <p className="text-muted-foreground text-sm">
                       {selectedEvent.reason}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">{t("forms:labels.how_it_ended")}</h4>
+                    <h4 className="font-semibold mb-2">
+                      {t("forms:labels.how_it_ended")}
+                    </h4>
                     <p className="text-muted-foreground text-sm">
                       {selectedEvent.outcome}
                     </p>
@@ -1024,7 +1112,8 @@ export function RegionTimeline({
 
             <div className="space-y-2">
               <Label htmlFor="era-description" className="text-primary">
-                {t("forms:labels.description")} <span className="text-destructive">*</span>
+                {t("forms:labels.description")}{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="era-description"
@@ -1048,7 +1137,8 @@ export function RegionTimeline({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="era-start" className="text-primary">
-                  {t("forms:labels.start")} <span className="text-destructive">*</span>
+                  {t("forms:labels.start")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="era-start"
@@ -1068,7 +1158,8 @@ export function RegionTimeline({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="era-end" className="text-primary">
-                  {t("forms:labels.end")} <span className="text-destructive">*</span>
+                  {t("forms:labels.end")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="era-end"
@@ -1164,7 +1255,8 @@ export function RegionTimeline({
 
             <div className="space-y-2">
               <Label htmlFor="event-desc" className="text-primary">
-                {t("forms:labels.description")} <span className="text-destructive">*</span>
+                {t("forms:labels.description")}{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="event-desc"
@@ -1188,7 +1280,8 @@ export function RegionTimeline({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="event-reason" className="text-primary">
-                  {t("forms:labels.reason")} <span className="text-destructive">*</span>
+                  {t("forms:labels.reason")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="event-reason"
@@ -1207,7 +1300,8 @@ export function RegionTimeline({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="event-outcome" className="text-primary">
-                  {t("forms:labels.how_it_ended")} <span className="text-destructive">*</span>
+                  {t("forms:labels.how_it_ended")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="event-outcome"
@@ -1232,7 +1326,8 @@ export function RegionTimeline({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="event-start" className="text-primary">
-                  {t("forms:labels.start_date")} <span className="text-destructive">*</span>
+                  {t("forms:labels.start_date")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="event-start"
@@ -1252,7 +1347,8 @@ export function RegionTimeline({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="event-end" className="text-primary">
-                  {t("forms:labels.end_date")} <span className="text-destructive">*</span>
+                  {t("forms:labels.end_date")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="event-end"
@@ -1413,7 +1509,9 @@ export function RegionTimeline({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-era-description">{t("forms:labels.description")}</Label>
+              <Label htmlFor="edit-era-description">
+                {t("forms:labels.description")}
+              </Label>
               <Textarea
                 id="edit-era-description"
                 value={editEra.description}
@@ -1435,7 +1533,9 @@ export function RegionTimeline({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-era-start">{t("forms:labels.start")}</Label>
+                <Label htmlFor="edit-era-start">
+                  {t("forms:labels.start")}
+                </Label>
                 <Input
                   id="edit-era-start"
                   value={editEra.startDate}

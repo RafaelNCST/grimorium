@@ -1557,9 +1557,9 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     }
 
     // Get all plot arcs to check if migration is needed
-    const arcs = await database.select<{ id: string; status: string; size: string }[]>(
-      "SELECT id, status, size FROM plot_arcs"
-    );
+    const arcs = await database.select<
+      { id: string; status: string; size: string }[]
+    >("SELECT id, status, size FROM plot_arcs");
 
     if (arcs.length === 0) {
       console.log("[db] No plot arcs found, skipping...");
@@ -1585,15 +1585,27 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     console.log(`[db] Migrating ${needsMigration.length} arcs...`);
 
     // Update status values
-    await database.execute("UPDATE plot_arcs SET status = 'finished' WHERE status = 'finalizado'");
-    await database.execute("UPDATE plot_arcs SET status = 'current' WHERE status = 'atual'");
-    await database.execute("UPDATE plot_arcs SET status = 'planning' WHERE status = 'planejamento'");
+    await database.execute(
+      "UPDATE plot_arcs SET status = 'finished' WHERE status = 'finalizado'"
+    );
+    await database.execute(
+      "UPDATE plot_arcs SET status = 'current' WHERE status = 'atual'"
+    );
+    await database.execute(
+      "UPDATE plot_arcs SET status = 'planning' WHERE status = 'planejamento'"
+    );
     console.log("[db] Updated status values");
 
     // Update size values
-    await database.execute("UPDATE plot_arcs SET size = 'small' WHERE size = 'pequeno'");
-    await database.execute("UPDATE plot_arcs SET size = 'medium' WHERE size = 'médio'");
-    await database.execute("UPDATE plot_arcs SET size = 'large' WHERE size = 'grande'");
+    await database.execute(
+      "UPDATE plot_arcs SET size = 'small' WHERE size = 'pequeno'"
+    );
+    await database.execute(
+      "UPDATE plot_arcs SET size = 'medium' WHERE size = 'médio'"
+    );
+    await database.execute(
+      "UPDATE plot_arcs SET size = 'large' WHERE size = 'grande'"
+    );
     console.log("[db] Updated size values");
 
     console.log("[db] Plot arc migration completed successfully!");
@@ -1630,14 +1642,14 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
 
     // Domain mapping from Portuguese to English
     const domainMapping: Record<string, string> = {
-      "Aquático": "aquatic",
-      "Terrestre": "terrestrial",
-      "Aéreo": "aerial",
-      "Subterrâneo": "underground",
-      "Elevado": "elevated",
-      "Dimensional": "dimensional",
-      "Espiritual": "spiritual",
-      "Cósmico": "cosmic"
+      Aquático: "aquatic",
+      Terrestre: "terrestrial",
+      Aéreo: "aerial",
+      Subterrâneo: "underground",
+      Elevado: "elevated",
+      Dimensional: "dimensional",
+      Espiritual: "spiritual",
+      Cósmico: "cosmic",
     };
 
     let migratedCount = 0;
@@ -1665,10 +1677,10 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
         }
 
         if (needsMigration) {
-          await database.execute(
-            "UPDATE races SET domain = $1 WHERE id = $2",
-            [JSON.stringify(newDomains), race.id]
-          );
+          await database.execute("UPDATE races SET domain = $1 WHERE id = $2", [
+            JSON.stringify(newDomains),
+            race.id,
+          ]);
           migratedCount++;
           console.log(
             `[db] Migrated domains for race ${race.id}: ${domains.join(", ")} -> ${newDomains.join(", ")}`

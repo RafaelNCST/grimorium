@@ -181,7 +181,9 @@ export const EntitySelect = React.forwardRef<
             <SelectGroup>
               {!required && (
                 <SelectItem value="__none__">
-                  <span className="text-muted-foreground">{t("empty-states:plot_arc.no_arc")}</span>
+                  <span className="text-muted-foreground">
+                    {t("empty-states:plot_arc.no_arc")}
+                  </span>
                 </SelectItem>
               )}
               {entities.map((entity) => (

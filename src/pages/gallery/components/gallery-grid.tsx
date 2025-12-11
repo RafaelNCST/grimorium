@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+
 import {
   DndContext,
   closestCenter,
@@ -18,6 +19,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 import { IGalleryItem } from "@/types/gallery-types";
+
 import { GalleryCard } from "./gallery-card";
 
 interface GalleryGridProps {
@@ -36,14 +38,15 @@ interface SortableCardProps {
   onDelete?: () => void;
 }
 
-function SortableCard({
-  item,
-  onClick,
-  onEdit,
-  onDelete,
-}: SortableCardProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: item.id });
+function SortableCard({ item, onClick, onEdit, onDelete }: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),

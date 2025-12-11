@@ -59,8 +59,8 @@ export function CommunicationPicker({
 
   // Converter getRaceCommunications para o formato GridSelectOption
   const raceCommunications = getRaceCommunications(t);
-  const options: GridSelectOption<RaceCommunication>[] =
-    raceCommunications.map((comm) => {
+  const options: GridSelectOption<RaceCommunication>[] = raceCommunications.map(
+    (comm) => {
       const colors = colorMap[comm.color] || {
         bg: "gray-500/10",
         border: "gray-500/30",
@@ -73,7 +73,8 @@ export function CommunicationPicker({
         backgroundColor: colors.bg,
         borderColor: colors.border,
       };
-    });
+    }
+  );
 
   const expandedContent = (
     <FormTextarea

@@ -195,9 +195,7 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       // Update cache
       set((state) => ({
         items: state.items.map((item) =>
-          item.id === itemId
-            ? { ...item, links: [...item.links, link] }
-            : item
+          item.id === itemId ? { ...item, links: [...item.links, link] } : item
         ),
       }));
     } catch (error) {
@@ -265,7 +263,5 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     });
   },
 
-  getGalleryItems: () => {
-    return get().items;
-  },
+  getGalleryItems: () => get().items,
 }));

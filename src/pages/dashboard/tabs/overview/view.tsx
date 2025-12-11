@@ -95,7 +95,10 @@ export function OverviewView(props: PropsOverviewView) {
     if (!isResizing) return;
 
     const delta = e.clientY - resizeStartY.current;
-    const newHeight = Math.max(300, Math.min(800, resizeStartHeight.current + delta));
+    const newHeight = Math.max(
+      300,
+      Math.min(800, resizeStartHeight.current + delta)
+    );
     onNotesBoardHeightChange(newHeight);
   };
 
@@ -187,30 +190,30 @@ export function OverviewView(props: PropsOverviewView) {
               className="relative bg-muted/10 rounded-lg border-2 border-dashed border-muted-foreground/20 overflow-hidden select-none"
               style={{ touchAction: "none", height: `${notesBoardHeight}px` }}
             >
-            {stickyNotes.length === 0 ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-muted-foreground text-sm">
-                  {t("notes_board.empty_state")}
-                </p>
-              </div>
-            ) : (
-              stickyNotes.map((note) => (
-                <StickyNote
-                  key={note.id}
-                  note={note}
-                  editingNote={editingNote}
-                  editContent={editContent}
-                  isCustomizing={isCustomizing || false}
-                  onEditingNoteChange={onEditingNoteChange}
-                  onEditContentChange={onEditContentChange}
-                  onEditNote={onEditNote}
-                  onDeleteNote={onDeleteNote}
-                  onColorChange={onColorChange}
-                  onBringToFront={onBringToFront}
-                  onSendToBack={onSendToBack}
-                />
-              ))
-            )}
+              {stickyNotes.length === 0 ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-muted-foreground text-sm">
+                    {t("notes_board.empty_state")}
+                  </p>
+                </div>
+              ) : (
+                stickyNotes.map((note) => (
+                  <StickyNote
+                    key={note.id}
+                    note={note}
+                    editingNote={editingNote}
+                    editContent={editContent}
+                    isCustomizing={isCustomizing || false}
+                    onEditingNoteChange={onEditingNoteChange}
+                    onEditContentChange={onEditContentChange}
+                    onEditNote={onEditNote}
+                    onDeleteNote={onDeleteNote}
+                    onColorChange={onColorChange}
+                    onBringToFront={onBringToFront}
+                    onSendToBack={onSendToBack}
+                  />
+                ))
+              )}
             </div>
             <div
               className="absolute bottom-0 left-0 right-0 h-6 flex items-center justify-center cursor-ns-resize hover:bg-primary/10 transition-colors group"

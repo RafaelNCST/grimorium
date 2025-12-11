@@ -1,3 +1,4 @@
+import { TFunction } from "i18next";
 import {
   type LucideIcon,
   Sparkles,
@@ -8,7 +9,6 @@ import {
   Skull,
   Fish,
 } from "lucide-react";
-import { TFunction } from "i18next";
 
 export interface RaceRelationshipTypeConfig {
   value: string;

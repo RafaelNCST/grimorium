@@ -1,10 +1,6 @@
 import { create } from "zustand";
 
-export type BookStatus =
-  | "planning"
-  | "releasing"
-  | "hiatus"
-  | "complete";
+export type BookStatus = "planning" | "releasing" | "hiatus" | "complete";
 
 export interface Book {
   id: string;

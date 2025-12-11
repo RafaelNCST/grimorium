@@ -23,8 +23,8 @@ export async function generateThumbnail(
       }
 
       // Calculate aspect ratio
-      let width = img.width;
-      let height = img.height;
+      let { width } = img;
+      let { height } = img;
 
       if (width > height) {
         if (width > maxWidth) {
@@ -95,7 +95,13 @@ export async function getImageDimensions(
  * @returns true se o formato é válido
  */
 export function isValidImageFormat(mimeType: string): boolean {
-  const validFormats = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+  const validFormats = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+  ];
   return validFormats.includes(mimeType.toLowerCase());
 }
 
@@ -111,7 +117,7 @@ export function formatFileSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100} ${sizes[i]}`;
 }
 
 /**
@@ -138,11 +144,11 @@ export function getExtensionFromMimeType(mimeType: string): string {
  */
 export function getMimeTypeFromExtension(extension: string): string {
   const extToMime: Record<string, string> = {
-    "jpg": "image/jpeg",
-    "jpeg": "image/jpeg",
-    "png": "image/png",
-    "webp": "image/webp",
-    "gif": "image/gif",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
   };
 
   return extToMime[extension.toLowerCase()] || "image/jpeg";
@@ -175,7 +181,7 @@ export async function fileToDataURL(file: File): Promise<string> {
 export function bytesToDataURL(bytes: Uint8Array, mimeType: string): string {
   // Process in chunks to avoid "Maximum call stack size exceeded"
   const CHUNK_SIZE = 8192; // 8KB chunks
-  let binaryString = '';
+  let binaryString = "";
 
   for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
     const chunk = bytes.slice(i, i + CHUNK_SIZE);

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+
 import { Link as LinkIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
-
 import { IGalleryItem } from "@/types/gallery-types";
 
 interface GalleryCardProps {
@@ -13,10 +13,7 @@ interface GalleryCardProps {
   onDelete?: () => void;
 }
 
-export function GalleryCard({
-  item,
-  onClick,
-}: GalleryCardProps) {
+export function GalleryCard({ item, onClick }: GalleryCardProps) {
   const { t } = useTranslation("gallery");
   const [isHovered, setIsHovered] = useState(false);
 
@@ -40,9 +37,7 @@ export function GalleryCard({
       {/* Content below image */}
       <div className="p-3 space-y-3">
         {/* Title */}
-        <h3 className="text-sm font-medium line-clamp-2">
-          {item.title}
-        </h3>
+        <h3 className="text-sm font-medium line-clamp-2">{item.title}</h3>
 
         {/* Links badge */}
         {item.links.length > 0 && (
