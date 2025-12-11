@@ -334,16 +334,18 @@ export function EntityListLayout<T extends string = string>({
 
       {/* Content or No Results State */}
       {showNoResultsState ? (
-        <EmptyState
-          icon={noResultsState?.icon || emptyState.icon}
-          title={noResultsState?.title || "No results found"}
-          description={
-            noResultsState?.description ||
-            "Try adjusting your search or filters"
-          }
-          primaryButton={noResultsState?.primaryButton}
-          secondaryButton={noResultsState?.secondaryButton}
-        />
+        <div className="flex-1 flex items-center justify-center min-h-[400px]">
+          <EmptyState
+            icon={noResultsState?.icon || emptyState.icon}
+            title={noResultsState?.title || "No results found"}
+            description={
+              noResultsState?.description ||
+              "Try adjusting your search or filters"
+            }
+            primaryButton={noResultsState?.primaryButton}
+            secondaryButton={noResultsState?.secondaryButton}
+          />
+        </div>
       ) : (
         children
       )}
