@@ -59,18 +59,18 @@ export function AllAnnotationsSidebar({
         </div>
 
         {/* Annotations List */}
-        <ScrollArea className="flex-1">
-          {annotations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-              <MessageSquare className="w-12 h-12 text-muted-foreground/30 mb-4" />
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                {t("empty-states:annotations.no_annotation")}
-              </h3>
-              <p className="text-xs text-muted-foreground/70">
-                {t("chapter-editor:annotations.no_annotations")}
-              </p>
-            </div>
-          ) : (
+        {annotations.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <MessageSquare className="w-12 h-12 text-muted-foreground/30 mb-4" />
+            <h3 className="text-sm font-medium text-muted-foreground mb-1">
+              {t("empty-states:annotations.no_annotation")}
+            </h3>
+            <p className="text-xs text-muted-foreground/70">
+              {t("chapter-editor:annotations.no_annotations")}
+            </p>
+          </div>
+        ) : (
+          <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
               {annotations.map((annotation) => {
                 const hasImportantNotes = annotation.notes.some(
@@ -165,8 +165,8 @@ export function AllAnnotationsSidebar({
                 );
               })}
             </div>
-          )}
-        </ScrollArea>
+          </ScrollArea>
+        )}
 
         {/* Footer com estatísticas */}
         {annotations.length > 0 && (
