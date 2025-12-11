@@ -2,9 +2,14 @@ import { useState, useRef, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
-import { type Entity } from "@/mocks/local/editor-data";
-
 import { ChapterEditorView } from "./view";
+
+interface Entity {
+  id: string;
+  name: string;
+  type: string;
+  description?: string;
+}
 
 const mockEntities: Entity[] = [];
 

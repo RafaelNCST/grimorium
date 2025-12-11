@@ -131,9 +131,28 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const [selectedColor, setSelectedColor] = useState<string>(
     NOTE_COLORS_CONSTANT[0]
   );
-  const [notesBoardHeight, setNotesBoardHeight] = useState(400);
+  const [notesBoardHeight, setNotesBoardHeight] = useState(() => {
+    // Load saved height from localStorage on mount
+    const savedHeight = localStorage.getItem(`notesBoard-height-${bookId}`);
+    return savedHeight ? parseInt(savedHeight, 10) : 400;
+  });
   const [hasInitialized, setHasInitialized] = useState(false);
   const mountCountRef = useRef(0);
+
+  // Load saved height when bookId changes
+  useEffect(() => {
+    const savedHeight = localStorage.getItem(`notesBoard-height-${bookId}`);
+    if (savedHeight) {
+      setNotesBoardHeight(parseInt(savedHeight, 10));
+    } else {
+      setNotesBoardHeight(400); // Reset to default if no saved height
+    }
+  }, [bookId]);
+
+  // Save notes board height to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(`notesBoard-height-${bookId}`, notesBoardHeight.toString());
+  }, [notesBoardHeight, bookId]);
 
   // Load data on mount (APENAS na primeira vez)
   useEffect(() => {

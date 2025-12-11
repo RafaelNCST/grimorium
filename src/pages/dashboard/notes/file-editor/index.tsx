@@ -15,8 +15,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { NoteFile } from "@/mocks/local/files-data";
 import { AnnotationLink } from "@/types/annotations";
+
+interface NoteFile {
+  id: string;
+  name: string;
+  content: string;
+  updatedAt: Date;
+  links?: AnnotationLink[];
+}
 
 export default function FileEditor() {
   const { bookId, fileId } = useParams({
