@@ -91,7 +91,11 @@
       "Bash(powershell.exe -Command \"Stop-Process -Force -Id 42244\")",
       "Bash(powershell.exe -Command \"Stop-Process -Force -Id 10436\")",
       "Bash(powershell.exe -Command \"Stop-Process -Force -Id 42704\")",
-      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 31592\")"
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 31592\")",
+      "Bash(if grep -rq \"from.*ui/$component\\|import.*$component\" \"C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\" --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)"
     ],
     "deny": [
       "Bash(git push --force:*)",
