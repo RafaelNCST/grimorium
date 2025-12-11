@@ -144,7 +144,7 @@ export function NotesView({
           <h2 className="text-xl font-semibold">{t("page.title")}</h2>
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             {getFolderPath().map((folder, index) => (
-              <span key={index}>
+              <span key={`${folder}-${index}`}>
                 {folder}
                 {index < getFolderPath().length - 1 && " / "}
               </span>

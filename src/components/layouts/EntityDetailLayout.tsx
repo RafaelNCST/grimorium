@@ -261,7 +261,7 @@ export function EntityDetailLayout({
             ) : (
               <div className="flex gap-2">
                 {extraActions.map((action, index) => (
-                  <Tooltip key={index}>
+                  <Tooltip key={`${action.tooltip || action.icon.name}-${index}`}>
                     <TooltipTrigger asChild>
                       <Button
                         variant={action.variant || "ghost"}

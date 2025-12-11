@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { BookOpen, Tag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -41,6 +43,12 @@ export function BookCard({
 }: PropsBookCard) {
   const { i18n, t } = useTranslation(["home", "create-book"]);
 
+  // Genres with unique IDs for stable keys
+  const genresWithIds = useMemo(
+    () => genre.map((g, index) => ({ id: `${g}-${index}`, value: g })),
+    [genre]
+  );
+
   const formattedLastModified = lastModified
     ? formatRelativeTime(lastModified, i18n.language)
     : undefined;
@@ -70,11 +78,11 @@ export function BookCard({
 
         {/* Genre Badges */}
         <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-1rem)] pointer-events-none">
-          {genre.slice(0, 6).map((g, index) => (
+          {genresWithIds.slice(0, 6).map((genre) => (
             <EntityTagBadge
-              key={index}
+              key={genre.id}
               config={GENRE_TAG_CONFIG}
-              label={t(getGenreTranslationKey(g), { ns: "create-book" })}
+              label={t(getGenreTranslationKey(genre.value), { ns: "create-book" })}
               className="text-xs"
             />
           ))}

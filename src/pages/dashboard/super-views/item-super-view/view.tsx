@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -49,6 +49,16 @@ export function ItemSuperView({
   onBack,
 }: ItemSuperViewProps) {
   const { t } = useTranslation(["item-detail", "create-item"] as any);
+
+  // Alternative names with unique IDs for stable keys
+  const alternativeNamesWithIds = useMemo(
+    () =>
+      item.alternativeNames?.map((name, index) => ({
+        id: `${name}-${index}`,
+        name,
+      })) || [],
+    [item.alternativeNames]
+  );
 
   // Mock field visibility - all visible in read-only mode
   const fieldVisibility: Record<string, boolean> = {};
@@ -202,14 +212,11 @@ export function ItemSuperView({
             <p className="text-sm font-medium mb-2">
               {t("item-detail:fields.alternative_names")}
             </p>
-            {item.alternativeNames && item.alternativeNames.length > 0 ? (
+            {alternativeNamesWithIds.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {item.alternativeNames.map((name, index) => (
-                  <span
-                    key={index}
-                    className="text-sm px-2 py-1 bg-muted rounded-md"
-                  >
-                    {name}
+                {alternativeNamesWithIds.map((item) => (
+                  <span key={item.id} className="text-sm px-2 py-1 bg-muted rounded-md">
+                    {item.name}
                   </span>
                 ))}
               </div>

@@ -110,7 +110,7 @@ const ChapterPDF = ({
 
         {/* Content - render paragraphs separately for better flow */}
         {paragraphs.map((paragraph, index) => (
-          <Text key={index} style={styles.paragraph}>
+          <Text key={`paragraph-${index}`} style={styles.paragraph}>
             {paragraph || " "}
           </Text>
         ))}

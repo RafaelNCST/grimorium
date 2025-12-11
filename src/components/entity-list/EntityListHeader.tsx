@@ -136,7 +136,7 @@ export function EntityListHeader({
             const ActionIcon = action.icon;
             return (
               <Button
-                key={index}
+                key={`${action.label}-${index}`}
                 variant={action.variant || "outline"}
                 size={action.size || "default"}
                 onClick={action.onClick}

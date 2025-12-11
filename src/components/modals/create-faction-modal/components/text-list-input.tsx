@@ -67,7 +67,7 @@ export function TextListInput({
         <div className="flex flex-wrap gap-2 mt-2">
           {value.map((item, index) => (
             <Badge
-              key={index}
+              key={`${item}-${index}`}
               variant="secondary"
               className="cursor-pointer hover:bg-secondary/80 gap-1"
               onClick={() => handleRemove(item)}

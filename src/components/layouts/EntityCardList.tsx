@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+type EntityWithId = { id: string } | { name: string };
+
 /**
  * Grid column configuration for responsive layouts
  */
@@ -28,7 +30,7 @@ export interface GridColsConfig {
   "2xl"?: number;
 }
 
-export interface EntityCardListProps<T> {
+export interface EntityCardListProps<T extends EntityWithId> {
   /**
    * Layout type for the card list
    * - "grid": Responsive grid layout (default)
@@ -44,6 +46,10 @@ export interface EntityCardListProps<T> {
    * Function to render each item as a card
    */
   renderCard: (item: T, index: number) => ReactNode;
+  /**
+   * Optional function to get unique key from entity
+   */
+  getEntityKey?: (entity: T) => string;
   /**
    * Grid columns configuration for responsive grid layout
    * Only applies when layout="grid"
@@ -161,11 +167,20 @@ export function EntityCardList<T>({
           className
         )}
       >
-        {items.map((item, index) => (
-          <div key={index} className="flex-shrink-0">
-            {renderCard(item, index)}
-          </div>
-        ))}
+        {items.map((item, index) => {
+          const key = getEntityKey
+            ? getEntityKey(item)
+            : "id" in item
+              ? item.id
+              : "name" in item
+                ? item.name
+                : `item-${index}`;
+          return (
+            <div key={key} className="flex-shrink-0">
+              {renderCard(item, index)}
+            </div>
+          );
+        })}
       </div>
     );
   }

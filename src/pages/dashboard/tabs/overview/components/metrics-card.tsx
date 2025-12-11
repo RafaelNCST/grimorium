@@ -269,7 +269,7 @@ export function MetricsCard({
             >
               {row1Metrics.map((metric, index) => (
                 <MetricItem
-                  key={index}
+                  key={`${metric.label}-${index}`}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}
@@ -336,7 +336,7 @@ export function MetricsCard({
             >
               {row2Metrics.map((metric, index) => (
                 <MetricItem
-                  key={index}
+                  key={`${metric.label}-${index}`}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}
@@ -403,7 +403,7 @@ export function MetricsCard({
             >
               {row3Metrics.map((metric, index) => (
                 <MetricItem
-                  key={index}
+                  key={`${metric.label}-${index}`}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}

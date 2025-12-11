@@ -118,6 +118,12 @@ export function Header({
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Genres with unique IDs for stable keys
+  const genresWithIds = useMemo(
+    () => book.genre.map((g, index) => ({ id: `${g}-${index}`, value: g })),
+    [book.genre]
+  );
+
   // Check if synopsis is longer than 3 lines
   const isSynopsisLong = (text: string) => {
     if (!text) return false;
@@ -370,11 +376,11 @@ export function Header({
 
             {/* Genre Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
-              {book.genre.map((g, index) => (
+              {genresWithIds.map((genre) => (
                 <EntityTagBadge
-                  key={index}
+                  key={genre.id}
                   config={GENRE_TAG_CONFIG}
-                  label={t(getGenreTranslationKey(g))}
+                  label={t(getGenreTranslationKey(genre.value))}
                 />
               ))}
             </div>

@@ -67,7 +67,7 @@ export function InputTagger({
         <div className="flex flex-wrap gap-2 mt-2">
           {value.map((item, index) => (
             <Badge
-              key={index}
+              key={`${item}-${index}`}
               variant="outline"
               className="cursor-pointer hover:bg-muted gap-1"
               onClick={() => handleRemove(item)}

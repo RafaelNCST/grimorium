@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Info, Package, NotebookPen, Image } from "lucide-react";
@@ -164,6 +164,21 @@ export const ItemDetailView = React.memo(
 
     // Navigation for entity notes
     const navigate = useNavigate();
+
+    // Alternative names with unique IDs for stable keys
+    const alternativeNamesWithIds = useMemo(
+      () =>
+        (isEditing ? editData.alternativeNames : item.alternativeNames)?.map(
+          (name, index) => ({
+            id: `${name}-${index}`,
+            name,
+          })
+        ) || [],
+      [
+        isEditing ? editData.alternativeNames : item.alternativeNames,
+        isEditing,
+      ]
+    );
 
     // Get current status icon for badge display
     const statusData = ITEM_STATUSES_CONSTANT.find(
@@ -494,11 +509,11 @@ export const ItemDetailView = React.memo(
                   maxLength={100}
                   inputSize="small"
                 />
-              ) : item.alternativeNames && item.alternativeNames.length > 0 ? (
+              ) : alternativeNamesWithIds.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {item.alternativeNames.map((name, index) => (
-                    <EntityTagBadge key={index} variant="outline">
-                      {name}
+                  {alternativeNamesWithIds.map((item) => (
+                    <EntityTagBadge key={item.id} variant="outline">
+                      {item.name}
                     </EntityTagBadge>
                   ))}
                 </div>

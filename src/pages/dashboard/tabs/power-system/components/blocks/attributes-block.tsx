@@ -179,7 +179,7 @@ export function AttributesBlock({
           <div className="flex h-3 rounded-md overflow-hidden border bg-muted/30">
             {Array.from({ length: content.max }, (_, index) => (
               <button
-                key={index}
+                key={`attr-bar-${index}`}
                 data-no-drag="true"
                 onClick={() => handleBarClick(index)}
                 className={`flex-1 border-r-[3px] border-r-border/60 last:border-r-0 transition-all cursor-pointer hover:opacity-80 ${
@@ -207,7 +207,7 @@ export function AttributesBlock({
       <div className="flex h-3 rounded-md overflow-hidden border bg-muted/30">
         {Array.from({ length: content.max }, (_, index) => (
           <div
-            key={index}
+            key={`attr-readonly-${index}`}
             className={`flex-1 border-r-[3px] border-r-border/60 last:border-r-0 transition-colors ${
               index < content.current ? barColorClass : "bg-muted"
             }`}

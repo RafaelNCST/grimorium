@@ -108,7 +108,7 @@ export function DisplayStringList({
         {hasItems ? (
           <ul className="list-disc list-inside space-y-1">
             {items.map((item, index) => (
-              <li key={index} className="text-sm">
+              <li key={`${item}-${index}`} className="text-sm">
                 {item}
               </li>
             ))}

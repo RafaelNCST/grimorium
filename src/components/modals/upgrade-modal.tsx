@@ -104,7 +104,7 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
                 const Icon = benefit.icon;
                 return (
                   <div
-                    key={index}
+                    key={`${benefit.titleKey}-${index}`}
                     className="flex gap-3 p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex-shrink-0">

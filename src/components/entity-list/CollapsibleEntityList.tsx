@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
-export interface CollapsibleEntityListProps<T> {
+type EntityWithId = { id: string } | { name: string };
+
+export interface CollapsibleEntityListProps<T extends EntityWithId> {
   title: string;
   entities: T[];
   isOpen: boolean;
@@ -22,6 +24,7 @@ export interface CollapsibleEntityListProps<T> {
   className?: string;
   headerClassName?: string;
   contentClassName?: string;
+  getEntityKey?: (entity: T) => string;
 }
 
 /**
@@ -86,21 +89,30 @@ export function CollapsibleEntityList<T>({
               {emptyText}
             </div>
           ) : (
-            entities.map((entity, index) => (
-              <div key={index} className="relative group">
-                {renderCard(entity, index)}
-                {isEditing && onRemove && (
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => onRemove(entity, index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            ))
+            entities.map((entity, index) => {
+              const key = getEntityKey
+                ? getEntityKey(entity)
+                : "id" in entity
+                  ? entity.id
+                  : "name" in entity
+                    ? entity.name
+                    : `entity-${index}`;
+              return (
+                <div key={key} className="relative group">
+                  {renderCard(entity, index)}
+                  {isEditing && onRemove && (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => onRemove(entity, index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </CollapsibleContent>
