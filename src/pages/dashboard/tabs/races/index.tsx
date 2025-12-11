@@ -15,17 +15,6 @@ interface PropsSpeciesTab {
   bookId: string;
 }
 
-// Map English domain values to Portuguese DomainType
-const DOMAIN_MAP: Record<string, DomainType> = {
-  aquatic: "Aquático",
-  terrestrial: "Terrestre",
-  aerial: "Aéreo",
-  underground: "Subterrâneo",
-  elevated: "Elevado",
-  dimensional: "Dimensional",
-  spiritual: "Espiritual",
-  cosmic: "Cósmico",
-};
 
 export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
@@ -89,14 +78,14 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const domainStats = useMemo(
     () =>
       calculateEntityStats(races, "domain", [
-        "Aquático",
-        "Terrestre",
-        "Aéreo",
-        "Subterrâneo",
-        "Elevado",
-        "Dimensional",
-        "Espiritual",
-        "Cósmico",
+        "aquatic",
+        "terrestrial",
+        "aerial",
+        "underground",
+        "elevated",
+        "dimensional",
+        "spiritual",
+        "cosmic",
       ]),
     [races]
   );
@@ -104,14 +93,10 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const handleCreateRace = useCallback(
     async (data: RaceFormSchema) => {
       try {
-        const convertedDomains = data.domain.map(
-          (d) => DOMAIN_MAP[d] || d
-        ) as DomainType[];
-
         const newRace: IRace = {
           id: crypto.randomUUID(),
           name: data.name,
-          domain: convertedDomains,
+          domain: data.domain as DomainType[],
           summary: data.summary,
           image: data.image,
           scientificName: data.scientificName,

@@ -9,7 +9,7 @@ import { DomainType } from "../types/race-types";
  * Creates filter configuration for race domains
  */
 export function createDomainFilterRows(
-  domainStats: Record<DomainType, number>,
+  domainStats: Record<string, number>,
   t: TFunction
 ): FilterRow<DomainType>[] {
   const domains: DomainType[] = [
