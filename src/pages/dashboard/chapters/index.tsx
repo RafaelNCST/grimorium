@@ -137,11 +137,6 @@ export function ChaptersPage() {
 
     if (cachedChapters.length === 0) return [];
 
-    console.log(
-      "[ChaptersPage] Convertendo cache atualizado, capítulos:",
-      cachedChapters.length
-    );
-
     return cachedChapters.map((ch) => ({
       id: ch.id,
       number: parseFloat(ch.chapterNumber),
@@ -192,16 +187,11 @@ export function ChaptersPage() {
 
           // Verificar se há dados no localStorage para migrar
           if (hasChaptersInLocalStorage()) {
-            console.log(
-              "[ChaptersPage] Detectados capítulos no localStorage, migrando..."
-            );
             await migrateChaptersFromLocalStorage(dashboardId);
           }
 
           // Carregar metadados do banco
           const metadata = await getChapterMetadataByBookId(dashboardId);
-
-          console.log("[ChaptersPage] Capítulos carregados:", metadata.length);
 
           // Salvar no cache do store (o useMemo acima converterá para UI)
           const chaptersForCache: ChapterData[] = metadata.map((ch) => ({

@@ -133,12 +133,6 @@ export async function uploadMapImage(
   const db = await getDB();
   const now = Date.now();
 
-  console.log("[region-maps] Upload started:", {
-    regionId,
-    versionId,
-    sourceFilePath,
-  });
-
   // Ensure maps directory exists
   await ensureMapsDirectory();
 
@@ -153,25 +147,16 @@ export async function uploadMapImage(
   const fileName = `map_${regionId}_${versionId || "main"}_${uniqueId}${ext}`;
   const relativePath = `maps/${fileName}`;
 
-  console.log("[region-maps] Generated unique filename:", {
-    originalFileName,
-    fileName,
-    relativePath,
-  });
-
   // Copy file to maps directory
   await copyFile(sourceFilePath, relativePath, {
     toPathBaseDir: BaseDirectory.AppData,
   });
-
-  console.log("[region-maps] File copied successfully");
 
   // Check if map already exists for this region and version
   const existingMap = await getMapByRegionId(regionId, versionId);
 
   if (existingMap) {
     // Delete all markers for this map before updating
-    console.log("[region-maps] Deleting all markers for map:", existingMap.id);
     await db.execute("DELETE FROM region_map_markers WHERE map_id = $1", [
       existingMap.id,
     ]);
@@ -199,8 +184,6 @@ export async function uploadMapImage(
         console.error("[region-maps] Failed to delete old image:", error);
       }
     }
-
-    console.log("[region-maps] Map updated and markers cleared");
 
     return {
       ...existingMap,

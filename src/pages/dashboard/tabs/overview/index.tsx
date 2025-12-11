@@ -170,9 +170,6 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
     // Apenas recalcular se já foi inicializado E não é o primeiro mount
     if (hasInitialized && mountCountRef.current > 1) {
-      console.log(
-        "[OverviewTab] Recalculando stats silenciosamente ao retornar"
-      );
       Promise.all([
         useOverviewStore.getState().calculateStats(bookId),
         useOverviewStore.getState().calculateArcsProgress(bookId),

@@ -286,8 +286,6 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
     if (!cached) return;
 
     try {
-      console.log("[useOverviewStore] Saving overview data for book:", bookId);
-
       // Save overview-specific data
       await updateOverviewData(bookId, {
         goals: cached.goals,
@@ -307,8 +305,6 @@ export const useOverviewStore = create<OverviewState>((set, get) => ({
         authorSummary: cached.authorSummary,
         storySummary: cached.storySummary,
       });
-
-      console.log("[useOverviewStore] Data saved successfully");
     } catch (error) {
       console.error("[useOverviewStore] Error saving overview data:", error);
       throw error;

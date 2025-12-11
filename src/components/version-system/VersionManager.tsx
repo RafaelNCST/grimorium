@@ -81,7 +81,6 @@ export const VersionManager = React.memo(
                   onVersionUpdate
                     ? () => {
                         // TODO: Implement edit dialog
-                        console.log("Edit version:", version.id);
                       }
                     : undefined
                 }

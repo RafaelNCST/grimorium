@@ -64,8 +64,6 @@ export function ImageLightbox({
   useEffect(() => {
     const loadImageSrc = async () => {
       try {
-        console.log("Loading image from:", item.originalPath);
-
         // Read file from AppData directory
         const fileBytes = await readFile(item.originalPath, {
           baseDir: BaseDirectory.AppData,
@@ -73,11 +71,6 @@ export function ImageLightbox({
 
         // Convert bytes to data URL
         const dataUrl = bytesToDataURL(fileBytes, item.mimeType);
-        console.log(
-          "Image loaded successfully, size:",
-          fileBytes.length,
-          "bytes"
-        );
         setImageSrc(dataUrl);
       } catch (error) {
         console.error("Error loading image source:", error);
@@ -243,7 +236,6 @@ export function ImageLightbox({
                       className="max-w-full max-h-full object-contain"
                       onError={(e) => {
                         console.error("Error loading image:", e);
-                        console.log("Failed image src:", imageSrc);
                       }}
                     />
                   ) : (

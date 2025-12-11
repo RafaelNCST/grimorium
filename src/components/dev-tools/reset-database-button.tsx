@@ -35,8 +35,7 @@ export function ResetDatabaseButton() {
   const handleReset = async () => {
     setIsResetting(true);
     try {
-      const result = await resetDatabase();
-      console.log(result);
+      await resetDatabase();
 
       // Reload page after 2 seconds
       setTimeout(() => {

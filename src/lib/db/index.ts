@@ -4,20 +4,14 @@ let db: Database | null = null;
 
 export async function getDB(): Promise<Database> {
   if (!db) {
-    console.log("[db] Initializing database connection...");
     db = await Database.load("sqlite:grimorium.db");
-    console.log("[db] Database connection established!");
-
-    console.log("[db] Running migrations...");
     await runMigrations(db);
-    console.log("[db] Migrations completed!");
   }
   return db;
 }
 
 async function runMigrations(database: Database): Promise<void> {
   try {
-    console.log("[db] Starting schema migrations...");
 
     const schema = `
     -- LIVROS (PROJETOS)
@@ -714,20 +708,14 @@ async function runMigrations(database: Database): Promise<void> {
   `;
 
     await database.execute(schema);
-    console.log("[db] Schema migrations executed successfully");
 
     // Add important_items column to plot_arcs if it doesn't exist
     try {
       await database.execute(
         "ALTER TABLE plot_arcs ADD COLUMN important_items TEXT"
       );
-      console.log("[db] Added important_items column to plot_arcs table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log(
-        "[db] important_items column already exists or error:",
-        error
-      );
     }
 
     // Add important_regions column to plot_arcs if it doesn't exist
@@ -735,13 +723,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE plot_arcs ADD COLUMN important_regions TEXT"
       );
-      console.log("[db] Added important_regions column to plot_arcs table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log(
-        "[db] important_regions column already exists or error:",
-        error
-      );
     }
 
     // Add icon_image column to power_systems if it doesn't exist
@@ -749,10 +732,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE power_systems ADD COLUMN icon_image TEXT"
       );
-      console.log("[db] Added icon_image column to power_systems table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] icon_image column already exists or error:", error);
     }
 
     // Add color column to region_map_markers if it doesn't exist
@@ -760,10 +741,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE region_map_markers ADD COLUMN color TEXT DEFAULT '#8b5cf6'"
       );
-      console.log("[db] Added color column to region_map_markers table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] color column already exists or error:", error);
     }
 
     // Add show_label column to region_map_markers if it doesn't exist
@@ -771,10 +750,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE region_map_markers ADD COLUMN show_label INTEGER DEFAULT 1"
       );
-      console.log("[db] Added show_label column to region_map_markers table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] show_label column already exists or error:", error);
     }
 
     // Add order_index column to regions if it doesn't exist
@@ -782,10 +759,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE regions ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0"
       );
-      console.log("[db] Added order_index column to regions table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] order_index column already exists or error:", error);
     }
 
     // Add version_id column to region_maps if it doesn't exist
@@ -793,10 +768,8 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE region_maps ADD COLUMN version_id TEXT"
       );
-      console.log("[db] Added version_id column to region_maps table");
     } catch (error) {
       // Column already exists or other error - safe to ignore
-      console.log("[db] version_id column already exists or error:", error);
     }
 
     // Migrate region_maps table to support version_id with correct constraints
@@ -810,10 +783,6 @@ async function runMigrations(database: Database): Promise<void> {
         tableInfo.length > 0 &&
         tableInfo[0].sql.includes("region_id TEXT NOT NULL UNIQUE")
       ) {
-        console.log(
-          "[db] Migrating region_maps table to support version_id..."
-        );
-
         // Create new table with correct schema
         await database.execute(`
           CREATE TABLE region_maps_new (
@@ -848,13 +817,9 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute(
           "CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id)"
         );
-
-        console.log("[db] Successfully migrated region_maps table");
-      } else {
-        console.log("[db] region_maps table already has correct schema");
       }
     } catch (error) {
-      console.log("[db] Migration error or already migrated:", error);
+      // Migration error or already migrated - safe to ignore
     }
 
     // Migrate region_map_markers to link to specific maps (version-specific)
@@ -867,10 +832,6 @@ async function runMigrations(database: Database): Promise<void> {
         markersTableInfo.length > 0 &&
         !markersTableInfo[0].sql.includes("map_id")
       ) {
-        console.log(
-          "[db] Migrating region_map_markers to link to specific maps..."
-        );
-
         // Create new table with map_id
         await database.execute(`
           CREATE TABLE region_map_markers_new (
@@ -918,13 +879,9 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute(
           "CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id)"
         );
-
-        console.log("[db] Successfully migrated region_map_markers table");
-      } else {
-        console.log("[db] region_map_markers table already has correct schema");
       }
     } catch (error) {
-      console.log("[db] Markers migration error or already migrated:", error);
+      // Markers migration error or already migrated - safe to ignore
     }
 
     // Add scale column to region_map_markers table
@@ -932,7 +889,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE region_map_markers ADD COLUMN scale REAL DEFAULT 1.0"
       );
-      console.log("[db] Added scale column to region_map_markers table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -940,7 +896,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add status column to characters table
     try {
       await database.execute("ALTER TABLE characters ADD COLUMN status TEXT");
-      console.log("[db] Added status column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -950,7 +905,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE characters ADD COLUMN nicknames TEXT"
       );
-      console.log("[db] Added nicknames column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -958,7 +912,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add past column to characters table
     try {
       await database.execute("ALTER TABLE characters ADD COLUMN past TEXT");
-      console.log("[db] Added past column to characters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -967,9 +920,6 @@ async function runMigrations(database: Database): Promise<void> {
     try {
       await database.execute(
         "ALTER TABLE races ADD COLUMN other_reproductive_cycle_description TEXT"
-      );
-      console.log(
-        "[db] Added other_reproductive_cycle_description column to races table"
       );
     } catch (error) {
       // Column already exists - safe to ignore
@@ -980,7 +930,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE races ADD COLUMN other_communication TEXT"
       );
-      console.log("[db] Added other_communication column to races table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -988,7 +937,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add item_usage column to items table
     try {
       await database.execute("ALTER TABLE items ADD COLUMN item_usage TEXT");
-      console.log("[db] Added item_usage column to items table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1005,9 +953,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     for (const field of environmentFields) {
       try {
-        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
         // Column already exists - safe to ignore
       }
@@ -1024,9 +970,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     for (const field of informationFields) {
       try {
-        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
         // Column already exists - safe to ignore
       }
@@ -1045,9 +989,7 @@ async function runMigrations(database: Database): Promise<void> {
 
     for (const field of narrativeFields) {
       try {
-        const [columnName] = field.split(" ");
         await database.execute(`ALTER TABLE regions ADD COLUMN ${field}`);
-        console.log(`[db] Added ${columnName} column to regions table`);
       } catch (error) {
         // Column already exists - safe to ignore
       }
@@ -1058,7 +1000,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE regions ADD COLUMN field_visibility TEXT"
       );
-      console.log("[db] Added field_visibility column to regions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1067,7 +1008,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE regions ADD COLUMN section_visibility TEXT"
       );
-      console.log("[db] Added section_visibility column to regions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1082,9 +1022,6 @@ async function runMigrations(database: Database): Promise<void> {
         timelineTableInfo.length > 0 &&
         timelineTableInfo[0].sql.includes("REFERENCES regions(id)")
       ) {
-        console.log(
-          "[db] Migrating region_timeline_eras to reference region_versions..."
-        );
 
         // Create new table with correct foreign key
         await database.execute(`
@@ -1156,15 +1093,9 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute(
           "CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id)"
         );
-
-        console.log("[db] Successfully migrated region_timeline_eras table");
-      } else {
-        console.log(
-          "[db] region_timeline_eras table already has correct schema"
-        );
       }
     } catch (error) {
-      console.log("[db] Timeline migration error or already migrated:", error);
+      // Timeline migration error or already migrated - safe to ignore
     }
 
     // Add description column to race_relationships table
@@ -1172,7 +1103,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE race_relationships ADD COLUMN description TEXT"
       );
-      console.log("[db] Added description column to race_relationships table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1258,13 +1188,9 @@ async function runMigrations(database: Database): Promise<void> {
         await database.execute(
           "CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)"
         );
-
-        console.log("[db] Removed race_views column from races table");
-      } else {
-        console.log("[db] race_views column already removed or never existed");
       }
     } catch (error) {
-      console.log("[db] Error removing race_views column:", error);
+      // Error removing race_views column - safe to ignore
     }
 
     // Add symbols_and_secrets column to factions table (replacing important_symbols and treasures_and_secrets)
@@ -1272,7 +1198,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE factions ADD COLUMN symbols_and_secrets TEXT"
       );
-      console.log("[db] Added symbols_and_secrets column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1280,7 +1205,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add timeline column to factions table (JSON array of IFactionTimelineEra)
     try {
       await database.execute("ALTER TABLE factions ADD COLUMN timeline TEXT");
-      console.log("[db] Added timeline column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1290,7 +1214,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE factions ADD COLUMN diplomatic_relations TEXT"
       );
-      console.log("[db] Added diplomatic_relations column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1298,7 +1221,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add hierarchy column to factions table (JSON array of IHierarchyTitle)
     try {
       await database.execute("ALTER TABLE factions ADD COLUMN hierarchy TEXT");
-      console.log("[db] Added hierarchy column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1306,7 +1228,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add ui_state column to factions table (JSON object for UI state persistence)
     try {
       await database.execute("ALTER TABLE factions ADD COLUMN ui_state TEXT");
-      console.log("[db] Added ui_state column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1316,14 +1237,12 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE factions ADD COLUMN dominated_areas TEXT"
       );
-      console.log("[db] Added dominated_areas column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
 
     try {
       await database.execute("ALTER TABLE factions ADD COLUMN main_base TEXT");
-      console.log("[db] Added main_base column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1332,7 +1251,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE factions ADD COLUMN areas_of_interest TEXT"
       );
-      console.log("[db] Added areas_of_interest column to factions table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1342,7 +1260,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE chapters ADD COLUMN paragraph_count INTEGER DEFAULT 0"
       );
-      console.log("[db] Added paragraph_count column to chapters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1352,7 +1269,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute(
         "ALTER TABLE chapters ADD COLUMN dialogue_count INTEGER DEFAULT 0"
       );
-      console.log("[db] Added dialogue_count column to chapters table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1360,7 +1276,6 @@ async function runMigrations(database: Database): Promise<void> {
     // Add tabs_config column to books table for dashboard customization
     try {
       await database.execute("ALTER TABLE books ADD COLUMN tabs_config TEXT");
-      console.log("[db] Added tabs_config column to books table");
     } catch (error) {
       // Column already exists - safe to ignore
     }
@@ -1374,8 +1289,6 @@ async function runMigrations(database: Database): Promise<void> {
       const hasBookId = notesTableInfo.some((col) => col.name === "book_id");
 
       if (!hasBookId) {
-        console.log("[db] Adding book_id column to notes table...");
-
         // Get all books
         const books = await database.select<{ id: string }[]>(
           "SELECT id FROM books"
@@ -1383,7 +1296,6 @@ async function runMigrations(database: Database): Promise<void> {
 
         // Add book_id column (allowing NULL temporarily)
         await database.execute("ALTER TABLE notes ADD COLUMN book_id TEXT");
-        console.log("[db] Added book_id column");
 
         if (books.length > 0) {
           // Assign all existing notes to the first book
@@ -1392,30 +1304,18 @@ async function runMigrations(database: Database): Promise<void> {
             "UPDATE notes SET book_id = ? WHERE book_id IS NULL",
             [firstBookId]
           );
-          console.log(
-            `[db] Assigned all existing notes to book: ${firstBookId}`
-          );
         } else {
           // No books found - delete orphan notes
           await database.execute("DELETE FROM notes WHERE book_id IS NULL");
-          console.log("[db] Deleted orphan notes (no books available)");
         }
-
-        console.log("[db] book_id column migration completed");
-      } else {
-        console.log("[db] book_id column already exists in notes table");
       }
     } catch (error) {
-      console.log("[db] book_id column migration error:", error);
+      // book_id column migration error - safe to ignore
     }
 
-    // Verify books table exists and log count
-    const result = await database.select<{ count: number }[]>(
+    // Verify books table exists
+    await database.select<{ count: number }[]>(
       "SELECT COUNT(*) as count FROM books"
-    );
-    console.log(
-      "[db] Books table verified. Current row count:",
-      result[0]?.count || 0
     );
 
     // Migrate book genres to new format (english lowercase)
@@ -1516,9 +1416,6 @@ async function migrateBookGenres(database: Database): Promise<void> {
             book.id,
           ]);
           migratedCount++;
-          console.log(
-            `[db] Migrated genres for book ${book.id}: ${genres.join(", ")} -> ${newGenres.join(", ")}`
-          );
         }
       } catch (parseError) {
         console.warn(
@@ -1528,13 +1425,6 @@ async function migrateBookGenres(database: Database): Promise<void> {
       }
     }
 
-    if (migratedCount > 0) {
-      console.log(
-        `[db] Genre migration completed. Migrated ${migratedCount} books.`
-      );
-    } else {
-      console.log("[db] No books needed genre migration.");
-    }
   } catch (error) {
     console.error("[db] Error during genre migration:", error);
     // Don't throw - this is a non-critical migration
@@ -1544,15 +1434,12 @@ async function migrateBookGenres(database: Database): Promise<void> {
 // Migration: Update plot arc status and size values from Portuguese to English
 async function migratePlotArcValues(database: Database): Promise<void> {
   try {
-    console.log("[db] Starting plot arc values migration...");
-
     // Check if plot_arcs table exists
     const tables = await database.select<{ name: string }[]>(
       "SELECT name FROM sqlite_master WHERE type='table' AND name='plot_arcs'"
     );
 
     if (tables.length === 0) {
-      console.log("[db] plot_arcs table does not exist, skipping...");
       return;
     }
 
@@ -1562,7 +1449,6 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     >("SELECT id, status, size FROM plot_arcs");
 
     if (arcs.length === 0) {
-      console.log("[db] No plot arcs found, skipping...");
       return;
     }
 
@@ -1578,11 +1464,8 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     );
 
     if (needsMigration.length === 0) {
-      console.log("[db] All arcs already migrated, skipping...");
       return;
     }
-
-    console.log(`[db] Migrating ${needsMigration.length} arcs...`);
 
     // Update status values
     await database.execute(
@@ -1594,7 +1477,6 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     await database.execute(
       "UPDATE plot_arcs SET status = 'planning' WHERE status = 'planejamento'"
     );
-    console.log("[db] Updated status values");
 
     // Update size values
     await database.execute(
@@ -1606,9 +1488,6 @@ async function migratePlotArcValues(database: Database): Promise<void> {
     await database.execute(
       "UPDATE plot_arcs SET size = 'large' WHERE size = 'grande'"
     );
-    console.log("[db] Updated size values");
-
-    console.log("[db] Plot arc migration completed successfully!");
   } catch (error) {
     console.error("[db] Error during plot arc migration:", error);
     // Don't throw - this is a non-critical migration
@@ -1618,15 +1497,12 @@ async function migratePlotArcValues(database: Database): Promise<void> {
 // Migration: Update race domain values from Portuguese to English
 async function migrateRaceDomainValues(database: Database): Promise<void> {
   try {
-    console.log("[db] Starting race domain values migration...");
-
     // Check if races table exists
     const tables = await database.select<{ name: string }[]>(
       "SELECT name FROM sqlite_master WHERE type='table' AND name='races'"
     );
 
     if (tables.length === 0) {
-      console.log("[db] races table does not exist, skipping...");
       return;
     }
 
@@ -1636,7 +1512,6 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
     );
 
     if (races.length === 0) {
-      console.log("[db] No races found, skipping...");
       return;
     }
 
@@ -1682,9 +1557,6 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
             race.id,
           ]);
           migratedCount++;
-          console.log(
-            `[db] Migrated domains for race ${race.id}: ${domains.join(", ")} -> ${newDomains.join(", ")}`
-          );
         }
       } catch (parseError) {
         console.warn(
@@ -1692,14 +1564,6 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
           parseError
         );
       }
-    }
-
-    if (migratedCount > 0) {
-      console.log(
-        `[db] Race domain migration completed. Migrated ${migratedCount} races.`
-      );
-    } else {
-      console.log("[db] No races needed domain migration.");
     }
   } catch (error) {
     console.error("[db] Error during race domain migration:", error);

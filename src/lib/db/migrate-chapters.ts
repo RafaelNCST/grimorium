@@ -23,7 +23,6 @@ export async function migrateChaptersFromLocalStorage(
     const localStorageData = localStorage.getItem(localStorageKey);
 
     if (!localStorageData) {
-      console.log("[migrate-chapters] Nenhum dado encontrado no localStorage");
       return 0;
     }
 
@@ -32,13 +31,8 @@ export async function migrateChaptersFromLocalStorage(
     const chapters = Object.values(parsedData.state.chapters);
 
     if (chapters.length === 0) {
-      console.log("[migrate-chapters] Nenhum capítulo para migrar");
       return 0;
     }
-
-    console.log(
-      `[migrate-chapters] Migrando ${chapters.length} capítulos para o banco...`
-    );
 
     // Migrar cada capítulo
     let migratedCount = 0;
@@ -46,9 +40,6 @@ export async function migrateChaptersFromLocalStorage(
       try {
         await createChapter(bookId, chapter);
         migratedCount++;
-        console.log(
-          `[migrate-chapters] Capítulo "${chapter.title}" migrado com sucesso`
-        );
       } catch (error) {
         console.error(
           `[migrate-chapters] Erro ao migrar capítulo "${chapter.title}":`,
@@ -58,14 +49,9 @@ export async function migrateChaptersFromLocalStorage(
       }
     }
 
-    console.log(
-      `[migrate-chapters] Migração concluída: ${migratedCount}/${chapters.length} capítulos migrados`
-    );
-
     // Limpar localStorage após migração bem-sucedida
     if (migratedCount === chapters.length) {
       localStorage.removeItem(localStorageKey);
-      console.log("[migrate-chapters] LocalStorage limpo");
     }
 
     return migratedCount;

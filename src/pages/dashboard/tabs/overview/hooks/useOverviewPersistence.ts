@@ -70,10 +70,6 @@ export function useOverviewPersistence(
     isLoadingRef.current = true;
 
     try {
-      console.log(
-        "[useOverviewPersistence] Loading overview data for book:",
-        bookId
-      );
       const data = await getOverviewData(bookId);
 
       if (data.goals) {
@@ -105,8 +101,6 @@ export function useOverviewPersistence(
           })
         );
       }
-
-      console.log("[useOverviewPersistence] Data loaded successfully");
     } catch (error) {
       console.error(
         "[useOverviewPersistence] Error loading overview data:",
@@ -127,11 +121,6 @@ export function useOverviewPersistence(
   // Save data to database
   const saveOverviewData = useCallback(async () => {
     try {
-      console.log(
-        "[useOverviewPersistence] Saving overview data for book:",
-        bookId
-      );
-
       // Save overview-specific data
       await updateOverviewData(bookId, {
         goals,
@@ -151,8 +140,6 @@ export function useOverviewPersistence(
         authorSummary,
         storySummary,
       });
-
-      console.log("[useOverviewPersistence] Data saved successfully");
     } catch (error) {
       console.error(
         "[useOverviewPersistence] Error saving overview data:",

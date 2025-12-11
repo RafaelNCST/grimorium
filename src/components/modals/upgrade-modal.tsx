@@ -208,7 +208,6 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
               className="w-full text-lg h-12"
               onClick={() => {
                 // TODO: Implementar processo de pagamento
-                console.log("Upgrade to:", selectedPlan);
               }}
             >
               <Crown className="w-5 h-5 mr-2" />

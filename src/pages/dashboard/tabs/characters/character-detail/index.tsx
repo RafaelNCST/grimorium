@@ -619,11 +619,6 @@ export function CharacterDetail() {
 
   const handleSave = useCallback(async () => {
     try {
-      console.log("[handleSave] Starting save...", {
-        currentVersion,
-        editData,
-      });
-
       // Validar TUDO com Zod
       const validatedData = CharacterSchema.parse({
         name: editData.name,
@@ -738,7 +733,6 @@ export function CharacterDetail() {
   }, [navigate, dashboardId]);
 
   const handleConfirmDelete = useCallback(async () => {
-    console.log("handleConfirmDelete called", { currentVersion, characterId });
     if (currentVersion && !currentVersion.isMain) {
       // Delete version (non-main)
       const versionToDelete = versions.find((v) => v.id === currentVersion.id);
@@ -765,14 +759,10 @@ export function CharacterDetail() {
       setVersions(updatedVersions);
     } else {
       // Delete entire character (main version)
-      console.log("Attempting to delete character");
       try {
-        console.log("Calling deleteCharacter with ID:", characterId);
         if (!dashboardId) return;
         // Deletar do store (que também deleta do DB)
         await deleteCharacterFromStore(dashboardId, characterId);
-        console.log("Delete successful");
-        console.log("Navigating to characters tab");
         navigateToCharactersTab();
       } catch (error) {
         console.error("Error deleting character:", error);

@@ -685,12 +685,6 @@ export function RegionDetail() {
       entityData: IRegionFormData;
     }) => {
       try {
-        console.log("[handleVersionCreate] Received versionData:", versionData);
-        console.log(
-          "[handleVersionCreate] entityData:",
-          versionData.entityData
-        );
-
         if (!versionData.entityData) {
           console.error(
             "[handleVersionCreate] ERROR: entityData is null/undefined!"
@@ -707,17 +701,8 @@ export function RegionDetail() {
           regionData: versionData.entityData as unknown as IRegion,
         };
 
-        console.log(
-          "[handleVersionCreate] Created newVersion object:",
-          newVersion
-        );
-
         // Save to database
         await createRegionVersion(regionId, newVersion);
-
-        console.log(
-          "[handleVersionCreate] Version saved to database successfully"
-        );
 
         // Update state only if save is successful
         setVersions((prev) => [...prev, newVersion]);
@@ -792,16 +777,11 @@ export function RegionDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    console.log("[handleSave] Starting save...", { currentVersion, editData });
     if (!currentVersion || !editData) {
-      console.log(
-        "[handleSave] Early return - missing currentVersion or editData"
-      );
       return;
     }
 
     try {
-      console.log("[handleSave] Validating data...");
 
       // Helper function to safely parse JSON strings to arrays
       const parseArrayField = (field: any): string[] | undefined => {
@@ -915,21 +895,13 @@ export function RegionDetail() {
 
       // Check if we're editing the main version or an alternate version
       const isMainVersion = currentVersion?.isMain ?? true;
-      console.log("[handleSave] isMainVersion:", isMainVersion);
 
       if (isMainVersion) {
         // Update the main region in database
-        console.log("[handleSave] Updating main region...");
         await updateRegion(regionId, dataToSave);
-        console.log("[handleSave] Main region updated successfully");
       } else {
         // Update the alternate version's data in database
-        console.log(
-          "[handleSave] Updating alternate version...",
-          currentVersion.id
-        );
         await updateRegionVersionData(currentVersion.id, updatedRegion);
-        console.log("[handleSave] Alternate version updated successfully");
       }
 
       // Update original visibility to match saved state
@@ -938,18 +910,14 @@ export function RegionDetail() {
 
       // Save timeline for current version
       if (currentVersion) {
-        console.log("[handleSave] Saving timeline...");
         await saveRegionVersionTimeline(currentVersion.id, timeline);
-        console.log("[handleSave] Timeline saved");
       }
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
 
       setErrors({}); // Limpar erros
-      console.log("[handleSave] Exiting edit mode...");
       setIsEditing(false);
-      console.log("[handleSave] Save completed successfully!");
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -1134,12 +1102,6 @@ export function RegionDetail() {
     setFieldVisibility((prev) => {
       const newVisibility = toggleFieldVisibility(fieldName, prev);
       fieldVisibilityRef.current = newVisibility;
-      console.log(
-        "[Visibility] Field toggled:",
-        fieldName,
-        "New state:",
-        newVisibility
-      );
       return newVisibility;
     });
   }, []);
@@ -1148,12 +1110,6 @@ export function RegionDetail() {
     setSectionVisibility((prev) => {
       const newVisibility = toggleSectionVisibility(sectionName, prev);
       sectionVisibilityRef.current = newVisibility;
-      console.log(
-        "[Visibility] Section toggled:",
-        sectionName,
-        "New state:",
-        newVisibility
-      );
       return newVisibility;
     });
   }, []);

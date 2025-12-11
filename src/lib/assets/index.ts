@@ -36,7 +36,6 @@ export async function loadImage(path: string): Promise<string> {
 export async function deleteImage(path: string): Promise<void> {
   // For now, nothing to do since we're using base64
   // In future, could delete from file system
-  console.log("Image deleted (no-op for base64):", path);
 }
 
 /**

@@ -243,7 +243,6 @@ export function MetricsCard({
                   e.preventDefault();
                   const newValue = !row1Visible;
                   setRow1Visible(newValue);
-                  console.log("Row1 toggled to:", newValue);
                 }}
                 title={
                   row1Visible
@@ -310,7 +309,6 @@ export function MetricsCard({
                   e.preventDefault();
                   const newValue = !row2Visible;
                   setRow2Visible(newValue);
-                  console.log("Row2 toggled to:", newValue);
                 }}
                 title={
                   row2Visible
@@ -377,7 +375,6 @@ export function MetricsCard({
                   e.preventDefault();
                   const newValue = !row3Visible;
                   setRow3Visible(newValue);
-                  console.log("Row3 toggled to:", newValue);
                 }}
                 title={
                   row3Visible

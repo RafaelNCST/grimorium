@@ -58,26 +58,14 @@ function dbBookToBook(dbBook: DBBook): Book {
 }
 
 export async function getAllBooks(): Promise<Book[]> {
-  console.log("[books.service] getAllBooks called");
-
   try {
     const db = await getDB();
-    console.log("[books.service] Database connection obtained");
 
     const result = await db.select<DBBook[]>(
       "SELECT * FROM books ORDER BY last_opened_at DESC NULLS LAST, updated_at DESC"
     );
 
-    console.log("[books.service] Query executed successfully:", {
-      rowCount: result.length,
-      books: result,
-    });
-
     const books = result.map(dbBookToBook);
-    console.log("[books.service] Books converted to store format:", {
-      count: books.length,
-      books,
-    });
 
     return books;
   } catch (error) {

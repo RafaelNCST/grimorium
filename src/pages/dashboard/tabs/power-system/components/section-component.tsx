@@ -488,7 +488,6 @@ export function SectionComponent({
             <Button
               variant="outline"
               onClick={() => {
-                console.log("Add block button clicked!");
                 onAddBlock();
               }}
               className="w-full cursor-pointer"

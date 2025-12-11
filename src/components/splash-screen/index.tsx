@@ -44,11 +44,8 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
   useEffect(() => {
     const loadAppData = async () => {
       try {
-        console.log("[SplashScreen] Starting to load app data...");
-
         // Load books from database
         const booksFromDB = await getAllBooks();
-        console.log("[SplashScreen] Books loaded:", booksFromDB.length);
 
         setBooks(booksFromDB);
 
@@ -58,7 +55,6 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
         // - Run migrations
         // - Load user settings
 
-        console.log("[SplashScreen] All data loaded successfully");
         setIsDataLoaded(true);
       } catch (error) {
         console.error("[SplashScreen] Error loading app data:", error);

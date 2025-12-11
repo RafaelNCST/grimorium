@@ -69,7 +69,6 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
                 className="w-full justify-start h-auto p-3 text-left"
                 onClick={() => {
                   // TODO: Implement privacy policy
-                  console.log("Privacy Policy");
                 }}
               >
                 <Shield className="w-4 h-4 mr-3 text-muted-foreground" />
@@ -86,7 +85,6 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
                 className="w-full justify-start h-auto p-3 text-left"
                 onClick={() => {
                   // TODO: Implement terms of use
-                  console.log("Terms of Use");
                 }}
               >
                 <FileText className="w-4 h-4 mr-3 text-muted-foreground" />

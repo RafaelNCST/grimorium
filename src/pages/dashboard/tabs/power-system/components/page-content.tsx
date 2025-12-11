@@ -284,10 +284,6 @@ export function PageContent({
                   }
                   onDeleteSection={() => onDeleteSection(section.id)}
                   onAddBlock={() => {
-                    console.log(
-                      "onAddBlock called in page-content for section:",
-                      section.id
-                    );
                     onAddBlock(section.id);
                   }}
                   onUpdateBlock={onUpdateBlock}
