@@ -5,7 +5,7 @@
     "description": "Gerencie armas, artefatos e itens importantes da sua história",
     "new_item": "Novo Item",
     "search_placeholder": "Buscar Item",
-    "total_badge": "Total",
+    "total_badge": "Todos",
     "category_badge": {
       "weapon": "Arma",
       "armor": "Armadura",

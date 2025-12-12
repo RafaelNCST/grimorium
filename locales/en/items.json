@@ -5,7 +5,7 @@
     "description": "Manage weapons, artifacts, and important items in your story",
     "new_item": "New Item",
     "search_placeholder": "Search Item",
-    "total_badge": "Total",
+    "total_badge": "All",
     "category_badge": {
       "weapon": "Weapon",
       "armor": "Armor",

@@ -10,7 +10,7 @@
     "title": "Facções",
     "description": "Gerencie as facções, reinos, seitas e grupos do seu mundo",
     "new_faction": "Nova Facção",
-    "total_badge": "Total",
+    "total_badge": "Todos",
     "search_placeholder": "Buscar Facção"
   },
   "empty_state": {

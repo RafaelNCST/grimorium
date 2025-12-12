@@ -12,7 +12,7 @@
   "filters": {
     "all": "All",
     "domain": "Domain",
-    "total": "Total"
+    "total": "All"
   },
   "domains": {
     "Aquático": "Aquatic",
