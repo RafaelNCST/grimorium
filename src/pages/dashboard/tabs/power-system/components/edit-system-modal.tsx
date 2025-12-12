@@ -147,6 +147,12 @@ export function EditSystemModal({
                         <Input
                           placeholder={t("modals.edit_system.name_placeholder")}
                           {...field}
+                          onFocus={(e) => {
+                            // Remove text selection when focused
+                            setTimeout(() => {
+                              e.target.selectionStart = e.target.selectionEnd;
+                            }, 0);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -159,7 +165,7 @@ export function EditSystemModal({
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={handleCancel}
                 className="flex-1 cursor-pointer"
               >
