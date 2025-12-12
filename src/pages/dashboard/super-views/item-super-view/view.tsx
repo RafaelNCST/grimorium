@@ -215,7 +215,10 @@ export function ItemSuperView({
             {alternativeNamesWithIds.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {alternativeNamesWithIds.map((item) => (
-                  <span key={item.id} className="text-sm px-2 py-1 bg-muted rounded-md">
+                  <span
+                    key={item.id}
+                    className="text-sm px-2 py-1 bg-muted rounded-md"
+                  >
                     {item.name}
                   </span>
                 ))}

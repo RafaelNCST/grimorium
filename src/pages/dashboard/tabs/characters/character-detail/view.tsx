@@ -41,7 +41,6 @@ import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-
 import { type IGender as IGenderModal } from "@/components/modals/create-character-modal/constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";

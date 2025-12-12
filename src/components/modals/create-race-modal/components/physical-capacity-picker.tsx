@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
-import { InfoAlert } from "@/components/ui/info-alert";
 
 import { getRacePhysicalCapacities } from "../constants/physical-capacities";
 

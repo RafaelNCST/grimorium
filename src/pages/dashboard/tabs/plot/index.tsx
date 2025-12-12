@@ -25,8 +25,12 @@ export function PlotTab({ bookId }: PropsPlotTab) {
   const navigate = useNavigate();
 
   // Store selectors - acesso direto ao cache para evitar re-renders
-  const arcs = usePlotStore((state) => state.cache[bookId]?.arcs ?? EMPTY_ARRAY);
-  const isLoading = usePlotStore((state) => state.cache[bookId]?.isLoading ?? false);
+  const arcs = usePlotStore(
+    (state) => state.cache[bookId]?.arcs ?? EMPTY_ARRAY
+  );
+  const isLoading = usePlotStore(
+    (state) => state.cache[bookId]?.isLoading ?? false
+  );
 
   // Store actions
   const fetchPlotArcs = usePlotStore((state) => state.fetchPlotArcs);

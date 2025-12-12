@@ -82,7 +82,9 @@ export function BookCard({
             <EntityTagBadge
               key={genre.id}
               config={GENRE_TAG_CONFIG}
-              label={t(getGenreTranslationKey(genre.value), { ns: "create-book" })}
+              label={t(getGenreTranslationKey(genre.value), {
+                ns: "create-book",
+              })}
               className="text-xs"
             />
           ))}

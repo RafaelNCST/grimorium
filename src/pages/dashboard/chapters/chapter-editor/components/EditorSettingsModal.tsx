@@ -1,4 +1,4 @@
-import { Settings, ChevronUp, ChevronDown, X } from "lucide-react";
+import { Settings, ChevronUp, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";

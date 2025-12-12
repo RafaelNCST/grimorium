@@ -4,10 +4,9 @@
  * Informações do app, reportar bugs e fazer sugestões
  */
 
-import { Bug, Lightbulb, ExternalLink, Info, Github } from "lucide-react";
+import { Bug, Lightbulb, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 const APP_VERSION = "0.0.0"; // TODO: Pegar do package.json ou ambiente

@@ -107,3 +107,5 @@ export const FieldWithVisibilityToggle = React.memo(
     );
   }
 );
+
+FieldWithVisibilityToggle.displayName = "FieldWithVisibilityToggle";

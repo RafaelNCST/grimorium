@@ -174,10 +174,7 @@ export const ItemDetailView = React.memo(
             name,
           })
         ) || [],
-      [
-        isEditing ? editData.alternativeNames : item.alternativeNames,
-        isEditing,
-      ]
+      [isEditing ? editData.alternativeNames : item.alternativeNames, isEditing]
     );
 
     // Get current status icon for badge display

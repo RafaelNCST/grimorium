@@ -122,28 +122,36 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const { t } = useTranslation("overview");
 
   // Store selectors - acesso direto ao cache para evitar re-renders
-  const goals = useOverviewStore((state) => state.cache[bookId]?.goals ?? DEFAULT_GOALS);
-  const storyProgress = useOverviewStore((state) => state.cache[bookId]?.storyProgress ?? DEFAULT_STORY_PROGRESS);
+  const goals = useOverviewStore(
+    (state) => state.cache[bookId]?.goals ?? DEFAULT_GOALS
+  );
+  const storyProgress = useOverviewStore(
+    (state) => state.cache[bookId]?.storyProgress ?? DEFAULT_STORY_PROGRESS
+  );
   const stickyNotes = useOverviewStore(
     (state) => state.cache[bookId]?.stickyNotes ?? EMPTY_ARRAY
   );
   const checklistItems = useOverviewStore(
     (state) => state.cache[bookId]?.checklistItems ?? EMPTY_CHECKLIST
   );
-  const sections = useOverviewStore((state) => state.cache[bookId]?.sections ?? DEFAULT_SECTIONS);
-  const authorSummary = useOverviewStore((state) =>
-    state.cache[bookId]?.authorSummary ?? ""
+  const sections = useOverviewStore(
+    (state) => state.cache[bookId]?.sections ?? DEFAULT_SECTIONS
   );
-  const storySummary = useOverviewStore((state) =>
-    state.cache[bookId]?.storySummary ?? ""
+  const authorSummary = useOverviewStore(
+    (state) => state.cache[bookId]?.authorSummary ?? ""
   );
-  const overviewStats = useOverviewStore((state) =>
-    state.cache[bookId]?.overviewStats ?? DEFAULT_OVERVIEW_STATS
+  const storySummary = useOverviewStore(
+    (state) => state.cache[bookId]?.storySummary ?? ""
   );
-  const allArcsProgress = useOverviewStore((state) =>
-    state.cache[bookId]?.allArcsProgress ?? EMPTY_PROGRESS
+  const overviewStats = useOverviewStore(
+    (state) => state.cache[bookId]?.overviewStats ?? DEFAULT_OVERVIEW_STATS
   );
-  const isLoading = useOverviewStore((state) => state.cache[bookId]?.isLoading ?? false);
+  const allArcsProgress = useOverviewStore(
+    (state) => state.cache[bookId]?.allArcsProgress ?? EMPTY_PROGRESS
+  );
+  const isLoading = useOverviewStore(
+    (state) => state.cache[bookId]?.isLoading ?? false
+  );
 
   // Store actions
   const fetchOverview = useOverviewStore((state) => state.fetchOverview);
@@ -209,7 +217,10 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
 
   // Save notes board height to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem(`notesBoard-height-${bookId}`, notesBoardHeight.toString());
+    localStorage.setItem(
+      `notesBoard-height-${bookId}`,
+      notesBoardHeight.toString()
+    );
   }, [notesBoardHeight, bookId]);
 
   // Load data on mount (APENAS na primeira vez)

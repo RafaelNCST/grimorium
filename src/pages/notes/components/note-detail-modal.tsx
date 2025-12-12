@@ -6,7 +6,6 @@ import {
   Building2,
   Dna,
   Package,
-  X,
   Search,
   Check,
   BookOpen,
@@ -23,7 +22,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -127,10 +125,10 @@ function NoteDetailModalComponent({
   const { t } = useTranslation("notes");
   const currentBook = useBookStore((state) => state.currentBook);
 
-  const [content, setContent] = useState<JSONContent | undefined>(
+  const [_content, setContent] = useState<JSONContent | undefined>(
     note?.content
   );
-  const [color, setColor] = useState<NoteColor>(
+  const [_color, setColor] = useState<NoteColor>(
     note?.color || DEFAULT_NOTE_COLOR
   );
   const [links, setLinks] = useState<INoteLink[]>(note?.links || []);
@@ -336,7 +334,7 @@ function NoteDetailModalComponent({
     [note?.id, onUpdate]
   );
 
-  const handleColorChange = useCallback(
+  const _handleColorChange = useCallback(
     (newColor: NoteColor) => {
       if (note) {
         onUpdate(note.id, { color: newColor });
@@ -547,8 +545,8 @@ function NoteDetailModalComponent({
             <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-0">
               {ENTITY_TABS.map((tab, index) => {
                 const Icon = tab.icon;
-                const total = entityCounts[tab.type];
-                const selected = selectedCounts[tab.type];
+                const _total = entityCounts[tab.type];
+                const _selected = selectedCounts[tab.type];
                 const isFirst = index === 0;
                 const isLast = index === ENTITY_TABS.length - 1;
 

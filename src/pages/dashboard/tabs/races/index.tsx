@@ -15,7 +15,6 @@ interface PropsSpeciesTab {
   bookId: string;
 }
 
-
 export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
 

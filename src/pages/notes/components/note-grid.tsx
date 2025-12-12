@@ -16,7 +16,6 @@ import { FileText } from "lucide-react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils";
 import type { INote, NoteColor, NoteTextColor } from "@/types/note-types";
 
 import { NoteCard } from "./note-card";
@@ -112,6 +111,8 @@ const DraggableNote = memo(
     );
   }
 );
+
+DraggableNote.displayName = "DraggableNote";
 
 function NoteGridComponent({
   notes,

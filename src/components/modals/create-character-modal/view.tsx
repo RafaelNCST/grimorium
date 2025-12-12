@@ -9,7 +9,6 @@ import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityModal } from "@/components/modals/entity-modal";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "@/components/ui/section-title";
@@ -53,8 +52,8 @@ export function CreateCharacterModalView({
   onSubmit,
   isValid,
   bookId,
-  hasLocations,
-  locations,
+  hasLocations: _hasLocations,
+  locations: _locations,
 }: PropsCreateCharacterModalView) {
   const { t } = useTranslation("create-character");
   const {

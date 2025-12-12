@@ -23,14 +23,6 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { SectionTitle } from "@/components/ui/section-title";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
@@ -215,15 +207,15 @@ export function CreateChapterModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [availableArcs, setAvailableArcs] = useState<IPlotArc[]>([]);
-  const [availableCharacters, setAvailableCharacters] = useState<
+  const [_availableCharacters, setAvailableCharacters] = useState<
     EntityOption[]
   >([]);
-  const [availableRegions, setAvailableRegions] = useState<EntityOption[]>([]);
-  const [availableItems, setAvailableItems] = useState<EntityOption[]>([]);
-  const [availableFactions, setAvailableFactions] = useState<EntityOption[]>(
+  const [_availableRegions, setAvailableRegions] = useState<EntityOption[]>([]);
+  const [_availableItems, setAvailableItems] = useState<EntityOption[]>([]);
+  const [_availableFactions, setAvailableFactions] = useState<EntityOption[]>(
     []
   );
-  const [availableRaces, setAvailableRaces] = useState<EntityOption[]>([]);
+  const [_availableRaces, setAvailableRaces] = useState<EntityOption[]>([]);
 
   // Load arcs and entities when modal opens
   useEffect(() => {
@@ -318,7 +310,7 @@ export function CreateChapterModal({
   // This function is no longer needed since FormEntityMultiSelectAuto
   // returns full entity objects in the onChange callback
   // Keeping it for backwards compatibility but it now passes through the full entity data
-  const idsToEntities = (
+  const _idsToEntities = (
     ids: string[],
     availableEntities: EntityOption[]
   ): EntityMention[] =>

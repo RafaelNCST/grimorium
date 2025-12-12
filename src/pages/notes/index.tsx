@@ -6,7 +6,6 @@ import { useBookStore } from "@/stores/book-store";
 import { useNotesStore } from "@/stores/notes-store";
 import type { INote, INoteLink, NoteColor } from "@/types/note-types";
 
-import { DEFAULT_NOTE_COLOR } from "./constants";
 import { NotesView } from "./view";
 
 import type { JSONContent } from "@tiptap/react";

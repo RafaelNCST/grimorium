@@ -63,7 +63,7 @@ export function EntityDetailVersionPanel({
   versions,
   currentVersionId,
   onCreate,
-  onSelect,
+  onSelect: _onSelect,
   createLabel = "Nova Versão",
   title = "Versões",
   emptyStateTitle = "Nenhuma versão alternativa",

@@ -16,7 +16,7 @@ import { EntityNotesView } from "./view";
 import type { JSONContent } from "@tiptap/react";
 
 export function EntityNotesPage() {
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const params = useParams({ strict: false });
   const search = useSearch({ strict: false }) as { entityName?: string };
 
@@ -35,7 +35,7 @@ export function EntityNotesPage() {
     (state) => state.updateNoteLinksInCache
   );
   const deleteNote = useNotesStore((state) => state.deleteNote);
-  const reorderNotes = useNotesStore((state) => state.reorderNotes);
+  const _reorderNotes = useNotesStore((state) => state.reorderNotes);
   const currentBook = useBookStore((state) => state.currentBook);
 
   // Filter notes linked to this entity

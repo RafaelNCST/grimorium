@@ -1,5 +1,3 @@
-import { BadgeColorConfig } from "../EntityFilterBadges";
-
 /**
  * Tailwind color names available for badges
  */

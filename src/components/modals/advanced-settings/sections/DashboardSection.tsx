@@ -17,7 +17,6 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { DashboardTabId } from "@/types/app-settings";
 

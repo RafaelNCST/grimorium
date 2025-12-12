@@ -145,7 +145,7 @@ function SortableItem({ id, text, onTextChange, onDelete }: SortableItemProps) {
 export function FormListInput({
   label,
   placeholder,
-  buttonText,
+  buttonText: _buttonText,
   value,
   onChange,
   labelClassName,

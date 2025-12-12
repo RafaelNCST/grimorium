@@ -9,8 +9,8 @@ import {
   Save,
   X,
   Menu,
+  AlertCircle,
 } from "lucide-react";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 import { Button } from "@/components/ui/button";
@@ -119,8 +119,8 @@ export function EntityDetailLayout({
   onEdit,
   onDelete,
   extraActions = [],
-  editLabel = "Editar",
-  deleteLabel = "Excluir",
+  editLabel: _editLabel = "Editar",
+  deleteLabel: _deleteLabel = "Excluir",
   editTooltip,
   deleteTooltip,
 
@@ -261,7 +261,9 @@ export function EntityDetailLayout({
             ) : (
               <div className="flex gap-2">
                 {extraActions.map((action, index) => (
-                  <Tooltip key={`${action.tooltip || action.icon.name}-${index}`}>
+                  <Tooltip
+                    key={`${action.tooltip || action.icon.name}-${index}`}
+                  >
                     <TooltipTrigger asChild>
                       <Button
                         variant={action.variant || "ghost"}

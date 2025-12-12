@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
-  AlertCircle,
   BookOpen,
   Download,
 } from "lucide-react";

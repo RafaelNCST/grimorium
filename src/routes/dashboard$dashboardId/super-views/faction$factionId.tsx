@@ -8,6 +8,8 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <div>Hello "/dashboard$dashboardId/super-views/faction$factionId"!</div>
+    <div>
+      Hello &quot;/dashboard$dashboardId/super-views/faction$factionId&quot;!
+    </div>
   );
 }

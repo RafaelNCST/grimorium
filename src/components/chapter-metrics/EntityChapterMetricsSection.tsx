@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { BookOpen, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InfoAlert } from "@/components/ui/info-alert";

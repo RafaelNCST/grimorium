@@ -6,7 +6,7 @@ import {
   updatePlotArc,
   deletePlotArc,
 } from "@/lib/db/plot.service";
-import type { IPlotArc, PlotArcStatus, PlotArcSize } from "@/types/plot-types";
+import type { IPlotArc } from "@/types/plot-types";
 
 interface PlotCache {
   [bookId: string]: {

@@ -782,7 +782,6 @@ export function RegionDetail() {
     }
 
     try {
-
       // Helper function to safely parse JSON strings to arrays
       const parseArrayField = (field: any): string[] | undefined => {
         if (!field) return undefined;

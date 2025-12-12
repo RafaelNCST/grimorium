@@ -1,4 +1,4 @@
-import { Info, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -7,7 +7,6 @@ import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityModal } from "@/components/modals/entity-modal";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "@/components/ui/section-title";

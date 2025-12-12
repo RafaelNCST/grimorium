@@ -1,14 +1,10 @@
 import type { EntityMention } from "@/components/modals/create-chapter-modal";
-import type {
-  Annotation,
-  ChapterData,
-  ChapterStatus,
-} from "@/stores/chapters-store";
+import type { Annotation, ChapterData } from "@/stores/chapters-store";
 
 import { getDB } from "./index";
 
 // Função auxiliar para calcular diferenças entre arrays
-function diffArrays<T>(
+function _diffArrays<T>(
   oldArray: T[],
   newArray: T[],
   getKey: (item: T) => string

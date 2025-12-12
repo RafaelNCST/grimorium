@@ -344,15 +344,12 @@ export function CollapsibleSection({
                 )}
 
                 {/* Chevron Icon - Only if collapsible */}
-                {isCollapsible && (
-                  <>
-                    {isOpen ? (
-                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    )}
-                  </>
-                )}
+                {isCollapsible &&
+                  (isOpen ? (
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  ))}
               </div>
             </div>
           </CardHeader>

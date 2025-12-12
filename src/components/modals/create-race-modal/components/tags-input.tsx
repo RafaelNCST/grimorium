@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Plus, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

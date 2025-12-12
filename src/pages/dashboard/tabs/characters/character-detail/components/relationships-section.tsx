@@ -28,7 +28,6 @@ import { useTranslation } from "react-i18next";
 
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {

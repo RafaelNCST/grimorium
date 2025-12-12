@@ -525,9 +525,7 @@ export async function deleteRegionVersion(versionId: string): Promise<void> {
   const db = await getDB();
 
   // Delete the version
-  await db.execute("DELETE FROM region_versions WHERE id = $1", [
-    versionId,
-  ]);
+  await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
 }
 
 /**

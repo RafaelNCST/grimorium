@@ -1,11 +1,4 @@
-import {
-  Heart,
-  Skull,
-  Lock,
-  HelpCircle,
-  Moon,
-  type LucideIcon,
-} from "lucide-react";
+import { Heart, Skull, Lock, HelpCircle, Moon } from "lucide-react";
 
 import { type IEntityTagConfig } from "@/components/ui/entity-tag-badge";
 

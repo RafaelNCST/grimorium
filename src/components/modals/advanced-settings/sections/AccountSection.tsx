@@ -12,7 +12,6 @@ import {
   LogOut,
   Mail,
   Calendar,
-  Check,
   Camera,
   X,
   User,
@@ -20,7 +19,6 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { UpgradeModal } from "@/components/modals/upgrade-modal";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,7 +48,7 @@ export function AccountSection() {
     displayName !== user.displayName && displayName.trim() !== "";
 
   const isPremium = user.subscription.tier === "realeza";
-  const isActive = user.subscription.status === "active";
+  const _isActive = user.subscription.status === "active";
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString(
@@ -382,6 +380,7 @@ export function AccountSection() {
           variant="destructive"
           className="w-full"
           onClick={() => {
+            // eslint-disable-next-line no-alert
             if (window.confirm(t("account.auth.logout_confirm"))) {
               logout();
               // TODO: Redirect to login page

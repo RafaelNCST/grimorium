@@ -38,8 +38,8 @@ export function CreateRaceModalView({
   onSubmit,
   isValid,
   isSubmitting,
-  availableRaces,
-  bookId,
+  availableRaces: _availableRaces,
+  bookId: _bookId,
 }: PropsCreateRaceModalView) {
   const { t } = useTranslation("create-race");
   const {

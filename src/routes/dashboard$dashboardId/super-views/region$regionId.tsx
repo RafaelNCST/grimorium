@@ -7,5 +7,9 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  return <div>Hello "/dashboard$dashboardId/super-views/region$regionId"!</div>;
+  return (
+    <div>
+      Hello &quot;/dashboard$dashboardId/super-views/region$regionId&quot;!
+    </div>
+  );
 }

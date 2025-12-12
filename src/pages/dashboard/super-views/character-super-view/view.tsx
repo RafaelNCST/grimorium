@@ -20,7 +20,6 @@ import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Separator } from "@/components/ui/separator";
 import { AlignmentMatrix } from "@/pages/dashboard/tabs/characters/character-detail/components/alignment-matrix";

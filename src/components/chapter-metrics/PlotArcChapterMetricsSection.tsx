@@ -19,7 +19,7 @@ interface PropsPlotArcChapterMetricsSection {
 export function PlotArcChapterMetricsSection({
   bookId,
   plotArcId,
-  onChapterClick,
+  onChapterClick: _onChapterClick,
 }: PropsPlotArcChapterMetricsSection) {
   const { t } = useTranslation("chapter-metrics");
 
