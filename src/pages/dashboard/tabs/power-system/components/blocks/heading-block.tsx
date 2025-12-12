@@ -100,50 +100,44 @@ export function HeadingBlock({
             </Select>
 
             {/* Alignment buttons */}
-            <button
+            <Button
               type="button"
+              variant="ghost-active"
+              size="icon"
+              active={content.alignment === "left"}
               onClick={() => onUpdate({ ...content, alignment: "left" })}
-              className={`p-2 rounded-md border-2 transition-all ${
-                content.alignment === "left"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
               title={t("blocks.heading.alignment_left")}
             >
               <AlignLeft className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost-active"
+              size="icon"
+              active={content.alignment === "center"}
               onClick={() => onUpdate({ ...content, alignment: "center" })}
-              className={`p-2 rounded-md border-2 transition-all ${
-                content.alignment === "center"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
               title={t("blocks.heading.alignment_center")}
             >
               <AlignCenter className="w-5 h-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost-active"
+              size="icon"
+              active={content.alignment === "right"}
               onClick={() => onUpdate({ ...content, alignment: "right" })}
-              className={`p-2 rounded-md border-2 transition-all ${
-                content.alignment === "right"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
               title={t("blocks.heading.alignment_right")}
             >
               <AlignRight className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+            className="cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>

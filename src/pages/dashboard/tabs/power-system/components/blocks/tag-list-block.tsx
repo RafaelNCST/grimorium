@@ -56,7 +56,7 @@ export function TagListBlock({
         <div className="flex items-center justify-between gap-2 mb-2">
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
             className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"

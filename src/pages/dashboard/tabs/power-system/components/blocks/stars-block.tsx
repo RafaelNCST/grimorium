@@ -77,47 +77,38 @@ export function StarsBlock({
         <div className="flex items-center justify-between gap-2 mb-2">
           {/* Size controls */}
           <div className="flex gap-2" data-no-drag="true">
-            <button
+            <Button
               type="button"
+              variant="ghost-active"
+              active={currentSize === "small"}
               onClick={() => handleSizeChange("small")}
-              className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                currentSize === "small"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
             >
               {t("blocks.stars.size_small")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost-active"
+              active={currentSize === "medium"}
               onClick={() => handleSizeChange("medium")}
-              className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                currentSize === "medium"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
             >
               {t("blocks.stars.size_medium")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost-active"
+              active={currentSize === "large"}
               onClick={() => handleSizeChange("large")}
-              className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                currentSize === "large"
-                  ? "border-primary/40 bg-primary/10 shadow-sm"
-                  : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-              }`}
             >
               {t("blocks.stars.size_large")}
-            </button>
+            </Button>
           </div>
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+            className="cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>

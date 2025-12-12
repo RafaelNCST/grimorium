@@ -243,49 +243,40 @@ export function ImageBlock({
                   {t("blocks.image.object_fit_label")}
                 </Label>
                 <div className="flex gap-2" data-no-drag="true">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost-active"
+                    active={(content.objectFit || "fill") === "fill"}
                     onClick={() => handleObjectFitChange("fill")}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                      (content.objectFit || "fill") === "fill"
-                        ? "border-primary/40 bg-primary/10 shadow-sm"
-                        : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                    }`}
                   >
                     {t("blocks.image.fill")}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost-active"
+                    active={content.objectFit === "fit"}
                     onClick={() => handleObjectFitChange("fit")}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                      content.objectFit === "fit"
-                        ? "border-primary/40 bg-primary/10 shadow-sm"
-                        : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                    }`}
                   >
                     {t("blocks.image.fit")}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost-active"
+                    active={content.objectFit === "crop"}
                     onClick={() => handleObjectFitChange("crop")}
-                    className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                      content.objectFit === "crop"
-                        ? "border-primary/40 bg-primary/10 shadow-sm"
-                        : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                    }`}
                   >
                     {t("blocks.image.crop")}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
 
             <Button
               data-no-drag="true"
-              variant="ghost"
+              variant="ghost-destructive"
               size="icon"
               onClick={onDelete}
-              className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"
+              className="ml-auto cursor-pointer"
             >
               <Trash2 className="w-5 h-5" />
             </Button>
@@ -385,7 +376,7 @@ export function ImageBlock({
               </div>
             </div>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={handleCancelCrop}>
+              <Button variant="secondary" size="lg" onClick={handleCancelCrop}>
                 {t("blocks.image.crop_cancel")}
               </Button>
               <Button

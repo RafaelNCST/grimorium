@@ -118,14 +118,12 @@ export function ParagraphBlock({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost-active"
+                    size="icon"
+                    active={isLocked}
                     onClick={handleToggleLock}
-                    className={`p-2 rounded-md border-2 transition-all ${
-                      isLocked
-                        ? "border-primary/40 bg-primary/10 shadow-sm"
-                        : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                    }`}
                     title={
                       isLocked
                         ? t("blocks.paragraph.unlock_height")
@@ -137,7 +135,7 @@ export function ParagraphBlock({
                     ) : (
                       <LockOpen className="w-5 h-5" />
                     )}
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   {isLocked
@@ -150,10 +148,10 @@ export function ParagraphBlock({
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+            className="cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>

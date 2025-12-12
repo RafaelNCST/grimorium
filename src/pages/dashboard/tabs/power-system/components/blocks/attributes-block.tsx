@@ -166,7 +166,7 @@ export function AttributesBlock({
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
             className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer h-8 w-8"

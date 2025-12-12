@@ -393,10 +393,10 @@ export function SectionComponent({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="ghost-destructive"
                   size="icon"
                   onClick={onDeleteSection}
-                  className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+                  className="cursor-pointer"
                 >
                   <Trash2 className="w-5 h-5" />
                 </Button>
@@ -486,7 +486,7 @@ export function SectionComponent({
           {/* Add Block Button */}
           {isEditMode && (
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => {
                 onAddBlock();
               }}

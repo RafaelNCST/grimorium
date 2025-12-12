@@ -288,10 +288,10 @@ export function IconGroupBlock({
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+            className="cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
@@ -328,7 +328,7 @@ export function IconGroupBlock({
                 <div className="flex gap-1">
                   <Button
                     data-no-drag="true"
-                    variant="ghost"
+                    variant="ghost-destructive"
                     size="icon"
                     onClick={() => openEditDialog(icon)}
                     className="h-7 w-7 cursor-pointer"
@@ -337,7 +337,7 @@ export function IconGroupBlock({
                   </Button>
                   <Button
                     data-no-drag="true"
-                    variant="ghost"
+                    variant="ghost-destructive"
                     size="icon"
                     onClick={() => handleDeleteIcon(icon.id)}
                     className="h-7 w-7 text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"

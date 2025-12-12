@@ -76,48 +76,39 @@ export function IconBlock({
               {t("blocks.icon.alignment_label")}
             </Label>
             <div className="flex gap-2" data-no-drag="true">
-              <button
+              <Button
                 type="button"
+                variant="ghost-active"
+                active={(content.alignment || "center") === "start"}
                 onClick={() => handleAlignmentChange("start")}
-                className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                  (content.alignment || "center") === "start"
-                    ? "border-primary/40 bg-primary/10 shadow-sm"
-                    : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                }`}
               >
                 {t("blocks.icon.align_start")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost-active"
+                active={(content.alignment || "center") === "center"}
                 onClick={() => handleAlignmentChange("center")}
-                className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                  (content.alignment || "center") === "center"
-                    ? "border-primary/40 bg-primary/10 shadow-sm"
-                    : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                }`}
               >
                 {t("blocks.icon.align_center")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost-active"
+                active={(content.alignment || "center") === "end"}
                 onClick={() => handleAlignmentChange("end")}
-                className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-                  (content.alignment || "center") === "end"
-                    ? "border-primary/40 bg-primary/10 shadow-sm"
-                    : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-                }`}
               >
                 {t("blocks.icon.align_end")}
-              </button>
+              </Button>
             </div>
           </div>
 
           <Button
             data-no-drag="true"
-            variant="ghost"
+            variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+            className="cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>

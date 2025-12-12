@@ -24,6 +24,8 @@ const buttonVariants = cva(
           "hover:bg-black/10 dark:hover:bg-black/20 transition-colors duration-200",
         "ghost-destructive":
           "hover:bg-destructive/10 hover:text-destructive transition-colors duration-200",
+        "ghost-active":
+          "hover:bg-accent hover:text-accent-foreground transition-colors duration-200 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         accent:
           "bg-gradient-accent text-accent-foreground hover:shadow-accent-glow hover:-translate-y-0.5 font-semibold transition-all duration-300",
@@ -46,15 +48,17 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  active?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, active, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        data-active={active}
         {...props}
       />
     );

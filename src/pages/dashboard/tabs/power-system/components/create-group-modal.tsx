@@ -87,7 +87,8 @@ export function CreateGroupModal({
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
+                size="lg"
                 onClick={handleCancel}
                 className="flex-1"
               >

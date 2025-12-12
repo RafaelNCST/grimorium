@@ -45,3 +45,17 @@ Classificação dos 6 principais tipos de botões utilizados no projeto.
 **Nome:** `variant="ghost-destructive"`
 **Uso:** Botões de fechar/deletar com destaque destrutivo
 **Descrição visual:** Fundo transparente com hover em vermelho claro
+
+---
+
+## 7. Ghost Ativável
+**Nome:** `variant="ghost-active"`
+**Uso:** Botões ativáveis em blocos/cards (filtros, toggles visuais)
+**Propriedade adicional:** `active={boolean}`
+**Descrição visual:** Fundo transparente com hover em amarelo/accent suave. Quando `active={true}`, mantém o estado de hover permanentemente
+**Exemplo:**
+```tsx
+<Button variant="ghost-active" active={isSelected}>
+  Opção
+</Button>
+```
