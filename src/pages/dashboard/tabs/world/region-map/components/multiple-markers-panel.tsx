@@ -49,14 +49,16 @@ export function MultipleMarkersPanel({
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Calculate if majority of markers have showLabel enabled
-  const labelsVisible = markers.filter((m) => m.showLabel).length > markers.length / 2;
+  const labelsVisible =
+    markers.filter((m) => m.showLabel).length > markers.length / 2;
 
   return (
     <div className="bg-background border rounded-lg shadow-lg w-80 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between gap-4 flex-shrink-0">
         <h3 className="font-semibold text-sm">
-          {count} {count === 1 ? "marcador selecionado" : "marcadores selecionados"}
+          {count}{" "}
+          {count === 1 ? "marcador selecionado" : "marcadores selecionados"}
         </h3>
         <Button
           variant="ghost-destructive"

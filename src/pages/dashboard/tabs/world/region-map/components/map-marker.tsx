@@ -80,7 +80,11 @@ export function MapMarker({
   const wrapperWidth =
     Math.max(markerSize, estimatedLabelWidth) + wrapperPaddingX * 2;
   const wrapperHeight =
-    markerSize + labelSpacing + labelHeight + wrapperPaddingTop + wrapperPaddingBottom;
+    markerSize +
+    labelSpacing +
+    labelHeight +
+    wrapperPaddingTop +
+    wrapperPaddingBottom;
 
   // Handle size for resize corners
   const handleSize = 8 / zoomScale;

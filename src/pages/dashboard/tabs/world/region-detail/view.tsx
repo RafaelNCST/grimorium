@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { AlertCircle, Trash2, Clock, NotebookPen, Image, Map as MapIcon } from "lucide-react";
+import {
+  AlertCircle,
+  Trash2,
+  Clock,
+  NotebookPen,
+  Image,
+  Map as MapIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";

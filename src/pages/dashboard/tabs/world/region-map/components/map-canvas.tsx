@@ -661,9 +661,7 @@ export function MapCanvas({
               <p className="text-sm font-semibold text-foreground mb-1">
                 Erro ao carregar mapa
               </p>
-              <p className="text-xs text-muted-foreground">
-                {loadError}
-              </p>
+              <p className="text-xs text-muted-foreground">{loadError}</p>
             </div>
           </div>
         </div>

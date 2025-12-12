@@ -425,7 +425,9 @@ export function RegionMapPage() {
 
     try {
       await Promise.all(
-        selectedMarkerIds.map((id) => updateMarkerLabelVisibility(id, showLabel))
+        selectedMarkerIds.map((id) =>
+          updateMarkerLabelVisibility(id, showLabel)
+        )
       );
       setMarkers((prev) =>
         prev.map((m) =>
@@ -451,7 +453,8 @@ export function RegionMapPage() {
   const selectedMarkers = markers.filter((m) =>
     selectedMarkerIds.includes(m.id)
   );
-  const selectedMarker = selectedMarkers.length === 1 ? selectedMarkers[0] : null;
+  const selectedMarker =
+    selectedMarkers.length === 1 ? selectedMarkers[0] : null;
   const selectedRegion = selectedMarker
     ? childrenRegions.find((r) => r.id === selectedMarker.childRegionId)
     : null;
@@ -526,7 +529,9 @@ export function RegionMapPage() {
       {/* Right Sidebar - Marker Details - Fixed */}
       {selectedMarkerIds.length > 0 && (
         <div className="fixed top-12 right-4 z-30">
-          {selectedMarkerIds.length === 1 && selectedRegion && selectedMarker ? (
+          {selectedMarkerIds.length === 1 &&
+          selectedRegion &&
+          selectedMarker ? (
             <MapMarkerDetails
               region={selectedRegion}
               mapRegionId={regionId}
