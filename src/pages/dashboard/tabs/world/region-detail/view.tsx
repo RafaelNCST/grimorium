@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { AlertCircle, Trash2, Clock, NotebookPen, Image } from "lucide-react";
+import { AlertCircle, Trash2, Clock, NotebookPen, Image, Map as MapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -280,7 +280,7 @@ export function RegionDetailView({
                 helperText="opcional"
                 height="h-[28rem]"
                 shape="rounded"
-                placeholderIcon={Map}
+                placeholderIcon={MapIcon}
                 id="region-image-upload"
               />
             </div>
@@ -400,7 +400,7 @@ export function RegionDetailView({
               </div>
             ) : (
               <DisplayImage
-                icon={Map}
+                icon={MapIcon}
                 height="h-[28rem]"
                 width="w-full"
                 shape="rounded"
@@ -423,7 +423,7 @@ export function RegionDetailView({
 
           {parentRegion && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Map className="w-4 h-4" />
+              <MapIcon className="w-4 h-4" />
               <span>
                 {t("region-detail:fields.parent_of")}: {parentRegion.name}
               </span>
@@ -1333,7 +1333,7 @@ export function RegionDetailView({
               },
               {
                 label: t("region-detail:header.view_map"),
-                icon: Map,
+                icon: MapIcon,
                 onClick: onViewMap,
                 tooltip: t("region-detail:header.view_map"),
               },

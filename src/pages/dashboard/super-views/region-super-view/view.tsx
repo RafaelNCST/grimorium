@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Map } from "lucide-react";
+import { Map as MapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -114,7 +114,7 @@ export function RegionSuperView({
             </div>
           ) : (
             <DisplayImage
-              icon={Map}
+              icon={MapIcon}
               text={t("world:region_map.no_image")}
               height="h-[28rem]"
               width="w-full"

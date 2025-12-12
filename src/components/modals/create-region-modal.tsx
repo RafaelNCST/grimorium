@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Map } from "lucide-react";
+import { Map as MapIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -254,7 +254,7 @@ export function CreateRegionModal({
             title: editRegion
               ? t("create_region.edit_title")
               : t("create_region.title"),
-            icon: Map,
+            icon: MapIcon,
             description: t("description"),
             warning: t("create_region.warning"),
           }}
@@ -275,7 +275,7 @@ export function CreateRegionModal({
                         helperText="opcional"
                         height="h-[28rem]"
                         shape="rounded"
-                        placeholderIcon={Map}
+                        placeholderIcon={MapIcon}
                         id="region-image-upload"
                       />
                     </FormControl>

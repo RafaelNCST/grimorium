@@ -10,7 +10,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Map,
+  Map as MapIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -274,7 +274,7 @@ export function MapMarkerDetails({
             </div>
           ) : (
             <div className="aspect-video rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-              <Map className="w-12 h-12 text-muted-foreground/30" />
+              <MapIcon className="w-12 h-12 text-muted-foreground/30" />
             </div>
           )}
 

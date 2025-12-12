@@ -1,4 +1,4 @@
-import { Map, MapPin } from "lucide-react";
+import { Map as MapIcon, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
@@ -39,7 +39,7 @@ export function RegionCard({ region, onClick, parentRegion }: RegionCardProps) {
         </div>
       ) : (
         <FormImageDisplay
-          icon={Map}
+          icon={MapIcon}
           height="h-[28rem]"
           width="w-full"
           shape="rounded"

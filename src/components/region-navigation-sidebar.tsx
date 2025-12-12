@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { X, Map } from "lucide-react";
+import { X, Map as MapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntitySearchBar } from "@/components/entity-list";
@@ -50,7 +50,7 @@ export function RegionNavigationSidebar({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
-          <Map className="w-5 h-5 text-muted-foreground" />
+          <MapIcon className="w-5 h-5 text-muted-foreground" />
           <h2 className="font-semibold">{t("world:sidebar.title")}</h2>
           <span className="text-xs text-muted-foreground">
             ({regions.length})
@@ -88,7 +88,7 @@ export function RegionNavigationSidebar({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Map className="w-5 h-5 text-muted-foreground/50" />
+                <MapIcon className="w-5 h-5 text-muted-foreground/50" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -108,7 +108,7 @@ export function RegionNavigationSidebar({
         <div className="p-2">
           {filteredOtherRegions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <Map className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <MapIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>{t("empty-states:entity_search.no_region")}</p>
             </div>
           ) : (
@@ -130,7 +130,7 @@ export function RegionNavigationSidebar({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Map className="w-5 h-5 text-muted-foreground/50" />
+                      <MapIcon className="w-5 h-5 text-muted-foreground/50" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
