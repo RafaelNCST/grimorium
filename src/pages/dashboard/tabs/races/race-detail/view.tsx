@@ -167,20 +167,18 @@ export function RaceDetailView({
       {isEditing ? (
         <>
           {/* Image Upload */}
-          <div className="flex justify-center -mx-6">
-            <div className="w-full max-w-[587px] px-6">
-              <FormImageUpload
-                value={imagePreview}
-                onChange={(value) => onEditDataChange("image", value)}
-                label={t("race-detail:fields.image")}
-                helperText="opcional"
-                height="h-96"
-                shape="rounded"
-                imageFit="cover"
-                placeholderIcon={Dna}
-                id="race-image-upload"
-              />
-            </div>
+          <div className="max-w-[534px] mx-auto">
+            <FormImageUpload
+              value={imagePreview}
+              onChange={(value) => onEditDataChange("image", value)}
+              label={t("race-detail:fields.image")}
+              helperText="opcional"
+              height="h-96"
+              shape="rounded"
+              imageFit="cover"
+              placeholderIcon={Dna}
+              id="race-image-upload"
+            />
           </div>
 
           {/* Name and Scientific Name */}
@@ -279,29 +277,24 @@ export function RaceDetailView({
         // View Mode - Similar to Race Card structure
         <>
           {/* Image Display */}
-          <div className="flex justify-center -mx-6">
-            <div className="w-full max-w-[587px] px-6">
-              {race.image ? (
-                <div className="relative w-full h-80 rounded-lg overflow-hidden border">
-                  <img
-                    src={race.image}
-                    alt={race.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="relative w-full h-80 rounded-lg overflow-hidden">
-                  <FormImageDisplay
-                    icon={Dna}
-                    height="h-full"
-                    width="w-full"
-                    shape="square"
-                    className="rounded-lg"
-                  />
-                </div>
-              )}
+          {race.image ? (
+            <div className="relative w-full max-w-[534px] mx-auto h-96">
+              <img
+                src={race.image}
+                alt={race.name}
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
-          </div>
+          ) : (
+            <div className="max-w-[534px] mx-auto h-96">
+              <FormImageDisplay
+                icon={Dna}
+                height="h-full"
+                width="w-full"
+                shape="rounded"
+              />
+            </div>
+          )}
 
           {/* Race Info - Card style with fields stacked */}
           <div className="space-y-3">
