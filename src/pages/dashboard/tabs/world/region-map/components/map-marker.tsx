@@ -12,7 +12,7 @@ interface MapMarkerProps {
   showLabel?: boolean;
   isSelected?: boolean;
   isDraggable?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   onDragStart?: (e: React.DragEvent) => void;
   onDragEnd?: (e: React.DragEvent) => void;
   onMouseDown?: (e: React.MouseEvent) => void;
@@ -57,9 +57,9 @@ export function MapMarker({
   const borderRadius = 6 / zoomScale; // rounded-md equivalent
 
   // Estimate label width based on text length and font size
-  // Average character width is approximately 0.7 of the font size for most fonts (increased for safety)
+  // Average character width - using 0.6 for balanced fit
   const estimatedLabelWidth = showLabel
-    ? region.name.length * fontSize * 0.7 + labelPaddingX * 2 + borderWidth * 2
+    ? region.name.length * fontSize * 0.6 + labelPaddingX * 2 + borderWidth * 2
     : 0;
 
   const labelHeight = showLabel
@@ -67,12 +67,20 @@ export function MapMarker({
     : 0;
 
   // Selection wrapper size (includes marker and label if shown)
-  // Increased padding from 12 to 16 for more breathing room, especially at high zoom
-  const wrapperPadding = 16 / zoomScale;
+  // Adaptive padding: increase when element is small (high zoom out)
+  const isSmall = markerSize < 20; // Element is small when zoomed out
+  const basePaddingX = isSmall ? 6 : 2;
+  const basePaddingTop = isSmall ? 8 : 4;
+  const basePaddingBottom = isSmall ? 12 : 8;
+
+  const wrapperPaddingX = basePaddingX / zoomScale; // Horizontal padding
+  const wrapperPaddingTop = basePaddingTop / zoomScale; // Top padding
+  const wrapperPaddingBottom = basePaddingBottom / zoomScale; // Bottom padding
+
   const wrapperWidth =
-    Math.max(markerSize, estimatedLabelWidth) + wrapperPadding * 2;
+    Math.max(markerSize, estimatedLabelWidth) + wrapperPaddingX * 2;
   const wrapperHeight =
-    markerSize + labelSpacing + labelHeight + wrapperPadding * 2;
+    markerSize + labelSpacing + labelHeight + wrapperPaddingTop + wrapperPaddingBottom;
 
   // Handle size for resize corners
   const handleSize = 8 / zoomScale;
@@ -92,7 +100,7 @@ export function MapMarker({
         height: `${markerSize}px`,
         ...style,
       }}
-      onClick={onClick}
+      onClick={(e) => onClick?.(e)}
       onMouseDown={onMouseDown}
       draggable={false}
     >
@@ -102,7 +110,7 @@ export function MapMarker({
           className="absolute pointer-events-auto"
           style={{
             left: `${wrapperLeft}px`,
-            top: `${-wrapperPadding}px`,
+            top: `${-wrapperPaddingTop}px`,
             width: `${wrapperWidth}px`,
             height: `${wrapperHeight}px`,
           }}
@@ -115,7 +123,7 @@ export function MapMarker({
           className="absolute border-2 border-white pointer-events-none"
           style={{
             left: `${wrapperLeft}px`,
-            top: `${-wrapperPadding}px`,
+            top: `${-wrapperPaddingTop}px`,
             width: `${wrapperWidth}px`,
             height: `${wrapperHeight}px`,
           }}
@@ -169,7 +177,7 @@ export function MapMarker({
             className="absolute bg-blue-500 border border-white cursor-nwse-resize"
             style={{
               left: `${wrapperLeft - handleSize / 2}px`,
-              top: `${-wrapperPadding - handleSize / 2}px`,
+              top: `${-wrapperPaddingTop - handleSize / 2}px`,
               width: `${handleSize}px`,
               height: `${handleSize}px`,
             }}
@@ -181,7 +189,7 @@ export function MapMarker({
             className="absolute bg-blue-500 border border-white cursor-nesw-resize"
             style={{
               left: `${wrapperLeft + wrapperWidth - handleSize / 2}px`,
-              top: `${-wrapperPadding - handleSize / 2}px`,
+              top: `${-wrapperPaddingTop - handleSize / 2}px`,
               width: `${handleSize}px`,
               height: `${handleSize}px`,
             }}
@@ -193,7 +201,7 @@ export function MapMarker({
             className="absolute bg-blue-500 border border-white cursor-nesw-resize"
             style={{
               left: `${wrapperLeft - handleSize / 2}px`,
-              top: `${-wrapperPadding + wrapperHeight - handleSize / 2}px`,
+              top: `${-wrapperPaddingTop + wrapperHeight - handleSize / 2}px`,
               width: `${handleSize}px`,
               height: `${handleSize}px`,
             }}
@@ -205,7 +213,7 @@ export function MapMarker({
             className="absolute bg-blue-500 border border-white cursor-nwse-resize"
             style={{
               left: `${wrapperLeft + wrapperWidth - handleSize / 2}px`,
-              top: `${-wrapperPadding + wrapperHeight - handleSize / 2}px`,
+              top: `${-wrapperPaddingTop + wrapperHeight - handleSize / 2}px`,
               width: `${handleSize}px`,
               height: `${handleSize}px`,
             }}

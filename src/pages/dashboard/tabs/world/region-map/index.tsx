@@ -35,6 +35,7 @@ import { IRegion } from "../types/region-types";
 import { MapCanvas } from "./components/map-canvas";
 import { MapImageUploader } from "./components/map-image-uploader";
 import { MapMarkerDetails } from "./components/map-marker-details";
+import { MultipleMarkersPanel } from "./components/multiple-markers-panel";
 import { RegionChildrenList } from "./components/region-children-list";
 
 export function RegionMapPage() {
@@ -49,7 +50,7 @@ export function RegionMapPage() {
   const [mapImagePath, setMapImagePath] = useState<string | null>(null);
   const [mapId, setMapId] = useState<string | null>(null);
   const [markers, setMarkers] = useState<IRegionMapMarker[]>([]);
-  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
+  const [selectedMarkerIds, setSelectedMarkerIds] = useState<string[]>([]);
   const [selectedChildForPlacement, setSelectedChildForPlacement] = useState<
     string | null
   >(null);
@@ -83,31 +84,34 @@ export function RegionMapPage() {
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
-      // ESC key pressed - deselect child for placement or marker
+      // ESC key pressed - deselect child for placement or markers
       if (event.key === "Escape") {
         if (selectedChildForPlacement) {
           event.preventDefault();
           setSelectedChildForPlacement(null);
-        } else if (selectedMarkerId) {
+        } else if (selectedMarkerIds.length > 0) {
           event.preventDefault();
-          setSelectedMarkerId(null);
+          setSelectedMarkerIds([]);
         }
         return;
       }
 
-      // Delete key pressed with a marker selected
-      if ((event.key === "Delete" || event.key === "Del") && selectedMarkerId) {
+      // Delete key pressed with markers selected
+      if (
+        (event.key === "Delete" || event.key === "Del") &&
+        selectedMarkerIds.length > 0
+      ) {
         event.preventDefault();
 
-        const marker = markers.find((m) => m.id === selectedMarkerId);
-        if (marker) {
-          try {
-            await removeMarker(marker.id);
-            setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
-            setSelectedMarkerId(null);
-          } catch (error) {
-            console.error("Failed to remove marker:", error);
-          }
+        try {
+          // Remove all selected markers
+          await Promise.all(selectedMarkerIds.map((id) => removeMarker(id)));
+          setMarkers((prev) =>
+            prev.filter((m) => !selectedMarkerIds.includes(m.id))
+          );
+          setSelectedMarkerIds([]);
+        } catch (error) {
+          console.error("Failed to remove markers:", error);
         }
       }
     };
@@ -117,7 +121,7 @@ export function RegionMapPage() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedMarkerId, selectedChildForPlacement, markers]);
+  }, [selectedMarkerIds, selectedChildForPlacement, markers]);
 
   const loadData = async () => {
     try {
@@ -280,7 +284,7 @@ export function RegionMapPage() {
 
   const handleChildSelect = (childRegionId: string) => {
     setSelectedChildForPlacement(childRegionId);
-    setSelectedMarkerId(null); // Clear marker selection
+    setSelectedMarkerIds([]); // Clear marker selection
   };
 
   const handleDeselectChild = () => {
@@ -329,8 +333,20 @@ export function RegionMapPage() {
     }
   };
 
-  const handleMarkerClick = (marker: IRegionMapMarker) => {
-    setSelectedMarkerId(marker.id);
+  const handleMarkerClick = (marker: IRegionMapMarker, ctrlKey: boolean) => {
+    if (ctrlKey) {
+      // Ctrl+click (or Cmd+click on Mac): add to selection
+      if (selectedMarkerIds.includes(marker.id)) {
+        // Deselect if already selected
+        setSelectedMarkerIds((prev) => prev.filter((id) => id !== marker.id));
+      } else {
+        // Add to selection
+        setSelectedMarkerIds((prev) => [...prev, marker.id]);
+      }
+    } else {
+      // Normal click: select only this marker
+      setSelectedMarkerIds([marker.id]);
+    }
   };
 
   const handleMarkerDragEnd = async (
@@ -357,30 +373,39 @@ export function RegionMapPage() {
       await removeMarker(marker.id);
       setMarkers((prev) => prev.filter((m) => m.id !== marker.id));
 
-      if (selectedMarkerId === marker.id) {
-        setSelectedMarkerId(null);
+      if (selectedMarkerIds.includes(marker.id)) {
+        setSelectedMarkerIds((prev) => prev.filter((id) => id !== marker.id));
       }
     } catch (error) {
       console.error("Failed to remove marker:", error);
     }
   };
 
-  const handleRemoveSelectedMarker = async () => {
-    if (!selectedMarkerId) return;
+  const handleRemoveSelectedMarkers = async () => {
+    if (selectedMarkerIds.length === 0) return;
 
-    const marker = markers.find((m) => m.id === selectedMarkerId);
-    if (marker) {
-      await handleRemoveMarker(marker);
+    try {
+      await Promise.all(selectedMarkerIds.map((id) => removeMarker(id)));
+      setMarkers((prev) =>
+        prev.filter((m) => !selectedMarkerIds.includes(m.id))
+      );
+      setSelectedMarkerIds([]);
+    } catch (error) {
+      console.error("Failed to remove markers:", error);
     }
   };
 
   const handleColorChange = async (color: string) => {
-    if (!selectedMarkerId) return;
+    if (selectedMarkerIds.length === 0) return;
 
     try {
-      await updateMarkerColor(selectedMarkerId, color);
+      await Promise.all(
+        selectedMarkerIds.map((id) => updateMarkerColor(id, color))
+      );
       setMarkers((prev) =>
-        prev.map((m) => (m.id === selectedMarkerId ? { ...m, color } : m))
+        prev.map((m) =>
+          selectedMarkerIds.includes(m.id) ? { ...m, color } : m
+        )
       );
     } catch (error) {
       console.error("Failed to update marker color:", error);
@@ -388,12 +413,16 @@ export function RegionMapPage() {
   };
 
   const handleLabelToggle = async (showLabel: boolean) => {
-    if (!selectedMarkerId) return;
+    if (selectedMarkerIds.length === 0) return;
 
     try {
-      await updateMarkerLabelVisibility(selectedMarkerId, showLabel);
+      await Promise.all(
+        selectedMarkerIds.map((id) => updateMarkerLabelVisibility(id, showLabel))
+      );
       setMarkers((prev) =>
-        prev.map((m) => (m.id === selectedMarkerId ? { ...m, showLabel } : m))
+        prev.map((m) =>
+          selectedMarkerIds.includes(m.id) ? { ...m, showLabel } : m
+        )
       );
     } catch (error) {
       console.error("Failed to update marker label visibility:", error);
@@ -411,7 +440,10 @@ export function RegionMapPage() {
     }
   };
 
-  const selectedMarker = markers.find((m) => m.id === selectedMarkerId);
+  const selectedMarkers = markers.filter((m) =>
+    selectedMarkerIds.includes(m.id)
+  );
+  const selectedMarker = selectedMarkers.length === 1 ? selectedMarkers[0] : null;
   const selectedRegion = selectedMarker
     ? childrenRegions.find((r) => r.id === selectedMarker.childRegionId)
     : null;
@@ -484,22 +516,33 @@ export function RegionMapPage() {
       </div>
 
       {/* Right Sidebar - Marker Details - Fixed */}
-      {selectedRegion && selectedMarker && (
+      {selectedMarkerIds.length > 0 && (
         <div className="fixed top-12 right-4 z-30">
-          <MapMarkerDetails
-            region={selectedRegion}
-            markerColor={selectedMarker.color}
-            showLabel={selectedMarker.showLabel}
-            characters={characters}
-            factions={factions}
-            races={races}
-            items={items}
-            isEditMode
-            onClose={() => setSelectedMarkerId(null)}
-            onRemoveMarker={handleRemoveSelectedMarker}
-            onColorChange={handleColorChange}
-            onLabelToggle={handleLabelToggle}
-          />
+          {selectedMarkerIds.length === 1 && selectedRegion && selectedMarker ? (
+            <MapMarkerDetails
+              region={selectedRegion}
+              markerColor={selectedMarker.color}
+              showLabel={selectedMarker.showLabel}
+              characters={characters}
+              factions={factions}
+              races={races}
+              items={items}
+              isEditMode
+              onClose={() => setSelectedMarkerIds([])}
+              onRemoveMarker={handleRemoveSelectedMarkers}
+              onColorChange={handleColorChange}
+              onLabelToggle={handleLabelToggle}
+            />
+          ) : (
+            <MultipleMarkersPanel
+              count={selectedMarkerIds.length}
+              markers={selectedMarkers}
+              onClose={() => setSelectedMarkerIds([])}
+              onRemoveMarkers={handleRemoveSelectedMarkers}
+              onColorChange={handleColorChange}
+              onLabelToggle={handleLabelToggle}
+            />
+          )}
         </div>
       )}
 
@@ -511,7 +554,7 @@ export function RegionMapPage() {
             imagePath={mapImagePath}
             children={childrenRegions}
             markers={markers}
-            selectedMarkerId={selectedMarkerId}
+            selectedMarkerIds={selectedMarkerIds}
             selectedChildForPlacement={selectedChildForPlacement}
             onMarkerClick={handleMarkerClick}
             onMapClick={handleMapClick}

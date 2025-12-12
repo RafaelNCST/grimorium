@@ -20,9 +20,9 @@ interface MapCanvasProps {
   imagePath: string;
   children: IRegion[];
   markers: IRegionMapMarker[];
-  selectedMarkerId?: string | null;
+  selectedMarkerIds?: string[];
   selectedChildForPlacement?: string | null;
-  onMarkerClick?: (marker: IRegionMapMarker) => void;
+  onMarkerClick?: (marker: IRegionMapMarker, ctrlKey: boolean) => void;
   onMapClick?: (x: number, y: number) => void;
   onMarkerDragEnd?: (markerId: string, x: number, y: number) => void;
   onMarkerScaleChange?: (markerId: string, scale: number) => void;
@@ -32,7 +32,7 @@ export function MapCanvas({
   imagePath,
   children,
   markers,
-  selectedMarkerId,
+  selectedMarkerIds = [],
   selectedChildForPlacement,
   onMarkerClick,
   onMapClick,
@@ -291,7 +291,8 @@ export function MapCanvas({
         // Was a click, trigger marker click
         const marker = markers.find((m) => m.id === draggingMarkerId);
         if (marker) {
-          onMarkerClick?.(marker);
+          // Pass ctrlKey or metaKey for multi-selection
+          onMarkerClick?.(marker, e.ctrlKey || e.metaKey);
         }
       }
 
@@ -590,7 +591,7 @@ export function MapCanvas({
                     const y = tempPos ? tempPos.y : marker.positionY;
                     const isDragging = draggingMarkerId === marker.id;
                     const isResizing = resizingMarkerId === marker.id;
-                    const isSelected = selectedMarkerId === marker.id;
+                    const isSelected = selectedMarkerIds.includes(marker.id);
 
                     return (
                       <MapMarker
@@ -604,9 +605,6 @@ export function MapCanvas({
                         isDraggable
                         markerScale={marker.scale || 1.0}
                         zoomScale={currentScale}
-                        onClick={() =>
-                          !isDragging && !isResizing && onMarkerClick?.(marker)
-                        }
                         onMouseDown={(e) => handleMarkerMouseDown(e, marker.id)}
                         style={{
                           cursor: isDragging
