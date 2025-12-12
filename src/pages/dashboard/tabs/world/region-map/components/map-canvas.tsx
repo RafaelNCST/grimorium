@@ -40,6 +40,7 @@ export function MapCanvas({
   onMarkerScaleChange,
 }: MapCanvasProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isFullyReady, setIsFullyReady] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
     height: 0,
@@ -87,6 +88,10 @@ export function MapCanvas({
 
     const loadImage = async () => {
       try {
+        // Reset states when loading new image
+        setImageLoaded(false);
+        setIsFullyReady(false);
+
         // Read file as binary using Tauri plugin-fs
         const fileData = await readFile(imagePath, {
           baseDir: BaseDirectory.AppData,
@@ -102,7 +107,6 @@ export function MapCanvas({
         const img = new Image();
         img.onload = () => {
           setImageDimensions({ width: img.width, height: img.height });
-          setImageLoaded(true);
         };
         img.onerror = (e) => {
           console.error("Failed to load image from blob:", e);
@@ -130,6 +134,10 @@ export function MapCanvas({
       setTimeout(() => {
         // Always center, but use saved scale
         transformRef.current?.centerView(savedScale, 0);
+        // After positioning, mark as fully ready
+        setTimeout(() => {
+          setIsFullyReady(true);
+        }, 50);
       }, 100);
     }
   }, [imageLoaded, savedScale]);
@@ -550,7 +558,7 @@ export function MapCanvas({
                   msUserSelect: "none",
                 }}
               >
-                {/* Map Image */}
+                {/* Map Image - Hidden until fully ready */}
                 <img
                   ref={imageRef}
                   src={imageUrl}
@@ -566,11 +574,13 @@ export function MapCanvas({
                     msUserSelect: "none",
                     WebkitUserDrag: "none",
                     userDrag: "none",
+                    opacity: isFullyReady ? 1 : 0,
+                    transition: "opacity 0.2s ease-in-out",
                   }}
                 />
 
-                {/* Markers */}
-                {imageLoaded &&
+                {/* Markers - Only show when fully ready */}
+                {isFullyReady &&
                   markers.map((marker) => {
                     const region = getRegionById(marker.childRegionId);
                     if (!region) return null;
@@ -617,8 +627,8 @@ export function MapCanvas({
       </TransformWrapper>
 
       {/* Loading State */}
-      {!imageLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background">
+      {!isFullyReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background z-40">
           <div className="text-center space-y-2">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-sm text-muted-foreground">Carregando mapa...</p>

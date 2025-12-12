@@ -97,7 +97,9 @@
       "Bash(else)",
       "Bash(fi)",
       "Bash(powershell.exe -Command \"Remove-Item ''C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\routes\\dashboard\\`$dashboardId\\tabs\\organization\\`$orgId.tsx''\")",
-      "Bash(1)"
+      "Bash(1)",
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | Format-Table LocalPort, State, OwningProcess -AutoSize\")",
+      "Bash(powershell.exe -Command \"Stop-Process -Force -Id 31248\")"
     ],
     "deny": [
       "Bash(git push --force:*)",
