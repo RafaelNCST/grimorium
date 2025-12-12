@@ -27,7 +27,6 @@ import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
 
 import { DataSourceSelector } from "./shared/data-source-selector";
-import { EntitySelect } from "./shared/entity-select";
 
 interface MultiDropdownBlockProps {
   block: IPowerBlock;
@@ -154,7 +153,7 @@ export function MultiDropdownBlock({
       case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
       default:
-        return <>{children}</>;
+        return children;
     }
   };
 

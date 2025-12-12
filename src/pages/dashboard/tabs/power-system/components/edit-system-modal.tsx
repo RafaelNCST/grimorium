@@ -88,7 +88,7 @@ export function EditSystemModal({
     }
   };
 
-  const handleRemoveImage = () => {
+  const _handleRemoveImage = () => {
     form.setValue("iconImage", "");
   };
 

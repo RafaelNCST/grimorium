@@ -109,7 +109,7 @@ export function NavigationSidebar({
   const {
     getExpandedGroups,
     setExpandedGroups: saveExpandedGroups,
-    toggleGroup: toggleGroupInStore,
+    toggleGroup: _toggleGroupInStore,
   } = usePowerSystemUIStore();
 
   // Initialize expanded groups from store

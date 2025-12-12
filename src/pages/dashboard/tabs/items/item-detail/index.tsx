@@ -61,7 +61,7 @@ export default function ItemDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [item, setItem] = useState<IItem>(emptyItem);
   const [editData, setEditData] = useState<IItem>(emptyItem);
-  const [imagePreview, setImagePreview] = useState("");
+  const [_imagePreview, _setImagePreview] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
     useState(false);

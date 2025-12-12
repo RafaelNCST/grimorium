@@ -157,7 +157,7 @@ export function OverviewTab({ book, bookId, isCustomizing }: PropsOverviewTab) {
   const fetchOverview = useOverviewStore((state) => state.fetchOverview);
   const setGoals = useOverviewStore((state) => state.setGoals);
   const setStickyNotes = useOverviewStore((state) => state.setStickyNotes);
-  const setChecklistItems = useOverviewStore(
+  const _setChecklistItems = useOverviewStore(
     (state) => state.setChecklistItems
   );
   const setSections = useOverviewStore((state) => state.setSections);

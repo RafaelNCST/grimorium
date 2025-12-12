@@ -96,7 +96,7 @@ export function AllAnnotationsSidebar({
                       <div className="flex items-start gap-2 group">
                         <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
                         <p className="text-sm font-medium italic flex-1 group-hover:text-primary transition-colors">
-                          "{annotation.text}"
+                          &quot;{annotation.text}&quot;
                         </p>
                       </div>
                     </div>

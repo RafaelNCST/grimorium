@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  StyleSheet,
-  pdf,
-  Font,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, StyleSheet, pdf } from "@react-pdf/renderer";
 
 import type {
   ExportConfig,
@@ -37,7 +30,7 @@ const getFontFamily = (fontValue: string): string => {
 };
 
 const createStyles = (config: ExportConfig) => {
-  const format = PAGE_FORMATS[config.pageFormat];
+  const _format = PAGE_FORMATS[config.pageFormat];
   const margins = MARGIN_PRESETS[config.margins];
   const titleFontFamily = getFontFamily(config.titleFont);
 
@@ -84,6 +77,7 @@ interface ChapterPDFProps {
   config: ExportConfig;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 const ChapterPDF = ({
   chapterNumber,
   chapterTitle,
@@ -133,7 +127,7 @@ export async function generateChapterPDF(
   chapterTitle: string,
   content: string,
   config: ExportConfig,
-  pages: PageContent[]
+  _pages: PageContent[]
 ): Promise<Blob> {
   const doc = (
     <ChapterPDF

@@ -77,9 +77,9 @@ export function FactionDetail() {
   const [versions, setVersions] = useState<IFactionVersion[]>([]);
   const [selectedVersion, setSelectedVersion] =
     useState<IFactionVersion | null>(null);
-  const [isCreatingVersion, setIsCreatingVersion] = useState(false);
-  const [isDeletingVersion, setIsDeletingVersion] = useState(false);
-  const [versionToDelete, setVersionToDelete] = useState<string | null>(null);
+  const [_isCreatingVersion, _setIsCreatingVersion] = useState(false);
+  const [_isDeletingVersion, _setIsDeletingVersion] = useState(false);
+  const [_versionToDelete, _setVersionToDelete] = useState<string | null>(null);
   const [fieldVisibility, setFieldVisibility] = useState<
     Record<string, boolean>
   >({
@@ -393,22 +393,22 @@ export function FactionDetail() {
     [versions, selectedVersion]
   );
 
-  const handleOpenCreateVersionDialog = useCallback(() => {
-    setIsCreatingVersion(true);
+  const _handleOpenCreateVersionDialog = useCallback(() => {
+    _setIsCreatingVersion(true);
   }, []);
 
-  const handleCloseCreateVersionDialog = useCallback(() => {
-    setIsCreatingVersion(false);
+  const _handleCloseCreateVersionDialog = useCallback(() => {
+    _setIsCreatingVersion(false);
   }, []);
 
-  const handleConfirmDeleteVersion = useCallback((versionId: string) => {
-    setVersionToDelete(versionId);
-    setIsDeletingVersion(true);
+  const _handleConfirmDeleteVersion = useCallback((versionId: string) => {
+    _setVersionToDelete(versionId);
+    _setIsDeletingVersion(true);
   }, []);
 
-  const handleCancelDeleteVersion = useCallback(() => {
-    setVersionToDelete(null);
-    setIsDeletingVersion(false);
+  const _handleCancelDeleteVersion = useCallback(() => {
+    _setVersionToDelete(null);
+    _setIsDeletingVersion(false);
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -572,7 +572,7 @@ export function FactionDetail() {
     [errors]
   );
 
-  const handleImageChange = useCallback((image: string) => {
+  const _handleImageChange = useCallback((image: string) => {
     setImagePreview(image);
     setEditData((prev) => ({ ...prev, image }));
   }, []);

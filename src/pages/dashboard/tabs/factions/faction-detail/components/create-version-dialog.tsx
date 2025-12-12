@@ -33,7 +33,7 @@ export function CreateVersionDialog({
   open,
   onClose,
   onConfirm,
-  baseFaction,
+  baseFaction: _baseFaction,
   bookId,
 }: CreateVersionDialogProps) {
   const { t } = useTranslation("faction-detail");

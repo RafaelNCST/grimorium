@@ -3,7 +3,6 @@ import { useState } from "react";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import {
-  FileText,
   Clock,
   ChevronDown,
   ChevronUp,
@@ -127,7 +126,7 @@ export function ChapterCard({
   const handleExportWord = async (
     config: ExportConfig,
     content: string,
-    pages: PageContent[]
+    _pages: PageContent[]
   ) => {
     try {
       // Generate Word blob

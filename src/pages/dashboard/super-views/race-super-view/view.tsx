@@ -32,7 +32,7 @@ interface RaceSuperViewProps {
 }
 
 // Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
+const _EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
   <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
     <p>{t("race-detail:empty_states.no_data")}</p>
   </div>
@@ -40,8 +40,8 @@ const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
 
 export function RaceSuperView({
   race,
-  displayData,
-  bookId,
+  displayData: _displayData,
+  bookId: _bookId,
   onBack,
 }: RaceSuperViewProps) {
   const { t } = useTranslation(["race-detail", "create-race"] as any);

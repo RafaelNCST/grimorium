@@ -100,11 +100,11 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
               {t("benefits.title")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {benefits.map((benefit, index) => {
+              {benefits.map((benefit) => {
                 const Icon = benefit.icon;
                 return (
                   <div
-                    key={`${benefit.titleKey}-${index}`}
+                    key={benefit.titleKey}
                     className="flex gap-3 p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex-shrink-0">

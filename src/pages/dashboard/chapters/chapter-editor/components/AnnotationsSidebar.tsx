@@ -95,7 +95,7 @@ export function AnnotationsSidebar({
             className="text-sm font-medium italic text-left w-full hover:text-primary transition-colors cursor-pointer flex items-start gap-2 group"
           >
             <MapPin className="w-4 h-4 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
-            <span className="flex-1">"{annotation.text}"</span>
+            <span className="flex-1">&quot;{annotation.text}&quot;</span>
           </button>
         </div>
 

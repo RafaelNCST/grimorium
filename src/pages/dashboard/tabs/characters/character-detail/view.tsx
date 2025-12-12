@@ -7,11 +7,9 @@ import {
   Heart,
   Image,
   NotebookPen,
-  Shield,
   Trash2,
   User,
   Users,
-  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -42,7 +40,6 @@ import { type IGender as IGenderModal } from "@/components/modals/create-charact
 import { PHYSICAL_TYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/physical-types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -239,7 +236,7 @@ export function CharacterDetailView({
   roles,
   genders,
   currentRole,
-  currentAlignment,
+  currentAlignment: _currentAlignment,
   currentGender,
   fieldVisibility,
   advancedSectionOpen,

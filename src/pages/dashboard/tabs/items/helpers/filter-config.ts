@@ -4,7 +4,6 @@ import {
   Sparkles,
   Gem,
   Apple,
-  Box,
   Crown,
   HelpCircle,
   Wrench,

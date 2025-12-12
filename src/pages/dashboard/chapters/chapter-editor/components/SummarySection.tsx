@@ -3,12 +3,8 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import {
-  FormEntityMultiSelectAuto,
-  type EntityOption,
-} from "@/components/forms/FormEntityMultiSelectAuto";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import { FormTextarea } from "@/components/forms/FormTextarea";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";

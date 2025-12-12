@@ -1,5 +1,4 @@
 import { getDB } from "@/lib/db";
-import type { ChapterStatus } from "@/stores/chapters-store";
 
 export interface EntityChapterMetrics {
   firstChapter: {

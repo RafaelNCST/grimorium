@@ -2,7 +2,6 @@ import { Plus, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
-  Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,

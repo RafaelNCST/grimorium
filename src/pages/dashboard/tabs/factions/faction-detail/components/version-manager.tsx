@@ -36,7 +36,7 @@ export function VersionManager({
   currentVersion,
   onVersionChange,
   onVersionCreate,
-  isEditMode,
+  isEditMode: _isEditMode,
   mainFactionData,
   bookId,
   translationNamespace = "faction-detail",

@@ -563,7 +563,7 @@ export async function updateRegionVersionData(
  */
 export async function reorderRegions(
   regionIds: string[],
-  parentId: string | null
+  _parentId: string | null
 ): Promise<void> {
   const db = await getDB();
   const now = Date.now();

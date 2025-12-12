@@ -3,12 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "@tanstack/react-router";
 
 import { useGalleryStore } from "@/stores/gallery-store";
-import {
-  IGalleryItem,
-  IGalleryLink,
-  GallerySortOrder,
-  EntityType,
-} from "@/types/gallery-types";
+import { IGalleryItem, IGalleryLink, EntityType } from "@/types/gallery-types";
 
 import { GalleryView } from "./view";
 

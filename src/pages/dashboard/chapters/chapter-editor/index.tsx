@@ -156,7 +156,7 @@ export function ChapterEditor() {
     const selection = window.getSelection();
     if (selection && selection.toString().trim() && selection.rangeCount > 0) {
       const text = selection.toString().trim();
-      const range = selection.getRangeAt(0);
+      const _range = selection.getRangeAt(0);
 
       // Calculate text offsets
       const containerText = editorRef.current?.textContent || "";
@@ -346,10 +346,10 @@ export function ChapterEditor() {
     // For React rendering with proper tooltips
     let elements: (string | JSX.Element)[] = [content];
 
-    sortedAnnotations.forEach((annotation, index) => {
+    sortedAnnotations.forEach((annotation, _index) => {
       const newElements: (string | JSX.Element)[] = [];
 
-      elements.forEach((element, elemIndex) => {
+      elements.forEach((element, _elemIndex) => {
         if (typeof element === "string") {
           const beforeText = element.substring(0, annotation.startOffset);
           const annotatedText = element.substring(

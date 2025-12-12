@@ -18,7 +18,6 @@ import type { IPlotArc } from "@/types/plot-types";
 
 import { AllAnnotationsSidebar } from "./components/AllAnnotationsSidebar";
 import { AnnotationsSidebar } from "./components/AnnotationsSidebar";
-import { CreateAnnotationPopup } from "./components/CreateAnnotationPopup";
 import { EditorHeader } from "./components/EditorHeader";
 import { EditorSettingsModal } from "./components/EditorSettingsModal";
 import { FormattingToolbar } from "./components/FormattingToolbar";
@@ -29,14 +28,8 @@ import { SummarySection } from "./components/SummarySection";
 import { TextEditor, type TextEditorRef } from "./components/TextEditor";
 import { useChapterMetrics } from "./hooks/useChapterMetrics";
 import { useSessionTimer } from "./hooks/useSessionTimer";
-import { DEFAULT_EDITOR_SETTINGS } from "./types/editor-settings";
 
-import type {
-  ChapterData,
-  Annotation,
-  AnnotationNote,
-  EntityMention,
-} from "./types";
+import type { ChapterData, Annotation, AnnotationNote } from "./types";
 import type { EditorSettings } from "./types/editor-settings";
 
 function ChapterEditorContent() {
@@ -115,7 +108,7 @@ function ChapterEditorContent() {
   const [showStatsDetailModal, setShowStatsDetailModal] = useState(false);
 
   // Session timer hook (GLOBAL - não reseta ao trocar de capítulo)
-  const { sessionMinutes, sessionId } = useSessionTimer();
+  const { sessionMinutes, sessionId: _sessionId } = useSessionTimer();
 
   // Calculate chapter metrics
   const metrics = useChapterMetrics({
@@ -343,7 +336,7 @@ function ChapterEditorContent() {
 
   // Save on window blur/beforeunload (protection against data loss)
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    const handleBeforeUnload = (_e: BeforeUnloadEvent) => {
       // Always save immediately before unload (synchronous, no delay)
       handleImmediateSave();
     };
@@ -497,7 +490,7 @@ function ChapterEditorContent() {
   };
 
   // Cancel text selection
-  const handleCancelSelection = () => {
+  const _handleCancelSelection = () => {
     setSelectedText("");
     setSelectedRange(null);
   };
@@ -633,13 +626,13 @@ function ChapterEditorContent() {
 
   // Calculate stats
   const trimmedContent = chapter.content.trim();
-  const wordCount = trimmedContent
+  const _wordCount = trimmedContent
     .split(/\s+/)
     .filter((word) => word.length > 0).length;
 
-  const characterCount = trimmedContent.replace(/\s+/g, "").length; // Without spaces
+  const _characterCount = trimmedContent.replace(/\s+/g, "").length; // Without spaces
   // With spaces - counts ALL spaces, even if only spaces are typed. Only ignores the initial newline from contentEditable
-  const characterCountWithSpaces =
+  const _characterCountWithSpaces =
     chapter.content === "" || chapter.content === "\n"
       ? 0
       : chapter.content.length;

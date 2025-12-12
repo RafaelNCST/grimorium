@@ -109,7 +109,7 @@ async function ensureMapsDirectory(): Promise<void> {
 /**
  * Sanitize filename by removing special characters and spaces
  */
-function sanitizeFileName(fileName: string): string {
+function _sanitizeFileName(fileName: string): string {
   // Extract extension
   const lastDot = fileName.lastIndexOf(".");
   const name = lastDot > 0 ? fileName.substring(0, lastDot) : fileName;

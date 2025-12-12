@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import { getNotesByBookId } from "@/lib/db/notes.service";
 import { AnnotationLink } from "@/types/annotations";
 
 import { NotesView } from "./view";

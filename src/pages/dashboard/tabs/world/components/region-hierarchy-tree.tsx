@@ -176,6 +176,7 @@ const RegionItem = memo(
     );
   }
 );
+RegionItem.displayName = "RegionItem";
 
 interface RegionNodeProps {
   region: IRegionWithChildren;

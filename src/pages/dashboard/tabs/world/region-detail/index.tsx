@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 
 import { useParams, useNavigate, useSearch } from "@tanstack/react-router";
-import { Map } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -76,7 +75,7 @@ export function RegionDetail() {
   const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, _setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("regionDetailAdvancedSectionOpen");
@@ -623,7 +622,7 @@ export function RegionDetail() {
       } catch (error) {
         console.error("Error loading region:", error);
       } finally {
-        setIsLoading(false);
+        _setIsLoading(false);
       }
     };
 

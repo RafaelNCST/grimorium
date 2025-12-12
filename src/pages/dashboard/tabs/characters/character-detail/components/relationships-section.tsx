@@ -291,7 +291,7 @@ export function RelationshipsSection({
 
             if (!character || !typeConfig) return null;
 
-            const TypeIcon = typeConfig.icon;
+            const _TypeIcon = typeConfig.icon;
 
             return (
               <Card

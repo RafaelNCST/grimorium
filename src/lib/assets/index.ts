@@ -11,7 +11,7 @@
  */
 export async function saveImage(
   base64: string,
-  filename?: string
+  _filename?: string
 ): Promise<string> {
   // For now, just return the base64 string
   // In future, could save to app data directory using Tauri's fs API
@@ -33,7 +33,7 @@ export async function loadImage(path: string): Promise<string> {
  * Delete an image from storage
  * @param path File path or identifier
  */
-export async function deleteImage(path: string): Promise<void> {
+export async function deleteImage(_path: string): Promise<void> {
   // For now, nothing to do since we're using base64
   // In future, could delete from file system
 }

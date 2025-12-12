@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const HoverCard = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Root>
->(({ openDelay = 500, closeDelay = 0, ...props }, ref) => (
+>(({ openDelay = 500, closeDelay = 0, ...props }, _ref) => (
   <HoverCardPrimitive.Root
     openDelay={openDelay}
     closeDelay={closeDelay}

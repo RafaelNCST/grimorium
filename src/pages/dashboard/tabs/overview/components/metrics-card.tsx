@@ -266,9 +266,9 @@ export function MetricsCard({
                   : ""
               }`}
             >
-              {row1Metrics.map((metric, index) => (
+              {row1Metrics.map((metric) => (
                 <MetricItem
-                  key={`${metric.label}-${index}`}
+                  key={metric.label}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}
@@ -332,9 +332,9 @@ export function MetricsCard({
                   : ""
               }`}
             >
-              {row2Metrics.map((metric, index) => (
+              {row2Metrics.map((metric) => (
                 <MetricItem
-                  key={`${metric.label}-${index}`}
+                  key={metric.label}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}
@@ -398,9 +398,9 @@ export function MetricsCard({
                   : ""
               }`}
             >
-              {row3Metrics.map((metric, index) => (
+              {row3Metrics.map((metric) => (
                 <MetricItem
-                  key={`${metric.label}-${index}`}
+                  key={metric.label}
                   icon={metric.icon}
                   label={metric.label}
                   value={metric.value}

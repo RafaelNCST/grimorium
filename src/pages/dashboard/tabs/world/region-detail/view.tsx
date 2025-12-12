@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import {
-  Map,
-  AlertCircle,
-  Trash2,
-  Clock,
-  NotebookPen,
-  Image,
-} from "lucide-react";
+import { AlertCircle, Trash2, Clock, NotebookPen, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -17,7 +10,6 @@ import {
   type IFieldVisibility,
   type ISectionVisibility,
   FieldWithVisibilityToggle,
-  hasVisibleFields,
   isSectionVisible,
 } from "@/components/detail-page";
 import {
@@ -36,10 +28,7 @@ import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateRegionModal } from "@/components/modals/create-region-modal";
 import { SeasonPicker } from "@/components/modals/create-region-modal/components/season-picker";
 import { REGION_SEASONS } from "@/components/modals/create-region-modal/constants/seasons";
-import {
-  DeleteEntityModal,
-  type IEntityVersion,
-} from "@/components/modals/delete-entity-modal";
+import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
 import { RegionNavigationSidebar } from "@/components/region-navigation-sidebar";
 import { Button } from "@/components/ui/button";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
@@ -147,7 +136,7 @@ export function RegionDetailView({
   showDeleteModal,
   isNavigationSidebarOpen,
   imagePreview,
-  fileInputRef,
+  fileInputRef: _fileInputRef,
   allRegions,
   advancedSectionOpen,
   timelineSectionOpen,
@@ -179,12 +168,12 @@ export function RegionDetailView({
   onConfirmDelete,
   onVersionChange,
   onVersionCreate,
-  onVersionDelete,
-  onVersionUpdate,
-  onImageFileChange,
+  onVersionDelete: _onVersionDelete,
+  onVersionUpdate: _onVersionUpdate,
+  onImageFileChange: _onImageFileChange,
   onEditDataChange,
   onAdvancedSectionToggle,
-  onTimelineSectionToggle,
+  onTimelineSectionToggle: _onTimelineSectionToggle,
 }: RegionDetailViewProps) {
   const { t } = useTranslation([
     "region-detail",

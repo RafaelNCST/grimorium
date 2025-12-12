@@ -11,20 +11,10 @@ import {
 } from "@/components/displays";
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
-import {
-  ITEM_CATEGORIES_CONSTANT,
-  type IItemCategory,
-} from "@/components/modals/create-item-modal/constants/item-categories";
-import {
-  ITEM_STATUSES_CONSTANT,
-  type IItemStatus,
-} from "@/components/modals/create-item-modal/constants/item-statuses";
-import {
-  STORY_RARITIES_CONSTANT,
-  type IStoryRarity,
-} from "@/components/modals/create-item-modal/constants/story-rarities";
+import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
+import { STORY_RARITIES_CONSTANT } from "@/components/modals/create-item-modal/constants/story-rarities";
 import { Badge } from "@/components/ui/badge";
-import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Separator } from "@/components/ui/separator";
 import type { IItem } from "@/lib/db/items.service";
 
@@ -36,7 +26,7 @@ interface ItemSuperViewProps {
 }
 
 // Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
+const _EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
   <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
     <p>{t("item-detail:empty_states.no_data")}</p>
   </div>
@@ -44,8 +34,8 @@ const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
 
 export function ItemSuperView({
   item,
-  displayData,
-  bookId,
+  displayData: _displayData,
+  bookId: _bookId,
   onBack,
 }: ItemSuperViewProps) {
   const { t } = useTranslation(["item-detail", "create-item"] as any);

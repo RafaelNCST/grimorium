@@ -96,7 +96,8 @@
       "Bash(then)",
       "Bash(else)",
       "Bash(fi)",
-      "Bash(powershell.exe -Command \"Remove-Item ''C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\routes\\dashboard\\`$dashboardId\\tabs\\organization\\`$orgId.tsx''\")"
+      "Bash(powershell.exe -Command \"Remove-Item ''C:\\Users\\rafae\\Desktop\\dev\\grimorium\\src\\routes\\dashboard\\`$dashboardId\\tabs\\organization\\`$orgId.tsx''\")",
+      "Bash(1)"
     ],
     "deny": [
       "Bash(git push --force:*)",

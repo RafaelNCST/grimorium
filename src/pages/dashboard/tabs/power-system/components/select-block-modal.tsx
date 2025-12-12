@@ -1,7 +1,6 @@
 import {
   Heading,
   AlignLeft,
-  AlertTriangle,
   List,
   ListOrdered,
   Tag,

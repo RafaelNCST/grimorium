@@ -192,7 +192,7 @@ export function useTextSearch({
     if (results.length === 0 || !replaceTerm) return null;
 
     let newContent = content;
-    const offset = 0;
+    const _offset = 0;
 
     // Replace from end to start to maintain correct offsets
     const sortedResults = [...results].sort((a, b) => b.start - a.start);

@@ -27,9 +27,9 @@ export function SortableTab({
   tab,
   isCustomizing,
   onToggleVisibility,
-  isFirst = false,
-  isLast = false,
-  isDragging: isDraggingProp = false,
+  isFirst: _isFirst = false,
+  isLast: _isLast = false,
+  isDragging: _isDraggingProp = false,
 }: PropsSortableTab) {
   const { t } = useTranslation("tooltips");
   const { attributes, listeners, setNodeRef, isDragging, transform } =

@@ -90,7 +90,7 @@ export function DialogueFormatSettings({
     onOpenChange(false);
   };
 
-  const handleCancel = () => {
+  const _handleCancel = () => {
     setLocalFormats(formats); // Reset to original
     onOpenChange(false);
   };

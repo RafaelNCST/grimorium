@@ -63,10 +63,10 @@ export function PowerSystemView({
   onOpenCreateSystemModal,
   onCloseCreateSystemModal,
   onCloseEditSystemModal,
-  onOpenDeleteSystemModal,
+  onOpenDeleteSystemModal: _onOpenDeleteSystemModal,
   onCloseDeleteSystemModal,
 }: PowerSystemViewProps) {
-  const { t } = useTranslation("power-system");
+  const _t = useTranslation("power-system").t;
 
   return (
     <>

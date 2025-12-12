@@ -33,7 +33,7 @@ export function PowerInstanceView({
   bookId,
   onBack,
 }: PowerInstanceViewProps) {
-  const { t } = useTranslation("power-system");
+  const _t = useTranslation("power-system").t;
   const [link, setLink] = useState<IPowerCharacterLink | null>(null);
   const [page, setPage] = useState<IPowerPage | null>(null);
   const [sections, setSections] = useState<IPowerSection[]>([]);

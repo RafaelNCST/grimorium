@@ -4,7 +4,6 @@ import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import { getRaceById } from "@/lib/db/races.service";
-import type { IRaceVersion } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { Route } from "@/routes/dashboard/$dashboardId/super-views/race/$raceId";
 

@@ -42,7 +42,7 @@ export function useFormatState(): FormatState {
         }
 
         // Check if we're inside a contentEditable element
-        const range = selection.getRangeAt(0);
+        const _range = selection.getRangeAt(0);
         const { anchorNode } = selection;
 
         if (!anchorNode) {
@@ -99,7 +99,6 @@ export function useFormatState(): FormatState {
         });
       } catch (error) {
         // Ignore errors (can happen in some edge cases)
-        console.debug("Error checking format state:", error);
       }
     };
 

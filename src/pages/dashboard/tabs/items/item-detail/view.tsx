@@ -130,14 +130,14 @@ export const ItemDetailView = React.memo(
     allItems,
     currentCategory,
     currentStatus,
-    currentRarity,
+    currentRarity: _currentRarity,
     hasChanges,
-    hasRequiredFieldsEmpty,
+    hasRequiredFieldsEmpty: _hasRequiredFieldsEmpty,
     missingFields,
     errors,
     fieldVisibility,
     advancedSectionOpen,
-    openSections,
+    openSections: _openSections,
     customCategoryError,
     isValid,
     onBack,
@@ -158,7 +158,7 @@ export const ItemDetailView = React.memo(
     validateField,
     onFieldVisibilityToggle,
     onAdvancedSectionToggle,
-    toggleSection,
+    toggleSection: _toggleSection,
   }: ItemDetailViewProps) => {
     const { t } = useTranslation(["item-detail", "create-item"]);
 
@@ -963,3 +963,4 @@ export const ItemDetailView = React.memo(
     );
   }
 );
+ItemDetailView.displayName = "ItemDetailView";

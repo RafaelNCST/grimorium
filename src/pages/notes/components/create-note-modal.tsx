@@ -239,7 +239,7 @@ export function CreateNoteModal({
     setContent(newContent);
   }, []);
 
-  const handleColorChange = useCallback((newColor: NoteColor) => {
+  const _handleColorChange = useCallback((newColor: NoteColor) => {
     setColor(newColor);
   }, []);
 
@@ -408,8 +408,8 @@ export function CreateNoteModal({
             <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-0">
               {ENTITY_TABS.map((tab, index) => {
                 const Icon = tab.icon;
-                const total = entityCounts[tab.type];
-                const selected = selectedCounts[tab.type];
+                const _total = entityCounts[tab.type];
+                const _selected = selectedCounts[tab.type];
                 const isFirst = index === 0;
                 const isLast = index === ENTITY_TABS.length - 1;
 

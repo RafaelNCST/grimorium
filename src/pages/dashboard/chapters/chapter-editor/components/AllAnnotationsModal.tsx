@@ -73,7 +73,7 @@ export function AllAnnotationsModal({
                         {t("annotations.selected_text")}:
                       </p>
                       <p className="font-medium italic bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded">
-                        "{annotation.text}"
+                        &quot;{annotation.text}&quot;
                       </p>
                     </div>
 

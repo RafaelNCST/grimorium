@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -89,7 +88,7 @@ export default function FileEditor() {
     });
   };
 
-  const formatText = (text: string) =>
+  const _formatText = (text: string) =>
     // No longer needed - content is already in HTML format for rich text editor
     text;
   if (!file) {

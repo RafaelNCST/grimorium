@@ -1,7 +1,6 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
@@ -39,7 +38,7 @@ const FamilyFieldOptimized = React.memo(
     family,
     currentCharacterId,
     bookId,
-    label,
+    label: _label,
     placeholder,
     noSelectionText,
     onChange,
@@ -152,6 +151,7 @@ const FamilyFieldOptimized = React.memo(
     return true;
   }
 );
+FamilyFieldOptimized.displayName = "FamilyFieldOptimized";
 
 interface FamilySectionProps {
   family: ICharacterFamily;
@@ -178,7 +178,7 @@ export const FamilySection = React.memo(
     const { t } = useTranslation("character-detail");
 
     // Check if family has any members
-    const hasFamilyMembers = useMemo(() => {
+    const _hasFamilyMembers = useMemo(() => {
       if (!family) return false;
       return (
         (family.grandparents && family.grandparents.length > 0) ||
@@ -386,3 +386,4 @@ export const FamilySection = React.memo(
     );
   }
 );
+FamilySection.displayName = "FamilySection";

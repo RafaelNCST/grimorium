@@ -22,7 +22,7 @@ export function HomePage() {
     setSearchTerm,
     addBook,
     books,
-    setBooks,
+    setBooks: _setBooks,
   } = useBookStore();
   const { dashboard } = useAppSettingsStore();
 

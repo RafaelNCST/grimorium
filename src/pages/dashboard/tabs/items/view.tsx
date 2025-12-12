@@ -3,7 +3,7 @@ import { memo, useMemo } from "react";
 import { Plus, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { EntityListLayout, EntityCardList } from "@/components/layouts";
+import { EntityListLayout } from "@/components/layouts";
 import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks/use-item-validation";
 import { CreateItemModal } from "@/components/modals/create-item-modal/index";
 

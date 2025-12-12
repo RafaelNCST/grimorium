@@ -7,7 +7,6 @@ import { useEntityFilters } from "@/hooks/use-entity-filters";
 import { createRace, getRacesByBookId } from "@/lib/db/races.service";
 import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
-import { createDomainFilterRows } from "./helpers/domain-filter-config";
 import { IRace, DomainType } from "./types/race-types";
 import { SpeciesView } from "./view";
 

@@ -111,7 +111,12 @@ interface SystemCardProps {
   onEdit: () => void;
 }
 
-function SystemCard({ system, isEditMode, onSelect, onEdit }: SystemCardProps) {
+function SystemCard({
+  system,
+  isEditMode: _isEditMode,
+  onSelect,
+  onEdit,
+}: SystemCardProps) {
   const { t } = useTranslation("power-system");
 
   return (

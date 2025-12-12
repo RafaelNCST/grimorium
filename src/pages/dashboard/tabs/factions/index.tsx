@@ -28,7 +28,7 @@ export function FactionsTab({ bookId }: PropsFactionsTab) {
   const factions = useFactionsStore(
     (state) => state.cache[bookId]?.factions ?? EMPTY_ARRAY
   );
-  const isLoading = useFactionsStore(
+  const _isLoading = useFactionsStore(
     (state) => state.cache[bookId]?.isLoading ?? false
   );
 

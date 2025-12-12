@@ -67,12 +67,12 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
       settings,
       onUndo: externalOnUndo,
       onRedo: externalOnRedo,
-      canUndo: externalCanUndo,
-      canRedo: externalCanRedo,
+      canUndo: _externalCanUndo,
+      canRedo: _externalCanRedo,
     },
     ref
   ) => {
-    const navigate = useNavigate();
+    const _navigate = useNavigate();
     const editorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [selectedSearchText, setSelectedSearchText] = useState("");
@@ -426,7 +426,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
               selection?.removeAllRanges();
               selection?.addRange(range);
             }
-          } catch (e) {
+          } catch (_e) {
             // Ignore cursor restoration errors
           }
         }
@@ -549,7 +549,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const containerRect = containerRef.current.getBoundingClientRect();
+        const _containerRect = containerRef.current.getBoundingClientRect();
 
         if (settings?.autoScrollMode === "center") {
           // Typewriter mode: keep cursor centered in the viewport
@@ -654,7 +654,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
           selection.removeAllRanges();
           selection.addRange(range);
         }
-      } catch (e) {
+      } catch (_e) {
         // Ignore cursor restoration errors
       }
     };
@@ -719,7 +719,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         }
 
         return cursorPosition;
-      } catch (e) {
+      } catch (_e) {
         return 0;
       }
     };
@@ -735,7 +735,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         // Cursor is at the end if position equals total length, or 1 character before
         // (happens during typing when content updates before cursor position)
         return totalLength - currentPosition <= 1;
-      } catch (e) {
+      } catch (_e) {
         return false;
       }
     };
@@ -1128,7 +1128,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
       try {
         await navigator.clipboard.writeText(selectedText);
-      } catch (err) {
+      } catch (_err) {
         // Fallback to execCommand
         document.execCommand("copy");
       }
@@ -1142,7 +1142,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         await navigator.clipboard.writeText(selectedText);
         document.execCommand("delete");
         handleInput();
-      } catch (err) {
+      } catch (_err) {
         // Fallback to execCommand
         document.execCommand("cut");
         handleInput();
@@ -1154,7 +1154,7 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
         const text = await navigator.clipboard.readText();
         document.execCommand("insertText", false, text);
         handleInput();
-      } catch (err) {
+      } catch (_err) {
         // Fallback to execCommand
         document.execCommand("paste");
         handleInput();
@@ -1298,3 +1298,4 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     );
   }
 );
+TextEditor.displayName = "TextEditor";

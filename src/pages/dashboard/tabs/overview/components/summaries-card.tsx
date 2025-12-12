@@ -4,15 +4,8 @@ import { Edit2, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { DisplayTextarea } from "@/components/displays";
-import { FormTextarea } from "@/components/forms";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const MAX_SUMMARY_LENGTH = 2000;
 
@@ -43,7 +36,7 @@ function SummaryItem({
   summary,
   isEditing,
   placeholder,
-  emptyMessage,
+  emptyMessage: _emptyMessage,
   onSummaryChange,
 }: SummaryItemProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -118,10 +111,9 @@ export function SummariesCard({
   onAuthorSummaryChange,
   onStorySummaryChange,
   onEditingSummariesChange,
-  onSaveSummaries,
+  onSaveSummaries: _onSaveSummaries,
 }: SummariesCardProps) {
   const { t } = useTranslation("overview");
-  const { t: tCommon } = useTranslation("common");
   const { t: tTooltips } = useTranslation("tooltips");
 
   // Load visibility state from localStorage or use defaults

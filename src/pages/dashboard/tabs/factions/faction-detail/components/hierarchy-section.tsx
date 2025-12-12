@@ -25,6 +25,7 @@ interface HierarchySectionProps {
 }
 
 // 12 cores predefinidas para títulos (tons suaves com opacidade)
+// eslint-disable-next-line react-refresh/only-export-components
 export const HIERARCHY_TITLE_COLORS = [
   {
     value: "slate",
@@ -100,6 +101,7 @@ export const HIERARCHY_TITLE_COLORS = [
   },
 ];
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getColorClasses(colorValue: string | undefined) {
   const color = HIERARCHY_TITLE_COLORS.find((c) => c.value === colorValue);
   return color || HIERARCHY_TITLE_COLORS[0];

@@ -63,7 +63,7 @@ export interface UseVersionManagementReturn<T> {
  * @returns Version management state and functions
  */
 export function useVersionManagement<T>({
-  entityId,
+  entityId: _entityId,
   versions,
   currentVersionId,
   onVersionChange,
@@ -72,9 +72,9 @@ export function useVersionManagement<T>({
   onVersionDelete,
   onVersionActivate,
   hasUnsavedChanges = false,
-  entityType = "entity",
+  entityType: _entityType = "entity",
 }: UseVersionManagementOptions<T>): UseVersionManagementReturn<T> {
-  const { t } = useTranslation(["errors"]);
+  const _t = useTranslation(["errors"]).t;
   const [currentVersion, setCurrentVersion] = useState<IVersion<T> | null>(
     null
   );

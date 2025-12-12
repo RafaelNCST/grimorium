@@ -60,7 +60,7 @@ export async function generateChapterWord(
   config: ExportConfig
 ): Promise<Blob> {
   const margins = MARGIN_PRESETS[config.margins];
-  const format = PAGE_FORMATS[config.pageFormat];
+  const _format = PAGE_FORMATS[config.pageFormat];
   const titleFont = getFontFamily(config.titleFont);
   const titleSize = getFontSize(config.titleSize);
 

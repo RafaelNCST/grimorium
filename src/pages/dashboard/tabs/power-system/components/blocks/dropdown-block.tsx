@@ -120,7 +120,7 @@ export function DropdownBlock({
       case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
       default:
-        return <>{children}</>;
+        return children;
     }
   };
 

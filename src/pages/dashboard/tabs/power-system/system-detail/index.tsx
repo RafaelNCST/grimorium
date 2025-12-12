@@ -36,7 +36,6 @@ import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
 import { PowerSystemDetailView } from "./view";
 
 import type {
-  IPowerSystem,
   IPowerGroup,
   IPowerPage,
   IPowerSection,

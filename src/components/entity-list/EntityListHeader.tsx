@@ -132,11 +132,11 @@ export function EntityListHeader({
         {/* Action buttons */}
         <div className="flex items-center gap-2">
           {/* Secondary actions */}
-          {secondaryActions.map((action, index) => {
+          {secondaryActions.map((action) => {
             const ActionIcon = action.icon;
             return (
               <Button
-                key={`${action.label}-${index}`}
+                key={action.label}
                 variant={action.variant || "outline"}
                 size={action.size || "default"}
                 onClick={action.onClick}

@@ -2,7 +2,6 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   FileText,
   FolderOpen,
-  Plus,
   Edit2,
   Trash2,
   Folder,
@@ -15,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import { EntityLinksModal } from "@/components/annotations/entity-links-modal";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -24,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,

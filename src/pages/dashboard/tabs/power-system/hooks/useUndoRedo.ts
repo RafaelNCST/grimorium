@@ -1,15 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 
-import {
-  updatePowerSection,
-  updatePowerBlock,
-  deletePowerSection,
-  deletePowerBlock,
-  createPowerSection,
-  createPowerBlock,
-  reorderPowerSections,
-  reorderPowerBlocks,
-} from "@/lib/db/power-system.service";
+// Removed unused imports - these were imported but never used in this hook
 
 import type { IPowerSection, IPowerBlock } from "../types/power-system-types";
 

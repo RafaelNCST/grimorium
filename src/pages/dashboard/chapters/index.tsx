@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -27,7 +27,6 @@ import {
   getChapterMetadataByBookId,
   createChapter,
   deleteChapter as deleteChapterFromDB,
-  type ChapterMetadata,
 } from "@/lib/db/chapters.service";
 import {
   migrateChaptersFromLocalStorage,

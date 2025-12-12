@@ -92,12 +92,12 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
   const selectedStatuses = selectedFilters.status || [];
 
   // Calculate stats
-  const categoryStats = useMemo(
+  const _categoryStats = useMemo(
     () => calculateEntityStats(items, "category", CATEGORY_VALUES),
     [items]
   );
 
-  const statusStats = useMemo(
+  const _statusStats = useMemo(
     () => calculateEntityStats(items, "status", STATUS_VALUES),
     [items]
   );

@@ -119,3 +119,4 @@ export const VersionCard = React.memo(
     );
   }
 );
+VersionCard.displayName = "VersionCard";

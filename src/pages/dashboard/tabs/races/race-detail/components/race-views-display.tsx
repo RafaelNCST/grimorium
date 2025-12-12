@@ -1,4 +1,4 @@
-import { Eye, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { RaceViewsManager } from "@/components/modals/create-race-modal/components/race-views-manager";

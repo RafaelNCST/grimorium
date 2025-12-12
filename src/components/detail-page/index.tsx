@@ -16,4 +16,5 @@ export type { EditControlsProps } from "./EditControls";
 export { FieldWithVisibilityToggle } from "./FieldWithVisibilityToggle";
 export type { FieldWithVisibilityToggleProps } from "./FieldWithVisibilityToggle";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export * from "./visibility-helpers";

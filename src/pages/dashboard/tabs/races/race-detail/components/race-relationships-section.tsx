@@ -6,13 +6,6 @@ import {
   X,
   ChevronLeft,
   UserPlus,
-  Skull,
-  Fish,
-  Sparkles,
-  Shield,
-  Handshake,
-  Swords,
-  Equal,
   Heart,
   type LucideIcon,
 } from "lucide-react";
@@ -196,7 +189,7 @@ export function RaceRelationshipsSection({
     setModalStep(1);
   };
 
-  const handleOpenAddDialog = () => {
+  const _handleOpenAddDialog = () => {
     if (availableRaces.length === 0) {
       return;
     }
@@ -232,7 +225,7 @@ export function RaceRelationshipsSection({
 
             if (!race || !typeConfig) return null;
 
-            const TypeIcon = typeConfig.icon;
+            const _TypeIcon = typeConfig.icon as LucideIcon;
 
             return (
               <Card

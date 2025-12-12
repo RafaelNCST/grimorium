@@ -204,7 +204,7 @@ export function ImageLightbox({
             maxScale={4}
             centerOnInit
           >
-            {({ zoomIn, zoomOut, resetTransform }) => (
+            {({ zoomIn, zoomOut, resetTransform: _resetTransform }) => (
               <>
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-black/60 rounded-lg p-2 backdrop-blur-sm">
                   <Button

@@ -1378,7 +1378,7 @@ async function migrateBookGenres(database: Database): Promise<void> {
       "SELECT id, genre FROM books WHERE genre IS NOT NULL"
     );
 
-    let migratedCount = 0;
+    const _migratedCount = 0;
 
     for (const book of books) {
       if (!book.genre) continue;
@@ -1413,7 +1413,8 @@ async function migrateBookGenres(database: Database): Promise<void> {
             JSON.stringify(newGenres),
             book.id,
           ]);
-          migratedCount++;
+          let _migratedCount = 0;
+          _migratedCount++;
         }
       } catch (parseError) {
         console.warn(
@@ -1524,7 +1525,7 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
       Cósmico: "cosmic",
     };
 
-    let migratedCount = 0;
+    const _migratedCount2 = 0;
 
     for (const race of races) {
       try {
@@ -1553,7 +1554,8 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
             JSON.stringify(newDomains),
             race.id,
           ]);
-          migratedCount++;
+          let _migratedCount = 0;
+          _migratedCount++;
         }
       } catch (parseError) {
         console.warn(

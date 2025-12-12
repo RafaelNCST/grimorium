@@ -89,7 +89,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
     setSearchTerm: setSearchQuery,
     selectedFilters,
     toggleFilter,
-    clearFilters,
+    clearFilters: _clearFilters,
   } = useEntityFilters({
     entities: regions,
     searchFields: ["name", "summary"],

@@ -36,7 +36,7 @@ interface CharacterSuperViewProps {
 
 export function CharacterSuperView({
   character,
-  displayData,
+  displayData: _displayData,
   bookId,
   onBack,
 }: CharacterSuperViewProps) {

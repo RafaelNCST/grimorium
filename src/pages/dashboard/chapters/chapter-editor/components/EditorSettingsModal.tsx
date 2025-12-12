@@ -35,7 +35,6 @@ import type {
   AutoScrollMode,
   CursorColor,
 } from "../types/editor-settings";
-import type { MentionedEntities } from "../types/entity-link";
 
 interface EditorSettingsModalProps {
   open: boolean;

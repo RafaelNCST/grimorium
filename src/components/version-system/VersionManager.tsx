@@ -109,3 +109,4 @@ export const VersionManager = React.memo(
     );
   }
 );
+VersionManager.displayName = "VersionManager";

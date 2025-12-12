@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
-import { Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -41,9 +40,7 @@ import {
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
-import { FAMILY_RELATIONS_CONSTANT } from "./constants/family-relations-constant";
 import { RELATIONSHIP_TYPES_CONSTANT } from "./constants/relationship-types-constant";
-import { getFamilyRelationLabel } from "./utils/get-family-relation-label";
 import { getRelationshipTypeData } from "./utils/get-relationship-type-data";
 import { CharacterDetailView } from "./view";
 
@@ -154,7 +151,7 @@ export function CharacterDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
-  const [originalSectionVisibility, setOriginalSectionVisibility] =
+  const [originalSectionVisibility, _setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
 
   // Save advanced section state to localStorage
@@ -620,7 +617,7 @@ export function CharacterDetail() {
   const handleSave = useCallback(async () => {
     try {
       // Validar TUDO com Zod
-      const validatedData = CharacterSchema.parse({
+      const _validatedData = CharacterSchema.parse({
         name: editData.name,
         age: editData.age,
         role: editData.role,
@@ -806,7 +803,7 @@ export function CharacterDetail() {
     setShowUnsavedChangesDialog(false);
   }, [character, originalFieldVisibility, originalSectionVisibility]);
 
-  const handleAddQuality = useCallback(() => {
+  const _handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
       setEditData((prev) => ({
         ...prev,
@@ -816,14 +813,14 @@ export function CharacterDetail() {
     }
   }, [newQuality, editData.qualities]);
 
-  const handleRemoveQuality = useCallback((qualityToRemove: string) => {
+  const _handleRemoveQuality = useCallback((qualityToRemove: string) => {
     setEditData((prev) => ({
       ...prev,
       qualities: prev.qualities.filter((q) => q !== qualityToRemove),
     }));
   }, []);
 
-  const handleFamilyRelationChange = useCallback(
+  const _handleFamilyRelationChange = useCallback(
     (relationType: string, characterId: string | null) => {
       setEditData((prev) => {
         const newFamily = { ...prev.family };
@@ -956,7 +953,7 @@ export function CharacterDetail() {
     []
   );
 
-  const navigateBack = useCallback(() => {
+  const _navigateBack = useCallback(() => {
     window.history.back();
   }, []);
 
@@ -1016,7 +1013,7 @@ export function CharacterDetail() {
     setEditData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleNewQualityChange = useCallback((value: string) => {
+  const _handleNewQualityChange = useCallback((value: string) => {
     setNewQuality(value);
   }, []);
 

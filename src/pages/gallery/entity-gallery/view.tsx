@@ -94,7 +94,7 @@ export function EntityGalleryView({
   selectedItem,
   onCloseLightbox,
   entityName,
-  entityType,
+  entityType: _entityType,
   preSelectedLinks,
   onBack,
 }: EntityGalleryViewProps) {

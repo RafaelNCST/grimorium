@@ -19,7 +19,6 @@ import { getItemsByBookId } from "@/lib/db/items.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
 import {
   getMapByRegionId,
-  getMarkersByRegion,
   addMarker,
   updateMarkerPosition,
   updateMarkerColor,

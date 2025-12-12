@@ -111,7 +111,7 @@ function SectionWrapper({
 }
 
 export function PageContent({
-  system,
+  system: _system,
   page,
   pages,
   sections,

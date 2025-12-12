@@ -66,7 +66,7 @@ export function CharactersView({
 
   // Determine which empty state to show
   const hasNoResults = filteredCharacters.length === 0 && characters.length > 0;
-  const hasSearch = searchTerm.trim().length > 0;
+  const _hasSearch = searchTerm.trim().length > 0;
   const hasFilters = selectedRoles.length > 0;
 
   return (

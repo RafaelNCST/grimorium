@@ -102,7 +102,7 @@ interface RaceDetailViewProps {
 }
 
 // Helper component for empty state
-const EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
+const _EmptyFieldState = ({ t }: { t: (key: string) => string }) => (
   <div className="text-sm text-muted-foreground py-2 px-3 bg-muted/30 rounded-md">
     <p>{t("race-detail:empty_states.no_data")}</p>
   </div>
@@ -143,11 +143,11 @@ export function RaceDetailView({
   onAdvancedSectionToggle,
   onRelationshipsChange,
   validateField,
-  openSections,
-  toggleSection,
+  openSections: _openSections,
+  toggleSection: _toggleSection,
   onVersionChange,
   onVersionCreate,
-  onVersionDelete,
+  onVersionDelete: _onVersionDelete,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
