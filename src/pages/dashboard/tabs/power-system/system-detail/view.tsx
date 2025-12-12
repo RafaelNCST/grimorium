@@ -245,57 +245,9 @@ export function PowerSystemDetailView({
 
   if (!currentPage && !isLoadingPages) {
     return (
-      <div className="flex h-full overflow-hidden">
-        {/* Navigation Sidebar */}
-        <div
-          className={cn(
-            "transition-all duration-300 ease-in-out overflow-hidden",
-            isLeftSidebarOpen ? "w-80" : "w-0"
-          )}
-        >
-          <NavigationSidebar
-            systemId={system.id}
-            isOpen={isLeftSidebarOpen}
-            onToggle={onToggleLeftSidebar}
-            groups={groups}
-            pages={pages}
-            currentPageId={currentPage?.id}
-            isEditMode={isEditMode}
-            onPageSelect={onPageSelect}
-            onCreateGroup={onOpenCreateGroupModal}
-            onCreatePage={onOpenCreatePageModal}
-            onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
-            onDeleteGroup={onDeleteGroup}
-            onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
-            onDeletePage={onDeletePage}
-            onDuplicatePage={onDuplicatePage}
-            onMovePage={onMovePage}
-            onReorderPages={(pageIds) => {
-              const reorderedPages = pageIds
-                .map((id, index) => {
-                  const page = pages.find((p) => p.id === id);
-                  return page ? { ...page, orderIndex: index } : null;
-                })
-                .filter(Boolean) as IPowerPage[];
-              onReorderPages(reorderedPages);
-            }}
-            onReorderGroups={(groupIds) => {
-              const reorderedGroups = groupIds
-                .map((id, index) => {
-                  const group = groups.find((g) => g.id === id);
-                  return group ? { ...group, orderIndex: index } : null;
-                })
-                .filter(Boolean) as IPowerGroup[];
-              onReorderGroups(reorderedGroups);
-            }}
-            onItemSelect={onItemSelect}
-          />
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
-          {/* Header */}
-          <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Header */}
+        <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
             <div className="flex items-center gap-2">
               {/* Back Button */}
               <Button
@@ -383,6 +335,54 @@ export function PowerSystemDetailView({
                 </TooltipContent>
               </Tooltip>
             </div>
+          </div>
+
+        {/* Content Area with Sidebar */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Navigation Sidebar */}
+          <div
+            className={cn(
+              "transition-all duration-300 ease-in-out overflow-hidden",
+              isLeftSidebarOpen ? "w-80" : "w-0"
+            )}
+          >
+            <NavigationSidebar
+              systemId={system.id}
+              isOpen={isLeftSidebarOpen}
+              onToggle={onToggleLeftSidebar}
+              groups={groups}
+              pages={pages}
+              currentPageId={currentPage?.id}
+              isEditMode={isEditMode}
+              onPageSelect={onPageSelect}
+              onCreateGroup={onOpenCreateGroupModal}
+              onCreatePage={onOpenCreatePageModal}
+              onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
+              onDeleteGroup={onDeleteGroup}
+              onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
+              onDeletePage={onDeletePage}
+              onDuplicatePage={onDuplicatePage}
+              onMovePage={onMovePage}
+              onReorderPages={(pageIds) => {
+                const reorderedPages = pageIds
+                  .map((id, index) => {
+                    const page = pages.find((p) => p.id === id);
+                    return page ? { ...page, orderIndex: index } : null;
+                  })
+                  .filter(Boolean) as IPowerPage[];
+                onReorderPages(reorderedPages);
+              }}
+              onReorderGroups={(groupIds) => {
+                const reorderedGroups = groupIds
+                  .map((id, index) => {
+                    const group = groups.find((g) => g.id === id);
+                    return group ? { ...group, orderIndex: index } : null;
+                  })
+                  .filter(Boolean) as IPowerGroup[];
+                onReorderGroups(reorderedGroups);
+              }}
+              onItemSelect={onItemSelect}
+            />
           </div>
 
           {/* Empty State - Simple message instead of CTA */}
@@ -492,57 +492,9 @@ export function PowerSystemDetailView({
   // ============================================================================
 
   return (
-    <div className="flex h-full overflow-hidden">
-      {/* Navigation Sidebar */}
-      <div
-        className={cn(
-          "transition-all duration-300 ease-in-out overflow-hidden",
-          isLeftSidebarOpen ? "w-80" : "w-0"
-        )}
-      >
-        <NavigationSidebar
-          systemId={system.id}
-          isOpen={isLeftSidebarOpen}
-          onToggle={onToggleLeftSidebar}
-          groups={groups}
-          pages={pages}
-          currentPageId={currentPage?.id}
-          isEditMode={isEditMode}
-          onPageSelect={onPageSelect}
-          onCreateGroup={onOpenCreateGroupModal}
-          onCreatePage={onOpenCreatePageModal}
-          onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
-          onDeleteGroup={onDeleteGroup}
-          onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
-          onDeletePage={onDeletePage}
-          onDuplicatePage={onDuplicatePage}
-          onMovePage={onMovePage}
-          onReorderPages={(pageIds) => {
-            const reorderedPages = pageIds
-              .map((id, index) => {
-                const page = pages.find((p) => p.id === id);
-                return page ? { ...page, orderIndex: index } : null;
-              })
-              .filter(Boolean) as IPowerPage[];
-            onReorderPages(reorderedPages);
-          }}
-          onReorderGroups={(groupIds) => {
-            const reorderedGroups = groupIds
-              .map((id, index) => {
-                const group = groups.find((g) => g.id === id);
-                return group ? { ...group, orderIndex: index } : null;
-              })
-              .filter(Boolean) as IPowerGroup[];
-            onReorderGroups(reorderedGroups);
-          }}
-          onItemSelect={onItemSelect}
-        />
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
-        {/* Header */}
-        <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-2">
             {/* Back Button */}
             <Button
@@ -671,30 +623,80 @@ export function PowerSystemDetailView({
           </div>
         </div>
 
-        {/* Page Content */}
-        {currentPage && system && (
-          <PageContent
-            system={system}
-            page={currentPage}
+      {/* Content Area with Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Navigation Sidebar */}
+        <div
+          className={cn(
+            "transition-all duration-300 ease-in-out overflow-hidden",
+            isLeftSidebarOpen ? "w-80" : "w-0"
+          )}
+        >
+          <NavigationSidebar
+            systemId={system.id}
+            isOpen={isLeftSidebarOpen}
+            onToggle={onToggleLeftSidebar}
+            groups={groups}
             pages={pages}
-            sections={sections}
-            blocks={blocks}
-            bookId={bookId}
+            currentPageId={currentPage?.id}
             isEditMode={isEditMode}
-            onUpdatePageName={(name) => onUpdatePage(currentPage.id, name)}
-            onAddSection={onOpenCreateSectionModal}
-            onUpdateSection={onUpdateSection}
-            onDeleteSection={onDeleteSection}
-            onReorderSections={onReorderSections}
-            onAddBlock={onOpenSelectBlockModal}
-            onUpdateBlock={onUpdateBlock}
-            onDeleteBlock={onDeleteBlock}
-            onReorderBlocks={onReorderBlocks}
             onPageSelect={onPageSelect}
-            onManagePageLinks={onManagePageLinks}
-            onManageSectionLinks={onManageSectionLinks}
+            onCreateGroup={onOpenCreateGroupModal}
+            onCreatePage={onOpenCreatePageModal}
+            onEditGroup={(groupId, newName) => onUpdateGroup(groupId, newName)}
+            onDeleteGroup={onDeleteGroup}
+            onEditPage={(pageId, newName) => onUpdatePage(pageId, newName)}
+            onDeletePage={onDeletePage}
+            onDuplicatePage={onDuplicatePage}
+            onMovePage={onMovePage}
+            onReorderPages={(pageIds) => {
+              const reorderedPages = pageIds
+                .map((id, index) => {
+                  const page = pages.find((p) => p.id === id);
+                  return page ? { ...page, orderIndex: index } : null;
+                })
+                .filter(Boolean) as IPowerPage[];
+              onReorderPages(reorderedPages);
+            }}
+            onReorderGroups={(groupIds) => {
+              const reorderedGroups = groupIds
+                .map((id, index) => {
+                  const group = groups.find((g) => g.id === id);
+                  return group ? { ...group, orderIndex: index } : null;
+                })
+                .filter(Boolean) as IPowerGroup[];
+              onReorderGroups(reorderedGroups);
+            }}
+            onItemSelect={onItemSelect}
           />
-        )}
+        </div>
+
+        {/* Page Content */}
+        <div className="flex-1 overflow-hidden">
+          {currentPage && system && (
+            <PageContent
+              system={system}
+              page={currentPage}
+              pages={pages}
+              sections={sections}
+              blocks={blocks}
+              bookId={bookId}
+              isEditMode={isEditMode}
+              onUpdatePageName={(name) => onUpdatePage(currentPage.id, name)}
+              onAddSection={onOpenCreateSectionModal}
+              onUpdateSection={onUpdateSection}
+              onDeleteSection={onDeleteSection}
+              onReorderSections={onReorderSections}
+              onAddBlock={onOpenSelectBlockModal}
+              onUpdateBlock={onUpdateBlock}
+              onDeleteBlock={onDeleteBlock}
+              onReorderBlocks={onReorderBlocks}
+              onPageSelect={onPageSelect}
+              onManagePageLinks={onManagePageLinks}
+              onManageSectionLinks={onManageSectionLinks}
+            />
+          )}
+        </div>
       </div>
 
       {/* Modals */}
