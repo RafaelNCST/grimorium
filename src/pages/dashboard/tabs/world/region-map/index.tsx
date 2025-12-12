@@ -74,7 +74,7 @@ export function RegionMapPage() {
 
   useEffect(() => {
     loadData();
-  }, [regionId]);
+  }, [regionId, versionId]);
 
   // Close tooltip when map image changes
   useEffect(() => {
@@ -126,6 +126,14 @@ export function RegionMapPage() {
   const loadData = async () => {
     try {
       setIsLoading(true);
+
+      // Reset states before loading
+      setRegion(null);
+      setChildrenRegions([]);
+      setMapImagePath(null);
+      setMapId(null);
+      setMarkers([]);
+      setSelectedMarkerIds([]);
 
       // Load region
       const regionData = await getRegionById(regionId);
@@ -521,6 +529,8 @@ export function RegionMapPage() {
           {selectedMarkerIds.length === 1 && selectedRegion && selectedMarker ? (
             <MapMarkerDetails
               region={selectedRegion}
+              mapRegionId={regionId}
+              mapVersionId={versionId}
               markerColor={selectedMarker.color}
               showLabel={selectedMarker.showLabel}
               characters={characters}
@@ -550,7 +560,7 @@ export function RegionMapPage() {
       <div className="fixed inset-x-0 bottom-0 top-8 w-full">
         {mapImagePath ? (
           <MapCanvas
-            key={mapImagePath}
+            key={`${regionId}-${mapId}`}
             imagePath={mapImagePath}
             children={childrenRegions}
             markers={markers}

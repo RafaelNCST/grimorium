@@ -46,6 +46,9 @@ export function RegionDetail() {
   });
   const search = useSearch({ strict: false });
   const versionIdFromUrl = (search as { versionId?: string })?.versionId;
+  const fromMapId = (search as { fromMapId?: string })?.fromMapId;
+  const fromMapVersionId = (search as { fromMapVersionId?: string })
+    ?.fromMapVersionId;
   const navigate = useNavigate();
   const { t } = useTranslation("region-detail");
 
@@ -1034,8 +1037,18 @@ export function RegionDetail() {
   );
 
   const handleBack = useCallback(() => {
-    navigateToWorldTab();
-  }, [navigateToWorldTab]);
+    // If came from a map, go back to that map
+    if (fromMapId) {
+      navigate({
+        to: "/dashboard/$dashboardId/tabs/world/$regionId/map",
+        params: { dashboardId, regionId: fromMapId },
+        search: fromMapVersionId ? { versionId: fromMapVersionId } : undefined,
+      });
+    } else {
+      // Otherwise go back to world tab
+      navigateToWorldTab();
+    }
+  }, [fromMapId, fromMapVersionId, navigate, dashboardId, navigateToWorldTab]);
 
   const handleViewMap = useCallback(() => {
     navigate({

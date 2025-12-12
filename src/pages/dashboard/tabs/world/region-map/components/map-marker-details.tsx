@@ -33,6 +33,8 @@ import { IRegion } from "../../types/region-types";
 
 interface MapMarkerDetailsProps {
   region: IRegion;
+  mapRegionId: string;
+  mapVersionId?: string | null;
   markerColor: string;
   showLabel: boolean;
   characters: Array<{ id: string; name: string; image?: string }>;
@@ -63,6 +65,8 @@ const MARKER_COLORS = [
 
 export function MapMarkerDetails({
   region,
+  mapRegionId,
+  mapVersionId,
   markerColor,
   showLabel,
   characters,
@@ -122,6 +126,10 @@ export function MapMarkerDetails({
     navigate({
       to: "/dashboard/$dashboardId/tabs/world/$regionId",
       params: { dashboardId: region.bookId, regionId: region.id },
+      search: {
+        fromMapId: mapRegionId,
+        fromMapVersionId: mapVersionId || undefined,
+      },
     });
   };
 

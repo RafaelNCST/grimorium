@@ -41,6 +41,7 @@ export function MapCanvas({
 }: MapCanvasProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isFullyReady, setIsFullyReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
     height: 0,
@@ -91,6 +92,7 @@ export function MapCanvas({
         // Reset states when loading new image
         setImageLoaded(false);
         setIsFullyReady(false);
+        setLoadError(null);
 
         // Read file as binary using Tauri plugin-fs
         const fileData = await readFile(imagePath, {
@@ -110,10 +112,12 @@ export function MapCanvas({
         };
         img.onerror = (e) => {
           console.error("Failed to load image from blob:", e);
+          setLoadError("Erro ao carregar imagem do mapa");
         };
         img.src = objectUrl;
       } catch (error) {
         console.error("Failed to read file:", error);
+        setLoadError("Arquivo de imagem do mapa não encontrado");
       }
     };
 
@@ -624,12 +628,43 @@ export function MapCanvas({
         )}
       </TransformWrapper>
 
-      {/* Loading State */}
-      {!isFullyReady && (
+      {/* Loading State or Error */}
+      {!isFullyReady && !loadError && (
         <div className="absolute inset-0 flex items-center justify-center bg-background z-40">
           <div className="text-center space-y-2">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="text-sm text-muted-foreground">Carregando mapa...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {loadError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background z-40">
+          <div className="text-center space-y-3 max-w-md px-4">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+              <svg
+                className="w-8 h-8 text-destructive"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground mb-1">
+                Erro ao carregar mapa
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {loadError}
+              </p>
+            </div>
           </div>
         </div>
       )}
