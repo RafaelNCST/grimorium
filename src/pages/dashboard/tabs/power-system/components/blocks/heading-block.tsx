@@ -155,7 +155,7 @@ export function HeadingBlock({
   }
 
   return content.text ? (
-    <HeadingTag className={getHeadingClass(content.level, content.alignment)}>
+    <HeadingTag className={`${getHeadingClass(content.level, content.alignment)} mb-6`}>
       {content.text}
     </HeadingTag>
   ) : null;

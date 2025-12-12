@@ -475,7 +475,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (!currentSystem) return;
 
     try {
-      const orderIndex = groups.length;
+      let orderIndex = 0;
+      setGroups((prevGroups) => {
+        orderIndex = prevGroups.length;
+        return prevGroups;
+      });
+
       const groupId = await createPowerGroup(
         currentSystem.id,
         name,
@@ -490,7 +495,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         createdAt: Date.now(),
       };
 
-      setGroups([...groups, newGroup]);
+      setGroups((prev) => [...prev, newGroup]);
       setIsCreateGroupModalOpen(false);
     } catch (error) {
       console.error("Error creating group:", error);
@@ -499,13 +504,15 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
   const handleUpdateGroup = async (groupId: string, name: string) => {
     try {
-      await updatePowerGroup(groupId, name);
-
-      setGroups(
-        groups.map((group) =>
+      // Update state immediately (optimistic update)
+      setGroups((prevGroups) =>
+        prevGroups.map((group) =>
           group.id === groupId ? { ...group, name } : group
         )
       );
+
+      // Then persist to database
+      await updatePowerGroup(groupId, name);
     } catch (error) {
       console.error("Error updating group:", error);
     }
@@ -515,11 +522,11 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerGroup(groupId);
 
-      setGroups(groups.filter((group) => group.id !== groupId));
+      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
 
       // Update pages that belonged to this group
-      setPages(
-        pages.map((page) =>
+      setPages((prevPages) =>
+        prevPages.map((page) =>
           page.groupId === groupId ? { ...page, groupId: undefined } : page
         )
       );
@@ -553,7 +560,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (!currentSystem) return;
 
     try {
-      const orderIndex = pages.length;
+      let orderIndex = 0;
+      setPages((prevPages) => {
+        orderIndex = prevPages.length;
+        return prevPages;
+      });
+
       const pageId = await createPowerPage(
         currentSystem.id,
         name,
@@ -571,7 +583,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         updatedAt: Date.now(),
       };
 
-      setPages([...pages, newPage]);
+      setPages((prev) => [...prev, newPage]);
       setCurrentPage(newPage);
       setCurrentPageId(currentSystem.id, newPage.id);
       setIsCreatePageModalOpen(false);
@@ -582,10 +594,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
   const handleUpdatePage = async (pageId: string, name: string) => {
     try {
-      await updatePowerPage(pageId, name);
-
-      setPages(
-        pages.map((page) =>
+      // Update state immediately (optimistic update)
+      setPages((prevPages) =>
+        prevPages.map((page) =>
           page.id === pageId ? { ...page, name, updatedAt: Date.now() } : page
         )
       );
@@ -593,6 +604,9 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       if (currentPage?.id === pageId) {
         setCurrentPage({ ...currentPage, name, updatedAt: Date.now() });
       }
+
+      // Then persist to database
+      await updatePowerPage(pageId, name);
     } catch (error) {
       console.error("Error updating page:", error);
     }
@@ -602,8 +616,8 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await movePowerPage(pageId, newGroupId);
 
-      setPages(
-        pages.map((page) =>
+      setPages((prevPages) =>
+        prevPages.map((page) =>
           page.id === pageId
             ? { ...page, groupId: newGroupId, updatedAt: Date.now() }
             : page
@@ -620,15 +634,17 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerPage(pageId);
 
-      setPages(pages.filter((page) => page.id !== pageId));
+      setPages((prevPages) => {
+        const filteredPages = prevPages.filter((page) => page.id !== pageId);
 
-      if (currentPage?.id === pageId) {
-        const remainingPages = pages.filter((p) => p.id !== pageId);
-        const newCurrentPage =
-          remainingPages.length > 0 ? remainingPages[0] : null;
-        setCurrentPage(newCurrentPage);
-        setCurrentPageId(systemId, newCurrentPage?.id || null);
-      }
+        if (currentPage?.id === pageId) {
+          const newCurrentPage = filteredPages.length > 0 ? filteredPages[0] : null;
+          setCurrentPage(newCurrentPage);
+          setCurrentPageId(systemId, newCurrentPage?.id || null);
+        }
+
+        return filteredPages;
+      });
     } catch (error) {
       console.error("Error deleting page:", error);
     }
@@ -673,7 +689,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (!currentPage) return;
 
     try {
-      const orderIndex = sections.length;
+      let orderIndex = 0;
+      setSections((prevSections) => {
+        orderIndex = prevSections.length;
+        return prevSections;
+      });
+
       const sectionId = await createPowerSection(
         currentPage.id,
         title,
@@ -690,7 +711,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         updatedAt: Date.now(),
       };
 
-      setSections([...sections, newSection]);
+      setSections((prev) => [...prev, newSection]);
       setIsCreateSectionModalOpen(false);
 
       // Save snapshot AFTER action is completed
@@ -702,15 +723,17 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
   const handleUpdateSection = async (sectionId: string, title: string) => {
     try {
-      await updatePowerSection(sectionId, title);
-
-      setSections(
-        sections.map((section) =>
+      // Update state immediately (optimistic update)
+      setSections((prevSections) =>
+        prevSections.map((section) =>
           section.id === sectionId
             ? { ...section, title, updatedAt: Date.now() }
             : section
         )
       );
+
+      // Then persist to database
+      await updatePowerSection(sectionId, title);
 
       // Save snapshot AFTER action is completed
       setTimeout(() => saveSnapshot(), 100);
@@ -723,8 +746,8 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerSection(sectionId);
 
-      setSections(sections.filter((section) => section.id !== sectionId));
-      setBlocks(blocks.filter((block) => block.sectionId !== sectionId));
+      setSections((prevSections) => prevSections.filter((section) => section.id !== sectionId));
+      setBlocks((prevBlocks) => prevBlocks.filter((block) => block.sectionId !== sectionId));
 
       // Save snapshot AFTER action is completed
       setTimeout(() => saveSnapshot(), 100);
@@ -755,8 +778,12 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     content: BlockContent
   ) => {
     try {
-      const sectionBlocks = blocks.filter((b) => b.sectionId === sectionId);
-      const orderIndex = sectionBlocks.length;
+      let orderIndex = 0;
+      setBlocks((prevBlocks) => {
+        const sectionBlocks = prevBlocks.filter((b) => b.sectionId === sectionId);
+        orderIndex = sectionBlocks.length;
+        return prevBlocks;
+      });
 
       const blockId = await createPowerBlock(
         sectionId,
@@ -775,7 +802,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         updatedAt: Date.now(),
       };
 
-      setBlocks([...blocks, newBlock]);
+      setBlocks((prev) => [...prev, newBlock]);
       setIsSelectBlockModalOpen(false);
 
       // Save snapshot AFTER action is completed
@@ -787,15 +814,17 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
   const handleUpdateBlock = async (blockId: string, content: BlockContent) => {
     try {
-      await updatePowerBlock(blockId, content);
-
-      setBlocks(
-        blocks.map((block) =>
+      // Update state immediately (optimistic update)
+      setBlocks((prevBlocks) =>
+        prevBlocks.map((block) =>
           block.id === blockId
             ? { ...block, content, updatedAt: Date.now() }
             : block
         )
       );
+
+      // Then persist to database
+      await updatePowerBlock(blockId, content);
 
       // Save snapshot AFTER action is completed
       setTimeout(() => saveSnapshot(), 100);
@@ -808,7 +837,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       await deletePowerBlock(blockId);
 
-      setBlocks(blocks.filter((block) => block.id !== blockId));
+      setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== blockId));
 
       // Save snapshot AFTER action is completed
       setTimeout(() => saveSnapshot(), 100);
