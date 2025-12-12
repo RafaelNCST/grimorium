@@ -115,37 +115,16 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
           </div>
         </div>
 
-        {/* App Name */}
+        {/* Loading phrase with fade transition */}
         <div className="text-center space-y-3">
-          <h1 className="text-4xl font-bold text-foreground tracking-wide">
-            Grimorium
-          </h1>
-
-          {/* Loading phrase with fade transition */}
-          <div className="h-6 flex items-center justify-center">
-            <p
+          <div className="h-12 flex items-center justify-center">
+            <h1
               key={currentPhraseIndex}
-              className="text-sm text-muted-foreground animate-in fade-in duration-300"
+              className="text-4xl font-bold text-foreground tracking-wide animate-in fade-in duration-300"
             >
               {LOADING_PHRASES[currentPhraseIndex]}
-            </p>
+            </h1>
           </div>
-        </div>
-
-        {/* Loading dots indicator */}
-        <div className="flex gap-2">
-          <div
-            className="w-2 h-2 rounded-full bg-primary animate-pulse"
-            style={{ animationDelay: "0ms" }}
-          />
-          <div
-            className="w-2 h-2 rounded-full bg-primary animate-pulse"
-            style={{ animationDelay: "150ms" }}
-          />
-          <div
-            className="w-2 h-2 rounded-full bg-primary animate-pulse"
-            style={{ animationDelay: "300ms" }}
-          />
         </div>
       </div>
     </div>
