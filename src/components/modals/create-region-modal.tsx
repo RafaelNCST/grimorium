@@ -268,16 +268,20 @@ export function CreateRegionModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <FormImageUpload
-                        value={field.value}
-                        onChange={field.onChange}
-                        label={t("create_region.image_label")}
-                        helperText="opcional"
-                        height="h-[28rem]"
-                        shape="rounded"
-                        placeholderIcon={MapIcon}
-                        id="region-image-upload"
-                      />
+                      <div className="flex justify-center -mx-6">
+                        <div className="w-full max-w-[587px] px-6">
+                          <FormImageUpload
+                            value={field.value}
+                            onChange={field.onChange}
+                            label={t("create_region.image_label")}
+                            helperText="opcional"
+                            height="h-[28rem]"
+                            shape="rounded"
+                            placeholderIcon={MapIcon}
+                            id="region-image-upload"
+                          />
+                        </div>
+                      </div>
                     </FormControl>
                   </FormItem>
                 )}
