@@ -471,6 +471,9 @@ export function PowerSystemDetailView({
                 case "navigator":
                   defaultContent = { linkedPageId: undefined, title: "" };
                   break;
+                case "spacer":
+                  defaultContent = { size: "medium" };
+                  break;
               }
 
               onCreateBlock(selectedSectionForBlock, type, defaultContent);
@@ -778,6 +781,9 @@ export function PowerSystemDetailView({
                 break;
               case "navigator":
                 defaultContent = { linkedPageId: undefined, title: "" };
+                break;
+              case "spacer":
+                defaultContent = { size: "medium" };
                 break;
             }
 

@@ -13,6 +13,7 @@ import {
   Star,
   BarChart3,
   Navigation2,
+  ArrowDownUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -53,6 +54,7 @@ const blockTypes: BlockTypeOption[] = [
   { type: "stars", icon: Star },
   { type: "attributes", icon: BarChart3 },
   { type: "navigator", icon: Navigation2 },
+  { type: "spacer", icon: ArrowDownUp },
 ];
 
 export function SelectBlockModal({

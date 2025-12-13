@@ -252,6 +252,13 @@
       "title_placeholder": "Título opcional",
       "page_not_found": "Página não encontrada",
       "no_link": "Sem link"
+    },
+    "spacer": {
+      "name": "Espaçador",
+      "description": "Adiciona espaçamento vertical entre blocos",
+      "size_small": "Pequeno",
+      "size_medium": "Médio",
+      "size_large": "Grande"
     }
   },
   "modals": {

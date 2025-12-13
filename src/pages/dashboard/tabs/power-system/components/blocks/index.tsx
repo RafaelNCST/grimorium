@@ -13,3 +13,4 @@ export { DividerBlock } from "./divider-block";
 export { StarsBlock } from "./stars-block";
 export { AttributesBlock } from "./attributes-block";
 export { NavigatorBlock } from "./navigator-block";
+export { SpacerBlock } from "./spacer-block";

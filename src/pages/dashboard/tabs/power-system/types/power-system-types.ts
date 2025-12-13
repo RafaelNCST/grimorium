@@ -14,7 +14,8 @@ export type BlockType =
   | "divider"
   | "stars"
   | "attributes"
-  | "navigator";
+  | "navigator"
+  | "spacer";
 
 // Content interfaces for each block type
 export interface HeadingContent {
@@ -118,6 +119,10 @@ export interface NavigatorContent {
   title?: string; // Optional custom title
 }
 
+export interface SpacerContent {
+  size: "small" | "medium" | "large"; // Spacing size
+}
+
 export type BlockContent =
   | HeadingContent
   | ParagraphContent
@@ -133,7 +138,8 @@ export type BlockContent =
   | DividerContent
   | StarsContent
   | AttributesContent
-  | NavigatorContent;
+  | NavigatorContent
+  | SpacerContent;
 
 // Main entities
 export interface IPowerSystem {

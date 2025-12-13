@@ -252,6 +252,13 @@
       "title_placeholder": "Optional title",
       "page_not_found": "Page not found",
       "no_link": "No link"
+    },
+    "spacer": {
+      "name": "Spacer",
+      "description": "Add vertical spacing between blocks",
+      "size_small": "Small",
+      "size_medium": "Medium",
+      "size_large": "Large"
     }
   },
   "modals": {

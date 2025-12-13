@@ -52,6 +52,7 @@ import {
   StarsBlock,
   AttributesBlock,
   NavigatorBlock,
+  SpacerBlock,
 } from "./blocks";
 
 import type {
@@ -180,6 +181,8 @@ function SortableBlock({
             currentPageId={currentPageId}
           />
         );
+      case "spacer":
+        return <SpacerBlock {...commonProps} />;
       default:
         return null;
     }
