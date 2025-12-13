@@ -10,11 +10,13 @@ import {
   useSensors,
   closestCenter,
   DragOverEvent,
+  useDroppable,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
   useSortable,
+  arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { motion } from "framer-motion";
@@ -420,42 +422,19 @@ export function NavigationSidebar({
                 onDragCancel={handleDragCancel}
               >
                 <div className="space-y-1">
-                  {/* Standalone Pages Section */}
-                  {standalonePages.length > 0 && (
-                    <SortableContext
-                      items={standalonePageIds}
-                      strategy={verticalListSortingStrategy}
-                      id="standalone-area"
-                    >
-                      <div
-                        className={cn(
-                          "space-y-1 rounded-md transition-colors",
-                          overId === "standalone-area" &&
-                            activeItem?.type === "page" &&
-                            activeItem.groupId &&
-                            "bg-primary/10 ring-2 ring-primary/20"
-                        )}
-                      >
-                        {standalonePages.map((page) => (
-                          <SortablePageItem
-                            key={page.id}
-                            page={page}
-                            isActive={page.id === currentPageId}
-                            isEditMode={isEditMode}
-                            isDragging={activeItem?.id === page.id}
-                            isOver={overId === page.id}
-                            onSelect={(pageId) => {
-                              onPageSelect(pageId);
-                              onItemSelect?.(pageId, "page");
-                            }}
-                            onEdit={onEditPage}
-                            onDelete={onDeletePage}
-                            onDuplicate={onDuplicatePage}
-                          />
-                        ))}
-                      </div>
-                    </SortableContext>
-                  )}
+                  {/* Standalone Pages Drop Zone - Always visible when dragging from group */}
+                  <StandaloneDropZone
+                    pages={standalonePages}
+                    activeItem={activeItem}
+                    overId={overId}
+                    currentPageId={currentPageId}
+                    isEditMode={isEditMode}
+                    onPageSelect={onPageSelect}
+                    onEditPage={onEditPage}
+                    onDeletePage={onDeletePage}
+                    onDuplicatePage={onDuplicatePage}
+                    onItemSelect={onItemSelect}
+                  />
 
                   {/* Groups with Pages */}
                   <SortableContext
@@ -550,6 +529,82 @@ export function NavigationSidebar({
   );
 }
 
+// Standalone Drop Zone Component
+interface StandaloneDropZoneProps {
+  pages: IPowerPage[];
+  activeItem: DragItem | null;
+  overId: string | null;
+  currentPageId?: string;
+  isEditMode: boolean;
+  onPageSelect: (pageId: string) => void;
+  onEditPage: (pageId: string, newName: string) => void;
+  onDeletePage: (pageId: string) => void;
+  onDuplicatePage: (pageId: string) => void;
+  onItemSelect?: (itemId: string, itemType: "page" | "group") => void;
+}
+
+function StandaloneDropZone({
+  pages,
+  activeItem,
+  overId,
+  currentPageId,
+  isEditMode,
+  onPageSelect,
+  onEditPage,
+  onDeletePage,
+  onDuplicatePage,
+  onItemSelect,
+}: StandaloneDropZoneProps) {
+  const { t } = useTranslation("power-system");
+  const { setNodeRef, isOver } = useDroppable({
+    id: "standalone-area",
+    data: {
+      type: "standalone-area",
+    },
+  });
+
+  const pageIds = pages.map((p) => p.id);
+  const isDraggingFromGroup = activeItem?.type === "page" && activeItem.groupId;
+
+  return (
+    <div ref={setNodeRef}>
+      <SortableContext
+        items={pageIds}
+        strategy={verticalListSortingStrategy}
+        id="standalone-area"
+      >
+        <div
+          className={cn(
+            "space-y-1 rounded-md transition-all min-h-[8px]",
+            // Subtle highlight when hovering to drop from group
+            isOver &&
+              isDraggingFromGroup &&
+              "bg-primary/5 ring-1 ring-primary/20"
+          )}
+        >
+          {pages.map((page) => (
+            <SortablePageItem
+              key={page.id}
+              page={page}
+              isActive={page.id === currentPageId}
+              isEditMode={isEditMode}
+              isDragging={activeItem?.id === page.id}
+              isOver={overId === page.id}
+              onSelect={(pageId) => {
+                onPageSelect(pageId);
+                onItemSelect?.(pageId, "page");
+              }}
+              onEdit={onEditPage}
+              onDelete={onDeletePage}
+              onDuplicate={onDuplicatePage}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </div>
+  );
+}
+
 // Sortable Group Item Component
 interface SortableGroupItemProps {
   group: IPowerGroup;
@@ -592,8 +647,9 @@ function SortableGroupItem({
     disabled: !isEditMode,
   });
 
+  // Only apply transform to the item being dragged, not to items being moved
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: isSortableDragging ? CSS.Transform.toString(transform) : undefined,
     transition,
   };
 
@@ -602,10 +658,14 @@ function SortableGroupItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "transition-opacity",
+        "transition-opacity relative",
         (isDragging || isSortableDragging) && "opacity-50"
       )}
     >
+      {/* Drop indicator - shows where item will be placed */}
+      {isOver && !isSortableDragging && (
+        <div className="absolute -top-1 left-0 right-0 h-0.5 bg-primary rounded-full z-10" />
+      )}
       <GroupItem
         group={group}
         isExpanded={isExpanded}
@@ -894,8 +954,9 @@ function SortablePageItem({
     disabled: !isEditMode,
   });
 
+  // Only apply transform to the item being dragged, not to items being moved
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: isSortableDragging ? CSS.Transform.toString(transform) : undefined,
     transition,
   };
 
@@ -904,10 +965,14 @@ function SortablePageItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "transition-opacity",
+        "transition-opacity relative",
         (isDragging || isSortableDragging) && "opacity-50"
       )}
     >
+      {/* Drop indicator - shows where item will be placed */}
+      {isOver && !isSortableDragging && (
+        <div className="absolute -top-1 left-0 right-0 h-0.5 bg-primary rounded-full z-10" />
+      )}
       <PageItem
         page={page}
         isActive={isActive}

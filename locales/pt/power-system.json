@@ -41,7 +41,8 @@
     "sidebar_toggle": "Alternar navegação",
     "empty_pages": "Nenhuma página criada ainda",
     "create_group": "Criar Grupo",
-    "create_page": "Criar Página"
+    "create_page": "Criar Página",
+    "drop_to_remove_from_group": "Solte aqui para remover do grupo"
   },
   "system": {
     "delete_confirm": "Tem certeza que deseja excluir este sistema de poder? Todos os grupos, páginas, seções e blocos serão permanentemente perdidos."
