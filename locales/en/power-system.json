@@ -143,6 +143,7 @@
       "data_source_factions": "Factions",
       "data_source_items": "Items",
       "data_source_races": "Races",
+      "data_source_regions": "Regions",
       "select_entity": "Select an entity...",
       "loading_entities": "Loading entities...",
       "no_entities": "No entities available"
@@ -190,8 +191,10 @@
       "edit_icon": "Edit Icon",
       "icon_title_placeholder": "Icon title",
       "icon_description_placeholder": "Icon description",
-      "title_placeholder": "Title",
-      "description_placeholder": "Description",
+      "title_label": "Title",
+      "title_placeholder": "e.g., Leadership, Combat, Magic",
+      "description_label": "Description",
+      "description_placeholder": "Brief description of this icon...",
       "add_icon_button": "Add Icon",
       "cancel": "Cancel",
       "save": "Save"
@@ -303,14 +306,14 @@
     "create_group": {
       "title": "Create Group",
       "name_label": "Group Name",
-      "name_placeholder": "e.g., Basic Powers, Advanced Techniques",
+      "name_placeholder": "Enter a name to organize related pages",
       "submit": "Create",
       "cancel": "Cancel"
     },
     "create_page": {
       "title": "Create Page",
       "name_label": "Page Name",
-      "name_placeholder": "e.g., Fire Magic, Healing Abilities",
+      "name_placeholder": "Enter a descriptive name for this power or ability",
       "group_label": "Group (optional)",
       "submit": "Create",
       "cancel": "Cancel",
@@ -342,7 +345,7 @@
     "create_section": {
       "title": "Create Section",
       "title_label": "Section Title",
-      "title_placeholder": "e.g., Overview, Requirements, Effects",
+      "title_placeholder": "Enter a title to organize content blocks",
       "submit": "Create",
       "cancel": "Cancel"
     },
@@ -425,6 +428,7 @@
     "character_not_found": "Character not found",
     "faction_not_found": "Faction not found",
     "item_not_found": "Item not found",
-    "race_not_found": "Race not found"
+    "race_not_found": "Race not found",
+    "region_not_found": "Region not found"
   }
 }

@@ -1,8 +1,11 @@
+import { useEffect } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { FormInput } from "@/components/forms/FormInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,10 +18,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 
 interface CreateSectionModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ interface CreateSectionModalProps {
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, { message: "Section title is required" }),
+  title: z.string().max(100).optional().default(""),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -48,6 +48,7 @@ export function CreateSectionModal({
   });
 
   const handleSubmit = (data: FormData) => {
+    if (!data.title?.trim()) return;
     onSubmit(data.title);
     form.reset();
     onClose();
@@ -57,6 +58,13 @@ export function CreateSectionModal({
     form.reset();
     onClose();
   };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      form.reset();
+    }
+  }, [isOpen, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -68,22 +76,25 @@ export function CreateSectionModal({
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
+            noValidate
           >
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {t("modals.create_section.title_label")}
-                  </FormLabel>
                   <FormControl>
-                    <Input
+                    <FormInput
+                      label={t("modals.create_section.title_label")}
                       placeholder={t("modals.create_section.title_placeholder")}
+                      required
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                      maxLength={100}
+                      showCharCount
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -102,9 +113,7 @@ export function CreateSectionModal({
                 variant="magical"
                 size="lg"
                 className="flex-1 animate-glow"
-                disabled={
-                  !form.formState.isValid || form.formState.isSubmitting
-                }
+                disabled={!form.watch("title")?.trim()}
               >
                 {t("modals.create_section.submit")}
               </Button>

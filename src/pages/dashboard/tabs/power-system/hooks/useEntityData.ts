@@ -5,7 +5,9 @@ import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
 import type { IItem } from "@/lib/db/items.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
+import { getRegionsByBookId } from "@/lib/db/regions.service";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
+import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import type { ICharacter } from "@/types/character-types";
 import type { IFaction } from "@/types/faction-types";
 
@@ -67,6 +69,15 @@ export function useEntityData(dataSource: string | undefined, bookId: string) {
               id: race.id,
               name: race.name,
               image: race.image,
+            }));
+            break;
+          }
+          case "regions": {
+            const regions = await getRegionsByBookId(bookId);
+            options = regions.map((region: IRegion) => ({
+              id: region.id,
+              name: region.name,
+              image: region.image,
             }));
             break;
           }

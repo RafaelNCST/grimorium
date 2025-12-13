@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { ITEM_CATEGORIES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-categories";
+import { ITEM_STATUSES_CONSTANT } from "@/components/modals/create-item-modal/constants/item-statuses";
 import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
@@ -81,61 +84,78 @@ export function ItemHoverCard({ itemId, children }: ItemHoverCardProps) {
             {/* Top Section: Image + Name/Category/Status */}
             <div className="flex gap-4">
               {/* Item Image - Square */}
-              <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10">
-                {item.image ? (
+              {item.image ? (
+                <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xl font-semibold">
-                    {item.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2)}
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <FormImageDisplay
+                  icon={Package}
+                  height="h-20"
+                  width="w-20"
+                  shape="square"
+                  className="rounded-lg"
+                />
+              )}
 
               {/* Name, Category, and Status */}
               <div className="flex-1 min-w-0 space-y-2">
-                <h4 className="text-base font-bold line-clamp-2">
+                <h3 className="font-semibold text-lg leading-tight">
                   {item.name}
-                </h4>
+                </h3>
 
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  {item.category && (
-                    <div className="flex items-center gap-1.5">
-                      <Package className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-sm font-medium text-muted-foreground capitalize">
-                        {item.customCategory ||
-                          t(`create-item:category.${item.category}`)}
-                      </span>
-                    </div>
-                  )}
+                {/* Category and Status badges */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {item.category &&
+                    (() => {
+                      const categoryData = ITEM_CATEGORIES_CONSTANT.find(
+                        (c) => c.value === item.category
+                      );
+                      const CategoryIcon = categoryData?.icon;
+                      const displayCategory =
+                        item.category === "other" && item.customCategory
+                          ? item.customCategory
+                          : t(`create-item:category.${item.category}`);
+                      return categoryData && CategoryIcon ? (
+                        <Badge
+                          className={`${categoryData.bgColorClass} ${categoryData.colorClass} border px-3 py-1 pointer-events-none select-none`}
+                        >
+                          <CategoryIcon className="w-3.5 h-3.5 mr-1.5" />
+                          <span className="text-xs font-medium">
+                            {displayCategory}
+                          </span>
+                        </Badge>
+                      ) : null;
+                    })()}
+                  {item.status &&
+                    (() => {
+                      const statusData = ITEM_STATUSES_CONSTANT.find(
+                        (s) => s.value === item.status
+                      );
+                      const StatusIcon = statusData?.icon;
+                      return statusData && StatusIcon ? (
+                        <Badge
+                          className={`${statusData.bgColorClass} ${statusData.colorClass} border px-3 py-1 pointer-events-none select-none`}
+                        >
+                          <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
+                          <span className="text-xs font-medium">
+                            {t(`create-item:status.${item.status}`)}
+                          </span>
+                        </Badge>
+                      ) : null;
+                    })()}
                 </div>
-
-                {/* Status Badge */}
-                {item.status && (
-                  <div className="flex">
-                    <Badge variant="secondary" className="px-3 py-1">
-                      <span className="text-xs font-medium capitalize">
-                        {t(`create-item:status.${item.status}`)}
-                      </span>
-                    </Badge>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Description */}
-            {item.basicDescription && (
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {item.basicDescription}
-              </p>
-            )}
+            {/* Basic description */}
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+              {item.basicDescription}
+            </p>
           </div>
         )}
       </HoverCardContent>

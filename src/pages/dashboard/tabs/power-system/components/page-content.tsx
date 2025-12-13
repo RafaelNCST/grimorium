@@ -264,8 +264,8 @@ export function PageContent({
       <ScrollArea className="flex-1">
         <div className="px-6 py-6 pb-20 max-w-4xl mx-auto">
           {sortedSections.length === 0 ? (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-muted-foreground">
+            <div className="flex items-center justify-center min-h-[calc(100vh-16rem)]">
+              <p className="text-muted-foreground text-center">
                 {t("pages.empty_sections")}
               </p>
             </div>

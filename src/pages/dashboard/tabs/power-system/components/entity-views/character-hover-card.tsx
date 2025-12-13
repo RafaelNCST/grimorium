@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Calendar } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { CHARACTER_ROLES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-roles";
+import { CHARACTER_STATUS_CONSTANT } from "@/components/modals/create-character-modal/constants/character-status";
 import { GENDERS_CONSTANT } from "@/components/modals/create-character-modal/constants/genders";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import {
   HoverCard,
   HoverCardContent,
@@ -88,18 +90,27 @@ export function CharacterHoverCard({
             {/* Top Section: Image + Name/Age/Gender/Role */}
             <div className="flex gap-4">
               {/* Character Image - Circular */}
-              <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage src={character.image} className="object-cover" />
-                <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                  {character.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              {character.image ? (
+                <Avatar className="w-20 h-20 flex-shrink-0">
+                  <AvatarImage src={character.image} className="object-cover" />
+                  <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
+                    {character.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <FormImageDisplay
+                  icon={User}
+                  height="h-20"
+                  width="w-20"
+                  shape="circle"
+                />
+              )}
 
-              {/* Name, Age, Gender, and Role */}
+              {/* Name, Age, Gender, and Role/Status */}
               <div className="flex-1 min-w-0 space-y-2">
                 <h4 className="text-base font-bold line-clamp-2">
                   {character.name}
@@ -131,37 +142,42 @@ export function CharacterHoverCard({
                     })()}
                 </div>
 
-                {/* Role Badge */}
-                {character.role &&
-                  (() => {
-                    const roleData = CHARACTER_ROLES_CONSTANT.find(
-                      (r) => r.value === character.role
-                    );
-                    const RoleIcon = roleData?.icon;
-                    return (
-                      <div className="flex">
-                        <Badge
-                          className={`${roleData?.bgColorClass} ${roleData?.colorClass} border px-3 py-1`}
-                        >
-                          {RoleIcon && (
-                            <RoleIcon className="w-3.5 h-3.5 mr-1.5" />
+                {/* Role and Status Badges */}
+                <div className="flex gap-2 flex-wrap">
+                  {character.role &&
+                    (() => {
+                      const roleData = CHARACTER_ROLES_CONSTANT.find(
+                        (r) => r.value === character.role
+                      );
+                      return roleData ? (
+                        <EntityTagBadge
+                          config={roleData}
+                          label={t(`create-character:role.${character.role}`)}
+                        />
+                      ) : null;
+                    })()}
+                  {character.status &&
+                    (() => {
+                      const statusData = CHARACTER_STATUS_CONSTANT.find(
+                        (s) => s.value === character.status
+                      );
+                      return statusData ? (
+                        <EntityTagBadge
+                          config={statusData}
+                          label={t(
+                            `create-character:status.${character.status}`
                           )}
-                          <span className="text-xs font-medium">
-                            {t(`create-character:role.${character.role}`)}
-                          </span>
-                        </Badge>
-                      </div>
-                    );
-                  })()}
+                        />
+                      ) : null;
+                    })()}
+                </div>
               </div>
             </div>
 
             {/* Description */}
-            {character.description && (
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {character.description}
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+              {character.description}
+            </p>
           </div>
         )}
       </HoverCardContent>

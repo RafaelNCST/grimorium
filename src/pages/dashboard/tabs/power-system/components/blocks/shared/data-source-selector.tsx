@@ -18,9 +18,10 @@ export function DataSourceSelector({
   const sources: { value: DataSourceType; label: string }[] = [
     { value: "manual", label: t("blocks.dropdown.data_source_manual") },
     { value: "characters", label: t("blocks.dropdown.data_source_characters") },
+    { value: "regions", label: t("blocks.dropdown.data_source_regions") },
     { value: "factions", label: t("blocks.dropdown.data_source_factions") },
-    { value: "items", label: t("blocks.dropdown.data_source_items") },
     { value: "races", label: t("blocks.dropdown.data_source_races") },
+    { value: "items", label: t("blocks.dropdown.data_source_items") },
   ];
 
   return (

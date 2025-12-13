@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { FormInput } from "@/components/forms/FormInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,17 +18,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface CreatePageModalProps {
   isOpen: boolean;
@@ -38,7 +29,7 @@ interface CreatePageModalProps {
 }
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: "Page name is required" }),
+  name: z.string().max(100).optional().default(""),
   groupId: z.string().optional(),
 });
 
@@ -61,17 +52,23 @@ export function CreatePageModal({
     },
   });
 
-  // Reset form when modal opens
+  // Reset form when modal opens or closes
   useEffect(() => {
     if (isOpen) {
       form.reset({
         name: "",
         groupId: preselectedGroupId || undefined,
       });
+    } else {
+      form.reset({
+        name: "",
+        groupId: undefined,
+      });
     }
   }, [isOpen, preselectedGroupId, form]);
 
   const handleSubmit = (data: FormData) => {
+    if (!data.name?.trim()) return;
     onSubmit(data.name, data.groupId);
     form.reset({
       name: "",
@@ -99,6 +96,7 @@ export function CreatePageModal({
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
+            noValidate
           >
             {/* Page Name Input */}
             <FormField
@@ -106,51 +104,21 @@ export function CreatePageModal({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("modals.create_page.name_label")}</FormLabel>
                   <FormControl>
-                    <Input
+                    <FormInput
+                      label={t("modals.create_page.name_label")}
                       placeholder={t("modals.create_page.name_placeholder")}
+                      required
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                      maxLength={100}
+                      showCharCount
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Group Selection - Only shows when opened from group menu */}
-            {preselectedGroupId && groups.length > 0 && (
-              <FormField
-                control={form.control}
-                name="groupId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("modals.create_page.group_label")}</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={t("modals.create_page.group_label")}
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {groups.map((group) => (
-                          <SelectItem key={group.id} value={group.id}>
-                            {group.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
@@ -168,6 +136,7 @@ export function CreatePageModal({
                 variant="magical"
                 size="lg"
                 className="flex-1 animate-glow"
+                disabled={!form.watch("name")?.trim()}
               >
                 {t("modals.create_page.submit")}
               </Button>

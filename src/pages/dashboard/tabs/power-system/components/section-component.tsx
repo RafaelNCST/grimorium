@@ -313,7 +313,7 @@ export function SectionComponent({
     <div className="border rounded-lg bg-card" id={`section-${section.id}`}>
       {/* Section Header */}
       {isEditMode ? (
-        <div className="border-b px-4 py-3">
+        <div className={cn("px-4 py-3", !isCollapsed && "border-b")}>
           <div className="flex items-center gap-2">
             {/* Toggle Button in Edit Mode */}
             <Button
@@ -335,6 +335,7 @@ export function SectionComponent({
               onChange={(e) => onUpdateSection(e.target.value)}
               className="flex-1 text-lg font-semibold border-0 shadow-none px-2 h-auto focus-visible:ring-0"
               placeholder={t("section.title_placeholder")}
+              maxLength={100}
             />
 
             {/* Manage Links Button */}

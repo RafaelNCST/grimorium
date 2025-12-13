@@ -46,7 +46,8 @@ export type DataSourceType =
   | "characters"
   | "factions"
   | "items"
-  | "races";
+  | "races"
+  | "regions";
 
 export interface DropdownContent {
   dataSource?: DataSourceType; // Default 'manual' para retrocompatibilidade

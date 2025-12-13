@@ -1,8 +1,11 @@
+import { useEffect } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { FormInput } from "@/components/forms/FormInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,10 +18,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ interface CreateGroupModalProps {
 }
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: "Group name is required" }),
+  name: z.string().max(100).optional().default(""),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -47,6 +47,7 @@ export function CreateGroupModal({
   });
 
   const handleSubmit = (data: FormData) => {
+    if (!data.name?.trim()) return;
     onSubmit(data.name);
     form.reset();
     onClose();
@@ -56,6 +57,13 @@ export function CreateGroupModal({
     form.reset();
     onClose();
   };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      form.reset();
+    }
+  }, [isOpen, form]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -67,20 +75,25 @@ export function CreateGroupModal({
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
+            noValidate
           >
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("modals.create_group.name_label")}</FormLabel>
                   <FormControl>
-                    <Input
+                    <FormInput
+                      label={t("modals.create_group.name_label")}
                       placeholder={t("modals.create_group.name_placeholder")}
+                      required
+                      labelClassName="text-primary"
+                      showOptionalLabel={false}
+                      maxLength={100}
+                      showCharCount
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -99,6 +112,7 @@ export function CreateGroupModal({
                 variant="magical"
                 size="lg"
                 className="flex-1 animate-glow"
+                disabled={!form.watch("name")?.trim()}
               >
                 {t("modals.create_group.submit")}
               </Button>

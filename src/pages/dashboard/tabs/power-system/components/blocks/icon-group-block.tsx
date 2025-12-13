@@ -4,6 +4,8 @@ import { Plus, Trash2, UserCircle, Edit2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,8 +14,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 
 import {
   type IPowerBlock,
@@ -116,40 +116,43 @@ function IconCardDialog({
 
           {/* Campos */}
           <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">
-                {t("blocks.icon_group.title_placeholder")}
-              </label>
-              <Input
-                data-no-drag="true"
-                placeholder={t("blocks.icon_group.title_placeholder")}
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-1.5 block">
-                {t("blocks.icon_group.description_placeholder")}
-              </label>
-              <Textarea
-                data-no-drag="true"
-                placeholder={t("blocks.icon_group.description_placeholder")}
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="min-h-[9rem] max-h-[9rem] resize-none pr-2"
-              />
-            </div>
+            <FormInput
+              label={t("blocks.icon_group.title_label")}
+              placeholder={t("blocks.icon_group.title_placeholder")}
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              required
+              labelClassName="text-primary"
+              showOptionalLabel={false}
+              maxLength={100}
+              showCharCount
+              data-no-drag="true"
+            />
+
+            <FormTextarea
+              label={t("blocks.icon_group.description_label")}
+              placeholder={t("blocks.icon_group.description_placeholder")}
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              required
+              labelClassName="text-primary"
+              showOptionalLabel={false}
+              maxLength={500}
+              showCharCount
+              className="min-h-[9rem] max-h-[9rem] resize-none pr-2"
+              data-no-drag="true"
+            />
           </div>
         </div>
 
         <DialogFooter>
           <Button
             data-no-drag="true"
-            variant="outline"
+            variant="secondary"
             onClick={onClose}
             className="cursor-pointer"
           >
@@ -270,36 +273,16 @@ export function IconGroupBlock({
             {content.icons.map((icon) => (
               <div
                 key={icon.id}
-                className="p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 group overflow-hidden"
+                className="relative p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 group overflow-hidden h-[15.5rem]"
               >
-                <div className="relative w-16 h-16 rounded-full overflow-hidden border">
-                  {icon.imageUrl ? (
-                    <img
-                      src={icon.imageUrl}
-                      alt={icon.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                      <UserCircle className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 space-y-1 w-full min-w-0">
-                  <h4 className="font-semibold text-sm truncate w-full">
-                    {icon.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words overflow-wrap-anywhere w-full pr-2">
-                    {icon.description}
-                  </p>
-                </div>
-                <div className="flex gap-1">
+                {/* Botões de ação no topo */}
+                <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                   <Button
                     data-no-drag="true"
                     variant="ghost"
                     size="icon"
                     onClick={() => openEditDialog(icon)}
-                    className="h-7 w-7 cursor-pointer"
+                    className="h-6 w-6 cursor-pointer"
                   >
                     <Edit2 className="h-3 w-3" />
                   </Button>
@@ -308,10 +291,32 @@ export function IconGroupBlock({
                     variant="ghost-destructive"
                     size="icon"
                     onClick={() => handleDeleteIcon(icon.id)}
-                    className="h-7 w-7 cursor-pointer"
+                    className="h-6 w-6 cursor-pointer"
                   >
-                    <X className="h-3 w-3" />
+                    <Trash2 className="h-3 w-3" />
                   </Button>
+                </div>
+
+                <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0">
+                  {icon.imageUrl ? (
+                    <img
+                      src={icon.imageUrl}
+                      alt={icon.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
+                      <UserCircle className="w-8 h-8 text-purple-400" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1 w-full min-w-0">
+                  <h4 className="font-semibold text-sm w-full break-words max-h-[3rem] overflow-y-auto pr-1">
+                    {icon.title}
+                  </h4>
+                  <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words w-full pr-1">
+                    {icon.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -335,9 +340,9 @@ export function IconGroupBlock({
           {content.icons.map((icon) => (
             <div
               key={icon.id}
-              className="p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 overflow-hidden"
+              className="p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 overflow-hidden h-[15.5rem]"
             >
-              <div className="w-16 h-16 rounded-full overflow-hidden border">
+              <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
                 {icon.imageUrl ? (
                   <img
                     src={icon.imageUrl}
@@ -345,16 +350,16 @@ export function IconGroupBlock({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                    <UserCircle className="w-8 h-8 text-muted-foreground" />
+                  <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
+                    <UserCircle className="w-8 h-8 text-purple-400" />
                   </div>
                 )}
               </div>
               <div className="flex-1 space-y-1 w-full min-w-0">
-                <h4 className="font-semibold text-sm truncate w-full">
+                <h4 className="font-semibold text-sm w-full break-words max-h-[3rem] overflow-y-auto pr-1">
                   {icon.title}
                 </h4>
-                <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words overflow-wrap-anywhere w-full pr-2">
+                <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words w-full pr-1">
                   {icon.description}
                 </p>
               </div>

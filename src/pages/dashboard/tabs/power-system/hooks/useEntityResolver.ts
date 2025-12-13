@@ -4,6 +4,7 @@ import { getCharacterById } from "@/lib/db/characters.service";
 import { getFactionById } from "@/lib/db/factions.service";
 import { getItemById } from "@/lib/db/items.service";
 import { getRaceById } from "@/lib/db/races.service";
+import { getRegionById } from "@/lib/db/regions.service";
 
 interface ResolvedEntity {
   id: string;
@@ -48,6 +49,9 @@ export function useEntityResolver(
                   break;
                 case "races":
                   entity = await getRaceById(id);
+                  break;
+                case "regions":
+                  entity = await getRegionById(id);
                   break;
               }
 

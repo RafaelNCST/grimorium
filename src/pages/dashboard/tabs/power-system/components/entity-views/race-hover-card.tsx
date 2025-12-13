@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { Dna } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { getRaceDomains } from "@/components/modals/create-race-modal/constants/domains";
 import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRaceById } from "@/lib/db/races.service";
+import { getDomainDisplayData } from "@/pages/dashboard/tabs/races/helpers/domain-filter-config";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
 interface RaceHoverCardProps {
@@ -20,7 +22,7 @@ interface RaceHoverCardProps {
 }
 
 export function RaceHoverCard({ raceId, children }: RaceHoverCardProps) {
-  const { t } = useTranslation(["power-system", "create-race"]);
+  const { t } = useTranslation(["power-system", "create-race", "races"]);
   const [race, setRace] = useState<IRace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -65,7 +67,7 @@ export function RaceHoverCard({ raceId, children }: RaceHoverCardProps) {
         {isLoading ? (
           <div className="p-1 space-y-4">
             <div className="flex gap-4">
-              <Skeleton className="h-20 w-20 rounded-full flex-shrink-0" />
+              <Skeleton className="h-20 w-20 rounded-lg flex-shrink-0" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-3 w-24" />
@@ -80,58 +82,74 @@ export function RaceHoverCard({ raceId, children }: RaceHoverCardProps) {
           </div>
         ) : (
           <div className="p-1 space-y-4">
-            {/* Top Section: Image + Name/Domain */}
+            {/* Top Section: Image + Name/Scientific Name/Domain */}
             <div className="flex gap-4">
-              {/* Race Image - Circular */}
-              <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage src={race.image} className="object-cover" />
-                <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                  {race.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              {/* Race Image - Square with rounded corners */}
+              {race?.image ? (
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <img
+                    src={race.image}
+                    alt={race?.name || "Race"}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              ) : (
+                <FormImageDisplay
+                  icon={Dna}
+                  height="h-20"
+                  width="w-20"
+                  shape="square"
+                  className="rounded-lg"
+                />
+              )}
 
-              {/* Name and Domain */}
+              {/* Names and Domains */}
               <div className="flex-1 min-w-0 space-y-2">
-                <h4 className="text-base font-bold line-clamp-2">
-                  {race.name}
-                </h4>
-
-                {race.scientificName && (
-                  <div className="flex items-center gap-1.5">
-                    <Dna className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-sm font-medium text-muted-foreground italic">
+                {/* Names Section */}
+                <div>
+                  <h3 className="font-semibold text-lg leading-tight">
+                    {race.name}
+                  </h3>
+                  {race.scientificName && (
+                    <p className="text-sm italic text-muted-foreground mt-1">
                       {race.scientificName}
-                    </span>
-                  </div>
-                )}
+                    </p>
+                  )}
+                </div>
 
-                {/* Domain Badges */}
-                {race.domain && race.domain.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {race.domain.map((domain) => (
+                {/* Domains */}
+                <div className="flex flex-wrap gap-1.5">
+                  {race.domain.map((domainValue) => {
+                    const raceDomains = getRaceDomains(t);
+                    const domainData = raceDomains.find(
+                      (d) => d.value === domainValue
+                    );
+                    const { icon: DomainIcon, colorConfig } =
+                      getDomainDisplayData(domainValue, t);
+
+                    if (!DomainIcon || !colorConfig || !domainData)
+                      return null;
+
+                    return (
                       <Badge
-                        key={domain}
-                        variant="secondary"
-                        className="px-2 py-0.5"
+                        key={domainValue}
+                        className={`flex items-center gap-1 ${colorConfig.inactiveClasses} px-2 py-0.5 pointer-events-none`}
                       >
-                        <span className="text-xs font-medium">{domain}</span>
+                        <DomainIcon className="w-3.5 h-3.5" />
+                        <span className="text-xs font-medium">
+                          {domainData.label}
+                        </span>
                       </Badge>
-                    ))}
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* Summary */}
-            {race.summary && (
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {race.summary}
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+              {race.summary}
+            </p>
           </div>
         )}
       </HoverCardContent>

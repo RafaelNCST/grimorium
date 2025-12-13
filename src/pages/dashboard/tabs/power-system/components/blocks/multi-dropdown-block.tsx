@@ -25,6 +25,7 @@ import { CharacterHoverCard } from "../entity-views/character-hover-card";
 import { FactionHoverCard } from "../entity-views/faction-hover-card";
 import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
+import { RegionHoverCard } from "../entity-views/region-hover-card";
 
 import { DataSourceSelector } from "./shared/data-source-selector";
 
@@ -152,6 +153,8 @@ export function MultiDropdownBlock({
         return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
       case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
+      case "regions":
+        return <RegionHoverCard regionId={entityId}>{children}</RegionHoverCard>;
       default:
         return children;
     }

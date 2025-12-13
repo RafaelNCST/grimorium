@@ -24,6 +24,7 @@ import { CharacterHoverCard } from "../entity-views/character-hover-card";
 import { FactionHoverCard } from "../entity-views/faction-hover-card";
 import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
+import { RegionHoverCard } from "../entity-views/region-hover-card";
 
 import { DataSourceSelector } from "./shared/data-source-selector";
 import { EntitySelect } from "./shared/entity-select";
@@ -119,6 +120,8 @@ export function DropdownBlock({
         return <ItemHoverCard itemId={entityId}>{children}</ItemHoverCard>;
       case "races":
         return <RaceHoverCard raceId={entityId}>{children}</RaceHoverCard>;
+      case "regions":
+        return <RegionHoverCard regionId={entityId}>{children}</RegionHoverCard>;
       default:
         return children;
     }
@@ -220,15 +223,48 @@ export function DropdownBlock({
           </>
         )}
 
-        {/* Entity Modes (Characters, Factions, Items, Races) */}
+        {/* Entity Modes (Characters, Factions, Items, Races, Regions) */}
         {dataSource !== "manual" && (
-          <EntitySelect
-            entities={entities}
-            selectedId={content.selectedEntityId}
-            onSelect={handleSelectEntity}
-            isLoading={isLoadingEntities}
-            placeholder={t("blocks.dropdown.select_entity")}
-          />
+          <>
+            {isLoadingEntities ? (
+              <div className="text-sm text-muted-foreground">
+                {t("blocks.dropdown.loading_entities")}
+              </div>
+            ) : entities.length === 0 ? (
+              <div className="text-sm text-muted-foreground">
+                {t("blocks.dropdown.no_entities")}
+              </div>
+            ) : (
+              <Select
+                value={content.selectedEntityId}
+                onValueChange={handleSelectEntity}
+              >
+                {content.selectedEntityId && selectedEntity ? (
+                  renderHoverCard(
+                    content.selectedEntityId,
+                    <span className="inline-block w-full">
+                      <SelectTrigger data-no-drag="true" className="w-full">
+                        <SelectValue>{selectedEntity.name}</SelectValue>
+                      </SelectTrigger>
+                    </span>
+                  )
+                ) : (
+                  <SelectTrigger data-no-drag="true">
+                    <SelectValue
+                      placeholder={t("blocks.dropdown.select_entity")}
+                    />
+                  </SelectTrigger>
+                )}
+                <SelectContent>
+                  {entities.map((entity) => (
+                    <SelectItem key={entity.id} value={entity.id}>
+                      {entity.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </>
         )}
       </div>
     );

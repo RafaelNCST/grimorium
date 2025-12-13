@@ -143,6 +143,7 @@
       "data_source_factions": "Facções",
       "data_source_items": "Itens",
       "data_source_races": "Raças",
+      "data_source_regions": "Regiões",
       "select_entity": "Selecione uma entidade",
       "loading_entities": "Carregando entidades",
       "no_entities": "Nenhuma entidade disponível"
@@ -190,8 +191,10 @@
       "edit_icon": "Editar Ícone",
       "icon_title_placeholder": "Título do ícone",
       "icon_description_placeholder": "Descrição do ícone",
-      "title_placeholder": "Título",
-      "description_placeholder": "Descrição",
+      "title_label": "Título",
+      "title_placeholder": "ex: Liderança, Combate, Magia",
+      "description_label": "Descrição",
+      "description_placeholder": "Breve descrição deste ícone...",
       "add_icon_button": "Adicionar Ícone",
       "cancel": "Cancelar",
       "save": "Salvar"
@@ -303,14 +306,14 @@
     "create_group": {
       "title": "Criar Grupo",
       "name_label": "Nome do Grupo",
-      "name_placeholder": "Poderes Básicos, Técnicas Avançadas",
+      "name_placeholder": "Digite um nome para organizar páginas relacionadas",
       "submit": "Criar",
       "cancel": "Cancelar"
     },
     "create_page": {
       "title": "Criar Página",
       "name_label": "Nome da Página",
-      "name_placeholder": "Magia de Fogo, Habilidades de Cura",
+      "name_placeholder": "Digite um nome descritivo para este poder ou habilidade",
       "group_label": "Grupo (opcional)",
       "submit": "Criar",
       "cancel": "Cancelar",
@@ -342,7 +345,7 @@
     "create_section": {
       "title": "Criar Seção",
       "title_label": "Título da Seção",
-      "title_placeholder": "ex: Visão Geral, Requisitos, Efeitos",
+      "title_placeholder": "Digite um título para organizar blocos de conteúdo",
       "submit": "Criar",
       "cancel": "Cancelar"
     },
@@ -425,6 +428,7 @@
     "character_not_found": "Personagem não encontrado",
     "faction_not_found": "Facção não encontrada",
     "item_not_found": "Item não encontrado",
-    "race_not_found": "Raça não encontrada"
+    "race_not_found": "Raça não encontrada",
+    "region_not_found": "Região não encontrada"
   }
 }

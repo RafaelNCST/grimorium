@@ -73,6 +73,11 @@ export function EditSystemModal({
   const iconImage = form.watch("iconImage");
   const systemName = form.watch("name");
 
+  // Check if there are changes compared to original values
+  const hasChanges =
+    systemName !== system?.name ||
+    (iconImage || "") !== (system?.iconImage || "");
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -136,6 +141,7 @@ export function EditSystemModal({
                 variant="magical"
                 size="lg"
                 className="flex-1 animate-glow cursor-pointer"
+                disabled={!hasChanges}
               >
                 {t("modals.edit_system.submit")}
               </Button>

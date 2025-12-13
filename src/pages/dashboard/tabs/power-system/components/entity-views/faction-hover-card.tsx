@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import { Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { DisplayImage } from "@/components/displays";
+import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
+import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import {
   HoverCard,
   HoverCardContent,
@@ -68,7 +71,7 @@ export function FactionHoverCard({
         {isLoading ? (
           <div className="p-1 space-y-4">
             <div className="flex gap-4">
-              <Skeleton className="h-20 w-20 rounded-full flex-shrink-0" />
+              <Skeleton className="h-20 w-20 rounded-lg flex-shrink-0" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-3 w-24" />
@@ -85,56 +88,62 @@ export function FactionHoverCard({
           <div className="p-1 space-y-4">
             {/* Top Section: Image + Name/Type/Status */}
             <div className="flex gap-4">
-              {/* Faction Image - Circular */}
-              <Avatar className="w-20 h-20 flex-shrink-0">
-                <AvatarImage src={faction.image} className="object-cover" />
-                <AvatarFallback className="text-xl bg-gradient-to-br from-primary/20 to-primary/10">
-                  {faction.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              {/* Faction Symbol - Square with rounded corners */}
+              {faction.image ? (
+                <Avatar className="w-24 h-24 rounded-lg flex-shrink-0">
+                  <AvatarImage src={faction.image} className="object-cover" />
+                </Avatar>
+              ) : (
+                <DisplayImage
+                  icon={Shield}
+                  height="h-24"
+                  width="w-24"
+                  shape="square"
+                />
+              )}
 
               {/* Name, Type, and Status */}
               <div className="flex-1 min-w-0 space-y-2">
-                <h4 className="text-base font-bold line-clamp-2">
+                <h3 className="font-semibold text-lg leading-tight line-clamp-1">
                   {faction.name}
-                </h4>
+                </h3>
 
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  {faction.factionType && (
-                    <div className="flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-sm font-medium text-muted-foreground capitalize">
-                        {t(
-                          `create-faction:faction_type.${faction.factionType}`
-                        )}
-                      </span>
-                    </div>
-                  )}
+                {/* Status and Faction Type badges */}
+                <div className="flex flex-wrap gap-2">
+                  {faction.status &&
+                    (() => {
+                      const statusData = FACTION_STATUS_CONSTANT.find(
+                        (s) => s.value === faction.status
+                      );
+                      return statusData ? (
+                        <EntityTagBadge
+                          config={statusData}
+                          label={t(`create-faction:status.${faction.status}`)}
+                        />
+                      ) : null;
+                    })()}
+                  {faction.factionType &&
+                    (() => {
+                      const typeData = FACTION_TYPES_CONSTANT.find(
+                        (c) => c.value === faction.factionType
+                      );
+                      return typeData ? (
+                        <EntityTagBadge
+                          config={typeData}
+                          label={t(
+                            `create-faction:faction_type.${faction.factionType}`
+                          )}
+                        />
+                      ) : null;
+                    })()}
                 </div>
-
-                {/* Status Badge */}
-                {faction.status && (
-                  <div className="flex">
-                    <Badge variant="secondary" className="px-3 py-1">
-                      <span className="text-xs font-medium capitalize">
-                        {t(`create-faction:status.${faction.status}`)}
-                      </span>
-                    </Badge>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Summary */}
-            {faction.summary && (
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                {faction.summary}
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+              {faction.summary}
+            </p>
           </div>
         )}
       </HoverCardContent>

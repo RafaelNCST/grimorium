@@ -88,14 +88,24 @@ export function HeadingBlock({
               }
             >
               <SelectTrigger data-no-drag="true" className="w-20">
-                <SelectValue />
+                <SelectValue>H{content.level}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">H1</SelectItem>
-                <SelectItem value="2">H2</SelectItem>
-                <SelectItem value="3">H3</SelectItem>
-                <SelectItem value="4">H4</SelectItem>
-                <SelectItem value="5">H5</SelectItem>
+                <SelectItem value="1">
+                  <span className="text-4xl font-bold">H1</span>
+                </SelectItem>
+                <SelectItem value="2">
+                  <span className="text-3xl font-bold">H2</span>
+                </SelectItem>
+                <SelectItem value="3">
+                  <span className="text-2xl font-semibold">H3</span>
+                </SelectItem>
+                <SelectItem value="4">
+                  <span className="text-xl font-semibold">H4</span>
+                </SelectItem>
+                <SelectItem value="5">
+                  <span className="text-lg font-semibold">H5</span>
+                </SelectItem>
               </SelectContent>
             </Select>
 
