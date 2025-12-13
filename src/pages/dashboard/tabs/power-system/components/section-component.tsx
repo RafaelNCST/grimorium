@@ -77,6 +77,7 @@ interface SectionComponentProps {
   onDeleteBlock: (blockId: string) => void;
   onReorderBlocks: (blocks: IPowerBlock[]) => void;
   onPageSelect?: (pageId: string) => void; // For navigator block
+  currentPageId?: string; // Current page ID for navigator block
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onManageSectionLinks?: () => void; // For managing character links
@@ -91,6 +92,7 @@ interface SortableBlockProps {
   onUpdate: (content: BlockContent) => void;
   onDelete: () => void;
   onPageSelect?: (pageId: string) => void;
+  currentPageId?: string;
 }
 
 function SortableBlock({
@@ -102,6 +104,7 @@ function SortableBlock({
   onUpdate,
   onDelete,
   onPageSelect,
+  currentPageId,
 }: SortableBlockProps) {
   const {
     attributes,
@@ -174,6 +177,7 @@ function SortableBlock({
             {...commonProps}
             pages={pages}
             onPageSelect={onPageSelect}
+            currentPageId={currentPageId}
           />
         );
       default:
@@ -241,6 +245,7 @@ export function SectionComponent({
   onDeleteBlock,
   onReorderBlocks,
   onPageSelect,
+  currentPageId,
   onMoveUp,
   onMoveDown,
   onManageSectionLinks,
@@ -452,6 +457,7 @@ export function SectionComponent({
                     onUpdate={(content) => onUpdateBlock(block.id, content)}
                     onDelete={() => onDeleteBlock(block.id)}
                     onPageSelect={onPageSelect}
+                    currentPageId={currentPageId}
                   />
                 ))}
               </SortableContext>
@@ -470,6 +476,7 @@ export function SectionComponent({
                       }
                       onDelete={() => onDeleteBlock(activeBlock.id)}
                       onPageSelect={onPageSelect}
+                      currentPageId={currentPageId}
                     />
                   </div>
                 ) : null}

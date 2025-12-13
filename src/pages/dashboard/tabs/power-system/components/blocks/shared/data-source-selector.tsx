@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 import type { DataSourceType } from "../../../types/power-system-types";
 
@@ -24,24 +24,20 @@ export function DataSourceSelector({
   ];
 
   return (
-    <div className="space-y-2">
-      <Label>{t("blocks.dropdown.data_source_label")}</Label>
-      <div className="flex flex-wrap gap-2" data-no-drag="true">
-        {sources.map((source) => (
-          <button
-            key={source.value}
-            type="button"
-            onClick={() => onChange(source.value)}
-            className={`px-4 py-2 rounded-md text-sm font-medium border-2 transition-all ${
-              value === source.value
-                ? "border-primary/40 bg-primary/10 shadow-sm"
-                : "border-muted bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/30"
-            }`}
-          >
-            {source.label}
-          </button>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-2" data-no-drag="true">
+      {sources.map((source) => (
+        <Button
+          key={source.value}
+          type="button"
+          variant="ghost-active"
+          size="sm"
+          active={value === source.value}
+          onClick={() => onChange(source.value)}
+          className="cursor-pointer"
+        >
+          {source.label}
+        </Button>
+      ))}
     </div>
   );
 }

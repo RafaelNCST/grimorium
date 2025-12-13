@@ -61,6 +61,7 @@ interface SectionWrapperProps {
   onDeleteBlock: (blockId: string) => void;
   onReorderBlocks: (blocks: IPowerBlock[]) => void;
   onPageSelect?: (pageId: string) => void;
+  currentPageId?: string;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onManageSectionLinks?: () => void;
@@ -82,6 +83,7 @@ function SectionWrapper({
   onDeleteBlock,
   onReorderBlocks,
   onPageSelect,
+  currentPageId,
   onMoveUp,
   onMoveDown,
   onManageSectionLinks,
@@ -103,6 +105,7 @@ function SectionWrapper({
       onDeleteBlock={onDeleteBlock}
       onReorderBlocks={onReorderBlocks}
       onPageSelect={onPageSelect}
+      currentPageId={currentPageId}
       onMoveUp={onMoveUp}
       onMoveDown={onMoveDown}
       onManageSectionLinks={onManageSectionLinks}
@@ -292,6 +295,7 @@ export function PageContent({
                     onReorderBlocks(section.id, blocks)
                   }
                   onPageSelect={onPageSelect}
+                  currentPageId={page.id}
                   onMoveUp={() => handleMoveSectionUp(section.id)}
                   onMoveDown={() => handleMoveSectionDown(section.id)}
                   onManageSectionLinks={

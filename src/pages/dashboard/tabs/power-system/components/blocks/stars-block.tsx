@@ -32,15 +32,15 @@ export function StarsBlock({
     const currentValue = content.rating;
 
     // If clicking the same star
-    if (clickedValue === currentValue) {
-      // Full star -> half star
-      onUpdate({ ...content, rating: clickedValue - 0.5 });
-    } else if (clickedValue - 0.5 === currentValue) {
-      // Half star -> empty
+    if (clickedValue - 0.5 === currentValue) {
+      // Half star -> full star
+      onUpdate({ ...content, rating: clickedValue });
+    } else if (clickedValue === currentValue) {
+      // Full star -> empty
       onUpdate({ ...content, rating: clickedValue - 1 });
     } else {
-      // Empty or different star -> full star
-      onUpdate({ ...content, rating: clickedValue });
+      // Empty or different star -> half star
+      onUpdate({ ...content, rating: clickedValue - 0.5 });
     }
   };
 

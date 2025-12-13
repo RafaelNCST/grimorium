@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { Image as ImageIcon, Trash2, Upload } from "lucide-react";
+import { Image as ImageIcon, Trash2 } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
 import { useTranslation } from "react-i18next";
 
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import {
   type IPowerBlock,
@@ -116,22 +116,24 @@ export function ImageBlock({
     return () => clearTimeout(timer);
   }, [localCaption]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        // When uploading a new image, set it as both the current and original
-        // Clear any previous crop data
-        onUpdate({
-          ...content,
-          imageUrl: result,
-          originalImageUrl: result,
-          croppedImageUrl: undefined,
-        });
-      };
-      reader.readAsDataURL(file);
+  const handleImageChange = (value: string) => {
+    if (value) {
+      // When uploading a new image, set it as both the current and original
+      // Clear any previous crop data
+      onUpdate({
+        ...content,
+        imageUrl: value,
+        originalImageUrl: value,
+        croppedImageUrl: undefined,
+      });
+    } else {
+      // When removing image
+      onUpdate({
+        ...content,
+        imageUrl: "",
+        originalImageUrl: undefined,
+        croppedImageUrl: undefined,
+      });
     }
   };
 
@@ -238,36 +240,34 @@ export function ImageBlock({
           <div className="flex items-center justify-between gap-2 mb-2">
             {/* Image fit controls */}
             {content.imageUrl && (
-              <div className="flex-1">
-                <Label className="text-sm mb-2 block">
-                  {t("blocks.image.object_fit_label")}
-                </Label>
-                <div className="flex gap-2" data-no-drag="true">
-                  <Button
-                    type="button"
-                    variant="ghost-active"
-                    active={(content.objectFit || "fill") === "fill"}
-                    onClick={() => handleObjectFitChange("fill")}
-                  >
-                    {t("blocks.image.fill")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost-active"
-                    active={content.objectFit === "fit"}
-                    onClick={() => handleObjectFitChange("fit")}
-                  >
-                    {t("blocks.image.fit")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost-active"
-                    active={content.objectFit === "crop"}
-                    onClick={() => handleObjectFitChange("crop")}
-                  >
-                    {t("blocks.image.crop")}
-                  </Button>
-                </div>
+              <div className="flex gap-2" data-no-drag="true">
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="sm"
+                  active={(content.objectFit || "fill") === "fill"}
+                  onClick={() => handleObjectFitChange("fill")}
+                >
+                  {t("blocks.image.fill")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="sm"
+                  active={content.objectFit === "fit"}
+                  onClick={() => handleObjectFitChange("fit")}
+                >
+                  {t("blocks.image.fit")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="sm"
+                  active={content.objectFit === "crop"}
+                  onClick={() => handleObjectFitChange("crop")}
+                >
+                  {t("blocks.image.crop")}
+                </Button>
               </div>
             )}
 
@@ -282,67 +282,20 @@ export function ImageBlock({
             </Button>
           </div>
 
-          <div className="w-full aspect-video rounded-lg overflow-hidden border bg-muted/50">
-            {content.imageUrl ? (
-              <div className="relative w-full h-full group">
-                <img
-                  src={content.imageUrl}
-                  alt="Block image"
-                  className={`w-full h-full ${getObjectFitClass()}`}
-                />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <label
-                    htmlFor={`image-upload-${block.id}`}
-                    data-no-drag="true"
-                    className="cursor-pointer"
-                  >
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="cursor-pointer"
-                      asChild
-                    >
-                      <span>
-                        <Upload className="h-4 w-4 mr-2" />
-                        {t("blocks.image.change_image")}
-                      </span>
-                    </Button>
-                  </label>
-                  <input
-                    data-no-drag="true"
-                    id={`image-upload-${block.id}`}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                <ImageIcon className="w-16 h-16 text-muted-foreground" />
-                <label
-                  htmlFor={`image-upload-${block.id}`}
-                  data-no-drag="true"
-                  className="cursor-pointer"
-                >
-                  <Button variant="secondary" size="sm" asChild>
-                    <span className="cursor-pointer">
-                      <Upload className="h-4 w-4 mr-2" />
-                      {t("blocks.image.upload_image")}
-                    </span>
-                  </Button>
-                </label>
-                <input
-                  data-no-drag="true"
-                  id={`image-upload-${block.id}`}
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </div>
-            )}
+          <div data-no-drag="true">
+            <FormImageUpload
+              value={content.imageUrl}
+              onChange={handleImageChange}
+              label=""
+              height="aspect-video"
+              width="w-full"
+              shape="rounded"
+              imageFit={content.objectFit === "fit" ? "contain" : "cover"}
+              showLabel={false}
+              compact
+              placeholderIcon={ImageIcon}
+              id={`image-upload-${block.id}`}
+            />
           </div>
 
           <Input

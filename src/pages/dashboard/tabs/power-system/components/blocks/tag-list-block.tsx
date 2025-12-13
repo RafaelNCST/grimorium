@@ -59,7 +59,7 @@ export function TagListBlock({
             variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"
+            className="ml-auto cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
@@ -83,7 +83,7 @@ export function TagListBlock({
             data-no-drag="true"
             onClick={handleAddTag}
             size="sm"
-            variant="outline"
+            variant="secondary"
             className="cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-1" />

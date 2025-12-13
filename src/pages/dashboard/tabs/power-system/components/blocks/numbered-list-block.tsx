@@ -85,7 +85,7 @@ function SortableItem({
               e.stopPropagation();
               onDelete();
             }}
-            className="h-8 w-8 text-destructive hover:bg-red-500/20 hover:text-red-600 transition-opacity cursor-pointer"
+            className="h-8 w-8 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -171,7 +171,7 @@ export function NumberedListBlock({
             variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 ml-auto cursor-pointer"
+            className="ml-auto cursor-pointer"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
@@ -195,7 +195,7 @@ export function NumberedListBlock({
             data-no-drag="true"
             onClick={handleAddItem}
             size="sm"
-            variant="outline"
+            variant="secondary"
             className="cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-1" />

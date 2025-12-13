@@ -250,7 +250,8 @@
       "no_page_selected": "No page selected",
       "click_to_navigate": "Click here to navigate",
       "title_placeholder": "Optional title",
-      "page_not_found": "Page not found"
+      "page_not_found": "Page not found",
+      "no_link": "No link"
     }
   },
   "modals": {

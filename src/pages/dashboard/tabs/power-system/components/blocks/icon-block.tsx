@@ -1,9 +1,9 @@
-import { UserCircle, Upload, Trash2 } from "lucide-react";
+import { UserCircle, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import {
@@ -27,16 +27,8 @@ export function IconBlock({
   const { t } = useTranslation("power-system");
   const content = block.content as IconContent;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        onUpdate({ ...content, imageUrl: result });
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (value: string) => {
+    onUpdate({ ...content, imageUrl: value });
   };
 
   const handleAlignmentChange = (value: string) => {
@@ -71,36 +63,34 @@ export function IconBlock({
         {/* Top row: Alignment buttons and delete button */}
         <div className="flex items-center justify-between gap-2">
           {/* Alignment controls */}
-          <div className="flex-1">
-            <Label className="text-sm mb-2 block">
-              {t("blocks.icon.alignment_label")}
-            </Label>
-            <div className="flex gap-2" data-no-drag="true">
-              <Button
-                type="button"
-                variant="ghost-active"
-                active={(content.alignment || "center") === "start"}
-                onClick={() => handleAlignmentChange("start")}
-              >
-                {t("blocks.icon.align_start")}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost-active"
-                active={(content.alignment || "center") === "center"}
-                onClick={() => handleAlignmentChange("center")}
-              >
-                {t("blocks.icon.align_center")}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost-active"
-                active={(content.alignment || "center") === "end"}
-                onClick={() => handleAlignmentChange("end")}
-              >
-                {t("blocks.icon.align_end")}
-              </Button>
-            </div>
+          <div className="flex gap-2" data-no-drag="true">
+            <Button
+              type="button"
+              variant="ghost-active"
+              size="sm"
+              active={(content.alignment || "center") === "start"}
+              onClick={() => handleAlignmentChange("start")}
+            >
+              {t("blocks.icon.align_start")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost-active"
+              size="sm"
+              active={(content.alignment || "center") === "center"}
+              onClick={() => handleAlignmentChange("center")}
+            >
+              {t("blocks.icon.align_center")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost-active"
+              size="sm"
+              active={(content.alignment || "center") === "end"}
+              onClick={() => handleAlignmentChange("end")}
+            >
+              {t("blocks.icon.align_end")}
+            </Button>
           </div>
 
           <Button
@@ -116,51 +106,20 @@ export function IconBlock({
 
         {/* Icon upload area */}
         <div className={`flex flex-col gap-4 ${getAlignmentClasses()}`}>
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors group">
-            {content.imageUrl ? (
-              <>
-                <img
-                  src={content.imageUrl}
-                  alt={content.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <label
-                    data-no-drag="true"
-                    htmlFor={`icon-upload-${block.id}`}
-                    className="cursor-pointer"
-                  >
-                    <Upload className="h-6 w-6 text-white" />
-                  </label>
-                  <input
-                    data-no-drag="true"
-                    id={`icon-upload-${block.id}`}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </div>
-              </>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                <label
-                  data-no-drag="true"
-                  htmlFor={`icon-upload-${block.id}`}
-                  className="cursor-pointer flex flex-col items-center gap-1"
-                >
-                  <UserCircle className="w-12 h-12 text-muted-foreground" />
-                  <input
-                    data-no-drag="true"
-                    id={`icon-upload-${block.id}`}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            )}
+          <div data-no-drag="true">
+            <FormImageUpload
+              value={content.imageUrl}
+              onChange={handleImageChange}
+              label=""
+              height="h-24"
+              width="w-24"
+              shape="circle"
+              imageFit="cover"
+              showLabel={false}
+              compact
+              placeholderIcon={UserCircle}
+              id={`icon-upload-${block.id}`}
+            />
           </div>
 
           {/* Title and description inputs */}

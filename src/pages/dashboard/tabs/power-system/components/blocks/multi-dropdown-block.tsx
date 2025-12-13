@@ -162,13 +162,10 @@ export function MultiDropdownBlock({
       <div className="space-y-3 p-4 rounded-lg border bg-card">
         {/* Top row: Data source selector and delete button */}
         <div className="flex items-center justify-between gap-2 mb-2">
-          {/* Data Source Selector */}
-          <div className="flex-1">
-            <DataSourceSelector
-              value={dataSource}
-              onChange={handleDataSourceChange}
-            />
-          </div>
+          <DataSourceSelector
+            value={dataSource}
+            onChange={handleDataSourceChange}
+          />
 
           <Button
             data-no-drag="true"
@@ -203,7 +200,7 @@ export function MultiDropdownBlock({
                   data-no-drag="true"
                   onClick={handleAddOption}
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
                   className="cursor-pointer"
                 >
                   <Plus className="h-4 w-4 mr-1" />

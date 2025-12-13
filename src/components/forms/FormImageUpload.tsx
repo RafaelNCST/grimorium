@@ -1,9 +1,8 @@
 import { useState, useRef } from "react";
 
-import { ImagePlus, X, LucideIcon } from "lucide-react";
+import { ImagePlus, Upload, LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 type ImageShape = "square" | "rounded" | "circle";
@@ -222,24 +221,31 @@ export function FormImageUpload({
         />
 
         {preview ? (
-          <div
-            className={`relative ${width} ${height} ${shapeClass} overflow-hidden border`}
+          <label
+            htmlFor={id}
+            className="cursor-pointer block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
-            <img
-              src={preview}
-              alt="Preview"
-              className={`w-full h-full ${fitClass}`}
-            />
-            <Button
-              type="button"
-              variant="ghost-destructive"
-              size="icon"
-              className="absolute top-2 right-2"
-              onClick={handleRemoveImage}
+            <div
+              className={`relative ${width} ${height} ${shapeClass} overflow-hidden border group`}
             >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+              <img
+                src={preview}
+                alt="Preview"
+                className={`w-full h-full ${fitClass} transition-all duration-300 group-hover:brightness-50`}
+              />
+
+              {/* Hover overlay with upload icon */}
+              <div
+                className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-300 ${
+                  isHovered ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <Upload className="h-12 w-12 text-white" />
+              </div>
+            </div>
+          </label>
         ) : (
           <label
             htmlFor={id}
@@ -248,7 +254,11 @@ export function FormImageUpload({
             onMouseLeave={() => setIsHovered(false)}
           >
             <div
-              className={`relative ${width} ${height} border-dashed border-2 border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40 overflow-hidden`}
+              className={`relative ${width} ${height} border-dashed border-2 transition-colors ${shapeClass} flex flex-col items-center justify-center gap-2 bg-purple-950/40 overflow-hidden ${
+                isHovered
+                  ? "border-primary"
+                  : "border-muted-foreground/25"
+              }`}
             >
               <PlaceholderIcon className="h-12 w-12 text-muted-foreground/60" />
               {placeholderText && !compact && (

@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { stat, readFile } from "@tauri-apps/plugin-fs";
-import { Upload, X } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormInput } from "@/components/forms/FormInput";
@@ -273,68 +273,50 @@ export function UploadImageModal({
             {/* Image Selection */}
             <div className="space-y-2">
               <Label>{t("upload_modal.select_image")}</Label>
-              <div className="relative w-full h-64 rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary transition-colors overflow-hidden bg-muted">
-                {imagePreview ? (
-                  <>
-                    {/* Image container - clicável para trocar */}
-                    <div
-                      className="relative group cursor-pointer w-full h-full"
-                      onClick={handleSelectImage}
-                    >
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-full object-contain"
-                      />
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                        <Upload className="h-12 w-12 text-white" />
-                      </div>
+              {imagePreview ? (
+                <div
+                  className="relative w-full h-64 rounded-lg border overflow-hidden cursor-pointer group"
+                  onClick={handleSelectImage}
+                >
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-contain transition-all duration-300 group-hover:brightness-50"
+                  />
+                  {/* Hover overlay with upload icon */}
+                  <div className="absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                    <Upload className="h-12 w-12 text-white" />
+                  </div>
+
+                  {/* File info - on top */}
+                  {imageMetadata && (
+                    <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded flex items-center gap-2 z-20">
+                      <span className="font-medium truncate max-w-[200px]">
+                        {imageMetadata.filename}
+                      </span>
+                      <span className="text-white/80">•</span>
+                      <span className="text-white/80">
+                        {formatFileSize(imageMetadata.size)}
+                      </span>
                     </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="relative w-full h-64 border-dashed border-2 border-muted-foreground/25 hover:border-primary transition-colors rounded-lg flex flex-col items-center justify-center gap-2 bg-purple-950/40 overflow-hidden cursor-pointer group"
+                  onClick={handleSelectImage}
+                >
+                  <Upload className="h-12 w-12 text-muted-foreground/60" />
 
-                    {/* File info - on top */}
-                    {imageMetadata && (
-                      <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded flex items-center gap-2">
-                        <span className="font-medium truncate max-w-[200px]">
-                          {imageMetadata.filename}
-                        </span>
-                        <span className="text-white/80">•</span>
-                        <span className="text-white/80">
-                          {formatFileSize(imageMetadata.size)}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Delete button - mais sobressaído */}
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 z-20 shadow-lg bg-destructive/90 hover:bg-destructive"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setImagePreview("");
-                        setSelectedImagePath("");
-                        setSelectedImageDataURL("");
-                        setImageMetadata(null);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={handleSelectImage}
-                  >
-                    <Upload className="h-8 w-8 text-muted-foreground" />
-                    <span className="text-sm">
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 z-10 bg-black/60 flex items-center justify-center transition-opacity duration-300 rounded-lg p-2 opacity-0 group-hover:opacity-100">
+                    <span className="text-white text-sm font-semibold text-center">
                       {t("upload_modal.select_image")}
                     </span>
-                  </button>
-                )}
-              </div>
+                  </div>
+                </button>
+              )}
             </div>
 
             {/* Title */}

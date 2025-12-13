@@ -20,6 +20,7 @@ interface NavigatorBlockProps {
   onDelete: () => void;
   pages?: IPowerPage[]; // Available pages for selection
   onPageSelect?: (pageId: string) => void; // Callback to navigate to page
+  currentPageId?: string; // Current page ID to prevent navigation to same page
 }
 
 export function NavigatorBlock({
@@ -29,6 +30,7 @@ export function NavigatorBlock({
   onDelete,
   pages = [],
   onPageSelect,
+  currentPageId,
 }: NavigatorBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as NavigatorContent;
@@ -64,7 +66,7 @@ export function NavigatorBlock({
           <div className="flex items-center gap-2">
             <Button
               data-no-drag="true"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setIsSelectPageModalOpen(true)}
               className="cursor-pointer"
@@ -75,9 +77,13 @@ export function NavigatorBlock({
                 : t("blocks.navigator.select_page")}
             </Button>
 
-            {linkedPage && (
+            {linkedPage ? (
               <span className="text-sm text-muted-foreground">
                 {linkedPage.name}
+              </span>
+            ) : (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground border">
+                {t("blocks.navigator.no_link")}
               </span>
             )}
 
@@ -115,7 +121,7 @@ export function NavigatorBlock({
           onClose={() => setIsSelectPageModalOpen(false)}
           onSelect={handleSelectPage}
           pages={pages}
-          currentPageId={content.linkedPageId}
+          currentPageId={currentPageId}
         />
       </>
     );

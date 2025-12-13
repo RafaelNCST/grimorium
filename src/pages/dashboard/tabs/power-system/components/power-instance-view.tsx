@@ -169,6 +169,7 @@ export function PowerInstanceView({
                   bookId={bookId}
                   isEditMode={false}
                   isReadOnlyView
+                  currentPageId={page?.id}
                   onUpdateSection={() => {}}
                   onDeleteSection={() => {}}
                   onAddBlock={() => {}}

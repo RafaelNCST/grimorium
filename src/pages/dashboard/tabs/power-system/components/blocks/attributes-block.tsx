@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Trash2, Plus, Minus, Palette, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import {
   type IPowerBlock,
@@ -26,6 +31,17 @@ const BAR_COLORS = {
   yellow: "bg-yellow-500",
   cyan: "bg-cyan-500",
 } as const;
+
+const COLOR_HEX_MAP: Record<BarColor, string> = {
+  purple: "#a855f7",
+  blue: "#3b82f6",
+  green: "#22c55e",
+  red: "#ef4444",
+  orange: "#f97316",
+  pink: "#ec4899",
+  yellow: "#eab308",
+  cyan: "#06b6d4",
+};
 
 type BarColor = keyof typeof BAR_COLORS;
 
@@ -45,6 +61,17 @@ export function AttributesBlock({
   const { t } = useTranslation("power-system");
   const content = block.content as AttributesContent;
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const [tooltipsEnabled, setTooltipsEnabled] = useState(false);
+
+  // Habilita tooltips após o popover abrir completamente
+  useEffect(() => {
+    if (isColorPickerOpen) {
+      const timer = setTimeout(() => setTooltipsEnabled(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setTooltipsEnabled(false);
+    }
+  }, [isColorPickerOpen]);
 
   const handleAddBar = () => {
     if (content.max < 10) {
@@ -96,7 +123,7 @@ export function AttributesBlock({
           <div className="flex items-center gap-2">
             <Button
               data-no-drag="true"
-              variant="outline"
+              variant="secondary"
               size="icon"
               onClick={handleRemoveBar}
               disabled={content.max <= 1}
@@ -106,7 +133,7 @@ export function AttributesBlock({
             </Button>
             <Button
               data-no-drag="true"
-              variant="outline"
+              variant="secondary"
               size="icon"
               onClick={handleAddBar}
               disabled={content.max >= 10}
@@ -118,47 +145,54 @@ export function AttributesBlock({
             <Popover
               open={isColorPickerOpen}
               onOpenChange={setIsColorPickerOpen}
+              modal={false}
             >
               <PopoverTrigger asChild>
                 <Button
                   data-no-drag="true"
-                  variant="outline"
+                  variant="secondary"
                   size="icon"
                   className="h-8 w-8 cursor-pointer"
                 >
                   <Palette className="w-4 h-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-3" align="start">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">
-                    {t("blocks.attributes.color_picker")}
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {(Object.keys(BAR_COLORS) as BarColor[]).map((color) => (
-                      <button
-                        key={color}
-                        data-no-drag="true"
-                        onClick={() => handleColorChange(color)}
-                        className={`relative w-8 h-8 rounded-md border transition-all ${
-                          BAR_COLORS[color]
-                        } ${
-                          currentColor === color
-                            ? "border-foreground/40 shadow-lg scale-105"
-                            : "border-transparent hover:scale-105 hover:shadow-md"
-                        } cursor-pointer flex items-center justify-center`}
-                        title={t(`blocks.attributes.colors.${color}`)}
-                        aria-label={t(`blocks.attributes.colors.${color}`)}
-                      >
-                        {currentColor === color && (
-                          <Check
-                            className="w-5 h-5 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                            strokeWidth={3}
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
+              <PopoverContent
+                className="w-auto p-3 z-[9999]"
+                side="bottom"
+                align="start"
+                sideOffset={15}
+                collisionPadding={20}
+                avoidCollisions={true}
+              >
+                <div className="flex gap-2">
+                  {(Object.keys(BAR_COLORS) as BarColor[]).map((color) => (
+                    <Tooltip key={color} delayDuration={300} open={tooltipsEnabled ? undefined : false}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          data-no-drag="true"
+                          onClick={() => handleColorChange(color)}
+                          className={`w-8 h-8 aspect-square rounded-lg border transition-all flex items-center justify-center ${
+                            currentColor === color
+                              ? "opacity-60 border-foreground"
+                              : "border-border cursor-pointer hover:opacity-60"
+                          }`}
+                          style={{ backgroundColor: COLOR_HEX_MAP[color] }}
+                        >
+                          {currentColor === color && (
+                            <Check
+                              className="w-5 h-5 text-purple-600 dark:text-purple-400 drop-shadow-lg"
+                              strokeWidth={3}
+                            />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>{t(`blocks.attributes.colors.${color}`)}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
                 </div>
               </PopoverContent>
             </Popover>
@@ -169,7 +203,7 @@ export function AttributesBlock({
             variant="ghost-destructive"
             size="icon"
             onClick={onDelete}
-            className="text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer h-8 w-8"
+            className="cursor-pointer h-8 w-8"
           >
             <Trash2 className="w-4 h-4" />
           </Button>

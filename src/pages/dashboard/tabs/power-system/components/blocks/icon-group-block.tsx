@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
-import { Plus, Trash2, UserCircle, Upload, Edit2, X } from "lucide-react";
+import { Plus, Trash2, UserCircle, Edit2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,16 +74,8 @@ function IconCardDialog({
     }
   }, [isOpen, initialData]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setFormData({ ...formData, imageUrl: result });
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageChange = (value: string) => {
+    setFormData({ ...formData, imageUrl: value });
   };
 
   const handleSave = () => {
@@ -105,45 +98,20 @@ function IconCardDialog({
 
         <div className="space-y-4">
           {/* Ícone centralizado no topo */}
-          <div className="flex justify-center">
-            <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors group">
-              {formData.imageUrl ? (
-                <>
-                  <img
-                    src={formData.imageUrl}
-                    alt="Icon preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <label
-                      htmlFor="icon-group-upload"
-                      className="cursor-pointer"
-                      data-no-drag="true"
-                    >
-                      <Upload className="h-5 w-5 text-white" />
-                    </label>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                  <label
-                    htmlFor="icon-group-upload"
-                    className="cursor-pointer"
-                    data-no-drag="true"
-                  >
-                    <UserCircle className="w-10 h-10 text-muted-foreground" />
-                  </label>
-                </div>
-              )}
-              <input
-                id="icon-group-upload"
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                onChange={handleFileChange}
-                className="hidden"
-                data-no-drag="true"
-              />
-            </div>
+          <div className="flex justify-center" data-no-drag="true">
+            <FormImageUpload
+              value={formData.imageUrl}
+              onChange={handleImageChange}
+              label=""
+              height="h-20"
+              width="w-20"
+              shape="circle"
+              imageFit="cover"
+              showLabel={false}
+              compact
+              placeholderIcon={UserCircle}
+              id="icon-group-upload"
+            />
           </div>
 
           {/* Campos */}
@@ -279,7 +247,7 @@ export function IconGroupBlock({
             data-no-drag="true"
             onClick={openAddDialog}
             size="sm"
-            variant="outline"
+            variant="secondary"
             className="cursor-pointer"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -328,7 +296,7 @@ export function IconGroupBlock({
                 <div className="flex gap-1">
                   <Button
                     data-no-drag="true"
-                    variant="ghost-destructive"
+                    variant="ghost"
                     size="icon"
                     onClick={() => openEditDialog(icon)}
                     className="h-7 w-7 cursor-pointer"
@@ -340,7 +308,7 @@ export function IconGroupBlock({
                     variant="ghost-destructive"
                     size="icon"
                     onClick={() => handleDeleteIcon(icon.id)}
-                    className="h-7 w-7 text-destructive hover:bg-red-500/20 hover:text-red-600 cursor-pointer"
+                    className="h-7 w-7 cursor-pointer"
                   >
                     <X className="h-3 w-3" />
                   </Button>
