@@ -632,16 +632,41 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     if (!systemId) return;
 
     try {
+      // Capture current page value before async operation
+      const currentPageSnapshot = currentPage;
+      const isCurrentPageBeingDeleted = currentPageSnapshot?.id === pageId;
+
       await deletePowerPage(pageId);
 
       setPages((prevPages) => {
         const filteredPages = prevPages.filter((page) => page.id !== pageId);
 
-        if (currentPage?.id === pageId) {
-          const newCurrentPage = filteredPages.length > 0 ? filteredPages[0] : null;
+        // Only navigate if the deleted page is the current page
+        if (isCurrentPageBeingDeleted) {
+          // Find the index of the deleted page
+          const deletedIndex = prevPages.findIndex((page) => page.id === pageId);
+
+          let newCurrentPage: IPowerPage | null = null;
+
+          if (filteredPages.length > 0) {
+            // Try to navigate to the next page (at the same index after deletion)
+            if (deletedIndex < filteredPages.length) {
+              newCurrentPage = filteredPages[deletedIndex];
+            }
+            // If no next page, navigate to the previous one
+            else if (deletedIndex > 0) {
+              newCurrentPage = filteredPages[deletedIndex - 1];
+            }
+            // Fallback to first page if something goes wrong
+            else {
+              newCurrentPage = filteredPages[0];
+            }
+          }
+
           setCurrentPage(newCurrentPage);
           setCurrentPageId(systemId, newCurrentPage?.id || null);
         }
+        // If not the current page, keep the current page unchanged
 
         return filteredPages;
       });

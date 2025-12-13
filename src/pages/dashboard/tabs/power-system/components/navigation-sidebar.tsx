@@ -818,14 +818,27 @@ function GroupItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onCreatePage()}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCreatePage();
+                    }}
+                  >
                     {t("groups.add_page")}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(true);
+                    }}
+                  >
                     {t("groups.edit")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => onDelete(group.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(group.id);
+                    }}
                     className="text-destructive"
                   >
                     {t("groups.delete")}
@@ -1094,14 +1107,27 @@ function PageItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(true);
+                    }}
+                  >
                     {t("pages.edit")}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onDuplicate(page.id)}>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicate(page.id);
+                    }}
+                  >
                     {t("pages.duplicate")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => onDelete(page.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(page.id);
+                    }}
                     className="text-destructive"
                   >
                     {t("pages.delete")}
