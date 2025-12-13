@@ -368,6 +368,13 @@
       "description": "Esta ação não pode ser desfeita. Todos os grupos, páginas, seções e blocos dentro deste sistema serão permanentemente perdidos.",
       "confirm": "Excluir Sistema",
       "cancel": "Cancelar"
+    },
+    "delete_group": {
+      "title": "Excluir Grupo",
+      "description": "Este grupo contém {{count}} página(s). O que deseja fazer?",
+      "delete_group_only": "Apenas o Grupo",
+      "delete_all": "Grupo e Páginas",
+      "cancel": "Cancelar"
     }
   },
   "actions": {

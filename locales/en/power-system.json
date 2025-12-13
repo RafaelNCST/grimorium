@@ -368,6 +368,13 @@
       "description": "This action cannot be undone. All groups, pages, sections, and blocks within this system will be permanently lost.",
       "confirm": "Delete System",
       "cancel": "Cancel"
+    },
+    "delete_group": {
+      "title": "Delete Group",
+      "description": "This group contains {{count}} page(s). What would you like to do?",
+      "delete_group_only": "Group Only",
+      "delete_all": "Group and Pages",
+      "cancel": "Cancel"
     }
   },
   "actions": {

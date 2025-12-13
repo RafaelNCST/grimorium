@@ -29,6 +29,7 @@ import {
 import { usePowerSystemStore } from "@/stores/power-system-store";
 import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 
+import { DeleteGroupModal } from "../components/delete-group-modal";
 import { ManageLinksModal } from "../components/manage-links-modal";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
@@ -90,6 +91,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     useState(false);
   const [isSelectBlockModalOpen, setIsSelectBlockModalOpen] = useState(false);
   const [isDeleteSystemModalOpen, setIsDeleteSystemModalOpen] = useState(false);
+  const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false);
   const [isManageLinksModalOpen, setIsManageLinksModalOpen] = useState(false);
 
   // Modal Context
@@ -105,6 +107,7 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [selectedLinkSectionId, setSelectedLinkSectionId] = useState<
     string | undefined
   >();
+  const [groupToDelete, setGroupToDelete] = useState<IPowerGroup | null>(null);
 
   // Loading States
   const [isLoadingGroups, setIsLoadingGroups] = useState(false);
@@ -518,13 +521,30 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     }
   };
 
-  const handleDeleteGroup = async (groupId: string) => {
+  const handleDeleteGroup = (groupId: string) => {
+    const group = groups.find((g) => g.id === groupId);
+    if (!group) return;
+
+    // Check if group has pages
+    const groupPages = pages.filter((page) => page.groupId === groupId);
+
+    if (groupPages.length > 0) {
+      // Show modal to ask user what to do
+      setGroupToDelete(group);
+      setIsDeleteGroupModalOpen(true);
+    } else {
+      // No pages, delete directly
+      handleDeleteGroupOnly(groupId);
+    }
+  };
+
+  const handleDeleteGroupOnly = async (groupId: string) => {
     try {
       await deletePowerGroup(groupId);
 
       setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
 
-      // Update pages that belonged to this group
+      // Update pages that belonged to this group (make them standalone)
       setPages((prevPages) =>
         prevPages.map((page) =>
           page.groupId === groupId ? { ...page, groupId: undefined } : page
@@ -532,6 +552,35 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       );
     } catch (error) {
       console.error("Error deleting group:", error);
+    }
+  };
+
+  const handleDeleteGroupAndPages = async (groupId: string) => {
+    try {
+      // Delete the group
+      await deletePowerGroup(groupId);
+
+      // Get pages to delete
+      const pagesToDelete = pages.filter((page) => page.groupId === groupId);
+
+      // Delete all pages in the group
+      for (const page of pagesToDelete) {
+        await deletePowerPage(page.id);
+      }
+
+      // Update state
+      setGroups((prevGroups) => prevGroups.filter((group) => group.id !== groupId));
+      setPages((prevPages) => prevPages.filter((page) => page.groupId !== groupId));
+
+      // If current page was in the deleted group, navigate to first available page
+      if (currentPage && currentPage.groupId === groupId && systemId) {
+        const remainingPages = pages.filter((page) => page.groupId !== groupId);
+        const newCurrentPage = remainingPages.length > 0 ? remainingPages[0] : null;
+        setCurrentPage(newCurrentPage);
+        setCurrentPageId(systemId, newCurrentPage?.id || null);
+      }
+    } catch (error) {
+      console.error("Error deleting group and pages:", error);
     }
   };
 
@@ -1042,6 +1091,28 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
         }
       }}
     >
+      {/* Delete Group Modal */}
+      <DeleteGroupModal
+        isOpen={isDeleteGroupModalOpen}
+        onClose={() => setIsDeleteGroupModalOpen(false)}
+        onDeleteGroupOnly={() => {
+          if (groupToDelete) {
+            handleDeleteGroupOnly(groupToDelete.id);
+          }
+        }}
+        onDeleteGroupAndPages={() => {
+          if (groupToDelete) {
+            handleDeleteGroupAndPages(groupToDelete.id);
+          }
+        }}
+        groupName={groupToDelete?.name}
+        pageCount={
+          groupToDelete
+            ? pages.filter((p) => p.groupId === groupToDelete.id).length
+            : 0
+        }
+      />
+
       {/* Manage Links Modal */}
       <ManageLinksModal
         isOpen={isManageLinksModalOpen}
