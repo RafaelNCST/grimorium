@@ -94,7 +94,15 @@
     "mutualism_desc": "Mantém uma relação de cooperação mútua com a outra raça, onde ambas as partes obtêm vantagens e se beneficiam",
     "competition_desc": "Disputa recursos, território ou influência com a outra raça, gerando conflitos diretos por objetivos e interesses comuns",
     "neutralism_desc": "Não possui interações significativas com a outra raça, coexistindo sem impactos mútuos relevantes ou interferências",
-    "adoration_desc": "Venera, idolatra ou nutre profunda admiração e respeito pela outra raça, considerando-a superior ou digna de culto"
+    "adoration_desc": "Venera, idolatra ou nutre profunda admiração e respeito pela outra raça, considerando-a superior ou digna de culto",
+    "predation_label": "caça a raça",
+    "prey_label": "é caçada pela raça",
+    "parasitism_label": "parasita a raça",
+    "commensalism_label": "beneficia-se da raça",
+    "mutualism_label": "coopera mutuamente com a raça",
+    "competition_label": "compete com a raça",
+    "neutralism_label": "coexiste neutralmente com a raça",
+    "adoration_label": "venera a raça"
   },
   "empty_states": {
     "no_data": "Nenhuma informação fornecida",
@@ -134,7 +142,8 @@
     "add": "Adicionar",
     "save": "Salvar",
     "edit_title": "Editar Relacionamento",
-    "editing_with": "Editando relacionamento com"
+    "editing_with": "Editando relacionamento com",
+    "entity_name_plural": "raças"
   },
   "delete": {
     "title": "Excluir Raça",

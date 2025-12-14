@@ -1156,7 +1156,7 @@ export function RaceDetailView({
       emptyDescription: t("race-detail:empty_states.no_relationships_hint"),
       addButtonLabel: t("race-detail:relationships.add_relationship"),
       onAddClick: () => setIsAddRelationshipDialogOpen(true),
-      blockedEntityName: "raças",
+      blockedEntityName: t("race-detail:relationships.entity_name_plural"),
     },
     // Chapter Metrics section (only visible in view mode)
     ...(!isEditing

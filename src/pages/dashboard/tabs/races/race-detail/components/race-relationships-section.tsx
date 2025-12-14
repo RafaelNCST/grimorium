@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   Edit2,
@@ -7,12 +7,14 @@ import {
   ChevronLeft,
   UserPlus,
   Heart,
+  User,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -27,6 +29,7 @@ import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 import { getRaceRelationshipTypes } from "../constants/race-relationship-types";
 import { RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/race-relationship-types-badge-constant";
@@ -112,6 +115,8 @@ export function RaceRelationshipsSection({
   const [selectedType, setSelectedType] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
+  const [hasScroll, setHasScroll] = useState(false);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Get current race
   const currentRace = allRaces.find((race) => race.id === currentRaceId);
@@ -214,6 +219,30 @@ export function RaceRelationshipsSection({
     setDescription("");
   };
 
+  // Detectar se há scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasScroll(scrollHeight > clientHeight);
+      }
+    };
+
+    // Dar um pequeno delay para garantir que o conteúdo foi renderizado
+    const timeoutId = setTimeout(checkScroll, 0);
+
+    // Observar mudanças no tamanho do conteúdo
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [availableRaces, modalStep, isAddDialogOpen]);
+
   return (
     <div className="space-y-4">
       {/* Relationships List */}
@@ -234,16 +263,19 @@ export function RaceRelationshipsSection({
               >
                 <div className="flex items-center gap-4">
                   {/* Race Avatar */}
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={race.image} className="object-cover" />
-                    <AvatarFallback>
-                      {race.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
+                  {race.image ? (
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={race.image} className="object-cover" />
+                    </Avatar>
+                  ) : (
+                    <FormImageDisplay
+                      icon={User}
+                      height="h-12"
+                      width="w-12"
+                      shape="circle"
+                      iconSize="w-6 h-6"
+                    />
+                  )}
 
                   {/* Race Info */}
                   <div className="flex-1 min-w-0">
@@ -256,18 +288,32 @@ export function RaceRelationshipsSection({
                           RACE_RELATIONSHIP_TYPES_BADGE_CONSTANT.find(
                             (r) => r.value === relationship.type
                           );
-                        return badgeConfig ? (
-                          <EntityTagBadge
-                            config={badgeConfig}
-                            label={t(
-                              `race-detail:relationship_types.${badgeConfig.translationKey}`
-                            )}
-                          />
-                        ) : null;
+                        if (!badgeConfig) return null;
+
+                        const BadgeIcon = badgeConfig.icon;
+                        const relationshipDesc = `${race.name} ${t(
+                          `race-detail:relationship_types.${relationship.type}_label`
+                        )} ${currentRaceName}`;
+
+                        return (
+                          <div
+                            className={`${badgeConfig.bgColorClass} ${badgeConfig.colorClass} border px-3 py-1.5 rounded-md pointer-events-none select-none flex items-start gap-1.5`}
+                          >
+                            <BadgeIcon className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs font-medium leading-tight">
+                                {t(`race-detail:relationship_types.${badgeConfig.translationKey}`)}
+                              </span>
+                              <span className="text-[10px] leading-tight opacity-80">
+                                {relationshipDesc}
+                              </span>
+                            </div>
+                          </div>
+                        );
                       })()}
                     </div>
 
-                    {/* Description */}
+                    {/* Custom Description */}
                     {relationship.description && (
                       <p className="text-xs text-muted-foreground mt-2">
                         {relationship.description}
@@ -321,12 +367,18 @@ export function RaceRelationshipsSection({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <div
+            ref={scrollContainerRef}
+            className={cn(
+              "max-h-[60vh] overflow-y-auto custom-scrollbar",
+              hasScroll && "pr-3"
+            )}
+          >
             <div className="space-y-6 pr-2 pl-2">
               {/* STEP 1: Race Selection */}
               {modalStep === 1 && (
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold">
+                  <Label className="text-sm font-semibold text-purple-400">
                     {t("race-detail:relationships.available_races")}
                   </Label>
                   <div className="grid grid-cols-1 gap-3 p-1">
@@ -337,19 +389,22 @@ export function RaceRelationshipsSection({
                         onClick={() => handleRaceSelect(race.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <Avatar className="w-12 h-12">
-                            <AvatarImage
-                              src={race.image}
-                              className="object-cover"
+                          {race.image ? (
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage
+                                src={race.image}
+                                className="object-cover"
+                              />
+                            </Avatar>
+                          ) : (
+                            <FormImageDisplay
+                              icon={User}
+                              height="h-12"
+                              width="w-12"
+                              shape="circle"
+                              iconSize="w-6 h-6"
                             />
-                            <AvatarFallback>
-                              {race.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-base truncate">
                               {race.name}
@@ -367,24 +422,27 @@ export function RaceRelationshipsSection({
                 <div className="space-y-6">
                   {/* Selected Race Card (Read-only) */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold">
+                    <Label className="text-sm font-semibold text-purple-400">
                       {t("race-detail:relationships.selected_race")}
                     </Label>
                     <Card className="p-4 bg-primary/5 border-primary/20">
                       <div className="flex items-center gap-4">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={getRaceById(selectedRaceId)?.image}
-                            className="object-cover"
+                        {getRaceById(selectedRaceId)?.image ? (
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={getRaceById(selectedRaceId)?.image}
+                              className="object-cover"
+                            />
+                          </Avatar>
+                        ) : (
+                          <FormImageDisplay
+                            icon={User}
+                            height="h-12"
+                            width="w-12"
+                            shape="circle"
+                            iconSize="w-6 h-6"
                           />
-                          <AvatarFallback>
-                            {getRaceById(selectedRaceId)
-                              ?.name.split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        )}
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-base truncate">
                             {getRaceById(selectedRaceId)?.name}
@@ -392,13 +450,6 @@ export function RaceRelationshipsSection({
                         </div>
                       </div>
                     </Card>
-                    <p className="text-sm text-muted-foreground text-center pt-1">
-                      {t("race-detail:relationships.is_to_the")}{" "}
-                      <span className="font-semibold text-primary">
-                        {currentRaceName}
-                      </span>
-                      :
-                    </p>
                   </div>
 
                   {/* Relationship Type Selection */}
@@ -414,9 +465,9 @@ export function RaceRelationshipsSection({
                         label: t(
                           `race-detail:relationship_types.${type.translationKey}`
                         ),
-                        description: t(
-                          `race-detail:relationship_types.${type.translationKey}_desc`
-                        ),
+                        description: `${getRaceById(selectedRaceId)?.name} ${t(
+                          `race-detail:relationship_types.${type.translationKey}_label`
+                        )} ${currentRaceName}`,
                         icon: type.icon,
                         backgroundColor:
                           RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
@@ -451,7 +502,7 @@ export function RaceRelationshipsSection({
                 </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
 
           <DialogFooter>
             {modalStep === 1 ? (
@@ -496,52 +547,88 @@ export function RaceRelationshipsSection({
           </DialogHeader>
 
           <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6 pr-2">
-              {/* Relationship Type Selection */}
-              <div className="pb-2">
-                <FormSelectGrid
-                  value={selectedType}
-                  onChange={setSelectedType}
-                  label={t("race-detail:relationships.relationship_type")}
-                  columns={2}
-                  required
-                  options={RACE_RELATIONSHIP_TYPES.map((type) => ({
-                    value: type.value,
-                    label: t(
-                      `race-detail:relationship_types.${type.translationKey}`
-                    ),
-                    description: t(
-                      `race-detail:relationship_types.${type.translationKey}_desc`
-                    ),
-                    icon: type.icon,
-                    backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                    borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
-                  }))}
-                />
-              </div>
+            <div className="space-y-6 pr-2 pl-2">
+              {editingRelationship && (
+                <>
+                  {/* Selected Race Card (Read-only) */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold text-purple-400">
+                      {t("race-detail:relationships.selected_race")}
+                    </Label>
+                    <Card className="p-4 bg-primary/5 border-primary/20">
+                      <div className="flex items-center gap-4">
+                        {getRaceById(editingRelationship.raceId)?.image ? (
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={getRaceById(editingRelationship.raceId)?.image}
+                              className="object-cover"
+                            />
+                          </Avatar>
+                        ) : (
+                          <FormImageDisplay
+                            icon={User}
+                            height="h-12"
+                            width="w-12"
+                            shape="circle"
+                            iconSize="w-6 h-6"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-base truncate">
+                            {getRaceById(editingRelationship.raceId)?.name}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
 
-              {/* Description Field */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-primary">
-                  {t("race-detail:relationships.description_label")}
-                  <span className="text-muted-foreground font-normal ml-1">
-                    ({t("race-detail:relationships.optional")})
-                  </span>
-                </Label>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t(
-                    "race-detail:relationships.description_placeholder"
-                  )}
-                  rows={3}
-                  maxLength={200}
-                  className="resize-none w-full"
-                />
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{description.length}/200</span>
-                </div>
-              </div>
+                  {/* Relationship Type Selection */}
+                  <div className="pb-2">
+                    <FormSelectGrid
+                      value={selectedType}
+                      onChange={setSelectedType}
+                      label={t("race-detail:relationships.relationship_type")}
+                      columns={2}
+                      required
+                      options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                        value: type.value,
+                        label: t(
+                          `race-detail:relationship_types.${type.translationKey}`
+                        ),
+                        description: `${getRaceById(editingRelationship.raceId)?.name} ${t(
+                          `race-detail:relationship_types.${type.translationKey}_label`
+                        )} ${currentRaceName}`,
+                        icon: type.icon,
+                        backgroundColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                        borderColor: RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
+                      }))}
+                    />
+                  </div>
+
+                  {/* Description Field */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t("race-detail:relationships.description_label")}
+                      <span className="text-muted-foreground font-normal ml-1">
+                        ({t("race-detail:relationships.optional")})
+                      </span>
+                    </Label>
+                    <Textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={t(
+                        "race-detail:relationships.description_placeholder"
+                      )}
+                      rows={3}
+                      maxLength={200}
+                      className="resize-none w-full"
+                    />
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{description.length}/200</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </ScrollArea>
 
@@ -551,7 +638,8 @@ export function RaceRelationshipsSection({
               {t("race-detail:relationships.cancel")}
             </Button>
             <Button
-              variant="default"
+              variant="magical"
+              className="animate-glow"
               onClick={handleEditRelationship}
               disabled={!selectedType}
             >

@@ -93,7 +93,17 @@
     "commensalism_desc": "This race benefits without affecting the other",
     "mutualism_desc": "Both races benefit mutually",
     "competition_desc": "Both races compete for resources",
-    "neutralism_desc": "Coexist without significant interaction"
+    "neutralism_desc": "Coexist without significant interaction",
+    "adoration": "Adoration",
+    "adoration_desc": "This race venerates, worships, or holds deep admiration and respect for the other race, considering it superior or worthy of devotion",
+    "predation_label": "hunts the race",
+    "prey_label": "is hunted by the race",
+    "parasitism_label": "parasitizes the race",
+    "commensalism_label": "benefits from the race",
+    "mutualism_label": "cooperates mutually with the race",
+    "competition_label": "competes with the race",
+    "neutralism_label": "coexists neutrally with the race",
+    "adoration_label": "venerates the race"
   },
   "empty_states": {
     "no_data": "No information provided.",
@@ -129,7 +139,8 @@
     "add": "Add",
     "save": "Save",
     "edit_title": "Edit Relationship",
-    "editing_with": "Editing relationship with"
+    "editing_with": "Editing relationship with",
+    "entity_name_plural": "races"
   },
   "delete": {
     "title": "Delete Race",
