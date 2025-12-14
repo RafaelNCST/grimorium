@@ -29,14 +29,14 @@ import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
+import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateFactionModal } from "@/components/modals/create-faction-modal";
-import { FactionTypePicker } from "@/components/modals/create-faction-modal/components/faction-type-picker";
 import { PowerSlider } from "@/components/modals/create-faction-modal/components/power-slider";
-import { StatusPicker } from "@/components/modals/create-faction-modal/components/status-picker";
 import { FACTION_INFLUENCE_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-influence";
 import { FACTION_REPUTATION_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-reputation";
 import { FACTION_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-status";
+import { FACTION_TYPE_OPTIONS } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { FACTION_TYPES_CONSTANT } from "@/components/modals/create-faction-modal/constants/faction-types";
 import { DeleteEntityModal } from "@/components/modals/delete-entity-modal";
 import { Button } from "@/components/ui/button";
@@ -199,6 +199,28 @@ export function FactionDetailView({
   // Navigation for entity notes
   const navigate = useNavigate();
 
+  // Convert status constants to FormSimpleGrid format
+  const statusOptions = FACTION_STATUS_CONSTANT.map((status) => {
+    // Extract background and border colors from bgColorClass
+    const bgMatch = status.bgColorClass.match(/bg-(\w+-\d+\/\d+)/);
+    const borderMatch = status.bgColorClass.match(/border-(\w+-\d+\/\d+)/);
+
+    return {
+      value: status.value,
+      label: t(`create-faction:${status.translationKey}`),
+      icon: status.icon,
+      backgroundColor: bgMatch ? bgMatch[1] : "gray-500/10",
+      borderColor: borderMatch ? borderMatch[1] : "gray-500/30",
+    };
+  });
+
+  // Translate faction type options for FormSelectGrid
+  const translatedTypeOptions = FACTION_TYPE_OPTIONS.map((opt) => ({
+    ...opt,
+    label: t(`create-faction:${opt.label}`),
+    description: opt.description ? t(`create-faction:${opt.description}`) : undefined,
+  }));
+
   // Handlers for hierarchy modals
   const handleSaveTitles = (titles: typeof editData.hierarchy) => {
     onEditDataChange("hierarchy", titles);
@@ -293,15 +315,23 @@ export function FactionDetailView({
           </div>
 
           {/* Status Picker */}
-          <StatusPicker
+          <FormSimpleGrid
             value={editData.status || ""}
             onChange={(value) => onEditDataChange("status", value)}
+            label={t("create-faction:modal.status")}
+            required
+            options={statusOptions}
+            columns={5}
           />
 
           {/* Faction Type Picker */}
-          <FactionTypePicker
+          <FormSelectGrid
             value={editData.factionType || ""}
             onChange={(value) => onEditDataChange("factionType", value)}
+            label={t("create-faction:modal.faction_type")}
+            required
+            columns={4}
+            options={translatedTypeOptions}
           />
 
           {/* Summary */}

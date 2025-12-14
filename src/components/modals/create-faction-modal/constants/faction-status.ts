@@ -7,13 +7,19 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { SimplePickerOption } from "@/components/forms/FormSimplePicker";
-
 /**
- * Faction status options for FormSimplePicker
- * Used in create-faction-modal for status selection
+ * Faction status options base data
+ * Converted to FormSimpleGrid format in create-faction-modal
  */
-export const FACTION_STATUS_OPTIONS: SimplePickerOption[] = [
+export interface FactionStatusOption {
+  value: string;
+  translationKey: string;
+  icon: LucideIcon;
+  color: string;
+  activeColor: string;
+}
+
+export const FACTION_STATUS_OPTIONS: FactionStatusOption[] = [
   {
     value: "active",
     translationKey: "status.active",

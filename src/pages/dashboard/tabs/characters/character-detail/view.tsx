@@ -30,7 +30,6 @@ import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
-import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CreateCharacterModal } from "@/components/modals/create-character-modal";
 import { CHARACTER_ARCHETYPES_CONSTANT } from "@/components/modals/create-character-modal/constants/character-archetypes";
@@ -352,14 +351,20 @@ export function CharacterDetailView({
                 : "red-500/20",
   }));
 
-  // Convert status constants to FormSimplePicker format
-  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => ({
-    value: status.value,
-    translationKey: status.translationKey,
-    icon: status.icon,
-    color: "text-muted-foreground",
-    activeColor: status.colorClass,
-  }));
+  // Convert status constants to FormSimpleGrid format
+  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => {
+    // Extract background and border colors from bgColorClass
+    const bgMatch = status.bgColorClass.match(/bg-(\w+-\d+\/\d+)/);
+    const borderMatch = status.bgColorClass.match(/border-(\w+-\d+\/\d+)/);
+
+    return {
+      value: status.value,
+      label: t(`create-character:${status.translationKey}`),
+      icon: status.icon,
+      backgroundColor: bgMatch ? bgMatch[1] : "gray-500/10",
+      borderColor: borderMatch ? borderMatch[1] : "gray-500/30",
+    };
+  });
 
   // Basic Fields
   const basicFields = (
@@ -491,14 +496,14 @@ export function CharacterDetailView({
             </div>
           </div>
 
-          {/* Status - Using FormSimplePicker */}
-          <FormSimplePicker
+          {/* Status - Using FormSimpleGrid */}
+          <FormSimpleGrid
             value={editData.status || ""}
             onChange={(value) => onEditDataChange("status", value)}
             label={t("character-detail:fields.status")}
             required
             options={statusOptions}
-            translationNamespace="create-character"
+            columns={5}
           />
 
           {/* Role - Using FormSimpleGrid */}

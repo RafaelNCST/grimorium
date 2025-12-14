@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
-import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
+import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +42,22 @@ export function CreateItemModalView({
   } = form;
 
   const watchedValues = watch();
+
+  // Convert status constants to FormSimpleGrid format
+  const statusOptions = ITEM_STATUSES_CONSTANT.map((status) => {
+    // Extract background and border colors from bgColorClass
+    // Format: "bg-green-500/10 border-green-500/30"
+    const bgMatch = status.bgColorClass.match(/bg-(\w+-\d+\/\d+)/);
+    const borderMatch = status.bgColorClass.match(/border-(\w+-\d+\/\d+)/);
+
+    return {
+      value: status.value,
+      label: t(status.translationKey),
+      icon: status.icon,
+      backgroundColor: bgMatch ? bgMatch[1] : "gray-500/10",
+      borderColor: borderMatch ? borderMatch[1] : "gray-500/30",
+    };
+  });
 
   // Basic Fields
   const basicFields = (
@@ -83,14 +99,14 @@ export function CreateItemModalView({
       </div>
 
       {/* Status Picker */}
-      <FormSimplePicker
+      <FormSimpleGrid
         value={watchedValues.status}
         onChange={(value) => setValue("status", value)}
         label={t("modal.item_status")}
         required
-        options={ITEM_STATUSES_CONSTANT}
+        options={statusOptions}
         error={errors.status?.message}
-        translationNamespace="create-item"
+        columns={7}
       />
 
       {/* Category Selector */}

@@ -7,7 +7,7 @@ import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
-import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
+import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Form } from "@/components/ui/form";
@@ -71,6 +71,27 @@ export function CreateFactionModalView({
     description: opt.description ? t(opt.description) : undefined,
   }));
 
+  // Convert status options to FormSimpleGrid format
+  const statusOptions = FACTION_STATUS_OPTIONS.map((status) => {
+    // Map activeColor to backgroundColor/borderColor
+    const colorMap: Record<string, { bg: string; border: string }> = {
+      "text-green-600 dark:text-green-400": { bg: "green-500/10", border: "green-500/30" },
+      "text-yellow-600 dark:text-yellow-400": { bg: "yellow-500/10", border: "yellow-500/30" },
+      "text-red-600 dark:text-red-400": { bg: "red-500/10", border: "red-500/30" },
+      "text-blue-600 dark:text-blue-400": { bg: "blue-500/10", border: "blue-500/30" },
+      "text-purple-600 dark:text-purple-400": { bg: "purple-500/10", border: "purple-500/30" },
+    };
+    const colors = colorMap[status.activeColor] || { bg: "gray-500/10", border: "gray-500/30" };
+
+    return {
+      value: status.value,
+      label: t(status.translationKey),
+      icon: status.icon,
+      backgroundColor: colors.bg,
+      borderColor: colors.border,
+    };
+  });
+
   return (
     <Form {...form}>
       <form onSubmit={onSubmit}>
@@ -121,14 +142,14 @@ export function CreateFactionModalView({
               </div>
 
               {/* Status Picker */}
-              <FormSimplePicker
+              <FormSimpleGrid
                 value={watchedValues.status}
                 onChange={(value) => setValue("status", value)}
                 label={t("modal.status")}
                 required
-                options={FACTION_STATUS_OPTIONS}
+                options={statusOptions}
                 error={errors.status?.message}
-                translationNamespace="create-faction"
+                columns={5}
               />
 
               {/* Faction Type Picker */}

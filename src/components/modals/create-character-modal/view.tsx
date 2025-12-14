@@ -7,7 +7,6 @@ import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
-import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
 import { EntityModal } from "@/components/modals/entity-modal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,14 +132,21 @@ export function CreateCharacterModalView({
     borderColor: "purple-500/20",
   }));
 
-  // Convert status constants to FormSimplePicker format
-  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => ({
-    value: status.value,
-    translationKey: status.translationKey,
-    icon: status.icon,
-    color: "text-muted-foreground",
-    activeColor: status.colorClass,
-  }));
+  // Convert status constants to FormSimpleGrid format
+  const statusOptions = CHARACTER_STATUS_CONSTANT.map((status) => {
+    // Extract background and border colors from bgColorClass
+    // Format: "bg-green-500/10 border-green-500/30"
+    const bgMatch = status.bgColorClass.match(/bg-(\w+-\d+\/\d+)/);
+    const borderMatch = status.bgColorClass.match(/border-(\w+-\d+\/\d+)/);
+
+    return {
+      value: status.value,
+      label: t(status.translationKey),
+      icon: status.icon,
+      backgroundColor: bgMatch ? bgMatch[1] : "gray-500/10",
+      borderColor: borderMatch ? borderMatch[1] : "gray-500/30",
+    };
+  });
 
   const basicFields = (
     <>
@@ -257,14 +263,14 @@ export function CreateCharacterModalView({
         </div>
       </div>
 
-      {/* Status - Using FormSimplePicker */}
-      <FormSimplePicker
-        value={watchedValues.status || null}
+      {/* Status - Using FormSimpleGrid */}
+      <FormSimpleGrid
+        value={watchedValues.status || ""}
         onChange={(value) => setValue("status", value)}
         options={statusOptions}
         label={t("modal.status")}
         required
-        translationNamespace="create-character"
+        columns={5}
       />
 
       {/* Role Picker - Using FormSimpleGrid */}

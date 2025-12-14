@@ -15,7 +15,7 @@ import {
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
 import { FormListInput } from "@/components/forms/FormListInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
-import { FormSimplePicker } from "@/components/forms/FormSimplePicker";
+import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
 import { ItemNavigationSidebar } from "@/components/item-navigation-sidebar";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { CategorySelector } from "@/components/modals/create-item-modal/components/category-selector";
@@ -195,6 +195,21 @@ export const ItemDetailView = React.memo(
         ? item.customCategory
         : t(`create-item:category.${item.category}`);
 
+    // Convert status constants to FormSimpleGrid format
+    const statusOptions = ITEM_STATUSES_CONSTANT.map((status) => {
+      // Extract background and border colors from bgColorClass
+      const bgMatch = status.bgColorClass.match(/bg-(\w+-\d+\/\d+)/);
+      const borderMatch = status.bgColorClass.match(/border-(\w+-\d+\/\d+)/);
+
+      return {
+        value: status.value,
+        label: t(`create-item:${status.translationKey}`),
+        icon: status.icon,
+        backgroundColor: bgMatch ? bgMatch[1] : "gray-500/10",
+        borderColor: borderMatch ? borderMatch[1] : "gray-500/30",
+      };
+    });
+
     // ==================
     // BASIC FIELDS (following create-item modal layout)
     // ==================
@@ -251,14 +266,14 @@ export const ItemDetailView = React.memo(
             </div>
 
             {/* Status Picker */}
-            <FormSimplePicker
+            <FormSimpleGrid
               value={editData.status || ""}
               onChange={(value) => onEditDataChange("status", value)}
               label={t("create-item:modal.item_status")}
               required
-              options={ITEM_STATUSES_CONSTANT}
+              options={statusOptions}
               error={errors.status}
-              translationNamespace="create-item"
+              columns={7}
             />
 
             {/* Category Selector */}

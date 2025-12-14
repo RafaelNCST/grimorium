@@ -173,44 +173,7 @@ Componentes base reutilizáveis de formulário utilizados no projeto.
 
 ---
 
-## 12. FormSimplePicker
-**Componente:** `FormSimplePicker` (`src/components/forms/FormSimplePicker.tsx`)
-**Descrição:** Seleção visual horizontal com ícone e label. Efeitos de hover e scale. Sem bordas.
-
-**Diferenças do FormSimpleGrid:**
-- Layout horizontal (flex) vs grid
-- Efeito scale animado (hover 105%, selected 110%)
-- Sem bordas/cards
-- Ideal para 3-7 opções
-
-**Exemplo:**
-```tsx
-<FormSimplePicker
-  value={value}
-  onChange={setValue}
-  label="Status"
-  options={[
-    {
-      value: "active",
-      translationKey: "status.active",
-      icon: IconComponent,
-      color: "text-muted-foreground",
-      activeColor: "text-green-600 dark:text-green-400",
-    },
-  ]}
-/>
-```
-
-**Propriedades:**
-- `value`: string | null
-- `onChange`: (value: string) => void
-- `options`: Array (value, translationKey, icon, color, activeColor)
-- `label`: string
-- `required`: boolean (opcional)
-
----
-
-## 13. FormImageUpload
+## 12. FormImageUpload
 **Componente:** `FormImageUpload` (`src/components/forms/FormImageUpload.tsx`)
 **Descrição:** Upload de imagem com preview. Suporta diferentes formas (square, rounded, circle) e modos de fit (fill, cover, contain).
 
