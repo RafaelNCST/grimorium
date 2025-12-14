@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Trash2, Plus, Minus, Palette, Check } from "lucide-react";
+import { Plus, Minus, Palette, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
   type IPowerBlock,
   type AttributesContent,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 // Define bar colors with vibrant shades similar to primary
 const BAR_COLORS = {
@@ -50,6 +51,10 @@ interface AttributesBlockProps {
   isEditMode: boolean;
   onUpdate: (content: AttributesContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function AttributesBlock({
@@ -57,6 +62,10 @@ export function AttributesBlock({
   isEditMode,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: AttributesBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as AttributesContent;
@@ -198,15 +207,13 @@ export function AttributesBlock({
             </Popover>
           </div>
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer h-8 w-8"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         <div className="space-y-2">

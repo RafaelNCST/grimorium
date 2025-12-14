@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ArrowRight, Link, Trash2 } from "lucide-react";
+import { ArrowRight, Link } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import {
 } from "../../types/power-system-types";
 import { SelectPageModal } from "../select-page-modal";
 
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
+
 interface NavigatorBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
@@ -21,6 +23,10 @@ interface NavigatorBlockProps {
   pages?: IPowerPage[]; // Available pages for selection
   onPageSelect?: (pageId: string) => void; // Callback to navigate to page
   currentPageId?: string; // Current page ID to prevent navigation to same page
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function NavigatorBlock({
@@ -31,6 +37,10 @@ export function NavigatorBlock({
   pages = [],
   onPageSelect,
   currentPageId,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: NavigatorBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as NavigatorContent;
@@ -88,15 +98,13 @@ export function NavigatorBlock({
             )}
 
             <div className="ml-auto">
-              <Button
-                data-no-drag="true"
-                variant="ghost-destructive"
-                size="icon"
-                onClick={onDelete}
-                className="cursor-pointer"
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
+              <BlockReorderButtons
+                onMoveUp={onMoveUp}
+                onMoveDown={onMoveDown}
+                onDelete={onDelete}
+                isFirst={isFirst}
+                isLast={isLast}
+              />
             </div>
           </div>
 

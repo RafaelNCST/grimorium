@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
 import { RegionHoverCard } from "../entity-views/region-hover-card";
 
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 import { DataSourceSelector } from "./shared/data-source-selector";
 import { EntitySelect } from "./shared/entity-select";
 
@@ -36,6 +37,10 @@ interface DropdownBlockProps {
   isReadOnlyView?: boolean;
   onUpdate: (content: DropdownContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function DropdownBlock({
@@ -45,6 +50,10 @@ export function DropdownBlock({
   isReadOnlyView = false,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: DropdownBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as DropdownContent;
@@ -137,15 +146,13 @@ export function DropdownBlock({
             onChange={handleDataSourceChange}
           />
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         {/* Manual Mode */}

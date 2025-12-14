@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ import { ItemHoverCard } from "../entity-views/item-hover-card";
 import { RaceHoverCard } from "../entity-views/race-hover-card";
 import { RegionHoverCard } from "../entity-views/region-hover-card";
 
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 import { DataSourceSelector } from "./shared/data-source-selector";
 
 interface MultiDropdownBlockProps {
@@ -36,6 +37,10 @@ interface MultiDropdownBlockProps {
   isReadOnlyView?: boolean;
   onUpdate: (content: MultiDropdownContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function MultiDropdownBlock({
@@ -45,6 +50,10 @@ export function MultiDropdownBlock({
   isReadOnlyView = false,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: MultiDropdownBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as MultiDropdownContent;
@@ -170,15 +179,13 @@ export function MultiDropdownBlock({
             onChange={handleDataSourceChange}
           />
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         {/* Manual Mode */}

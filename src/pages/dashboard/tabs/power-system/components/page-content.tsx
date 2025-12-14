@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-import { Plus, Search, Link } from "lucide-react";
+import { Plus, Link } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -136,13 +134,8 @@ export function PageContent({
   onManageSectionLinks,
 }: PageContentProps) {
   const { t } = useTranslation("power-system");
-  const [sectionFilter, setSectionFilter] = useState("");
 
-  const sortedSections = [...sections]
-    .filter((section) =>
-      section.title.toLowerCase().includes(sectionFilter.toLowerCase())
-    )
-    .sort((a, b) => a.orderIndex - b.orderIndex);
+  const sortedSections = [...sections].sort((a, b) => a.orderIndex - b.orderIndex);
 
   const getBlocksForSection = (sectionId: string) =>
     blocks.filter((block) => block.sectionId === sectionId);
@@ -245,19 +238,6 @@ export function PageContent({
             )}
           </div>
         </div>
-
-        {/* Section Filter */}
-        {sortedSections.length > 0 && (
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={sectionFilter}
-              onChange={(e) => setSectionFilter(e.target.value)}
-              placeholder={t("pages.filter_sections")}
-              className="pl-9 pr-3 py-2"
-            />
-          </div>
-        )}
       </div>
 
       {/* Page Content */}

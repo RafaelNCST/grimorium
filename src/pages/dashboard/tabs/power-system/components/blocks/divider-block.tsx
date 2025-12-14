@@ -1,35 +1,42 @@
-import { Trash2 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import {
   type IPowerBlock,
   type DividerContent,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface DividerBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
   onUpdate: (content: DividerContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
-export function DividerBlock({ isEditMode, onDelete }: DividerBlockProps) {
+export function DividerBlock({
+  isEditMode,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
+}: DividerBlockProps) {
   if (isEditMode) {
     return (
       <div className="space-y-3 p-4 rounded-lg border bg-card">
-        {/* Linha 1: Botão de excluir */}
+        {/* Linha 1: Botões de controle */}
         <div className="flex justify-end">
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         {/* Linha 2: Divisor */}

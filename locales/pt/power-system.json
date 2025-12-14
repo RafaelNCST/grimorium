@@ -93,6 +93,8 @@
   "blocks": {
     "select_type": "Selecionar Tipo de Bloco",
     "confirm_delete": "Tem certeza que deseja excluir este bloco?",
+    "move_up": "Mover bloco para cima",
+    "move_down": "Mover bloco para baixo",
     "heading": {
       "name": "Título",
       "description": "Título com níveis hierárquicos (aparece na estrutura)",
@@ -377,14 +379,6 @@
       "delete_all": "Grupo e Páginas",
       "cancel": "Cancelar"
     }
-  },
-  "actions": {
-    "save": "Salvar",
-    "cancel": "Cancelar",
-    "delete": "Excluir",
-    "edit": "Editar",
-    "move_up": "Mover para cima",
-    "move_down": "Mover para baixo"
   },
   "notifications": {
     "system_created": "Sistema de poder criado com sucesso",

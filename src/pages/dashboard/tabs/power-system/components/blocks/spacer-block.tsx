@@ -1,4 +1,4 @@
-import { ArrowDownUp, Trash2 } from "lucide-react";
+import { ArrowDownUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,17 @@ import {
   type IPowerBlock,
   type SpacerContent,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface SpacerBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
   onUpdate: (content: SpacerContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function SpacerBlock({
@@ -20,6 +25,10 @@ export function SpacerBlock({
   isEditMode,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: SpacerBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as SpacerContent;
@@ -73,15 +82,13 @@ export function SpacerBlock({
             </Button>
           </div>
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         {/* Visual preview of the spacer */}

@@ -93,6 +93,8 @@
   "blocks": {
     "select_type": "Select Block Type",
     "confirm_delete": "Are you sure you want to delete this block?",
+    "move_up": "Move block up",
+    "move_down": "Move block down",
     "heading": {
       "name": "Heading",
       "description": "Title with hierarchy levels (appears in outline)",
@@ -377,14 +379,6 @@
       "delete_all": "Group and Pages",
       "cancel": "Cancel"
     }
-  },
-  "actions": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "move_up": "Move up",
-    "move_down": "Move down"
   },
   "notifications": {
     "system_created": "Power system created successfully",

@@ -1,23 +1,6 @@
 import { useState } from "react";
 
 import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  DragOverlay,
-  type DragStartEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
   ChevronDown,
   ChevronRight,
   ChevronUp,
@@ -84,152 +67,103 @@ interface SectionComponentProps {
   onManageSectionLinks?: () => void; // For managing character links
 }
 
-interface SortableBlockProps {
+interface BlockWrapperProps {
   block: IPowerBlock;
   pages?: IPowerPage[];
   bookId: string;
   isEditMode: boolean;
   isReadOnlyView?: boolean;
+  isFirst: boolean;
+  isLast: boolean;
   onUpdate: (content: BlockContent) => void;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onPageSelect?: (pageId: string) => void;
   currentPageId?: string;
 }
 
-function SortableBlock({
+function BlockWrapper({
   block,
   pages,
   bookId,
   isEditMode,
   isReadOnlyView = false,
+  isFirst,
+  isLast,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
   onPageSelect,
   currentPageId,
-}: SortableBlockProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: block.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    // Torna o elemento invisível durante o drag (o DragOverlay mostrará a cópia)
-    opacity: isDragging ? 0 : 1,
+}: BlockWrapperProps) {
+  const commonProps = {
+    block,
+    isEditMode,
+    onUpdate,
+    onDelete,
+    onMoveUp,
+    onMoveDown,
+    isFirst,
+    isLast,
   };
 
-  const renderBlock = () => {
-    const commonProps = {
-      block,
-      isEditMode,
-      onUpdate,
-      onDelete,
-    };
-
-    switch (block.type) {
-      case "heading":
-        return <HeadingBlock {...commonProps} />;
-      case "paragraph":
-        return <ParagraphBlock {...commonProps} />;
-      case "unordered-list":
-        return <UnorderedListBlock {...commonProps} />;
-      case "numbered-list":
-        return <NumberedListBlock {...commonProps} />;
-      case "tag-list":
-        return <TagListBlock {...commonProps} />;
-      case "dropdown":
-        return (
-          <DropdownBlock
-            {...commonProps}
-            isReadOnlyView={isReadOnlyView}
-            bookId={bookId}
-          />
-        );
-      case "multi-dropdown":
-        return (
-          <MultiDropdownBlock
-            {...commonProps}
-            isReadOnlyView={isReadOnlyView}
-            bookId={bookId}
-          />
-        );
-      case "image":
-        return <ImageBlock {...commonProps} />;
-      case "icon":
-        return <IconBlock {...commonProps} />;
-      case "icon-group":
-        return <IconGroupBlock {...commonProps} />;
-      case "informative":
-        return <InformativeBlock {...commonProps} />;
-      case "divider":
-        return <DividerBlock {...commonProps} />;
-      case "stars":
-        return <StarsBlock {...commonProps} />;
-      case "attributes":
-        return <AttributesBlock {...commonProps} />;
-      case "navigator":
-        return (
-          <NavigatorBlock
-            {...commonProps}
-            pages={pages}
-            onPageSelect={onPageSelect}
-            currentPageId={currentPageId}
-          />
-        );
-      case "spacer":
-        return <SpacerBlock {...commonProps} />;
-      default:
-        return null;
-    }
-  };
-
-  // Filter listeners to prevent dragging when clicking on elements with data-no-drag
-  const filteredListeners = isEditMode
-    ? Object.entries(listeners || {}).reduce(
-        (acc, [key, handler]) => {
-          acc[key] = (event: React.SyntheticEvent) => {
-            const target = event.target as HTMLElement;
-            // Check if the target or any parent has data-no-drag="true"
-            if (target.closest('[data-no-drag="true"]')) {
-              return;
-            }
-            // Call the original handler
-            if (handler) {
-              handler(event);
-            }
-          };
-          return acc;
-        },
-        {} as typeof listeners
-      )
-    : {};
-
-  // In edit mode, the entire block is draggable using the listeners
-  // Interactive elements inside blocks should have data-no-drag="true" to prevent dragging
-  if (isEditMode) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...filteredListeners}
-        className="cursor-grab active:cursor-grabbing touch-none"
-      >
-        {renderBlock()}
-      </div>
-    );
+  switch (block.type) {
+    case "heading":
+      return <HeadingBlock {...commonProps} />;
+    case "paragraph":
+      return <ParagraphBlock {...commonProps} />;
+    case "unordered-list":
+      return <UnorderedListBlock {...commonProps} />;
+    case "numbered-list":
+      return <NumberedListBlock {...commonProps} />;
+    case "tag-list":
+      return <TagListBlock {...commonProps} />;
+    case "dropdown":
+      return (
+        <DropdownBlock
+          {...commonProps}
+          isReadOnlyView={isReadOnlyView}
+          bookId={bookId}
+        />
+      );
+    case "multi-dropdown":
+      return (
+        <MultiDropdownBlock
+          {...commonProps}
+          isReadOnlyView={isReadOnlyView}
+          bookId={bookId}
+        />
+      );
+    case "image":
+      return <ImageBlock {...commonProps} />;
+    case "icon":
+      return <IconBlock {...commonProps} />;
+    case "icon-group":
+      return <IconGroupBlock {...commonProps} />;
+    case "informative":
+      return <InformativeBlock {...commonProps} />;
+    case "divider":
+      return <DividerBlock {...commonProps} />;
+    case "stars":
+      return <StarsBlock {...commonProps} />;
+    case "attributes":
+      return <AttributesBlock {...commonProps} />;
+    case "navigator":
+      return (
+        <NavigatorBlock
+          {...commonProps}
+          pages={pages}
+          onPageSelect={onPageSelect}
+          currentPageId={currentPageId}
+        />
+      );
+    case "spacer":
+      return <SpacerBlock {...commonProps} />;
+    default:
+      return null;
   }
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      {renderBlock()}
-    </div>
-  );
 }
 
 export function SectionComponent({
@@ -255,58 +189,47 @@ export function SectionComponent({
 }: SectionComponentProps) {
   const { t } = useTranslation("power-system");
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-        // Cancel activation if dialog is open
-        tolerance: 5,
-      },
-      // Custom event filter to prevent drag when dialog is open
-      onActivation: () => {
-        if (document.body.hasAttribute("data-dialog-open")) {
-          return false;
-        }
-      },
-    })
-  );
 
   const sortedBlocks = [...blocks].sort((a, b) => a.orderIndex - b.orderIndex);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    setActiveId(null);
-
-    if (over && active.id !== over.id) {
-      const oldIndex = sortedBlocks.findIndex(
-        (block) => block.id === active.id
-      );
-      const newIndex = sortedBlocks.findIndex((block) => block.id === over.id);
-
-      const reorderedBlocks = arrayMove(sortedBlocks, oldIndex, newIndex).map(
-        (block, index) => ({
-          ...block,
-          orderIndex: index,
-        })
-      );
-
-      onReorderBlocks(reorderedBlocks);
-    }
-  };
-
-  const activeBlock = activeId
-    ? sortedBlocks.find((block) => block.id === activeId)
-    : null;
-
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const handleMoveBlockUp = (blockId: string) => {
+    const currentIndex = sortedBlocks.findIndex((b) => b.id === blockId);
+    if (currentIndex <= 0) return;
+
+    const newBlocks = [...sortedBlocks];
+    [newBlocks[currentIndex - 1], newBlocks[currentIndex]] = [
+      newBlocks[currentIndex],
+      newBlocks[currentIndex - 1],
+    ];
+
+    const reorderedBlocks = newBlocks.map((block, index) => ({
+      ...block,
+      orderIndex: index,
+    }));
+
+    onReorderBlocks(reorderedBlocks);
+  };
+
+  const handleMoveBlockDown = (blockId: string) => {
+    const currentIndex = sortedBlocks.findIndex((b) => b.id === blockId);
+    if (currentIndex >= sortedBlocks.length - 1) return;
+
+    const newBlocks = [...sortedBlocks];
+    [newBlocks[currentIndex], newBlocks[currentIndex + 1]] = [
+      newBlocks[currentIndex + 1],
+      newBlocks[currentIndex],
+    ];
+
+    const reorderedBlocks = newBlocks.map((block, index) => ({
+      ...block,
+      orderIndex: index,
+    }));
+
+    onReorderBlocks(reorderedBlocks);
   };
 
   return (
@@ -440,52 +363,24 @@ export function SectionComponent({
         <div className="p-4 space-y-3">
           {/* Blocks */}
           {sortedBlocks.length > 0 ? (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={sortedBlocks.map((block) => block.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {sortedBlocks.map((block) => (
-                  <SortableBlock
-                    key={block.id}
-                    block={block}
-                    pages={pages}
-                    bookId={bookId}
-                    isEditMode={isEditMode}
-                    isReadOnlyView={isReadOnlyView}
-                    onUpdate={(content) => onUpdateBlock(block.id, content)}
-                    onDelete={() => onDeleteBlock(block.id)}
-                    onPageSelect={onPageSelect}
-                    currentPageId={currentPageId}
-                  />
-                ))}
-              </SortableContext>
-
-              <DragOverlay>
-                {activeBlock ? (
-                  <div className="cursor-grabbing opacity-80">
-                    <SortableBlock
-                      block={activeBlock}
-                      pages={pages}
-                      bookId={bookId}
-                      isEditMode={isEditMode}
-                      isReadOnlyView={isReadOnlyView}
-                      onUpdate={(content) =>
-                        onUpdateBlock(activeBlock.id, content)
-                      }
-                      onDelete={() => onDeleteBlock(activeBlock.id)}
-                      onPageSelect={onPageSelect}
-                      currentPageId={currentPageId}
-                    />
-                  </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
+            sortedBlocks.map((block, index) => (
+              <BlockWrapper
+                key={block.id}
+                block={block}
+                pages={pages}
+                bookId={bookId}
+                isEditMode={isEditMode}
+                isReadOnlyView={isReadOnlyView}
+                isFirst={index === 0}
+                isLast={index === sortedBlocks.length - 1}
+                onUpdate={(content) => onUpdateBlock(block.id, content)}
+                onDelete={() => onDeleteBlock(block.id)}
+                onMoveUp={() => handleMoveBlockUp(block.id)}
+                onMoveDown={() => handleMoveBlockDown(block.id)}
+                onPageSelect={onPageSelect}
+                currentPageId={currentPageId}
+              />
+            ))
           ) : (
             !isEditMode && (
               <p className="text-sm text-muted-foreground text-center py-4">

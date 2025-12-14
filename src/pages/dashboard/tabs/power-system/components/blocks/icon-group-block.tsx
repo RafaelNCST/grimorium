@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
 
-import { Plus, Trash2, UserCircle, Edit2, X } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Plus, UserCircle, Edit2, X, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageUpload } from "@/components/forms/FormImageUpload";
@@ -19,12 +34,149 @@ import {
   type IPowerBlock,
   type IconGroupContent,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface IconGroupBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
   onUpdate: (content: IconGroupContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
+}
+
+interface SortableIconCardProps {
+  icon: IconGroupContent["icons"][0];
+  isEditMode: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+function SortableIconCard({
+  icon,
+  isEditMode,
+  onEdit,
+  onDelete,
+}: SortableIconCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: icon.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0 : 1,
+  };
+
+  // Filter listeners to prevent dragging when clicking on interactive elements
+  const filteredListeners = isEditMode
+    ? Object.entries(listeners || {}).reduce(
+        (acc, [key, handler]) => {
+          acc[key] = (event: React.SyntheticEvent) => {
+            const target = event.target as HTMLElement;
+            if (target.closest('[data-no-drag="true"]')) {
+              return;
+            }
+            if (handler) {
+              handler(event);
+            }
+          };
+          return acc;
+        },
+        {} as typeof listeners
+      )
+    : {};
+
+  if (isEditMode) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...filteredListeners}
+        className="relative px-2 py-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 group overflow-hidden h-[15.5rem]"
+      >
+        {/* Botões de ação no topo */}
+        <div
+          className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          data-no-drag="true"
+        >
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEdit}
+            className="h-6 w-6 cursor-pointer"
+          >
+            <Edit2 className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost-destructive"
+            size="icon"
+            onClick={onDelete}
+            className="h-6 w-6 cursor-pointer"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+
+        <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0">
+          {icon.imageUrl ? (
+            <img
+              src={icon.imageUrl}
+              alt={icon.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
+              <UserCircle className="w-8 h-8 text-purple-400" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 flex flex-col gap-1 w-full min-w-0 overflow-hidden">
+          <h4 className="font-semibold text-sm w-full break-words line-clamp-2 pr-1 shrink-0">
+            {icon.title}
+          </h4>
+          <p className="text-xs text-muted-foreground break-words w-full pr-1 flex-1 overflow-y-auto">
+            {icon.description}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // View mode
+  return (
+    <div className="px-2 py-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 overflow-hidden h-[15.5rem]">
+      <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
+        {icon.imageUrl ? (
+          <img
+            src={icon.imageUrl}
+            alt={icon.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
+            <UserCircle className="w-8 h-8 text-purple-400" />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 flex flex-col gap-1 w-full min-w-0 overflow-hidden">
+        <h4 className="font-semibold text-sm w-full break-words line-clamp-2 pr-1 shrink-0">
+          {icon.title}
+        </h4>
+        <p className="text-xs text-muted-foreground break-words w-full pr-1 flex-1 overflow-y-auto">
+          {icon.description}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 interface IconCardDialogProps {
@@ -178,6 +330,10 @@ export function IconGroupBlock({
   isEditMode,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: IconGroupBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as IconGroupContent;
@@ -191,6 +347,15 @@ export function IconGroupBlock({
       }
     | undefined
   >();
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const handleAddIcon = (data: {
     id: string;
@@ -238,6 +403,30 @@ export function IconGroupBlock({
     setIsDialogOpen(true);
   };
 
+  const handleDragStart = (event: any) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      const oldIndex = content.icons.findIndex((icon) => icon.id === active.id);
+      const newIndex = content.icons.findIndex((icon) => icon.id === over.id);
+
+      const reorderedIcons = arrayMove(content.icons, oldIndex, newIndex);
+      onUpdate({
+        ...content,
+        icons: reorderedIcons,
+      });
+    }
+  };
+
+  const activeIcon = activeId
+    ? content.icons.find((icon) => icon.id === activeId)
+    : null;
+
   if (!isEditMode && content.icons.length === 0) {
     return null;
   }
@@ -257,70 +446,67 @@ export function IconGroupBlock({
             {t("blocks.icon_group.add_icon_button")}
           </Button>
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         {content.icons.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {content.icons.map((icon) => (
-              <div
-                key={icon.id}
-                className="relative p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 group overflow-hidden h-[15.5rem]"
-              >
-                {/* Botões de ação no topo */}
-                <div className="absolute top-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  <Button
-                    data-no-drag="true"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditDialog(icon)}
-                    className="h-6 w-6 cursor-pointer"
-                  >
-                    <Edit2 className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    data-no-drag="true"
-                    variant="ghost-destructive"
-                    size="icon"
-                    onClick={() => handleDeleteIcon(icon.id)}
-                    className="h-6 w-6 cursor-pointer"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-
-                <div className="relative w-16 h-16 rounded-full overflow-hidden shrink-0">
-                  {icon.imageUrl ? (
-                    <img
-                      src={icon.imageUrl}
-                      alt={icon.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
-                      <UserCircle className="w-8 h-8 text-purple-400" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 space-y-1 w-full min-w-0">
-                  <h4 className="font-semibold text-sm w-full break-words max-h-[3rem] overflow-y-auto pr-1">
-                    {icon.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words w-full pr-1">
-                    {icon.description}
-                  </p>
-                </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={content.icons.map((icon) => icon.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {content.icons.map((icon) => (
+                  <SortableIconCard
+                    key={icon.id}
+                    icon={icon}
+                    isEditMode={isEditMode}
+                    onEdit={() => openEditDialog(icon)}
+                    onDelete={() => handleDeleteIcon(icon.id)}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+
+            <DragOverlay>
+              {activeIcon ? (
+                <div className="px-2 py-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 overflow-hidden h-[15.5rem]">
+                  <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
+                    {activeIcon.imageUrl ? (
+                      <img
+                        src={activeIcon.imageUrl}
+                        alt={activeIcon.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
+                        <UserCircle className="w-8 h-8 text-purple-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 flex flex-col gap-1 w-full min-w-0 overflow-hidden">
+                    <h4 className="font-semibold text-sm w-full break-words line-clamp-2 pr-1 shrink-0">
+                      {activeIcon.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground break-words w-full pr-1 flex-1 overflow-y-auto">
+                      {activeIcon.description}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         )}
 
         <IconCardDialog
@@ -338,32 +524,13 @@ export function IconGroupBlock({
       {content.icons.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {content.icons.map((icon) => (
-            <div
+            <SortableIconCard
               key={icon.id}
-              className="p-3 rounded-lg border bg-card/50 flex flex-col items-center text-center gap-3 overflow-hidden h-[15.5rem]"
-            >
-              <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
-                {icon.imageUrl ? (
-                  <img
-                    src={icon.imageUrl}
-                    alt={icon.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-purple-950/40 flex items-center justify-center w-16 h-16 rounded-full">
-                    <UserCircle className="w-8 h-8 text-purple-400" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 space-y-1 w-full min-w-0">
-                <h4 className="font-semibold text-sm w-full break-words max-h-[3rem] overflow-y-auto pr-1">
-                  {icon.title}
-                </h4>
-                <p className="text-xs text-muted-foreground max-h-[6rem] overflow-y-auto break-words w-full pr-1">
-                  {icon.description}
-                </p>
-              </div>
-            </div>
+              icon={icon}
+              isEditMode={false}
+              onEdit={() => {}}
+              onDelete={() => {}}
+            />
           ))}
         </div>
       ) : null}

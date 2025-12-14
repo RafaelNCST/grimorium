@@ -1,4 +1,4 @@
-import { AlignCenter, AlignLeft, AlignRight, Trash2 } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,17 @@ import {
   type HeadingContent,
   type IPowerBlock,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface HeadingBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
   onUpdate: (content: HeadingContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export function HeadingBlock({
@@ -28,6 +33,10 @@ export function HeadingBlock({
   isEditMode,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: HeadingBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as HeadingContent;
@@ -142,15 +151,13 @@ export function HeadingBlock({
             </Button>
           </div>
 
-          <Button
-            data-no-drag="true"
-            variant="ghost-destructive"
-            size="icon"
-            onClick={onDelete}
-            className="cursor-pointer"
-          >
-            <Trash2 className="w-5 h-5" />
-          </Button>
+          <BlockReorderButtons
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+            onDelete={onDelete}
+            isFirst={isFirst}
+            isLast={isLast}
+          />
         </div>
 
         <Input

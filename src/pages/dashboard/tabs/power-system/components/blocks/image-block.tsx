@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { Image as ImageIcon, Trash2 } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import Cropper, { type Area } from "react-easy-crop";
 import { useTranslation } from "react-i18next";
 
@@ -19,12 +19,17 @@ import {
   type IPowerBlock,
   type ImageContent,
 } from "../../types/power-system-types";
+import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 
 interface ImageBlockProps {
   block: IPowerBlock;
   isEditMode: boolean;
   onUpdate: (content: ImageContent) => void;
   onDelete: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 // Helper function to create cropped image
@@ -84,6 +89,10 @@ export function ImageBlock({
   isEditMode,
   onUpdate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: ImageBlockProps) {
   const { t } = useTranslation("power-system");
   const content = block.content as ImageContent;
@@ -271,15 +280,13 @@ export function ImageBlock({
               </div>
             )}
 
-            <Button
-              data-no-drag="true"
-              variant="ghost-destructive"
-              size="icon"
-              onClick={onDelete}
-              className="ml-auto cursor-pointer"
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
+            <BlockReorderButtons
+              onMoveUp={onMoveUp}
+              onMoveDown={onMoveDown}
+              onDelete={onDelete}
+              isFirst={isFirst}
+              isLast={isLast}
+            />
           </div>
 
           <div data-no-drag="true">
