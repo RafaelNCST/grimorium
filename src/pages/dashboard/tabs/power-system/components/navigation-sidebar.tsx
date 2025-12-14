@@ -23,12 +23,16 @@ import { motion } from "framer-motion";
 import {
   ChevronDown,
   ChevronRight,
+  Copy,
+  Edit,
   File,
+  FilePlus,
   Folder,
   FolderPlus,
   MoreVertical,
   PanelLeftOpen,
   Plus,
+  Trash,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -37,6 +41,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -405,124 +410,250 @@ export function NavigationSidebar({
       >
         {/* Navigation Tree */}
         <ScrollArea className="flex-1">
-          <div className="p-2">
-            {!hasPagesOrGroups ? (
-              <div className="flex h-32 items-center justify-center">
-                <p className="text-center text-sm text-muted-foreground">
-                  {t("navigation.empty_pages")}
-                </p>
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-                onDragCancel={handleDragCancel}
-              >
-                <div className="space-y-1">
-                  {/* Standalone Pages Drop Zone - Always visible when dragging from group */}
-                  <StandaloneDropZone
-                    pages={standalonePages}
-                    activeItem={activeItem}
-                    overId={overId}
-                    currentPageId={currentPageId}
-                    isEditMode={isEditMode}
-                    onPageSelect={onPageSelect}
-                    onEditPage={onEditPage}
-                    onDeletePage={onDeletePage}
-                    onDuplicatePage={onDuplicatePage}
-                    onItemSelect={onItemSelect}
-                  />
+          {isEditMode ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+              onDragCancel={handleDragCancel}
+            >
+              <div className="p-2 min-h-[calc(100vh-12rem)]">
+                {!hasPagesOrGroups ? (
+                  <div className="flex h-32 items-center justify-center">
+                    <p className="text-center text-sm text-muted-foreground">
+                      {t("navigation.empty_pages")}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {/* Standalone Pages Drop Zone - Always visible when dragging from group */}
+                    <StandaloneDropZone
+                      pages={standalonePages}
+                      activeItem={activeItem}
+                      overId={overId}
+                      currentPageId={currentPageId}
+                      isEditMode={isEditMode}
+                      onPageSelect={onPageSelect}
+                      onEditPage={onEditPage}
+                      onDeletePage={onDeletePage}
+                      onDuplicatePage={onDuplicatePage}
+                      onItemSelect={onItemSelect}
+                      onCreateGroup={onCreateGroup}
+                      onCreatePage={() => onCreatePage()}
+                    />
 
-                  {/* Groups with Pages */}
-                  <SortableContext
-                    items={groupIds}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {sortedGroups.map((group) => {
-                      const groupPages = pages
-                        .filter((page) => page.groupId === group.id)
-                        .sort((a, b) => a.orderIndex - b.orderIndex);
-                      const isExpanded = expandedGroups.has(group.id);
+                        {/* Groups with Pages */}
+                        <SortableContext
+                          items={groupIds}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {sortedGroups.map((group) => {
+                            const groupPages = pages
+                              .filter((page) => page.groupId === group.id)
+                              .sort((a, b) => a.orderIndex - b.orderIndex);
+                            const isExpanded = expandedGroups.has(group.id);
 
-                      return (
-                        <div key={group.id} className="space-y-1">
-                          <SortableGroupItem
-                            group={group}
-                            isExpanded={isExpanded}
-                            isEditMode={isEditMode}
-                            isDragging={activeItem?.id === group.id}
-                            isOver={overId === group.id}
-                            onToggle={() => toggleGroup(group.id)}
-                            onEdit={onEditGroup}
-                            onDelete={onDeleteGroup}
-                            onCreatePage={() => onCreatePage(group.id)}
-                            onSelect={() => onItemSelect?.(group.id, "group")}
-                          />
-                          {isExpanded && (
-                            <SortableContext
-                              items={groupPages.map((p) => p.id)}
-                              strategy={verticalListSortingStrategy}
-                            >
-                              <div className="ml-10 space-y-1">
-                                {groupPages.map((page) => (
-                                  <SortablePageItem
-                                    key={page.id}
-                                    page={page}
-                                    isActive={page.id === currentPageId}
-                                    isEditMode={isEditMode}
-                                    isDragging={activeItem?.id === page.id}
-                                    isOver={overId === page.id}
-                                    onSelect={(pageId) => {
-                                      onPageSelect(pageId);
-                                      onItemSelect?.(pageId, "page");
-                                    }}
-                                    onEdit={onEditPage}
-                                    onDelete={onDeletePage}
-                                    onDuplicate={onDuplicatePage}
-                                  />
-                                ))}
+                            return (
+                              <div key={group.id} className="space-y-1">
+                                <SortableGroupItem
+                                  group={group}
+                                  isExpanded={isExpanded}
+                                  isEditMode={isEditMode}
+                                  isDragging={activeItem?.id === group.id}
+                                  isOver={overId === group.id}
+                                  onToggle={() => toggleGroup(group.id)}
+                                  onEdit={onEditGroup}
+                                  onDelete={onDeleteGroup}
+                                  onCreatePage={() => onCreatePage(group.id)}
+                                  onSelect={() => onItemSelect?.(group.id, "group")}
+                                />
+                                {isExpanded && (
+                                  <SortableContext
+                                    items={groupPages.map((p) => p.id)}
+                                    strategy={verticalListSortingStrategy}
+                                  >
+                                    <div className="ml-10 space-y-1">
+                                      {groupPages.map((page) => (
+                                        <SortablePageItem
+                                          key={page.id}
+                                          page={page}
+                                          isActive={page.id === currentPageId}
+                                          isEditMode={isEditMode}
+                                          isDragging={activeItem?.id === page.id}
+                                          isOver={overId === page.id}
+                                          onSelect={(pageId) => {
+                                            onPageSelect(pageId);
+                                            onItemSelect?.(pageId, "page");
+                                          }}
+                                          onEdit={onEditPage}
+                                          onDelete={onDeletePage}
+                                          onDuplicate={onDuplicatePage}
+                                        />
+                                      ))}
+                                    </div>
+                                  </SortableContext>
+                                )}
                               </div>
-                            </SortableContext>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </SortableContext>
-                </div>
+                            );
+                          })}
+                        </SortableContext>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Drag Overlay */}
-                <DragOverlay dropAnimation={null}>
-                  {activeItem ? (
-                    <div className="opacity-50">
-                      {activeItem.type === "page" ? (
-                        <PageItem
-                          page={pages.find((p) => p.id === activeItem.id)!}
-                          isActive={false}
-                          isEditMode={false}
-                          onSelect={() => {}}
-                          onEdit={() => {}}
-                          onDelete={() => {}}
-                        />
-                      ) : (
-                        <GroupItem
-                          group={groups.find((g) => g.id === activeItem.id)!}
-                          isExpanded={false}
-                          isEditMode={false}
-                          onToggle={() => {}}
-                          onEdit={() => {}}
-                          onDelete={() => {}}
-                          onCreatePage={() => {}}
-                        />
-                      )}
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
-            )}
-          </div>
+              {/* Drag Overlay */}
+              <DragOverlay dropAnimation={null}>
+                {activeItem ? (
+                  <div className="opacity-50">
+                    {activeItem.type === "page" ? (
+                      <PageItem
+                        page={pages.find((p) => p.id === activeItem.id)!}
+                        isActive={false}
+                        isEditMode={false}
+                        onSelect={() => {}}
+                        onEdit={() => {}}
+                        onDelete={() => {}}
+                      />
+                    ) : (
+                      <GroupItem
+                        group={groups.find((g) => g.id === activeItem.id)!}
+                        isExpanded={false}
+                        isEditMode={false}
+                        onToggle={() => {}}
+                        onEdit={() => {}}
+                        onDelete={() => {}}
+                        onCreatePage={() => {}}
+                      />
+                    )}
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          ) : (
+            <div className="p-2">
+              {!hasPagesOrGroups ? (
+                <div className="flex h-32 items-center justify-center">
+                  <p className="text-center text-sm text-muted-foreground">
+                    {t("navigation.empty_pages")}
+                  </p>
+                </div>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEnd}
+                  onDragCancel={handleDragCancel}
+                >
+                  <div className="space-y-1">
+                    {/* Standalone Pages Drop Zone - Always visible when dragging from group */}
+                    <StandaloneDropZone
+                      pages={standalonePages}
+                      activeItem={activeItem}
+                      overId={overId}
+                      currentPageId={currentPageId}
+                      isEditMode={isEditMode}
+                      onPageSelect={onPageSelect}
+                      onEditPage={onEditPage}
+                      onDeletePage={onDeletePage}
+                      onDuplicatePage={onDuplicatePage}
+                      onItemSelect={onItemSelect}
+                      onCreateGroup={onCreateGroup}
+                      onCreatePage={() => onCreatePage()}
+                    />
+
+                    {/* Groups with Pages */}
+                    <SortableContext
+                      items={groupIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {sortedGroups.map((group) => {
+                        const groupPages = pages
+                          .filter((page) => page.groupId === group.id)
+                          .sort((a, b) => a.orderIndex - b.orderIndex);
+                        const isExpanded = expandedGroups.has(group.id);
+
+                        return (
+                          <div key={group.id} className="space-y-1">
+                            <SortableGroupItem
+                              group={group}
+                              isExpanded={isExpanded}
+                              isEditMode={isEditMode}
+                              isDragging={activeItem?.id === group.id}
+                              isOver={overId === group.id}
+                              onToggle={() => toggleGroup(group.id)}
+                              onEdit={onEditGroup}
+                              onDelete={onDeleteGroup}
+                              onCreatePage={() => onCreatePage(group.id)}
+                              onSelect={() => onItemSelect?.(group.id, "group")}
+                            />
+                            {isExpanded && (
+                              <SortableContext
+                                items={groupPages.map((p) => p.id)}
+                                strategy={verticalListSortingStrategy}
+                              >
+                                <div className="ml-10 space-y-1">
+                                  {groupPages.map((page) => (
+                                    <SortablePageItem
+                                      key={page.id}
+                                      page={page}
+                                      isActive={page.id === currentPageId}
+                                      isEditMode={isEditMode}
+                                      isDragging={activeItem?.id === page.id}
+                                      isOver={overId === page.id}
+                                      onSelect={(pageId) => {
+                                        onPageSelect(pageId);
+                                        onItemSelect?.(pageId, "page");
+                                      }}
+                                      onEdit={onEditPage}
+                                      onDelete={onDeletePage}
+                                      onDuplicate={onDuplicatePage}
+                                    />
+                                  ))}
+                                </div>
+                              </SortableContext>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </SortableContext>
+                  </div>
+
+                  {/* Drag Overlay */}
+                  <DragOverlay dropAnimation={null}>
+                    {activeItem ? (
+                      <div className="opacity-50">
+                        {activeItem.type === "page" ? (
+                          <PageItem
+                            page={pages.find((p) => p.id === activeItem.id)!}
+                            isActive={false}
+                            isEditMode={false}
+                            onSelect={() => {}}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                            onDuplicate={() => {}}
+                          />
+                        ) : (
+                          <GroupItem
+                            group={groups.find((g) => g.id === activeItem.id)!}
+                            isExpanded={false}
+                            isEditMode={false}
+                            onToggle={() => {}}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                            onCreatePage={() => {}}
+                          />
+                        )}
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
+              )}
+            </div>
+          )}
         </ScrollArea>
       </motion.div>
     </motion.div>
@@ -541,6 +672,8 @@ interface StandaloneDropZoneProps {
   onDeletePage: (pageId: string) => void;
   onDuplicatePage: (pageId: string) => void;
   onItemSelect?: (itemId: string, itemType: "page" | "group") => void;
+  onCreateGroup: () => void;
+  onCreatePage: () => void;
 }
 
 function StandaloneDropZone({
@@ -554,6 +687,8 @@ function StandaloneDropZone({
   onDeletePage,
   onDuplicatePage,
   onItemSelect,
+  onCreateGroup,
+  onCreatePage,
 }: StandaloneDropZoneProps) {
   const { t } = useTranslation("power-system");
   const { setNodeRef, isOver } = useDroppable({
@@ -566,7 +701,14 @@ function StandaloneDropZone({
   const pageIds = pages.map((p) => p.id);
   const isDraggingFromGroup = activeItem?.type === "page" && activeItem.groupId;
 
-  return (
+  // Show drop zone if there are pages OR if dragging from a group
+  const shouldShow = pages.length > 0 || isDraggingFromGroup;
+
+  if (!shouldShow) {
+    return null;
+  }
+
+  const content = (
     <div ref={setNodeRef}>
       <SortableContext
         items={pageIds}
@@ -575,8 +717,10 @@ function StandaloneDropZone({
       >
         <div
           className={cn(
-            "space-y-1 rounded-md transition-all min-h-[8px]",
-            // Subtle highlight when hovering to drop from group
+            "space-y-1 rounded-md transition-all",
+            // Show drop zone visual when dragging from group but no pages exist
+            pages.length === 0 && isDraggingFromGroup && "min-h-[16px]",
+            // Highlight when hovering to drop from group
             isOver &&
               isDraggingFromGroup &&
               "bg-primary/5 ring-1 ring-primary/20"
@@ -603,6 +747,8 @@ function StandaloneDropZone({
       </SortableContext>
     </div>
   );
+
+  return content;
 }
 
 // Sortable Group Item Component
@@ -764,7 +910,7 @@ function GroupItem({
     }
   };
 
-  return (
+  const groupContent = (
     <div
       className={cn(
         "group flex items-center gap-1 rounded-md transition-colors min-h-[32px]",
@@ -909,8 +1055,11 @@ function GroupItem({
           )}
         </>
       )}
+
     </div>
   );
+
+  return groupContent;
 }
 
 // Sortable Page Item Component
@@ -1083,7 +1232,7 @@ function PageItem({
     baseSubtraction + groupSubtraction + buttonSpaceSubtraction;
   const maxWidth = `calc(320px - ${totalSubtraction}px)`;
 
-  return (
+  const pageContent = (
     <div
       className={cn(
         "group flex items-center gap-1 rounded-md transition-colors min-h-[32px]",
@@ -1203,6 +1352,9 @@ function PageItem({
           )}
         </>
       )}
+
     </div>
   );
+
+  return pageContent;
 }
