@@ -840,6 +840,7 @@ export function CreateRegionModal({
                 : t("create_region.create_button"),
             cancelLabel: t("create_region.cancel_button"),
           }}
+          width="w-full max-w-5xl"
         />
       </form>
     </Form>

@@ -484,8 +484,6 @@
     top: calc(50% + 16px) !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    width: fit-content !important;
-    max-width: 90vw !important;
   }
 
   /* Ensure Select trigger has proper styling */

@@ -164,7 +164,7 @@ export function ManageLinksModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!w-[400px] max-h-[80vh]">
+      <DialogContent className="w-full max-w-2xl max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>
             {pageId ? t("links.manage_page") : t("links.manage_section")}

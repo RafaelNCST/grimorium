@@ -300,7 +300,7 @@ export function CollapsibleSection({
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <Card
         className={cn(
-          "card-magical transition-all duration-200 overflow-hidden",
+          "card-magical transition-all duration-200 overflow-hidden w-full max-w-full",
           isVisible === false && isEditMode
             ? "opacity-50 bg-muted/30 border-dashed border-muted-foreground/30"
             : "",
@@ -358,10 +358,10 @@ export function CollapsibleSection({
         {/* Content with padding */}
         {isCollapsible ? (
           <CollapsibleContent>
-            <CardContent className="pt-6">{renderEmptyState()}</CardContent>
+            <CardContent className="pt-6 w-full max-w-full overflow-x-hidden">{renderEmptyState()}</CardContent>
           </CollapsibleContent>
         ) : (
-          <CardContent>{renderEmptyState()}</CardContent>
+          <CardContent className="w-full max-w-full overflow-x-hidden">{renderEmptyState()}</CardContent>
         )}
       </Card>
     </Collapsible>

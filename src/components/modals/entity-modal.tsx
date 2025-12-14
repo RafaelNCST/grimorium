@@ -38,7 +38,8 @@ interface EntityModalProps {
   basicFields: ReactNode; // Conteúdo dos campos básicos
   advancedFields?: ReactNode; // Conteúdo opcional da seção avançada
   footer: EntityModalFooter;
-  maxWidth?: string; // default: "max-w-2xl"
+  width?: string; // Classes Tailwind de largura (ex: "w-full max-w-3xl")
+  height?: string; // Classes Tailwind de altura (ex: "max-h-[90vh]")
   basicFieldsTitle?: string; // default traduzível
   advancedFieldsTitle?: string; // default traduzível
 }
@@ -50,7 +51,8 @@ export function EntityModal({
   basicFields,
   advancedFields,
   footer,
-  maxWidth = "max-w-2xl",
+  width = "w-full max-w-2xl",
+  height = "max-h-[90vh]",
   basicFieldsTitle = "Informações Básicas",
   advancedFieldsTitle = "Informações Avançadas",
 }: EntityModalProps) {
@@ -59,7 +61,7 @@ export function EntityModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`${maxWidth} max-h-[90vh] flex flex-col gap-0`}>
+      <DialogContent className={`${width} ${height} flex flex-col gap-0`}>
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Icon className="w-5 h-5 text-primary" />
@@ -69,12 +71,12 @@ export function EntityModal({
         </DialogHeader>
 
         {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto pl-1 pr-4 pb-6 mt-4">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pl-1 pr-4 pb-6 mt-4">
           {/* Important Note Alert */}
           {header.warning && <InfoAlert>{header.warning}</InfoAlert>}
 
           {/* Basic Fields Section */}
-          <div className="space-y-6 mt-4">
+          <div className="space-y-6 mt-4 w-full max-w-full">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">
               {basicFieldsTitle}
             </h3>
@@ -83,13 +85,13 @@ export function EntityModal({
 
           {/* Advanced Section */}
           {advancedFields && (
-            <div className="mt-6">
+            <div className="mt-6 w-full max-w-full">
               <CollapsibleSection
                 title={advancedFieldsTitle}
                 isOpen={isAdvancedOpen}
                 onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
               >
-                <div className="space-y-6">{advancedFields}</div>
+                <div className="space-y-6 w-full max-w-full">{advancedFields}</div>
               </CollapsibleSection>
             </div>
           )}

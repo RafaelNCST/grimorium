@@ -657,7 +657,7 @@ export function CreateCharacterModalView({
         submitLabel: t("button.create"),
         cancelLabel: t("button.cancel"),
       }}
-      maxWidth="max-w-3xl"
+      width="w-full max-w-5xl"
       basicFieldsTitle={t("modal.basic_fields")}
       advancedFieldsTitle={t("modal.advanced_fields")}
     />

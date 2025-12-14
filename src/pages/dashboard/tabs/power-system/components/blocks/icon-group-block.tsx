@@ -239,7 +239,7 @@ function IconCardDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>
             {initialData

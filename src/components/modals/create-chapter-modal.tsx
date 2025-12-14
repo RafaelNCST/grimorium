@@ -669,7 +669,7 @@ export function CreateChapterModal({
               : t("modal.create_button"),
             cancelLabel: t("modal.cancel_button"),
           }}
-          maxWidth="max-w-2xl"
+          width="w-full max-w-5xl"
         />
       </form>
     </Form>

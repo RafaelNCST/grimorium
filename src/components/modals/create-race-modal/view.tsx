@@ -415,7 +415,7 @@ export function CreateRaceModalView({
             submitLabel: t("button.create"),
             cancelLabel: t("button.cancel"),
           }}
-          maxWidth="max-w-[800px]"
+          width="w-full max-w-5xl"
         />
       </form>
     </Form>
