@@ -50,15 +50,17 @@ export function ConfirmDeleteModal({
 
   return (
     <AlertDialog open={open} onOpenChange={handleClose}>
-      <AlertDialogContent className="max-w-md">
-        <AlertDialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader className="text-left">
+          {/* Ícone e Título lado a lado */}
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
             <AlertDialogTitle className="text-left">{title}</AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-left">
+
+          <AlertDialogDescription className="pt-4 text-left font-medium text-foreground">
             {description}
             {itemName && (
               <>
@@ -85,7 +87,7 @@ export function ConfirmDeleteModal({
           </div>
         )}
 
-        <AlertDialogFooter className="gap-2">
+        <AlertDialogFooter className="flex justify-end gap-2">
           <Button variant="outline" onClick={handleClose}>
             {t("button.no")}
           </Button>

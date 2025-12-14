@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { AlertTriangle } from "lucide-react";
 
 import {
   AlertDialog,
@@ -33,17 +34,24 @@ export function DeleteSystemModal({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t("modals.delete_system.title")}
-            {systemName && ` "${systemName}"`}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader className="text-left">
+          {/* Ícone e Título lado a lado */}
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-destructive/10 p-2 flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-left">
+              {t("modals.delete_system.title")}
+              {systemName && ` "${systemName}"`}
+            </AlertDialogTitle>
+          </div>
+
+          <AlertDialogDescription className="pt-4 text-left font-medium text-foreground">
             {t("modals.delete_system.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex justify-end gap-2">
           <AlertDialogCancel>
             {t("modals.delete_system.cancel")}
           </AlertDialogCancel>

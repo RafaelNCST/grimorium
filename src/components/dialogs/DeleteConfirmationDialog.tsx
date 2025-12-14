@@ -77,19 +77,19 @@ export function DeleteConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader className="text-left">
+          {/* Ícone Container */}
+          <div className="mb-4 flex justify-start">
+            <div className="rounded-lg bg-destructive/10 p-2">
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
-            <div className="flex-1">
-              <AlertDialogTitle>
-                {title || t("delete_confirmation.title", { type: entityType })}
-              </AlertDialogTitle>
-            </div>
           </div>
-          <AlertDialogDescription className="pt-2">
+
+          <AlertDialogTitle className="text-left">
+            {title || t("delete_confirmation.title", { type: entityType })}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="pt-4 text-left font-medium text-foreground">
             {description ||
               t("delete_confirmation.message", { name: entityName })}
           </AlertDialogDescription>
@@ -99,7 +99,7 @@ export function DeleteConfirmationDialog({
           <div className="rounded-md bg-muted p-4 space-y-2">{children}</div>
         )}
 
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex justify-end gap-2">
           <AlertDialogCancel disabled={isDeleting}>
             {displayCancelText}
           </AlertDialogCancel>
@@ -107,6 +107,8 @@ export function DeleteConfirmationDialog({
             onClick={handleConfirm}
             disabled={isDeleting}
             variant="destructive"
+            size="lg"
+            className="animate-glow-red"
           >
             {isDeleting && (
               <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />

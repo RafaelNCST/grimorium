@@ -43,23 +43,26 @@ export function FinishArcWarningDialog({
   return (
     <AlertDialog open={isOpen} onOpenChange={handleClose}>
       <AlertDialogContent
+        className="sm:max-w-md"
         onOverlayClick={handleClose}
         onEscapeKeyDown={handleClose}
       >
-        <AlertDialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-amber-500/10 p-2 flex-shrink-0">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+        <AlertDialogHeader className="text-left">
+          {/* Ícone e Título lado a lado */}
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-yellow-500/10 p-2 flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
             </div>
-            <AlertDialogTitle>
+            <AlertDialogTitle className="text-left">
               {t("finish_arc.cannot_finish_title")}
             </AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-left pt-4 text-foreground">
+
+          <AlertDialogDescription className="pt-4 text-left font-medium text-foreground">
             {getMessage()}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex justify-end gap-2">
           <AlertDialogAction variant="secondary" onClick={handleClose}>
             {t("finish_arc.understand")}
           </AlertDialogAction>
