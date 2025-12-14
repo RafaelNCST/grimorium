@@ -10,7 +10,7 @@ import {
   Shield,
   Users,
   Crown,
-  UserPlus,
+  Plus,
   Edit2,
   Trash2,
   X,
@@ -22,12 +22,15 @@ import {
   Flame,
   Minus,
   Sparkle,
+  User,
+  Save,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { FormSimpleGrid } from "@/components/forms/FormSimpleGrid";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -40,9 +43,9 @@ import {
 } from "@/components/ui/dialog";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 import { RELATIONSHIP_TYPES_BADGE_CONSTANT } from "../constants/relationship-types-badge-constant";
 
@@ -153,6 +156,8 @@ export function RelationshipsSection({
   const [intensity, setIntensity] = useState<number[]>([5]);
   const [description, setDescription] = useState<string>("");
   const [modalStep, setModalStep] = useState<1 | 2>(1);
+  const [hasScroll, setHasScroll] = useState(false);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Reset form when dialog opens (especially important when controlled externally)
   useEffect(() => {
@@ -268,6 +273,30 @@ export function RelationshipsSection({
     setDescription("");
   };
 
+  // Detectar se há scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasScroll(scrollHeight > clientHeight);
+      }
+    };
+
+    // Dar um pequeno delay para garantir que o conteúdo foi renderizado
+    const timeoutId = setTimeout(checkScroll, 0);
+
+    // Observar mudanças no tamanho do conteúdo
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [availableCharacters, modalStep, isAddDialogOpen]);
+
   return (
     <div className="space-y-4">
       {/* Add Relationship Button - Only visible when there are available characters */}
@@ -277,7 +306,7 @@ export function RelationshipsSection({
           className="w-full"
           variant="magical"
         >
-          <UserPlus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 mr-2" />
           {t("character-detail:relationships.add_relationship")}
         </Button>
       )}
@@ -300,19 +329,19 @@ export function RelationshipsSection({
               >
                 <div className="flex items-center gap-4">
                   {/* Character Avatar */}
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage
-                      src={character.image}
-                      className="object-cover"
+                  {character.image ? (
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={character.image} className="object-cover" />
+                    </Avatar>
+                  ) : (
+                    <FormImageDisplay
+                      icon={User}
+                      height="h-12"
+                      width="w-12"
+                      shape="circle"
+                      iconSize="w-6 h-6"
                     />
-                    <AvatarFallback>
-                      {character.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
+                  )}
 
                   {/* Character Info */}
                   <div className="flex-1 min-w-0">
@@ -389,8 +418,8 @@ export function RelationshipsSection({
 
       {/* Add Relationship Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {modalStep === 1
                 ? t("character-detail:relationships.add_relationship")
@@ -403,15 +432,23 @@ export function RelationshipsSection({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6 pr-2 pl-2">
-              {/* STEP 1: Character Selection */}
-              {modalStep === 1 && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold">
-                    {t("character-detail:relationships.available_characters")}
-                  </Label>
-                  <div className="grid grid-cols-1 gap-3 p-1">
+          {/* STEP 1: Character Selection */}
+          {modalStep === 1 && (
+            <>
+              <div className="flex-shrink-0 pb-2">
+                <Label className="text-sm font-semibold text-primary">
+                  {t("character-detail:relationships.available_characters")}
+                </Label>
+              </div>
+              <div
+                ref={scrollContainerRef}
+                className={cn(
+                  "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+                  hasScroll && "pr-2"
+                )}
+              >
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-3">
                     {availableCharacters.map((character) => (
                       <Card
                         key={character.id}
@@ -419,19 +456,22 @@ export function RelationshipsSection({
                         onClick={() => handleCharacterSelect(character.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <Avatar className="w-12 h-12">
-                            <AvatarImage
-                              src={character.image}
-                              className="object-cover"
+                          {character.image ? (
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage
+                                src={character.image}
+                                className="object-cover"
+                              />
+                            </Avatar>
+                          ) : (
+                            <FormImageDisplay
+                              icon={User}
+                              height="h-12"
+                              width="w-12"
+                              shape="circle"
+                              iconSize="w-6 h-6"
                             />
-                            <AvatarFallback>
-                              {character.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-base truncate">
                               {character.name}
@@ -447,31 +487,44 @@ export function RelationshipsSection({
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            </>
+          )}
 
-              {/* STEP 2: Relationship Type & Intensity */}
-              {modalStep === 2 && selectedCharacterId && (
+          {/* STEP 2: Relationship Type & Intensity */}
+          {modalStep === 2 && selectedCharacterId && (
+            <div
+              ref={scrollContainerRef}
+              className={cn(
+                "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+                hasScroll && "pr-2"
+              )}
+            >
+              <div className="space-y-6">
                 <div className="space-y-6">
                   {/* Selected Character Card (Read-only) */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold">
+                    <Label className="text-sm font-semibold text-primary">
                       {t("character-detail:relationships.selected_character")}
                     </Label>
                     <Card className="p-4 bg-primary/5 border-primary/20">
                       <div className="flex items-center gap-4">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage
-                            src={getCharacterById(selectedCharacterId)?.image}
-                            className="object-cover"
+                        {getCharacterById(selectedCharacterId)?.image ? (
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={getCharacterById(selectedCharacterId)?.image}
+                              className="object-cover"
+                            />
+                          </Avatar>
+                        ) : (
+                          <FormImageDisplay
+                            icon={User}
+                            height="h-12"
+                            width="w-12"
+                            shape="circle"
+                            iconSize="w-6 h-6"
                           />
-                          <AvatarFallback>
-                            {getCharacterById(selectedCharacterId)
-                              ?.name.split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        )}
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-base truncate">
                             {getCharacterById(selectedCharacterId)?.name}
@@ -495,6 +548,7 @@ export function RelationshipsSection({
                     )}
                     columns={4}
                     required
+                    className="px-1"
                     options={RELATIONSHIP_TYPES.map((type) => ({
                       value: type.value,
                       label: t(
@@ -547,26 +601,28 @@ export function RelationshipsSection({
                         ({t("character-detail:relationships.optional")})
                       </span>
                     </Label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t(
-                        "character-detail:relationships.description_placeholder"
-                      )}
-                      rows={3}
-                      maxLength={200}
-                      className="resize-none w-full"
-                    />
+                    <div className="px-1">
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={t(
+                          "character-detail:relationships.description_placeholder"
+                        )}
+                        rows={3}
+                        maxLength={200}
+                        className="resize-none w-full"
+                      />
+                    </div>
                     <div className="flex justify-end text-xs text-muted-foreground">
                       <span>{description.length}/200</span>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          </ScrollArea>
+          )}
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             {modalStep === 1 ? (
               <Button variant="secondary" onClick={closeAddDialog}>
                 <X className="w-4 h-4 mr-2" />
@@ -584,7 +640,7 @@ export function RelationshipsSection({
                   disabled={!selectedType}
                   className="animate-glow"
                 >
-                  <UserPlus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-2" />
                   {t("character-detail:relationships.add")}
                 </Button>
               </>
@@ -595,8 +651,8 @@ export function RelationshipsSection({
 
       {/* Edit Relationship Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {t("character-detail:relationships.edit_title")}
             </DialogTitle>
@@ -608,25 +664,65 @@ export function RelationshipsSection({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6 pr-2">
-              {/* Relationship Type Selection */}
-              <FormSimpleGrid
-                value={selectedType}
-                onChange={setSelectedType}
-                label={t("character-detail:relationships.relationship_type")}
-                columns={4}
-                required
-                options={RELATIONSHIP_TYPES.map((type) => ({
-                  value: type.value,
-                  label: t(
-                    `character-detail:relationship_types.${type.translationKey}`
-                  ),
-                  icon: type.icon,
-                  backgroundColor: RELATIONSHIP_COLOR_MAP[type.value].bg,
-                  borderColor: RELATIONSHIP_COLOR_MAP[type.value].border,
-                }))}
-              />
+          <div className="flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px] pr-2">
+            <div className="space-y-6">
+              {editingRelationship && (
+                <>
+                  {/* Selected Character Card (Read-only) */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold text-primary">
+                      {t("character-detail:relationships.selected_character")}
+                    </Label>
+                    <Card className="p-4 bg-primary/5 border-primary/20">
+                      <div className="flex items-center gap-4">
+                        {getCharacterById(editingRelationship.characterId)?.image ? (
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage
+                              src={getCharacterById(editingRelationship.characterId)?.image}
+                              className="object-cover"
+                            />
+                          </Avatar>
+                        ) : (
+                          <FormImageDisplay
+                            icon={User}
+                            height="h-12"
+                            width="w-12"
+                            shape="circle"
+                            iconSize="w-6 h-6"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-base truncate">
+                            {getCharacterById(editingRelationship.characterId)?.name}
+                          </p>
+                          {getCharacterById(editingRelationship.characterId)?.role && (
+                            <p className="text-sm text-muted-foreground truncate">
+                              {getCharacterById(editingRelationship.characterId)?.role}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Relationship Type Selection */}
+                  <FormSimpleGrid
+                    value={selectedType}
+                    onChange={setSelectedType}
+                    label={t("character-detail:relationships.relationship_type")}
+                    columns={4}
+                    required
+                    className="px-1"
+                    options={RELATIONSHIP_TYPES.map((type) => ({
+                      value: type.value,
+                      label: t(
+                        `character-detail:relationship_types.${type.translationKey}`
+                      ),
+                      icon: type.icon,
+                      backgroundColor: RELATIONSHIP_COLOR_MAP[type.value].bg,
+                      borderColor: RELATIONSHIP_COLOR_MAP[type.value].border,
+                    }))}
+                  />
 
               {/* Intensity Slider */}
               <div className="space-y-3">
@@ -660,42 +756,47 @@ export function RelationshipsSection({
                 </div>
               </div>
 
-              {/* Description Field */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium text-primary">
-                  {t("character-detail:relationships.description_label")}
-                  <span className="text-muted-foreground font-normal ml-1">
-                    ({t("character-detail:relationships.optional")})
-                  </span>
-                </Label>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t(
-                    "character-detail:relationships.description_placeholder"
-                  )}
-                  rows={3}
-                  maxLength={200}
-                  className="resize-none w-full"
-                />
-                <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{description.length}/200</span>
-                </div>
-              </div>
+                  {/* Description Field */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium text-primary">
+                      {t("character-detail:relationships.description_label")}
+                      <span className="text-muted-foreground font-normal ml-1">
+                        ({t("character-detail:relationships.optional")})
+                      </span>
+                    </Label>
+                    <div className="px-1">
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={t(
+                          "character-detail:relationships.description_placeholder"
+                        )}
+                        rows={3}
+                        maxLength={200}
+                        className="resize-none w-full"
+                      />
+                    </div>
+                    <div className="flex justify-end text-xs text-muted-foreground">
+                      <span>{description.length}/200</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-          </ScrollArea>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             <Button variant="secondary" onClick={closeEditDialog}>
               <X className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.cancel")}
             </Button>
             <Button
-              variant="default"
+              variant="magical"
+              className="animate-glow"
               onClick={handleEditRelationship}
               disabled={!selectedType}
             >
-              <Edit2 className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 mr-2" />
               {t("character-detail:relationships.save")}
             </Button>
           </DialogFooter>

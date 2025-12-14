@@ -177,7 +177,7 @@ export function ManageLinksModal({
         <div className="space-y-4">
           {/* Linked Characters Section */}
           <div>
-            <h3 className="text-sm font-semibold mb-2 text-purple-400">
+            <h3 className="text-sm font-semibold mb-2 text-primary">
               {t("links.linked_characters")}
             </h3>
 
@@ -240,7 +240,7 @@ export function ManageLinksModal({
 
           {/* Available Characters Section */}
           <div>
-            <h3 className="text-sm font-semibold mb-2 text-purple-400">
+            <h3 className="text-sm font-semibold mb-2 text-primary">
               {t("links.available_characters")}
             </h3>
 

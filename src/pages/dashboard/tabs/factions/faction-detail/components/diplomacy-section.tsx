@@ -4,9 +4,11 @@ import { Plus, Shield, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { DIPLOMATIC_STATUS_CONSTANT } from "@/components/modals/create-faction-modal/constants/diplomatic-status";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { Button } from "@/components/ui/button";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   type IDiplomaticRelation,
   type DiplomaticStatus,
@@ -92,7 +94,7 @@ export function DiplomacySection({
   const getRelationForFaction = (factionId: string) =>
     diplomaticRelations.find((r) => r.targetFactionId === factionId);
 
-  // Render faction item (simplified - only image and name)
+  // Render faction item with updated styling
   const renderFactionItem = (
     faction: { id: string; name: string; image?: string },
     status: DiplomaticStatus
@@ -102,17 +104,23 @@ export function DiplomacySection({
     return (
       <div
         key={faction.id}
-        className="flex items-center gap-2 p-2 bg-muted rounded-lg group"
+        className="flex items-center gap-3 p-3 border rounded-lg group"
       >
         {faction.image ? (
           <img
             src={faction.image}
             alt={faction.name}
-            className="w-8 h-8 rounded object-cover flex-shrink-0"
+            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-8 h-8 rounded bg-muted-foreground/20 flex items-center justify-center flex-shrink-0">
-            <Shield className="w-4 h-4 text-muted-foreground" />
+          <div className="rounded-lg overflow-hidden flex-shrink-0">
+            <FormImageDisplay
+              icon={Shield}
+              height="h-10"
+              width="w-10"
+              shape="square"
+              iconSize="w-5 h-5"
+            />
           </div>
         )}
         <span className="text-sm font-medium flex-1 truncate">
@@ -151,50 +159,31 @@ export function DiplomacySection({
           )}
 
         {/* Tabs Container */}
-        <div className="w-full">
-          {/* Custom Tab List */}
-          <div className="grid w-full grid-cols-6 bg-muted rounded-lg overflow-hidden">
-            {DIPLOMATIC_STATUS_CONSTANT.map((status, index) => {
-              const Icon = status.icon;
+        <Tabs value={activeTab} onValueChange={(value) => onActiveTabChange(value as DiplomaticStatus)}>
+          <TabsList className="w-full grid grid-cols-6 h-auto p-0 bg-muted rounded-md">
+            {DIPLOMATIC_STATUS_CONSTANT.map((status) => {
               const count = getFactionsWithStatus(
                 status.value as DiplomaticStatus
               ).length;
-              const isActive = activeTab === status.value;
-              const isFirst = index === 0;
-              const isLast = index === DIPLOMATIC_STATUS_CONSTANT.length - 1;
+              const StatusIcon = status.icon;
+
               return (
-                <button
+                <TabsTrigger
                   key={status.value}
-                  onClick={() =>
-                    onActiveTabChange(status.value as DiplomaticStatus)
-                  }
-                  className={`
-                    flex items-center justify-center gap-1 sm:gap-2 px-2 py-2
-                    transition-colors duration-200
-                    ${isFirst ? "rounded-l-lg" : ""}
-                    ${isLast ? "rounded-r-lg" : ""}
-                    ${
-                      isActive
-                        ? "bg-purple-600 text-white"
-                        : "hover:bg-white/5 dark:hover:bg-white/10"
-                    }
-                  `}
+                  value={status.value}
+                  className="flex items-center justify-center gap-2 py-3 bg-muted flex-1 rounded-none first:rounded-l-md last:rounded-r-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow"
                 >
-                  <Icon
-                    className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-white" : status.colorClass}`}
-                  />
-                  <span className="hidden md:inline truncate text-sm">
+                  <StatusIcon className="w-4 h-4 shrink-0" />
+                  <span className="text-xs font-medium truncate">
                     {t(`diplomatic_status.${status.value}`)}
                   </span>
-                  <span
-                    className={`ml-auto text-xs ${isActive ? "text-white" : "text-muted-foreground"}`}
-                  >
+                  <span className="text-xs font-semibold">
                     {count}
                   </span>
-                </button>
+                </TabsTrigger>
               );
             })}
-          </div>
+          </TabsList>
 
           {/* Tab Content */}
           <div className="mt-4 border rounded-lg">
@@ -217,7 +206,7 @@ export function DiplomacySection({
               </div>
             </ScrollArea>
           </div>
-        </div>
+        </Tabs>
       </div>
 
       {showAddModal && (
@@ -227,7 +216,6 @@ export function DiplomacySection({
           currentFactionId={currentFactionId}
           availableFactions={otherFactions}
           existingRelations={diplomaticRelations}
-          defaultStatus={activeTab}
           onSave={handleSaveRelation}
         />
       )}

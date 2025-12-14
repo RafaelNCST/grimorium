@@ -1460,32 +1460,13 @@ export function FactionDetailView({
       // Empty states
       emptyState: (() => {
         const otherFactions = mockFactions.filter((f) => f.id !== faction.id);
-        const relations = editData.diplomaticRelations || [];
 
-        // Estado 3: Bloqueado - não há outras facções
-        if (otherFactions.length === 0 && isEditing) {
+        // Estado único: Bloqueado - não há outras facções
+        if (otherFactions.length === 0) {
           return "blocked-no-data";
         }
 
-        // Estado 4: Bloqueado - todas as facções têm relações
-        if (
-          isEditing &&
-          relations.length > 0 &&
-          relations.length === otherFactions.length
-        ) {
-          return "blocked-all-used";
-        }
-
-        // Estado 1: Vazio em visualização
-        if (relations.length === 0 && !isEditing) {
-          return "empty-view";
-        }
-
-        // Estado 2: Vazio em edição
-        if (relations.length === 0 && isEditing) {
-          return "empty-edit";
-        }
-
+        // Sempre mostrar a tabela de diplomacia (com facções em "Neutral" por padrão)
         return null;
       })(),
       emptyIcon: Handshake,

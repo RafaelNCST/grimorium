@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Check,
   Crown,
+  Save,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -16,6 +17,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -178,9 +180,9 @@ export function ManageTitlesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[80vh]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col gap-0">
         <TooltipProvider delayDuration={300}>
-          <DialogHeader>
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {viewMode === "list" && t("hierarchy.manage_titles")}
               {viewMode === "add" && t("hierarchy.add_title")}
@@ -194,26 +196,29 @@ export function ManageTitlesModal({
           </DialogHeader>
 
           {viewMode === "list" ? (
-            <div className="space-y-4 py-4">
-              {/* Botão Adicionar */}
-              <Button
-                variant="magical"
-                size="sm"
-                className="w-full animate-glow"
-                onClick={handleStartAdd}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {t("hierarchy.add_title")}
-              </Button>
+            <>
+              {/* Botão Adicionar - Fixo */}
+              <div className="flex-shrink-0 pt-4 pb-4">
+                <Button
+                  variant="magical"
+                  size="sm"
+                  className="w-full animate-glow"
+                  onClick={handleStartAdd}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t("hierarchy.add_title")}
+                </Button>
+              </div>
 
-              {/* Lista de Títulos */}
+              {/* Lista de Títulos - Scrollável */}
               <div
                 ref={scrollContainerRef}
                 className={cn(
-                  "h-[300px] overflow-y-auto custom-scrollbar",
-                  hasScroll && "pr-3"
+                  "flex-1 overflow-y-auto custom-scrollbar pb-3",
+                  hasScroll && "pr-2"
                 )}
               >
+                <div className="min-h-[300px]">
                 {customTitles.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-[300px] py-12 text-muted-foreground">
                     <Crown className="w-12 h-12 mb-3 opacity-50" />
@@ -264,28 +269,34 @@ export function ManageTitlesModal({
                     })}
                   </div>
                 )}
+                </div>
               </div>
 
-              {/* Botão Fechar */}
-              <Button variant="secondary" className="w-full" onClick={onClose}>
-                {t("hierarchy.close")}
-              </Button>
-            </div>
+              <DialogFooter className="flex-shrink-0 pt-4 border-t">
+                <Button variant="secondary" className="w-full" onClick={onClose}>
+                  {t("hierarchy.close")}
+                </Button>
+              </DialogFooter>
+            </>
           ) : (
-            <div className="space-y-4 py-4">
-              {/* Nome do Título */}
-              <div className="space-y-2">
-                <Label htmlFor="title-name" className="text-purple-400">
+            <>
+              <div className="flex-1 overflow-y-auto custom-scrollbar pb-6 pr-4">
+                <div className="space-y-4">
+                  {/* Nome do Título */}
+                  <div className="space-y-2">
+                <Label htmlFor="title-name" className="text-primary">
                   {t("hierarchy.title_name")}
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
-                <Input
-                  id="title-name"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder={t("hierarchy.title_name_placeholder")}
-                  maxLength={200}
-                />
+                <div className="px-1">
+                  <Input
+                    id="title-name"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    placeholder={t("hierarchy.title_name_placeholder")}
+                    maxLength={200}
+                  />
+                </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
                   <span>{formName.length}/200</span>
                 </div>
@@ -293,15 +304,16 @@ export function ManageTitlesModal({
 
               {/* Ordem (Contador 1-100) */}
               <div className="space-y-2">
-                <Label className="text-purple-400">{t("hierarchy.title_order")}</Label>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="text"
-                    value={formOrder}
-                    onChange={handleOrderInputChange}
-                    className="w-16 h-10 text-center font-mono font-semibold text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    placeholder="1"
-                  />
+                <Label className="text-primary">{t("hierarchy.title_order")}</Label>
+                <div className="px-1">
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="text"
+                      value={formOrder}
+                      onChange={handleOrderInputChange}
+                      className="w-16 h-10 text-center font-mono font-semibold text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      placeholder="1"
+                    />
                   <div className="flex flex-col gap-0.5">
                     <Tooltip delayDuration={300} disableHoverableContent>
                       <TooltipTrigger asChild>
@@ -338,6 +350,7 @@ export function ManageTitlesModal({
                       </TooltipContent>
                     </Tooltip>
                   </div>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {t("hierarchy.order_hint")}
@@ -346,7 +359,7 @@ export function ManageTitlesModal({
 
               {/* Seletor de Cor */}
               <div className="space-y-2">
-                <Label className="text-purple-400">{t("hierarchy.title_color")}</Label>
+                <Label className="text-primary">{t("hierarchy.title_color")}</Label>
                 <div className="grid grid-cols-6 gap-2">
                   {HIERARCHY_TITLE_COLORS.map((color) => (
                     <Tooltip key={color.value} delayDuration={300}>
@@ -373,10 +386,11 @@ export function ManageTitlesModal({
                     </Tooltip>
                   ))}
                 </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Botões */}
-              <div className="flex gap-2 pt-2">
+              <DialogFooter className="flex-shrink-0 pt-4 border-t">
                 <Button
                   variant="secondary"
                   className="flex-1"
@@ -393,12 +407,17 @@ export function ManageTitlesModal({
                   onClick={handleSaveTitle}
                   disabled={!isFormValid}
                 >
+                  {viewMode === "add" ? (
+                    <Plus className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
                   {viewMode === "add"
                     ? t("hierarchy.create_title")
                     : t("hierarchy.save_title")}
                 </Button>
-              </div>
-            </div>
+              </DialogFooter>
+            </>
           )}
         </TooltipProvider>
       </DialogContent>

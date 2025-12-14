@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { Check, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import type { IPlotEvent } from "@/types/plot-types";
 
 interface PropsEventModal {
@@ -32,6 +33,8 @@ export function EventModal({
   const { t } = useTranslation("create-plot-arc");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [hasScroll, setHasScroll] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const isEditing = !!event;
 
@@ -47,6 +50,27 @@ export function EventModal({
     }
   }, [open, event]);
 
+  // Detectar se há scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasScroll(scrollHeight > clientHeight);
+      }
+    };
+
+    const timeoutId = setTimeout(checkScroll, 0);
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [name, description, open]);
+
   const handleConfirm = () => {
     if (!name.trim() || !description.trim()) return;
     onConfirm(name.trim(), description.trim());
@@ -57,14 +81,21 @@ export function EventModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col gap-0">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {isEditing ? t("modal.edit_event") : t("modal.add_event")}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div
+          ref={scrollContainerRef}
+          className={cn(
+            "flex-1 overflow-y-auto custom-scrollbar pb-6",
+            hasScroll && "pr-2"
+          )}
+        >
+          <div className="space-y-4">
           <div className="space-y-2">
             <Label
               htmlFor="event-name"
@@ -73,13 +104,15 @@ export function EventModal({
               {t("modal.event_name")}{" "}
               <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="event-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("modal.event_name_placeholder")}
-              maxLength={100}
-            />
+            <div className="px-1">
+              <Input
+                id="event-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t("modal.event_name_placeholder")}
+                maxLength={100}
+              />
+            </div>
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{name.length}/100</span>
             </div>
@@ -93,22 +126,25 @@ export function EventModal({
               {t("modal.event_description")}{" "}
               <span className="text-destructive">*</span>
             </Label>
-            <Textarea
-              id="event-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("modal.event_description_placeholder")}
-              rows={4}
-              maxLength={500}
-              className="resize-none"
-            />
+            <div className="px-1">
+              <Textarea
+                id="event-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t("modal.event_description_placeholder")}
+                rows={4}
+                maxLength={500}
+                className="resize-none"
+              />
+            </div>
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{description.length}/500</span>
             </div>
           </div>
+          </div>
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="flex-shrink-0 pt-4 border-t gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             <X className="w-4 h-4 mr-2" />
             {t("button.cancel")}

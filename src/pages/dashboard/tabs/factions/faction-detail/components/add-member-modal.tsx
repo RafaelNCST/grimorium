@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { ChevronLeft, User, UserPlus, X } from "lucide-react";
+import { ChevronLeft, User, Plus, Save, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
@@ -135,8 +135,8 @@ export function AddMemberModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {modalStep === 1
               ? t("hierarchy.add_member")
@@ -151,21 +151,23 @@ export function AddMemberModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          ref={scrollContainerRef}
-          className={cn(
-            "max-h-[60vh] overflow-y-auto custom-scrollbar",
-            hasScroll && "pr-1.5"
-          )}
-        >
-          <div className="space-y-6 pr-2 pl-2">
-            {/* STEP 1: Seleção do Personagem */}
-            {modalStep === 1 && (
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold text-purple-400">
-                  {t("hierarchy.available_characters")}
-                </Label>
-                <div className="grid grid-cols-1 gap-3 p-1">
+        {/* STEP 1: Seleção do Personagem */}
+        {modalStep === 1 && (
+          <>
+            <div className="flex-shrink-0 pb-2">
+              <Label className="text-sm font-semibold text-primary">
+                {t("hierarchy.available_characters")}
+              </Label>
+            </div>
+            <div
+              ref={scrollContainerRef}
+              className={cn(
+                "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+                hasScroll && "pr-2"
+              )}
+            >
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 gap-3">
                   {filteredCharacters.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <p className="text-sm">
@@ -207,14 +209,24 @@ export function AddMemberModal({
                   )}
                 </div>
               </div>
-            )}
+            </div>
+          </>
+        )}
 
-            {/* STEP 2: Seleção do Título */}
-            {modalStep === 2 && selectedCharacterId && (
+        {/* STEP 2: Seleção do Título */}
+        {modalStep === 2 && selectedCharacterId && (
+          <div
+            ref={scrollContainerRef}
+            className={cn(
+              "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+              hasScroll && "pr-2"
+            )}
+          >
+            <div className="space-y-6">
               <div className="space-y-6">
                 {/* Card do Personagem Selecionado (Read-only) */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold text-purple-400">
+                  <Label className="text-sm font-semibold text-primary">
                     {t("hierarchy.selected_character")}
                   </Label>
                   <Card className="p-4 bg-primary/5 border-primary/20">
@@ -246,13 +258,14 @@ export function AddMemberModal({
 
                 {/* Seleção de Título */}
                 <div className="space-y-3 pb-4">
-                  <Label className="text-sm font-semibold text-purple-400">
+                  <Label className="text-sm font-semibold text-primary">
                     {t("hierarchy.select_title")}
+                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   {sortedTitles.length === 0 ? (
                     <InfoAlert>{t("hierarchy.no_titles_available")}</InfoAlert>
                   ) : (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                       {sortedTitles.map((title) => {
                         const colorClasses = getColorClasses(title.color);
                         const isSelected = selectedTitleId === title.id;
@@ -282,11 +295,11 @@ export function AddMemberModal({
                   )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
           {modalStep === 1 ? (
             <Button variant="secondary" onClick={handleClose}>
               <X className="w-4 h-4 mr-2" />
@@ -312,7 +325,11 @@ export function AddMemberModal({
                 disabled={!selectedTitleId}
                 className="animate-glow"
               >
-                <UserPlus className="w-4 h-4 mr-2" />
+                {isEditMode ? (
+                  <Save className="w-4 h-4 mr-2" />
+                ) : (
+                  <Plus className="w-4 h-4 mr-2" />
+                )}
                 {isEditMode
                   ? t("hierarchy.save_member")
                   : t("hierarchy.add_member_btn")}

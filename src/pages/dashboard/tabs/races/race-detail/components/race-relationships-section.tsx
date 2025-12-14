@@ -5,7 +5,8 @@ import {
   Trash2,
   X,
   ChevronLeft,
-  UserPlus,
+  Plus,
+  Save,
   Heart,
   User,
   type LucideIcon,
@@ -27,7 +28,6 @@ import {
 } from "@/components/ui/dialog";
 import { EntityTagBadge } from "@/components/ui/entity-tag-badge";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -219,6 +219,16 @@ export function RaceRelationshipsSection({
     setDescription("");
   };
 
+  // Reset modal to step 1 when it closes
+  useEffect(() => {
+    if (!isAddDialogOpen) {
+      setModalStep(1);
+      setSelectedRaceId("");
+      setSelectedType("");
+      setDescription("");
+    }
+  }, [isAddDialogOpen]);
+
   // Detectar se há scroll
   useEffect(() => {
     const checkScroll = () => {
@@ -241,7 +251,7 @@ export function RaceRelationshipsSection({
       clearTimeout(timeoutId);
       observer.disconnect();
     };
-  }, [availableRaces, modalStep, isAddDialogOpen]);
+  }, [availableRaces, modalStep, isAddDialogOpen, isEditDialogOpen, editingRelationship]);
 
   return (
     <div className="space-y-4">
@@ -353,8 +363,8 @@ export function RaceRelationshipsSection({
 
       {/* Add Relationship Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {modalStep === 1
                 ? t("race-detail:relationships.add_relationship")
@@ -367,70 +377,33 @@ export function RaceRelationshipsSection({
             </DialogDescription>
           </DialogHeader>
 
-          <div
-            ref={scrollContainerRef}
-            className={cn(
-              "max-h-[60vh] overflow-y-auto custom-scrollbar",
-              hasScroll && "pr-3"
-            )}
-          >
-            <div className="space-y-6 pr-2 pl-2">
-              {/* STEP 1: Race Selection */}
-              {modalStep === 1 && (
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold text-purple-400">
-                    {t("race-detail:relationships.available_races")}
-                  </Label>
-                  <div className="grid grid-cols-1 gap-3 p-1">
-                    {availableRaces.map((race) => (
-                      <Card
-                        key={race.id}
-                        className="p-4 cursor-pointer transition-all border-muted hover:bg-muted/50"
-                        onClick={() => handleRaceSelect(race.id)}
-                      >
-                        <div className="flex items-center gap-4">
-                          {race.image ? (
-                            <Avatar className="w-12 h-12">
-                              <AvatarImage
-                                src={race.image}
-                                className="object-cover"
-                              />
-                            </Avatar>
-                          ) : (
-                            <FormImageDisplay
-                              icon={User}
-                              height="h-12"
-                              width="w-12"
-                              shape="circle"
-                              iconSize="w-6 h-6"
-                            />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-base truncate">
-                              {race.name}
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 2: Relationship Type & Intensity */}
-              {modalStep === 2 && selectedRaceId && (
-                <div className="space-y-6">
-                  {/* Selected Race Card (Read-only) */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-purple-400">
-                      {t("race-detail:relationships.selected_race")}
-                    </Label>
-                    <Card className="p-4 bg-primary/5 border-primary/20">
+          {/* STEP 1: Race Selection */}
+          {modalStep === 1 && (
+            <>
+              <div className="flex-shrink-0 pb-2">
+                <Label className="text-sm font-semibold text-primary">
+                  {t("race-detail:relationships.available_races")}
+                </Label>
+              </div>
+              <div
+                ref={scrollContainerRef}
+                className={cn(
+                  "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+                  hasScroll && "pr-2"
+                )}
+              >
+                <div className="grid grid-cols-1 gap-3">
+                  {availableRaces.map((race) => (
+                    <Card
+                      key={race.id}
+                      className="p-4 cursor-pointer transition-all border-muted hover:bg-muted/50"
+                      onClick={() => handleRaceSelect(race.id)}
+                    >
                       <div className="flex items-center gap-4">
-                        {getRaceById(selectedRaceId)?.image ? (
+                        {race.image ? (
                           <Avatar className="w-12 h-12">
                             <AvatarImage
-                              src={getRaceById(selectedRaceId)?.image}
+                              src={race.image}
                               className="object-cover"
                             />
                           </Avatar>
@@ -445,46 +418,94 @@ export function RaceRelationshipsSection({
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-base truncate">
-                            {getRaceById(selectedRaceId)?.name}
+                            {race.name}
                           </p>
                         </div>
                       </div>
                     </Card>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
-                  {/* Relationship Type Selection */}
-                  <div className="pb-2">
-                    <FormSelectGrid
-                      value={selectedType}
-                      onChange={setSelectedType}
-                      label={t("race-detail:relationships.relationship_type")}
-                      columns={2}
-                      required
-                      options={RACE_RELATIONSHIP_TYPES.map((type) => ({
-                        value: type.value,
-                        label: t(
-                          `race-detail:relationship_types.${type.translationKey}`
-                        ),
-                        description: `${getRaceById(selectedRaceId)?.name} ${t(
-                          `race-detail:relationship_types.${type.translationKey}_label`
-                        )} ${currentRaceName}`,
-                        icon: type.icon,
-                        backgroundColor:
-                          RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
-                        borderColor:
-                          RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
-                      }))}
-                    />
-                  </div>
+          {/* STEP 2: Relationship Type & Intensity */}
+          {modalStep === 2 && selectedRaceId && (
+            <div
+              ref={scrollContainerRef}
+              className={cn(
+                "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+                hasScroll && "pr-2"
+              )}
+            >
+              <div className="space-y-6">
+                {/* Selected Race Card (Read-only) */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold text-primary">
+                    {t("race-detail:relationships.selected_race")}
+                  </Label>
+                  <Card className="p-4 bg-primary/5 border-primary/20">
+                    <div className="flex items-center gap-4">
+                      {getRaceById(selectedRaceId)?.image ? (
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage
+                            src={getRaceById(selectedRaceId)?.image}
+                            className="object-cover"
+                          />
+                        </Avatar>
+                      ) : (
+                        <FormImageDisplay
+                          icon={User}
+                          height="h-12"
+                          width="w-12"
+                          shape="circle"
+                          iconSize="w-6 h-6"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-base truncate">
+                          {getRaceById(selectedRaceId)?.name}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
 
-                  {/* Description Field */}
-                  <div className="space-y-3">
-                    <Label className="text-sm font-medium text-primary">
-                      {t("race-detail:relationships.description_label")}
-                      <span className="text-muted-foreground font-normal ml-1">
-                        ({t("race-detail:relationships.optional")})
-                      </span>
-                    </Label>
+                {/* Relationship Type Selection */}
+                <div className="pb-2">
+                  <FormSelectGrid
+                    value={selectedType}
+                    onChange={setSelectedType}
+                    label={t("race-detail:relationships.relationship_type")}
+                    columns={2}
+                    required
+                    className="px-1"
+                    options={RACE_RELATIONSHIP_TYPES.map((type) => ({
+                      value: type.value,
+                      label: t(
+                        `race-detail:relationship_types.${type.translationKey}`
+                      ),
+                      description: `${getRaceById(selectedRaceId)?.name} ${t(
+                        `race-detail:relationship_types.${type.translationKey}_label`
+                      )} ${currentRaceName}`,
+                      icon: type.icon,
+                      backgroundColor:
+                        RACE_RELATIONSHIP_COLOR_MAP[type.value].bg,
+                      borderColor:
+                        RACE_RELATIONSHIP_COLOR_MAP[type.value].border,
+                    }))}
+                  />
+                </div>
+
+                {/* Description Field */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-primary">
+                    {t("race-detail:relationships.description_label")}
+                    <span className="text-muted-foreground font-normal ml-1">
+                      ({t("race-detail:relationships.optional")})
+                    </span>
+                  </Label>
+                  <div className="px-1">
                     <Textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -495,16 +516,16 @@ export function RaceRelationshipsSection({
                       maxLength={200}
                       className="resize-none w-full"
                     />
-                    <div className="flex justify-end text-xs text-muted-foreground">
-                      <span>{description.length}/200</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{description.length}/200</span>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             {modalStep === 1 ? (
               <Button variant="secondary" onClick={closeAddDialog}>
                 <X className="w-4 h-4 mr-2" />
@@ -522,7 +543,7 @@ export function RaceRelationshipsSection({
                   disabled={!selectedType}
                   className="animate-glow"
                 >
-                  <UserPlus className="w-4 h-4 mr-2" />
+                  <Plus className="w-4 h-4 mr-2" />
                   {t("race-detail:relationships.add")}
                 </Button>
               </>
@@ -533,8 +554,8 @@ export function RaceRelationshipsSection({
 
       {/* Edit Relationship Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh]">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {t("race-detail:relationships.edit_title")}
             </DialogTitle>
@@ -546,13 +567,19 @@ export function RaceRelationshipsSection({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh] pr-4">
-            <div className="space-y-6 pr-2 pl-2">
+          <div
+            ref={scrollContainerRef}
+            className={cn(
+              "flex-1 overflow-y-auto custom-scrollbar pb-3 px-[2px]",
+              hasScroll && "pr-2"
+            )}
+          >
+            <div className="space-y-6">
               {editingRelationship && (
                 <>
                   {/* Selected Race Card (Read-only) */}
                   <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-purple-400">
+                    <Label className="text-sm font-semibold text-primary">
                       {t("race-detail:relationships.selected_race")}
                     </Label>
                     <Card className="p-4 bg-primary/5 border-primary/20">
@@ -590,6 +617,7 @@ export function RaceRelationshipsSection({
                       label={t("race-detail:relationships.relationship_type")}
                       columns={2}
                       required
+                      className="px-1"
                       options={RACE_RELATIONSHIP_TYPES.map((type) => ({
                         value: type.value,
                         label: t(
@@ -613,16 +641,18 @@ export function RaceRelationshipsSection({
                         ({t("race-detail:relationships.optional")})
                       </span>
                     </Label>
-                    <Textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t(
-                        "race-detail:relationships.description_placeholder"
-                      )}
-                      rows={3}
-                      maxLength={200}
-                      className="resize-none w-full"
-                    />
+                    <div className="px-1">
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={t(
+                          "race-detail:relationships.description_placeholder"
+                        )}
+                        rows={3}
+                        maxLength={200}
+                        className="resize-none w-full"
+                      />
+                    </div>
                     <div className="flex justify-end text-xs text-muted-foreground">
                       <span>{description.length}/200</span>
                     </div>
@@ -630,9 +660,9 @@ export function RaceRelationshipsSection({
                 </>
               )}
             </div>
-          </ScrollArea>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             <Button variant="secondary" onClick={closeEditDialog}>
               <X className="w-4 h-4 mr-2" />
               {t("race-detail:relationships.cancel")}
@@ -643,7 +673,7 @@ export function RaceRelationshipsSection({
               onClick={handleEditRelationship}
               disabled={!selectedType}
             >
-              <Edit2 className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 mr-2" />
               {t("race-detail:relationships.save")}
             </Button>
           </DialogFooter>
