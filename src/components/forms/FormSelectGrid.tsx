@@ -290,7 +290,7 @@ export function FormSelectGrid<T extends string = string>({
 
       {!!alertText.length && <InfoAlert>{alertText}</InfoAlert>}
 
-      <div className={cn("grid gap-3 w-full overflow-x-hidden", getGridColsClass(columns), className)}>
+      <div className={cn("grid gap-3 w-full p-1", getGridColsClass(columns), className)}>
         {options.map((option) => {
           const Icon = option.icon;
           const selected = isSelected(option.value);

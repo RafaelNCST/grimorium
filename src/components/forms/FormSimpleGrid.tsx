@@ -228,7 +228,7 @@ export function FormSimpleGrid<T extends string = string>({
         </Label>
       )}
 
-      <div className={cn("grid gap-3 w-full overflow-x-hidden", gridColsClass, className)}>
+      <div className={cn("grid gap-3 w-full p-1", gridColsClass, className)}>
         {options.map((option) => {
           const Icon = option.icon;
           const selected = isSelected(option.value);
