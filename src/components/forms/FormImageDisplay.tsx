@@ -9,6 +9,7 @@ interface FormImageDisplayProps {
   width?: string;
   shape?: "square" | "rounded" | "circle";
   className?: string;
+  iconSize?: string;
 }
 
 /**
@@ -23,6 +24,7 @@ interface FormImageDisplayProps {
  * @param width - Largura do componente (default: w-40)
  * @param shape - Forma do componente: square, rounded ou circle (default: rounded)
  * @param className - Classes CSS adicionais
+ * @param iconSize - Tamanho do ícone (default: w-12 h-12)
  *
  * @example
  * // Exibir estado vazio quando não está editando e não tem imagem
@@ -41,6 +43,7 @@ export function FormImageDisplay({
   width = "w-40",
   shape = "rounded",
   className,
+  iconSize = "w-12 h-12",
 }: FormImageDisplayProps) {
   const shapeClasses = {
     square: "",
@@ -58,7 +61,7 @@ export function FormImageDisplay({
         className
       )}
     >
-      <Icon className="w-12 h-12 text-purple-400" />
+      <Icon className={cn(iconSize, "text-purple-400")} />
       {text && <span className="text-sm text-purple-300">{text}</span>}
     </div>
   );

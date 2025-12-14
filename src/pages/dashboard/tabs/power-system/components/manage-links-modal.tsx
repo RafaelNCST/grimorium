@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 
-import { Check, UserCircle } from "lucide-react";
+import { Check, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -162,15 +164,20 @@ export function ManageLinksModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="!w-[400px] max-h-[80vh]">
         <DialogHeader>
-          <DialogTitle>{t("links.manage")}</DialogTitle>
+          <DialogTitle>
+            {pageId ? t("links.manage_page") : t("links.manage_section")}
+          </DialogTitle>
+          <DialogDescription className="whitespace-normal">
+            {pageId ? t("links.page_description") : t("links.section_description")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Linked Characters Section */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">
+            <h3 className="text-sm font-semibold mb-2 text-purple-400">
               {t("links.linked_characters")}
             </h3>
 
@@ -186,22 +193,24 @@ export function ManageLinksModal({
                       key={character.id}
                       className="flex items-center gap-3 p-2 rounded-md hover:bg-muted transition-colors"
                     >
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={character.image} />
-                        <AvatarFallback>
-                          <UserCircle className="h-6 w-6" />
-                        </AvatarFallback>
-                      </Avatar>
+                      {character.image ? (
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={character.image} />
+                        </Avatar>
+                      ) : (
+                        <FormImageDisplay
+                          icon={User}
+                          height="h-10"
+                          width="w-10"
+                          shape="circle"
+                          iconSize="w-5 h-5"
+                        />
+                      )}
 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
                           {character.name}
                         </p>
-                        {character.role && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {character.role}
-                          </p>
-                        )}
                       </div>
 
                       <Badge
@@ -214,7 +223,7 @@ export function ManageLinksModal({
 
                       <Button
                         size="sm"
-                        variant="ghost"
+                        variant="ghost-destructive"
                         onClick={() => handleToggleLink(character.id)}
                         disabled={isProcessing === character.id}
                       >
@@ -231,7 +240,7 @@ export function ManageLinksModal({
 
           {/* Available Characters Section */}
           <div>
-            <h3 className="text-sm font-semibold mb-2">
+            <h3 className="text-sm font-semibold mb-2 text-purple-400">
               {t("links.available_characters")}
             </h3>
 
@@ -253,34 +262,28 @@ export function ManageLinksModal({
                   {availableCharacters.map((character) => (
                     <div
                       key={character.id}
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-muted transition-colors"
+                      onClick={() => handleToggleLink(character.id)}
+                      className="flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-black/10 dark:hover:bg-black/20 transition-colors duration-200"
                     >
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={character.image} />
-                        <AvatarFallback>
-                          <UserCircle className="h-6 w-6" />
-                        </AvatarFallback>
-                      </Avatar>
+                      {character.image ? (
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={character.image} />
+                        </Avatar>
+                      ) : (
+                        <FormImageDisplay
+                          icon={User}
+                          height="h-10"
+                          width="w-10"
+                          shape="circle"
+                          iconSize="w-5 h-5"
+                        />
+                      )}
 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
                           {character.name}
                         </p>
-                        {character.role && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {character.role}
-                          </p>
-                        )}
                       </div>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleToggleLink(character.id)}
-                        disabled={isProcessing === character.id}
-                      >
-                        {t("links.add")}
-                      </Button>
                     </div>
                   ))}
                 </div>
@@ -290,7 +293,7 @@ export function ManageLinksModal({
 
           {/* Close Button */}
           <div className="flex justify-end pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="secondary" onClick={onClose}>
               {t("actions.close")}
             </Button>
           </div>

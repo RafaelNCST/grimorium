@@ -161,7 +161,8 @@ export function ManageTitlesModal({
       }
     };
 
-    checkScroll();
+    // Dar um pequeno delay para garantir que o conteúdo foi renderizado
+    const timeoutId = setTimeout(checkScroll, 0);
 
     // Observar mudanças no tamanho do conteúdo
     const observer = new ResizeObserver(checkScroll);
@@ -169,7 +170,10 @@ export function ManageTitlesModal({
       observer.observe(scrollContainerRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, [customTitles, viewMode, isOpen]);
 
   return (
@@ -207,7 +211,7 @@ export function ManageTitlesModal({
                 ref={scrollContainerRef}
                 className={cn(
                   "h-[300px] overflow-y-auto custom-scrollbar",
-                  hasScroll && "pr-1.5"
+                  hasScroll && "pr-3"
                 )}
               >
                 {customTitles.length === 0 ? (
@@ -271,7 +275,10 @@ export function ManageTitlesModal({
             <div className="space-y-4 py-4">
               {/* Nome do Título */}
               <div className="space-y-2">
-                <Label htmlFor="title-name">{t("hierarchy.title_name")}</Label>
+                <Label htmlFor="title-name" className="text-purple-400">
+                  {t("hierarchy.title_name")}
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
                 <Input
                   id="title-name"
                   value={formName}
@@ -286,7 +293,7 @@ export function ManageTitlesModal({
 
               {/* Ordem (Contador 1-100) */}
               <div className="space-y-2">
-                <Label>{t("hierarchy.title_order")}</Label>
+                <Label className="text-purple-400">{t("hierarchy.title_order")}</Label>
                 <div className="flex items-center gap-1">
                   <Input
                     type="text"
@@ -339,7 +346,7 @@ export function ManageTitlesModal({
 
               {/* Seletor de Cor */}
               <div className="space-y-2">
-                <Label>{t("hierarchy.title_color")}</Label>
+                <Label className="text-purple-400">{t("hierarchy.title_color")}</Label>
                 <div className="grid grid-cols-6 gap-2">
                   {HIERARCHY_TITLE_COLORS.map((color) => (
                     <Tooltip key={color.value} delayDuration={300}>

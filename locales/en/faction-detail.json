@@ -220,7 +220,7 @@
     "edit_title_description": "Edit the title information.",
     "delete_title": "Delete Title",
     "title_name": "Title Name",
-    "title_name_placeholder": "E.g.: Leader, Captain, Member...",
+    "title_name_placeholder": "Leader, Captain, Member, Initiate...",
     "title_order": "Importance Order",
     "order": "Order",
     "order_hint": "The lower the number, the higher the importance in the hierarchy (1-100).",

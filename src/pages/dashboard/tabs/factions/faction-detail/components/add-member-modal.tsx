@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-import { ChevronLeft, UserPlus, X } from "lucide-react";
+import { ChevronLeft, User, UserPlus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { type IHierarchyTitle } from "@/types/faction-types";
 
 import { getColorClasses } from "./hierarchy-section";
@@ -46,6 +47,8 @@ export function AddMemberModal({
     null
   );
   const [selectedTitleId, setSelectedTitleId] = useState<string | null>(null);
+  const [hasScroll, setHasScroll] = useState(false);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -106,6 +109,30 @@ export function AddMemberModal({
 
   const isEditMode = !!editingMember;
 
+  // Detectar se há scroll
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasScroll(scrollHeight > clientHeight);
+      }
+    };
+
+    // Dar um pequeno delay para garantir que o conteúdo foi renderizado
+    const timeoutId = setTimeout(checkScroll, 0);
+
+    // Observar mudanças no tamanho do conteúdo
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [filteredCharacters, sortedTitles, modalStep, isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
@@ -124,12 +151,18 @@ export function AddMemberModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh] pr-4">
+        <div
+          ref={scrollContainerRef}
+          className={cn(
+            "max-h-[60vh] overflow-y-auto custom-scrollbar",
+            hasScroll && "pr-1.5"
+          )}
+        >
           <div className="space-y-6 pr-2 pl-2">
             {/* STEP 1: Seleção do Personagem */}
             {modalStep === 1 && (
               <div className="space-y-3">
-                <Label className="text-sm font-semibold">
+                <Label className="text-sm font-semibold text-purple-400">
                   {t("hierarchy.available_characters")}
                 </Label>
                 <div className="grid grid-cols-1 gap-3 p-1">
@@ -147,19 +180,22 @@ export function AddMemberModal({
                         onClick={() => handleCharacterSelect(character.id)}
                       >
                         <div className="flex items-center gap-4">
-                          <Avatar className="w-12 h-12">
-                            <AvatarImage
-                              src={character.image}
-                              className="object-cover"
+                          {character.image ? (
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage
+                                src={character.image}
+                                className="object-cover"
+                              />
+                            </Avatar>
+                          ) : (
+                            <FormImageDisplay
+                              icon={User}
+                              height="h-12"
+                              width="w-12"
+                              shape="circle"
+                              iconSize="w-6 h-6"
                             />
-                            <AvatarFallback>
-                              {character.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-base truncate">
                               {character.name}
@@ -178,24 +214,27 @@ export function AddMemberModal({
               <div className="space-y-6">
                 {/* Card do Personagem Selecionado (Read-only) */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-semibold">
+                  <Label className="text-sm font-semibold text-purple-400">
                     {t("hierarchy.selected_character")}
                   </Label>
                   <Card className="p-4 bg-primary/5 border-primary/20">
                     <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage
-                          src={getCharacterById(selectedCharacterId)?.image}
-                          className="object-cover"
+                      {getCharacterById(selectedCharacterId)?.image ? (
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage
+                            src={getCharacterById(selectedCharacterId)?.image}
+                            className="object-cover"
+                          />
+                        </Avatar>
+                      ) : (
+                        <FormImageDisplay
+                          icon={User}
+                          height="h-12"
+                          width="w-12"
+                          shape="circle"
+                          iconSize="w-6 h-6"
                         />
-                        <AvatarFallback>
-                          {getCharacterById(selectedCharacterId)
-                            ?.name.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-base truncate">
                           {getCharacterById(selectedCharacterId)?.name}
@@ -207,7 +246,7 @@ export function AddMemberModal({
 
                 {/* Seleção de Título */}
                 <div className="space-y-3 pb-4">
-                  <Label className="text-sm font-semibold">
+                  <Label className="text-sm font-semibold text-purple-400">
                     {t("hierarchy.select_title")}
                   </Label>
                   {sortedTitles.length === 0 ? (
@@ -221,7 +260,7 @@ export function AddMemberModal({
                         return (
                           <Card
                             key={title.id}
-                            className={`p-4 cursor-pointer transition-all ${colorClasses.bg} ${colorClasses.text} ${
+                            className={`p-4 cursor-pointer transition-all ${colorClasses.bg} ${
                               isSelected
                                 ? "ring-2 ring-primary"
                                 : "hover:opacity-80"
@@ -229,10 +268,10 @@ export function AddMemberModal({
                             onClick={() => setSelectedTitleId(title.id)}
                           >
                             <div className="text-center">
-                              <p className="font-semibold truncate">
+                              <p className="font-semibold truncate text-foreground">
                                 {title.name}
                               </p>
-                              <p className="text-xs opacity-80">
+                              <p className="text-xs text-muted-foreground">
                                 {t("hierarchy.order")}: #{title.order}
                               </p>
                             </div>
@@ -245,7 +284,7 @@ export function AddMemberModal({
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
         <DialogFooter>
           {modalStep === 1 ? (

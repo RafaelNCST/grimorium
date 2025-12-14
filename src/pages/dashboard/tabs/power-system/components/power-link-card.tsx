@@ -38,18 +38,18 @@ export function PowerLinkCard({
   return (
     <div
       className={cn(
-        "relative group bg-neutral-800 rounded-lg p-6 transition-all duration-200",
-        !isEditing && "hover:bg-neutral-700 cursor-pointer"
+        "relative group border border-purple-500/30 bg-purple-950/40 rounded-lg p-6 transition-all duration-200",
+        !isEditing && "hover:border-purple-400/50 hover:bg-purple-900/50 cursor-pointer"
       )}
       onClick={!isEditing ? onClick : undefined}
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-medium text-lg truncate">
+          <h3 className="text-purple-100 font-medium text-lg truncate">
             {displayLabel}
           </h3>
           {link.customLabel && (pageTitle || sectionTitle) && (
-            <p className="text-neutral-400 text-sm mt-1 truncate">
+            <p className="text-purple-300/70 text-sm mt-1 truncate">
               {pageTitle || sectionTitle}
             </p>
           )}
@@ -66,7 +66,7 @@ export function PowerLinkCard({
                   variant="ghost"
                   size="icon"
                   onClick={onEdit}
-                  className="h-8 w-8 text-white hover:bg-neutral-700"
+                  className="h-8 w-8"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -79,10 +79,10 @@ export function PowerLinkCard({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="ghost-destructive"
                   size="icon"
                   onClick={onDelete}
-                  className="h-8 w-8 text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                  className="h-8 w-8"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -93,7 +93,7 @@ export function PowerLinkCard({
             </Tooltip>
           </div>
         ) : (
-          <ChevronRight className="h-6 w-6 text-white flex-shrink-0" />
+          <ChevronRight className="h-6 w-6 text-purple-300 flex-shrink-0" />
         )}
       </div>
     </div>

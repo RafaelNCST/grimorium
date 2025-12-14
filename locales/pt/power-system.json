@@ -399,6 +399,10 @@
   },
   "links": {
     "manage": "Gerenciar Links",
+    "manage_page": "Linkar Personagem à Página",
+    "manage_section": "Linkar Personagem à Seção",
+    "page_description": "Linke um personagem a esta página para associá-lo a este poder ou habilidade. Personagens linkados a páginas aparecem nos detalhes do sistema de poder.",
+    "section_description": "Linke um personagem a esta seção para associá-lo a esta parte específica do poder. Personagens linkados a seções são mostrados dentro do contexto dessa seção.",
     "linked_characters": "Personagens Linkados",
     "available_characters": "Personagens Disponíveis",
     "no_characters": "Nenhum personagem disponível",

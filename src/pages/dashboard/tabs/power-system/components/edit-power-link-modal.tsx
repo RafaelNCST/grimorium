@@ -74,7 +74,7 @@ export function EditPowerLinkModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
             {t("actions.cancel")}
           </Button>
           <Button

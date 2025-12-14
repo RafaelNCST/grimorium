@@ -399,6 +399,10 @@
   },
   "links": {
     "manage": "Manage Links",
+    "manage_page": "Link Character to Page",
+    "manage_section": "Link Character to Section",
+    "page_description": "Link a character to this page to associate them with this power or ability. Characters linked to pages appear in the power system details.",
+    "section_description": "Link a character to this section to associate them with this specific part of the power. Characters linked to sections are shown within that section's context.",
     "linked_characters": "Linked Characters",
     "available_characters": "Available Characters",
     "no_characters": "No characters available",
