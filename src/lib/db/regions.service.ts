@@ -146,7 +146,7 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
 export async function getRegionsByBookId(bookId: string): Promise<IRegion[]> {
   const db = await getDB();
   const result = await db.select<DBRegion[]>(
-    "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index ASC, created_at DESC",
+    "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index DESC, created_at DESC",
     [bookId]
   );
   return result.map(dbRegionToRegion);
@@ -435,7 +435,7 @@ export async function getRegionHierarchy(
 
   // Sort children by orderIndex
   const sortByOrderIndex = (regions: IRegionWithChildren[]) => {
-    regions.sort((a, b) => a.orderIndex - b.orderIndex);
+    regions.sort((a, b) => b.orderIndex - a.orderIndex);
     regions.forEach((region) => {
       if (region.children.length > 0) {
         sortByOrderIndex(region.children);

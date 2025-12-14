@@ -125,7 +125,7 @@ export const useCharactersStore = create<CharactersState>((set, get) => ({
           cache: {
             ...state.cache,
             [bookId]: {
-              characters: [...(cached?.characters || []), character],
+              characters: [character, ...(cached?.characters || [])],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
               hasAnimated: cached?.hasAnimated || false,

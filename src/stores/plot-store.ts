@@ -125,7 +125,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
           cache: {
             ...state.cache,
             [bookId]: {
-              arcs: [...(cached?.arcs || []), arc],
+              arcs: [arc, ...(cached?.arcs || [])],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
             },

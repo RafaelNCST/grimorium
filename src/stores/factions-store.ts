@@ -104,7 +104,7 @@ export const useFactionsStore = create<FactionsState>((set, get) => ({
           cache: {
             ...state.cache,
             [bookId]: {
-              factions: [...(cached?.factions || []), faction],
+              factions: [faction, ...(cached?.factions || [])],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
               hasAnimated: cached?.hasAnimated || false,

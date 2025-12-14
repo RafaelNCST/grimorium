@@ -119,7 +119,7 @@ export const useItemsStore = create<ItemsState>((set, get) => ({
           cache: {
             ...state.cache,
             [bookId]: {
-              items: [...(cached?.items || []), item],
+              items: [item, ...(cached?.items || [])],
               isLoading: false,
               lastFetched: cached?.lastFetched || Date.now(),
               hasAnimated: cached?.hasAnimated || false,

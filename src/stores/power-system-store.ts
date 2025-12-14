@@ -127,7 +127,7 @@ export const usePowerSystemStore = create<PowerSystemState>((set, get) => ({
           cache: {
             ...state.cache,
             [bookId]: {
-              systems: [...(cached?.systems || []), newSystem],
+              systems: [newSystem, ...(cached?.systems || [])],
               isLoading: false,
               lastFetched: Date.now(),
               hasAnimated: cached?.hasAnimated || false,
