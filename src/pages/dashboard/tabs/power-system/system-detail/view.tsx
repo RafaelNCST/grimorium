@@ -4,8 +4,6 @@ import {
   PanelLeft,
   Trash2,
   Zap,
-  Undo2,
-  Redo2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -52,12 +50,6 @@ interface PowerSystemDetailViewProps {
   // UI State
   isEditMode: boolean;
   isLeftSidebarOpen: boolean;
-
-  // Undo/Redo State
-  canUndo?: boolean;
-  canRedo?: boolean;
-  onUndo?: () => void;
-  onRedo?: () => void;
 
   // Loading States
   isLoadingGroups: boolean;
@@ -155,12 +147,6 @@ export function PowerSystemDetailView({
   // UI State
   isEditMode,
   isLeftSidebarOpen,
-
-  // Undo/Redo State
-  canUndo = false,
-  canRedo = false,
-  onUndo,
-  onRedo,
 
   // Loading States
   isLoadingPages,
@@ -551,45 +537,6 @@ export function PowerSystemDetailView({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Undo/Redo Buttons - Only visible in edit mode */}
-            {isEditMode && (
-              <div className="flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={onUndo}
-                      disabled={!canUndo}
-                      className="cursor-pointer"
-                    >
-                      <Undo2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm font-medium">Undo (Ctrl+Z)</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={onRedo}
-                      disabled={!canRedo}
-                      className="cursor-pointer"
-                    >
-                      <Redo2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm font-medium">Redo (Ctrl+Y)</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            )}
-
             {/* Edit Mode Toggle Switch */}
             <div className="flex items-center gap-2">
               <Label

@@ -32,7 +32,6 @@ import { usePowerSystemUIStore } from "@/stores/power-system-ui-store";
 import { DeleteGroupModal } from "../components/delete-group-modal";
 import { ManageLinksModal } from "../components/manage-links-modal";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
-import { useUndoRedo, type Snapshot } from "../hooks/useUndoRedo";
 
 import { PowerSystemDetailView } from "./view";
 
@@ -114,20 +113,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   const [isLoadingPages, setIsLoadingPages] = useState(false);
   const [isLoadingSections, setIsLoadingSections] = useState(false);
   const [isLoadingBlocks, setIsLoadingBlocks] = useState(false);
-
-  // Undo/Redo Hook
-  const {
-    pushSnapshot,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    clearHistory,
-    isApplyingSnapshot,
-  } = useUndoRedo({
-    maxHistorySize: 50,
-    pageId: currentPage?.id || null,
-  });
 
   // Restore UI state from store when system changes
   useEffect(() => {
@@ -233,22 +218,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
           allBlocks.push(...sectionBlocks);
         }
         setBlocks(allBlocks);
-
-        // Save initial snapshot when entering edit mode with loaded data
-        if (isEditMode && !isApplyingSnapshot) {
-          const snapshot: Snapshot = {
-            pageId: currentPage.id,
-            // Deep clone sections to preserve all properties
-            sections: fetchedSections.map((section) => ({ ...section })),
-            // Deep clone blocks to preserve content including images
-            blocks: allBlocks.map((block) => ({
-              ...block,
-              content: JSON.parse(JSON.stringify(block.content)),
-            })),
-            timestamp: Date.now(),
-          };
-          pushSnapshot(snapshot);
-        }
       } catch (error) {
         console.error("Error loading page data:", error);
       } finally {
@@ -259,101 +228,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
     loadPageData();
   }, [currentPage?.id]);
-
-  // ============================================================================
-  // HISTORY MANAGEMENT
-  // ============================================================================
-
-  /**
-   * Save current snapshot after an action is completed.
-   * This should be called AFTER create/update/delete/reorder operations.
-   * Uses deep clone to preserve all data including images and complex content.
-   */
-  const saveSnapshot = useCallback(() => {
-    if (!currentPage || !isEditMode || isApplyingSnapshot) return;
-
-    const snapshot: Snapshot = {
-      pageId: currentPage.id,
-      // Deep clone sections to preserve all properties
-      sections: sections.map((section) => ({ ...section })),
-      // Deep clone blocks to preserve content including images
-      blocks: blocks.map((block) => ({
-        ...block,
-        content: JSON.parse(JSON.stringify(block.content)), // Deep clone content
-      })),
-      timestamp: Date.now(),
-    };
-    pushSnapshot(snapshot);
-  }, [
-    currentPage,
-    sections,
-    blocks,
-    isEditMode,
-    isApplyingSnapshot,
-    pushSnapshot,
-  ]);
-
-  /**
-   * Handle undo action
-   */
-  const handleUndo = useCallback(async () => {
-    if (!canUndo || !currentPage) return;
-
-    const result = await undo();
-    if (result) {
-      setSections(result.sections);
-      setBlocks(result.blocks);
-    }
-  }, [canUndo, currentPage, undo]);
-
-  /**
-   * Handle redo action
-   */
-  const handleRedo = useCallback(async () => {
-    if (!canRedo || !currentPage) return;
-
-    const result = await redo();
-    if (result) {
-      setSections(result.sections);
-      setBlocks(result.blocks);
-    }
-  }, [canRedo, currentPage, redo]);
-
-  // Clear history when page changes
-  useEffect(() => {
-    clearHistory();
-  }, [currentPage?.id, clearHistory]);
-
-  // Clear history when system changes
-  useEffect(() => {
-    clearHistory();
-  }, [systemId, clearHistory]);
-
-  // Clear history when exiting edit mode, save initial snapshot when entering
-  useEffect(() => {
-    if (!isEditMode) {
-      clearHistory();
-    } else if (
-      isEditMode &&
-      currentPage &&
-      sections.length > 0 &&
-      !isApplyingSnapshot
-    ) {
-      // Save initial snapshot when entering edit mode with existing data
-      const snapshot: Snapshot = {
-        pageId: currentPage.id,
-        // Deep clone sections to preserve all properties
-        sections: sections.map((section) => ({ ...section })),
-        // Deep clone blocks to preserve content including images
-        blocks: blocks.map((block) => ({
-          ...block,
-          content: JSON.parse(JSON.stringify(block.content)),
-        })),
-        timestamp: Date.now(),
-      };
-      pushSnapshot(snapshot);
-    }
-  }, [isEditMode]);
 
   // ============================================================================
   // KEYBOARD SHORTCUTS
@@ -417,8 +291,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
   useKeyboardShortcuts({
     enabled: isEditMode,
     handlers: {
-      onUndo: handleUndo,
-      onRedo: handleRedo,
       onRename: handleRenameShortcut,
       onDelete: handleDeleteShortcut,
     },
@@ -787,9 +659,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setSections((prev) => [...prev, newSection]);
       setIsCreateSectionModalOpen(false);
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error creating section:", error);
     }
@@ -808,9 +677,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       // Then persist to database
       await updatePowerSection(sectionId, title);
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error updating section:", error);
     }
@@ -822,9 +688,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setSections((prevSections) => prevSections.filter((section) => section.id !== sectionId));
       setBlocks((prevBlocks) => prevBlocks.filter((block) => block.sectionId !== sectionId));
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error deleting section:", error);
     }
@@ -834,9 +697,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
     try {
       setSections(reorderedSections);
       await reorderPowerSections(reorderedSections.map((s) => s.id));
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error reordering sections:", error);
     }
@@ -878,9 +738,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       setBlocks((prev) => [...prev, newBlock]);
       setIsSelectBlockModalOpen(false);
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error creating block:", error);
     }
@@ -899,9 +756,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
 
       // Then persist to database
       await updatePowerBlock(blockId, content);
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error updating block:", error);
     }
@@ -912,9 +766,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       await deletePowerBlock(blockId);
 
       setBlocks((prevBlocks) => prevBlocks.filter((block) => block.id !== blockId));
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error deleting block:", error);
     }
@@ -932,9 +783,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       });
 
       await reorderPowerBlocks(reorderedBlocks.map((b) => b.id));
-
-      // Save snapshot AFTER action is completed
-      setTimeout(() => saveSnapshot(), 100);
     } catch (error) {
       console.error("Error reordering blocks:", error);
     }
@@ -1008,11 +856,6 @@ export function PowerSystemDetail({ bookId }: PowerSystemDetailProps) {
       // UI State
       isEditMode={isEditMode}
       isLeftSidebarOpen={isLeftSidebarOpen}
-      // Undo/Redo State
-      canUndo={canUndo}
-      canRedo={canRedo}
-      onUndo={handleUndo}
-      onRedo={handleRedo}
       // Loading States
       isLoadingGroups={isLoadingGroups}
       isLoadingPages={isLoadingPages}
