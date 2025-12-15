@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 
-import { getRaceMoralTendencies } from "../constants/moral-tendencies";
+import { getMoralTendencyOptions } from "../constants/moral-tendencies";
 
 interface PropsMoralTendencyPicker {
   value: string;
@@ -16,7 +16,7 @@ export function MoralTendencyPicker({
   hideLabel,
 }: PropsMoralTendencyPicker) {
   const { t } = useTranslation("create-race");
-  const moralTendencyOptions = getRaceMoralTendencies(t);
+  const moralTendencyOptions = getMoralTendencyOptions(t);
 
   return (
     <FormSelectGrid

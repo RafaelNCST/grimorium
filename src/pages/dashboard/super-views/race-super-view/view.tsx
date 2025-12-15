@@ -13,11 +13,11 @@ import {
 import { FormImageDisplay } from "@/components/forms/FormImageDisplay";
 import { EntityDetailLayout } from "@/components/layouts/EntityDetailLayout";
 import { getRaceCommunications } from "@/components/modals/create-race-modal/constants/communications";
-import { getRaceDiets } from "@/components/modals/create-race-modal/constants/diets";
-import { getRaceHabits } from "@/components/modals/create-race-modal/constants/habits";
-import { getRaceMoralTendencies } from "@/components/modals/create-race-modal/constants/moral-tendencies";
-import { getRacePhysicalCapacities } from "@/components/modals/create-race-modal/constants/physical-capacities";
-import { getRaceReproductiveCycles } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
+import { getDietOptions } from "@/components/modals/create-race-modal/constants/diets";
+import { getHabitsOptions } from "@/components/modals/create-race-modal/constants/habits";
+import { getMoralTendencyOptions } from "@/components/modals/create-race-modal/constants/moral-tendencies";
+import { getPhysicalCapacityOptions } from "@/components/modals/create-race-modal/constants/physical-capacities";
+import { getReproductiveCycleOptions } from "@/components/modals/create-race-modal/constants/reproductive-cycles";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
@@ -260,7 +260,7 @@ export function RaceSuperView({
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
-          <DisplaySelectGrid value={race.habits} options={getRaceHabits(t)} />
+          <DisplaySelectGrid value={race.habits} options={getHabitsOptions(t)} />
         </FieldWithVisibilityToggle>
 
         {/* Reproductive Cycle */}
@@ -274,7 +274,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.reproductiveCycle}
-            options={getRaceReproductiveCycles(t)}
+            options={getReproductiveCycleOptions(t)}
           />
         </FieldWithVisibilityToggle>
 
@@ -287,7 +287,7 @@ export function RaceSuperView({
           isEditing={isEditing}
           onFieldVisibilityToggle={onFieldVisibilityToggle}
         >
-          <DisplaySelectGrid value={race.diet} options={getRaceDiets(t)} />
+          <DisplaySelectGrid value={race.diet} options={getDietOptions(t)} />
         </FieldWithVisibilityToggle>
 
         {/* Communication */}
@@ -391,7 +391,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.moralTendency}
-            options={getRaceMoralTendencies(t)}
+            options={getMoralTendencyOptions(t)}
           />
         </FieldWithVisibilityToggle>
 
@@ -442,7 +442,7 @@ export function RaceSuperView({
         >
           <DisplaySelectGrid
             value={race.physicalCapacity}
-            options={getRacePhysicalCapacities(t)}
+            options={getPhysicalCapacityOptions(t)}
           />
         </FieldWithVisibilityToggle>
 

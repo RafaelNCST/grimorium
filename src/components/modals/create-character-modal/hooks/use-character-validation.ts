@@ -14,7 +14,7 @@ export const characterFormSchema = z.object({
     .min(1, "validation.description_required")
     .max(500, "validation.description_max_length"),
   image: z.string().optional(),
-  status: z.string().optional(),
+  status: z.string().min(1, "validation.status_required"),
 
   // Appearance (Advanced - all optional)
   height: z.string().optional(),

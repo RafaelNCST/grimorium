@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 
-import { getRaceDiets } from "../constants/diets";
+import { getDietOptions } from "../constants/diets";
 
 interface PropsDietPicker {
   value: string;
@@ -24,7 +24,7 @@ export function DietPicker({
 }: PropsDietPicker) {
   const { t } = useTranslation("create-race");
   const isOther = value === "other";
-  const dietOptions = getRaceDiets(t);
+  const dietOptions = getDietOptions(t);
 
   return (
     <FormSelectGrid

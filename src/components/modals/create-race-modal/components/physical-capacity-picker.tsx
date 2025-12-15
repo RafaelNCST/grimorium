@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 
-import { getRacePhysicalCapacities } from "../constants/physical-capacities";
+import { getPhysicalCapacityOptions } from "../constants/physical-capacities";
 
 interface PropsPhysicalCapacityPicker {
   value: string;
@@ -16,7 +16,7 @@ export function PhysicalCapacityPicker({
   hideLabel,
 }: PropsPhysicalCapacityPicker) {
   const { t } = useTranslation("create-race");
-  const physicalCapacityOptions = getRacePhysicalCapacities(t);
+  const physicalCapacityOptions = getPhysicalCapacityOptions(t);
 
   return (
     <div className="space-y-3">

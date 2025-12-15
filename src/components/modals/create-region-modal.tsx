@@ -64,14 +64,16 @@ const createRegionFormSchema = (t: (key: string) => string) =>
       .min(1, t("forms:validation.name_required"))
       .max(100, t("forms:validation.name_too_long")),
     parentId: z.string().nullable(),
-    scale: z.enum([
-      "local",
-      "continental",
-      "planetary",
-      "galactic",
-      "universal",
-      "multiversal",
-    ]),
+    scale: z
+      .string()
+      .min(1, t("forms:validation.scale_required"))
+      .refine(
+        (val) =>
+          ["local", "continental", "planetary", "galactic", "universal", "multiversal"].includes(
+            val
+          ),
+        { message: t("forms:validation.scale_invalid") }
+      ),
     summary: z
       .string()
       .min(1, t("forms:validation.summary_required"))
@@ -141,7 +143,7 @@ export function CreateRegionModal({
     defaultValues: {
       name: editRegion?.name || "",
       parentId: editRegion?.parentId || null,
-      scale: editRegion?.scale || "local",
+      scale: editRegion?.scale || "",
       summary: editRegion?.summary || "",
       image: editRegion?.image || "",
       // Environment
@@ -201,7 +203,7 @@ export function CreateRegionModal({
       form.reset({
         name: "",
         parentId: null,
-        scale: "local",
+        scale: "",
         summary: "",
         image: "",
         climate: "",
