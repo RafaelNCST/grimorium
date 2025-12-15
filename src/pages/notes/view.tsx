@@ -84,17 +84,19 @@ function NotesViewComponent({
       </div>
 
       {/* Content - Grid */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto">
         {notes.length === 0 ? (
           <NotesEmptyState />
         ) : (
-          <NoteGrid
-            notes={notes}
-            onNoteClick={onNoteClick}
-            onReorder={onReorder}
-            onUpdateNote={onUpdateNote}
-            onDeleteNote={onDeleteNote}
-          />
+          <div className="p-6">
+            <NoteGrid
+              notes={notes}
+              onNoteClick={onNoteClick}
+              onReorder={onReorder}
+              onUpdateNote={onUpdateNote}
+              onDeleteNote={onDeleteNote}
+            />
+          </div>
         )}
       </div>
 

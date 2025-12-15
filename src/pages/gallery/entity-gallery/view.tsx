@@ -21,6 +21,7 @@ import {
 import { GalleryGrid } from "../components/gallery-grid";
 import { ImageLightbox } from "../components/image-lightbox";
 import { UploadImageModal } from "../components/upload-image-modal";
+import { EntityGalleryEmptyState } from "./components/entity-gallery-empty-state";
 
 interface EntityGalleryViewProps {
   items: IGalleryItem[];
@@ -141,9 +142,14 @@ export function EntityGalleryView({
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-6 space-y-6">
-          {/* Filters */}
-          {items.length > 0 && (
+        {items.length === 0 ? (
+          <EntityGalleryEmptyState
+            entityName={entityName}
+            hasFilters={hasActiveFilters}
+          />
+        ) : (
+          <div className="p-6 space-y-6">
+            {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3">
               {/* Search */}
               <div className="relative flex-1">
@@ -186,26 +192,8 @@ export function EntityGalleryView({
                 </Button>
               )}
             </div>
-          )}
 
-          {/* Grid */}
-          {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-              <div className="rounded-full bg-muted p-6 mb-4">
-                <Upload className="h-12 w-12 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">
-                {hasActiveFilters
-                  ? t("empty_state.no_results")
-                  : t("entity_gallery.empty_state_title")}
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                {hasActiveFilters
-                  ? t("empty_state.no_results_description")
-                  : t("entity_gallery.empty_state_description", { entityName })}
-              </p>
-            </div>
-          ) : (
+            {/* Grid */}
             <GalleryGrid
               items={items}
               onItemClick={onItemClick}
@@ -214,8 +202,8 @@ export function EntityGalleryView({
               onReorder={onReorder}
               enableDragDrop={sortOrder === "manual"}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Upload/Edit Modal */}

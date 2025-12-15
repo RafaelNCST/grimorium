@@ -85,9 +85,9 @@
   },
   "entity_gallery": {
     "title": "Galeria de {{entityName}}",
-    "subtitle": "{{count}} imagem(ns) vinculada(s)",
+    "subtitle": "{{count}} imagem(ns) linkada(s)",
     "upload_image": "Enviar Imagem",
-    "empty_state_title": "Nenhuma imagem vinculada",
-    "empty_state_description": "Envie sua primeira imagem para {{entityName}} e ela será automaticamente vinculada."
+    "empty_state_title": "Nenhuma imagem vinculada ainda",
+    "empty_state_description": "Envie sua primeira imagem para {{entityName}} e ela aparecerá aqui!"
   }
 }

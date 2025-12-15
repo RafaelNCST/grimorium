@@ -87,7 +87,7 @@
     "title": "{{entityName}} Gallery",
     "subtitle": "{{count}} image(s) linked",
     "upload_image": "Upload Image",
-    "empty_state_title": "No linked images",
-    "empty_state_description": "Upload your first image for {{entityName}} and it will be automatically linked."
+    "empty_state_title": "No linked images yet",
+    "empty_state_description": "Upload your first image for {{entityName}} and it will appear here!"
   }
 }

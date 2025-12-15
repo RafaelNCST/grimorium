@@ -47,12 +47,12 @@
     "more_entities": "+{{count}} more"
   },
   "empty_state": {
-    "title": "No notes here yet",
+    "title": "No notes yet",
     "description": "Create your first note and it will appear here!",
-    "no_notes": "No notes here yet",
+    "no_notes": "No notes yet",
     "no_notes_description": "Create your first note and it will appear here!",
     "no_results": "No notes found",
-    "no_results_description": "Try adjusting the filters or search term."
+    "no_results_description": "Try adjusting filters or search term"
   },
   "tabs": {
     "characters": "Characters",
@@ -148,8 +148,8 @@
     "subtitle": "{{count}} note(s) linked",
     "new_note": "New Note",
     "empty_state": {
-      "title": "No linked notes",
-      "description": "Create your first note for {{entityName}} and it will be automatically linked to this entity."
+      "title": "No linked notes yet",
+      "description": "Create your first note for {{entityName}} and it will appear here!"
     }
   }
 }

@@ -47,12 +47,12 @@
     "more_entities": "+{{count}} mais"
   },
   "empty_state": {
-    "title": "Sem anotações por aqui",
+    "title": "Nenhuma anotação ainda",
     "description": "Crie sua primeira anotação e ela aparecerá aqui!",
-    "no_notes": "Sem anotações por aqui",
+    "no_notes": "Nenhuma anotação ainda",
     "no_notes_description": "Crie sua primeira anotação e ela aparecerá aqui!",
     "no_results": "Nenhuma anotação encontrada",
-    "no_results_description": "Tente ajustar os filtros ou o termo de busca."
+    "no_results_description": "Tente ajustar os filtros ou termo de busca"
   },
   "tabs": {
     "characters": "Personagens",
@@ -148,8 +148,8 @@
     "subtitle": "{{count}} anotação(ões) linkada(s)",
     "new_note": "Nova Anotação",
     "empty_state": {
-      "title": "Sem anotações linkadas",
-      "description": "Crie sua primeira anotação para {{entityName}} e ela será automaticamente linkada a esta entidade."
+      "title": "Nenhuma anotação vinculada ainda",
+      "description": "Crie sua primeira anotação para {{entityName}} e ela aparecerá aqui!"
     }
   }
 }

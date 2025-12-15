@@ -115,9 +115,11 @@ export function GalleryView({
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-6 space-y-6">
-          {/* Filters */}
-          {items.length > 0 && (
+        {items.length === 0 ? (
+          <GalleryEmptyState hasFilters={hasActiveFilters} />
+        ) : (
+          <div className="p-6 space-y-6">
+            {/* Filters */}
             <GalleryFilters
               searchTerm={searchTerm}
               onSearchChange={onSearchChange}
@@ -126,12 +128,8 @@ export function GalleryView({
               onClearFilters={onClearFilters}
               hasActiveFilters={hasActiveFilters}
             />
-          )}
 
-          {/* Grid */}
-          {items.length === 0 ? (
-            <GalleryEmptyState hasFilters={hasActiveFilters} />
-          ) : (
+            {/* Grid */}
             <GalleryGrid
               items={items}
               onItemClick={onItemClick}
@@ -140,8 +138,8 @@ export function GalleryView({
               onReorder={onReorder}
               enableDragDrop={false}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Upload/Edit Modal */}
