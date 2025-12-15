@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 
-import { X, Search } from "lucide-react";
+import { X, Search, User, Shield, Dna, Package, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +47,14 @@ export interface EntityOption {
   parentId?: string;
   parentName?: string;
 }
+
+const ENTITY_ICON_MAP: Record<EntityType, any> = {
+  character: User,
+  faction: Shield,
+  race: Dna,
+  item: Package,
+  region: MapPin,
+};
 
 interface FormEntityMultiSelectAutoProps {
   /**
@@ -335,13 +343,40 @@ export function FormEntityMultiSelectAuto({
     onChange(newIds, newEntities);
   };
 
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const getAvatarShape = (type: EntityType): string => {
+    return type === "character" ? "rounded-full" : "rounded-sm";
+  };
+
+  const EntityAvatar = ({
+    image,
+    name,
+    size
+  }: {
+    image?: string;
+    name: string;
+    size: "sm" | "md";
+  }) => {
+    const Icon = ENTITY_ICON_MAP[entityType];
+    const avatarShape = getAvatarShape(entityType);
+    const sizeClasses = size === "sm" ? "w-8 h-8" : "w-10 h-10";
+    const iconSize = size === "sm" ? "w-4 h-4" : "w-5 h-5";
+
+    if (image) {
+      return (
+        <Avatar className={`${sizeClasses} ${avatarShape}`}>
+          <AvatarImage src={image} alt={name} />
+        </Avatar>
+      );
+    }
+
+    return (
+      <div
+        className={`${sizeClasses} ${avatarShape} bg-purple-950/40 flex items-center justify-center`}
+      >
+        <Icon className={`${iconSize} text-purple-400`} />
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -435,15 +470,11 @@ export function FormEntityMultiSelectAuto({
                           className="py-3 cursor-pointer focus:!bg-primary/10 focus:!text-foreground hover:!bg-primary/10"
                         >
                           <div className="flex items-center gap-3">
-                            <Avatar className="w-8 h-8 rounded-md">
-                              <AvatarImage
-                                src={option.image}
-                                alt={option.name}
-                              />
-                              <AvatarFallback className="text-xs rounded-md !text-foreground">
-                                {getInitials(option.name)}
-                              </AvatarFallback>
-                            </Avatar>
+                            <EntityAvatar
+                              image={option.image}
+                              name={option.name}
+                              size="sm"
+                            />
                             <span>{option.name}</span>
                           </div>
                         </SelectItem>
@@ -459,22 +490,21 @@ export function FormEntityMultiSelectAuto({
             )}
           </div>
 
-          {/* Selected items display - Fixed height to prevent layout shift */}
-          <div className="h-[115px]">
+          {/* Selected items display */}
+          <div>
             {selectedOptions.length > 0 ? (
-              <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+              <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 <div className="flex flex-wrap gap-3">
                   {selectedOptions.map((option) => (
                     <div
                       key={option.id}
                       className="relative group flex items-center gap-2 p-2 pr-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
                     >
-                      <Avatar className="w-10 h-10 rounded-md">
-                        <AvatarImage src={option.image} alt={option.name} />
-                        <AvatarFallback className="text-xs rounded-md">
-                          {getInitials(option.name)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <EntityAvatar
+                        image={option.image}
+                        name={option.name}
+                        size="md"
+                      />
                       <span className="text-sm font-medium">{option.name}</span>
                       <Button
                         type="button"
@@ -490,7 +520,7 @@ export function FormEntityMultiSelectAuto({
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg">
+              <div className="min-h-[115px] flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg">
                 <p className="text-sm">{noSelectionText}</p>
               </div>
             )}
