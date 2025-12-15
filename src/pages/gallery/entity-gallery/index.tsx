@@ -24,7 +24,10 @@ export function EntityGalleryPage() {
   const {
     items,
     isLoading,
+    isLoadingMore,
+    hasMore,
     fetchGalleryItems,
+    loadMoreGalleryItems,
     addGalleryItem,
     updateGalleryItemInCache,
     updateGalleryLinksInCache,
@@ -294,10 +297,17 @@ export function EntityGalleryPage() {
     [entityId, entityType, dashboardId, entityName]
   );
 
+  // Memoize load more handler
+  const handleLoadMore = useCallback(() => {
+    loadMoreGalleryItems();
+  }, [loadMoreGalleryItems]);
+
   return (
     <EntityGalleryView
       items={filteredAndSortedItems}
       isLoading={isLoading}
+      isLoadingMore={isLoadingMore}
+      hasMore={hasMore}
       searchTerm={searchTerm}
       onSearchChange={handleSearchChange}
       sortOrder={sortOrder}
@@ -314,6 +324,7 @@ export function EntityGalleryPage() {
       onItemDelete={handleItemDelete}
       onItemUnlink={handleItemUnlink}
       onReorder={handleReorder}
+      onLoadMore={handleLoadMore}
       selectedItem={selectedItem}
       onCloseLightbox={handleCloseLightbox}
       entityName={entityName || "Entity"}

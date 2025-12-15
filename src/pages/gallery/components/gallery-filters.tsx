@@ -23,7 +23,7 @@ export function GalleryFilters({
   const { t } = useTranslation("gallery");
 
   return (
-    <div className="flex items-center gap-3 max-w-md">
+    <div className="flex items-center gap-3 w-1/2">
       {/* Search */}
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

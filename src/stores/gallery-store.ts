@@ -12,17 +12,25 @@ import {
   removeGalleryLink,
   updateGalleryLinks,
   reorderGalleryItems,
+  getGalleryItemsPaginated,
+  getGalleryItemsCount,
 } from "@/lib/db/gallery.service";
 import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
+
+const PAGE_SIZE = 30;
 
 interface GalleryState {
   items: IGalleryItem[];
   isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
+  totalCount: number;
   lastFetched: number;
   currentBookId: string | null;
 
   // Fetch
   fetchGalleryItems: (forceRefresh?: boolean, bookId?: string) => Promise<void>;
+  loadMoreGalleryItems: () => Promise<void>;
   getGalleryItemById: (itemId: string) => Promise<IGalleryItem | null>;
 
   // CRUD
@@ -52,10 +60,14 @@ interface GalleryState {
 
 // Promise para rastrear fetch em andamento
 let fetchingPromise: Promise<void> | null = null;
+let loadingMorePromise: Promise<void> | null = null;
 
 export const useGalleryStore = create<GalleryState>((set, get) => ({
   items: [],
   isLoading: false,
+  isLoadingMore: false,
+  hasMore: true,
+  totalCount: 0,
   lastFetched: 0,
   currentBookId: null,
 
@@ -78,16 +90,28 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       }
 
       // Marcar como loading
-      set({ isLoading: true, currentBookId: bookId ?? null });
+      set({
+        isLoading: true,
+        currentBookId: bookId ?? null,
+        items: [], // Limpar itens ao trocar de book ou refresh
+      });
 
       try {
-        const fetchedItems = bookId
-          ? await getGalleryItemsByBookId(bookId)
-          : await getAllGalleryItems();
+        const targetBookId = bookId ?? null;
+
+        // Buscar primeira página e total count em paralelo
+        const [fetchedItems, totalCount] = await Promise.all([
+          getGalleryItemsPaginated(targetBookId, 0, PAGE_SIZE),
+          getGalleryItemsCount(targetBookId),
+        ]);
+
         const now = Date.now();
+        const hasMore = fetchedItems.length < totalCount;
 
         set({
           items: fetchedItems,
+          totalCount,
+          hasMore,
           isLoading: false,
           lastFetched: now,
         });
@@ -104,6 +128,56 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
       await promise;
     } finally {
       fetchingPromise = null;
+    }
+  },
+
+  loadMoreGalleryItems: async () => {
+    // Se já está carregando mais, retornar a promise existente
+    if (loadingMorePromise) {
+      return loadingMorePromise;
+    }
+
+    const state = get();
+
+    // Se não tem mais itens ou está carregando, retornar
+    if (!state.hasMore || state.isLoading || state.isLoadingMore) {
+      return;
+    }
+
+    const promise = (async () => {
+      set({ isLoadingMore: true });
+
+      try {
+        const currentOffset = state.items.length;
+        const targetBookId = state.currentBookId;
+
+        const fetchedItems = await getGalleryItemsPaginated(
+          targetBookId,
+          currentOffset,
+          PAGE_SIZE
+        );
+
+        const newItems = [...state.items, ...fetchedItems];
+        const hasMore = newItems.length < state.totalCount;
+
+        set({
+          items: newItems,
+          hasMore,
+          isLoadingMore: false,
+        });
+      } catch (error) {
+        console.error("Error loading more gallery items:", error);
+        set({ isLoadingMore: false });
+        throw error;
+      }
+    })();
+
+    loadingMorePromise = promise;
+
+    try {
+      await promise;
+    } finally {
+      loadingMorePromise = null;
     }
   },
 
@@ -134,9 +208,10 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     try {
       await createGalleryItem(item);
 
-      // Add to cache
+      // Add to cache and increment total count
       set((state) => ({
         items: [item, ...state.items],
+        totalCount: state.totalCount + 1,
       }));
     } catch (error) {
       console.error("Error adding gallery item:", error);
@@ -164,9 +239,11 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     try {
       await deleteGalleryItem(itemId);
 
-      // Remove from cache
+      // Remove from cache and decrement total count
       set((state) => ({
         items: state.items.filter((item) => item.id !== itemId),
+        totalCount: Math.max(0, state.totalCount - 1),
+        hasMore: state.items.length - 1 < state.totalCount - 1,
       }));
     } catch (error) {
       console.error("Error deleting gallery item:", error);
@@ -178,9 +255,11 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     try {
       await deleteGalleryItems(itemIds);
 
-      // Remove from cache
+      // Remove from cache and decrement total count
       set((state) => ({
         items: state.items.filter((item) => !itemIds.includes(item.id)),
+        totalCount: Math.max(0, state.totalCount - itemIds.length),
+        hasMore: state.items.length - itemIds.length < state.totalCount - itemIds.length,
       }));
     } catch (error) {
       console.error("Error deleting gallery items:", error);
@@ -260,6 +339,8 @@ export const useGalleryStore = create<GalleryState>((set, get) => ({
     set({
       items: [],
       lastFetched: 0,
+      hasMore: true,
+      totalCount: 0,
     });
   },
 

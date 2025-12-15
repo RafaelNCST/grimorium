@@ -1,3 +1,5 @@
+import { useRef, useCallback, useEffect } from "react";
+
 import { Upload, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -14,6 +16,8 @@ import { UploadImageModal } from "./components/upload-image-modal";
 interface GalleryViewProps {
   items: IGalleryItem[];
   isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
 
   // Filters
   searchTerm: string;
@@ -47,6 +51,9 @@ interface GalleryViewProps {
   onItemDelete: (item: IGalleryItem) => void;
   onReorder: (reorderedItems: IGalleryItem[]) => void;
 
+  // Infinite scroll
+  onLoadMore: () => void;
+
   // Lightbox
   selectedItem: IGalleryItem | null;
   onCloseLightbox: () => void;
@@ -58,6 +65,8 @@ interface GalleryViewProps {
 export function GalleryView({
   items,
   isLoading,
+  isLoadingMore,
+  hasMore,
   searchTerm,
   onSearchChange,
   entityTypeFilters,
@@ -73,11 +82,37 @@ export function GalleryView({
   onItemEdit,
   onItemDelete,
   onReorder,
+  onLoadMore,
   selectedItem,
   onCloseLightbox,
   onBackToDashboard,
 }: GalleryViewProps) {
   const { t } = useTranslation("gallery");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoadingMore || !hasMore) return;
+
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+
+    // Load more when 80% scrolled
+    if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+      onLoadMore();
+    }
+  }, [isLoadingMore, hasMore, onLoadMore]);
+
+  // Attach scroll listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   if (isLoading) {
     return (
@@ -113,22 +148,26 @@ export function GalleryView({
         </Button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
+      {/* Filters - always visible */}
+      <div className="px-6 py-4">
+        <GalleryFilters
+          searchTerm={searchTerm}
+          onSearchChange={onSearchChange}
+          entityTypeFilters={entityTypeFilters}
+          onEntityTypeToggle={onEntityTypeToggle}
+          onClearFilters={onClearFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
+
+      {/* Content area - scrollable */}
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto">
         {items.length === 0 ? (
-          <GalleryEmptyState hasFilters={hasActiveFilters} />
+          <div className="flex items-center justify-center h-full">
+            <GalleryEmptyState hasFilters={hasActiveFilters} />
+          </div>
         ) : (
           <div className="p-6 space-y-6">
-            {/* Filters */}
-            <GalleryFilters
-              searchTerm={searchTerm}
-              onSearchChange={onSearchChange}
-              entityTypeFilters={entityTypeFilters}
-              onEntityTypeToggle={onEntityTypeToggle}
-              onClearFilters={onClearFilters}
-              hasActiveFilters={hasActiveFilters}
-            />
-
             {/* Grid */}
             <GalleryGrid
               items={items}
@@ -138,6 +177,13 @@ export function GalleryView({
               onReorder={onReorder}
               enableDragDrop={false}
             />
+
+            {/* Loading more indicator */}
+            {isLoadingMore && (
+              <div className="flex items-center justify-center py-8">
+                <LoadingSpinner className="border-t-purple-500" />
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,3 +1,5 @@
+import { useRef, useCallback, useEffect } from "react";
+
 import { Upload, ArrowLeft, Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -26,6 +28,8 @@ import { EntityGalleryEmptyState } from "./components/entity-gallery-empty-state
 interface EntityGalleryViewProps {
   items: IGalleryItem[];
   isLoading: boolean;
+  isLoadingMore: boolean;
+  hasMore: boolean;
 
   // Filters
   searchTerm: string;
@@ -60,6 +64,9 @@ interface EntityGalleryViewProps {
   onItemUnlink: (item: IGalleryItem) => void;
   onReorder: (reorderedItems: IGalleryItem[]) => void;
 
+  // Infinite scroll
+  onLoadMore: () => void;
+
   // Lightbox
   selectedItem: IGalleryItem | null;
   onCloseLightbox: () => void;
@@ -76,6 +83,8 @@ interface EntityGalleryViewProps {
 export function EntityGalleryView({
   items,
   isLoading,
+  isLoadingMore,
+  hasMore,
   searchTerm,
   onSearchChange,
   sortOrder,
@@ -92,6 +101,7 @@ export function EntityGalleryView({
   onItemDelete,
   onItemUnlink,
   onReorder,
+  onLoadMore,
   selectedItem,
   onCloseLightbox,
   entityName,
@@ -100,6 +110,31 @@ export function EntityGalleryView({
   onBack,
 }: EntityGalleryViewProps) {
   const { t } = useTranslation("gallery");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoadingMore || !hasMore) return;
+
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+
+    // Load more when 80% scrolled
+    if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+      onLoadMore();
+    }
+  }, [isLoadingMore, hasMore, onLoadMore]);
+
+  // Attach scroll listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   if (isLoading) {
     return (
@@ -140,59 +175,63 @@ export function EntityGalleryView({
         </Button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
+      {/* Filters - always visible */}
+      <div className="px-6 py-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:w-1/2">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={t("page.search_placeholder")}
+              className="pl-9"
+            />
+          </div>
+
+          {/* Sort */}
+          <Select value={sortOrder} onValueChange={onSortChange}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder={t("filters.sort_label")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">
+                {t("filters.sort_recent")}
+              </SelectItem>
+              <SelectItem value="alphabetical">
+                {t("filters.sort_alphabetical")}
+              </SelectItem>
+              <SelectItem value="manual">
+                {t("filters.sort_manual")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClearFilters}
+              className="shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Content area - scrollable */}
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto">
         {items.length === 0 ? (
-          <EntityGalleryEmptyState
-            entityName={entityName}
-            hasFilters={hasActiveFilters}
-          />
+          <div className="flex items-center justify-center h-full">
+            <EntityGalleryEmptyState
+              entityName={entityName}
+              hasFilters={hasActiveFilters}
+            />
+          </div>
         ) : (
           <div className="p-6 space-y-6">
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  value={searchTerm}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  placeholder={t("page.search_placeholder")}
-                  className="pl-9"
-                />
-              </div>
-
-              {/* Sort */}
-              <Select value={sortOrder} onValueChange={onSortChange}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                  <SelectValue placeholder={t("filters.sort_label")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">
-                    {t("filters.sort_recent")}
-                  </SelectItem>
-                  <SelectItem value="alphabetical">
-                    {t("filters.sort_alphabetical")}
-                  </SelectItem>
-                  <SelectItem value="manual">
-                    {t("filters.sort_manual")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Clear Filters */}
-              {hasActiveFilters && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClearFilters}
-                  className="shrink-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-
             {/* Grid */}
             <GalleryGrid
               items={items}
@@ -202,6 +241,13 @@ export function EntityGalleryView({
               onReorder={onReorder}
               enableDragDrop={sortOrder === "manual"}
             />
+
+            {/* Loading more indicator */}
+            {isLoadingMore && (
+              <div className="flex items-center justify-center py-8">
+                <LoadingSpinner className="border-t-purple-500" />
+              </div>
+            )}
           </div>
         )}
       </div>

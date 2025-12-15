@@ -16,7 +16,10 @@ export function GalleryPage() {
   const {
     items,
     isLoading,
+    isLoadingMore,
+    hasMore,
     fetchGalleryItems,
+    loadMoreGalleryItems,
     addGalleryItem,
     updateGalleryItemInCache,
     updateGalleryLinksInCache,
@@ -204,12 +207,22 @@ export function GalleryPage() {
     setSelectedItem(null);
   }, []);
 
-  const hasActiveFilters = searchTerm.length > 0;
+  const hasActiveFilters = useMemo(
+    () => searchTerm.length > 0 || entityTypeFilters.length > 0,
+    [searchTerm, entityTypeFilters]
+  );
+
+  // Memoize load more handler
+  const handleLoadMore = useCallback(() => {
+    loadMoreGalleryItems();
+  }, [loadMoreGalleryItems]);
 
   return (
     <GalleryView
       items={filteredAndSortedItems}
       isLoading={isLoading}
+      isLoadingMore={isLoadingMore}
+      hasMore={hasMore}
       searchTerm={searchTerm}
       onSearchChange={handleSearchChange}
       entityTypeFilters={entityTypeFilters}
@@ -225,6 +238,7 @@ export function GalleryPage() {
       onItemEdit={handleItemEdit}
       onItemDelete={handleItemDelete}
       onReorder={handleReorder}
+      onLoadMore={handleLoadMore}
       selectedItem={selectedItem}
       onCloseLightbox={handleCloseLightbox}
       onBackToDashboard={handleBackToDashboard}

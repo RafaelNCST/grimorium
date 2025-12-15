@@ -180,6 +180,67 @@ export async function getAllGalleryItems(): Promise<IGalleryItem[]> {
 }
 
 /**
+ * Get gallery items with pagination
+ */
+export async function getGalleryItemsPaginated(
+  bookId: string | null,
+  offset: number = 0,
+  limit: number = 30
+): Promise<IGalleryItem[]> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+
+    let query: string;
+    let params: unknown[];
+
+    if (bookId) {
+      query = "SELECT * FROM gallery_items WHERE book_id = $1 ORDER BY order_index ASC, updated_at DESC LIMIT $2 OFFSET $3";
+      params = [bookId, limit, offset];
+    } else {
+      query = "SELECT * FROM gallery_items ORDER BY updated_at DESC LIMIT $1 OFFSET $2";
+      params = [limit, offset];
+    }
+
+    const items = await db.select<DBGalleryItem[]>(query, params);
+
+    const itemsWithLinks: IGalleryItem[] = [];
+
+    for (const dbItem of items) {
+      const links = await getGalleryLinks(dbItem.id);
+      itemsWithLinks.push({
+        ...dbGalleryItemToGalleryItem(dbItem),
+        links,
+      });
+    }
+
+    return itemsWithLinks;
+  }, 'getGalleryItemsPaginated');
+}
+
+/**
+ * Get total count of gallery items
+ */
+export async function getGalleryItemsCount(bookId: string | null): Promise<number> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+
+    let query: string;
+    let params: unknown[];
+
+    if (bookId) {
+      query = "SELECT COUNT(*) as count FROM gallery_items WHERE book_id = $1";
+      params = [bookId];
+    } else {
+      query = "SELECT COUNT(*) as count FROM gallery_items";
+      params = [];
+    }
+
+    const result = await db.select<Array<{ count: number }>>(query, params);
+    return result[0]?.count || 0;
+  }, 'getGalleryItemsCount');
+}
+
+/**
  * Get gallery items by book ID
  */
 export async function getGalleryItemsByBookId(
