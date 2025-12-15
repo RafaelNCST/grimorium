@@ -255,9 +255,21 @@ export function RaceRelationshipsSection({
 
   return (
     <div className="space-y-4">
+      {/* Add Relationship Button - Show when in edit mode and there are available races */}
+      {isEditMode && availableRaces.length > 0 && (
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="w-full"
+          variant="magical"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {t("race-detail:relationships.add_relationship")}
+        </Button>
+      )}
+
       {/* Relationships List */}
-      {relationships.length > 0 ? (
-        <div className="space-y-3">
+      {relationships.length > 0 && (
+        <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2 pb-4">
           {relationships.map((relationship) => {
             const race = getRaceById(relationship.raceId);
             const typeConfig = getRelationshipTypeConfig(relationship.type);
@@ -359,7 +371,7 @@ export function RaceRelationshipsSection({
             );
           })}
         </div>
-      ) : null}
+      )}
 
       {/* Add Relationship Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

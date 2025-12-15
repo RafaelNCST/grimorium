@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { InfoAlert } from "@/components/ui/info-alert";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { type IHierarchyTitle } from "@/types/faction-types";
 
 interface HierarchySectionProps {
@@ -216,11 +215,8 @@ export function HierarchySection({
           </div>
         )
       ) : (
-        <ScrollArea
-          className={sortedMembers.length > 6 ? "max-h-[420px] pr-3" : ""}
-        >
-          <div className="space-y-2">
-            {sortedMembers.map(({ characterId, character, title }) => {
+        <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar pr-2 pb-4">
+          {sortedMembers.map(({ characterId, character, title }) => {
               const colorClasses = getColorClasses(title.color);
 
               return (
@@ -275,8 +271,7 @@ export function HierarchySection({
                 </div>
               );
             })}
-          </div>
-        </ScrollArea>
+        </div>
       )}
     </div>
   );

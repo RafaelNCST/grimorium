@@ -313,7 +313,7 @@ export function RelationshipsSection({
 
       {/* Relationships List */}
       {relationships.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2 pb-4">
           {relationships.map((relationship) => {
             const character = getCharacterById(relationship.characterId);
             const typeConfig = getRelationshipTypeConfig(relationship.type);

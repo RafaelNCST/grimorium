@@ -187,8 +187,8 @@ export function DiplomacySection({
 
           {/* Tab Content */}
           <div className="mt-4 border rounded-lg">
-            <ScrollArea className="h-[280px]">
-              <div className="p-3">
+            <ScrollArea className="h-[600px]">
+              <div className="p-3 pb-4">
                 {(() => {
                   const factions = getFactionsWithStatus(activeTab);
                   return factions.length === 0 ? (
