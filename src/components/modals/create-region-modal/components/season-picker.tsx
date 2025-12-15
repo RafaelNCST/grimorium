@@ -37,8 +37,8 @@ export function SeasonPicker({
   const seasonOptions: GridSelectOption<RegionSeason>[] = REGION_SEASONS.map(
     (season) => ({
       value: season.value,
-      label: season.label,
-      description: season.description,
+      label: t(season.label),
+      description: t(season.description),
       icon: season.icon,
       backgroundColor: seasonColorMap[season.value].bg,
       borderColor: seasonColorMap[season.value].border,

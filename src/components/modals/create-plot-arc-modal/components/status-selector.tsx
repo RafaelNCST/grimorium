@@ -62,7 +62,7 @@ export function StatusSelector({
         onChange={handleChange}
         options={availableOptions}
         label=""
-        columns={3}
+        columns={2}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
