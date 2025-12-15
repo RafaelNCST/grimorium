@@ -71,7 +71,6 @@ export function PowerSystemTab({ bookId }: PowerSystemTabProps) {
         }
       }
 
-      setIsEditMode(true); // Enable edit mode when creating a new system
       setIsCreateSystemModalOpen(false);
     } catch (error) {
       console.error("Error creating system:", error);

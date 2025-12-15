@@ -60,7 +60,7 @@ interface PowerSystemUIStoreState {
 const getDefaultState = (): PowerSystemUIState => ({
   expandedGroups: [],
   currentPageId: null,
-  isEditMode: true, // New systems start in edit mode by default
+  isEditMode: false, // New systems start in view mode by default
   isLeftSidebarOpen: true,
   selectedItemId: null,
   selectedItemType: null,

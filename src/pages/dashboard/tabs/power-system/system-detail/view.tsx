@@ -258,8 +258,8 @@ export function PowerSystemDetailView({
               {/* System Icon */}
               <Avatar className="w-8 h-8 rounded-md flex-shrink-0">
                 <AvatarImage src={system.iconImage} className="object-cover" />
-                <AvatarFallback className="rounded-md bg-gradient-to-br from-purple-500/10 to-blue-500/10">
-                  <Zap className="w-4 h-4 text-purple-500/50" />
+                <AvatarFallback className="rounded-md !bg-purple-950/40">
+                  <Zap className="w-4 h-4 text-purple-400" />
                 </AvatarFallback>
               </Avatar>
 
@@ -508,8 +508,8 @@ export function PowerSystemDetailView({
             {/* System Icon */}
             <Avatar className="w-8 h-8 rounded-md flex-shrink-0">
               <AvatarImage src={system.iconImage} className="object-cover" />
-              <AvatarFallback className="rounded-md bg-gradient-to-br from-purple-500/10 to-blue-500/10">
-                <Zap className="w-4 h-4 text-purple-500/50" />
+              <AvatarFallback className="rounded-md !bg-purple-950/40">
+                <Zap className="w-4 h-4 text-purple-400" />
               </AvatarFallback>
             </Avatar>
 
