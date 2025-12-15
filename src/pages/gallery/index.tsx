@@ -18,6 +18,7 @@ export function GalleryPage() {
     isLoading,
     isLoadingMore,
     hasMore,
+    totalCount,
     fetchGalleryItems,
     loadMoreGalleryItems,
     addGalleryItem,
@@ -223,6 +224,7 @@ export function GalleryPage() {
       isLoading={isLoading}
       isLoadingMore={isLoadingMore}
       hasMore={hasMore}
+      totalCount={totalCount}
       searchTerm={searchTerm}
       onSearchChange={handleSearchChange}
       entityTypeFilters={entityTypeFilters}

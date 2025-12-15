@@ -308,6 +308,7 @@ export function EntityGalleryPage() {
       isLoading={isLoading}
       isLoadingMore={isLoadingMore}
       hasMore={hasMore}
+      totalCount={filteredByEntity.length}
       searchTerm={searchTerm}
       onSearchChange={handleSearchChange}
       sortOrder={sortOrder}

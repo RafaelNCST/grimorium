@@ -30,6 +30,7 @@ interface EntityGalleryViewProps {
   isLoading: boolean;
   isLoadingMore: boolean;
   hasMore: boolean;
+  totalCount: number;
 
   // Filters
   searchTerm: string;
@@ -85,6 +86,7 @@ export function EntityGalleryView({
   isLoading,
   isLoadingMore,
   hasMore,
+  totalCount,
   searchTerm,
   onSearchChange,
   sortOrder,
@@ -175,51 +177,53 @@ export function EntityGalleryView({
         </Button>
       </div>
 
-      {/* Filters - always visible */}
-      <div className="px-6 py-4">
-        <div className="flex flex-col sm:flex-row gap-3 sm:w-1/2">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={t("page.search_placeholder")}
-              className={`pl-9 ${searchTerm.length > 0 ? "pr-10" : ""}`}
-            />
+      {/* Filters - only show when there are items */}
+      {totalCount > 0 && (
+        <div className="px-6 py-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:w-1/2">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder={t("page.search_placeholder")}
+                className={`pl-9 ${searchTerm.length > 0 ? "pr-10" : ""}`}
+              />
 
-            {/* Clear search button - positioned absolutely inside input */}
-            {searchTerm.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onSearchChange("")}
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+              {/* Clear search button - positioned absolutely inside input */}
+              {searchTerm.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onSearchChange("")}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Sort */}
+            <Select value={sortOrder} onValueChange={onSortChange}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder={t("filters.sort_label")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">
+                  {t("filters.sort_recent")}
+                </SelectItem>
+                <SelectItem value="alphabetical">
+                  {t("filters.sort_alphabetical")}
+                </SelectItem>
+                <SelectItem value="manual">
+                  {t("filters.sort_manual")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* Sort */}
-          <Select value={sortOrder} onValueChange={onSortChange}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder={t("filters.sort_label")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recent">
-                {t("filters.sort_recent")}
-              </SelectItem>
-              <SelectItem value="alphabetical">
-                {t("filters.sort_alphabetical")}
-              </SelectItem>
-              <SelectItem value="manual">
-                {t("filters.sort_manual")}
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
-      </div>
+      )}
 
       {/* Content area - scrollable */}
       <div ref={scrollContainerRef} className="flex-1 overflow-auto">

@@ -518,14 +518,16 @@ export function ChaptersPage() {
                   </TabsTrigger>
                 </TabsList>
 
-                {/* Search */}
-                <EntitySearchBar
-                  value={searchTerm}
-                  onChange={setSearchTerm}
-                  placeholder={t("chapters:page.search_placeholder")}
-                  maxWidth="max-w-[50%]"
-                  className="mt-4"
-                />
+                {/* Search - only show when there are chapters */}
+                {chapters.length > 0 && (
+                  <EntitySearchBar
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder={t("chapters:page.search_placeholder")}
+                    maxWidth="max-w-[50%]"
+                    className="mt-4"
+                  />
+                )}
 
                 <TabsContent
                   value="all"

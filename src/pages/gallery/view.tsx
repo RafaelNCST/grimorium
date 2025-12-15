@@ -18,6 +18,7 @@ interface GalleryViewProps {
   isLoading: boolean;
   isLoadingMore: boolean;
   hasMore: boolean;
+  totalCount: number;
 
   // Filters
   searchTerm: string;
@@ -67,6 +68,7 @@ export function GalleryView({
   isLoading,
   isLoadingMore,
   hasMore,
+  totalCount,
   searchTerm,
   onSearchChange,
   entityTypeFilters,
@@ -148,17 +150,19 @@ export function GalleryView({
         </Button>
       </div>
 
-      {/* Filters - always visible */}
-      <div className="px-6 py-4">
-        <GalleryFilters
-          searchTerm={searchTerm}
-          onSearchChange={onSearchChange}
-          entityTypeFilters={entityTypeFilters}
-          onEntityTypeToggle={onEntityTypeToggle}
-          onClearFilters={onClearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      </div>
+      {/* Filters - only show when there are items */}
+      {totalCount > 0 && (
+        <div className="px-6 py-4">
+          <GalleryFilters
+            searchTerm={searchTerm}
+            onSearchChange={onSearchChange}
+            entityTypeFilters={entityTypeFilters}
+            onEntityTypeToggle={onEntityTypeToggle}
+            onClearFilters={onClearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
+      )}
 
       {/* Content area - scrollable */}
       <div ref={scrollContainerRef} className="flex-1 overflow-auto">
