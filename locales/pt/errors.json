@@ -10,5 +10,31 @@
     "annotation": "Anotação não encontrada",
     "version": "Versão não encontrada",
     "version_showing_main": "Versão não encontrada, exibindo versão principal"
+  },
+  "database": {
+    "disk_full": {
+      "title": "Sem Espaço em Disco",
+      "message": "Não foi possível concluir a operação. Libere espaço em disco e tente novamente.",
+      "additionalInfo": "Verifique o espaço disponível no disco e remova arquivos desnecessários.",
+      "action": "Entendi"
+    },
+    "corrupt": {
+      "title": "Banco de Dados Corrompido",
+      "message": "O banco de dados está corrompido e não pode ser acessado.",
+      "additionalInfo": "Entre em contato com o suporte técnico para assistência.",
+      "action": "Fechar"
+    },
+    "locked": {
+      "title": "Banco de Dados Bloqueado",
+      "message": "O banco de dados está sendo usado por outro processo.",
+      "additionalInfo": "Tente novamente em alguns instantes.",
+      "action": "Tentar Novamente"
+    },
+    "generic": {
+      "title": "Erro no Banco de Dados",
+      "message": "Ocorreu um erro inesperado ao acessar o banco de dados.",
+      "additionalInfo": "Se o problema persistir, entre em contato com o suporte.",
+      "action": "Fechar"
+    }
   }
 }

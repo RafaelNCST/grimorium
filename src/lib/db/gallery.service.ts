@@ -12,6 +12,7 @@ import { EntityType, IGalleryItem, IGalleryLink } from "@/types/gallery-types";
 import { DBGalleryItem, DBGalleryLink } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // ========================================
 // Converters
@@ -99,7 +100,7 @@ function dbGalleryLinkToGalleryLink(dbLink: DBGalleryLink): IGalleryLink {
  * Ensure gallery directory exists in AppData
  */
 export async function ensureGalleryDirectory(): Promise<void> {
-  try {
+  return safeDBOperation(async () => {
     const directoryExists = await exists(GALLERY_DIRECTORY, {
       baseDir: BaseDirectory.AppData,
     });
@@ -110,10 +111,7 @@ export async function ensureGalleryDirectory(): Promise<void> {
         recursive: true,
       });
     }
-  } catch (error) {
-    console.error("Error ensuring gallery directory:", error);
-    throw error;
-  }
+  }, 'ensureGalleryDirectory');
 }
 
 /**
@@ -123,7 +121,7 @@ export async function ensureGalleryDirectory(): Promise<void> {
 export async function deleteGalleryImageFile(
   originalPath: string
 ): Promise<void> {
-  try {
+  return safeDBOperation(async () => {
     const fileExists = await exists(originalPath, {
       baseDir: BaseDirectory.AppData,
     });
@@ -133,10 +131,7 @@ export async function deleteGalleryImageFile(
         baseDir: BaseDirectory.AppData,
       });
     }
-  } catch (error) {
-    console.error("Error deleting gallery image file:", error);
-    // Don't throw - continue even if file deletion fails
-  }
+  }, 'deleteGalleryImageFile');
 }
 
 /**
@@ -148,15 +143,12 @@ export async function copyImageToGallery(
   sourceFilePath: string,
   destinationPath: string
 ): Promise<void> {
-  try {
+  return safeDBOperation(async () => {
     await ensureGalleryDirectory();
     await copyFile(sourceFilePath, destinationPath, {
       toPathBaseDir: BaseDirectory.AppData,
     });
-  } catch (error) {
-    console.error("Error copying image to gallery:", error);
-    throw error;
-  }
+  }, 'copyImageToGallery');
 }
 
 // ========================================
@@ -167,22 +159,24 @@ export async function copyImageToGallery(
  * Get all gallery items
  */
 export async function getAllGalleryItems(): Promise<IGalleryItem[]> {
-  const db = await getDB();
-  const items = await db.select<DBGalleryItem[]>(
-    "SELECT * FROM gallery_items ORDER BY updated_at DESC"
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const items = await db.select<DBGalleryItem[]>(
+      "SELECT * FROM gallery_items ORDER BY updated_at DESC"
+    );
 
-  const itemsWithLinks: IGalleryItem[] = [];
+    const itemsWithLinks: IGalleryItem[] = [];
 
-  for (const dbItem of items) {
-    const links = await getGalleryLinks(dbItem.id);
-    itemsWithLinks.push({
-      ...dbGalleryItemToGalleryItem(dbItem),
-      links,
-    });
-  }
+    for (const dbItem of items) {
+      const links = await getGalleryLinks(dbItem.id);
+      itemsWithLinks.push({
+        ...dbGalleryItemToGalleryItem(dbItem),
+        links,
+      });
+    }
 
-  return itemsWithLinks;
+    return itemsWithLinks;
+  }, 'getAllGalleryItems');
 }
 
 /**
@@ -191,23 +185,25 @@ export async function getAllGalleryItems(): Promise<IGalleryItem[]> {
 export async function getGalleryItemsByBookId(
   bookId: string
 ): Promise<IGalleryItem[]> {
-  const db = await getDB();
-  const items = await db.select<DBGalleryItem[]>(
-    "SELECT * FROM gallery_items WHERE book_id = $1 ORDER BY order_index ASC, updated_at DESC",
-    [bookId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const items = await db.select<DBGalleryItem[]>(
+      "SELECT * FROM gallery_items WHERE book_id = $1 ORDER BY order_index ASC, updated_at DESC",
+      [bookId]
+    );
 
-  const itemsWithLinks: IGalleryItem[] = [];
+    const itemsWithLinks: IGalleryItem[] = [];
 
-  for (const dbItem of items) {
-    const links = await getGalleryLinks(dbItem.id);
-    itemsWithLinks.push({
-      ...dbGalleryItemToGalleryItem(dbItem),
-      links,
-    });
-  }
+    for (const dbItem of items) {
+      const links = await getGalleryLinks(dbItem.id);
+      itemsWithLinks.push({
+        ...dbGalleryItemToGalleryItem(dbItem),
+        links,
+      });
+    }
 
-  return itemsWithLinks;
+    return itemsWithLinks;
+  }, 'getGalleryItemsByBookId');
 }
 
 /**
@@ -216,59 +212,63 @@ export async function getGalleryItemsByBookId(
 export async function getGalleryItemById(
   id: string
 ): Promise<IGalleryItem | null> {
-  const db = await getDB();
-  const result = await db.select<DBGalleryItem[]>(
-    "SELECT * FROM gallery_items WHERE id = $1",
-    [id]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBGalleryItem[]>(
+      "SELECT * FROM gallery_items WHERE id = $1",
+      [id]
+    );
 
-  if (result.length === 0) {
-    return null;
-  }
+    if (result.length === 0) {
+      return null;
+    }
 
-  const links = await getGalleryLinks(id);
+    const links = await getGalleryLinks(id);
 
-  return {
-    ...dbGalleryItemToGalleryItem(result[0]),
-    links,
-  };
+    return {
+      ...dbGalleryItemToGalleryItem(result[0]),
+      links,
+    };
+  }, 'getGalleryItemById');
 }
 
 /**
  * Create gallery item
  */
 export async function createGalleryItem(item: IGalleryItem): Promise<void> {
-  const db = await getDB();
-  const dbItem = galleryItemToDBGalleryItem(item);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const dbItem = galleryItemToDBGalleryItem(item);
 
-  await db.execute(
-    `INSERT INTO gallery_items (
-      id, book_id, title, description, thumbnail_base64, original_path,
-      original_filename, file_size, width, height, mime_type, order_index,
-      created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-    [
-      dbItem.id,
-      dbItem.book_id,
-      dbItem.title,
-      dbItem.description,
-      dbItem.thumbnail_base64,
-      dbItem.original_path,
-      dbItem.original_filename,
-      dbItem.file_size,
-      dbItem.width,
-      dbItem.height,
-      dbItem.mime_type,
-      dbItem.order_index,
-      dbItem.created_at,
-      dbItem.updated_at,
-    ]
-  );
+    await db.execute(
+      `INSERT INTO gallery_items (
+        id, book_id, title, description, thumbnail_base64, original_path,
+        original_filename, file_size, width, height, mime_type, order_index,
+        created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      [
+        dbItem.id,
+        dbItem.book_id,
+        dbItem.title,
+        dbItem.description,
+        dbItem.thumbnail_base64,
+        dbItem.original_path,
+        dbItem.original_filename,
+        dbItem.file_size,
+        dbItem.width,
+        dbItem.height,
+        dbItem.mime_type,
+        dbItem.order_index,
+        dbItem.created_at,
+        dbItem.updated_at,
+      ]
+    );
 
-  // Insert links
-  for (const link of item.links) {
-    await addGalleryLink(item.id, link);
-  }
+    // Insert links
+    for (const link of item.links) {
+      await addGalleryLink(item.id, link);
+    }
+  }, 'createGalleryItem');
 }
 
 /**
@@ -278,72 +278,78 @@ export async function updateGalleryItem(
   id: string,
   updates: Partial<Omit<IGalleryItem, "id" | "createdAt" | "links">>
 ): Promise<void> {
-  const db = await getDB();
-  const updated_at = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const updated_at = Date.now();
 
-  const updateFields: string[] = [];
-  const updateValues: unknown[] = [];
+    const updateFields: string[] = [];
+    const updateValues: unknown[] = [];
 
-  if (updates.title !== undefined) {
-    updateFields.push(`title = $${updateValues.length + 1}`);
-    updateValues.push(updates.title);
-  }
+    if (updates.title !== undefined) {
+      updateFields.push(`title = $${updateValues.length + 1}`);
+      updateValues.push(updates.title);
+    }
 
-  if (updates.description !== undefined) {
-    updateFields.push(`description = $${updateValues.length + 1}`);
-    updateValues.push(updates.description);
-  }
+    if (updates.description !== undefined) {
+      updateFields.push(`description = $${updateValues.length + 1}`);
+      updateValues.push(updates.description);
+    }
 
-  if (updates.thumbnailBase64 !== undefined) {
-    updateFields.push(`thumbnail_base64 = $${updateValues.length + 1}`);
-    updateValues.push(updates.thumbnailBase64);
-  }
+    if (updates.thumbnailBase64 !== undefined) {
+      updateFields.push(`thumbnail_base64 = $${updateValues.length + 1}`);
+      updateValues.push(updates.thumbnailBase64);
+    }
 
-  if (updates.originalPath !== undefined) {
-    updateFields.push(`original_path = $${updateValues.length + 1}`);
-    updateValues.push(updates.originalPath);
-  }
+    if (updates.originalPath !== undefined) {
+      updateFields.push(`original_path = $${updateValues.length + 1}`);
+      updateValues.push(updates.originalPath);
+    }
 
-  if (updates.orderIndex !== undefined) {
-    updateFields.push(`order_index = $${updateValues.length + 1}`);
-    updateValues.push(updates.orderIndex);
-  }
+    if (updates.orderIndex !== undefined) {
+      updateFields.push(`order_index = $${updateValues.length + 1}`);
+      updateValues.push(updates.orderIndex);
+    }
 
-  // Always update updated_at
-  updateFields.push(`updated_at = $${updateValues.length + 1}`);
-  updateValues.push(updated_at);
+    // Always update updated_at
+    updateFields.push(`updated_at = $${updateValues.length + 1}`);
+    updateValues.push(updated_at);
 
-  // Add id as the last parameter
-  updateValues.push(id);
+    // Add id as the last parameter
+    updateValues.push(id);
 
-  const query = `UPDATE gallery_items SET ${updateFields.join(", ")} WHERE id = $${updateValues.length}`;
+    const query = `UPDATE gallery_items SET ${updateFields.join(", ")} WHERE id = $${updateValues.length}`;
 
-  await db.execute(query, updateValues);
+    await db.execute(query, updateValues);
+  }, 'updateGalleryItem');
 }
 
 /**
  * Delete gallery item
  */
 export async function deleteGalleryItem(id: string): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Get item to delete the file
-  const item = await getGalleryItemById(id);
-  if (item) {
-    await deleteGalleryImageFile(item.originalPath);
-  }
+    // Get item to delete the file
+    const item = await getGalleryItemById(id);
+    if (item) {
+      await deleteGalleryImageFile(item.originalPath);
+    }
 
-  // Delete from database (links will be deleted automatically via CASCADE)
-  await db.execute("DELETE FROM gallery_items WHERE id = $1", [id]);
+    // Delete from database (links will be deleted automatically via CASCADE)
+    await db.execute("DELETE FROM gallery_items WHERE id = $1", [id]);
+  }, 'deleteGalleryItem');
 }
 
 /**
  * Delete multiple gallery items
  */
 export async function deleteGalleryItems(ids: string[]): Promise<void> {
-  for (const id of ids) {
-    await deleteGalleryItem(id);
-  }
+  return safeDBOperation(async () => {
+    for (const id of ids) {
+      await deleteGalleryItem(id);
+    }
+  }, 'deleteGalleryItems');
 }
 
 // ========================================
@@ -354,13 +360,15 @@ export async function deleteGalleryItems(ids: string[]): Promise<void> {
  * Get gallery links for an item
  */
 export async function getGalleryLinks(itemId: string): Promise<IGalleryLink[]> {
-  const db = await getDB();
-  const result = await db.select<DBGalleryLink[]>(
-    "SELECT * FROM gallery_links WHERE gallery_item_id = $1",
-    [itemId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBGalleryLink[]>(
+      "SELECT * FROM gallery_links WHERE gallery_item_id = $1",
+      [itemId]
+    );
 
-  return result.map(dbGalleryLinkToGalleryLink);
+    return result.map(dbGalleryLinkToGalleryLink);
+  }, 'getGalleryLinks');
 }
 
 /**
@@ -370,63 +378,10 @@ export async function addGalleryLink(
   itemId: string,
   link: IGalleryLink
 ): Promise<void> {
-  const db = await getDB();
-  const dbLink = galleryLinkToDBGalleryLink(itemId, link);
-
-  await db.execute(
-    `INSERT INTO gallery_links (id, gallery_item_id, entity_id, entity_type, book_id, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
-    [
-      dbLink.id,
-      dbLink.gallery_item_id,
-      dbLink.entity_id,
-      dbLink.entity_type,
-      dbLink.book_id,
-      dbLink.created_at,
-    ]
-  );
-
-  // Update item's updated_at
-  await updateGalleryItem(itemId, {});
-}
-
-/**
- * Remove gallery link
- */
-export async function removeGalleryLink(linkId: string): Promise<void> {
-  const db = await getDB();
-
-  // Get the item ID to update its updated_at
-  const link = await db.select<DBGalleryLink[]>(
-    "SELECT gallery_item_id FROM gallery_links WHERE id = $1",
-    [linkId]
-  );
-
-  await db.execute("DELETE FROM gallery_links WHERE id = $1", [linkId]);
-
-  // Update item's updated_at
-  if (link.length > 0) {
-    await updateGalleryItem(link[0].gallery_item_id, {});
-  }
-}
-
-/**
- * Update gallery links (replace all links)
- */
-export async function updateGalleryLinks(
-  itemId: string,
-  links: IGalleryLink[]
-): Promise<void> {
-  const db = await getDB();
-
-  // Delete all existing links
-  await db.execute("DELETE FROM gallery_links WHERE gallery_item_id = $1", [
-    itemId,
-  ]);
-
-  // Insert new links
-  for (const link of links) {
+  return safeDBOperation(async () => {
+    const db = await getDB();
     const dbLink = galleryLinkToDBGalleryLink(itemId, link);
+
     await db.execute(
       `INSERT INTO gallery_links (id, gallery_item_id, entity_id, entity_type, book_id, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -439,10 +394,69 @@ export async function updateGalleryLinks(
         dbLink.created_at,
       ]
     );
-  }
 
-  // Update item's updated_at
-  await updateGalleryItem(itemId, {});
+    // Update item's updated_at
+    await updateGalleryItem(itemId, {});
+  }, 'addGalleryLink');
+}
+
+/**
+ * Remove gallery link
+ */
+export async function removeGalleryLink(linkId: string): Promise<void> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+
+    // Get the item ID to update its updated_at
+    const link = await db.select<DBGalleryLink[]>(
+      "SELECT gallery_item_id FROM gallery_links WHERE id = $1",
+      [linkId]
+    );
+
+    await db.execute("DELETE FROM gallery_links WHERE id = $1", [linkId]);
+
+    // Update item's updated_at
+    if (link.length > 0) {
+      await updateGalleryItem(link[0].gallery_item_id, {});
+    }
+  }, 'removeGalleryLink');
+}
+
+/**
+ * Update gallery links (replace all links)
+ */
+export async function updateGalleryLinks(
+  itemId: string,
+  links: IGalleryLink[]
+): Promise<void> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+
+    // Delete all existing links
+    await db.execute("DELETE FROM gallery_links WHERE gallery_item_id = $1", [
+      itemId,
+    ]);
+
+    // Insert new links
+    for (const link of links) {
+      const dbLink = galleryLinkToDBGalleryLink(itemId, link);
+      await db.execute(
+        `INSERT INTO gallery_links (id, gallery_item_id, entity_id, entity_type, book_id, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          dbLink.id,
+          dbLink.gallery_item_id,
+          dbLink.entity_id,
+          dbLink.entity_type,
+          dbLink.book_id,
+          dbLink.created_at,
+        ]
+      );
+    }
+
+    // Update item's updated_at
+    await updateGalleryItem(itemId, {});
+  }, 'updateGalleryLinks');
 }
 
 // ========================================
@@ -455,14 +469,16 @@ export async function updateGalleryLinks(
 export async function reorderGalleryItems(
   items: Array<{ id: string; orderIndex: number }>
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  for (const item of items) {
-    await db.execute(
-      "UPDATE gallery_items SET order_index = $1 WHERE id = $2",
-      [item.orderIndex, item.id]
-    );
-  }
+    for (const item of items) {
+      await db.execute(
+        "UPDATE gallery_items SET order_index = $1 WHERE id = $2",
+        [item.orderIndex, item.id]
+      );
+    }
+  }, 'reorderGalleryItems');
 }
 
 // ========================================
@@ -475,36 +491,38 @@ export async function reorderGalleryItems(
 export async function getGalleryItemsByEntityTypes(
   entityTypes: EntityType[]
 ): Promise<IGalleryItem[]> {
-  if (entityTypes.length === 0) {
-    return getAllGalleryItems();
-  }
-
-  const db = await getDB();
-
-  // Build placeholders for IN clause
-  const placeholders = entityTypes
-    .map((_, index) => `$${index + 1}`)
-    .join(", ");
-
-  const links = await db.select<DBGalleryLink[]>(
-    `SELECT DISTINCT gallery_item_id FROM gallery_links WHERE entity_type IN (${placeholders})`,
-    entityTypes
-  );
-
-  const itemIds = links.map((link) => link.gallery_item_id);
-
-  if (itemIds.length === 0) {
-    return [];
-  }
-
-  const items: IGalleryItem[] = [];
-
-  for (const itemId of itemIds) {
-    const item = await getGalleryItemById(itemId);
-    if (item) {
-      items.push(item);
+  return safeDBOperation(async () => {
+    if (entityTypes.length === 0) {
+      return getAllGalleryItems();
     }
-  }
 
-  return items;
+    const db = await getDB();
+
+    // Build placeholders for IN clause
+    const placeholders = entityTypes
+      .map((_, index) => `$${index + 1}`)
+      .join(", ");
+
+    const links = await db.select<DBGalleryLink[]>(
+      `SELECT DISTINCT gallery_item_id FROM gallery_links WHERE entity_type IN (${placeholders})`,
+      entityTypes
+    );
+
+    const itemIds = links.map((link) => link.gallery_item_id);
+
+    if (itemIds.length === 0) {
+      return [];
+    }
+
+    const items: IGalleryItem[] = [];
+
+    for (const itemId of itemIds) {
+      const item = await getGalleryItemById(itemId);
+      if (item) {
+        items.push(item);
+      }
+    }
+
+    return items;
+  }, 'getGalleryItemsByEntityTypes');
 }

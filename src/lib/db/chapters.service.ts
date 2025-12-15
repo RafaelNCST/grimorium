@@ -2,6 +2,7 @@ import type { EntityMention } from "@/components/modals/create-chapter-modal";
 import type { Annotation, ChapterData } from "@/stores/chapters-store";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // Função auxiliar para calcular diferenças entre arrays
 function _diffArrays<T>(
@@ -141,13 +142,14 @@ function dbEntityToEntityMention(dbEntity: DBEntityMention): EntityMention {
 export async function getChapterMetadataByBookId(
   bookId: string
 ): Promise<ChapterMetadata[]> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Buscar capítulos
-  const chapters = await db.select<DBChapter[]>(
-    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
-    [bookId]
-  );
+    // Buscar capítulos
+    const chapters = await db.select<DBChapter[]>(
+      "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
+      [bookId]
+    );
 
   // Buscar todas as menções de uma vez
   const chapterIds = chapters.map((ch) => ch.id);
@@ -232,6 +234,7 @@ export async function getChapterMetadataByBookId(
       mentionedRaces: chapterMentions.races,
     };
   });
+  }, 'getChapterMetadataByBookId');
 }
 
 // Buscar dados mínimos para navegação (ultra-leve, otimizado para 1000+ capítulos)
@@ -239,37 +242,40 @@ export async function getChapterMetadataByBookId(
 export async function getChapterNavigationDataByBookId(
   bookId: string
 ): Promise<ChapterNavigationData[]> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Query extremamente leve - apenas 3 campos
-  const chapters = await db.select<
-    Pick<DBChapter, "id" | "chapter_number" | "title">[]
-  >(
-    "SELECT id, chapter_number, title FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
-    [bookId]
-  );
+    // Query extremamente leve - apenas 3 campos
+    const chapters = await db.select<
+      Pick<DBChapter, "id" | "chapter_number" | "title">[]
+    >(
+      "SELECT id, chapter_number, title FROM chapters WHERE book_id = $1 ORDER BY CAST(chapter_number AS REAL)",
+      [bookId]
+    );
 
-  return chapters.map((ch) => ({
-    id: ch.id,
-    chapterNumber: ch.chapter_number,
-    title: ch.title,
-  }));
+    return chapters.map((ch) => ({
+      id: ch.id,
+      chapterNumber: ch.chapter_number,
+      title: ch.title,
+    }));
+  }, 'getChapterNavigationDataByBookId');
 }
 
 // Buscar capítulo completo (com conteúdo)
 export async function getChapterById(
   chapterId: string
 ): Promise<ChapterData | null> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Buscar capítulo
-  const chapters = await db.select<DBChapter[]>(
-    "SELECT * FROM chapters WHERE id = $1",
-    [chapterId]
-  );
+    // Buscar capítulo
+    const chapters = await db.select<DBChapter[]>(
+      "SELECT * FROM chapters WHERE id = $1",
+      [chapterId]
+    );
 
-  if (chapters.length === 0) return null;
-  const chapter = chapters[0];
+    if (chapters.length === 0) return null;
+    const chapter = chapters[0];
 
   // Buscar menções
   const mentions = await db.select<DBEntityMention[]>(
@@ -353,6 +359,7 @@ export async function getChapterById(
     mentionedRaces,
     annotations,
   };
+  }, 'getChapterById');
 }
 
 // Criar novo capítulo
@@ -360,8 +367,9 @@ export async function createChapter(
   bookId: string,
   chapterData: ChapterData
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
   // Inserir capítulo principal
   await db.execute(
@@ -452,6 +460,7 @@ export async function createChapter(
       }
     }
   }
+  }, 'createChapter');
 }
 
 // Atualizar capítulo
@@ -459,8 +468,9 @@ export async function updateChapter(
   chapterId: string,
   updates: Partial<ChapterData>
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
   // Construir query dinâmica para campos do capítulo principal
   const fields: string[] = [];
@@ -599,13 +609,16 @@ export async function updateChapter(
       }
     }
   }
+  }, 'updateChapter');
 }
 
 // Deletar capítulo
 export async function deleteChapter(chapterId: string): Promise<void> {
-  const db = await getDB();
-  // As tabelas relacionadas serão deletadas via CASCADE
-  await db.execute("DELETE FROM chapters WHERE id = $1", [chapterId]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    // As tabelas relacionadas serão deletadas via CASCADE
+    await db.execute("DELETE FROM chapters WHERE id = $1", [chapterId]);
+  }, 'deleteChapter');
 }
 
 // Buscar capítulos por status
@@ -613,12 +626,13 @@ export async function getChaptersByStatus(
   bookId: string,
   status: ChapterStatus
 ): Promise<ChapterMetadata[]> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  const chapters = await db.select<DBChapter[]>(
-    "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 AND status = $2 ORDER BY CAST(chapter_number AS REAL)",
-    [bookId, status]
-  );
+    const chapters = await db.select<DBChapter[]>(
+      "SELECT id, book_id, chapter_number, title, status, plot_arc_id, summary, word_count, character_count, character_count_with_spaces, last_edited, created_at, updated_at FROM chapters WHERE book_id = $1 AND status = $2 ORDER BY CAST(chapter_number AS REAL)",
+      [bookId, status]
+    );
 
   // Buscar menções para esses capítulos
   const chapterIds = chapters.map((ch) => ch.id);
@@ -702,4 +716,5 @@ export async function getChaptersByStatus(
       mentionedRaces: chapterMentions.races,
     };
   });
+  }, 'getChaptersByStatus');
 }

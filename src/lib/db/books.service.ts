@@ -3,6 +3,7 @@ import { Book } from "@/stores/book-store";
 import { DBBook } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // Convert Book store type to DBBook
 function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
@@ -58,40 +59,33 @@ function dbBookToBook(dbBook: DBBook): Book {
 }
 
 export async function getAllBooks(): Promise<Book[]> {
-  try {
+  return safeDBOperation(async () => {
     const db = await getDB();
 
     const result = await db.select<DBBook[]>(
       "SELECT * FROM books ORDER BY last_opened_at DESC NULLS LAST, updated_at DESC"
     );
 
-    const books = result.map(dbBookToBook);
-
-    return books;
-  } catch (error) {
-    console.error("[books.service] Error in getAllBooks:", error);
-    console.error("[books.service] Error details:", {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-    throw error;
-  }
+    return result.map(dbBookToBook);
+  }, 'getAllBooks');
 }
 
 export async function getBookById(id: string): Promise<Book | null> {
-  const db = await getDB();
-  const result = await db.select<DBBook[]>(
-    "SELECT * FROM books WHERE id = $1",
-    [id]
-  );
-  return result.length > 0 ? dbBookToBook(result[0]) : null;
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBBook[]>(
+      "SELECT * FROM books WHERE id = $1",
+      [id]
+    );
+    return result.length > 0 ? dbBookToBook(result[0]) : null;
+  }, 'getBookById');
 }
 
 export async function createBook(
   book: Book,
   tabsConfig?: string
 ): Promise<void> {
-  try {
+  return safeDBOperation(async () => {
     const db = await getDB();
     const dbBook = bookToDBBook(book, tabsConfig);
 
@@ -136,88 +130,91 @@ export async function createBook(
         dbBook.tabs_config,
       ]
     );
-  } catch (error) {
-    console.error("[books.service] Error creating book:", error);
-    throw error;
-  }
+  }, 'createBook');
 }
 
 export async function updateBook(
   id: string,
   updates: Partial<Book>
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  // Build dynamic update query
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let paramIndex = 1;
+    // Build dynamic update query
+    const fields: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
 
-  if (updates.title !== undefined) {
-    fields.push(`title = $${paramIndex++}`);
-    values.push(updates.title);
-  }
-  if (updates.genre !== undefined) {
-    fields.push(`genre = $${paramIndex++}`);
-    values.push(JSON.stringify(updates.genre));
-  }
-  if (updates.visualStyle !== undefined) {
-    fields.push(`visual_style = $${paramIndex++}`);
-    values.push(updates.visualStyle);
-  }
-  if (updates.coverImage !== undefined) {
-    fields.push(`cover_image_path = $${paramIndex++}`);
-    values.push(updates.coverImage);
-  }
-  if (updates.status !== undefined) {
-    fields.push(`status = $${paramIndex++}`);
-    values.push(updates.status);
-  }
-  if (updates.chapters !== undefined) {
-    fields.push(`chapters = $${paramIndex++}`);
-    values.push(updates.chapters);
-  }
-  if (updates.currentArc !== undefined) {
-    fields.push(`current_arc = $${paramIndex++}`);
-    values.push(updates.currentArc);
-  }
-  if (updates.authorSummary !== undefined) {
-    fields.push(`author_summary = $${paramIndex++}`);
-    values.push(updates.authorSummary);
-  }
-  if (updates.storySummary !== undefined) {
-    fields.push(`story_summary = $${paramIndex++}`);
-    values.push(updates.storySummary);
-  }
+    if (updates.title !== undefined) {
+      fields.push(`title = $${paramIndex++}`);
+      values.push(updates.title);
+    }
+    if (updates.genre !== undefined) {
+      fields.push(`genre = $${paramIndex++}`);
+      values.push(JSON.stringify(updates.genre));
+    }
+    if (updates.visualStyle !== undefined) {
+      fields.push(`visual_style = $${paramIndex++}`);
+      values.push(updates.visualStyle);
+    }
+    if (updates.coverImage !== undefined) {
+      fields.push(`cover_image_path = $${paramIndex++}`);
+      values.push(updates.coverImage);
+    }
+    if (updates.status !== undefined) {
+      fields.push(`status = $${paramIndex++}`);
+      values.push(updates.status);
+    }
+    if (updates.chapters !== undefined) {
+      fields.push(`chapters = $${paramIndex++}`);
+      values.push(updates.chapters);
+    }
+    if (updates.currentArc !== undefined) {
+      fields.push(`current_arc = $${paramIndex++}`);
+      values.push(updates.currentArc);
+    }
+    if (updates.authorSummary !== undefined) {
+      fields.push(`author_summary = $${paramIndex++}`);
+      values.push(updates.authorSummary);
+    }
+    if (updates.storySummary !== undefined) {
+      fields.push(`story_summary = $${paramIndex++}`);
+      values.push(updates.storySummary);
+    }
 
-  // Always update updated_at
-  fields.push(`updated_at = $${paramIndex++}`);
-  values.push(now);
+    // Always update updated_at
+    fields.push(`updated_at = $${paramIndex++}`);
+    values.push(now);
 
-  // Add id to values
-  values.push(id);
+    // Add id to values
+    values.push(id);
 
-  if (fields.length > 0) {
-    await db.execute(
-      `UPDATE books SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
-      values
-    );
-  }
+    if (fields.length > 0) {
+      await db.execute(
+        `UPDATE books SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
+        values
+      );
+    }
+  }, 'updateBook');
 }
 
 export async function deleteBook(id: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM books WHERE id = $1", [id]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM books WHERE id = $1", [id]);
+  }, 'deleteBook');
 }
 
 export async function updateLastOpened(id: string): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
-  await db.execute(
-    "UPDATE books SET last_opened_at = $1, updated_at = $2 WHERE id = $3",
-    [now, now, id]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
+    await db.execute(
+      "UPDATE books SET last_opened_at = $1, updated_at = $2 WHERE id = $3",
+      [now, now, id]
+    );
+  }, 'updateLastOpened');
 }
 
 // Overview-specific update functions
@@ -257,137 +254,141 @@ export async function updateOverviewData(
   bookId: string,
   overviewData: OverviewData
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  let paramIndex = 1;
+    const fields: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
 
-  // Goals
-  if (overviewData.goals) {
-    fields.push(`words_per_day = $${paramIndex++}`);
-    values.push(overviewData.goals.wordsPerDay);
-    fields.push(`chapters_per_week = $${paramIndex++}`);
-    values.push(overviewData.goals.chaptersPerWeek);
-  }
+    // Goals
+    if (overviewData.goals) {
+      fields.push(`words_per_day = $${paramIndex++}`);
+      values.push(overviewData.goals.wordsPerDay);
+      fields.push(`chapters_per_week = $${paramIndex++}`);
+      values.push(overviewData.goals.chaptersPerWeek);
+    }
 
-  // Story Progress
-  if (overviewData.storyProgress) {
-    fields.push(`estimated_arcs = $${paramIndex++}`);
-    values.push(overviewData.storyProgress.estimatedArcs);
-    fields.push(`estimated_chapters = $${paramIndex++}`);
-    values.push(overviewData.storyProgress.estimatedChapters);
-    fields.push(`completed_arcs = $${paramIndex++}`);
-    values.push(overviewData.storyProgress.completedArcs);
-    fields.push(`current_arc_progress = $${paramIndex++}`);
-    values.push(overviewData.storyProgress.currentArcProgress);
-  }
+    // Story Progress
+    if (overviewData.storyProgress) {
+      fields.push(`estimated_arcs = $${paramIndex++}`);
+      values.push(overviewData.storyProgress.estimatedArcs);
+      fields.push(`estimated_chapters = $${paramIndex++}`);
+      values.push(overviewData.storyProgress.estimatedChapters);
+      fields.push(`completed_arcs = $${paramIndex++}`);
+      values.push(overviewData.storyProgress.completedArcs);
+      fields.push(`current_arc_progress = $${paramIndex++}`);
+      values.push(overviewData.storyProgress.currentArcProgress);
+    }
 
-  // Sticky Notes
-  if (overviewData.stickyNotes) {
-    fields.push(`sticky_notes = $${paramIndex++}`);
-    values.push(JSON.stringify(overviewData.stickyNotes));
-  }
+    // Sticky Notes
+    if (overviewData.stickyNotes) {
+      fields.push(`sticky_notes = $${paramIndex++}`);
+      values.push(JSON.stringify(overviewData.stickyNotes));
+    }
 
-  // Checklist Items
-  if (overviewData.checklistItems) {
-    fields.push(`checklist_items = $${paramIndex++}`);
-    values.push(JSON.stringify(overviewData.checklistItems));
-  }
+    // Checklist Items
+    if (overviewData.checklistItems) {
+      fields.push(`checklist_items = $${paramIndex++}`);
+      values.push(JSON.stringify(overviewData.checklistItems));
+    }
 
-  // Sections Config
-  if (overviewData.sectionsConfig) {
-    fields.push(`sections_config = $${paramIndex++}`);
-    values.push(JSON.stringify(overviewData.sectionsConfig));
-  }
+    // Sections Config
+    if (overviewData.sectionsConfig) {
+      fields.push(`sections_config = $${paramIndex++}`);
+      values.push(JSON.stringify(overviewData.sectionsConfig));
+    }
 
-  // Always update updated_at
-  fields.push(`updated_at = $${paramIndex++}`);
-  values.push(now);
+    // Always update updated_at
+    fields.push(`updated_at = $${paramIndex++}`);
+    values.push(now);
 
-  // Add bookId to values
-  values.push(bookId);
+    // Add bookId to values
+    values.push(bookId);
 
-  if (fields.length > 1) {
-    // More than just updated_at
-    await db.execute(
-      `UPDATE books SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
-      values
-    );
-  }
+    if (fields.length > 1) {
+      // More than just updated_at
+      await db.execute(
+        `UPDATE books SET ${fields.join(", ")} WHERE id = $${paramIndex}`,
+        values
+      );
+    }
+  }, 'updateOverviewData');
 }
 
 export async function getOverviewData(bookId: string): Promise<OverviewData> {
-  const db = await getDB();
-  const result = await db.select<DBBook[]>(
-    `SELECT words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
-     completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
-     FROM books WHERE id = $1`,
-    [bookId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBBook[]>(
+      `SELECT words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
+       completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
+       FROM books WHERE id = $1`,
+      [bookId]
+    );
 
-  if (result.length === 0) {
-    return {};
-  }
-
-  const row = result[0];
-  const overviewData: OverviewData = {};
-
-  // Parse goals
-  if (row.words_per_day !== undefined || row.chapters_per_week !== undefined) {
-    overviewData.goals = {
-      wordsPerDay: row.words_per_day || 0,
-      chaptersPerWeek: row.chapters_per_week || 0,
-    };
-  }
-
-  // Parse story progress
-  if (
-    row.estimated_arcs !== undefined ||
-    row.estimated_chapters !== undefined ||
-    row.completed_arcs !== undefined ||
-    row.current_arc_progress !== undefined
-  ) {
-    overviewData.storyProgress = {
-      estimatedArcs: row.estimated_arcs || 0,
-      estimatedChapters: row.estimated_chapters || 0,
-      completedArcs: row.completed_arcs || 0,
-      currentArcProgress: row.current_arc_progress || 0,
-    };
-  }
-
-  // Parse sticky notes
-  if (row.sticky_notes) {
-    try {
-      overviewData.stickyNotes = JSON.parse(row.sticky_notes);
-    } catch (e) {
-      console.error("Error parsing sticky notes:", e);
-      overviewData.stickyNotes = [];
+    if (result.length === 0) {
+      return {};
     }
-  }
 
-  // Parse checklist items
-  if (row.checklist_items) {
-    try {
-      overviewData.checklistItems = JSON.parse(row.checklist_items);
-    } catch (e) {
-      console.error("Error parsing checklist items:", e);
-      overviewData.checklistItems = [];
+    const row = result[0];
+    const overviewData: OverviewData = {};
+
+    // Parse goals
+    if (row.words_per_day !== undefined || row.chapters_per_week !== undefined) {
+      overviewData.goals = {
+        wordsPerDay: row.words_per_day || 0,
+        chaptersPerWeek: row.chapters_per_week || 0,
+      };
     }
-  }
 
-  // Parse sections config
-  if (row.sections_config) {
-    try {
-      overviewData.sectionsConfig = JSON.parse(row.sections_config);
-    } catch (e) {
-      console.error("Error parsing sections config:", e);
-      overviewData.sectionsConfig = [];
+    // Parse story progress
+    if (
+      row.estimated_arcs !== undefined ||
+      row.estimated_chapters !== undefined ||
+      row.completed_arcs !== undefined ||
+      row.current_arc_progress !== undefined
+    ) {
+      overviewData.storyProgress = {
+        estimatedArcs: row.estimated_arcs || 0,
+        estimatedChapters: row.estimated_chapters || 0,
+        completedArcs: row.completed_arcs || 0,
+        currentArcProgress: row.current_arc_progress || 0,
+      };
     }
-  }
 
-  return overviewData;
+    // Parse sticky notes
+    if (row.sticky_notes) {
+      try {
+        overviewData.stickyNotes = JSON.parse(row.sticky_notes);
+      } catch (e) {
+        console.error("Error parsing sticky notes:", e);
+        overviewData.stickyNotes = [];
+      }
+    }
+
+    // Parse checklist items
+    if (row.checklist_items) {
+      try {
+        overviewData.checklistItems = JSON.parse(row.checklist_items);
+      } catch (e) {
+        console.error("Error parsing checklist items:", e);
+        overviewData.checklistItems = [];
+      }
+    }
+
+    // Parse sections config
+    if (row.sections_config) {
+      try {
+        overviewData.sectionsConfig = JSON.parse(row.sections_config);
+      } catch (e) {
+        console.error("Error parsing sections config:", e);
+        overviewData.sectionsConfig = [];
+      }
+    }
+
+    return overviewData;
+  }, 'getOverviewData');
 }
 
 // Tabs configuration
@@ -398,32 +399,36 @@ export interface TabConfig {
 }
 
 export async function getTabsConfig(bookId: string): Promise<TabConfig[]> {
-  const db = await getDB();
-  const result = await db.select<DBBook[]>(
-    `SELECT tabs_config FROM books WHERE id = $1`,
-    [bookId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBBook[]>(
+      `SELECT tabs_config FROM books WHERE id = $1`,
+      [bookId]
+    );
 
-  if (result.length === 0 || !result[0].tabs_config) {
-    return []; // Return empty array, dashboard will use defaults
-  }
+    if (result.length === 0 || !result[0].tabs_config) {
+      return []; // Return empty array, dashboard will use defaults
+    }
 
-  try {
-    return JSON.parse(result[0].tabs_config);
-  } catch (e) {
-    console.error("Error parsing tabs config:", e);
-    return [];
-  }
+    try {
+      return JSON.parse(result[0].tabs_config);
+    } catch (e) {
+      console.error("Error parsing tabs config:", e);
+      return [];
+    }
+  }, 'getTabsConfig');
 }
 
 export async function updateTabsConfig(
   bookId: string,
   tabs: TabConfig[]
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
-  await db.execute(
-    "UPDATE books SET tabs_config = $1, updated_at = $2 WHERE id = $3",
-    [JSON.stringify(tabs), now, bookId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
+    await db.execute(
+      "UPDATE books SET tabs_config = $1, updated_at = $2 WHERE id = $3",
+      [JSON.stringify(tabs), now, bookId]
+    );
+  }, 'updateTabsConfig');
 }

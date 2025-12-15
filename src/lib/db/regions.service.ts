@@ -6,6 +6,7 @@ import {
 } from "@/pages/dashboard/tabs/world/types/region-types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 /**
  * Database representation of a region (snake_case)
@@ -144,24 +145,28 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
  * Get all regions for a book
  */
 export async function getRegionsByBookId(bookId: string): Promise<IRegion[]> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegion[]>(
     "SELECT * FROM regions WHERE book_id = $1 ORDER BY order_index DESC, created_at DESC",
     [bookId]
   );
   return result.map(dbRegionToRegion);
+}, 'getRegionsByBookId');
 }
 
 /**
  * Get a single region by ID
  */
 export async function getRegionById(id: string): Promise<IRegion | null> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegion[]>(
     "SELECT * FROM regions WHERE id = $1",
     [id]
   );
   return result.length > 0 ? dbRegionToRegion(result[0]) : null;
+}, 'getRegionById');
 }
 
 /**
@@ -170,6 +175,7 @@ export async function getRegionById(id: string): Promise<IRegion | null> {
 export async function createRegion(
   region: Omit<IRegion, "id" | "createdAt" | "updatedAt" | "orderIndex">
 ): Promise<IRegion> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
   const id = crypto.randomUUID();
@@ -243,6 +249,7 @@ export async function createRegion(
   );
 
   return newRegion;
+}, 'createRegion');
 }
 
 /**
@@ -252,6 +259,7 @@ export async function updateRegion(
   id: string,
   updates: Partial<Omit<IRegion, "id" | "bookId" | "createdAt">>
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -329,14 +337,17 @@ export async function updateRegion(
       id,
     ]
   );
+}, 'updateRegion');
 }
 
 /**
  * Delete a region
  */
 export async function deleteRegion(id: string): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   await db.execute("DELETE FROM regions WHERE id = $1", [id]);
+}, 'deleteRegion');
 }
 
 /**
@@ -346,6 +357,7 @@ export async function updateParentRegion(
   regionId: string,
   newParentId: string | null
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -361,6 +373,7 @@ export async function updateParentRegion(
     "UPDATE regions SET parent_id = $1, updated_at = $2 WHERE id = $3",
     [newParentId, now, regionId]
   );
+}, 'updateParentRegion');
 }
 
 /**
@@ -404,6 +417,7 @@ async function checkCircularHierarchy(
 export async function getRegionHierarchy(
   bookId: string
 ): Promise<IRegionWithChildren[]> {
+  return safeDBOperation(async () => {
   const regions = await getRegionsByBookId(bookId);
 
   // Build a map for quick lookup
@@ -446,6 +460,7 @@ export async function getRegionHierarchy(
   sortByOrderIndex(rootRegions);
 
   return rootRegions;
+}, 'getRegionHierarchy');
 }
 
 /**
@@ -476,6 +491,7 @@ interface DBRegionVersion {
 export async function getRegionVersions(
   regionId: string
 ): Promise<IRegionVersion[]> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegionVersion[]>(
     "SELECT * FROM region_versions WHERE region_id = $1 ORDER BY is_main DESC, created_at ASC",
@@ -490,6 +506,7 @@ export async function getRegionVersions(
     isMain: dbVersion.is_main === 1,
     regionData: JSON.parse(dbVersion.region_data),
   }));
+}, 'getRegionVersions');
 }
 
 /**
@@ -499,6 +516,7 @@ export async function createRegionVersion(
   regionId: string,
   version: IRegionVersion
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   await db.execute(
     `INSERT INTO region_versions (
@@ -516,16 +534,19 @@ export async function createRegionVersion(
       JSON.stringify(version.regionData),
     ]
   );
+}, 'createRegionVersion');
 }
 
 /**
  * Delete a region version
  */
 export async function deleteRegionVersion(versionId: string): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
 
   // Delete the version
   await db.execute("DELETE FROM region_versions WHERE id = $1", [versionId]);
+}, 'deleteRegionVersion');
 }
 
 /**
@@ -536,11 +557,13 @@ export async function updateRegionVersion(
   name: string,
   description?: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   await db.execute(
     "UPDATE region_versions SET name = $1, description = $2 WHERE id = $3",
     [name, description, versionId]
   );
+}, 'updateRegionVersion');
 }
 
 /**
@@ -550,11 +573,13 @@ export async function updateRegionVersionData(
   versionId: string,
   regionData: IRegionFormData
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   await db.execute(
     "UPDATE region_versions SET region_data = $1 WHERE id = $2",
     [JSON.stringify(regionData), versionId]
   );
+}, 'updateRegionVersionData');
 }
 
 /**
@@ -565,6 +590,7 @@ export async function reorderRegions(
   regionIds: string[],
   _parentId: string | null
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -575,6 +601,7 @@ export async function reorderRegions(
       [i, now, regionIds[i]]
     );
   }
+}, 'reorderRegions');
 }
 
 /**
@@ -586,6 +613,7 @@ export async function moveRegion(
   newParentId: string | null,
   newOrderIndex?: number
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -620,6 +648,7 @@ export async function moveRegion(
     "UPDATE regions SET parent_id = $1, order_index = $2, updated_at = $3 WHERE id = $4",
     [newParentId, orderIndex, now, regionId]
   );
+}, 'moveRegion');
 }
 
 /**
@@ -678,6 +707,7 @@ interface DBTimelineEra {
 export async function getRegionVersionTimeline(
   versionId: string
 ): Promise<ITimelineEra[]> {
+  return safeDBOperation(async () => {
   const db = await getDB();
 
   // Get all eras for this version
@@ -720,6 +750,7 @@ export async function getRegionVersionTimeline(
   }
 
   return timeline;
+}, 'getRegionVersionTimeline');
 }
 
 /**
@@ -729,6 +760,7 @@ export async function saveRegionVersionTimeline(
   versionId: string,
   timeline: ITimelineEra[]
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
 
   // Delete existing timeline for this version
@@ -775,4 +807,5 @@ export async function saveRegionVersionTimeline(
       );
     }
   }
+}, 'saveRegionVersionTimeline');
 }

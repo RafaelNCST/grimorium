@@ -7,6 +7,7 @@ import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import { DBRace, DBRaceVersion, DBRaceRelationship } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // Convert IRace to DBRace
 function raceToDBRace(bookId: string, race: IRace): DBRace {
@@ -98,219 +99,235 @@ function dbRaceToRace(dbRace: DBRace): IRace {
 }
 
 export async function getRacesByBookId(bookId: string): Promise<IRace[]> {
-  const db = await getDB();
-  const result = await db.select<DBRace[]>(
-    "SELECT * FROM races WHERE book_id = $1 ORDER BY created_at DESC",
-    [bookId]
-  );
-  return result.map(dbRaceToRace);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBRace[]>(
+      "SELECT * FROM races WHERE book_id = $1 ORDER BY created_at DESC",
+      [bookId]
+    );
+    return result.map(dbRaceToRace);
+  }, 'getRacesByBookId');
 }
 
 export async function getRaceById(id: string): Promise<IRace | null> {
-  const db = await getDB();
-  const result = await db.select<DBRace[]>(
-    "SELECT * FROM races WHERE id = $1",
-    [id]
-  );
-  return result.length > 0 ? dbRaceToRace(result[0]) : null;
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBRace[]>(
+      "SELECT * FROM races WHERE id = $1",
+      [id]
+    );
+    return result.length > 0 ? dbRaceToRace(result[0]) : null;
+  }, 'getRaceById');
 }
 
 export async function createRace(bookId: string, race: IRace): Promise<void> {
-  const db = await getDB();
-  const dbRace = raceToDBRace(bookId, race);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const dbRace = raceToDBRace(bookId, race);
 
-  await db.execute(
-    `INSERT INTO races (
-      id, book_id, group_id, name, domain, summary, image, scientific_name,
-      alternative_names, cultural_notes,
-      general_appearance, life_expectancy, average_height, average_weight,
-      special_physical_characteristics,
-      habits, reproductive_cycle, other_reproductive_cycle_description, diet, elemental_diet, communication,
-      other_communication, moral_tendency, social_organization, habitat,
-      physical_capacity, special_characteristics, weaknesses,
-      story_motivation, inspirations,
-      field_visibility, created_at, updated_at
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-      $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-      $29, $30, $31, $32, $33
-    )`,
-    [
-      dbRace.id,
-      dbRace.book_id,
-      dbRace.group_id,
-      dbRace.name,
-      dbRace.domain,
-      dbRace.summary,
-      dbRace.image,
-      dbRace.scientific_name,
-      dbRace.alternative_names,
-      dbRace.cultural_notes,
-      dbRace.general_appearance,
-      dbRace.life_expectancy,
-      dbRace.average_height,
-      dbRace.average_weight,
-      dbRace.special_physical_characteristics,
-      dbRace.habits,
-      dbRace.reproductive_cycle,
-      dbRace.other_reproductive_cycle_description,
-      dbRace.diet,
-      dbRace.elemental_diet,
-      dbRace.communication,
-      dbRace.other_communication,
-      dbRace.moral_tendency,
-      dbRace.social_organization,
-      dbRace.habitat,
-      dbRace.physical_capacity,
-      dbRace.special_characteristics,
-      dbRace.weaknesses,
-      dbRace.story_motivation,
-      dbRace.inspirations,
-      dbRace.field_visibility,
-      dbRace.created_at,
-      dbRace.updated_at,
-    ]
-  );
+    await db.execute(
+      `INSERT INTO races (
+        id, book_id, group_id, name, domain, summary, image, scientific_name,
+        alternative_names, cultural_notes,
+        general_appearance, life_expectancy, average_height, average_weight,
+        special_physical_characteristics,
+        habits, reproductive_cycle, other_reproductive_cycle_description, diet, elemental_diet, communication,
+        other_communication, moral_tendency, social_organization, habitat,
+        physical_capacity, special_characteristics, weaknesses,
+        story_motivation, inspirations,
+        field_visibility, created_at, updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+        $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
+        $29, $30, $31, $32, $33
+      )`,
+      [
+        dbRace.id,
+        dbRace.book_id,
+        dbRace.group_id,
+        dbRace.name,
+        dbRace.domain,
+        dbRace.summary,
+        dbRace.image,
+        dbRace.scientific_name,
+        dbRace.alternative_names,
+        dbRace.cultural_notes,
+        dbRace.general_appearance,
+        dbRace.life_expectancy,
+        dbRace.average_height,
+        dbRace.average_weight,
+        dbRace.special_physical_characteristics,
+        dbRace.habits,
+        dbRace.reproductive_cycle,
+        dbRace.other_reproductive_cycle_description,
+        dbRace.diet,
+        dbRace.elemental_diet,
+        dbRace.communication,
+        dbRace.other_communication,
+        dbRace.moral_tendency,
+        dbRace.social_organization,
+        dbRace.habitat,
+        dbRace.physical_capacity,
+        dbRace.special_characteristics,
+        dbRace.weaknesses,
+        dbRace.story_motivation,
+        dbRace.inspirations,
+        dbRace.field_visibility,
+        dbRace.created_at,
+        dbRace.updated_at,
+      ]
+    );
+  }, 'createRace');
 }
 
 export async function updateRace(
   id: string,
   updates: Partial<IRace>
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  // Get current race to preserve existing data
-  const current = await db.select<DBRace[]>(
-    "SELECT * FROM races WHERE id = $1",
-    [id]
-  );
+    // Get current race to preserve existing data
+    const current = await db.select<DBRace[]>(
+      "SELECT * FROM races WHERE id = $1",
+      [id]
+    );
 
-  if (current.length === 0) {
-    throw new Error("Race not found");
-  }
+    if (current.length === 0) {
+      throw new Error("Race not found");
+    }
 
-  // Convert current DB race to IRace to preserve existing values
-  const currentRace = dbRaceToRace(current[0]);
+    // Convert current DB race to IRace to preserve existing values
+    const currentRace = dbRaceToRace(current[0]);
 
-  // Merge updates with current race, preserving existing values
-  const fullRace: IRace = {
-    ...currentRace,
-    ...updates,
-    id, // Ensure ID is preserved
-  };
+    // Merge updates with current race, preserving existing values
+    const fullRace: IRace = {
+      ...currentRace,
+      ...updates,
+      id, // Ensure ID is preserved
+    };
 
-  const dbRace = raceToDBRace(current[0].book_id, fullRace);
-  dbRace.updated_at = now;
+    const dbRace = raceToDBRace(current[0].book_id, fullRace);
+    dbRace.updated_at = now;
 
-  await db.execute(
-    `UPDATE races SET
-      group_id = $1, name = $2, domain = $3, summary = $4, image = $5, scientific_name = $6,
-      alternative_names = $7, cultural_notes = $8,
-      general_appearance = $9, life_expectancy = $10, average_height = $11,
-      average_weight = $12, special_physical_characteristics = $13,
-      habits = $14, reproductive_cycle = $15, other_reproductive_cycle_description = $16, diet = $17, elemental_diet = $18,
-      communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
-      habitat = $23, physical_capacity = $24, special_characteristics = $25,
-      weaknesses = $26, story_motivation = $27, inspirations = $28,
-      field_visibility = $29, updated_at = $30
-    WHERE id = $31`,
-    [
-      dbRace.group_id,
-      dbRace.name,
-      dbRace.domain,
-      dbRace.summary,
-      dbRace.image,
-      dbRace.scientific_name,
-      dbRace.alternative_names,
-      dbRace.cultural_notes,
-      dbRace.general_appearance,
-      dbRace.life_expectancy,
-      dbRace.average_height,
-      dbRace.average_weight,
-      dbRace.special_physical_characteristics,
-      dbRace.habits,
-      dbRace.reproductive_cycle,
-      dbRace.other_reproductive_cycle_description,
-      dbRace.diet,
-      dbRace.elemental_diet,
-      dbRace.communication,
-      dbRace.other_communication,
-      dbRace.moral_tendency,
-      dbRace.social_organization,
-      dbRace.habitat,
-      dbRace.physical_capacity,
-      dbRace.special_characteristics,
-      dbRace.weaknesses,
-      dbRace.story_motivation,
-      dbRace.inspirations,
-      dbRace.field_visibility,
-      dbRace.updated_at,
-      id,
-    ]
-  );
+    await db.execute(
+      `UPDATE races SET
+        group_id = $1, name = $2, domain = $3, summary = $4, image = $5, scientific_name = $6,
+        alternative_names = $7, cultural_notes = $8,
+        general_appearance = $9, life_expectancy = $10, average_height = $11,
+        average_weight = $12, special_physical_characteristics = $13,
+        habits = $14, reproductive_cycle = $15, other_reproductive_cycle_description = $16, diet = $17, elemental_diet = $18,
+        communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
+        habitat = $23, physical_capacity = $24, special_characteristics = $25,
+        weaknesses = $26, story_motivation = $27, inspirations = $28,
+        field_visibility = $29, updated_at = $30
+      WHERE id = $31`,
+      [
+        dbRace.group_id,
+        dbRace.name,
+        dbRace.domain,
+        dbRace.summary,
+        dbRace.image,
+        dbRace.scientific_name,
+        dbRace.alternative_names,
+        dbRace.cultural_notes,
+        dbRace.general_appearance,
+        dbRace.life_expectancy,
+        dbRace.average_height,
+        dbRace.average_weight,
+        dbRace.special_physical_characteristics,
+        dbRace.habits,
+        dbRace.reproductive_cycle,
+        dbRace.other_reproductive_cycle_description,
+        dbRace.diet,
+        dbRace.elemental_diet,
+        dbRace.communication,
+        dbRace.other_communication,
+        dbRace.moral_tendency,
+        dbRace.social_organization,
+        dbRace.habitat,
+        dbRace.physical_capacity,
+        dbRace.special_characteristics,
+        dbRace.weaknesses,
+        dbRace.story_motivation,
+        dbRace.inspirations,
+        dbRace.field_visibility,
+        dbRace.updated_at,
+        id,
+      ]
+    );
+  }, 'updateRace');
 }
 
 export async function deleteRace(id: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM races WHERE id = $1", [id]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM races WHERE id = $1", [id]);
+  }, 'deleteRace');
 }
 
 // Race Versions
 export async function getRaceVersions(raceId: string): Promise<IRaceVersion[]> {
-  const db = await getDB();
-  const result = await db.select<DBRaceVersion[]>(
-    "SELECT * FROM race_versions WHERE race_id = $1 ORDER BY created_at DESC",
-    [raceId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBRaceVersion[]>(
+      "SELECT * FROM race_versions WHERE race_id = $1 ORDER BY created_at DESC",
+      [raceId]
+    );
 
-  return result.map((v) => {
-    const parsedData = v.race_data ? JSON.parse(v.race_data) : {};
-    // Extrair _relationships do JSON e separar
-    const { _relationships, ...raceData } = parsedData;
-    return {
-      id: v.id,
-      name: v.name,
-      description: v.description || "",
-      createdAt: new Date(v.created_at).toISOString(),
-      isMain: v.is_main === 1,
-      raceData: raceData as IRace,
-      relationships: _relationships || [],
-    };
-  });
+    return result.map((v) => {
+      const parsedData = v.race_data ? JSON.parse(v.race_data) : {};
+      // Extrair _relationships do JSON e separar
+      const { _relationships, ...raceData } = parsedData;
+      return {
+        id: v.id,
+        name: v.name,
+        description: v.description || "",
+        createdAt: new Date(v.created_at).toISOString(),
+        isMain: v.is_main === 1,
+        raceData: raceData as IRace,
+        relationships: _relationships || [],
+      };
+    });
+  }, 'getRaceVersions');
 }
 
 export async function createRaceVersion(
   raceId: string,
   version: IRaceVersion
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Armazenar raceData e relationships juntos
-  const dataToStore = {
-    ...version.raceData,
-    _relationships: version.relationships || [],
-  };
+    // Armazenar raceData e relationships juntos
+    const dataToStore = {
+      ...version.raceData,
+      _relationships: version.relationships || [],
+    };
 
-  await db.execute(
-    `INSERT INTO race_versions (
-      id, race_id, name, description, is_main, race_data, created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [
-      version.id,
-      raceId,
-      version.name,
-      version.description,
-      version.isMain ? 1 : 0,
-      JSON.stringify(dataToStore),
-      Date.now(),
-    ]
-  );
+    await db.execute(
+      `INSERT INTO race_versions (
+        id, race_id, name, description, is_main, race_data, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        version.id,
+        raceId,
+        version.name,
+        version.description,
+        version.isMain ? 1 : 0,
+        JSON.stringify(dataToStore),
+        Date.now(),
+      ]
+    );
+  }, 'createRaceVersion');
 }
 
 export async function deleteRaceVersion(versionId: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM race_versions WHERE id = $1", [versionId]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM race_versions WHERE id = $1", [versionId]);
+  }, 'deleteRaceVersion');
 }
 
 export async function updateRaceVersion(
@@ -318,11 +335,13 @@ export async function updateRaceVersion(
   name: string,
   description?: string
 ): Promise<void> {
-  const db = await getDB();
-  await db.execute(
-    "UPDATE race_versions SET name = $1, description = $2 WHERE id = $3",
-    [name, description, versionId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute(
+      "UPDATE race_versions SET name = $1, description = $2 WHERE id = $3",
+      [name, description, versionId]
+    );
+  }, 'updateRaceVersion');
 }
 
 export async function updateRaceVersionData(
@@ -330,54 +349,60 @@ export async function updateRaceVersionData(
   raceData: IRace,
   relationships?: IRaceRelationship[]
 ): Promise<void> {
-  const db = await getDB();
-  // Armazenar raceData e relationships juntos no campo race_data
-  const dataToStore = {
-    ...raceData,
-    _relationships: relationships || [],
-  };
-  await db.execute("UPDATE race_versions SET race_data = $1 WHERE id = $2", [
-    JSON.stringify(dataToStore),
-    versionId,
-  ]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    // Armazenar raceData e relationships juntos no campo race_data
+    const dataToStore = {
+      ...raceData,
+      _relationships: relationships || [],
+    };
+    await db.execute("UPDATE race_versions SET race_data = $1 WHERE id = $2", [
+      JSON.stringify(dataToStore),
+      versionId,
+    ]);
+  }, 'updateRaceVersionData');
 }
 
 // Race Relationships
 export async function getRaceRelationships(
   raceId: string
 ): Promise<IRaceRelationship[]> {
-  const db = await getDB();
-  const result = await db.select<DBRaceRelationship[]>(
-    "SELECT * FROM race_relationships WHERE race_id = $1",
-    [raceId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBRaceRelationship[]>(
+      "SELECT * FROM race_relationships WHERE race_id = $1",
+      [raceId]
+    );
 
-  return result.map((rel) => ({
-    id: rel.id,
-    raceId: rel.related_race_id,
-    type: rel.type as IRaceRelationship["type"],
-    description: rel.description,
-  }));
+    return result.map((rel) => ({
+      id: rel.id,
+      raceId: rel.related_race_id,
+      type: rel.type as IRaceRelationship["type"],
+      description: rel.description,
+    }));
+  }, 'getRaceRelationships');
 }
 
 export async function saveRaceRelationships(
   raceId: string,
   relationships: IRaceRelationship[]
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Delete existing relationships
-  await db.execute("DELETE FROM race_relationships WHERE race_id = $1", [
-    raceId,
-  ]);
+    // Delete existing relationships
+    await db.execute("DELETE FROM race_relationships WHERE race_id = $1", [
+      raceId,
+    ]);
 
-  // Insert new relationships
-  for (const rel of relationships) {
-    const relId = `${raceId}-${rel.raceId}-${rel.type}-${Date.now()}`;
-    await db.execute(
-      `INSERT INTO race_relationships (id, race_id, related_race_id, type, description, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [relId, raceId, rel.raceId, rel.type, rel.description || null, Date.now()]
-    );
-  }
+    // Insert new relationships
+    for (const rel of relationships) {
+      const relId = `${raceId}-${rel.raceId}-${rel.type}-${Date.now()}`;
+      await db.execute(
+        `INSERT INTO race_relationships (id, race_id, related_race_id, type, description, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [relId, raceId, rel.raceId, rel.type, rel.description || null, Date.now()]
+      );
+    }
+  }, 'saveRaceRelationships');
 }

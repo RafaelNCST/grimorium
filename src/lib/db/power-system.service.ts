@@ -19,6 +19,7 @@ import {
 } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // ============================================================================
 // CONVERSION FUNCTIONS
@@ -107,6 +108,7 @@ function dbPowerCharacterLinkToPowerCharacterLink(
 export async function getPowerSystemsByBookId(
   bookId: string
 ): Promise<IPowerSystem[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerSystem[]>(
@@ -118,11 +120,13 @@ export async function getPowerSystemsByBookId(
     console.error("Error fetching power systems:", error);
     throw error;
   }
+}, 'getPowerSystemsByBookId');
 }
 
 export async function getPowerSystemById(
   systemId: string
 ): Promise<IPowerSystem | null> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerSystem[]>(
@@ -134,6 +138,7 @@ export async function getPowerSystemById(
     console.error("Error fetching power system:", error);
     throw error;
   }
+}, 'getPowerSystemById');
 }
 
 export async function createPowerSystem(
@@ -141,6 +146,7 @@ export async function createPowerSystem(
   name: string,
   iconImage?: string
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -157,6 +163,7 @@ export async function createPowerSystem(
     console.error("Error creating power system:", error);
     throw error;
   }
+}, 'createPowerSystem');
 }
 
 export async function updatePowerSystem(
@@ -164,6 +171,7 @@ export async function updatePowerSystem(
   name: string,
   iconImage?: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -176,9 +184,11 @@ export async function updatePowerSystem(
     console.error("Error updating power system:", error);
     throw error;
   }
+}, 'updatePowerSystem');
 }
 
 export async function deletePowerSystem(systemId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -223,6 +233,7 @@ export async function deletePowerSystem(systemId: string): Promise<void> {
     console.error("Error deleting power system:", error);
     throw error;
   }
+}, 'deletePowerSystem');
 }
 
 // ============================================================================
@@ -232,6 +243,7 @@ export async function deletePowerSystem(systemId: string): Promise<void> {
 export async function getPowerGroupsBySystemId(
   systemId: string
 ): Promise<IPowerGroup[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerGroup[]>(
@@ -243,6 +255,7 @@ export async function getPowerGroupsBySystemId(
     console.error("Error fetching power groups:", error);
     throw error;
   }
+}, 'getPowerGroupsBySystemId');
 }
 
 export async function createPowerGroup(
@@ -250,6 +263,7 @@ export async function createPowerGroup(
   name: string,
   orderIndex: number
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -266,12 +280,14 @@ export async function createPowerGroup(
     console.error("Error creating power group:", error);
     throw error;
   }
+}, 'createPowerGroup');
 }
 
 export async function updatePowerGroup(
   groupId: string,
   name: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -283,9 +299,11 @@ export async function updatePowerGroup(
     console.error("Error updating power group:", error);
     throw error;
   }
+}, 'updatePowerGroup');
 }
 
 export async function deletePowerGroup(groupId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -301,9 +319,11 @@ export async function deletePowerGroup(groupId: string): Promise<void> {
     console.error("Error deleting power group:", error);
     throw error;
   }
+}, 'deletePowerGroup');
 }
 
 export async function reorderPowerGroups(groupIds: string[]): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -318,6 +338,7 @@ export async function reorderPowerGroups(groupIds: string[]): Promise<void> {
     console.error("Error reordering power groups:", error);
     throw error;
   }
+}, 'reorderPowerGroups');
 }
 
 // ============================================================================
@@ -327,6 +348,7 @@ export async function reorderPowerGroups(groupIds: string[]): Promise<void> {
 export async function getPowerPagesBySystemId(
   systemId: string
 ): Promise<IPowerPage[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerPage[]>(
@@ -338,11 +360,13 @@ export async function getPowerPagesBySystemId(
     console.error("Error fetching power pages:", error);
     throw error;
   }
+}, 'getPowerPagesBySystemId');
 }
 
 export async function getPowerPageById(
   pageId: string
 ): Promise<IPowerPage | null> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerPage[]>(
@@ -354,6 +378,7 @@ export async function getPowerPageById(
     console.error("Error fetching power page:", error);
     throw error;
   }
+}, 'getPowerPageById');
 }
 
 export async function createPowerPage(
@@ -362,6 +387,7 @@ export async function createPowerPage(
   groupId: string | undefined,
   orderIndex: number
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -378,12 +404,14 @@ export async function createPowerPage(
     console.error("Error creating power page:", error);
     throw error;
   }
+}, 'createPowerPage');
 }
 
 export async function updatePowerPage(
   pageId: string,
   name: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -396,12 +424,14 @@ export async function updatePowerPage(
     console.error("Error updating power page:", error);
     throw error;
   }
+}, 'updatePowerPage');
 }
 
 export async function movePowerPage(
   pageId: string,
   newGroupId: string | undefined
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -414,9 +444,11 @@ export async function movePowerPage(
     console.error("Error moving power page:", error);
     throw error;
   }
+}, 'movePowerPage');
 }
 
 export async function deletePowerPage(pageId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -442,9 +474,11 @@ export async function deletePowerPage(pageId: string): Promise<void> {
     console.error("Error deleting power page:", error);
     throw error;
   }
+}, 'deletePowerPage');
 }
 
 export async function reorderPowerPages(pageIds: string[]): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -459,9 +493,11 @@ export async function reorderPowerPages(pageIds: string[]): Promise<void> {
     console.error("Error reordering power pages:", error);
     throw error;
   }
+}, 'reorderPowerPages');
 }
 
 export async function duplicatePowerPage(pageId: string): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -583,6 +619,7 @@ export async function duplicatePowerPage(pageId: string): Promise<string> {
     console.error("Error duplicating power page:", error);
     throw error;
   }
+}, 'duplicatePowerPage');
 }
 
 // ============================================================================
@@ -592,6 +629,7 @@ export async function duplicatePowerPage(pageId: string): Promise<string> {
 export async function getPowerSectionsByPageId(
   pageId: string
 ): Promise<IPowerSection[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerSection[]>(
@@ -603,11 +641,13 @@ export async function getPowerSectionsByPageId(
     console.error("Error fetching power sections:", error);
     throw error;
   }
+}, 'getPowerSectionsByPageId');
 }
 
 export async function getPowerSectionById(
   sectionId: string
 ): Promise<IPowerSection | null> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerSection[]>(
@@ -619,6 +659,7 @@ export async function getPowerSectionById(
     console.error("Error fetching power section:", error);
     throw error;
   }
+}, 'getPowerSectionById');
 }
 
 export async function createPowerSection(
@@ -626,6 +667,7 @@ export async function createPowerSection(
   title: string,
   orderIndex: number
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -642,12 +684,14 @@ export async function createPowerSection(
     console.error("Error creating power section:", error);
     throw error;
   }
+}, 'createPowerSection');
 }
 
 export async function updatePowerSection(
   sectionId: string,
   title: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -660,12 +704,14 @@ export async function updatePowerSection(
     console.error("Error updating power section:", error);
     throw error;
   }
+}, 'updatePowerSection');
 }
 
 export async function toggleSectionCollapse(
   sectionId: string,
   collapsed: boolean
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -678,9 +724,11 @@ export async function toggleSectionCollapse(
     console.error("Error toggling section collapse:", error);
     throw error;
   }
+}, 'toggleSectionCollapse');
 }
 
 export async function deletePowerSection(sectionId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -695,11 +743,13 @@ export async function deletePowerSection(sectionId: string): Promise<void> {
     console.error("Error deleting power section:", error);
     throw error;
   }
+}, 'deletePowerSection');
 }
 
 export async function reorderPowerSections(
   sectionIds: string[]
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -714,6 +764,7 @@ export async function reorderPowerSections(
     console.error("Error reordering power sections:", error);
     throw error;
   }
+}, 'reorderPowerSections');
 }
 
 // ============================================================================
@@ -723,6 +774,7 @@ export async function reorderPowerSections(
 export async function getPowerBlocksBySectionId(
   sectionId: string
 ): Promise<IPowerBlock[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerBlock[]>(
@@ -734,6 +786,7 @@ export async function getPowerBlocksBySectionId(
     console.error("Error fetching power blocks:", error);
     throw error;
   }
+}, 'getPowerBlocksBySectionId');
 }
 
 export async function createPowerBlock(
@@ -742,6 +795,7 @@ export async function createPowerBlock(
   content: BlockContent,
   orderIndex: number
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -758,12 +812,14 @@ export async function createPowerBlock(
     console.error("Error creating power block:", error);
     throw error;
   }
+}, 'createPowerBlock');
 }
 
 export async function updatePowerBlock(
   blockId: string,
   content: BlockContent
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const now = Date.now();
@@ -776,9 +832,11 @@ export async function updatePowerBlock(
     console.error("Error updating power block:", error);
     throw error;
   }
+}, 'updatePowerBlock');
 }
 
 export async function deletePowerBlock(blockId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -787,9 +845,11 @@ export async function deletePowerBlock(blockId: string): Promise<void> {
     console.error("Error deleting power block:", error);
     throw error;
   }
+}, 'deletePowerBlock');
 }
 
 export async function reorderPowerBlocks(blockIds: string[]): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -804,6 +864,7 @@ export async function reorderPowerBlocks(blockIds: string[]): Promise<void> {
     console.error("Error reordering power blocks:", error);
     throw error;
   }
+}, 'reorderPowerBlocks');
 }
 
 // ============================================================================
@@ -813,6 +874,7 @@ export async function reorderPowerBlocks(blockIds: string[]): Promise<void> {
 export async function getPowerLinksByCharacterId(
   characterId: string
 ): Promise<IPowerCharacterLink[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerCharacterLink[]>(
@@ -824,6 +886,7 @@ export async function getPowerLinksByCharacterId(
     console.error("Error fetching power links by character:", error);
     throw error;
   }
+}, 'getPowerLinksByCharacterId');
 }
 
 /**
@@ -890,6 +953,7 @@ export async function getPowerLinksWithTitlesByCharacterId(
 export async function getPowerLinksByPageId(
   pageId: string
 ): Promise<IPowerCharacterLink[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerCharacterLink[]>(
@@ -901,11 +965,13 @@ export async function getPowerLinksByPageId(
     console.error("Error fetching power links by page:", error);
     throw error;
   }
+}, 'getPowerLinksByPageId');
 }
 
 export async function getPowerLinksBySectionId(
   sectionId: string
 ): Promise<IPowerCharacterLink[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerCharacterLink[]>(
@@ -917,6 +983,7 @@ export async function getPowerLinksBySectionId(
     console.error("Error fetching power links by section:", error);
     throw error;
   }
+}, 'getPowerLinksBySectionId');
 }
 
 export async function createPowerCharacterLink(
@@ -925,6 +992,7 @@ export async function createPowerCharacterLink(
   sectionId?: string,
   customLabel?: string
 ): Promise<string> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const id = crypto.randomUUID();
@@ -948,12 +1016,14 @@ export async function createPowerCharacterLink(
     console.error("Error creating power character link:", error);
     throw error;
   }
+}, 'createPowerCharacterLink');
 }
 
 export async function updatePowerCharacterLinkLabel(
   linkId: string,
   customLabel: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -965,9 +1035,11 @@ export async function updatePowerCharacterLinkLabel(
     console.error("Error updating power character link label:", error);
     throw error;
   }
+}, 'updatePowerCharacterLinkLabel');
 }
 
 export async function deletePowerCharacterLink(linkId: string): Promise<void> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -978,11 +1050,13 @@ export async function deletePowerCharacterLink(linkId: string): Promise<void> {
     console.error("Error deleting power character link:", error);
     throw error;
   }
+}, 'deletePowerCharacterLink');
 }
 
 export async function getPowerLinkById(
   linkId: string
 ): Promise<IPowerCharacterLink | null> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
     const result = await db.select<DBPowerCharacterLink[]>(
@@ -996,6 +1070,7 @@ export async function getPowerLinkById(
     console.error("Error fetching power link by ID:", error);
     throw error;
   }
+}, 'getPowerLinkById');
 }
 
 export async function checkPowerLinkExists(
@@ -1003,6 +1078,7 @@ export async function checkPowerLinkExists(
   pageId?: string,
   sectionId?: string
 ): Promise<boolean> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -1025,6 +1101,7 @@ export async function checkPowerLinkExists(
     console.error("Error checking power link existence:", error);
     throw error;
   }
+}, 'checkPowerLinkExists');
 }
 
 /**
@@ -1038,6 +1115,7 @@ export async function checkPowerLinkExists(
 export async function getLinkedCharacterIdsInPageHierarchy(
   pageId: string
 ): Promise<string[]> {
+  return safeDBOperation(async () => {
   try {
     const db = await getDB();
 
@@ -1078,6 +1156,7 @@ export async function getLinkedCharacterIdsInPageHierarchy(
     );
     throw error;
   }
+}, 'getLinkedCharacterIdsInPageHierarchy');
 }
 
 /**
@@ -1092,6 +1171,7 @@ export async function getLinkedCharacterIdsInPageHierarchy(
 export async function getLinkedCharacterIdsInSectionHierarchy(
   sectionId: string
 ): Promise<string[]> {
+  return safeDBOperation(async () => {
   try {
     // Get the section to find its parent page
     const section = await getPowerSectionById(sectionId);
@@ -1108,4 +1188,5 @@ export async function getLinkedCharacterIdsInSectionHierarchy(
     );
     throw error;
   }
+}, 'getLinkedCharacterIdsInSectionHierarchy');
 }

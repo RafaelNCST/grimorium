@@ -3,6 +3,7 @@ import { EntityType, INote, INoteLink, PaperMode } from "@/types/note-types";
 import { DBNote, DBNoteLink } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 import type { JSONContent } from "@tiptap/react";
 
@@ -63,111 +64,121 @@ function dbNoteLinkToNoteLink(dbLink: DBNoteLink): INoteLink {
 
 // Get all notes
 export async function getAllNotes(): Promise<INote[]> {
-  const db = await getDB();
-  const notes = await db.select<DBNote[]>(
-    "SELECT * FROM notes ORDER BY updated_at DESC"
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const notes = await db.select<DBNote[]>(
+      "SELECT * FROM notes ORDER BY updated_at DESC"
+    );
 
-  const notesWithLinks: INote[] = [];
+    const notesWithLinks: INote[] = [];
 
-  for (const dbNote of notes) {
-    const links = await getNoteLinks(dbNote.id);
-    notesWithLinks.push({
-      ...dbNoteToNote(dbNote),
-      links,
-    });
-  }
+    for (const dbNote of notes) {
+      const links = await getNoteLinks(dbNote.id);
+      notesWithLinks.push({
+        ...dbNoteToNote(dbNote),
+        links,
+      });
+    }
 
-  return notesWithLinks;
+    return notesWithLinks;
+  }, 'getAllNotes');
 }
 
 // Get notes by book ID
 export async function getNotesByBookId(bookId: string): Promise<INote[]> {
-  const db = await getDB();
-  const notes = await db.select<DBNote[]>(
-    "SELECT * FROM notes WHERE book_id = $1 ORDER BY updated_at DESC",
-    [bookId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const notes = await db.select<DBNote[]>(
+      "SELECT * FROM notes WHERE book_id = $1 ORDER BY updated_at DESC",
+      [bookId]
+    );
 
-  const notesWithLinks: INote[] = [];
+    const notesWithLinks: INote[] = [];
 
-  for (const dbNote of notes) {
-    const links = await getNoteLinks(dbNote.id);
-    notesWithLinks.push({
-      ...dbNoteToNote(dbNote),
-      links,
-    });
-  }
+    for (const dbNote of notes) {
+      const links = await getNoteLinks(dbNote.id);
+      notesWithLinks.push({
+        ...dbNoteToNote(dbNote),
+        links,
+      });
+    }
 
-  return notesWithLinks;
+    return notesWithLinks;
+  }, 'getNotesByBookId');
 }
 
 // Get note by ID
 export async function getNoteById(id: string): Promise<INote | null> {
-  const db = await getDB();
-  const result = await db.select<DBNote[]>(
-    "SELECT * FROM notes WHERE id = $1",
-    [id]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBNote[]>(
+      "SELECT * FROM notes WHERE id = $1",
+      [id]
+    );
 
-  if (result.length === 0) {
-    return null;
-  }
+    if (result.length === 0) {
+      return null;
+    }
 
-  const links = await getNoteLinks(id);
+    const links = await getNoteLinks(id);
 
-  return {
-    ...dbNoteToNote(result[0]),
-    links,
-  };
+    return {
+      ...dbNoteToNote(result[0]),
+      links,
+    };
+  }, 'getNoteById');
 }
 
 // Get note links
 export async function getNoteLinks(noteId: string): Promise<INoteLink[]> {
-  const db = await getDB();
-  const result = await db.select<DBNoteLink[]>(
-    "SELECT * FROM note_links WHERE note_id = $1",
-    [noteId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBNoteLink[]>(
+      "SELECT * FROM note_links WHERE note_id = $1",
+      [noteId]
+    );
 
-  return result.map(dbNoteLinkToNoteLink);
+    return result.map(dbNoteLinkToNoteLink);
+  }, 'getNoteLinks');
 }
 
 // Create note
 export async function createNote(note: INote): Promise<void> {
-  const db = await getDB();
-  const dbNote = noteToDBNote(note);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const dbNote = noteToDBNote(note);
 
-  await db.execute(
-    `INSERT INTO notes (id, book_id, name, content, paper_mode, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [
-      dbNote.id,
-      dbNote.book_id,
-      dbNote.name,
-      dbNote.content,
-      dbNote.paper_mode,
-      dbNote.created_at,
-      dbNote.updated_at,
-    ]
-  );
-
-  // Insert links
-  for (const link of note.links) {
-    const dbLink = noteLinkToDBNoteLink(note.id, link);
     await db.execute(
-      `INSERT INTO note_links (id, note_id, entity_id, entity_type, book_id, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+      `INSERT INTO notes (id, book_id, name, content, paper_mode, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
-        dbLink.id,
-        dbLink.note_id,
-        dbLink.entity_id,
-        dbLink.entity_type,
-        dbLink.book_id,
-        dbLink.created_at,
+        dbNote.id,
+        dbNote.book_id,
+        dbNote.name,
+        dbNote.content,
+        dbNote.paper_mode,
+        dbNote.created_at,
+        dbNote.updated_at,
       ]
     );
-  }
+
+    // Insert links
+    for (const link of note.links) {
+      const dbLink = noteLinkToDBNoteLink(note.id, link);
+      await db.execute(
+        `INSERT INTO note_links (id, note_id, entity_id, entity_type, book_id, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          dbLink.id,
+          dbLink.note_id,
+          dbLink.entity_id,
+          dbLink.entity_type,
+          dbLink.book_id,
+          dbLink.created_at,
+        ]
+      );
+    }
+  }, 'createNote');
 }
 
 // Update note
@@ -175,37 +186,39 @@ export async function updateNote(
   id: string,
   updates: Partial<Omit<INote, "id" | "createdAt" | "links">>
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  const setClauses: string[] = [];
-  const values: unknown[] = [];
-  let paramIndex = 1;
+    const setClauses: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
 
-  if (updates.name !== undefined) {
-    setClauses.push(`name = $${paramIndex++}`);
-    values.push(updates.name);
-  }
+    if (updates.name !== undefined) {
+      setClauses.push(`name = $${paramIndex++}`);
+      values.push(updates.name);
+    }
 
-  if (updates.content !== undefined) {
-    setClauses.push(`content = $${paramIndex++}`);
-    values.push(JSON.stringify(updates.content));
-  }
+    if (updates.content !== undefined) {
+      setClauses.push(`content = $${paramIndex++}`);
+      values.push(JSON.stringify(updates.content));
+    }
 
-  if (updates.paperMode !== undefined) {
-    setClauses.push(`paper_mode = $${paramIndex++}`);
-    values.push(updates.paperMode);
-  }
+    if (updates.paperMode !== undefined) {
+      setClauses.push(`paper_mode = $${paramIndex++}`);
+      values.push(updates.paperMode);
+    }
 
-  setClauses.push(`updated_at = $${paramIndex++}`);
-  values.push(now);
+    setClauses.push(`updated_at = $${paramIndex++}`);
+    values.push(now);
 
-  values.push(id);
+    values.push(id);
 
-  await db.execute(
-    `UPDATE notes SET ${setClauses.join(", ")} WHERE id = $${paramIndex}`,
-    values
-  );
+    await db.execute(
+      `UPDATE notes SET ${setClauses.join(", ")} WHERE id = $${paramIndex}`,
+      values
+    );
+  }, 'updateNote');
 }
 
 // Update note content (optimized for auto-save)
@@ -213,24 +226,28 @@ export async function updateNoteContent(
   id: string,
   content: JSONContent
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    "UPDATE notes SET content = $1, updated_at = $2 WHERE id = $3",
-    [JSON.stringify(content), now, id]
-  );
+    await db.execute(
+      "UPDATE notes SET content = $1, updated_at = $2 WHERE id = $3",
+      [JSON.stringify(content), now, id]
+    );
+  }, 'updateNoteContent');
 }
 
 // Update note name
 export async function updateNoteName(id: string, name: string): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    "UPDATE notes SET name = $1, updated_at = $2 WHERE id = $3",
-    [name, now, id]
-  );
+    await db.execute(
+      "UPDATE notes SET name = $1, updated_at = $2 WHERE id = $3",
+      [name, now, id]
+    );
+  }, 'updateNoteName');
 }
 
 // Update note paper mode
@@ -238,27 +255,33 @@ export async function updateNotePaperMode(
   id: string,
   paperMode: PaperMode
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  await db.execute(
-    "UPDATE notes SET paper_mode = $1, updated_at = $2 WHERE id = $3",
-    [paperMode, now, id]
-  );
+    await db.execute(
+      "UPDATE notes SET paper_mode = $1, updated_at = $2 WHERE id = $3",
+      [paperMode, now, id]
+    );
+  }, 'updateNotePaperMode');
 }
 
 // Delete note
 export async function deleteNote(id: string): Promise<void> {
-  const db = await getDB();
-  // Links will be deleted automatically due to CASCADE
-  await db.execute("DELETE FROM notes WHERE id = $1", [id]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    // Links will be deleted automatically due to CASCADE
+    await db.execute("DELETE FROM notes WHERE id = $1", [id]);
+  }, 'deleteNote');
 }
 
 // Delete multiple notes
 export async function deleteNotes(ids: string[]): Promise<void> {
-  const db = await getDB();
-  const placeholders = ids.map((_, i) => `$${i + 1}`).join(", ");
-  await db.execute(`DELETE FROM notes WHERE id IN (${placeholders})`, ids);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const placeholders = ids.map((_, i) => `$${i + 1}`).join(", ");
+    await db.execute(`DELETE FROM notes WHERE id IN (${placeholders})`, ids);
+  }, 'deleteNotes');
 }
 
 // Add link to note
@@ -266,65 +289,11 @@ export async function addNoteLink(
   noteId: string,
   link: INoteLink
 ): Promise<void> {
-  const db = await getDB();
-  const dbLink = noteLinkToDBNoteLink(noteId, link);
-  const now = Date.now();
-
-  await db.execute(
-    `INSERT INTO note_links (id, note_id, entity_id, entity_type, book_id, created_at)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
-    [
-      dbLink.id,
-      dbLink.note_id,
-      dbLink.entity_id,
-      dbLink.entity_type,
-      dbLink.book_id,
-      dbLink.created_at,
-    ]
-  );
-
-  // Update note's updated_at
-  await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
-    now,
-    noteId,
-  ]);
-}
-
-// Remove link from note
-export async function removeNoteLink(linkId: string): Promise<void> {
-  const db = await getDB();
-
-  // Get noteId before deleting
-  const result = await db.select<DBNoteLink[]>(
-    "SELECT note_id FROM note_links WHERE id = $1",
-    [linkId]
-  );
-
-  await db.execute("DELETE FROM note_links WHERE id = $1", [linkId]);
-
-  // Update note's updated_at
-  if (result.length > 0) {
-    await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
-      Date.now(),
-      result[0].note_id,
-    ]);
-  }
-}
-
-// Update all links for a note (replace all)
-export async function updateNoteLinks(
-  noteId: string,
-  links: INoteLink[]
-): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
-
-  // Delete existing links
-  await db.execute("DELETE FROM note_links WHERE note_id = $1", [noteId]);
-
-  // Insert new links
-  for (const link of links) {
+  return safeDBOperation(async () => {
+    const db = await getDB();
     const dbLink = noteLinkToDBNoteLink(noteId, link);
+    const now = Date.now();
+
     await db.execute(
       `INSERT INTO note_links (id, note_id, entity_id, entity_type, book_id, created_at)
        VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -337,45 +306,107 @@ export async function updateNoteLinks(
         dbLink.created_at,
       ]
     );
-  }
 
-  // Update note's updated_at
-  await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
-    now,
-    noteId,
-  ]);
+    // Update note's updated_at
+    await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
+      now,
+      noteId,
+    ]);
+  }, 'addNoteLink');
+}
+
+// Remove link from note
+export async function removeNoteLink(linkId: string): Promise<void> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+
+    // Get noteId before deleting
+    const result = await db.select<DBNoteLink[]>(
+      "SELECT note_id FROM note_links WHERE id = $1",
+      [linkId]
+    );
+
+    await db.execute("DELETE FROM note_links WHERE id = $1", [linkId]);
+
+    // Update note's updated_at
+    if (result.length > 0) {
+      await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
+        Date.now(),
+        result[0].note_id,
+      ]);
+    }
+  }, 'removeNoteLink');
+}
+
+// Update all links for a note (replace all)
+export async function updateNoteLinks(
+  noteId: string,
+  links: INoteLink[]
+): Promise<void> {
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
+
+    // Delete existing links
+    await db.execute("DELETE FROM note_links WHERE note_id = $1", [noteId]);
+
+    // Insert new links
+    for (const link of links) {
+      const dbLink = noteLinkToDBNoteLink(noteId, link);
+      await db.execute(
+        `INSERT INTO note_links (id, note_id, entity_id, entity_type, book_id, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          dbLink.id,
+          dbLink.note_id,
+          dbLink.entity_id,
+          dbLink.entity_type,
+          dbLink.book_id,
+          dbLink.created_at,
+        ]
+      );
+    }
+
+    // Update note's updated_at
+    await db.execute("UPDATE notes SET updated_at = $1 WHERE id = $2", [
+      now,
+      noteId,
+    ]);
+  }, 'updateNoteLinks');
 }
 
 // Get notes by entity type filter
 export async function getNotesByEntityTypes(
   entityTypes: EntityType[]
 ): Promise<INote[]> {
-  if (entityTypes.length === 0) {
-    return getAllNotes();
-  }
-
-  const db = await getDB();
-  const placeholders = entityTypes.map((_, i) => `$${i + 1}`).join(", ");
-
-  const noteIds = await db.select<{ note_id: string }[]>(
-    `SELECT DISTINCT note_id FROM note_links WHERE entity_type IN (${placeholders})`,
-    entityTypes
-  );
-
-  if (noteIds.length === 0) {
-    return [];
-  }
-
-  const notes: INote[] = [];
-  for (const { note_id } of noteIds) {
-    const note = await getNoteById(note_id);
-    if (note) {
-      notes.push(note);
+  return safeDBOperation(async () => {
+    if (entityTypes.length === 0) {
+      return getAllNotes();
     }
-  }
 
-  // Sort by updated_at DESC
-  return notes.sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+    const db = await getDB();
+    const placeholders = entityTypes.map((_, i) => `$${i + 1}`).join(", ");
+
+    const noteIds = await db.select<{ note_id: string }[]>(
+      `SELECT DISTINCT note_id FROM note_links WHERE entity_type IN (${placeholders})`,
+      entityTypes
+    );
+
+    if (noteIds.length === 0) {
+      return [];
+    }
+
+    const notes: INote[] = [];
+    for (const { note_id } of noteIds) {
+      const note = await getNoteById(note_id);
+      if (note) {
+        notes.push(note);
+      }
+    }
+
+    // Sort by updated_at DESC
+    return notes.sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  }, 'getNotesByEntityTypes');
 }

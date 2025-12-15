@@ -4,8 +4,10 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { ResetDatabaseButton } from "@/components/dev-tools/reset-database-button";
 import { InboxInitializer } from "@/components/inbox-initializer";
+import { DatabaseErrorModal } from "@/components/modals/database-error-modal";
 import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useErrorModalStore } from "@/stores/error-modal-store";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -22,6 +24,7 @@ declare module "@tanstack/react-router" {
 
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const { isOpen, errorType, hideError } = useErrorModalStore();
 
   if (showSplash) {
     return <SplashScreen onLoadingComplete={() => setShowSplash(false)} />;
@@ -32,6 +35,15 @@ const App = () => {
       <InboxInitializer />
       <RouterProvider router={router} />
       <ResetDatabaseButton />
+
+      {/* Modal global de erro do banco de dados */}
+      {errorType && (
+        <DatabaseErrorModal
+          isOpen={isOpen}
+          errorType={errorType}
+          onClose={hideError}
+        />
+      )}
     </TooltipProvider>
   );
 };

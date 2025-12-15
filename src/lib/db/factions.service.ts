@@ -3,6 +3,7 @@ import { IFaction, IFactionVersion } from "@/types/faction-types";
 import { DBFaction, DBFactionVersion } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 // Convert IFaction to DBFaction
 function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
@@ -190,29 +191,34 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
 }
 
 export async function getFactionsByBookId(bookId: string): Promise<IFaction[]> {
-  const db = await getDB();
-  const result = await db.select<DBFaction[]>(
-    "SELECT * FROM factions WHERE book_id = $1 ORDER BY created_at DESC",
-    [bookId]
-  );
-  return result.map(dbFactionToFaction);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBFaction[]>(
+      "SELECT * FROM factions WHERE book_id = $1 ORDER BY created_at DESC",
+      [bookId]
+    );
+    return result.map(dbFactionToFaction);
+  }, 'getFactionsByBookId');
 }
 
 export async function getFactionById(id: string): Promise<IFaction | null> {
-  const db = await getDB();
-  const result = await db.select<DBFaction[]>(
-    "SELECT * FROM factions WHERE id = $1",
-    [id]
-  );
-  return result.length > 0 ? dbFactionToFaction(result[0]) : null;
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBFaction[]>(
+      "SELECT * FROM factions WHERE id = $1",
+      [id]
+    );
+    return result.length > 0 ? dbFactionToFaction(result[0]) : null;
+  }, 'getFactionById');
 }
 
 export async function createFaction(
   bookId: string,
   faction: IFaction
 ): Promise<void> {
-  const db = await getDB();
-  const dbFaction = factionToDBFaction(bookId, faction);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const dbFaction = factionToDBFaction(bookId, faction);
 
   await db.execute(
     `INSERT INTO factions (
@@ -277,36 +283,38 @@ export async function createFaction(
       dbFaction.created_at,
     ]
   );
+  }, 'createFaction');
 }
 
 export async function updateFaction(
   id: string,
   updates: Partial<IFaction>
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  // Get current faction to preserve existing data
-  const current = await db.select<DBFaction[]>(
-    "SELECT * FROM factions WHERE id = $1",
-    [id]
-  );
+    // Get current faction to preserve existing data
+    const current = await db.select<DBFaction[]>(
+      "SELECT * FROM factions WHERE id = $1",
+      [id]
+    );
 
-  if (current.length === 0) {
-    throw new Error("Faction not found");
-  }
+    if (current.length === 0) {
+      throw new Error("Faction not found");
+    }
 
-  // Convert current DB faction to IFaction to preserve existing values
-  const currentFaction = dbFactionToFaction(current[0]);
+    // Convert current DB faction to IFaction to preserve existing values
+    const currentFaction = dbFactionToFaction(current[0]);
 
-  // Merge updates with current faction, preserving existing values
-  const fullFaction: IFaction = {
-    ...currentFaction,
-    ...updates,
-    id, // Ensure ID is preserved
-    bookId: current[0].book_id, // Ensure bookId is preserved
-  };
+    // Merge updates with current faction, preserving existing values
+    const fullFaction: IFaction = {
+      ...currentFaction,
+      ...updates,
+      id, // Ensure ID is preserved
+      bookId: current[0].book_id, // Ensure bookId is preserved
+    };
 
-  const dbFaction = factionToDBFaction(current[0].book_id, fullFaction);
+    const dbFaction = factionToDBFaction(current[0].book_id, fullFaction);
 
   await db.execute(
     `UPDATE factions SET
@@ -364,58 +372,67 @@ export async function updateFaction(
       id,
     ]
   );
+  }, 'updateFaction');
 }
 
 export async function deleteFaction(id: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM factions WHERE id = $1", [id]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM factions WHERE id = $1", [id]);
+  }, 'deleteFaction');
 }
 
 // Version Management Functions
 export async function getFactionVersions(
   factionId: string
 ): Promise<IFactionVersion[]> {
-  const db = await getDB();
-  const result = await db.select<DBFactionVersion[]>(
-    "SELECT * FROM faction_versions WHERE faction_id = $1 ORDER BY created_at DESC",
-    [factionId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBFactionVersion[]>(
+      "SELECT * FROM faction_versions WHERE faction_id = $1 ORDER BY created_at DESC",
+      [factionId]
+    );
 
-  return result.map((v) => ({
-    id: v.id,
-    name: v.name,
-    description: v.description || "",
-    createdAt: new Date(v.created_at).toISOString(),
-    isMain: v.is_main === 1,
-    factionData: v.faction_data ? JSON.parse(v.faction_data) : ({} as IFaction),
-  }));
+    return result.map((v) => ({
+      id: v.id,
+      name: v.name,
+      description: v.description || "",
+      createdAt: new Date(v.created_at).toISOString(),
+      isMain: v.is_main === 1,
+      factionData: v.faction_data ? JSON.parse(v.faction_data) : ({} as IFaction),
+    }));
+  }, 'getFactionVersions');
 }
 
 export async function createFactionVersion(
   factionId: string,
   version: IFactionVersion
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  await db.execute(
-    `INSERT INTO faction_versions (
-      id, faction_id, name, description, is_main, faction_data, created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [
-      version.id,
-      factionId,
-      version.name,
-      version.description,
-      version.isMain ? 1 : 0,
-      JSON.stringify(version.factionData),
-      Date.now(),
-    ]
-  );
+    await db.execute(
+      `INSERT INTO faction_versions (
+        id, faction_id, name, description, is_main, faction_data, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        version.id,
+        factionId,
+        version.name,
+        version.description,
+        version.isMain ? 1 : 0,
+        JSON.stringify(version.factionData),
+        Date.now(),
+      ]
+    );
+  }, 'createFactionVersion');
 }
 
 export async function deleteFactionVersion(versionId: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM faction_versions WHERE id = $1", [versionId]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM faction_versions WHERE id = $1", [versionId]);
+  }, 'deleteFactionVersion');
 }
 
 export async function updateFactionVersion(
@@ -423,20 +440,24 @@ export async function updateFactionVersion(
   name: string,
   description?: string
 ): Promise<void> {
-  const db = await getDB();
-  await db.execute(
-    "UPDATE faction_versions SET name = $1, description = $2 WHERE id = $3",
-    [name, description, versionId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute(
+      "UPDATE faction_versions SET name = $1, description = $2 WHERE id = $3",
+      [name, description, versionId]
+    );
+  }, 'updateFactionVersion');
 }
 
 export async function updateFactionVersionData(
   versionId: string,
   factionData: IFaction
 ): Promise<void> {
-  const db = await getDB();
-  await db.execute(
-    "UPDATE faction_versions SET faction_data = $1 WHERE id = $2",
-    [JSON.stringify(factionData), versionId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute(
+      "UPDATE faction_versions SET faction_data = $1 WHERE id = $2",
+      [JSON.stringify(factionData), versionId]
+    );
+  }, 'updateFactionVersionData');
 }

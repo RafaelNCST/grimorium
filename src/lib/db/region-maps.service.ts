@@ -7,6 +7,7 @@ import {
 } from "@tauri-apps/plugin-fs";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 /**
  * Region Map Types
@@ -130,6 +131,7 @@ export async function uploadMapImage(
   sourceFilePath: string,
   versionId: string | null = null
 ): Promise<IRegionMap> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -210,6 +212,7 @@ export async function uploadMapImage(
 
     return newMap;
   }
+}, 'uploadMapImage');
 }
 
 /**
@@ -219,6 +222,7 @@ export async function getMapByRegionId(
   regionId: string,
   versionId: string | null = null
 ): Promise<IRegionMap | null> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const query = versionId
     ? "SELECT * FROM region_maps WHERE region_id = $1 AND version_id = $2"
@@ -228,12 +232,14 @@ export async function getMapByRegionId(
   const result = await db.select<DBRegionMap[]>(query, params);
 
   return result.length > 0 ? dbRegionMapToRegionMap(result[0]) : null;
+}, 'getMapByRegionId');
 }
 
 /**
  * Delete map for a region
  */
 export async function deleteMap(regionId: string): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
 
   // Get the map to find the image path
@@ -257,6 +263,7 @@ export async function deleteMap(regionId: string): Promise<void> {
       regionId,
     ]);
   }
+}, 'deleteMap');
 }
 
 /**
@@ -272,6 +279,7 @@ export async function addMarker(
   showLabel: boolean = true,
   scale: number = 1.0
 ): Promise<IRegionMapMarker> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
   const id = crypto.randomUUID();
@@ -309,6 +317,7 @@ export async function addMarker(
   );
 
   return newMarker;
+}, 'addMarker');
 }
 
 /**
@@ -319,6 +328,7 @@ export async function updateMarkerPosition(
   x: number,
   y: number
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -326,6 +336,7 @@ export async function updateMarkerPosition(
     `UPDATE region_map_markers SET position_x = $1, position_y = $2, updated_at = $3 WHERE id = $4`,
     [Math.round(x), Math.round(y), now, markerId]
   );
+}, 'updateMarkerPosition');
 }
 
 /**
@@ -335,6 +346,7 @@ export async function updateMarkerColor(
   markerId: string,
   color: string
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -342,6 +354,7 @@ export async function updateMarkerColor(
     `UPDATE region_map_markers SET color = $1, updated_at = $2 WHERE id = $3`,
     [color, now, markerId]
   );
+}, 'updateMarkerColor');
 }
 
 /**
@@ -351,6 +364,7 @@ export async function updateMarkerLabelVisibility(
   markerId: string,
   showLabel: boolean
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -358,6 +372,7 @@ export async function updateMarkerLabelVisibility(
     `UPDATE region_map_markers SET show_label = $1, updated_at = $2 WHERE id = $3`,
     [showLabel ? 1 : 0, now, markerId]
   );
+}, 'updateMarkerLabelVisibility');
 }
 
 /**
@@ -367,6 +382,7 @@ export async function updateMarkerScale(
   markerId: string,
   scale: number
 ): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const now = Date.now();
 
@@ -374,14 +390,17 @@ export async function updateMarkerScale(
     `UPDATE region_map_markers SET scale = $1, updated_at = $2 WHERE id = $3`,
     [scale, now, markerId]
   );
+}, 'updateMarkerScale');
 }
 
 /**
  * Remove a marker from the map
  */
 export async function removeMarker(markerId: string): Promise<void> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   await db.execute("DELETE FROM region_map_markers WHERE id = $1", [markerId]);
+}, 'removeMarker');
 }
 
 /**
@@ -390,6 +409,7 @@ export async function removeMarker(markerId: string): Promise<void> {
 export async function getMarkersByMapId(
   mapId: string
 ): Promise<IRegionMapMarker[]> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegionMapMarker[]>(
     "SELECT * FROM region_map_markers WHERE map_id = $1",
@@ -397,6 +417,7 @@ export async function getMarkersByMapId(
   );
 
   return result.map(dbMarkerToMarker);
+}, 'getMarkersByMapId');
 }
 
 /**
@@ -405,6 +426,7 @@ export async function getMarkersByMapId(
 export async function getMarkersByRegion(
   parentRegionId: string
 ): Promise<IRegionMapMarker[]> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegionMapMarker[]>(
     "SELECT * FROM region_map_markers WHERE parent_region_id = $1",
@@ -412,6 +434,7 @@ export async function getMarkersByRegion(
   );
 
   return result.map(dbMarkerToMarker);
+}, 'getMarkersByRegion');
 }
 
 /**
@@ -421,6 +444,7 @@ export async function getMarkerByChildRegion(
   mapId: string,
   childRegionId: string
 ): Promise<IRegionMapMarker | null> {
+  return safeDBOperation(async () => {
   const db = await getDB();
   const result = await db.select<DBRegionMapMarker[]>(
     "SELECT * FROM region_map_markers WHERE map_id = $1 AND child_region_id = $2",
@@ -428,6 +452,7 @@ export async function getMarkerByChildRegion(
   );
 
   return result.length > 0 ? dbMarkerToMarker(result[0]) : null;
+}, 'getMarkerByChildRegion');
 }
 
 /**
@@ -437,6 +462,8 @@ export async function hasMarker(
   mapId: string,
   childRegionId: string
 ): Promise<boolean> {
+  return safeDBOperation(async () => {
   const marker = await getMarkerByChildRegion(mapId, childRegionId);
   return marker !== null;
+}, 'hasMarker');
 }

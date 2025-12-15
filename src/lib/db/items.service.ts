@@ -1,6 +1,7 @@
 import { DBItem, DBItemVersion } from "./types";
 
 import { getDB } from "./index";
+import { safeDBOperation } from "./safe-db-operation";
 
 export interface IItem {
   id: string;
@@ -96,166 +97,182 @@ function dbItemToItem(dbItem: DBItem): IItem {
 }
 
 export async function getItemsByBookId(bookId: string): Promise<IItem[]> {
-  const db = await getDB();
-  const result = await db.select<DBItem[]>(
-    "SELECT * FROM items WHERE book_id = $1 ORDER BY created_at DESC",
-    [bookId]
-  );
-  return result.map(dbItemToItem);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBItem[]>(
+      "SELECT * FROM items WHERE book_id = $1 ORDER BY created_at DESC",
+      [bookId]
+    );
+    return result.map(dbItemToItem);
+  }, 'getItemsByBookId');
 }
 
 export async function getItemById(id: string): Promise<IItem | null> {
-  const db = await getDB();
-  const result = await db.select<DBItem[]>(
-    "SELECT * FROM items WHERE id = $1",
-    [id]
-  );
-  return result.length > 0 ? dbItemToItem(result[0]) : null;
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBItem[]>(
+      "SELECT * FROM items WHERE id = $1",
+      [id]
+    );
+    return result.length > 0 ? dbItemToItem(result[0]) : null;
+  }, 'getItemById');
 }
 
 export async function createItem(bookId: string, item: IItem): Promise<void> {
-  const db = await getDB();
-  const dbItem = itemToDBItem(bookId, item);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const dbItem = itemToDBItem(bookId, item);
 
-  await db.execute(
-    `INSERT INTO items (
-      id, book_id, name, status, category, custom_category, basic_description, image,
-      appearance, origin, alternative_names, story_rarity, narrative_purpose,
-      usage_requirements, usage_consequences, item_usage, field_visibility, created_at, updated_at
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-    )`,
-    [
-      dbItem.id,
-      dbItem.book_id,
-      dbItem.name,
-      dbItem.status,
-      dbItem.category,
-      dbItem.custom_category,
-      dbItem.basic_description,
-      dbItem.image,
-      dbItem.appearance,
-      dbItem.origin,
-      dbItem.alternative_names,
-      dbItem.story_rarity,
-      dbItem.narrative_purpose,
-      dbItem.usage_requirements,
-      dbItem.usage_consequences,
-      dbItem.item_usage,
-      dbItem.field_visibility,
-      dbItem.created_at,
-      dbItem.updated_at,
-    ]
-  );
+    await db.execute(
+      `INSERT INTO items (
+        id, book_id, name, status, category, custom_category, basic_description, image,
+        appearance, origin, alternative_names, story_rarity, narrative_purpose,
+        usage_requirements, usage_consequences, item_usage, field_visibility, created_at, updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+      )`,
+      [
+        dbItem.id,
+        dbItem.book_id,
+        dbItem.name,
+        dbItem.status,
+        dbItem.category,
+        dbItem.custom_category,
+        dbItem.basic_description,
+        dbItem.image,
+        dbItem.appearance,
+        dbItem.origin,
+        dbItem.alternative_names,
+        dbItem.story_rarity,
+        dbItem.narrative_purpose,
+        dbItem.usage_requirements,
+        dbItem.usage_consequences,
+        dbItem.item_usage,
+        dbItem.field_visibility,
+        dbItem.created_at,
+        dbItem.updated_at,
+      ]
+    );
+  }, 'createItem');
 }
 
 export async function updateItem(
   id: string,
   updates: Partial<IItem>
 ): Promise<void> {
-  const db = await getDB();
-  const now = Date.now();
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const now = Date.now();
 
-  // Get current item to preserve existing data
-  const current = await db.select<DBItem[]>(
-    "SELECT * FROM items WHERE id = $1",
-    [id]
-  );
+    // Get current item to preserve existing data
+    const current = await db.select<DBItem[]>(
+      "SELECT * FROM items WHERE id = $1",
+      [id]
+    );
 
-  if (current.length === 0) {
-    throw new Error("Item not found");
-  }
+    if (current.length === 0) {
+      throw new Error("Item not found");
+    }
 
-  // Convert current DB item to IItem to preserve existing values
-  const currentItem = dbItemToItem(current[0]);
+    // Convert current DB item to IItem to preserve existing values
+    const currentItem = dbItemToItem(current[0]);
 
-  // Merge updates with current item, preserving existing values
-  const fullItem: IItem = {
-    ...currentItem,
-    ...updates,
-    id, // Ensure ID is preserved
-  };
+    // Merge updates with current item, preserving existing values
+    const fullItem: IItem = {
+      ...currentItem,
+      ...updates,
+      id, // Ensure ID is preserved
+    };
 
-  const dbItem = itemToDBItem(current[0].book_id, fullItem);
-  dbItem.updated_at = now;
+    const dbItem = itemToDBItem(current[0].book_id, fullItem);
+    dbItem.updated_at = now;
 
-  await db.execute(
-    `UPDATE items SET
-      name = $1, status = $2, category = $3, custom_category = $4,
-      basic_description = $5, image = $6, appearance = $7, origin = $8,
-      alternative_names = $9, story_rarity = $10, narrative_purpose = $11,
-      usage_requirements = $12, usage_consequences = $13, item_usage = $14,
-      field_visibility = $15, updated_at = $16
-    WHERE id = $17`,
-    [
-      dbItem.name,
-      dbItem.status,
-      dbItem.category,
-      dbItem.custom_category,
-      dbItem.basic_description,
-      dbItem.image,
-      dbItem.appearance,
-      dbItem.origin,
-      dbItem.alternative_names,
-      dbItem.story_rarity,
-      dbItem.narrative_purpose,
-      dbItem.usage_requirements,
-      dbItem.usage_consequences,
-      dbItem.item_usage,
-      dbItem.field_visibility,
-      dbItem.updated_at,
-      id,
-    ]
-  );
+    await db.execute(
+      `UPDATE items SET
+        name = $1, status = $2, category = $3, custom_category = $4,
+        basic_description = $5, image = $6, appearance = $7, origin = $8,
+        alternative_names = $9, story_rarity = $10, narrative_purpose = $11,
+        usage_requirements = $12, usage_consequences = $13, item_usage = $14,
+        field_visibility = $15, updated_at = $16
+      WHERE id = $17`,
+      [
+        dbItem.name,
+        dbItem.status,
+        dbItem.category,
+        dbItem.custom_category,
+        dbItem.basic_description,
+        dbItem.image,
+        dbItem.appearance,
+        dbItem.origin,
+        dbItem.alternative_names,
+        dbItem.story_rarity,
+        dbItem.narrative_purpose,
+        dbItem.usage_requirements,
+        dbItem.usage_consequences,
+        dbItem.item_usage,
+        dbItem.field_visibility,
+        dbItem.updated_at,
+        id,
+      ]
+    );
+  }, 'updateItem');
 }
 
 export async function deleteItem(id: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM items WHERE id = $1", [id]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM items WHERE id = $1", [id]);
+  }, 'deleteItem');
 }
 
 export async function getItemVersions(itemId: string): Promise<IItemVersion[]> {
-  const db = await getDB();
-  const result = await db.select<DBItemVersion[]>(
-    "SELECT * FROM item_versions WHERE item_id = $1 ORDER BY created_at DESC",
-    [itemId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    const result = await db.select<DBItemVersion[]>(
+      "SELECT * FROM item_versions WHERE item_id = $1 ORDER BY created_at DESC",
+      [itemId]
+    );
 
-  return result.map((v) => ({
-    id: v.id,
-    name: v.name,
-    description: v.description,
-    createdAt: new Date(v.created_at).toISOString(),
-    isMain: v.is_main === 1,
-    itemData: v.item_data ? JSON.parse(v.item_data) : ({} as IItem),
-  }));
+    return result.map((v) => ({
+      id: v.id,
+      name: v.name,
+      description: v.description,
+      createdAt: new Date(v.created_at).toISOString(),
+      isMain: v.is_main === 1,
+      itemData: v.item_data ? JSON.parse(v.item_data) : ({} as IItem),
+    }));
+  }, 'getItemVersions');
 }
 
 export async function createItemVersion(
   itemId: string,
   version: IItemVersion
 ): Promise<void> {
-  const db = await getDB();
+  return safeDBOperation(async () => {
+    const db = await getDB();
 
-  await db.execute(
-    `INSERT INTO item_versions (
-      id, item_id, name, description, is_main, item_data, created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [
-      version.id,
-      itemId,
-      version.name,
-      version.description,
-      version.isMain ? 1 : 0,
-      JSON.stringify(version.itemData),
-      Date.now(),
-    ]
-  );
+    await db.execute(
+      `INSERT INTO item_versions (
+        id, item_id, name, description, is_main, item_data, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        version.id,
+        itemId,
+        version.name,
+        version.description,
+        version.isMain ? 1 : 0,
+        JSON.stringify(version.itemData),
+        Date.now(),
+      ]
+    );
+  }, 'createItemVersion');
 }
 
 export async function deleteItemVersion(versionId: string): Promise<void> {
-  const db = await getDB();
-  await db.execute("DELETE FROM item_versions WHERE id = $1", [versionId]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("DELETE FROM item_versions WHERE id = $1", [versionId]);
+  }, 'deleteItemVersion');
 }
 
 export async function updateItemVersion(
@@ -263,20 +280,24 @@ export async function updateItemVersion(
   name: string,
   description?: string
 ): Promise<void> {
-  const db = await getDB();
-  await db.execute(
-    "UPDATE item_versions SET name = $1, description = $2 WHERE id = $3",
-    [name, description, versionId]
-  );
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute(
+      "UPDATE item_versions SET name = $1, description = $2 WHERE id = $3",
+      [name, description, versionId]
+    );
+  }, 'updateItemVersion');
 }
 
 export async function updateItemVersionData(
   versionId: string,
   itemData: IItem
 ): Promise<void> {
-  const db = await getDB();
-  await db.execute("UPDATE item_versions SET item_data = $1 WHERE id = $2", [
-    JSON.stringify(itemData),
-    versionId,
-  ]);
+  return safeDBOperation(async () => {
+    const db = await getDB();
+    await db.execute("UPDATE item_versions SET item_data = $1 WHERE id = $2", [
+      JSON.stringify(itemData),
+      versionId,
+    ]);
+  }, 'updateItemVersionData');
 }

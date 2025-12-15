@@ -10,5 +10,31 @@
     "annotation": "Annotation not found",
     "version": "Version not found",
     "version_showing_main": "Version not found, showing main version"
+  },
+  "database": {
+    "disk_full": {
+      "title": "Disk Full",
+      "message": "Unable to complete the operation. Free up disk space and try again.",
+      "additionalInfo": "Check available disk space and remove unnecessary files.",
+      "action": "Got it"
+    },
+    "corrupt": {
+      "title": "Database Corrupted",
+      "message": "The database is corrupted and cannot be accessed.",
+      "additionalInfo": "Please contact technical support for assistance.",
+      "action": "Close"
+    },
+    "locked": {
+      "title": "Database Locked",
+      "message": "The database is being used by another process.",
+      "additionalInfo": "Please try again in a few moments.",
+      "action": "Retry"
+    },
+    "generic": {
+      "title": "Database Error",
+      "message": "An unexpected error occurred while accessing the database.",
+      "additionalInfo": "If the problem persists, please contact support.",
+      "action": "Close"
+    }
   }
 }
