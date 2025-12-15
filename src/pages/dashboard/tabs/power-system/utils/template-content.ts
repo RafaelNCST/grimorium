@@ -454,6 +454,169 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
             ],
           },
           {
+            name: "Meu Grimório",
+            sections: [
+              {
+                title: "Perfil do Mago",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Meu Perfil Mágico",
+                      level: 1,
+                      alignment: "center",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Este é meu grimório pessoal, onde registro minhas preferências mágicas, feitiços dominados e meu progresso como mago.",
+                    },
+                  },
+                  {
+                    type: "image",
+                    content: {
+                      imageUrl: "",
+                      caption: "Meu Círculo Mágico Pessoal",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "medium",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Especialização",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Minha Escola de Magia",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Cada mago eventualmente se especializa em uma escola de magia que melhor se alinha com suas habilidades e personalidade.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Evocação", "Ilusão", "Necromancia", "Encantamento", "Transmutação", "Adivinhação"],
+                      selectedValue: "",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "small",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Repertório",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Feitiços que Domino",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Lista de feitiços que aprendi e domino completamente. Posso conjurá-los sem dificuldade.",
+                    },
+                  },
+                  {
+                    type: "multi-dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Luz Mágica", "Bola de Fogo", "Escudo Arcano", "Raio Congelante", "Teletransporte", "Meteoro Flamejante"],
+                      selectedValues: [],
+                    },
+                  },
+                  {
+                    type: "informative",
+                    content: {
+                      icon: "info",
+                      text: "Quanto mais feitiços você dominar, mais versátil será em combate.",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Mentor",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Meu Mestre de Magia",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Todo mago aprende com um mestre. Selecione o personagem que é seu mentor nas artes arcanas.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "characters",
+                      options: [],
+                      selectedEntityId: undefined,
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "large",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Estudos Relacionados",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Explorar Elementos",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Use os navegadores abaixo para estudar cada elemento em detalhes.",
+                    },
+                  },
+                  {
+                    type: "navigator",
+                    content: {
+                      linkedPageId: undefined,
+                      title: "Estudar Tipos Elementais",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
             name: "Tipos Elementais",
             sections: [
               {
@@ -999,6 +1162,169 @@ const magicTemplateContent: Record<Language, TemplateContent> = {
                     content: {
                       rating: 5,
                       size: "large",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "My Grimoire",
+            sections: [
+              {
+                title: "Mage Profile",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My Magical Profile",
+                      level: 1,
+                      alignment: "center",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "This is my personal grimoire, where I record my magical preferences, mastered spells, and my progress as a mage.",
+                    },
+                  },
+                  {
+                    type: "image",
+                    content: {
+                      imageUrl: "",
+                      caption: "My Personal Magic Circle",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "medium",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Specialization",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My School of Magic",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Each mage eventually specializes in a school of magic that best aligns with their abilities and personality.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Evocation", "Illusion", "Necromancy", "Enchantment", "Transmutation", "Divination"],
+                      selectedValue: "",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "small",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Repertoire",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Spells I Master",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "List of spells I've learned and completely mastered. I can cast them without difficulty.",
+                    },
+                  },
+                  {
+                    type: "multi-dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Magic Light", "Fireball", "Arcane Shield", "Freezing Ray", "Teleportation", "Flaming Meteor"],
+                      selectedValues: [],
+                    },
+                  },
+                  {
+                    type: "informative",
+                    content: {
+                      icon: "info",
+                      text: "The more spells you master, the more versatile you'll be in combat.",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Mentor",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My Magic Master",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Every mage learns from a master. Select the character who is your mentor in the arcane arts.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "characters",
+                      options: [],
+                      selectedEntityId: undefined,
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "large",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Related Studies",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Explore Elements",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Use the navigators below to study each element in detail.",
+                    },
+                  },
+                  {
+                    type: "navigator",
+                    content: {
+                      linkedPageId: undefined,
+                      title: "Study Elemental Types",
                     },
                   },
                 ],
@@ -1566,6 +1892,169 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
             ],
           },
           {
+            name: "Meu Dojo",
+            sections: [
+              {
+                title: "Perfil do Guerreiro",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Meu Perfil Marcial",
+                      level: 1,
+                      alignment: "center",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Este é meu dojo pessoal, onde registro meu estilo de luta preferido, técnicas dominadas e meu progresso como artista marcial.",
+                    },
+                  },
+                  {
+                    type: "image",
+                    content: {
+                      imageUrl: "",
+                      caption: "Minha Postura de Combate",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "medium",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Especialização",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Meu Estilo Principal",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Todo artista marcial eventualmente escolhe um estilo que melhor se adapta à sua natureza e objetivos de combate.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Estilo do Tigre", "Estilo da Serpente", "Estilo da Tartaruga", "Estilo da Garça"],
+                      selectedValue: "",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "small",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Arsenal",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Técnicas que Domino",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Lista de técnicas marciais que aprendi e domino completamente. Posso executá-las com precisão em combate.",
+                    },
+                  },
+                  {
+                    type: "multi-dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Soco de Ferro", "Palma de Aço", "Chute Voador", "Golpe do Dragão", "Barreira de Energia", "Onda de Choque de Ki"],
+                      selectedValues: [],
+                    },
+                  },
+                  {
+                    type: "informative",
+                    content: {
+                      icon: "info",
+                      text: "Quanto mais técnicas você dominar, mais adaptável será em diferentes situações de combate.",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Mestre",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Meu Mestre Marcial",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Todo guerreiro aprende com um mestre. Selecione o personagem que é seu mentor nas artes marciais.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "characters",
+                      options: [],
+                      selectedEntityId: undefined,
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "large",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Treinamento Relacionado",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Explorar Estilos",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Use os navegadores abaixo para estudar cada estilo de combate em detalhes.",
+                    },
+                  },
+                  {
+                    type: "navigator",
+                    content: {
+                      linkedPageId: undefined,
+                      title: "Estudar Posturas de Combate",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
             name: "Posturas de Combate",
             sections: [
               {
@@ -2118,6 +2607,169 @@ const martialTemplateContent: Record<Language, TemplateContent> = {
                     content: {
                       rating: 5,
                       size: "large",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            name: "My Dojo",
+            sections: [
+              {
+                title: "Warrior Profile",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My Martial Profile",
+                      level: 1,
+                      alignment: "center",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "This is my personal dojo, where I record my preferred fighting style, mastered techniques, and my progress as a martial artist.",
+                    },
+                  },
+                  {
+                    type: "image",
+                    content: {
+                      imageUrl: "",
+                      caption: "My Combat Stance",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "medium",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Specialization",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My Main Style",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Every martial artist eventually chooses a style that best suits their nature and combat goals.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Tiger Style", "Snake Style", "Turtle Style", "Crane Style"],
+                      selectedValue: "",
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "small",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Arsenal",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Techniques I Master",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "List of martial techniques I've learned and completely mastered. I can execute them with precision in combat.",
+                    },
+                  },
+                  {
+                    type: "multi-dropdown",
+                    content: {
+                      dataSource: "manual",
+                      options: ["Iron Fist", "Steel Palm", "Flying Kick", "Dragon Strike", "Energy Barrier", "Ki Shockwave"],
+                      selectedValues: [],
+                    },
+                  },
+                  {
+                    type: "informative",
+                    content: {
+                      icon: "info",
+                      text: "The more techniques you master, the more adaptable you'll be in different combat situations.",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Master",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "My Martial Master",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Every warrior learns from a master. Select the character who is your mentor in the martial arts.",
+                    },
+                  },
+                  {
+                    type: "dropdown",
+                    content: {
+                      dataSource: "characters",
+                      options: [],
+                      selectedEntityId: undefined,
+                    },
+                  },
+                  {
+                    type: "spacer",
+                    content: {
+                      size: "large",
+                    },
+                  },
+                ],
+              },
+              {
+                title: "Related Training",
+                blocks: [
+                  {
+                    type: "heading",
+                    content: {
+                      text: "Explore Styles",
+                      level: 2,
+                      alignment: "left",
+                    },
+                  },
+                  {
+                    type: "paragraph",
+                    content: {
+                      text: "Use the navigators below to study each combat style in detail.",
+                    },
+                  },
+                  {
+                    type: "navigator",
+                    content: {
+                      linkedPageId: undefined,
+                      title: "Study Combat Stances",
                     },
                   },
                 ],

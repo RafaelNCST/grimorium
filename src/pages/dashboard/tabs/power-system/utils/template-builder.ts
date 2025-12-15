@@ -3,6 +3,7 @@ import {
   createPowerPage,
   createPowerSection,
   createPowerBlock,
+  updatePowerBlock,
 } from "@/lib/db/power-system.service";
 
 import {
@@ -14,6 +15,16 @@ import {
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+interface PageCreationResult {
+  pageId: string;
+  pageName: string;
+  navigatorBlocks: Array<{
+    blockId: string;
+    targetPageName: string;
+    content: any;
+  }>;
+}
 
 async function createPageWithContent(
   systemId: string,
@@ -27,9 +38,11 @@ async function createPageWithContent(
     }>;
   }>,
   orderIndex: number
-): Promise<string> {
+): Promise<PageCreationResult> {
   // Create the page
   const pageId = await createPowerPage(systemId, pageName, groupId, orderIndex);
+
+  const navigatorBlocks: Array<{ blockId: string; targetPageName: string; content: any }> = [];
 
   // Create sections and blocks
   for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex++) {
@@ -43,11 +56,32 @@ async function createPageWithContent(
     // Create blocks within the section
     for (let blockIndex = 0; blockIndex < section.blocks.length; blockIndex++) {
       const block = section.blocks[blockIndex];
-      await createPowerBlock(sectionId, block.type, block.content, blockIndex);
+      const blockId = await createPowerBlock(sectionId, block.type, block.content, blockIndex);
+
+      // Track navigator blocks for later linking
+      if (block.type === "navigator" && block.content.title) {
+        // Extract target page name from title
+        // "Estudar Tipos Elementais" -> "Tipos Elementais"
+        // "Study Elemental Types" -> "Elemental Types"
+        let targetPageName = "";
+        if (block.content.title.includes("Tipos Elementais")) {
+          targetPageName = "Tipos Elementais";
+        } else if (block.content.title.includes("Elemental Types")) {
+          targetPageName = "Elemental Types";
+        } else if (block.content.title.includes("Posturas de Combate")) {
+          targetPageName = "Posturas de Combate";
+        } else if (block.content.title.includes("Combat Stances")) {
+          targetPageName = "Combat Stances";
+        }
+
+        if (targetPageName) {
+          navigatorBlocks.push({ blockId, targetPageName, content: block.content });
+        }
+      }
     }
   }
 
-  return pageId;
+  return { pageId, pageName, navigatorBlocks };
 }
 
 // ============================================================================
@@ -65,15 +99,20 @@ export async function buildMagicTemplate(
   const content = getMagicTemplateContent(language);
 
   let firstPageId: string | null = null;
+  const pageMap = new Map<string, string>(); // pageName -> pageId
+  const allNavigatorBlocks: Array<{ blockId: string; targetPageName: string }> = [];
 
   // Create the overview page (without group)
-  firstPageId = await createPageWithContent(
+  const overviewResult = await createPageWithContent(
     systemId,
     undefined, // No group for overview page
     content.overviewPage.name,
     content.overviewPage.sections,
     0
   );
+  firstPageId = overviewResult.pageId;
+  pageMap.set(overviewResult.pageName, overviewResult.pageId);
+  allNavigatorBlocks.push(...overviewResult.navigatorBlocks);
 
   // Create groups and their pages
   for (let groupIndex = 0; groupIndex < content.groups.length; groupIndex++) {
@@ -86,13 +125,26 @@ export async function buildMagicTemplate(
     for (let pageIndex = 0; pageIndex < group.pages.length; pageIndex++) {
       const page = group.pages[pageIndex];
 
-      await createPageWithContent(
+      const pageResult = await createPageWithContent(
         systemId,
         groupId,
         page.name,
         page.sections,
         pageIndex
       );
+      pageMap.set(pageResult.pageName, pageResult.pageId);
+      allNavigatorBlocks.push(...pageResult.navigatorBlocks);
+    }
+  }
+
+  // Update all navigator blocks with correct linkedPageId
+  for (const navBlock of allNavigatorBlocks) {
+    const targetPageId = pageMap.get(navBlock.targetPageName);
+    if (targetPageId) {
+      await updatePowerBlock(navBlock.blockId, {
+        ...navBlock.content,
+        linkedPageId: targetPageId,
+      });
     }
   }
 
@@ -110,15 +162,20 @@ export async function buildMartialTemplate(
   const content = getMartialTemplateContent(language);
 
   let firstPageId: string | null = null;
+  const pageMap = new Map<string, string>(); // pageName -> pageId
+  const allNavigatorBlocks: Array<{ blockId: string; targetPageName: string; content: any }> = [];
 
   // Create the overview page (without group)
-  firstPageId = await createPageWithContent(
+  const overviewResult = await createPageWithContent(
     systemId,
     undefined, // No group for overview page
     content.overviewPage.name,
     content.overviewPage.sections,
     0
   );
+  firstPageId = overviewResult.pageId;
+  pageMap.set(overviewResult.pageName, overviewResult.pageId);
+  allNavigatorBlocks.push(...overviewResult.navigatorBlocks);
 
   // Create groups and their pages
   for (let groupIndex = 0; groupIndex < content.groups.length; groupIndex++) {
@@ -131,13 +188,26 @@ export async function buildMartialTemplate(
     for (let pageIndex = 0; pageIndex < group.pages.length; pageIndex++) {
       const page = group.pages[pageIndex];
 
-      await createPageWithContent(
+      const pageResult = await createPageWithContent(
         systemId,
         groupId,
         page.name,
         page.sections,
         pageIndex
       );
+      pageMap.set(pageResult.pageName, pageResult.pageId);
+      allNavigatorBlocks.push(...pageResult.navigatorBlocks);
+    }
+  }
+
+  // Update all navigator blocks with correct linkedPageId
+  for (const navBlock of allNavigatorBlocks) {
+    const targetPageId = pageMap.get(navBlock.targetPageName);
+    if (targetPageId) {
+      await updatePowerBlock(navBlock.blockId, {
+        ...navBlock.content,
+        linkedPageId: targetPageId,
+      });
     }
   }
 
