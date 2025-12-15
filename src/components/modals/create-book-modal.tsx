@@ -133,7 +133,7 @@ export function CreateBookModal({
         </DialogHeader>
 
         {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto pl-1 pr-4 pb-6 mt-4">
+        <div className="flex-1 overflow-y-auto pl-1 pr-2 pb-6 mt-4">
           <form
             id="create-book-form"
             onSubmit={handleSubmit}

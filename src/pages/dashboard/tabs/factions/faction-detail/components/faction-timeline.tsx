@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import {
   Plus,
@@ -31,6 +31,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -42,6 +43,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import {
   type IFactionTimelineEvent,
   type IFactionTimelineEra,
@@ -121,6 +123,12 @@ export function FactionTimeline({
     startDate: "",
     endDate: "",
   });
+
+  const [hasScrollCreateEra, setHasScrollCreateEra] = useState(false);
+  const scrollContainerCreateEraRef = useRef<HTMLDivElement>(null);
+
+  const [hasScrollEditEra, setHasScrollEditEra] = useState(false);
+  const scrollContainerEditEraRef = useRef<HTMLDivElement>(null);
 
   const handleCreateEra = () => {
     if (!newEra.name.trim()) {
@@ -291,6 +299,48 @@ export function FactionTimeline({
 
   const getItemName = (id: string) =>
     items.find((i) => i.id === id)?.name || t("timeline.item_not_found");
+
+  // Detectar se há scroll no modal de criar era
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerCreateEraRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerCreateEraRef.current;
+        setHasScrollCreateEra(scrollHeight > clientHeight);
+      }
+    };
+
+    const timeoutId = setTimeout(checkScroll, 0);
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerCreateEraRef.current) {
+      observer.observe(scrollContainerCreateEraRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [newEra, showCreateEraModal]);
+
+  // Detectar se há scroll no modal de editar era
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollContainerEditEraRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerEditEraRef.current;
+        setHasScrollEditEra(scrollHeight > clientHeight);
+      }
+    };
+
+    const timeoutId = setTimeout(checkScroll, 0);
+    const observer = new ResizeObserver(checkScroll);
+    if (scrollContainerEditEraRef.current) {
+      observer.observe(scrollContainerEditEraRef.current);
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
+  }, [editEra, showEditEraModal]);
 
   return (
     <>
@@ -996,102 +1046,118 @@ export function FactionTimeline({
           }
         }}
       >
-        <DialogContent className="sm:min-w-[600px]">
-          <DialogHeader>
+        <DialogContent className="sm:min-w-[600px] max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>{t("timeline.new_era")}</DialogTitle>
             <DialogDescription>
               {t("timeline.new_era_description")}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="era-name" className="text-primary">
-                {t("timeline.era_name")}{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="era-name"
-                value={newEra.name}
-                onChange={(e) =>
-                  setNewEra((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder={t("timeline.era_name_placeholder")}
-                maxLength={200}
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{newEra.name.length}/200</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="era-description" className="text-primary">
-                {t("timeline.description")}{" "}
-                <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                id="era-description"
-                value={newEra.description}
-                onChange={(e) =>
-                  setNewEra((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                placeholder={t("timeline.era_description_placeholder")}
-                rows={2}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{newEra.description.length}/500</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div
+            ref={scrollContainerCreateEraRef}
+            className={cn(
+              "flex-1 overflow-y-auto custom-scrollbar pb-6",
+              hasScrollCreateEra && "pr-2"
+            )}
+          >
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="era-start" className="text-primary">
-                  {t("timeline.start")}{" "}
+                <Label htmlFor="era-name" className="text-primary">
+                  {t("timeline.era_name")}{" "}
                   <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="era-start"
-                  value={newEra.startDate}
-                  onChange={(e) =>
-                    setNewEra((prev) => ({
-                      ...prev,
-                      startDate: e.target.value,
-                    }))
-                  }
-                  placeholder={t("timeline.date_placeholder")}
-                  maxLength={50}
-                />
+                <div className="px-1">
+                  <Input
+                    id="era-name"
+                    value={newEra.name}
+                    onChange={(e) =>
+                      setNewEra((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder={t("timeline.era_name_placeholder")}
+                    maxLength={200}
+                  />
+                </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{newEra.startDate.length}/50</span>
+                  <span>{newEra.name.length}/200</span>
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="era-end" className="text-primary">
-                  {t("timeline.end")}{" "}
+                <Label htmlFor="era-description" className="text-primary">
+                  {t("timeline.description")}{" "}
                   <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="era-end"
-                  value={newEra.endDate}
-                  onChange={(e) =>
-                    setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
-                  }
-                  placeholder={t("timeline.date_placeholder")}
-                  maxLength={50}
-                />
+                <div className="px-1">
+                  <Textarea
+                    id="era-description"
+                    value={newEra.description}
+                    onChange={(e) =>
+                      setNewEra((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder={t("timeline.era_description_placeholder")}
+                    rows={2}
+                    maxLength={500}
+                    className="resize-none"
+                  />
+                </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{newEra.endDate.length}/50</span>
+                  <span>{newEra.description.length}/500</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="era-start" className="text-primary">
+                    {t("timeline.start")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="era-start"
+                      value={newEra.startDate}
+                      onChange={(e) =>
+                        setNewEra((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      placeholder={t("timeline.date_placeholder")}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEra.startDate.length}/50</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="era-end" className="text-primary">
+                    {t("timeline.end")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="era-end"
+                      value={newEra.endDate}
+                      onChange={(e) =>
+                        setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
+                      }
+                      placeholder={t("timeline.date_placeholder")}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{newEra.endDate.length}/50</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             <Button
               variant="secondary"
               onClick={() => setShowCreateEraModal(false)}
@@ -1113,7 +1179,7 @@ export function FactionTimeline({
               <Plus className="w-4 h-4 mr-2" />
               {t("timeline.create_era")}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -1399,92 +1465,118 @@ export function FactionTimeline({
           }
         }}
       >
-        <DialogContent>
-          <DialogHeader>
+        <DialogContent className="sm:min-w-[600px] max-h-[90vh] flex flex-col gap-0">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>{t("timeline.edit_era")}</DialogTitle>
             <DialogDescription>
               {t("timeline.edit_era_description")}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-era-name">{t("timeline.era_name")} *</Label>
-              <Input
-                id="edit-era-name"
-                value={editEra.name}
-                onChange={(e) =>
-                  setEditEra((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder={t("timeline.era_name_placeholder")}
-                maxLength={200}
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editEra.name.length}/200</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="edit-era-description">
-                {t("timeline.description")}
-              </Label>
-              <Textarea
-                id="edit-era-description"
-                value={editEra.description}
-                onChange={(e) =>
-                  setEditEra((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                placeholder={t("timeline.era_description_placeholder")}
-                rows={2}
-                maxLength={500}
-                className="resize-none"
-              />
-              <div className="flex justify-end text-xs text-muted-foreground">
-                <span>{editEra.description.length}/500</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div
+            ref={scrollContainerEditEraRef}
+            className={cn(
+              "flex-1 overflow-y-auto custom-scrollbar pb-6",
+              hasScrollEditEra && "pr-2"
+            )}
+          >
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-era-start">{t("timeline.start")}</Label>
-                <Input
-                  id="edit-era-start"
-                  value={editEra.startDate}
-                  onChange={(e) =>
-                    setEditEra((prev) => ({
-                      ...prev,
-                      startDate: e.target.value,
-                    }))
-                  }
-                  placeholder={t("timeline.date_placeholder")}
-                  maxLength={50}
-                />
+                <Label htmlFor="edit-era-name" className="text-primary">
+                  {t("timeline.era_name")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <div className="px-1">
+                  <Input
+                    id="edit-era-name"
+                    value={editEra.name}
+                    onChange={(e) =>
+                      setEditEra((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder={t("timeline.era_name_placeholder")}
+                    maxLength={200}
+                  />
+                </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editEra.startDate.length}/50</span>
+                  <span>{editEra.name.length}/200</span>
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="edit-era-end">{t("timeline.end")}</Label>
-                <Input
-                  id="edit-era-end"
-                  value={editEra.endDate}
-                  onChange={(e) =>
-                    setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
-                  }
-                  placeholder={t("timeline.date_placeholder")}
-                  maxLength={50}
-                />
+                <Label htmlFor="edit-era-description" className="text-primary">
+                  {t("timeline.description")}{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <div className="px-1">
+                  <Textarea
+                    id="edit-era-description"
+                    value={editEra.description}
+                    onChange={(e) =>
+                      setEditEra((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder={t("timeline.era_description_placeholder")}
+                    rows={2}
+                    maxLength={500}
+                    className="resize-none"
+                  />
+                </div>
                 <div className="flex justify-end text-xs text-muted-foreground">
-                  <span>{editEra.endDate.length}/50</span>
+                  <span>{editEra.description.length}/500</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-era-start" className="text-primary">
+                    {t("timeline.start")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="edit-era-start"
+                      value={editEra.startDate}
+                      onChange={(e) =>
+                        setEditEra((prev) => ({
+                          ...prev,
+                          startDate: e.target.value,
+                        }))
+                      }
+                      placeholder={t("timeline.date_placeholder")}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editEra.startDate.length}/50</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-era-end" className="text-primary">
+                    {t("timeline.end")}{" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="px-1">
+                    <Input
+                      id="edit-era-end"
+                      value={editEra.endDate}
+                      onChange={(e) =>
+                        setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
+                      }
+                      placeholder={t("timeline.date_placeholder")}
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="flex justify-end text-xs text-muted-foreground">
+                    <span>{editEra.endDate.length}/50</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <DialogFooter className="flex-shrink-0 pt-4 border-t">
             <Button
               variant="secondary"
               onClick={() => setShowEditEraModal(false)}
@@ -1500,7 +1592,7 @@ export function FactionTimeline({
               <Save className="w-4 h-4 mr-2" />
               {t("timeline.save_changes")}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
