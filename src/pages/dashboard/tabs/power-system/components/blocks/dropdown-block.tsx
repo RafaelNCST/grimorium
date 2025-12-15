@@ -28,7 +28,6 @@ import { RegionHoverCard } from "../entity-views/region-hover-card";
 
 import { BlockReorderButtons } from "./shared/block-reorder-buttons";
 import { DataSourceSelector } from "./shared/data-source-selector";
-import { EntitySelect } from "./shared/entity-select";
 
 interface DropdownBlockProps {
   block: IPowerBlock;

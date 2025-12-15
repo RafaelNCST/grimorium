@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
   Accordion,
   AccordionContent,
@@ -49,14 +49,10 @@ import {
 
 interface PropsFactionTimeline {
   factionId: string;
+  bookId: string;
   isEditing: boolean;
   timeline: IFactionTimelineEra[];
   onTimelineChange: (timeline: IFactionTimelineEra[]) => void;
-  // Real data from the app
-  characters: Array<{ id: string; name: string; image?: string }>;
-  factions: Array<{ id: string; name: string; image?: string }>;
-  races: Array<{ id: string; name: string; image?: string }>;
-  items: Array<{ id: string; name: string; image?: string }>;
   /** Controlled state for create era dialog - when true, opens the create era dialog */
   isCreateEraDialogOpen?: boolean;
   /** Callback when the create era dialog open state changes */
@@ -64,13 +60,10 @@ interface PropsFactionTimeline {
 }
 
 export function FactionTimeline({
+  bookId,
   isEditing,
   timeline,
   onTimelineChange,
-  characters,
-  factions,
-  races,
-  items,
   isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
   onCreateEraDialogOpenChange,
 }: PropsFactionTimeline) {
@@ -788,13 +781,14 @@ export function FactionTimeline({
                   </div>
                 </div>
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="character"
+                  bookId={bookId}
                   label={t("timeline.characters_involved")}
                   placeholder={t("timeline.select_characters")}
                   emptyText={t("timeline.no_characters")}
                   noSelectionText={t("timeline.no_characters_selected")}
                   searchPlaceholder={t("timeline.search_character")}
-                  options={characters}
                   value={newEvent.charactersInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -804,13 +798,14 @@ export function FactionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="faction"
+                  bookId={bookId}
                   label={t("timeline.factions_involved")}
                   placeholder={t("timeline.select_factions")}
                   emptyText={t("timeline.no_factions")}
                   noSelectionText={t("timeline.no_factions_selected")}
                   searchPlaceholder={t("timeline.search_faction")}
-                  options={factions}
                   value={newEvent.factionsInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -820,13 +815,14 @@ export function FactionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="race"
+                  bookId={bookId}
                   label={t("timeline.races_involved")}
                   placeholder={t("timeline.select_races")}
                   emptyText={t("timeline.no_races")}
                   noSelectionText={t("timeline.no_races_selected")}
                   searchPlaceholder={t("timeline.search_race")}
-                  options={races}
                   value={newEvent.racesInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -836,13 +832,14 @@ export function FactionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="item"
+                  bookId={bookId}
                   label={t("timeline.items_involved")}
                   placeholder={t("timeline.select_items")}
                   emptyText={t("timeline.no_items")}
                   noSelectionText={t("timeline.no_items_selected")}
                   searchPlaceholder={t("timeline.search_item")}
-                  options={items}
                   value={newEvent.itemsInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -1285,13 +1282,14 @@ export function FactionTimeline({
               </div>
             </div>
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="character"
+              bookId={bookId}
               label={t("timeline.characters_involved")}
               placeholder={t("timeline.select_characters")}
               emptyText={t("timeline.no_characters")}
               noSelectionText={t("timeline.no_characters_selected")}
               searchPlaceholder={t("timeline.search_character")}
-              options={characters}
               value={newEvent.charactersInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1302,13 +1300,14 @@ export function FactionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="faction"
+              bookId={bookId}
               label={t("timeline.factions_involved")}
               placeholder={t("timeline.select_factions")}
               emptyText={t("timeline.no_factions")}
               noSelectionText={t("timeline.no_factions_selected")}
               searchPlaceholder={t("timeline.search_faction")}
-              options={factions}
               value={newEvent.factionsInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1319,13 +1318,14 @@ export function FactionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="race"
+              bookId={bookId}
               label={t("timeline.races_involved")}
               placeholder={t("timeline.select_races")}
               emptyText={t("timeline.no_races")}
               noSelectionText={t("timeline.no_races_selected")}
               searchPlaceholder={t("timeline.search_race")}
-              options={races}
               value={newEvent.racesInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1336,13 +1336,14 @@ export function FactionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="item"
+              bookId={bookId}
               label={t("timeline.items_involved")}
               placeholder={t("timeline.select_items")}
               emptyText={t("timeline.no_items")}
               noSelectionText={t("timeline.no_items_selected")}
               searchPlaceholder={t("timeline.search_item")}
-              options={items}
               value={newEvent.itemsInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({

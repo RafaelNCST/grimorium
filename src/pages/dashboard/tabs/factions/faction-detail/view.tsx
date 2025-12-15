@@ -1433,15 +1433,12 @@ export function FactionDetailView({
       content: (
         <FactionTimeline
           factionId={faction.id}
+          bookId={bookId}
           timeline={editData.timeline || []}
           isEditing={isEditing}
           onTimelineChange={(timeline) =>
             onEditDataChange("timeline", timeline)
           }
-          characters={mockCharacters}
-          factions={mockFactions}
-          races={mockRaces}
-          items={mockItems}
           isCreateEraDialogOpen={isCreateEraDialogOpen}
           onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
         />

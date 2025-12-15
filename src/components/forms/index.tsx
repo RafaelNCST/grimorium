@@ -27,13 +27,6 @@ export type {
   MultiSelectOption,
 } from "./FormMultiSelect";
 
-export { EntitySelect } from "./EntitySelect";
-export type {
-  EntitySelectProps,
-  EntityType as EntitySelectType,
-  Entity,
-} from "./EntitySelect";
-
 // Advanced form components
 export { FormImageUpload } from "./FormImageUpload";
 

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { MultiSelect } from "@/components/modals/create-region-modal/components/multi-select";
+import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
   Accordion,
   AccordionContent,
@@ -71,14 +71,10 @@ export interface ITimelineEra {
 
 interface PropsRegionTimeline {
   regionId: string;
+  bookId: string;
   isEditing: boolean;
   timeline: ITimelineEra[];
   onTimelineChange: (timeline: ITimelineEra[]) => void;
-  // Real data from the app
-  characters: Array<{ id: string; name: string; image?: string }>;
-  factions: Array<{ id: string; name: string; image?: string }>;
-  races: Array<{ id: string; name: string; image?: string }>;
-  items: Array<{ id: string; name: string; image?: string }>;
   /** Controlled state for create era dialog - when true, opens the create era dialog */
   isCreateEraDialogOpen?: boolean;
   /** Callback when the create era dialog open state changes */
@@ -86,13 +82,10 @@ interface PropsRegionTimeline {
 }
 
 export function RegionTimeline({
+  bookId,
   isEditing,
   timeline,
   onTimelineChange,
-  characters,
-  factions,
-  races,
-  items,
   isCreateEraDialogOpen: controlledIsCreateEraDialogOpen,
   onCreateEraDialogOpenChange,
 }: PropsRegionTimeline) {
@@ -915,13 +908,14 @@ export function RegionTimeline({
                   </div>
                 </div>
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="character"
+                  bookId={bookId}
                   label={t("world:timeline.involved_characters")}
                   placeholder={t("world:timeline.select_characters")}
                   emptyText={t("empty-states:entities.no_character_registered")}
                   noSelectionText={t("world:timeline.no_character_selected")}
                   searchPlaceholder={t("world:timeline.search_character")}
-                  options={characters}
                   value={newEvent.charactersInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -931,13 +925,14 @@ export function RegionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="faction"
+                  bookId={bookId}
                   label={t("world:timeline.involved_factions")}
                   placeholder={t("world:timeline.select_factions")}
                   emptyText={t("empty-states:entities.no_faction_registered")}
                   noSelectionText={t("world:timeline.no_faction_selected")}
                   searchPlaceholder={t("world:timeline.search_faction")}
-                  options={factions}
                   value={newEvent.factionsInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -947,13 +942,14 @@ export function RegionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="race"
+                  bookId={bookId}
                   label={t("world:timeline.involved_races")}
                   placeholder={t("world:timeline.select_races")}
                   emptyText={t("empty-states:entities.no_race_registered")}
                   noSelectionText={t("world:timeline.no_race_selected")}
                   searchPlaceholder={t("world:timeline.search_race")}
-                  options={races}
                   value={newEvent.racesInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -963,13 +959,14 @@ export function RegionTimeline({
                   }
                 />
 
-                <MultiSelect
+                <FormEntityMultiSelectAuto
+                  entityType="item"
+                  bookId={bookId}
                   label={t("world:timeline.involved_items")}
                   placeholder={t("world:timeline.select_items")}
                   emptyText={t("empty-states:entities.no_item_registered")}
                   noSelectionText={t("world:timeline.no_item_selected")}
                   searchPlaceholder={t("world:timeline.search_item")}
-                  options={items}
                   value={newEvent.itemsInvolved}
                   onChange={(value) =>
                     setNewEvent((prev) => ({
@@ -1428,13 +1425,14 @@ export function RegionTimeline({
               </div>
             </div>
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="character"
+              bookId={bookId}
               label={t("world:timeline.involved_characters")}
               placeholder={t("world:timeline.select_characters")}
               emptyText={t("empty-states:entities.no_character_registered")}
               noSelectionText={t("world:timeline.no_character_selected")}
               searchPlaceholder={t("world:timeline.search_character")}
-              options={characters}
               value={newEvent.charactersInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1445,13 +1443,14 @@ export function RegionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="faction"
+              bookId={bookId}
               label={t("world:timeline.involved_factions")}
               placeholder={t("world:timeline.select_factions")}
               emptyText={t("empty-states:entities.no_faction_registered")}
               noSelectionText={t("world:timeline.no_faction_selected")}
               searchPlaceholder={t("world:timeline.search_faction")}
-              options={factions}
               value={newEvent.factionsInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1462,13 +1461,14 @@ export function RegionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="race"
+              bookId={bookId}
               label={t("world:timeline.involved_races")}
               placeholder={t("world:timeline.select_races")}
               emptyText={t("empty-states:entities.no_race_registered")}
               noSelectionText={t("world:timeline.no_race_selected")}
               searchPlaceholder={t("world:timeline.search_race")}
-              options={races}
               value={newEvent.racesInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({
@@ -1479,13 +1479,14 @@ export function RegionTimeline({
               labelClassName="text-primary text-sm font-medium"
             />
 
-            <MultiSelect
+            <FormEntityMultiSelectAuto
+              entityType="item"
+              bookId={bookId}
               label={t("world:timeline.involved_items")}
               placeholder={t("world:timeline.select_items")}
               emptyText={t("empty-states:entities.no_item_registered")}
               noSelectionText={t("world:timeline.no_item_selected")}
               searchPlaceholder={t("world:timeline.search_item")}
-              options={items}
               value={newEvent.itemsInvolved}
               onChange={(value) =>
                 setNewEvent((prev) => ({

@@ -1369,13 +1369,10 @@ export function RegionDetailView({
                 content: (
                   <RegionTimeline
                     regionId={region.id}
+                    bookId={bookId}
                     isEditing={isEditing}
                     timeline={timeline}
                     onTimelineChange={onTimelineChange}
-                    characters={characters}
-                    factions={factions}
-                    races={races}
-                    items={items}
                     isCreateEraDialogOpen={isCreateEraDialogOpen}
                     onCreateEraDialogOpenChange={setIsCreateEraDialogOpen}
                   />
