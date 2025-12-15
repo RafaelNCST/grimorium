@@ -23,25 +23,23 @@ export function GalleryFilters({
   const { t } = useTranslation("gallery");
 
   return (
-    <div className="flex items-center gap-3 w-1/2">
+    <div className="relative w-1/2">
       {/* Search */}
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={t("page.search_placeholder")}
-          className="pl-9"
-        />
-      </div>
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+      <Input
+        value={searchTerm}
+        onChange={(e) => onSearchChange(e.target.value)}
+        placeholder={t("page.search_placeholder")}
+        className={`pl-9 ${searchTerm.length > 0 ? "pr-10" : ""}`}
+      />
 
-      {/* Clear Filters */}
-      {hasActiveFilters && (
+      {/* Clear search button - positioned absolutely inside input */}
+      {searchTerm.length > 0 && (
         <Button
           variant="ghost"
           size="icon"
-          onClick={onClearFilters}
-          className="shrink-0"
+          onClick={() => onSearchChange("")}
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
         >
           <X className="h-4 w-4" />
         </Button>

@@ -1,5 +1,6 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface EntitySearchBarProps {
@@ -29,7 +30,7 @@ interface EntitySearchBarProps {
  * EntitySearchBar - Reusable search bar component for entity lists
  *
  * Based on the World tab pattern, this component provides a consistent
- * search input with an icon on the left side.
+ * search input with an icon on the left side and a clear button.
  *
  * @example
  * ```tsx
@@ -65,8 +66,20 @@ export function EntitySearchBar({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pl-10"
+        className={`pl-10 ${value.length > 0 ? "pr-10" : ""}`}
       />
+
+      {/* Clear button - positioned absolutely inside input */}
+      {value.length > 0 && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onChange("")}
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 }
