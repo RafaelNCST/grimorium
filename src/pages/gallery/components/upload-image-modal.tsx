@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { stat, readFile } from "@tauri-apps/plugin-fs";
-import { Upload } from "lucide-react";
+import { Upload, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { FormInput } from "@/components/forms/FormInput";
@@ -260,7 +260,7 @@ export function UploadImageModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingItem
@@ -272,7 +272,7 @@ export function UploadImageModal({
           <div className="space-y-4">
             {/* Image Selection */}
             <div className="space-y-2">
-              <Label>{t("upload_modal.select_image")}</Label>
+              <Label className="text-primary">{t("upload_modal.select_image")}</Label>
               {imagePreview ? (
                 <div
                   className="relative w-full h-64 rounded-lg border overflow-hidden cursor-pointer group"
@@ -330,6 +330,7 @@ export function UploadImageModal({
               showCharCount
               required
               showOptionalLabel={false}
+              labelClassName="text-primary"
             />
 
             {/* Description */}
@@ -342,12 +343,13 @@ export function UploadImageModal({
               maxLength={500}
               showCharCount
               className="min-h-[120px]"
+              labelClassName="text-primary"
             />
 
             {/* Links */}
             {!disableLinksManagement && (
               <div className="space-y-2">
-                <Label>{t("upload_modal.links_label")}</Label>
+                <Label className="text-primary">{t("upload_modal.links_label")}</Label>
                 <Button
                   type="button"
                   variant="secondary"
@@ -367,7 +369,7 @@ export function UploadImageModal({
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="border-t pt-4">
             <Button
               type="button"
               variant="secondary"
@@ -383,6 +385,13 @@ export function UploadImageModal({
               disabled={isUploading || !imagePreview || !title.trim()}
               className="animate-glow"
             >
+              {isUploading ? (
+                <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-primary" />
+              ) : editingItem ? (
+                <Save className="w-4 h-4 mr-2" />
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
               {isUploading
                 ? editingItem
                   ? t("upload_modal.saving")
