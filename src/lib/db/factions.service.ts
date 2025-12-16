@@ -9,6 +9,18 @@ import {
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import {
+  safeParseEntityRefs,
+  safeParseStringArray,
+  safeParseUnknownObject,
+  safeParseUnknownArray,
+  safeJSONParse,
+  factionTimelineSchema,
+  diplomaticRelationsSchema,
+  hierarchySchema,
+  locationArraySchema,
+  unknownObjectSchema,
+} from "./safe-json-parse";
 
 // Convert IFaction to DBFaction
 function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
@@ -124,25 +136,27 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
 
     // Advanced fields - Territory
     dominatedAreas: dbFaction.dominated_areas
-      ? JSON.parse(dbFaction.dominated_areas)
+      ? safeJSONParse(dbFaction.dominated_areas, locationArraySchema, [])
       : undefined,
-    mainBase: dbFaction.main_base ? JSON.parse(dbFaction.main_base) : undefined,
+    mainBase: dbFaction.main_base
+      ? safeJSONParse(dbFaction.main_base, unknownObjectSchema, {})
+      : undefined,
     areasOfInterest: dbFaction.areas_of_interest
-      ? JSON.parse(dbFaction.areas_of_interest)
+      ? safeJSONParse(dbFaction.areas_of_interest, locationArraySchema, [])
       : undefined,
 
     // Advanced fields - Internal Structure
     governmentForm: dbFaction.government_form,
     rulesAndLaws: dbFaction.rules_and_laws
-      ? JSON.parse(dbFaction.rules_and_laws)
+      ? safeParseStringArray(dbFaction.rules_and_laws)
       : undefined,
     mainResources: dbFaction.main_resources
-      ? JSON.parse(dbFaction.main_resources)
+      ? safeParseStringArray(dbFaction.main_resources)
       : undefined,
     economy: dbFaction.economy,
     symbolsAndSecrets: dbFaction.symbols_and_secrets,
     currencies: dbFaction.currencies
-      ? JSON.parse(dbFaction.currencies)
+      ? safeParseStringArray(dbFaction.currencies)
       : undefined,
 
     // Advanced fields - Power
@@ -154,23 +168,25 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     // Advanced fields - Culture
     factionMotto: dbFaction.faction_motto,
     traditionsAndRituals: dbFaction.traditions_and_rituals
-      ? JSON.parse(dbFaction.traditions_and_rituals)
+      ? safeParseStringArray(dbFaction.traditions_and_rituals)
       : undefined,
     beliefsAndValues: dbFaction.beliefs_and_values
-      ? JSON.parse(dbFaction.beliefs_and_values)
+      ? safeParseStringArray(dbFaction.beliefs_and_values)
       : undefined,
     languagesUsed: dbFaction.languages_used
-      ? JSON.parse(dbFaction.languages_used)
+      ? safeParseStringArray(dbFaction.languages_used)
       : undefined,
     uniformAndAesthetics: dbFaction.uniform_and_aesthetics,
-    races: dbFaction.races ? JSON.parse(dbFaction.races) : undefined,
+    races: dbFaction.races ? safeParseEntityRefs(dbFaction.races) : undefined,
 
     // Advanced fields - History
     foundationDate: dbFaction.foundation_date,
     foundationHistorySummary: dbFaction.foundation_history_summary,
-    founders: dbFaction.founders ? JSON.parse(dbFaction.founders) : undefined,
+    founders: dbFaction.founders
+      ? safeParseEntityRefs(dbFaction.founders)
+      : undefined,
     chronology: dbFaction.chronology
-      ? JSON.parse(dbFaction.chronology)
+      ? safeParseStringArray(dbFaction.chronology)
       : undefined,
 
     // Advanced fields - Narrative
@@ -179,16 +195,20 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     inspirations: dbFaction.inspirations,
 
     // Special sections
-    timeline: dbFaction.timeline ? JSON.parse(dbFaction.timeline) : undefined,
+    timeline: dbFaction.timeline
+      ? safeJSONParse(dbFaction.timeline, factionTimelineSchema, [])
+      : undefined,
     diplomaticRelations: dbFaction.diplomatic_relations
-      ? JSON.parse(dbFaction.diplomatic_relations)
+      ? safeJSONParse(dbFaction.diplomatic_relations, diplomaticRelationsSchema, [])
       : undefined,
     hierarchy: dbFaction.hierarchy
-      ? JSON.parse(dbFaction.hierarchy)
+      ? safeJSONParse(dbFaction.hierarchy, hierarchySchema, [])
       : undefined,
 
     // UI State
-    uiState: dbFaction.ui_state ? JSON.parse(dbFaction.ui_state) : undefined,
+    uiState: dbFaction.ui_state
+      ? safeParseUnknownObject(dbFaction.ui_state)
+      : undefined,
 
     // Metadata
     createdAt: new Date(dbFaction.created_at).toISOString(),
@@ -404,7 +424,11 @@ export async function deleteFaction(id: string): Promise<void> {
 
     for (const faction of allFactions) {
       try {
-        const relations = JSON.parse(faction.diplomatic_relations);
+        const relations = safeJSONParse(
+          faction.diplomatic_relations,
+          diplomaticRelationsSchema,
+          []
+        );
         const filteredRelations = relations.filter(
           (rel: any) => rel.targetFactionId !== id
         );
@@ -454,7 +478,7 @@ export async function getFactionVersions(
       description: v.description || "",
       createdAt: new Date(v.created_at).toISOString(),
       isMain: v.is_main === 1,
-      factionData: v.faction_data ? JSON.parse(v.faction_data) : ({} as IFaction),
+      factionData: safeParseUnknownObject(v.faction_data) as IFaction,
     }));
   }, 'getFactionVersions');
 }

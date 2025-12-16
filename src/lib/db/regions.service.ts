@@ -11,6 +11,10 @@ import {
   cleanCommonEntityReferences,
   removeFromJSONArray,
 } from "./cleanup-helpers";
+import {
+  safeParseUnknownObject,
+  safeParseEntityRefs,
+} from "./safe-json-parse";
 
 /**
  * Database representation of a region (snake_case)
@@ -529,7 +533,7 @@ export async function getRegionVersions(
     description: dbVersion.description || undefined,
     createdAt: dbVersion.created_at,
     isMain: dbVersion.is_main === 1,
-    regionData: JSON.parse(dbVersion.region_data),
+    regionData: safeParseUnknownObject(dbVersion.region_data),
   }));
 }, 'getRegionVersions');
 }
@@ -758,10 +762,10 @@ export async function getRegionVersionTimeline(
       outcome: dbEvent.outcome,
       startDate: dbEvent.start_date,
       endDate: dbEvent.end_date,
-      charactersInvolved: JSON.parse(dbEvent.characters_involved || "[]"),
-      factionsInvolved: JSON.parse(dbEvent.factions_involved || "[]"),
-      racesInvolved: JSON.parse(dbEvent.races_involved || "[]"),
-      itemsInvolved: JSON.parse(dbEvent.items_involved || "[]"),
+      charactersInvolved: safeParseEntityRefs(dbEvent.characters_involved),
+      factionsInvolved: safeParseEntityRefs(dbEvent.factions_involved),
+      racesInvolved: safeParseEntityRefs(dbEvent.races_involved),
+      itemsInvolved: safeParseEntityRefs(dbEvent.items_involved),
     }));
 
     timeline.push({

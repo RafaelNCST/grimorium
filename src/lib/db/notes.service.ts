@@ -4,6 +4,7 @@ import { DBNote, DBNoteLink } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import { safeParseUnknownObject } from "./safe-json-parse";
 
 import type { JSONContent } from "@tiptap/react";
 
@@ -30,7 +31,9 @@ function dbNoteToNote(dbNote: DBNote): Omit<INote, "links"> {
     id: dbNote.id,
     bookId: dbNote.book_id,
     name: dbNote.name,
-    content: dbNote.content ? JSON.parse(dbNote.content) : undefined,
+    content: dbNote.content
+      ? (safeParseUnknownObject(dbNote.content) as JSONContent)
+      : undefined,
     paperMode: dbNote.paper_mode as PaperMode,
     createdAt: new Date(dbNote.created_at).toISOString(),
     updatedAt: new Date(dbNote.updated_at).toISOString(),

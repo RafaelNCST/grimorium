@@ -4,6 +4,14 @@ import { DBBook } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  safeParseStringArray,
+  safeJSONParse,
+  stickyNotesSchema,
+  checklistItemsSchema,
+  sectionsConfigSchema,
+  tabsConfigSchema,
+} from "./safe-json-parse";
 
 // Convert Book store type to DBBook
 function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
@@ -45,7 +53,7 @@ function dbBookToBook(dbBook: DBBook): Book {
   return {
     id: dbBook.id,
     title: dbBook.title,
-    genre: dbBook.genre ? JSON.parse(dbBook.genre) : [],
+    genre: safeParseStringArray(dbBook.genre),
     visualStyle: dbBook.visual_style || "",
     coverImage: dbBook.cover_image_path || "",
     chapters: dbBook.chapters,
@@ -358,34 +366,25 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
     }
 
     // Parse sticky notes
-    if (row.sticky_notes) {
-      try {
-        overviewData.stickyNotes = JSON.parse(row.sticky_notes);
-      } catch (e) {
-        console.error("Error parsing sticky notes:", e);
-        overviewData.stickyNotes = [];
-      }
-    }
+    overviewData.stickyNotes = safeJSONParse(
+      row.sticky_notes,
+      stickyNotesSchema,
+      []
+    );
 
     // Parse checklist items
-    if (row.checklist_items) {
-      try {
-        overviewData.checklistItems = JSON.parse(row.checklist_items);
-      } catch (e) {
-        console.error("Error parsing checklist items:", e);
-        overviewData.checklistItems = [];
-      }
-    }
+    overviewData.checklistItems = safeJSONParse(
+      row.checklist_items,
+      checklistItemsSchema,
+      []
+    );
 
     // Parse sections config
-    if (row.sections_config) {
-      try {
-        overviewData.sectionsConfig = JSON.parse(row.sections_config);
-      } catch (e) {
-        console.error("Error parsing sections config:", e);
-        overviewData.sectionsConfig = [];
-      }
-    }
+    overviewData.sectionsConfig = safeJSONParse(
+      row.sections_config,
+      sectionsConfigSchema,
+      []
+    );
 
     return overviewData;
   }, 'getOverviewData');
@@ -410,12 +409,7 @@ export async function getTabsConfig(bookId: string): Promise<TabConfig[]> {
       return []; // Return empty array, dashboard will use defaults
     }
 
-    try {
-      return JSON.parse(result[0].tabs_config);
-    } catch (e) {
-      console.error("Error parsing tabs config:", e);
-      return [];
-    }
+    return safeJSONParse(result[0].tabs_config, tabsConfigSchema, []);
   }, 'getTabsConfig');
 }
 

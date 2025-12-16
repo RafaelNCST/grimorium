@@ -13,6 +13,11 @@ import {
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import {
+  safeParseStringArray,
+  safeParseFieldVisibility,
+  safeParseUnknownObject,
+} from "./safe-json-parse";
 
 // Convert IRace to DBRace
 function raceToDBRace(bookId: string, race: IRace): DBRace {
@@ -65,12 +70,12 @@ function dbRaceToRace(dbRace: DBRace): IRace {
   return {
     id: dbRace.id,
     name: dbRace.name,
-    domain: JSON.parse(dbRace.domain),
+    domain: safeParseStringArray(dbRace.domain),
     summary: dbRace.summary,
     image: dbRace.image,
     scientificName: dbRace.scientific_name,
     alternativeNames: dbRace.alternative_names
-      ? JSON.parse(dbRace.alternative_names)
+      ? safeParseStringArray(dbRace.alternative_names)
       : undefined,
     culturalNotes: dbRace.cultural_notes,
     generalAppearance: dbRace.general_appearance,
@@ -85,19 +90,21 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     diet: dbRace.diet,
     elementalDiet: dbRace.elemental_diet,
     communication: dbRace.communication
-      ? JSON.parse(dbRace.communication)
+      ? safeParseStringArray(dbRace.communication)
       : undefined,
     otherCommunication: dbRace.other_communication,
     moralTendency: dbRace.moral_tendency,
     socialOrganization: dbRace.social_organization,
-    habitat: dbRace.habitat ? JSON.parse(dbRace.habitat) : undefined,
+    habitat: dbRace.habitat
+      ? safeParseStringArray(dbRace.habitat)
+      : undefined,
     physicalCapacity: dbRace.physical_capacity,
     specialCharacteristics: dbRace.special_characteristics,
     weaknesses: dbRace.weaknesses,
     storyMotivation: dbRace.story_motivation,
     inspirations: dbRace.inspirations,
     fieldVisibility: dbRace.field_visibility
-      ? JSON.parse(dbRace.field_visibility)
+      ? safeParseFieldVisibility(dbRace.field_visibility)
       : undefined,
     speciesId: "", // Legacy field, kept for backwards compatibility
   };
@@ -305,7 +312,7 @@ export async function getRaceVersions(raceId: string): Promise<IRaceVersion[]> {
     );
 
     return result.map((v) => {
-      const parsedData = v.race_data ? JSON.parse(v.race_data) : {};
+      const parsedData = safeParseUnknownObject(v.race_data);
       // Extrair _relationships do JSON e separar
       const { _relationships, ...raceData } = parsedData;
       return {

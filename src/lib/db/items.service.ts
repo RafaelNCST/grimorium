@@ -7,6 +7,11 @@ import {
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import {
+  safeParseStringArray,
+  safeParseFieldVisibility,
+  safeParseUnknownObject,
+} from "./safe-json-parse";
 
 export interface IItem {
   id: string;
@@ -85,17 +90,13 @@ function dbItemToItem(dbItem: DBItem): IItem {
     image: dbItem.image,
     appearance: dbItem.appearance,
     origin: dbItem.origin,
-    alternativeNames: dbItem.alternative_names
-      ? JSON.parse(dbItem.alternative_names)
-      : [],
+    alternativeNames: safeParseStringArray(dbItem.alternative_names),
     storyRarity: dbItem.story_rarity,
     narrativePurpose: dbItem.narrative_purpose,
     usageRequirements: dbItem.usage_requirements,
     usageConsequences: dbItem.usage_consequences,
     itemUsage: dbItem.item_usage,
-    fieldVisibility: dbItem.field_visibility
-      ? JSON.parse(dbItem.field_visibility)
-      : {},
+    fieldVisibility: safeParseFieldVisibility(dbItem.field_visibility),
     createdAt: new Date(dbItem.created_at).toISOString(),
     updatedAt: new Date(dbItem.updated_at).toISOString(),
   };
@@ -264,7 +265,7 @@ export async function getItemVersions(itemId: string): Promise<IItemVersion[]> {
       description: v.description,
       createdAt: new Date(v.created_at).toISOString(),
       isMain: v.is_main === 1,
-      itemData: v.item_data ? JSON.parse(v.item_data) : ({} as IItem),
+      itemData: safeParseUnknownObject(v.item_data) as IItem,
     }));
   }, 'getItemVersions');
 }

@@ -20,6 +20,7 @@ import {
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import { safeJSONParse, blockContentSchema } from "./safe-json-parse";
 
 // ============================================================================
 // CONVERSION FUNCTIONS
@@ -81,7 +82,7 @@ function dbPowerBlockToPowerBlock(db: DBPowerBlock): IPowerBlock {
     sectionId: db.section_id,
     type: db.type as BlockType,
     orderIndex: db.order_index,
-    content: JSON.parse(db.content_json) as BlockContent,
+    content: safeJSONParse(db.content_json, blockContentSchema, {}) as BlockContent,
     createdAt: db.created_at,
     updatedAt: db.updated_at,
   };

@@ -3,6 +3,7 @@
  */
 
 import { getDB } from "./index";
+import { safeParseStringArray, safeParseUnknownObject } from "./safe-json-parse";
 
 /**
  * Remove an ID from a JSON array field in the database
@@ -36,7 +37,7 @@ export async function removeFromJSONArray(
     if (!columnValue) continue;
 
     try {
-      const array: string[] = JSON.parse(columnValue);
+      const array: string[] = safeParseStringArray(columnValue);
       const filteredArray = array.filter((id) => id !== entityId);
 
       // Only update if something changed
@@ -88,7 +89,7 @@ export async function removeFromNestedJSONArray(
     if (!columnValue) continue;
 
     try {
-      const data = JSON.parse(columnValue);
+      const data = safeParseUnknownObject(columnValue);
       let modified = false;
 
       // Recursively clean the nested structure

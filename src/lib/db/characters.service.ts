@@ -19,6 +19,15 @@ import {
   removeFromJSONArray,
   removeFromNestedJSONArray,
 } from "./cleanup-helpers";
+import {
+  safeParseStringArray,
+  safeParseEntityRefs,
+  safeParseLocations,
+  safeParseFieldVisibility,
+  safeParseUnknownObject,
+  safeJSONParse,
+  hierarchySchema,
+} from "./safe-json-parse";
 
 // Convert ICharacter to DBCharacter
 function characterToDBCharacter(
@@ -97,9 +106,7 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     eyes: dbChar.eyes,
     face: dbChar.face,
     distinguishingFeatures: dbChar.distinguishing_features,
-    speciesAndRace: dbChar.species_and_race
-      ? JSON.parse(dbChar.species_and_race)
-      : [],
+    speciesAndRace: safeParseEntityRefs(dbChar.species_and_race),
     archetype: dbChar.archetype,
     personality: dbChar.personality,
     hobbies: dbChar.hobbies,
@@ -107,13 +114,13 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     fearsAndTraumas: dbChar.fears_and_traumas,
     favoriteFood: dbChar.favorite_food,
     favoriteMusic: dbChar.favorite_music,
-    birthPlace: dbChar.birth_place ? JSON.parse(dbChar.birth_place) : [],
+    birthPlace: safeParseLocations(dbChar.birth_place),
     affiliatedPlace: dbChar.affiliated_place,
     organization: dbChar.organization,
-    nicknames: dbChar.nicknames ? JSON.parse(dbChar.nicknames) : [],
+    nicknames: safeParseStringArray(dbChar.nicknames),
     past: dbChar.past,
     fieldVisibility: dbChar.field_visibility
-      ? JSON.parse(dbChar.field_visibility)
+      ? safeParseFieldVisibility(dbChar.field_visibility)
       : undefined,
     createdAt: new Date(dbChar.created_at).toISOString(),
     updatedAt: new Date(dbChar.updated_at).toISOString(),
@@ -311,7 +318,7 @@ export async function deleteCharacter(id: string): Promise<void> {
 
     for (const faction of factions) {
       try {
-        const hierarchy = JSON.parse(faction.hierarchy);
+        const hierarchy = safeJSONParse(faction.hierarchy, hierarchySchema, []);
         let modified = false;
 
         for (const title of hierarchy) {
@@ -529,9 +536,7 @@ export async function getCharacterVersions(
       description: v.description || "",
       createdAt: new Date(v.created_at).toISOString(),
       isMain: v.is_main === 1,
-      characterData: v.character_data
-        ? JSON.parse(v.character_data)
-        : ({} as ICharacter),
+      characterData: safeParseUnknownObject(v.character_data) as ICharacter,
     }));
   }, 'getCharacterVersions');
 }

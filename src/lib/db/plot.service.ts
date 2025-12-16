@@ -4,6 +4,7 @@ import { DBPlotArc, DBPlotEvent } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import { safeParseEntityRefs } from "./safe-json-parse";
 
 // Convert IPlotArc to DBPlotArc
 function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
@@ -48,18 +49,10 @@ function dbPlotArcToArc(dbArc: DBPlotArc, events: IPlotEvent[]): IPlotArc {
     status: dbArc.status as IPlotArc["status"],
     order: dbArc.order_index,
     events,
-    importantCharacters: dbArc.important_characters
-      ? JSON.parse(dbArc.important_characters)
-      : [],
-    importantFactions: dbArc.important_factions
-      ? JSON.parse(dbArc.important_factions)
-      : [],
-    importantItems: dbArc.important_items
-      ? JSON.parse(dbArc.important_items)
-      : [],
-    importantRegions: dbArc.important_regions
-      ? JSON.parse(dbArc.important_regions)
-      : [],
+    importantCharacters: safeParseEntityRefs(dbArc.important_characters),
+    importantFactions: safeParseEntityRefs(dbArc.important_factions),
+    importantItems: safeParseEntityRefs(dbArc.important_items),
+    importantRegions: safeParseEntityRefs(dbArc.important_regions),
     arcMessage: dbArc.arc_message,
     worldImpact: dbArc.world_impact,
   };
@@ -235,27 +228,19 @@ export async function updatePlotArc(
       importantCharacters:
         updates.importantCharacters !== undefined
           ? updates.importantCharacters
-          : currentArc.important_characters
-            ? JSON.parse(currentArc.important_characters)
-            : [],
+          : safeParseEntityRefs(currentArc.important_characters),
       importantFactions:
         updates.importantFactions !== undefined
           ? updates.importantFactions
-          : currentArc.important_factions
-            ? JSON.parse(currentArc.important_factions)
-            : [],
+          : safeParseEntityRefs(currentArc.important_factions),
       importantItems:
         updates.importantItems !== undefined
           ? updates.importantItems
-          : currentArc.important_items
-            ? JSON.parse(currentArc.important_items)
-            : [],
+          : safeParseEntityRefs(currentArc.important_items),
       importantRegions:
         updates.importantRegions !== undefined
           ? updates.importantRegions
-          : currentArc.important_regions
-            ? JSON.parse(currentArc.important_regions)
-            : [],
+          : safeParseEntityRefs(currentArc.important_regions),
       arcMessage:
         updates.arcMessage !== undefined
           ? updates.arcMessage

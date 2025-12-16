@@ -1,6 +1,7 @@
 import type { ChapterData } from "@/stores/chapters-store";
 
 import { createChapter } from "./chapters.service";
+import { safeParseUnknownObject } from "./safe-json-parse";
 
 interface LocalStorageChaptersState {
   state: {
@@ -27,8 +28,8 @@ export async function migrateChaptersFromLocalStorage(
     }
 
     // Parse dos dados
-    const parsedData: LocalStorageChaptersState = JSON.parse(localStorageData);
-    const chapters = Object.values(parsedData.state.chapters);
+    const parsedData = safeParseUnknownObject(localStorageData) as LocalStorageChaptersState;
+    const chapters = Object.values(parsedData.state?.chapters || {});
 
     if (chapters.length === 0) {
       return 0;
@@ -72,8 +73,8 @@ export function hasChaptersInLocalStorage(): boolean {
 
     if (!localStorageData) return false;
 
-    const parsedData: LocalStorageChaptersState = JSON.parse(localStorageData);
-    const chapters = Object.values(parsedData.state.chapters);
+    const parsedData = safeParseUnknownObject(localStorageData) as LocalStorageChaptersState;
+    const chapters = Object.values(parsedData.state?.chapters || {});
 
     return chapters.length > 0;
   } catch (error) {

@@ -1,4 +1,5 @@
 import Database from "@tauri-apps/plugin-sql";
+import { safeParseStringArray } from "./safe-json-parse";
 
 let db: Database | null = null;
 
@@ -1472,7 +1473,7 @@ async function migrateBookGenres(database: Database): Promise<void> {
       if (!book.genre) continue;
 
       try {
-        const genres: string[] = JSON.parse(book.genre);
+        const genres: string[] = safeParseStringArray(book.genre);
         let needsMigration = false;
         const newGenres: string[] = [];
 
@@ -1618,7 +1619,7 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
     for (const race of races) {
       try {
         // Parse the domain JSON array
-        const domains: string[] = JSON.parse(race.domain);
+        const domains: string[] = safeParseStringArray(race.domain);
         let needsMigration = false;
         const newDomains: string[] = [];
 
