@@ -23,3 +23,6 @@ export const GRID_GAP = 4;
 
 // Directory for file storage
 export const GALLERY_DIRECTORY = "gallery";
+export const THUMBNAILS_DIRECTORY = "gallery/thumbnails";
+export const THUMBNAIL_FILE_PREFIX = "thumb_";
+export const THUMBNAIL_FORMAT = "jpg";

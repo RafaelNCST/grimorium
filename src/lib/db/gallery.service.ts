@@ -25,7 +25,8 @@ function galleryItemToDBGalleryItem(item: IGalleryItem): DBGalleryItem {
     book_id: item.bookId,
     title: item.title,
     description: item.description,
-    thumbnail_base64: item.thumbnailBase64,
+    thumbnail_base64: item.thumbnailBase64, // DEPRECATED: para compatibilidade temporária
+    thumbnail_path: item.thumbnailPath,
     original_path: item.originalPath,
     original_filename: item.originalFilename,
     file_size: item.fileSize,
@@ -51,7 +52,8 @@ function dbGalleryItemToGalleryItem(
     bookId: dbItem.book_id,
     title: dbItem.title,
     description: dbItem.description,
-    thumbnailBase64: dbItem.thumbnail_base64,
+    thumbnailBase64: dbItem.thumbnail_base64, // DEPRECATED: para compatibilidade temporária
+    thumbnailPath: dbItem.thumbnail_path || getThumbnailPath(dbItem.id),
     originalPath: dbItem.original_path,
     originalFilename: dbItem.original_filename,
     fileSize: dbItem.file_size,
@@ -112,6 +114,132 @@ export async function ensureGalleryDirectory(): Promise<void> {
       });
     }
   }, 'ensureGalleryDirectory');
+}
+
+// ========================================
+// Thumbnail File System Operations
+// ========================================
+
+/**
+ * Ensure thumbnails directory exists in AppData
+ */
+export async function ensureThumbnailsDirectory(): Promise<void> {
+  return safeDBOperation(async () => {
+    const { THUMBNAILS_DIRECTORY } = await import(
+      "@/pages/gallery/constants/gallery-constants"
+    );
+
+    const directoryExists = await exists(THUMBNAILS_DIRECTORY, {
+      baseDir: BaseDirectory.AppData,
+    });
+
+    if (!directoryExists) {
+      await mkdir(THUMBNAILS_DIRECTORY, {
+        baseDir: BaseDirectory.AppData,
+        recursive: true,
+      });
+    }
+  }, 'ensureThumbnailsDirectory');
+}
+
+/**
+ * Get thumbnail file path for a gallery item
+ * @param itemId - Gallery item ID
+ * @returns Relative path (e.g., "gallery/thumbnails/thumb_123.jpg")
+ */
+export function getThumbnailPath(itemId: string): string {
+  return `gallery/thumbnails/thumb_${itemId}.jpg`;
+}
+
+/**
+ * Save thumbnail file to filesystem
+ * @param itemId - Gallery item ID
+ * @param base64Data - Base64 data URL of thumbnail
+ * @returns Relative path to saved thumbnail
+ */
+export async function saveThumbnailFile(
+  itemId: string,
+  base64Data: string
+): Promise<string> {
+  return safeDBOperation(async () => {
+    const { saveThumbnailToFile } = await import(
+      "@/pages/gallery/utils/image-utils"
+    );
+
+    return await saveThumbnailToFile(itemId, base64Data);
+  }, 'saveThumbnailFile');
+}
+
+/**
+ * Delete thumbnail file from filesystem
+ * @param thumbnailPath - Relative path to thumbnail file
+ */
+export async function deleteThumbnailFile(
+  thumbnailPath: string
+): Promise<void> {
+  return safeDBOperation(async () => {
+    const fileExists = await exists(thumbnailPath, {
+      baseDir: BaseDirectory.AppData,
+    });
+
+    if (fileExists) {
+      await remove(thumbnailPath, {
+        baseDir: BaseDirectory.AppData,
+      });
+    }
+  }, 'deleteThumbnailFile');
+}
+
+/**
+ * Load thumbnail as data URL with fallback to regeneration
+ * @param item - Gallery item (needs id, thumbnailPath, originalPath, mimeType)
+ * @returns Data URL for thumbnail
+ */
+export async function loadThumbnailWithFallback(
+  item: Pick<IGalleryItem, 'id' | 'thumbnailPath' | 'originalPath' | 'mimeType'>
+): Promise<string> {
+  return safeDBOperation(async () => {
+    const {
+      loadThumbnailAsDataURL,
+      regenerateThumbnailFromOriginal,
+    } = await import("@/pages/gallery/utils/image-utils");
+
+    try {
+      // Tentar carregar thumbnail do filesystem
+      return await loadThumbnailAsDataURL(item.thumbnailPath);
+    } catch (error) {
+      // Fallback: regenerar da imagem original
+      console.warn(
+        `[loadThumbnailWithFallback] Thumbnail not found for item ${item.id}, regenerating...`
+      );
+
+      try {
+        const newThumbnailPath = await regenerateThumbnailFromOriginal(
+          item.originalPath,
+          item.mimeType,
+          item.id
+        );
+
+        // Atualizar o banco de dados com o novo path
+        await updateGalleryItem(item.id, { thumbnailPath: newThumbnailPath });
+
+        // Carregar o thumbnail regenerado
+        return await loadThumbnailAsDataURL(newThumbnailPath);
+      } catch (regenerateError) {
+        console.error(
+          `[loadThumbnailWithFallback] Failed to regenerate thumbnail for item ${item.id}:`,
+          regenerateError
+        );
+        throw new Error(
+          `Cannot load or regenerate thumbnail: ${
+            regenerateError instanceof Error
+              ? regenerateError.message
+              : "Unknown error"
+          }`
+        );
+      }
+    }
+  }, 'loadThumbnailWithFallback');
 }
 
 /**
@@ -301,18 +429,25 @@ export async function createGalleryItem(item: IGalleryItem): Promise<void> {
     const db = await getDB();
     const dbItem = galleryItemToDBGalleryItem(item);
 
+    // Se thumbnailBase64 existe (compatibilidade com código antigo), salvar como arquivo
+    let thumbnailPath = dbItem.thumbnail_path;
+    if (item.thumbnailBase64 && !thumbnailPath) {
+      thumbnailPath = await saveThumbnailFile(item.id, item.thumbnailBase64);
+    }
+
     await db.execute(
       `INSERT INTO gallery_items (
-        id, book_id, title, description, thumbnail_base64, original_path,
+        id, book_id, title, description, thumbnail_base64, thumbnail_path, original_path,
         original_filename, file_size, width, height, mime_type, order_index,
         created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
       [
         dbItem.id,
         dbItem.book_id,
         dbItem.title,
         dbItem.description,
-        dbItem.thumbnail_base64,
+        null, // thumbnail_base64 - não salvamos mais
+        thumbnailPath,
         dbItem.original_path,
         dbItem.original_filename,
         dbItem.file_size,
@@ -356,9 +491,30 @@ export async function updateGalleryItem(
       updateValues.push(updates.description);
     }
 
+    // Se thumbnailBase64 foi fornecido (compatibilidade), converter para arquivo
     if (updates.thumbnailBase64 !== undefined) {
+      // Deletar thumbnail antigo se existir
+      const currentItem = await getGalleryItemById(id);
+      if (currentItem?.thumbnailPath) {
+        await deleteThumbnailFile(currentItem.thumbnailPath);
+      }
+
+      // Salvar novo thumbnail
+      const newThumbnailPath = await saveThumbnailFile(id, updates.thumbnailBase64);
+
+      // Atualizar thumbnail_path no banco
+      updateFields.push(`thumbnail_path = $${updateValues.length + 1}`);
+      updateValues.push(newThumbnailPath);
+
+      // Limpar thumbnail_base64
       updateFields.push(`thumbnail_base64 = $${updateValues.length + 1}`);
-      updateValues.push(updates.thumbnailBase64);
+      updateValues.push(null);
+    }
+
+    // Se thumbnailPath foi fornecido diretamente
+    if (updates.thumbnailPath !== undefined && !updates.thumbnailBase64) {
+      updateFields.push(`thumbnail_path = $${updateValues.length + 1}`);
+      updateValues.push(updates.thumbnailPath);
     }
 
     if (updates.originalPath !== undefined) {
@@ -391,10 +547,16 @@ export async function deleteGalleryItem(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
 
-    // Get item to delete the file
+    // Get item to delete the files
     const item = await getGalleryItemById(id);
     if (item) {
+      // Delete original image
       await deleteGalleryImageFile(item.originalPath);
+
+      // Delete thumbnail file
+      if (item.thumbnailPath) {
+        await deleteThumbnailFile(item.thumbnailPath);
+      }
     }
 
     // Delete from database (links will be deleted automatically via CASCADE)

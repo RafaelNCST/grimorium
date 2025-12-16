@@ -589,7 +589,8 @@ async function runMigrations(database: Database): Promise<void> {
       book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
       title TEXT NOT NULL,
       description TEXT,
-      thumbnail_base64 TEXT NOT NULL,
+      thumbnail_base64 TEXT,
+      thumbnail_path TEXT,
       original_path TEXT NOT NULL,
       original_filename TEXT NOT NULL,
       file_size INTEGER NOT NULL,
@@ -1309,6 +1310,81 @@ async function runMigrations(database: Database): Promise<void> {
       }
     } catch (_error) {
       // book_id column migration error - safe to ignore
+    }
+
+    // Add thumbnail_path column to gallery_items table
+    try {
+      await database.execute(
+        "ALTER TABLE gallery_items ADD COLUMN thumbnail_path TEXT"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Migrate gallery_items to make thumbnail_base64 nullable (it's deprecated)
+    try {
+      // Check if we need to migrate by checking if thumbnail_base64 is NOT NULL
+      const tableInfo = await database.select<Array<{ sql: string }>>(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='gallery_items'"
+      );
+
+      if (
+        tableInfo.length > 0 &&
+        tableInfo[0].sql.includes("thumbnail_base64 TEXT NOT NULL")
+      ) {
+        console.log('[Migration] Making thumbnail_base64 nullable in gallery_items...');
+
+        // Create new table with nullable thumbnail_base64
+        await database.execute(`
+          CREATE TABLE gallery_items_new (
+            id TEXT PRIMARY KEY,
+            book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+            title TEXT NOT NULL,
+            description TEXT,
+            thumbnail_base64 TEXT,
+            thumbnail_path TEXT,
+            original_path TEXT NOT NULL,
+            original_filename TEXT NOT NULL,
+            file_size INTEGER NOT NULL,
+            width INTEGER,
+            height INTEGER,
+            mime_type TEXT NOT NULL,
+            order_index INTEGER NOT NULL DEFAULT 0,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+          )
+        `);
+
+        // Copy existing data
+        await database.execute(`
+          INSERT INTO gallery_items_new
+          SELECT * FROM gallery_items
+        `);
+
+        // Drop old table (links will be preserved as they reference by ID)
+        await database.execute("DROP TABLE gallery_items");
+
+        // Rename new table
+        await database.execute(
+          "ALTER TABLE gallery_items_new RENAME TO gallery_items"
+        );
+
+        // Recreate indexes
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_gallery_items_book_id ON gallery_items(book_id)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_gallery_items_updated_at ON gallery_items(updated_at DESC)"
+        );
+        await database.execute(
+          "CREATE INDEX IF NOT EXISTS idx_gallery_items_order ON gallery_items(book_id, order_index)"
+        );
+
+        console.log('[Migration] gallery_items migration complete');
+      }
+    } catch (migrationError) {
+      console.error('[Migration] Error migrating gallery_items:', migrationError);
+      // Don't throw - this is a non-critical migration that can be retried
     }
 
     // Verify books table exists

@@ -191,3 +191,124 @@ export function bytesToDataURL(bytes: Uint8Array, mimeType: string): string {
   const base64 = btoa(binaryString);
   return `data:${mimeType};base64,${base64}`;
 }
+
+/**
+ * Converte base64 data URL para Uint8Array
+ * @param base64DataUrl - Data URL no formato "data:image/jpeg;base64,..."
+ * @returns Uint8Array dos bytes da imagem
+ */
+export function dataURLToBytes(base64DataUrl: string): Uint8Array {
+  // Remove o prefixo "data:image/jpeg;base64," para obter apenas o base64
+  const base64 = base64DataUrl.split(',')[1];
+
+  // Decodifica base64 para string binária
+  const binaryString = atob(base64);
+
+  // Converte string binária para Uint8Array
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+/**
+ * Salva thumbnail base64 como arquivo no filesystem
+ * @param itemId - ID do item da galeria
+ * @param base64Data - Data URL do thumbnail (data:image/jpeg;base64,...)
+ * @returns Path relativo do thumbnail salvo (ex: "gallery/thumbnails/thumb_123.jpg")
+ */
+export async function saveThumbnailToFile(
+  itemId: string,
+  base64Data: string
+): Promise<string> {
+  const { writeFile, BaseDirectory, mkdir, exists } = await import(
+    "@tauri-apps/plugin-fs"
+  );
+  const {
+    THUMBNAILS_DIRECTORY,
+    THUMBNAIL_FILE_PREFIX,
+    THUMBNAIL_FORMAT,
+  } = await import("../constants/gallery-constants");
+
+  // Garantir que o diretório existe
+  const dirExists = await exists(THUMBNAILS_DIRECTORY, {
+    baseDir: BaseDirectory.AppData,
+  });
+
+  if (!dirExists) {
+    await mkdir(THUMBNAILS_DIRECTORY, {
+      baseDir: BaseDirectory.AppData,
+      recursive: true,
+    });
+  }
+
+  // Converter base64 para bytes
+  const bytes = dataURLToBytes(base64Data);
+
+  // Criar path do arquivo
+  const filename = `${THUMBNAIL_FILE_PREFIX}${itemId}.${THUMBNAIL_FORMAT}`;
+  const relativePath = `${THUMBNAILS_DIRECTORY}/${filename}`;
+
+  // Escrever arquivo
+  await writeFile(relativePath, bytes, { baseDir: BaseDirectory.AppData });
+
+  return relativePath;
+}
+
+/**
+ * Carrega thumbnail do filesystem como data URL
+ * @param thumbnailPath - Path relativo do thumbnail (ex: "gallery/thumbnails/thumb_123.jpg")
+ * @returns Data URL do thumbnail para uso em <img src>
+ */
+export async function loadThumbnailAsDataURL(
+  thumbnailPath: string
+): Promise<string> {
+  const { readFile, BaseDirectory } = await import("@tauri-apps/plugin-fs");
+
+  // Ler arquivo do filesystem
+  const bytes = await readFile(thumbnailPath, { baseDir: BaseDirectory.AppData });
+
+  // Converter para data URL (sempre JPEG para thumbnails)
+  return bytesToDataURL(bytes, "image/jpeg");
+}
+
+/**
+ * Regenera thumbnail a partir da imagem original
+ * Usado como fallback se o arquivo de thumbnail não existir
+ * @param originalPath - Path da imagem original
+ * @param mimeType - MIME type da imagem original
+ * @param itemId - ID do item da galeria
+ * @returns Path do thumbnail regenerado
+ */
+export async function regenerateThumbnailFromOriginal(
+  originalPath: string,
+  mimeType: string,
+  itemId: string
+): Promise<string> {
+  const { readFile, BaseDirectory } = await import("@tauri-apps/plugin-fs");
+
+  try {
+    // Ler imagem original
+    const originalBytes = await readFile(originalPath, {
+      baseDir: BaseDirectory.AppData,
+    });
+
+    // Converter para data URL
+    const originalDataURL = bytesToDataURL(originalBytes, mimeType);
+
+    // Gerar thumbnail
+    const thumbnailDataURL = await generateThumbnail(originalDataURL);
+
+    // Salvar como arquivo
+    const thumbnailPath = await saveThumbnailToFile(itemId, thumbnailDataURL);
+
+    return thumbnailPath;
+  } catch (error) {
+    console.error("[regenerateThumbnailFromOriginal] Error:", error);
+    throw new Error(
+      `Cannot regenerate thumbnail: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
+}

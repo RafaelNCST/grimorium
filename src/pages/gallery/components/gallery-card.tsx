@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Link as LinkIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
+import { loadThumbnailWithFallback } from "@/lib/db/gallery.service";
 import { IGalleryItem } from "@/types/gallery-types";
 
 interface GalleryCardProps {
@@ -16,6 +17,36 @@ interface GalleryCardProps {
 export function GalleryCard({ item, onClick }: GalleryCardProps) {
   const { t } = useTranslation("gallery");
   const [isHovered, setIsHovered] = useState(false);
+  const [thumbnailSrc, setThumbnailSrc] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Carregar thumbnail do filesystem
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadThumbnail() {
+      try {
+        setIsLoading(true);
+        const dataUrl = await loadThumbnailWithFallback(item);
+        if (mounted) {
+          setThumbnailSrc(dataUrl);
+        }
+      } catch (error) {
+        console.error("[GalleryCard] Failed to load thumbnail:", error);
+        // Manter isLoading=true para mostrar placeholder
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadThumbnail();
+
+    return () => {
+      mounted = false;
+    };
+  }, [item.id, item.thumbnailPath, item.updatedAt]);
 
   return (
     <div
@@ -26,12 +57,19 @@ export function GalleryCard({ item, onClick }: GalleryCardProps) {
     >
       {/* Thumbnail */}
       <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
-        <img
-          src={item.thumbnailBase64}
-          alt={item.title}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+        {isLoading ? (
+          <div className="h-full w-full flex items-center justify-center">
+            <div className="animate-pulse bg-muted-foreground/20 h-full w-full" />
+          </div>
+        ) : (
+          <img
+            key={`${item.id}-${item.updatedAt}`}
+            src={thumbnailSrc}
+            alt={item.title}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        )}
       </div>
 
       {/* Content below image */}

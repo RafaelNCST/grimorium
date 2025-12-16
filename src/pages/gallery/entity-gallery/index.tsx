@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useParams, useSearch, useNavigate } from "@tanstack/react-router";
 
+import { getThumbnailPath } from "@/lib/db/gallery.service";
 import { useGalleryStore } from "@/stores/gallery-store";
 import {
   IGalleryItem,
   IGalleryLink,
-  GallerySortOrder,
   EntityType,
 } from "@/types/gallery-types";
 
@@ -37,7 +37,6 @@ export function EntityGalleryPage() {
   } = useGalleryStore();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState<GallerySortOrder>("recent");
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<IGalleryItem | null>(null);
@@ -59,7 +58,7 @@ export function EntityGalleryPage() {
     [items, entityId, entityType]
   );
 
-  // Filter and sort items
+  // Filter items
   const filteredAndSortedItems = useMemo(() => {
     let result = [...filteredByEntity];
 
@@ -73,32 +72,12 @@ export function EntityGalleryPage() {
       );
     }
 
-    // Sort
-    switch (sortOrder) {
-      case "alphabetical":
-        result.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case "recent":
-        result.sort(
-          (a, b) =>
-            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
-        break;
-      case "manual":
-        result.sort((a, b) => a.orderIndex - b.orderIndex);
-        break;
-    }
-
     return result;
-  }, [filteredByEntity, searchTerm, sortOrder]);
+  }, [filteredByEntity, searchTerm]);
 
   // Event handlers
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
-  }, []);
-
-  const handleSortChange = useCallback((value: GallerySortOrder) => {
-    setSortOrder(value);
   }, []);
 
   const handleClearFilters = useCallback(() => {
@@ -123,7 +102,8 @@ export function EntityGalleryPage() {
         const updatedData = {
           title: data.title,
           description: data.description,
-          thumbnailBase64: data.thumbnailBase64,
+          thumbnailBase64: data.thumbnailBase64, // Service layer converte para arquivo
+          thumbnailPath: getThumbnailPath(editingItem.id),
           originalPath: data.originalPath,
           originalFilename: data.originalFilename,
           fileSize: data.fileSize,
@@ -151,12 +131,14 @@ export function EntityGalleryPage() {
         setEditingItem(null);
       } else {
         // Create new item - data.links already contains the pre-selected entity link
+        const itemId = crypto.randomUUID();
         const newItem: IGalleryItem = {
-          id: crypto.randomUUID(),
+          id: itemId,
           bookId: dashboardId,
           title: data.title,
           description: data.description,
-          thumbnailBase64: data.thumbnailBase64,
+          thumbnailBase64: data.thumbnailBase64, // Service layer converte para arquivo
+          thumbnailPath: getThumbnailPath(itemId),
           originalPath: data.originalPath,
           originalFilename: data.originalFilename,
           fileSize: data.fileSize,
@@ -311,8 +293,6 @@ export function EntityGalleryPage() {
       totalCount={filteredByEntity.length}
       searchTerm={searchTerm}
       onSearchChange={handleSearchChange}
-      sortOrder={sortOrder}
-      onSortChange={handleSortChange}
       onClearFilters={handleClearFilters}
       hasActiveFilters={hasActiveFilters}
       isUploadModalOpen={isUploadModalOpen}

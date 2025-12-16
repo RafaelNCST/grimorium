@@ -1,6 +1,5 @@
 # Regras principais
 - Sempre certifique-se de seguir os padrões propostos em `@docs\tech.md` em cada implementação do projeto
-- Sempre que abrir qualquer server do app, feche ele e qualquer um aberto ao final da operação
 
 ## Documentação para padronização e criação
 - Para ver buttons: `@docs\build\buttons.md`

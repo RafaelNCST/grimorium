@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import {
   copyImageToGallery,
   ensureGalleryDirectory,
+  loadThumbnailWithFallback,
 } from "@/lib/db/gallery.service";
 import { IGalleryItem, IGalleryLink } from "@/types/gallery-types";
 
@@ -95,7 +96,17 @@ export function UploadImageModal({
       setTitle(editingItem.title);
       setDescription(editingItem.description || "");
       setLinks(editingItem.links);
-      setImagePreview(editingItem.thumbnailBase64);
+
+      // Carregar thumbnail do filesystem
+      loadThumbnailWithFallback(editingItem)
+        .then((thumbnailDataUrl) => {
+          setImagePreview(thumbnailDataUrl);
+        })
+        .catch((error) => {
+          console.error("[UploadImageModal] Failed to load thumbnail:", error);
+          setImagePreview(""); // Fallback para string vazia
+        });
+
       setImageMetadata({
         filename: editingItem.originalFilename,
         size: editingItem.fileSize,

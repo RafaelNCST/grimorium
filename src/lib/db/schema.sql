@@ -238,7 +238,8 @@ CREATE TABLE IF NOT EXISTS gallery_items (
   description TEXT,
 
   -- Armazenamento Híbrido
-  thumbnail_base64 TEXT NOT NULL,  -- Thumbnail para visualização rápida no grid
+  thumbnail_base64 TEXT,           -- Thumbnail para visualização rápida no grid (DEPRECATED - migrar para thumbnail_path)
+  thumbnail_path TEXT,             -- Path para thumbnail no filesystem (gallery/thumbnails/thumb_{id}.jpg)
   original_path TEXT NOT NULL,     -- Caminho relativo no AppData (gallery/image_{id}_{uuid}.{ext})
 
   -- Metadados da imagem

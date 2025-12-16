@@ -10,6 +10,10 @@ import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
 
 import { getAllBooks } from "@/lib/db/books.service";
+import {
+  needsGalleryThumbnailMigration,
+  migrateGalleryThumbnails,
+} from "@/lib/db/migrate-gallery-thumbnails";
 import { useBookStore } from "@/stores/book-store";
 
 const LOADING_PHRASES = [
@@ -52,8 +56,19 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
         // TODO: Add more initialization here:
         // - Check for updates
         // - Validate subscription
-        // - Run migrations
         // - Load user settings
+
+        // Run gallery thumbnail migration if needed
+        const needsMigration = await needsGalleryThumbnailMigration();
+
+        if (needsMigration) {
+          console.log('[SplashScreen] Starting gallery thumbnail migration...');
+          const result = await migrateGalleryThumbnails((current, total) => {
+            // Progresso da migração (opcional: pode atualizar uma mensagem no futuro)
+            console.log(`[SplashScreen] Migration progress: ${current}/${total}`);
+          });
+          console.log('[SplashScreen] Migration complete:', result);
+        }
 
         setIsDataLoaded(true);
       } catch (error) {

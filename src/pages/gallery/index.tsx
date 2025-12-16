@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 
+import { getThumbnailPath } from "@/lib/db/gallery.service";
 import { useGalleryStore } from "@/stores/gallery-store";
 import { IGalleryItem, IGalleryLink, EntityType } from "@/types/gallery-types";
 
@@ -40,7 +41,7 @@ export function GalleryPage() {
     fetchGalleryItems(false, dashboardId);
   }, [dashboardId, fetchGalleryItems]);
 
-  // Filter and sort items
+  // Filter items
   const filteredAndSortedItems = useMemo(() => {
     let result = [...items];
 
@@ -60,12 +61,6 @@ export function GalleryPage() {
         item.links.some((link) => entityTypeFilters.includes(link.entityType))
       );
     }
-
-    // Sort by recent (fixed)
-    result.sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
 
     return result;
   }, [items, searchTerm, entityTypeFilters]);
@@ -103,7 +98,8 @@ export function GalleryPage() {
         const updatedData = {
           title: data.title,
           description: data.description,
-          thumbnailBase64: data.thumbnailBase64,
+          thumbnailBase64: data.thumbnailBase64, // Service layer converte para arquivo
+          thumbnailPath: getThumbnailPath(editingItem.id),
           originalPath: data.originalPath,
           originalFilename: data.originalFilename,
           fileSize: data.fileSize,
@@ -131,12 +127,14 @@ export function GalleryPage() {
         setEditingItem(null);
       } else {
         // Create new item
+        const itemId = crypto.randomUUID();
         const newItem: IGalleryItem = {
-          id: crypto.randomUUID(),
+          id: itemId,
           bookId: dashboardId,
           title: data.title,
           description: data.description,
-          thumbnailBase64: data.thumbnailBase64,
+          thumbnailBase64: data.thumbnailBase64, // Service layer converte para arquivo
+          thumbnailPath: getThumbnailPath(itemId),
           originalPath: data.originalPath,
           originalFilename: data.originalFilename,
           fileSize: data.fileSize,

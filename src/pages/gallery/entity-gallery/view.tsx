@@ -7,16 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   IGalleryItem,
   IGalleryLink,
-  GallerySortOrder,
   EntityType,
 } from "@/types/gallery-types";
 
@@ -35,8 +27,6 @@ interface EntityGalleryViewProps {
   // Filters
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  sortOrder: GallerySortOrder;
-  onSortChange: (value: GallerySortOrder) => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
 
@@ -89,8 +79,6 @@ export function EntityGalleryView({
   totalCount,
   searchTerm,
   onSearchChange,
-  sortOrder,
-  onSortChange,
   onClearFilters,
   hasActiveFilters,
   isUploadModalOpen,
@@ -203,24 +191,6 @@ export function EntityGalleryView({
                 </Button>
               )}
             </div>
-
-            {/* Sort */}
-            <Select value={sortOrder} onValueChange={onSortChange}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder={t("filters.sort_label")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recent">
-                  {t("filters.sort_recent")}
-                </SelectItem>
-                <SelectItem value="alphabetical">
-                  {t("filters.sort_alphabetical")}
-                </SelectItem>
-                <SelectItem value="manual">
-                  {t("filters.sort_manual")}
-                </SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
       )}
@@ -243,7 +213,7 @@ export function EntityGalleryView({
               onItemEdit={onItemEdit}
               onItemDelete={onItemDelete}
               onReorder={onReorder}
-              enableDragDrop={sortOrder === "manual"}
+              enableDragDrop={false}
             />
 
             {/* Loading more indicator */}

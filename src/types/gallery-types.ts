@@ -24,8 +24,9 @@ export interface IGalleryItem {
   description?: string;
 
   // Hybrid storage
-  thumbnailBase64: string; // For grid display
-  originalPath: string; // For fullscreen/download
+  thumbnailBase64?: string; // DEPRECATED: para compatibilidade temporária
+  thumbnailPath: string;    // Path para thumbnail no filesystem
+  originalPath: string;     // For fullscreen/download
 
   // Metadata
   originalFilename: string;
