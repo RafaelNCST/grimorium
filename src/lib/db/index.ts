@@ -12,6 +12,9 @@ export async function getDB(): Promise<Database> {
 
 async function runMigrations(database: Database): Promise<void> {
   try {
+    // Start transaction
+    await database.execute("BEGIN TRANSACTION");
+
     const schema = `
     -- LIVROS (PROJETOS)
     CREATE TABLE IF NOT EXISTS books (
@@ -1400,9 +1403,18 @@ async function runMigrations(database: Database): Promise<void> {
 
     // Migrate race domain values from Portuguese to English
     await migrateRaceDomainValues(database);
+
+    // Commit transaction
+    await database.execute("COMMIT");
   } catch (_error) {
-    console.error("[db] Error during migrations:", error);
-    throw error;
+    // Rollback transaction on error
+    try {
+      await database.execute("ROLLBACK");
+    } catch (rollbackError) {
+      console.error("[db] Error during rollback:", rollbackError);
+    }
+    console.error("[db] Error during migrations:", _error);
+    throw _error;
   }
 }
 
@@ -1500,7 +1512,7 @@ async function migrateBookGenres(database: Database): Promise<void> {
       }
     }
   } catch (_error) {
-    console.error("[db] Error during genre migration:", error);
+    console.error("[db] Error during genre migration:", _error);
     // Don't throw - this is a non-critical migration
   }
 }
@@ -1563,7 +1575,7 @@ async function migratePlotArcValues(database: Database): Promise<void> {
       "UPDATE plot_arcs SET size = 'large' WHERE size = 'grande'"
     );
   } catch (_error) {
-    console.error("[db] Error during plot arc migration:", error);
+    console.error("[db] Error during plot arc migration:", _error);
     // Don't throw - this is a non-critical migration
   }
 }
@@ -1641,7 +1653,7 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
       }
     }
   } catch (_error) {
-    console.error("[db] Error during race domain migration:", error);
+    console.error("[db] Error during race domain migration:", _error);
     // Don't throw - this is a non-critical migration
   }
 }
