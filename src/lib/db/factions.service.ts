@@ -4,6 +4,11 @@ import { DBFaction, DBFactionVersion } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  cleanCommonEntityReferences,
+  removeFromJSONArray,
+  removeFromNestedJSONArray,
+} from "./cleanup-helpers";
 
 // Convert IFaction to DBFaction
 function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
@@ -378,6 +383,56 @@ export async function updateFaction(
 export async function deleteFaction(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
+
+    // 1. Clean common entity references (mentions, gallery, notes)
+    await cleanCommonEntityReferences(id, "faction");
+
+    // 2. Remove from plot_arcs.important_factions
+    await removeFromJSONArray("plot_arcs", "important_factions", id);
+
+    // 3. Remove from region_timeline_events.factions_involved
+    await removeFromJSONArray(
+      "region_timeline_events",
+      "factions_involved",
+      id
+    );
+
+    // 4. Remove from factions.diplomatic_relations (in ALL factions, not just the deleted one)
+    const allFactions = await db.select<
+      Array<{ id: string; diplomatic_relations: string }>
+    >("SELECT id, diplomatic_relations FROM factions WHERE diplomatic_relations IS NOT NULL");
+
+    for (const faction of allFactions) {
+      try {
+        const relations = JSON.parse(faction.diplomatic_relations);
+        const filteredRelations = relations.filter(
+          (rel: any) => rel.targetFactionId !== id
+        );
+
+        if (filteredRelations.length !== relations.length) {
+          await db.execute(
+            "UPDATE factions SET diplomatic_relations = $1 WHERE id = $2",
+            [JSON.stringify(filteredRelations), faction.id]
+          );
+        }
+      } catch (error) {
+        console.warn(
+          `[deleteFaction] Failed to parse diplomatic_relations for faction ${faction.id}:`,
+          error
+        );
+      }
+    }
+
+    // 5. Remove from factions.timeline[].events[].factionsInvolved
+    await removeFromNestedJSONArray("factions", "timeline", id, [
+      "timeline",
+      "*",
+      "events",
+      "*",
+      "factionsInvolved",
+    ]);
+
+    // 6. Finally, delete the faction (CASCADE will handle versions)
     await db.execute("DELETE FROM factions WHERE id = $1", [id]);
   }, 'deleteFaction');
 }

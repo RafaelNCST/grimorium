@@ -7,6 +7,10 @@ import {
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  cleanCommonEntityReferences,
+  removeFromJSONArray,
+} from "./cleanup-helpers";
 
 /**
  * Database representation of a region (snake_case)
@@ -345,9 +349,30 @@ export async function updateRegion(
  */
 export async function deleteRegion(id: string): Promise<void> {
   return safeDBOperation(async () => {
-  const db = await getDB();
-  await db.execute("DELETE FROM regions WHERE id = $1", [id]);
-}, 'deleteRegion');
+    const db = await getDB();
+
+    // 1. Clean common entity references (mentions, gallery, notes)
+    await cleanCommonEntityReferences(id, "region");
+
+    // 2. Remove from plot_arcs.important_regions
+    await removeFromJSONArray("plot_arcs", "important_regions", id);
+
+    // 3. Remove from characters.birth_place
+    await removeFromJSONArray("characters", "birth_place", id);
+
+    // 4. Remove from factions.dominated_areas
+    await removeFromJSONArray("factions", "dominated_areas", id);
+
+    // 5. Remove from factions.main_base
+    await removeFromJSONArray("factions", "main_base", id);
+
+    // 6. Remove from factions.areas_of_interest
+    await removeFromJSONArray("factions", "areas_of_interest", id);
+
+    // 7. Finally, delete the region (CASCADE will handle versions, maps, markers)
+    // Child regions will have parent_id SET NULL automatically
+    await db.execute("DELETE FROM regions WHERE id = $1", [id]);
+  }, 'deleteRegion');
 }
 
 /**

@@ -2,6 +2,11 @@ import { DBItem, DBItemVersion } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  cleanCommonEntityReferences,
+  removeFromJSONArray,
+  removeFromNestedJSONArray,
+} from "./cleanup-helpers";
 
 export interface IItem {
   id: string;
@@ -221,6 +226,26 @@ export async function updateItem(
 export async function deleteItem(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
+
+    // 1. Clean common entity references (mentions, gallery, notes)
+    await cleanCommonEntityReferences(id, "item");
+
+    // 2. Remove from plot_arcs.important_items
+    await removeFromJSONArray("plot_arcs", "important_items", id);
+
+    // 3. Remove from region_timeline_events.items_involved
+    await removeFromJSONArray("region_timeline_events", "items_involved", id);
+
+    // 4. Remove from factions.timeline[].events[].itemsInvolved
+    await removeFromNestedJSONArray("factions", "timeline", id, [
+      "timeline",
+      "*",
+      "events",
+      "*",
+      "itemsInvolved",
+    ]);
+
+    // 5. Finally, delete the item (CASCADE will handle versions)
     await db.execute("DELETE FROM items WHERE id = $1", [id]);
   }, 'deleteItem');
 }

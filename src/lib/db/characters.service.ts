@@ -14,6 +14,11 @@ import {
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  cleanCommonEntityReferences,
+  removeFromJSONArray,
+  removeFromNestedJSONArray,
+} from "./cleanup-helpers";
 
 // Convert ICharacter to DBCharacter
 function characterToDBCharacter(
@@ -282,6 +287,69 @@ export async function updateCharacter(
 export async function deleteCharacter(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
+
+    // 1. Clean common entity references (mentions, gallery, notes)
+    await cleanCommonEntityReferences(id, "character");
+
+    // 2. Remove from plot_arcs.important_characters
+    await removeFromJSONArray("plot_arcs", "important_characters", id);
+
+    // 3. Remove from region_timeline_events.characters_involved
+    await removeFromJSONArray(
+      "region_timeline_events",
+      "characters_involved",
+      id
+    );
+
+    // 4. Remove from factions.founders
+    await removeFromJSONArray("factions", "founders", id);
+
+    // 5. Remove from factions.hierarchy[].characterIds
+    const factions = await db.select<Array<{ id: string; hierarchy: string }>>(
+      "SELECT id, hierarchy FROM factions WHERE hierarchy IS NOT NULL"
+    );
+
+    for (const faction of factions) {
+      try {
+        const hierarchy = JSON.parse(faction.hierarchy);
+        let modified = false;
+
+        for (const title of hierarchy) {
+          if (Array.isArray(title.characterIds)) {
+            const before = title.characterIds.length;
+            title.characterIds = title.characterIds.filter(
+              (charId: string) => charId !== id
+            );
+            if (title.characterIds.length !== before) {
+              modified = true;
+            }
+          }
+        }
+
+        if (modified) {
+          await db.execute("UPDATE factions SET hierarchy = $1 WHERE id = $2", [
+            JSON.stringify(hierarchy),
+            faction.id,
+          ]);
+        }
+      } catch (error) {
+        console.warn(
+          `[deleteCharacter] Failed to parse hierarchy for faction ${faction.id}:`,
+          error
+        );
+      }
+    }
+
+    // 6. Remove from factions.timeline[].events[].charactersInvolved
+    await removeFromNestedJSONArray("factions", "timeline", id, [
+      "timeline",
+      "*",
+      "events",
+      "*",
+      "charactersInvolved",
+    ]);
+
+    // 7. Finally, delete the character (CASCADE will handle versions, relationships, family_relations, power_character_links)
     await db.execute("DELETE FROM characters WHERE id = $1", [id]);
   }, 'deleteCharacter');
 }

@@ -325,7 +325,13 @@ export async function updatePlotArc(
 export async function deletePlotArc(arcId: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
-    // Events will be deleted automatically due to CASCADE
+
+    // 1. Set plot_arc_id to NULL in chapters that reference this arc
+    await db.execute("UPDATE chapters SET plot_arc_id = NULL WHERE plot_arc_id = $1", [
+      arcId,
+    ]);
+
+    // 2. Delete the arc (CASCADE will handle events)
     await db.execute("DELETE FROM plot_arcs WHERE id = $1", [arcId]);
   }, 'deletePlotArc');
 }

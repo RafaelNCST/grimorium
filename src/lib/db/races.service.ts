@@ -8,6 +8,11 @@ import { DBRace, DBRaceVersion, DBRaceRelationship } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
+import {
+  cleanCommonEntityReferences,
+  removeFromJSONArray,
+  removeFromNestedJSONArray,
+} from "./cleanup-helpers";
 
 // Convert IRace to DBRace
 function raceToDBRace(bookId: string, race: IRace): DBRace {
@@ -263,6 +268,29 @@ export async function updateRace(
 export async function deleteRace(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
+
+    // 1. Clean common entity references (mentions, gallery, notes)
+    await cleanCommonEntityReferences(id, "race");
+
+    // 2. Remove from region_timeline_events.races_involved
+    await removeFromJSONArray("region_timeline_events", "races_involved", id);
+
+    // 3. Remove from characters.species_and_race
+    await removeFromJSONArray("characters", "species_and_race", id);
+
+    // 4. Remove from factions.races
+    await removeFromJSONArray("factions", "races", id);
+
+    // 5. Remove from factions.timeline[].events[].racesInvolved
+    await removeFromNestedJSONArray("factions", "timeline", id, [
+      "timeline",
+      "*",
+      "events",
+      "*",
+      "racesInvolved",
+    ]);
+
+    // 6. Finally, delete the race (CASCADE will handle versions, relationships)
     await db.execute("DELETE FROM races WHERE id = $1", [id]);
   }, 'deleteRace');
 }
