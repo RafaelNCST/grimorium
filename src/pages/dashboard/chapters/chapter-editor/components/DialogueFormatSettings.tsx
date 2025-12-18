@@ -90,11 +90,6 @@ export function DialogueFormatSettings({
     onOpenChange(false);
   };
 
-  const _handleCancel = () => {
-    setLocalFormats(formats); // Reset to original
-    onOpenChange(false);
-  };
-
   const selectedCount = Object.values(localFormats).filter(Boolean).length;
   const isOnlyOneSelected = selectedCount === 1;
 

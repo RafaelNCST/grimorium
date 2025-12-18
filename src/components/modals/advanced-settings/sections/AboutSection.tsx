@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 import { Separator } from "@/components/ui/separator";
 
-const APP_VERSION = "0.0.0"; // TODO: Pegar do package.json ou ambiente
+const APP_VERSION = "0.0.0";
 const GITHUB_ISSUES_URL = "https://github.com/seu-usuario/grimorium/issues";
 const GITHUB_DISCUSSIONS_URL =
   "https://github.com/seu-usuario/grimorium/discussions";
@@ -18,7 +18,6 @@ export function AboutSection() {
   const { t } = useTranslation("advanced-settings");
 
   const openExternal = (url: string) => {
-    // TODO: Usar Tauri shell.open para abrir URLs externas
     window.open(url, "_blank");
   };
 

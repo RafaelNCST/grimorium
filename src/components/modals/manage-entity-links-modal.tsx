@@ -75,8 +75,6 @@ export function ManageEntityLinksModal({
   bookId,
 }: ManageEntityLinksModalProps) {
   const { t } = useTranslation("notes");
-  const books = useBookStore((state) => state.books);
-  const _currentBook = bookId ? books.find((b) => b.id === bookId) : null;
 
   const [activeTab, setActiveTab] = useState<EntityType>("character");
   const [searchTerm, setSearchTerm] = useState("");
@@ -286,8 +284,6 @@ export function ManageEntityLinksModal({
           <TabsList className="w-full h-10 flex items-center justify-start rounded-md bg-transparent p-0">
             {ENTITY_TABS.map((tab, index) => {
               const Icon = tab.icon;
-              const _total = entityCounts[tab.type];
-              const _selected = selectedCounts[tab.type];
               const isFirst = index === 0;
               const isLast = index === ENTITY_TABS.length - 1;
 

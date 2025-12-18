@@ -53,11 +53,6 @@ export function SplashScreen({ onLoadingComplete }: SplashScreenProps) {
 
         setBooks(booksFromDB);
 
-        // TODO: Add more initialization here:
-        // - Check for updates
-        // - Validate subscription
-        // - Load user settings
-
         // Run gallery thumbnail migration if needed
         const needsMigration = await needsGalleryThumbnailMigration();
 

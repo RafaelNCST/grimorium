@@ -72,7 +72,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
     },
     ref
   ) => {
-    const _navigate = useNavigate();
     const editorRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [selectedSearchText, setSelectedSearchText] = useState("");
@@ -549,7 +548,6 @@ export const TextEditor = forwardRef<TextEditorRef, TextEditorProps>(
 
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const _containerRect = containerRef.current.getBoundingClientRect();
 
         if (settings?.autoScrollMode === "center") {
           // Typewriter mode: keep cursor centered in the viewport

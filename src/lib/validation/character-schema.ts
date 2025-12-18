@@ -1,8 +1,4 @@
-import i18next from "i18next";
 import { z } from "zod";
-
-// Helper function to get translation
-const _t = (key: string) => i18next.t(key);
 
 export const CharacterSchema = z.object({
   // Campos obrigatórios

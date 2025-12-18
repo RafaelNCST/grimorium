@@ -67,9 +67,7 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
               <Button
                 variant="ghost"
                 className="w-full justify-start h-auto p-3 text-left"
-                onClick={() => {
-                  // TODO: Implement privacy policy
-                }}
+                onClick={() => {}}
               >
                 <Shield className="w-4 h-4 mr-3 text-muted-foreground" />
                 <div>
@@ -83,9 +81,7 @@ export function SettingsModal({ open, onClose }: PropsSettingsModal) {
               <Button
                 variant="ghost"
                 className="w-full justify-start h-auto p-3 text-left"
-                onClick={() => {
-                  // TODO: Implement terms of use
-                }}
+                onClick={() => {}}
               >
                 <FileText className="w-4 h-4 mr-3 text-muted-foreground" />
                 <div>

@@ -16,8 +16,6 @@ export function useEditorShortcuts({
   editorRef,
   enabled = true,
 }: UseEditorShortcutsProps) {
-  const _lastInputRef = useRef<string>("");
-
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor || !enabled) return;
@@ -33,7 +31,6 @@ export function useEditorShortcuts({
 
       // Check if there's selected text
       const hasSelection = !range.collapsed;
-      const _selectedText = selection.toString();
 
       // Rule 4: Wrap selection with quotes or asterisks
       if (

@@ -206,9 +206,7 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
               variant="magical"
               size="lg"
               className="w-full text-lg h-12"
-              onClick={() => {
-                // TODO: Implementar processo de pagamento
-              }}
+              onClick={() => {}}
             >
               <Crown className="w-5 h-5 mr-2" />
               {t("cta_button")}

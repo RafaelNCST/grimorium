@@ -30,7 +30,6 @@ const getFontFamily = (fontValue: string): string => {
 };
 
 const createStyles = (config: ExportConfig) => {
-  const _format = PAGE_FORMATS[config.pageFormat];
   const margins = MARGIN_PRESETS[config.margins];
   const titleFontFamily = getFontFamily(config.titleFont);
 

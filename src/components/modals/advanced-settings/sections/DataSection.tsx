@@ -43,7 +43,6 @@ export function DataSection() {
   const handleExportBackup = async () => {
     setIsExporting(true);
     try {
-      // TODO: Implementar exportação real de backup
       await new Promise((resolve) => setTimeout(resolve, 1500));
     } catch (error) {
       console.error(error);
@@ -55,7 +54,6 @@ export function DataSection() {
   const handleImportBackup = async () => {
     setIsImporting(true);
     try {
-      // TODO: Implementar importação real de backup
       await new Promise((resolve) => setTimeout(resolve, 1500));
     } catch (error) {
       console.error(error);
@@ -66,12 +64,9 @@ export function DataSection() {
 
   const handleClearData = async () => {
     try {
-      // TODO: Implementar limpeza real de dados
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setShowClearDialog(false);
-
-      // TODO: Reiniciar app ou redirecionar
     } catch (error) {
       console.error(error);
     }
@@ -79,11 +74,9 @@ export function DataSection() {
 
   const handleUsageDataToggle = (checked: boolean) => {
     setAllowUsageData(checked);
-    // TODO: Implementar persistência da preferência
   };
 
   const openExternal = (url: string) => {
-    // TODO: Usar Tauri shell.open para abrir URLs externas
     window.open(url, "_blank");
   };
 

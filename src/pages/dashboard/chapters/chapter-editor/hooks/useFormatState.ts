@@ -42,7 +42,6 @@ export function useFormatState(): FormatState {
         }
 
         // Check if we're inside a contentEditable element
-        const _range = selection.getRangeAt(0);
         const { anchorNode } = selection;
 
         if (!anchorNode) {

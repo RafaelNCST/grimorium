@@ -306,46 +306,6 @@ export function CreateChapterModal({
     }
   }, [open, bookId]);
 
-  // Helper function to convert IDs to EntityMention[]
-  // This function is no longer needed since FormEntityMultiSelectAuto
-  // returns full entity objects in the onChange callback
-  // Keeping it for backwards compatibility but it now passes through the full entity data
-  const _idsToEntities = (
-    ids: string[],
-    availableEntities: EntityOption[]
-  ): EntityMention[] =>
-    ids.map((id) => {
-      const entity = availableEntities.find((e) => e.id === id);
-      if (!entity) {
-        return { id, name: id, image: undefined };
-      }
-      // Return complete entity with all fields
-      return {
-        id: entity.id,
-        name: entity.name,
-        image: entity.image,
-        // Character fields
-        age: entity.age,
-        gender: entity.gender,
-        role: entity.role,
-        status: entity.status,
-        description: entity.description,
-        // Item fields
-        category: entity.category,
-        basicDescription: entity.basicDescription,
-        // Faction fields
-        summary: entity.summary,
-        factionType: entity.factionType,
-        // Race fields
-        scientificName: entity.scientificName,
-        domain: entity.domain,
-        // Region fields
-        scale: entity.scale,
-        parentId: entity.parentId,
-        parentName: entity.parentName,
-      };
-    });
-
   // Helper function to convert EntityMention[] to IDs
   const entitiesToIds = (entities: EntityMention[]): string[] =>
     entities.map((e) => e.id);

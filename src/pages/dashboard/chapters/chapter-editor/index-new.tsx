@@ -489,12 +489,6 @@ function ChapterEditorContent() {
     }, 0);
   };
 
-  // Cancel text selection
-  const _handleCancelSelection = () => {
-    setSelectedText("");
-    setSelectedRange(null);
-  };
-
   // Update annotations (called when text is modified)
   const handleUpdateAnnotations = (updatedAnnotations: Annotation[]) => {
     setChapter((prev) => ({

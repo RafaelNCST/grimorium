@@ -110,8 +110,6 @@ export function CharacterDetail() {
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  // TODO: Refatorar anotações no futuro
-  // const [isLinkedNotesModalOpen, setIsLinkedNotesModalOpen] = useState(false);
   const [versions, setVersions] = useState<ICharacterVersion[]>([
     {
       id: "main-version",
@@ -986,15 +984,6 @@ export function CharacterDetail() {
     },
     [handleNavigateToCharacter]
   );
-
-  // TODO: Refatorar anotações no futuro
-  // const handleLinkedNotesModalOpen = useCallback(() => {
-  //   setIsLinkedNotesModalOpen(true);
-  // }, []);
-
-  // const handleLinkedNotesModalClose = useCallback(() => {
-  //   setIsLinkedNotesModalOpen(false);
-  // }, []);
 
   const handleEdit = useCallback(() => {
     setIsEditing(true);

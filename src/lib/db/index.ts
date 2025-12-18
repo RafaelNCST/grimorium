@@ -1467,8 +1467,6 @@ async function migrateBookGenres(database: Database): Promise<void> {
       "SELECT id, genre FROM books WHERE genre IS NOT NULL"
     );
 
-    const _migratedCount = 0;
-
     for (const book of books) {
       if (!book.genre) continue;
 
@@ -1613,8 +1611,6 @@ async function migrateRaceDomainValues(database: Database): Promise<void> {
       Espiritual: "spiritual",
       Cósmico: "cosmic",
     };
-
-    const _migratedCount2 = 0;
 
     for (const race of races) {
       try {

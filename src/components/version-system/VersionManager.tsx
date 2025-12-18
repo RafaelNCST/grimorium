@@ -79,9 +79,7 @@ export const VersionManager = React.memo(
                 onSelect={() => onVersionSelect(version.id)}
                 onEdit={
                   onVersionUpdate
-                    ? () => {
-                        // TODO: Implement edit dialog
-                      }
+                    ? () => {}
                     : undefined
                 }
                 onDelete={

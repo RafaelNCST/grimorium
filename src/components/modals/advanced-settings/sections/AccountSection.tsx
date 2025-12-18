@@ -48,7 +48,6 @@ export function AccountSection() {
     displayName !== user.displayName && displayName.trim() !== "";
 
   const isPremium = user.subscription.tier === "realeza";
-  const _isActive = user.subscription.status === "active";
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString(
@@ -74,8 +73,6 @@ export function AccountSection() {
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        // TODO: Implementar upload real do arquivo com Tauri
-        // Por enquanto, criando uma URL temporária
         const reader = new FileReader();
         reader.onload = (event) => {
           const url = event.target?.result as string;
@@ -383,7 +380,6 @@ export function AccountSection() {
             // eslint-disable-next-line no-alert
             if (window.confirm(t("account.auth.logout_confirm"))) {
               logout();
-              // TODO: Redirect to login page
             }
           }}
         >
