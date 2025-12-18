@@ -14,9 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import {
-  type IFieldVisibility,
   type ISectionVisibility,
-  FieldWithVisibilityToggle,
   isSectionVisible,
 } from "@/components/detail-page";
 import {
@@ -100,9 +98,7 @@ interface RegionDetailViewProps {
   hasRequiredFieldsEmpty: boolean;
   missingFields: string[];
   // Visibility
-  fieldVisibility: IFieldVisibility;
   sectionVisibility: ISectionVisibility;
-  onFieldVisibilityToggle: (fieldName: string) => void;
   onSectionVisibilityToggle: (sectionName: string) => void;
   onBack: () => void;
   onViewMap: () => void;
@@ -158,9 +154,7 @@ export function RegionDetailView({
   validateField,
   hasRequiredFieldsEmpty,
   missingFields,
-  fieldVisibility,
   sectionVisibility,
-  onFieldVisibilityToggle,
   onSectionVisibilityToggle,
   onBack,
   onViewMap,
@@ -450,68 +444,22 @@ export function RegionDetailView({
     );
   };
 
-  // Helper function to check if all fields in a group are hidden
-  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
-    if (isEditing) return false; // Never hide sections in edit mode
-    return fieldNames.every(
-      (fieldName) => fieldVisibility[fieldName] === false
-    );
-  };
-
-  // Define field groups for each mini-section
-  const environmentFields = [
-    "climate",
-    "currentSeason",
-    "generalDescription",
-    "regionAnomalies",
-  ];
-  const informationFields = [
-    "residentFactions",
-    "dominantFactions",
-    "importantCharacters",
-    "racesFound",
-    "itemsFound",
-  ];
-  const narrativeFields = [
-    "narrativePurpose",
-    "uniqueCharacteristics",
-    "politicalImportance",
-    "religiousImportance",
-    "worldPerception",
-    "regionMysteries",
-    "inspirations",
-  ];
-
-  // Check if mini-sections should be hidden
-  const hideEnvironmentSection = areAllFieldsHidden(environmentFields);
-  const hideInformationSection = areAllFieldsHidden(informationFields);
-  const hideNarrativeSection = areAllFieldsHidden(narrativeFields);
-
-  // Check if entire advanced section should be hidden
-  const hideEntireAdvancedSection =
-    hideEnvironmentSection && hideInformationSection && hideNarrativeSection;
 
   // Render advanced fields content
-  const renderAdvancedFields = () =>
-    hideEntireAdvancedSection ? null : (
+  const renderAdvancedFields = () => (
       <div className="space-y-6">
         {/* Environment Section */}
-        {!hideEnvironmentSection && (
-          <>
-            <div className="space-y-4">
+        <>
+          <div className="space-y-4">
               <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
                 {t("world:create_region.environment_section")}
               </h4>
 
               {/* Climate */}
-              <FieldWithVisibilityToggle
-                fieldName="climate"
-                label={t("world:create_region.climate_label")}
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
+              <div className="space-y-2">
+                <Label className="text-primary">
+                  {t("world:create_region.climate_label")}
+                </Label>
                 {isEditing ? (
                   <>
                     <Textarea
@@ -531,19 +479,15 @@ export function RegionDetailView({
                 ) : (
                   <DisplayTextarea value={region.climate} />
                 )}
-              </FieldWithVisibilityToggle>
+              </div>
 
               {/* Season Picker */}
-              <FieldWithVisibilityToggle
-                fieldName="currentSeason"
-                label={
-                  isEditing ? "" : t("world:create_region.current_season_label")
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
+              <div className="space-y-2">
+                {!isEditing && (
+                  <Label className="text-primary">
+                    {t("world:create_region.current_season_label")}
+                  </Label>
+                )}
                 {isEditing ? (
                   <SeasonPicker
                     value={editData.currentSeason}
@@ -591,17 +535,13 @@ export function RegionDetailView({
                     )}
                   />
                 )}
-              </FieldWithVisibilityToggle>
+              </div>
 
               {/* General Description */}
-              <FieldWithVisibilityToggle
-                fieldName="generalDescription"
-                label={t("world:create_region.general_description_label")}
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
+              <div className="space-y-2">
+                <Label className="text-primary">
+                  {t("world:create_region.general_description_label")}
+                </Label>
                 {isEditing ? (
                   <>
                     <Textarea
@@ -625,22 +565,14 @@ export function RegionDetailView({
                 ) : (
                   <DisplayTextarea value={region.generalDescription} />
                 )}
-              </FieldWithVisibilityToggle>
+              </div>
 
               {/* Region Anomalies */}
-              <FieldWithVisibilityToggle
-                fieldName="regionAnomalies"
-                label={
-                  isEditing
-                    ? t("world:create_region.region_anomalies_label")
-                    : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing && (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.region_anomalies_label")}
+                  </Label>
                   <FormListInput
                     label=""
                     placeholder={t("world:create_region.anomaly_placeholder")}
@@ -655,44 +587,35 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayStringList
-                    label={t("world:create_region.region_anomalies_label")}
-                    items={safeJsonParse(region.regionAnomalies)}
-                    open={openSections.regionAnomalies}
-                    onOpenChange={() => toggleSection("regionAnomalies")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              )}
+              {!isEditing && (
+                <DisplayStringList
+                  label={t("world:create_region.region_anomalies_label")}
+                  items={safeJsonParse(region.regionAnomalies)}
+                  open={openSections.regionAnomalies}
+                  onOpenChange={() => toggleSection("regionAnomalies")}
+                />
+              )}
             </div>
 
-            {/* Separator between Environment and Information - only show if both sections are visible */}
-            {!hideInformationSection && <Separator />}
-          </>
-        )}
+          {/* Separator between Environment and Information */}
+          <Separator />
+        </>
 
         {/* Information Section */}
-        {!hideInformationSection && (
-          <>
-            <div className="space-y-4">
+        <>
+          <div className="space-y-4">
               <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
                 {t("world:create_region.information_section")}
               </h4>
 
               {/* Resident Factions */}
-              <FieldWithVisibilityToggle
-                fieldName="residentFactions"
-                label={
-                  isEditing
-                    ? t("world:create_region.resident_factions_label")
-                    : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.resident_factions_label")}
+                  </Label>
                   <FormEntityMultiSelectAuto
                     key={`resident-factions-${refreshKey}`}
                     entityType="faction"
@@ -719,47 +642,39 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayEntityList
-                    label={t("world:create_region.resident_factions_label")}
-                    entities={
-                      safeJsonParse(region.residentFactions)
-                        .map((factionId: string): DisplayEntityItem | null => {
-                          const faction = factions.find(
-                            (f) => f.id === factionId
-                          );
-                          return faction
-                            ? {
-                                id: faction.id,
-                                name: faction.name,
-                                image: faction.image
-                                  ? convertFileSrc(faction.image)
-                                  : undefined,
-                              }
-                            : null;
-                        })
-                        .filter(Boolean) as DisplayEntityItem[]
-                    }
-                    open={openSections.residentFactions}
-                    onOpenChange={() => toggleSection("residentFactions")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              ) : (
+                <DisplayEntityList
+                  label={t("world:create_region.resident_factions_label")}
+                  entities={
+                    safeJsonParse(region.residentFactions)
+                      .map((factionId: string): DisplayEntityItem | null => {
+                        const faction = factions.find(
+                          (f) => f.id === factionId
+                        );
+                        return faction
+                          ? {
+                              id: faction.id,
+                              name: faction.name,
+                              image: faction.image
+                                ? convertFileSrc(faction.image)
+                                : undefined,
+                            }
+                          : null;
+                      })
+                      .filter(Boolean) as DisplayEntityItem[]
+                  }
+                  open={openSections.residentFactions}
+                  onOpenChange={() => toggleSection("residentFactions")}
+                />
+              )}
 
               {/* Dominant Factions */}
-              <FieldWithVisibilityToggle
-                fieldName="dominantFactions"
-                label={
-                  isEditing
-                    ? t("world:create_region.dominant_factions_label")
-                    : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.dominant_factions_label")}
+                  </Label>
                   <FormEntityMultiSelectAuto
                     key={`dominant-factions-${refreshKey}`}
                     entityType="faction"
@@ -786,47 +701,39 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayEntityList
-                    label={t("world:create_region.dominant_factions_label")}
-                    entities={
-                      safeJsonParse(region.dominantFactions)
-                        .map((factionId: string): DisplayEntityItem | null => {
-                          const faction = factions.find(
-                            (f) => f.id === factionId
-                          );
-                          return faction
-                            ? {
-                                id: faction.id,
-                                name: faction.name,
-                                image: faction.image
-                                  ? convertFileSrc(faction.image)
-                                  : undefined,
-                              }
-                            : null;
-                        })
-                        .filter(Boolean) as DisplayEntityItem[]
-                    }
-                    open={openSections.dominantFactions}
-                    onOpenChange={() => toggleSection("dominantFactions")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              ) : (
+                <DisplayEntityList
+                  label={t("world:create_region.dominant_factions_label")}
+                  entities={
+                    safeJsonParse(region.dominantFactions)
+                      .map((factionId: string): DisplayEntityItem | null => {
+                        const faction = factions.find(
+                          (f) => f.id === factionId
+                        );
+                        return faction
+                          ? {
+                              id: faction.id,
+                              name: faction.name,
+                              image: faction.image
+                                ? convertFileSrc(faction.image)
+                                : undefined,
+                            }
+                          : null;
+                      })
+                      .filter(Boolean) as DisplayEntityItem[]
+                  }
+                  open={openSections.dominantFactions}
+                  onOpenChange={() => toggleSection("dominantFactions")}
+                />
+              )}
 
               {/* Important Characters */}
-              <FieldWithVisibilityToggle
-                fieldName="importantCharacters"
-                label={
-                  isEditing
-                    ? t("world:create_region.important_characters_label")
-                    : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.important_characters_label")}
+                  </Label>
                   <FormEntityMultiSelectAuto
                     key={`important-characters-${refreshKey}`}
                     entityType="character"
@@ -855,47 +762,41 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayEntityList
-                    label={t("world:create_region.important_characters_label")}
-                    entities={
-                      safeJsonParse(region.importantCharacters)
-                        .map(
-                          (characterId: string): DisplayEntityItem | null => {
-                            const character = characters.find(
-                              (c) => c.id === characterId
-                            );
-                            return character
-                              ? {
-                                  id: character.id,
-                                  name: character.name,
-                                  image: character.image
-                                    ? convertFileSrc(character.image)
-                                    : undefined,
-                                }
-                              : null;
-                          }
-                        )
-                        .filter(Boolean) as DisplayEntityItem[]
-                    }
-                    open={openSections.importantCharacters}
-                    onOpenChange={() => toggleSection("importantCharacters")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              ) : (
+                <DisplayEntityList
+                  label={t("world:create_region.important_characters_label")}
+                  entities={
+                    safeJsonParse(region.importantCharacters)
+                      .map(
+                        (characterId: string): DisplayEntityItem | null => {
+                          const character = characters.find(
+                            (c) => c.id === characterId
+                          );
+                          return character
+                            ? {
+                                id: character.id,
+                                name: character.name,
+                                image: character.image
+                                  ? convertFileSrc(character.image)
+                                  : undefined,
+                              }
+                            : null;
+                        }
+                      )
+                      .filter(Boolean) as DisplayEntityItem[]
+                  }
+                  open={openSections.importantCharacters}
+                  onOpenChange={() => toggleSection("importantCharacters")}
+                />
+              )}
 
               {/* Races Found */}
-              <FieldWithVisibilityToggle
-                fieldName="racesFound"
-                label={
-                  isEditing ? t("world:create_region.races_found_label") : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.races_found_label")}
+                  </Label>
                   <FormEntityMultiSelectAuto
                     key={`races-found-${refreshKey}`}
                     entityType="race"
@@ -917,43 +818,37 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayEntityList
-                    label={t("world:create_region.races_found_label")}
-                    entities={
-                      safeJsonParse(region.racesFound)
-                        .map((raceId: string): DisplayEntityItem | null => {
-                          const race = races.find((r) => r.id === raceId);
-                          return race
-                            ? {
-                                id: race.id,
-                                name: race.name,
-                                image: race.image
-                                  ? convertFileSrc(race.image)
-                                  : undefined,
-                              }
-                            : null;
-                        })
-                        .filter(Boolean) as DisplayEntityItem[]
-                    }
-                    open={openSections.racesFound}
-                    onOpenChange={() => toggleSection("racesFound")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              ) : (
+                <DisplayEntityList
+                  label={t("world:create_region.races_found_label")}
+                  entities={
+                    safeJsonParse(region.racesFound)
+                      .map((raceId: string): DisplayEntityItem | null => {
+                        const race = races.find((r) => r.id === raceId);
+                        return race
+                          ? {
+                              id: race.id,
+                              name: race.name,
+                              image: race.image
+                                ? convertFileSrc(race.image)
+                                : undefined,
+                            }
+                          : null;
+                      })
+                      .filter(Boolean) as DisplayEntityItem[]
+                  }
+                  open={openSections.racesFound}
+                  onOpenChange={() => toggleSection("racesFound")}
+                />
+              )}
 
               {/* Items Found */}
-              <FieldWithVisibilityToggle
-                fieldName="itemsFound"
-                label={
-                  isEditing ? t("world:create_region.items_found_label") : ""
-                }
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
-                {isEditing ? (
+              {isEditing ? (
+                <div className="space-y-2">
+                  <Label className="text-primary">
+                    {t("world:create_region.items_found_label")}
+                  </Label>
                   <FormEntityMultiSelectAuto
                     key={`items-found-${refreshKey}`}
                     entityType="item"
@@ -975,53 +870,47 @@ export function RegionDetailView({
                     }
                     labelClassName="text-sm font-medium text-primary"
                   />
-                ) : (
-                  <DisplayEntityList
-                    label={t("world:create_region.items_found_label")}
-                    entities={
-                      safeJsonParse(region.itemsFound)
-                        .map((itemId: string): DisplayEntityItem | null => {
-                          const item = items.find((i) => i.id === itemId);
-                          return item
-                            ? {
-                                id: item.id,
-                                name: item.name,
-                                image: item.image
-                                  ? convertFileSrc(item.image)
-                                  : undefined,
-                              }
-                            : null;
-                        })
-                        .filter(Boolean) as DisplayEntityItem[]
-                    }
-                    open={openSections.itemsFound}
-                    onOpenChange={() => toggleSection("itemsFound")}
-                  />
-                )}
-              </FieldWithVisibilityToggle>
+                </div>
+              ) : (
+                <DisplayEntityList
+                  label={t("world:create_region.items_found_label")}
+                  entities={
+                    safeJsonParse(region.itemsFound)
+                      .map((itemId: string): DisplayEntityItem | null => {
+                        const item = items.find((i) => i.id === itemId);
+                        return item
+                          ? {
+                              id: item.id,
+                              name: item.name,
+                              image: item.image
+                                ? convertFileSrc(item.image)
+                                : undefined,
+                            }
+                          : null;
+                      })
+                      .filter(Boolean) as DisplayEntityItem[]
+                  }
+                  open={openSections.itemsFound}
+                  onOpenChange={() => toggleSection("itemsFound")}
+                />
+              )}
             </div>
 
-            {/* Separator between Information and Narrative - only show if both sections are visible */}
-            {!hideNarrativeSection && <Separator />}
-          </>
-        )}
+          {/* Separator between Information and Narrative */}
+          <Separator />
+        </>
 
         {/* Narrative Section */}
-        {!hideNarrativeSection && (
-          <div className="space-y-4">
+        <div className="space-y-4">
             <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
               {t("world:create_region.narrative_section")}
             </h4>
 
             {/* Narrative Purpose */}
-            <FieldWithVisibilityToggle
-              fieldName="narrativePurpose"
-              label={t("world:create_region.narrative_purpose_label")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("world:create_region.narrative_purpose_label")}
+              </Label>
               {isEditing ? (
                 <>
                   <Textarea
@@ -1043,17 +932,13 @@ export function RegionDetailView({
               ) : (
                 <DisplayTextarea value={region.narrativePurpose} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
             {/* Unique Characteristics */}
-            <FieldWithVisibilityToggle
-              fieldName="uniqueCharacteristics"
-              label={t("world:create_region.unique_characteristics_label")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("world:create_region.unique_characteristics_label")}
+              </Label>
               {isEditing ? (
                 <>
                   <Textarea
@@ -1078,17 +963,13 @@ export function RegionDetailView({
               ) : (
                 <DisplayTextarea value={region.uniqueCharacteristics} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
             {/* Political Importance */}
-            <FieldWithVisibilityToggle
-              fieldName="politicalImportance"
-              label={t("world:create_region.political_importance_label")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("world:create_region.political_importance_label")}
+              </Label>
               {isEditing ? (
                 <>
                   <Textarea
@@ -1110,17 +991,13 @@ export function RegionDetailView({
               ) : (
                 <DisplayTextarea value={region.politicalImportance} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
             {/* Religious Importance */}
-            <FieldWithVisibilityToggle
-              fieldName="religiousImportance"
-              label={t("world:create_region.religious_importance_label")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("world:create_region.religious_importance_label")}
+              </Label>
               {isEditing ? (
                 <>
                   <Textarea
@@ -1142,17 +1019,13 @@ export function RegionDetailView({
               ) : (
                 <DisplayTextarea value={region.religiousImportance} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
             {/* World Perception */}
-            <FieldWithVisibilityToggle
-              fieldName="worldPerception"
-              label={t("world:create_region.world_perception_label")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-primary">
+                {t("world:create_region.world_perception_label")}
+              </Label>
               {isEditing ? (
                 <>
                   <Textarea
@@ -1174,20 +1047,14 @@ export function RegionDetailView({
               ) : (
                 <DisplayTextarea value={region.worldPerception} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
             {/* Region Mysteries */}
-            <FieldWithVisibilityToggle
-              fieldName="regionMysteries"
-              label={
-                isEditing ? t("world:create_region.region_mysteries_label") : ""
-              }
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
-              {isEditing ? (
+            {isEditing && (
+              <div className="space-y-2">
+                <Label className="text-primary">
+                  {t("world:create_region.region_mysteries_label")}
+                </Label>
                 <FormListInput
                   label=""
                   placeholder={t("world:create_region.mystery_placeholder")}
@@ -1202,28 +1069,23 @@ export function RegionDetailView({
                   }
                   labelClassName="text-sm font-medium text-primary"
                 />
-              ) : (
-                <DisplayStringList
-                  label={t("world:create_region.region_mysteries_label")}
-                  items={safeJsonParse(region.regionMysteries)}
-                  open={openSections.regionMysteries}
-                  onOpenChange={() => toggleSection("regionMysteries")}
-                />
-              )}
-            </FieldWithVisibilityToggle>
+              </div>
+            )}
+            {!isEditing && (
+              <DisplayStringList
+                label={t("world:create_region.region_mysteries_label")}
+                items={safeJsonParse(region.regionMysteries)}
+                open={openSections.regionMysteries}
+                onOpenChange={() => toggleSection("regionMysteries")}
+              />
+            )}
 
             {/* Inspirations */}
-            <FieldWithVisibilityToggle
-              fieldName="inspirations"
-              label={
-                isEditing ? t("world:create_region.inspirations_label") : ""
-              }
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
-              {isEditing ? (
+            {isEditing && (
+              <div className="space-y-2">
+                <Label className="text-primary">
+                  {t("world:create_region.inspirations_label")}
+                </Label>
                 <FormListInput
                   label=""
                   placeholder={t("world:create_region.inspiration_placeholder")}
@@ -1238,17 +1100,17 @@ export function RegionDetailView({
                   }
                   labelClassName="text-sm font-medium text-primary"
                 />
-              ) : (
-                <DisplayStringList
-                  label={t("world:create_region.inspirations_label")}
-                  items={safeJsonParse(region.inspirations)}
-                  open={openSections.inspirations}
-                  onOpenChange={() => toggleSection("inspirations")}
-                />
-              )}
-            </FieldWithVisibilityToggle>
-          </div>
-        )}
+              </div>
+            )}
+            {!isEditing && (
+              <DisplayStringList
+                label={t("world:create_region.inspirations_label")}
+                items={safeJsonParse(region.inspirations)}
+                open={openSections.inspirations}
+                onOpenChange={() => toggleSection("inspirations")}
+              />
+            )}
+        </div>
       </div>
     );
 

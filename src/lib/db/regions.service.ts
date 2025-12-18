@@ -55,7 +55,6 @@ interface DBRegion {
   inspirations: string | null;
 
   // Visibility configuration
-  field_visibility: string | null;
   section_visibility: string | null;
 }
 
@@ -99,7 +98,6 @@ function regionToDBRegion(region: IRegion): DBRegion {
     inspirations: region.inspirations || null,
 
     // Visibility configuration
-    field_visibility: region.fieldVisibility || null,
     section_visibility: region.sectionVisibility || null,
   };
 }
@@ -144,7 +142,6 @@ function dbRegionToRegion(dbRegion: DBRegion): IRegion {
     inspirations: dbRegion.inspirations || undefined,
 
     // Visibility configuration
-    fieldVisibility: dbRegion.field_visibility || undefined,
     sectionVisibility: dbRegion.section_visibility || undefined,
   };
 }
@@ -215,13 +212,13 @@ export async function createRegion(
       climate, current_season, custom_season_name, general_description, region_anomalies,
       resident_factions, dominant_factions, important_characters, races_found, items_found,
       narrative_purpose, unique_characteristics, political_importance, religious_importance, world_perception, region_mysteries, inspirations,
-      field_visibility, section_visibility
+      section_visibility
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
       $11, $12, $13, $14, $15,
       $16, $17, $18, $19, $20,
       $21, $22, $23, $24, $25, $26, $27,
-      $28, $29
+      $28
     )`,
     [
       dbRegion.id,
@@ -251,7 +248,6 @@ export async function createRegion(
       dbRegion.world_perception,
       dbRegion.region_mysteries,
       dbRegion.inspirations,
-      dbRegion.field_visibility,
       dbRegion.section_visibility,
     ]
   );
@@ -312,9 +308,8 @@ export async function updateRegion(
       world_perception = $22,
       region_mysteries = $23,
       inspirations = $24,
-      field_visibility = $25,
-      section_visibility = $26
-    WHERE id = $27`,
+      section_visibility = $25
+    WHERE id = $26`,
     [
       dbRegion.name,
       dbRegion.parent_id,
@@ -340,7 +335,6 @@ export async function updateRegion(
       dbRegion.world_perception,
       dbRegion.region_mysteries,
       dbRegion.inspirations,
-      dbRegion.field_visibility,
       dbRegion.section_visibility,
       id,
     ]

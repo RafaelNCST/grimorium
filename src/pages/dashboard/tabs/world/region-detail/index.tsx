@@ -5,9 +5,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import {
-  type IFieldVisibility,
   type ISectionVisibility,
-  toggleFieldVisibility,
   toggleSectionVisibility,
 } from "@/components/detail-page/visibility-helpers";
 import { getCharactersByBookId } from "@/lib/db/characters.service";
@@ -108,16 +106,12 @@ export function RegionDetail() {
   const [originalTimeline, setOriginalTimeline] = useState<ITimelineEra[]>([]);
 
   // Visibility state
-  const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [sectionVisibility, setSectionVisibility] =
     useState<ISectionVisibility>({});
-  const [originalFieldVisibility, setOriginalFieldVisibility] =
-    useState<IFieldVisibility>({});
   const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
 
   // Refs to always have the latest visibility values
-  const fieldVisibilityRef = useRef<IFieldVisibility>({});
   const sectionVisibilityRef = useRef<ISectionVisibility>({});
 
   // Validation state
@@ -197,26 +191,6 @@ export function RegionDetail() {
     if (JSON.stringify(timeline) !== JSON.stringify(originalTimeline))
       return true;
 
-    // Helper function to compare field visibility
-    // Treats undefined and true as equivalent (both = visible)
-    const visibilityChanged = (
-      current: IFieldVisibility,
-      original: IFieldVisibility
-    ): boolean => {
-      const allFields = new Set([
-        ...Object.keys(current),
-        ...Object.keys(original),
-      ]);
-
-      for (const field of allFields) {
-        const currentValue = current[field] !== false; // undefined or true = visible
-        const originalValue = original[field] !== false; // undefined or true = visible
-        if (currentValue !== originalValue) return true;
-      }
-
-      return false;
-    };
-
     // Helper function to compare section visibility
     // Treats undefined and true as equivalent (both = visible)
     const sectionVisibilityChanged = (
@@ -238,8 +212,6 @@ export function RegionDetail() {
     };
 
     // Check if visibility has changed
-    if (visibilityChanged(fieldVisibility, originalFieldVisibility))
-      return true;
     if (sectionVisibilityChanged(sectionVisibility, originalSectionVisibility))
       return true;
 
@@ -350,8 +322,6 @@ export function RegionDetail() {
     isEditing,
     timeline,
     originalTimeline,
-    fieldVisibility,
-    originalFieldVisibility,
     sectionVisibility,
     originalSectionVisibility,
   ]);
@@ -390,21 +360,14 @@ export function RegionDetail() {
             setImagePreview(regionFromDB.image || "");
 
             // Load visibility preferences from the region data
-            const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
-              regionFromDB.fieldVisibility,
-              {}
-            );
             const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
               regionFromDB.sectionVisibility,
               {}
             );
 
-            setFieldVisibility(loadedFieldVisibility);
             setSectionVisibility(loadedSectionVisibility);
-            setOriginalFieldVisibility(loadedFieldVisibility);
             setOriginalSectionVisibility(loadedSectionVisibility);
             // Update refs
-            fieldVisibilityRef.current = loadedFieldVisibility;
             sectionVisibilityRef.current = loadedSectionVisibility;
           } else {
             // Update main version with loaded data
@@ -596,21 +559,14 @@ export function RegionDetail() {
               setImagePreview(selectedVersion.regionData.image || "");
 
               // Load visibility preferences from the region data
-              const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
-                selectedVersion.regionData.fieldVisibility,
-                {}
-              );
               const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
                 selectedVersion.regionData.sectionVisibility,
                 {}
               );
 
-              setFieldVisibility(loadedFieldVisibility);
               setSectionVisibility(loadedSectionVisibility);
-              setOriginalFieldVisibility(loadedFieldVisibility);
               setOriginalSectionVisibility(loadedSectionVisibility);
               // Update refs
-              fieldVisibilityRef.current = loadedFieldVisibility;
               sectionVisibilityRef.current = loadedSectionVisibility;
 
               // Load timeline for this version
@@ -651,21 +607,14 @@ export function RegionDetail() {
       setImagePreview(version.regionData.image || "");
 
       // Load visibility preferences from the region data
-      const loadedFieldVisibility = safeJsonParse<IFieldVisibility>(
-        version.regionData.fieldVisibility,
-        {}
-      );
       const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
         version.regionData.sectionVisibility,
         {}
       );
 
-      setFieldVisibility(loadedFieldVisibility);
       setSectionVisibility(loadedSectionVisibility);
-      setOriginalFieldVisibility(loadedFieldVisibility);
       setOriginalSectionVisibility(loadedSectionVisibility);
       // Update refs
-      fieldVisibilityRef.current = loadedFieldVisibility;
       sectionVisibilityRef.current = loadedSectionVisibility;
 
       // Load timeline for this version
@@ -850,7 +799,6 @@ export function RegionDetail() {
       }
 
       // Get current visibility state from refs
-      const currentFieldVisibility = fieldVisibilityRef.current;
       const currentSectionVisibility = sectionVisibilityRef.current;
 
       // Helper function to ensure array fields are JSON strings for database
@@ -890,7 +838,6 @@ export function RegionDetail() {
         regionMysteries: ensureJsonString(updatedRegion.regionMysteries),
         inspirations: ensureJsonString(updatedRegion.inspirations),
         // Visibility preferences
-        fieldVisibility: JSON.stringify(currentFieldVisibility),
         sectionVisibility: JSON.stringify(currentSectionVisibility),
       };
 
@@ -906,7 +853,6 @@ export function RegionDetail() {
       }
 
       // Update original visibility to match saved state
-      setOriginalFieldVisibility(currentFieldVisibility);
       setOriginalSectionVisibility(currentSectionVisibility);
 
       // Save timeline for current version
@@ -993,14 +939,12 @@ export function RegionDetail() {
     // If no changes, cancel immediately
     setEditData(region);
     setTimeline(originalTimeline);
-    setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
   }, [
     region,
     originalTimeline,
-    originalFieldVisibility,
     originalSectionVisibility,
     hasChanges,
   ]);
@@ -1008,7 +952,6 @@ export function RegionDetail() {
   const handleConfirmCancel = useCallback(() => {
     setEditData(region);
     setTimeline(originalTimeline);
-    setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
@@ -1016,7 +959,6 @@ export function RegionDetail() {
   }, [
     region,
     originalTimeline,
-    originalFieldVisibility,
     originalSectionVisibility,
   ]);
 
@@ -1109,14 +1051,6 @@ export function RegionDetail() {
     setTimeline(newTimeline);
   }, []);
 
-  const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
-    setFieldVisibility((prev) => {
-      const newVisibility = toggleFieldVisibility(fieldName, prev);
-      fieldVisibilityRef.current = newVisibility;
-      return newVisibility;
-    });
-  }, []);
-
   const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
     setSectionVisibility((prev) => {
       const newVisibility = toggleSectionVisibility(sectionName, prev);
@@ -1169,10 +1103,8 @@ export function RegionDetail() {
         validateField={validateField}
         hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
         missingFields={missingFields}
-        fieldVisibility={fieldVisibility}
         sectionVisibility={sectionVisibility}
         onTimelineChange={handleTimelineChange}
-        onFieldVisibilityToggle={handleFieldVisibilityToggle}
         onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onBack={handleBack}
         onViewMap={handleViewMap}

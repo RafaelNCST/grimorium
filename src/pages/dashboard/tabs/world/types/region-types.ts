@@ -4,7 +4,6 @@
  */
 
 import type {
-  IFieldVisibility,
   ISectionVisibility,
 } from "@/components/detail-page/visibility-helpers";
 
@@ -90,8 +89,6 @@ export interface IRegion {
   inspirations?: string;
 
   // Visibility configuration
-  /** Field visibility configuration for advanced fields */
-  fieldVisibility?: string;
   /** Section visibility configuration for special sections (timeline, map, etc.) */
   sectionVisibility?: string;
 }
@@ -138,6 +135,5 @@ export interface IRegionFormData {
   inspirations?: string[];
 
   // Visibility configuration
-  fieldVisibility?: IFieldVisibility;
   sectionVisibility?: ISectionVisibility;
 }
