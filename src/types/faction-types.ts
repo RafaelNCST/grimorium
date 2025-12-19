@@ -68,20 +68,6 @@ export interface IFactionTimelineEra {
   events: IFactionTimelineEvent[];
 }
 
-export type DiplomaticStatus =
-  | "alliance"
-  | "subordinate"
-  | "war"
-  | "peace"
-  | "hatred"
-  | "neutral";
-
-export interface IDiplomaticRelation {
-  id: string;
-  targetFactionId: string;
-  status: DiplomaticStatus;
-}
-
 export interface IHierarchyTitle {
   id: string;
   name: string;
@@ -94,7 +80,6 @@ export interface IHierarchyTitle {
 export interface IFactionUIState {
   advancedSectionOpen?: boolean;
   sectionVisibility?: Record<string, boolean>;
-  activeDiplomacyTab?: DiplomaticStatus;
 }
 
 export interface IFaction {
@@ -153,9 +138,6 @@ export interface IFaction {
 
   // Special sections - Timeline
   timeline?: IFactionTimelineEra[];
-
-  // Special sections - Diplomacy
-  diplomaticRelations?: IDiplomaticRelation[];
 
   // Special sections - Hierarchy
   hierarchy?: IHierarchyTitle[];
@@ -221,18 +203,6 @@ export interface IFactionFormData {
   // Special sections - Timeline
   timeline?: IFactionTimelineEra[];
 
-  // Special sections - Diplomacy
-  diplomaticRelations?: IDiplomaticRelation[];
-
   // Special sections - Hierarchy
   hierarchy?: IHierarchyTitle[];
-}
-
-export interface IFactionVersion {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  isMain: boolean;
-  factionData: IFaction;
 }

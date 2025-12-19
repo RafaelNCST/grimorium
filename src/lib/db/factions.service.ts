@@ -1,6 +1,6 @@
-import { IFaction, IFactionVersion } from "@/types/faction-types";
+import { IFaction } from "@/types/faction-types";
 
-import { DBFaction, DBFactionVersion } from "./types";
+import { DBFaction } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
@@ -16,7 +16,6 @@ import {
   safeParseUnknownArray,
   safeJSONParse,
   factionTimelineSchema,
-  diplomaticRelationsSchema,
   hierarchySchema,
   locationArraySchema,
   unknownObjectSchema,
@@ -98,9 +97,6 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
 
     // Special sections
     timeline: faction.timeline ? JSON.stringify(faction.timeline) : undefined,
-    diplomatic_relations: faction.diplomaticRelations
-      ? JSON.stringify(faction.diplomaticRelations)
-      : undefined,
     hierarchy: faction.hierarchy
       ? JSON.stringify(faction.hierarchy)
       : undefined,
@@ -198,9 +194,6 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
     timeline: dbFaction.timeline
       ? safeJSONParse(dbFaction.timeline, factionTimelineSchema, [])
       : undefined,
-    diplomaticRelations: dbFaction.diplomatic_relations
-      ? safeJSONParse(dbFaction.diplomatic_relations, diplomaticRelationsSchema, [])
-      : undefined,
     hierarchy: dbFaction.hierarchy
       ? safeJSONParse(dbFaction.hierarchy, hierarchySchema, [])
       : undefined,
@@ -257,12 +250,12 @@ export async function createFaction(
       languages_used, uniform_and_aesthetics, races,
       foundation_date, foundation_history_summary, founders, chronology,
       organization_objectives, narrative_importance, inspirations,
-      timeline, diplomatic_relations, hierarchy, ui_state,
+      timeline, hierarchy, ui_state,
       created_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
       $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27,
-      $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41
+      $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40
     )`,
     [
       dbFaction.id,
@@ -302,7 +295,6 @@ export async function createFaction(
       dbFaction.narrative_importance,
       dbFaction.inspirations,
       dbFaction.timeline,
-      dbFaction.diplomatic_relations,
       dbFaction.hierarchy,
       dbFaction.ui_state,
       dbFaction.created_at,
@@ -353,8 +345,8 @@ export async function updateFaction(
       languages_used = $25, uniform_and_aesthetics = $26, races = $27,
       foundation_date = $28, foundation_history_summary = $29, founders = $30, chronology = $31,
       organization_objectives = $32, narrative_importance = $33, inspirations = $34,
-      timeline = $35, diplomatic_relations = $36, hierarchy = $37, ui_state = $38
-    WHERE id = $39`,
+      timeline = $35, hierarchy = $36, ui_state = $37
+    WHERE id = $38`,
     [
       dbFaction.name,
       dbFaction.summary,
@@ -391,7 +383,6 @@ export async function updateFaction(
       dbFaction.narrative_importance,
       dbFaction.inspirations,
       dbFaction.timeline,
-      dbFaction.diplomatic_relations,
       dbFaction.hierarchy,
       dbFaction.ui_state,
       id,
@@ -417,37 +408,7 @@ export async function deleteFaction(id: string): Promise<void> {
       id
     );
 
-    // 4. Remove from factions.diplomatic_relations (in ALL factions, not just the deleted one)
-    const allFactions = await db.select<
-      Array<{ id: string; diplomatic_relations: string }>
-    >("SELECT id, diplomatic_relations FROM factions WHERE diplomatic_relations IS NOT NULL");
-
-    for (const faction of allFactions) {
-      try {
-        const relations = safeJSONParse(
-          faction.diplomatic_relations,
-          diplomaticRelationsSchema,
-          []
-        );
-        const filteredRelations = relations.filter(
-          (rel: any) => rel.targetFactionId !== id
-        );
-
-        if (filteredRelations.length !== relations.length) {
-          await db.execute(
-            "UPDATE factions SET diplomatic_relations = $1 WHERE id = $2",
-            [JSON.stringify(filteredRelations), faction.id]
-          );
-        }
-      } catch (error) {
-        console.warn(
-          `[deleteFaction] Failed to parse diplomatic_relations for faction ${faction.id}:`,
-          error
-        );
-      }
-    }
-
-    // 5. Remove from factions.timeline[].events[].factionsInvolved
+    // 4. Remove from factions.timeline[].events[].factionsInvolved
     await removeFromNestedJSONArray("factions", "timeline", id, [
       "timeline",
       "*",
@@ -456,87 +417,8 @@ export async function deleteFaction(id: string): Promise<void> {
       "factionsInvolved",
     ]);
 
-    // 6. Finally, delete the faction (CASCADE will handle versions)
+    // 5. Finally, delete the faction (CASCADE will handle versions)
     await db.execute("DELETE FROM factions WHERE id = $1", [id]);
   }, 'deleteFaction');
 }
 
-// Version Management Functions
-export async function getFactionVersions(
-  factionId: string
-): Promise<IFactionVersion[]> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const result = await db.select<DBFactionVersion[]>(
-      "SELECT * FROM faction_versions WHERE faction_id = $1 ORDER BY created_at DESC",
-      [factionId]
-    );
-
-    return result.map((v) => ({
-      id: v.id,
-      name: v.name,
-      description: v.description || "",
-      createdAt: new Date(v.created_at).toISOString(),
-      isMain: v.is_main === 1,
-      factionData: safeParseUnknownObject(v.faction_data) as IFaction,
-    }));
-  }, 'getFactionVersions');
-}
-
-export async function createFactionVersion(
-  factionId: string,
-  version: IFactionVersion
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-
-    await db.execute(
-      `INSERT INTO faction_versions (
-        id, faction_id, name, description, is_main, faction_data, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        version.id,
-        factionId,
-        version.name,
-        version.description,
-        version.isMain ? 1 : 0,
-        JSON.stringify(version.factionData),
-        Date.now(),
-      ]
-    );
-  }, 'createFactionVersion');
-}
-
-export async function deleteFactionVersion(versionId: string): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute("DELETE FROM faction_versions WHERE id = $1", [versionId]);
-  }, 'deleteFactionVersion');
-}
-
-export async function updateFactionVersion(
-  versionId: string,
-  name: string,
-  description?: string
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute(
-      "UPDATE faction_versions SET name = $1, description = $2 WHERE id = $3",
-      [name, description, versionId]
-    );
-  }, 'updateFactionVersion');
-}
-
-export async function updateFactionVersionData(
-  versionId: string,
-  factionData: IFaction
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute(
-      "UPDATE faction_versions SET faction_data = $1 WHERE id = $2",
-      [JSON.stringify(factionData), versionId]
-    );
-  }, 'updateFactionVersionData');
-}

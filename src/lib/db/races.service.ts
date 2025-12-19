@@ -1,10 +1,9 @@
 import {
-  IRaceVersion,
   IRaceRelationship,
 } from "@/pages/dashboard/tabs/races/race-detail/types/race-detail-types";
 import { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
-import { DBRace, DBRaceVersion, DBRaceRelationship } from "./types";
+import { DBRace, DBRaceRelationship } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
@@ -15,7 +14,6 @@ import {
 } from "./cleanup-helpers";
 import {
   safeParseStringArray,
-  safeParseFieldVisibility,
   safeParseUnknownObject,
 } from "./safe-json-parse";
 
@@ -57,9 +55,6 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     weaknesses: race.weaknesses,
     story_motivation: race.storyMotivation,
     inspirations: race.inspirations,
-    field_visibility: race.fieldVisibility
-      ? JSON.stringify(race.fieldVisibility)
-      : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -103,9 +98,6 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     weaknesses: dbRace.weaknesses,
     storyMotivation: dbRace.story_motivation,
     inspirations: dbRace.inspirations,
-    fieldVisibility: dbRace.field_visibility
-      ? safeParseFieldVisibility(dbRace.field_visibility)
-      : undefined,
     speciesId: "", // Legacy field, kept for backwards compatibility
   };
 }
@@ -147,11 +139,11 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         other_communication, moral_tendency, social_organization, habitat,
         physical_capacity, special_characteristics, weaknesses,
         story_motivation, inspirations,
-        field_visibility, created_at, updated_at
+        created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
         $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-        $29, $30, $31, $32, $33
+        $29, $30, $31, $32
       )`,
       [
         dbRace.id,
@@ -184,7 +176,6 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         dbRace.weaknesses,
         dbRace.story_motivation,
         dbRace.inspirations,
-        dbRace.field_visibility,
         dbRace.created_at,
         dbRace.updated_at,
       ]
@@ -233,8 +224,8 @@ export async function updateRace(
         communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
         habitat = $23, physical_capacity = $24, special_characteristics = $25,
         weaknesses = $26, story_motivation = $27, inspirations = $28,
-        field_visibility = $29, updated_at = $30
-      WHERE id = $31`,
+        updated_at = $29
+      WHERE id = $30`,
       [
         dbRace.group_id,
         dbRace.name,
@@ -264,7 +255,6 @@ export async function updateRace(
         dbRace.weaknesses,
         dbRace.story_motivation,
         dbRace.inspirations,
-        dbRace.field_visibility,
         dbRace.updated_at,
         id,
       ]
@@ -300,102 +290,6 @@ export async function deleteRace(id: string): Promise<void> {
     // 6. Finally, delete the race (CASCADE will handle versions, relationships)
     await db.execute("DELETE FROM races WHERE id = $1", [id]);
   }, 'deleteRace');
-}
-
-// Race Versions
-export async function getRaceVersions(raceId: string): Promise<IRaceVersion[]> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const result = await db.select<DBRaceVersion[]>(
-      "SELECT * FROM race_versions WHERE race_id = $1 ORDER BY created_at DESC",
-      [raceId]
-    );
-
-    return result.map((v) => {
-      const parsedData = safeParseUnknownObject(v.race_data);
-      // Extrair _relationships do JSON e separar
-      const { _relationships, ...raceData } = parsedData;
-      return {
-        id: v.id,
-        name: v.name,
-        description: v.description || "",
-        createdAt: new Date(v.created_at).toISOString(),
-        isMain: v.is_main === 1,
-        raceData: raceData as IRace,
-        relationships: _relationships || [],
-      };
-    });
-  }, 'getRaceVersions');
-}
-
-export async function createRaceVersion(
-  raceId: string,
-  version: IRaceVersion
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-
-    // Armazenar raceData e relationships juntos
-    const dataToStore = {
-      ...version.raceData,
-      _relationships: version.relationships || [],
-    };
-
-    await db.execute(
-      `INSERT INTO race_versions (
-        id, race_id, name, description, is_main, race_data, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        version.id,
-        raceId,
-        version.name,
-        version.description,
-        version.isMain ? 1 : 0,
-        JSON.stringify(dataToStore),
-        Date.now(),
-      ]
-    );
-  }, 'createRaceVersion');
-}
-
-export async function deleteRaceVersion(versionId: string): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute("DELETE FROM race_versions WHERE id = $1", [versionId]);
-  }, 'deleteRaceVersion');
-}
-
-export async function updateRaceVersion(
-  versionId: string,
-  name: string,
-  description?: string
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute(
-      "UPDATE race_versions SET name = $1, description = $2 WHERE id = $3",
-      [name, description, versionId]
-    );
-  }, 'updateRaceVersion');
-}
-
-export async function updateRaceVersionData(
-  versionId: string,
-  raceData: IRace,
-  relationships?: IRaceRelationship[]
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    // Armazenar raceData e relationships juntos no campo race_data
-    const dataToStore = {
-      ...raceData,
-      _relationships: relationships || [],
-    };
-    await db.execute("UPDATE race_versions SET race_data = $1 WHERE id = $2", [
-      JSON.stringify(dataToStore),
-      versionId,
-    ]);
-  }, 'updateRaceVersionData');
 }
 
 // Race Relationships

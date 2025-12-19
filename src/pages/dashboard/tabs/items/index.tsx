@@ -147,7 +147,6 @@ export function ItemsTab({ bookId }: PropsItemsTab) {
         narrativePurpose: itemData.narrativePurpose,
         usageRequirements: itemData.usageRequirements,
         usageConsequences: itemData.usageConsequences,
-        fieldVisibility: {},
         createdAt: new Date().toISOString(),
       };
 

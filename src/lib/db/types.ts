@@ -84,16 +84,6 @@ export interface DBCharacter {
   updated_at: number;
 }
 
-export interface DBCharacterVersion {
-  id: string;
-  character_id: string;
-  name: string;
-  description?: string;
-  is_main: number; // 0 or 1 (SQLite boolean)
-  character_data?: string; // JSON string
-  created_at: number;
-}
-
 export interface DBRelationship {
   id: string;
   character_id: string;
@@ -130,19 +120,8 @@ export interface DBItem {
   usage_consequences?: string;
   item_usage?: string;
 
-  field_visibility?: string;
   created_at: number;
   updated_at: number;
-}
-
-export interface DBItemVersion {
-  id: string;
-  item_id: string;
-  name: string;
-  description?: string;
-  is_main: number;
-  item_data?: string;
-  created_at: number;
 }
 
 export interface DBRaceGroup {
@@ -202,19 +181,8 @@ export interface DBRace {
   inspirations?: string;
 
   // Metadata
-  field_visibility?: string; // JSON object string
   created_at: number;
   updated_at: number;
-}
-
-export interface DBRaceVersion {
-  id: string;
-  race_id: string;
-  name: string;
-  description?: string;
-  is_main: number; // 0 or 1 (SQLite boolean)
-  race_data?: string; // JSON string
-  created_at: number;
 }
 
 export interface DBRaceRelationship {
@@ -282,23 +250,12 @@ export interface DBFaction {
 
   // Special sections (JSON strings)
   timeline?: string; // JSON array of IFactionTimelineEra
-  diplomatic_relations?: string; // JSON array of IDiplomaticRelation
   hierarchy?: string; // JSON array of IHierarchyTitle
 
   // UI State (JSON object)
   ui_state?: string; // JSON object for UI state persistence
 
   // Metadata
-  created_at: number;
-}
-
-export interface DBFactionVersion {
-  id: string;
-  faction_id: string;
-  name: string;
-  description?: string;
-  is_main: number; // 0 or 1 (SQLite boolean)
-  faction_data?: string; // JSON string
   created_at: number;
 }
 

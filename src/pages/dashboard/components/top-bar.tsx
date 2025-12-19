@@ -3,7 +3,6 @@ import {
   Trash2,
   FileText,
   Image,
-  NotebookPen,
   Palette,
   EyeOff,
   Eye,
@@ -25,7 +24,6 @@ interface PropsTopBar {
   onShowDeleteDialog: (show: boolean) => void;
   onNavigateToChapters: () => void;
   onNavigateToGallery: () => void;
-  onNavigateToNotes: () => void;
   onCustomizingToggle: () => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
 }
@@ -37,7 +35,6 @@ export function TopBar({
   onShowDeleteDialog,
   onNavigateToChapters,
   onNavigateToGallery,
-  onNavigateToNotes,
   onCustomizingToggle,
   onHeaderHiddenChange,
 }: PropsTopBar) {
@@ -121,22 +118,6 @@ export function TopBar({
             <p className="text-sm font-medium">
               {t("common:tooltips.gallery")}
             </p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onNavigateToNotes}
-              className="hover:bg-accent hover:text-accent-foreground"
-            >
-              <NotebookPen className="w-5 h-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-sm font-medium">{t("common:tooltips.notes")}</p>
           </TooltipContent>
         </Tooltip>
 

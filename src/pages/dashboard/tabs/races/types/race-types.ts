@@ -59,9 +59,6 @@ export interface IRace {
   storyMotivation?: string;
   inspirations?: string;
 
-  // Metadata
-  fieldVisibility?: { [key: string]: boolean };
-
   // Legacy field for backwards compatibility
   speciesId: string;
 }

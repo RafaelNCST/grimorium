@@ -114,7 +114,6 @@ export const FactionSchema = z.object({
   economicPower: z.number().min(1).max(10).optional(),
 
   // Relations (não validamos aqui pois são objetos complexos)
-  diplomaticRelations: z.any().optional(),
   hierarchy: z.any().optional(),
 });
 

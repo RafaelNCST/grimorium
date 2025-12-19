@@ -14,10 +14,6 @@ import {
   saveCharacterRelationships,
   getCharacterFamily,
   saveCharacterFamily,
-  getCharacterVersions,
-  createCharacterVersion,
-  deleteCharacterVersion,
-  updateCharacterVersion,
 } from "@/lib/db/characters.service";
 import {
   getPowerLinksWithTitlesByCharacterId,
@@ -31,12 +27,7 @@ import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/ty
 import type { IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 import type { IRegion } from "@/pages/dashboard/tabs/world/types/region-types";
 import { useCharactersStore } from "@/stores/characters-store";
-import {
-  type ICharacterVersion,
-  type ICharacterFormData,
-  type ICharacter,
-  type IFieldVisibility,
-} from "@/types/character-types";
+import { type ICharacter } from "@/types/character-types";
 
 import { UnsavedChangesDialog } from "./components/unsaved-changes-dialog";
 import { ALIGNMENTS_CONSTANT } from "./constants/alignments-constant";
@@ -89,7 +80,6 @@ export function CharacterDetail() {
       siblings: [],
       halfSiblings: [],
     },
-    fieldVisibility: {},
     createdAt: new Date().toISOString(),
   };
 
@@ -110,19 +100,6 @@ export function CharacterDetail() {
   const [selectedRelationshipType, setSelectedRelationshipType] = useState("");
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  const [versions, setVersions] = useState<ICharacterVersion[]>([
-    {
-      id: "main-version",
-      name: "Versão Principal",
-      description: "Versão principal do personagem",
-      createdAt: new Date().toISOString(),
-      isMain: true,
-      characterData: emptyCharacter as ICharacter,
-    },
-  ]);
-  const [currentVersion, setCurrentVersion] =
-    useState<ICharacterVersion | null>(versions[0]);
-  const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
   const [sectionVisibility, setSectionVisibility] =
     useState<ISectionVisibility>({});
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
@@ -147,8 +124,6 @@ export function CharacterDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Original states for comparison
-  const [originalFieldVisibility, setOriginalFieldVisibility] =
-    useState<IFieldVisibility>({});
   const [originalSectionVisibility, _setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
 
@@ -228,26 +203,6 @@ export function CharacterDetail() {
   const hasChanges = useMemo(() => {
     if (!isEditing) return false;
 
-    // Helper function to compare field visibility
-    // Treats undefined and true as equivalent (both = visible)
-    const visibilityChanged = (
-      current: IFieldVisibility,
-      original: IFieldVisibility
-    ): boolean => {
-      const allFields = new Set([
-        ...Object.keys(current),
-        ...Object.keys(original),
-      ]);
-
-      for (const field of allFields) {
-        const currentValue = current[field] !== false; // undefined or true = visible
-        const originalValue = original[field] !== false; // undefined or true = visible
-        if (currentValue !== originalValue) return true;
-      }
-
-      return false;
-    };
-
     // Helper function to compare section visibility
     // Treats undefined and true as equivalent (both = visible)
     const sectionVisibilityChanged = (
@@ -267,10 +222,6 @@ export function CharacterDetail() {
 
       return false;
     };
-
-    // Check if visibility has changed
-    if (visibilityChanged(fieldVisibility, originalFieldVisibility))
-      return true;
 
     // Check if section visibility has changed
     if (sectionVisibilityChanged(sectionVisibility, originalSectionVisibility))
@@ -350,8 +301,6 @@ export function CharacterDetail() {
     character,
     editData,
     isEditing,
-    fieldVisibility,
-    originalFieldVisibility,
     sectionVisibility,
     originalSectionVisibility,
   ]);
@@ -367,7 +316,6 @@ export function CharacterDetail() {
           characterFromDB,
           relationships,
           family,
-          versionsFromDB,
           allCharsFromBook,
           powerLinks,
           regionsFromDB,
@@ -376,7 +324,6 @@ export function CharacterDetail() {
           getCharacterById(characterId),
           getCharacterRelationships(characterId),
           getCharacterFamily(characterId),
-          getCharacterVersions(characterId),
           dashboardId
             ? getCharactersByBookId(dashboardId)
             : Promise.resolve([]),
@@ -401,57 +348,9 @@ export function CharacterDetail() {
             family,
           });
           setImagePreview(characterFromDB.image || "");
-          setFieldVisibility(characterFromDB.fieldVisibility || {});
-          setOriginalFieldVisibility(characterFromDB.fieldVisibility || {});
 
           // Set power links
           setCharacterPowerLinks(powerLinks);
-
-          // Load versions from database
-          // Se não houver versões, criar a versão principal
-          if (versionsFromDB.length === 0) {
-            const mainVersion: ICharacterVersion = {
-              id: `main-version-${characterId}`,
-              name: "Versão Principal",
-              description: "Versão principal do personagem",
-              createdAt: new Date().toISOString(),
-              isMain: true,
-              characterData: {
-                ...characterFromDB,
-                relationships,
-                family,
-              },
-            };
-
-            await createCharacterVersion(characterId, mainVersion);
-
-            // Check again before setState after async operation
-            if (!isMounted) return;
-
-            setVersions([mainVersion]);
-            setCurrentVersion(mainVersion);
-          } else {
-            // Atualizar versão principal com dados carregados
-            const updatedVersions = versionsFromDB.map((v) =>
-              v.isMain
-                ? {
-                    ...v,
-                    characterData: {
-                      ...characterFromDB,
-                      relationships,
-                      family,
-                    },
-                  }
-                : v
-            );
-            setVersions(updatedVersions);
-
-            // Definir versão principal como atual
-            const mainVersion = updatedVersions.find((v) => v.isMain);
-            if (mainVersion) {
-              setCurrentVersion(mainVersion);
-            }
-          }
 
           // Set all characters from the same book
           setAllCharacters(allCharsFromBook);
@@ -505,113 +404,6 @@ export function CharacterDetail() {
     [character.gender]
   );
 
-  const handleVersionChange = useCallback(
-    (versionId: string | null) => {
-      if (!versionId) return;
-
-      const version = versions.find((v) => v.id === versionId);
-      if (!version) return;
-
-      setCurrentVersion(version);
-      setCharacter(version.characterData as any);
-      setEditData({
-        ...(version.characterData as any),
-        relationships: version.characterData.relationships || [],
-      });
-      setImagePreview(version.characterData.image || "");
-      setFieldVisibility(version.characterData.fieldVisibility || {});
-    },
-    [versions]
-  );
-
-  const handleVersionCreate = useCallback(
-    async (versionData: {
-      name: string;
-      description: string;
-      entityData: ICharacterFormData;
-    }) => {
-      try {
-        const newVersion: ICharacterVersion = {
-          id: `version-${Date.now()}`,
-          name: versionData.name,
-          description: versionData.description,
-          createdAt: new Date().toISOString(),
-          isMain: false,
-          characterData: versionData.entityData as unknown as ICharacter,
-        };
-
-        // Salvar no banco de dados
-        await createCharacterVersion(characterId, newVersion);
-
-        // Atualizar o estado apenas se o save for bem-sucedido
-        setVersions((prev) => [...prev, newVersion]);
-      } catch (error) {
-        console.error("Error creating character version:", error);
-      }
-    },
-    [characterId]
-  );
-
-  const handleVersionDelete = useCallback(
-    async (versionId: string) => {
-      const versionToDelete = versions.find((v) => v.id === versionId);
-
-      // Não permitir deletar versão principal
-      if (versionToDelete?.isMain) {
-        return;
-      }
-
-      try {
-        // Deletar do banco de dados
-        await deleteCharacterVersion(versionId);
-
-        // Atualizar o estado apenas se o delete for bem-sucedido
-        const updatedVersions = versions.filter((v) => v.id !== versionId);
-
-        // Se a versão deletada for a atual, voltar para a principal
-        if (currentVersion?.id === versionId) {
-          const mainVersion = updatedVersions.find((v) => v.isMain);
-          if (mainVersion) {
-            setCurrentVersion(mainVersion);
-            setCharacter(mainVersion.characterData as any);
-            setEditData({
-              ...(mainVersion.characterData as any),
-              relationships: mainVersion.characterData.relationships || [],
-            });
-            setImagePreview(mainVersion.characterData.image || "");
-          }
-        }
-
-        setVersions(updatedVersions);
-      } catch (error) {
-        console.error("Error deleting character version:", error);
-      }
-    },
-    [versions, currentVersion]
-  );
-
-  const handleVersionUpdate = useCallback(
-    async (versionId: string, name: string, description?: string) => {
-      try {
-        // Atualizar no banco de dados
-        await updateCharacterVersion(versionId, name, description);
-
-        // Atualizar o estado apenas se o update for bem-sucedido
-        const updatedVersions = versions.map((v) =>
-          v.id === versionId ? { ...v, name, description } : v
-        );
-        setVersions(updatedVersions);
-
-        if (currentVersion.id === versionId) {
-          setCurrentVersion({ ...currentVersion, name, description });
-        }
-      } catch (error) {
-        console.error("Error updating character version:", error);
-      }
-    },
-    [versions, currentVersion]
-  );
-
   const handleSave = useCallback(async () => {
     try {
       // Validar TUDO com Zod
@@ -651,23 +443,8 @@ export function CharacterDetail() {
         relationships: editData.relationships,
       });
 
-      const updatedCharacter = { ...editData, fieldVisibility };
+      const updatedCharacter = { ...editData };
       setCharacter(updatedCharacter);
-
-      // Atualizar dados na versão atual
-      const updatedVersions = versions.map((v) =>
-        v.id === currentVersion?.id
-          ? { ...v, characterData: updatedCharacter as ICharacter }
-          : v
-      );
-      setVersions(updatedVersions);
-
-      const activeVersion = updatedVersions.find(
-        (v) => v.id === currentVersion?.id
-      );
-      if (activeVersion) {
-        setCurrentVersion(activeVersion);
-      }
 
       // Save relationships
       if (updatedCharacter.relationships) {
@@ -684,9 +461,6 @@ export function CharacterDetail() {
 
       // Atualizar no store (que também salva no DB)
       await updateCharacterInStore(characterId, updatedCharacter);
-
-      // Update original visibility to match saved state
-      setOriginalFieldVisibility(fieldVisibility);
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
@@ -710,14 +484,7 @@ export function CharacterDetail() {
         console.error("Error saving character:", error);
       }
     }
-  }, [
-    editData,
-    fieldVisibility,
-    versions,
-    currentVersion,
-    characterId,
-    updateCharacterInStore,
-  ]);
+  }, [editData, characterId, updateCharacterInStore, t]);
 
   const navigateToCharactersTab = useCallback(() => {
     if (!dashboardId) return;
@@ -728,50 +495,14 @@ export function CharacterDetail() {
   }, [navigate, dashboardId]);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (currentVersion && !currentVersion.isMain) {
-      // Delete version (non-main)
-      const versionToDelete = versions.find((v) => v.id === currentVersion.id);
-
-      if (!versionToDelete) return;
-
-      const updatedVersions = versions.filter(
-        (v) => v.id !== currentVersion.id
-      );
-
-      // Switch to main version after deleting
-      const mainVersion = updatedVersions.find((v) => v.isMain);
-      if (mainVersion) {
-        setCurrentVersion(mainVersion);
-        setCharacter(mainVersion.characterData as any);
-        setEditData({
-          ...(mainVersion.characterData as any),
-          relationships: mainVersion.characterData.relationships || [],
-        });
-        setImagePreview(mainVersion.characterData.image || "");
-        setFieldVisibility(mainVersion.characterData.fieldVisibility || {});
-      }
-
-      setVersions(updatedVersions);
-    } else {
-      // Delete entire character (main version)
-      try {
-        if (!dashboardId) return;
-        // Deletar do store (que também deleta do DB)
-        await deleteCharacterFromStore(dashboardId, characterId);
-        navigateToCharactersTab();
-      } catch (error) {
-        console.error("Error deleting character:", error);
-      }
+    try {
+      if (!dashboardId) return;
+      await deleteCharacterFromStore(dashboardId, characterId);
+      navigateToCharactersTab();
+    } catch (error) {
+      console.error("Error deleting character:", error);
     }
-  }, [
-    currentVersion,
-    versions,
-    navigateToCharactersTab,
-    characterId,
-    dashboardId,
-    deleteCharacterFromStore,
-    t,
-  ]);
+  }, [navigateToCharactersTab, characterId, dashboardId, deleteCharacterFromStore]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {
@@ -781,25 +512,22 @@ export function CharacterDetail() {
 
     // If no changes, cancel immediately
     setEditData({ ...character, relationships: character.relationships || [] });
-    setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
   }, [
     character,
-    originalFieldVisibility,
     originalSectionVisibility,
     hasChanges,
   ]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...character, relationships: character.relationships || [] });
-    setFieldVisibility(originalFieldVisibility);
     setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [character, originalFieldVisibility, originalSectionVisibility]);
+  }, [character, originalSectionVisibility]);
 
   const _handleAddQuality = useCallback(() => {
     if (newQuality.trim() && !editData.qualities.includes(newQuality.trim())) {
@@ -1024,13 +752,6 @@ export function CharacterDetail() {
     []
   );
 
-  const handleFieldVisibilityToggle = useCallback((fieldName: string) => {
-    setFieldVisibility((prev) => ({
-      ...prev,
-      [fieldName]: prev[fieldName] === false ? true : false,
-    }));
-  }, []);
-
   const handleSectionVisibilityToggle = useCallback((sectionName: string) => {
     setSectionVisibility((prev) => ({
       ...prev,
@@ -1106,8 +827,6 @@ export function CharacterDetail() {
         isEditing={isEditing}
         hasChanges={hasChanges}
         bookId={dashboardId}
-        versions={versions}
-        currentVersion={currentVersion}
         showDeleteModal={showDeleteModal}
         isNavigationSidebarOpen={isNavigationSidebarOpen}
         newQuality={newQuality}
@@ -1126,7 +845,6 @@ export function CharacterDetail() {
         currentRole={currentRole}
         currentAlignment={currentAlignment}
         currentGender={currentGender}
-        fieldVisibility={fieldVisibility}
         advancedSectionOpen={advancedSectionOpen}
         openSections={openSections}
         toggleSection={toggleSection}
@@ -1145,10 +863,6 @@ export function CharacterDetail() {
         onDeleteModalOpen={handleDeleteModalOpen}
         onDeleteModalClose={handleDeleteModalClose}
         onConfirmDelete={handleConfirmDelete}
-        onVersionChange={handleVersionChange}
-        onVersionCreate={handleVersionCreate}
-        onVersionDelete={handleVersionDelete}
-        onVersionUpdate={handleVersionUpdate}
         onImageFileChange={handleImageFileChange}
         onAgeChange={handleAgeChange}
         onEditDataChange={handleEditDataChange}
@@ -1158,7 +872,6 @@ export function CharacterDetail() {
         onRelationshipCharacterChange={handleRelationshipCharacterChange}
         onRelationshipTypeChange={handleRelationshipTypeChange}
         onRelationshipIntensityChange={handleRelationshipIntensityChange}
-        onFieldVisibilityToggle={handleFieldVisibilityToggle}
         sectionVisibility={sectionVisibility}
         onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}

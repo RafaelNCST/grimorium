@@ -61,22 +61,10 @@ CREATE TABLE IF NOT EXISTS characters (
   past TEXT,
 
   -- Metadata
-  field_visibility TEXT,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
 
   UNIQUE(book_id, name)
-);
-
--- VERSÕES DE PERSONAGENS
-CREATE TABLE IF NOT EXISTS character_versions (
-  id TEXT PRIMARY KEY,
-  character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT,
-  is_main INTEGER DEFAULT 0,
-  character_data TEXT,
-  created_at INTEGER NOT NULL
 );
 
 -- RELACIONAMENTOS
@@ -116,20 +104,8 @@ CREATE TABLE IF NOT EXISTS regions (
   FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
 );
 
--- VERSÕES DE REGIÕES
-CREATE TABLE IF NOT EXISTS region_versions (
-  id TEXT PRIMARY KEY,
-  region_id TEXT NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT,
-  is_main INTEGER DEFAULT 0,
-  region_data TEXT,
-  created_at TEXT NOT NULL
-);
-
 -- ÍNDICES
 CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
-CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
 CREATE INDEX IF NOT EXISTS idx_relationships_character ON relationships(character_id);
 CREATE INDEX IF NOT EXISTS idx_relationships_related ON relationships(related_character_id);
 CREATE INDEX IF NOT EXISTS idx_family_character ON family_relations(character_id);
@@ -137,36 +113,6 @@ CREATE INDEX IF NOT EXISTS idx_family_related ON family_relations(related_charac
 CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
 CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
 CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
-CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
-
--- ANOTAÇÕES (VINCULADAS A LIVROS)
-CREATE TABLE IF NOT EXISTS notes (
-  id TEXT PRIMARY KEY,
-  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  content TEXT, -- JSON do TipTap
-  paper_mode TEXT DEFAULT 'light', -- 'light' ou 'dark'
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL
-);
-
--- LINKS DE ANOTAÇÕES COM ENTIDADES
-CREATE TABLE IF NOT EXISTS note_links (
-  id TEXT PRIMARY KEY,
-  note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-  entity_id TEXT NOT NULL,
-  entity_type TEXT NOT NULL, -- 'character', 'region', 'faction', 'race', 'item'
-  book_id TEXT NOT NULL, -- Para saber de qual livro a entidade pertence
-  created_at INTEGER NOT NULL,
-  UNIQUE(note_id, entity_id, entity_type)
-);
-
--- ÍNDICES PARA ANOTAÇÕES
-CREATE INDEX IF NOT EXISTS idx_notes_book_id ON notes(book_id);
-CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at DESC);
-CREATE INDEX IF NOT EXISTS idx_note_links_note_id ON note_links(note_id);
-CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
-CREATE INDEX IF NOT EXISTS idx_note_links_entity_type ON note_links(entity_type);
 
 -- CAPÍTULOS
 CREATE TABLE IF NOT EXISTS chapters (

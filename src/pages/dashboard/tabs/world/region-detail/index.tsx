@@ -17,21 +17,12 @@ import {
   getRegionsByBookId,
   updateRegion,
   deleteRegion,
-  getRegionVersions,
-  createRegionVersion,
-  deleteRegionVersion,
-  updateRegionVersion,
-  updateRegionVersionData,
-  getRegionVersionTimeline,
-  saveRegionVersionTimeline,
-  type IRegionVersion,
   type ITimelineEra,
 } from "@/lib/db/regions.service";
 import { safeJsonParse } from "@/lib/utils/json-parse";
 import { RegionSchema } from "@/lib/validation/region-schema";
 import {
   type IRegion,
-  type IRegionFormData,
   type RegionScale,
 } from "@/pages/dashboard/tabs/world/types/region-types";
 
@@ -72,10 +63,6 @@ export function RegionDetail() {
     useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
-  const [versions, setVersions] = useState<IRegionVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IRegionVersion | null>(
-    null
-  );
   const [_isLoading, _setIsLoading] = useState(true);
   const [allRegions, setAllRegions] = useState<IRegion[]>([]);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
@@ -332,55 +319,21 @@ export function RegionDetail() {
       try {
         const regionFromDB = await getRegionById(regionId);
         if (regionFromDB) {
-          // Load versions from database
-          const versionsFromDB = await getRegionVersions(regionId);
+          // Set region data
+          setRegion(regionFromDB);
+          setEditData(regionFromDB);
+          setImagePreview(regionFromDB.image || "");
 
-          // Prepare versions list
-          let updatedVersions: IRegionVersion[] = [];
+          // Load visibility preferences from the region data
+          const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
+            regionFromDB.sectionVisibility,
+            {}
+          );
 
-          // If no versions exist, create main version
-          if (versionsFromDB.length === 0) {
-            const mainVersion: IRegionVersion = {
-              id: `main-version-${regionId}`,
-              name: "Versão Principal",
-              description: "Versão principal da região",
-              createdAt: new Date().toISOString(),
-              isMain: true,
-              regionData: regionFromDB,
-            };
-
-            await createRegionVersion(regionId, mainVersion);
-            updatedVersions = [mainVersion];
-            setVersions([mainVersion]);
-            setCurrentVersion(mainVersion);
-
-            // Set region data from main version
-            setRegion(regionFromDB);
-            setEditData(regionFromDB);
-            setImagePreview(regionFromDB.image || "");
-
-            // Load visibility preferences from the region data
-            const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
-              regionFromDB.sectionVisibility,
-              {}
-            );
-
-            setSectionVisibility(loadedSectionVisibility);
-            setOriginalSectionVisibility(loadedSectionVisibility);
-            // Update refs
-            sectionVisibilityRef.current = loadedSectionVisibility;
-          } else {
-            // Update main version with loaded data
-            updatedVersions = versionsFromDB.map((v) =>
-              v.isMain
-                ? {
-                    ...v,
-                    regionData: regionFromDB,
-                  }
-                : v
-            );
-            setVersions(updatedVersions);
-          }
+          setSectionVisibility(loadedSectionVisibility);
+          setOriginalSectionVisibility(loadedSectionVisibility);
+          // Update refs
+          sectionVisibilityRef.current = loadedSectionVisibility;
 
           // Load all regions from the same book
           if (dashboardId) {
@@ -428,153 +381,69 @@ export function RegionDetail() {
               }))
             );
 
-            // Clean orphaned IDs from all versions BEFORE setting state
+            // Clean orphaned IDs from region data
             const characterIds = new Set(charactersData.map((c) => c.id));
             const factionIds = new Set(factionsData.map((f) => f.id));
             const raceIds = new Set(racesData.map((r) => r.id));
             const itemIds = new Set(itemsData.map((i) => i.id));
 
-            let hasOrphanedIds = false;
+            // Parse and clean each field
+            const importantCharacters = safeJsonParse<string[]>(
+              regionFromDB.importantCharacters,
+              []
+            );
+            const importantFactions = safeJsonParse<string[]>(
+              regionFromDB.importantFactions,
+              []
+            );
+            const racesFound = safeJsonParse<string[]>(
+              regionFromDB.racesFound,
+              []
+            );
+            const itemsFound = safeJsonParse<string[]>(
+              regionFromDB.itemsFound,
+              []
+            );
 
-            const cleanedVersions = updatedVersions.map((version) => {
-              const { regionData } = version;
+            // Filter out orphaned IDs
+            const cleanedCharacters = importantCharacters.filter((id: string) =>
+              characterIds.has(id)
+            );
+            const cleanedFactions = importantFactions.filter((id: string) =>
+              factionIds.has(id)
+            );
+            const cleanedRaces = racesFound.filter((id: string) =>
+              raceIds.has(id)
+            );
+            const cleanedItems = itemsFound.filter((id: string) =>
+              itemIds.has(id)
+            );
 
-              // Skip cleaning if regionData is null
-              if (!regionData) {
-                return version;
-              }
+            // Check if any IDs were removed
+            const hasOrphanedIds =
+              cleanedCharacters.length !== importantCharacters.length ||
+              cleanedFactions.length !== importantFactions.length ||
+              cleanedRaces.length !== racesFound.length ||
+              cleanedItems.length !== itemsFound.length;
 
-              let needsUpdate = false;
-
-              // Parse and clean each field
-              const importantCharacters = safeJsonParse<string[]>(
-                regionData.importantCharacters,
-                []
-              );
-              const importantFactions = safeJsonParse<string[]>(
-                regionData.importantFactions,
-                []
-              );
-              const racesFound = safeJsonParse<string[]>(
-                regionData.racesFound,
-                []
-              );
-              const itemsFound = safeJsonParse<string[]>(
-                regionData.itemsFound,
-                []
-              );
-
-              // Filter out orphaned IDs
-              const cleanedCharacters = importantCharacters.filter(
-                (id: string) => characterIds.has(id)
-              );
-              const cleanedFactions = importantFactions.filter((id: string) =>
-                factionIds.has(id)
-              );
-              const cleanedRaces = racesFound.filter((id: string) =>
-                raceIds.has(id)
-              );
-              const cleanedItems = itemsFound.filter((id: string) =>
-                itemIds.has(id)
-              );
-
-              // Check if any IDs were removed
-              if (
-                cleanedCharacters.length !== importantCharacters.length ||
-                cleanedFactions.length !== importantFactions.length ||
-                cleanedRaces.length !== racesFound.length ||
-                cleanedItems.length !== itemsFound.length
-              ) {
-                needsUpdate = true;
-                hasOrphanedIds = true;
-              }
-
-              if (needsUpdate) {
-                return {
-                  ...version,
-                  regionData: {
-                    ...regionData,
-                    importantCharacters: JSON.stringify(cleanedCharacters),
-                    importantFactions: JSON.stringify(cleanedFactions),
-                    racesFound: JSON.stringify(cleanedRaces),
-                    itemsFound: JSON.stringify(cleanedItems),
-                  },
-                };
-              }
-
-              return version;
-            });
-
-            // Update database if orphaned IDs were found
             if (hasOrphanedIds) {
-              for (const version of cleanedVersions) {
-                try {
-                  if (version.isMain) {
-                    // Update main region
-                    await updateRegion(regionId, version.regionData);
-                  } else {
-                    // Update version
-                    const { updateRegionVersionData } = await import(
-                      "@/lib/db/regions.service"
-                    );
-                    await updateRegionVersionData(
-                      version.id,
-                      version.regionData
-                    );
-                  }
-                } catch (error) {
-                  console.error(
-                    `Failed to clean orphaned IDs for version ${version.id}:`,
-                    error
-                  );
-                }
+              const cleanedRegion = {
+                ...regionFromDB,
+                importantCharacters: JSON.stringify(cleanedCharacters),
+                importantFactions: JSON.stringify(cleanedFactions),
+                racesFound: JSON.stringify(cleanedRaces),
+                itemsFound: JSON.stringify(cleanedItems),
+              };
+
+              // Update database
+              try {
+                await updateRegion(regionId, cleanedRegion);
+                // Update state with cleaned data
+                setRegion(cleanedRegion);
+                setEditData(cleanedRegion);
+              } catch (error) {
+                console.error("Failed to clean orphaned IDs:", error);
               }
-            }
-
-            // Update state with cleaned versions (always use cleaned versions)
-            const finalVersions = hasOrphanedIds
-              ? cleanedVersions
-              : updatedVersions;
-            setVersions(finalVersions);
-
-            // Set current version based on URL parameter or default to main (using cleaned data)
-            let selectedVersion: IRegionVersion | undefined;
-
-            if (versionIdFromUrl) {
-              selectedVersion = finalVersions.find(
-                (v) => v.id === versionIdFromUrl
-              );
-              if (!selectedVersion) {
-                selectedVersion = finalVersions.find((v) => v.isMain);
-              }
-            } else {
-              selectedVersion = finalVersions.find((v) => v.isMain);
-            }
-
-            if (selectedVersion) {
-              setCurrentVersion(selectedVersion);
-              // Set region data from selected version (already cleaned)
-              setRegion(selectedVersion.regionData);
-              setEditData(selectedVersion.regionData);
-              setImagePreview(selectedVersion.regionData.image || "");
-
-              // Load visibility preferences from the region data
-              const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
-                selectedVersion.regionData.sectionVisibility,
-                {}
-              );
-
-              setSectionVisibility(loadedSectionVisibility);
-              setOriginalSectionVisibility(loadedSectionVisibility);
-              // Update refs
-              sectionVisibilityRef.current = loadedSectionVisibility;
-
-              // Load timeline for this version
-              const timelineData = await getRegionVersionTimeline(
-                selectedVersion.id
-              );
-              setTimeline(timelineData);
-              setOriginalTimeline(timelineData);
             }
           }
         }
@@ -586,149 +455,10 @@ export function RegionDetail() {
     };
 
     loadRegion();
-  }, [regionId, dashboardId, versionIdFromUrl]);
-
-  const handleVersionChange = useCallback(
-    async (versionId: string | null) => {
-      if (!versionId) return;
-
-      const version = versions.find((v) => v.id === versionId);
-      if (!version) return;
-
-      // If regionData is null, log error and return
-      if (!version.regionData) {
-        console.error("Version has null regionData:", version);
-        return;
-      }
-
-      setCurrentVersion(version);
-      setRegion(version.regionData);
-      setEditData(version.regionData);
-      setImagePreview(version.regionData.image || "");
-
-      // Load visibility preferences from the region data
-      const loadedSectionVisibility = safeJsonParse<ISectionVisibility>(
-        version.regionData.sectionVisibility,
-        {}
-      );
-
-      setSectionVisibility(loadedSectionVisibility);
-      setOriginalSectionVisibility(loadedSectionVisibility);
-      // Update refs
-      sectionVisibilityRef.current = loadedSectionVisibility;
-
-      // Load timeline for this version
-      try {
-        const timelineData = await getRegionVersionTimeline(version.id);
-        setTimeline(timelineData);
-        setOriginalTimeline(timelineData);
-      } catch (error) {
-        console.error("Error loading version timeline:", error);
-      }
-    },
-    [versions]
-  );
-
-  const handleVersionCreate = useCallback(
-    async (versionData: {
-      name: string;
-      description: string;
-      entityData: IRegionFormData;
-    }) => {
-      try {
-        if (!versionData.entityData) {
-          console.error(
-            "[handleVersionCreate] ERROR: entityData is null/undefined!"
-          );
-          return;
-        }
-
-        const newVersion: IRegionVersion = {
-          id: `version-${Date.now()}`,
-          name: versionData.name,
-          description: versionData.description,
-          createdAt: new Date().toISOString(),
-          isMain: false,
-          regionData: versionData.entityData as unknown as IRegion,
-        };
-
-        // Save to database
-        await createRegionVersion(regionId, newVersion);
-
-        // Update state only if save is successful
-        setVersions((prev) => [...prev, newVersion]);
-      } catch (error) {
-        console.error(
-          "[handleVersionCreate] Error creating region version:",
-          error
-        );
-      }
-    },
-    [regionId]
-  );
-
-  const handleVersionDelete = useCallback(
-    async (versionId: string) => {
-      const versionToDelete = versions.find((v) => v.id === versionId);
-
-      // Don't allow deleting main version
-      if (versionToDelete?.isMain) {
-        return;
-      }
-
-      try {
-        // Delete from database
-        await deleteRegionVersion(versionId);
-
-        // Update state only if delete is successful
-        const updatedVersions = versions.filter((v) => v.id !== versionId);
-
-        // If the deleted version was the current one, switch to main
-        if (currentVersion?.id === versionId) {
-          const mainVersion = updatedVersions.find((v) => v.isMain);
-          if (mainVersion) {
-            setCurrentVersion(mainVersion);
-            setRegion(mainVersion.regionData);
-            setEditData(mainVersion.regionData);
-            setImagePreview(mainVersion.regionData.image || "");
-          }
-        }
-
-        setVersions(updatedVersions);
-      } catch (error) {
-        console.error(
-          "[handleVersionDelete] Error deleting region version:",
-          error
-        );
-      }
-    },
-    [versions, currentVersion]
-  );
-
-  const handleVersionUpdate = useCallback(
-    async (versionId: string, name: string, description?: string) => {
-      try {
-        // Update in database
-        await updateRegionVersion(versionId, name, description);
-
-        // Update state only if update is successful
-        const updatedVersions = versions.map((v) =>
-          v.id === versionId ? { ...v, name, description } : v
-        );
-        setVersions(updatedVersions);
-
-        if (currentVersion?.id === versionId) {
-          setCurrentVersion({ ...currentVersion, name, description });
-        }
-      } catch (error) {
-        console.error("Error updating region version:", error);
-      }
-    },
-    [versions, currentVersion]
-  );
+  }, [regionId, dashboardId]);
 
   const handleSave = useCallback(async () => {
-    if (!currentVersion || !editData) {
+    if (!editData) {
       return;
     }
 
@@ -785,19 +515,6 @@ export function RegionDetail() {
 
       setRegion(updatedRegion);
 
-      // Update data in current version
-      const updatedVersions = versions.map((v) =>
-        v.id === currentVersion?.id ? { ...v, regionData: updatedRegion } : v
-      );
-      setVersions(updatedVersions);
-
-      const activeVersion = updatedVersions.find(
-        (v) => v.id === currentVersion?.id
-      );
-      if (activeVersion) {
-        setCurrentVersion(activeVersion);
-      }
-
       // Get current visibility state from refs
       const currentSectionVisibility = sectionVisibilityRef.current;
 
@@ -841,24 +558,11 @@ export function RegionDetail() {
         sectionVisibility: JSON.stringify(currentSectionVisibility),
       };
 
-      // Check if we're editing the main version or an alternate version
-      const isMainVersion = currentVersion?.isMain ?? true;
-
-      if (isMainVersion) {
-        // Update the main region in database
-        await updateRegion(regionId, dataToSave);
-      } else {
-        // Update the alternate version's data in database
-        await updateRegionVersionData(currentVersion.id, updatedRegion);
-      }
+      // Update the region in database
+      await updateRegion(regionId, dataToSave);
 
       // Update original visibility to match saved state
       setOriginalSectionVisibility(currentSectionVisibility);
-
-      // Save timeline for current version
-      if (currentVersion) {
-        await saveRegionVersionTimeline(currentVersion.id, timeline);
-      }
 
       // Update original timeline after successful save
       setOriginalTimeline(timeline);
@@ -880,7 +584,7 @@ export function RegionDetail() {
         console.error("Error saving region:", error);
       }
     }
-  }, [editData, versions, currentVersion, regionId, timeline, t]);
+  }, [editData, regionId, timeline]);
 
   const navigateToWorldTab = useCallback(() => {
     if (!dashboardId) return;
@@ -891,44 +595,14 @@ export function RegionDetail() {
   }, [navigate, dashboardId]);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (currentVersion && !currentVersion.isMain) {
-      // Delete version (non-main)
-      const versionToDelete = versions.find((v) => v.id === currentVersion.id);
-
-      if (!versionToDelete) return;
-
-      try {
-        // Delete from database
-        await deleteRegionVersion(currentVersion.id);
-
-        const updatedVersions = versions.filter(
-          (v) => v.id !== currentVersion.id
-        );
-
-        // Switch to main version after deleting
-        const mainVersion = updatedVersions.find((v) => v.isMain);
-        if (mainVersion) {
-          setCurrentVersion(mainVersion);
-          setRegion(mainVersion.regionData);
-          setEditData(mainVersion.regionData);
-          setImagePreview(mainVersion.regionData.image || "");
-        }
-
-        setVersions(updatedVersions);
-      } catch (error) {
-        console.error("[handleConfirmDelete] Error deleting version:", error);
-      }
-    } else {
-      // Delete entire region (main version)
-      try {
-        if (!dashboardId) return;
-        await deleteRegion(regionId);
-        navigateToWorldTab();
-      } catch (error) {
-        console.error("Error deleting region:", error);
-      }
+    try {
+      if (!dashboardId) return;
+      await deleteRegion(regionId);
+      navigateToWorldTab();
+    } catch (error) {
+      console.error("Error deleting region:", error);
     }
-  }, [currentVersion, versions, navigateToWorldTab, regionId, dashboardId, t]);
+  }, [navigateToWorldTab, regionId, dashboardId]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {
@@ -996,12 +670,8 @@ export function RegionDetail() {
     navigate({
       to: "/dashboard/$dashboardId/tabs/world/$regionId/map",
       params: { dashboardId, regionId },
-      search:
-        currentVersion?.id && currentVersion.id !== "main-version"
-          ? { versionId: currentVersion.id }
-          : undefined,
     });
-  }, [navigate, dashboardId, regionId, currentVersion]);
+  }, [navigate, dashboardId, regionId]);
 
   const handleNavigationSidebarToggle = useCallback(() => {
     setIsNavigationSidebarOpen((prev) => !prev);
@@ -1060,7 +730,7 @@ export function RegionDetail() {
   }, []);
 
   // Don't render until we have the region data loaded
-  if (!region || !currentVersion) {
+  if (!region) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center space-y-4">
@@ -1084,8 +754,6 @@ export function RegionDetail() {
         editData={editData}
         isEditing={isEditing}
         hasChanges={hasChanges}
-        versions={versions}
-        currentVersion={currentVersion}
         showDeleteModal={showDeleteModal}
         isNavigationSidebarOpen={isNavigationSidebarOpen}
         imagePreview={imagePreview}
@@ -1117,10 +785,6 @@ export function RegionDetail() {
         onDeleteModalOpen={handleDeleteModalOpen}
         onDeleteModalClose={handleDeleteModalClose}
         onConfirmDelete={handleConfirmDelete}
-        onVersionChange={handleVersionChange}
-        onVersionCreate={handleVersionCreate}
-        onVersionDelete={handleVersionDelete}
-        onVersionUpdate={handleVersionUpdate}
         onImageFileChange={handleImageFileChange}
         onEditDataChange={handleEditDataChange}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}

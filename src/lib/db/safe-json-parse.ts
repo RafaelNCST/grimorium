@@ -65,16 +65,6 @@ export const factionTimelineEraSchema = z.object({
 
 export const factionTimelineSchema = z.array(factionTimelineEraSchema);
 
-// Diplomatic relation schema
-export const diplomaticRelationSchema = z.object({
-  factionId: z.string(),
-  factionName: z.string().optional(),
-  relationType: z.string(),
-  description: z.string().optional(),
-});
-
-export const diplomaticRelationsSchema = z.array(diplomaticRelationSchema);
-
 // Hierarchy title schema
 export const hierarchyTitleSchema = z.object({
   title: z.string(),

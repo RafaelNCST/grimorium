@@ -33,10 +33,6 @@ export interface ICharacterFamily {
   halfSiblings: string[]; // Meio-irmãos
 }
 
-export interface IFieldVisibility {
-  [fieldName: string]: boolean; // true = visível, false = oculto
-}
-
 export interface ICharacter {
   id: string;
   name: string;
@@ -83,9 +79,6 @@ export interface ICharacter {
 
   // Family
   family?: ICharacterFamily;
-
-  // Field Visibility
-  fieldVisibility?: IFieldVisibility;
 
   // Legacy fields (for backward compatibility)
   appearance?: string;
@@ -136,13 +129,4 @@ export interface ICharacterFormData {
   organization: string;
   nicknames: string[];
   past: string;
-}
-
-export interface ICharacterVersion {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  isMain: boolean;
-  characterData: ICharacter;
 }

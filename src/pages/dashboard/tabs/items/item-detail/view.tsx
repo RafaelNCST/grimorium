@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Info, Package, NotebookPen, Image } from "lucide-react";
+import { AlertCircle, Info, Package, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -40,16 +40,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  EntityVersionManager,
-  CreateVersionWithEntityDialog,
-  VersionsPanel,
-} from "@/components/version-system";
-import { type IItem, type IItemVersion } from "@/lib/db/items.service";
+import { type IItem } from "@/lib/db/items.service";
 import { type IFieldVisibility } from "@/types/character-types";
 
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
-import { VersionCard } from "./components/version-card";
 
 // Info Alert component
 const InfoAlert = ({
@@ -69,8 +63,6 @@ interface ItemDetailViewProps {
   item: IItem;
   editData: IItem;
   isEditing: boolean;
-  versions: IItemVersion[];
-  currentVersion: IItemVersion | null;
   showDeleteModal: boolean;
   isNavigationSidebarOpen: boolean;
   allItems: IItem[];
@@ -99,18 +91,6 @@ interface ItemDetailViewProps {
   onDeleteModalOpen: () => void;
   onDeleteModalClose: () => void;
   onConfirmDelete: () => void;
-  onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (versionData: {
-    name: string;
-    description: string;
-    entityData: ItemFormSchema;
-  }) => void;
-  onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (
-    versionId: string,
-    name: string,
-    description?: string
-  ) => void;
   onEditDataChange: (field: string, value: unknown) => void;
   validateField: (field: string, value: any) => void;
   onFieldVisibilityToggle: (field: string) => void;
@@ -123,8 +103,6 @@ export const ItemDetailView = React.memo(
     item,
     editData,
     isEditing,
-    versions,
-    currentVersion,
     showDeleteModal,
     isNavigationSidebarOpen,
     allItems,
@@ -150,10 +128,6 @@ export const ItemDetailView = React.memo(
     onDeleteModalOpen,
     onDeleteModalClose,
     onConfirmDelete,
-    onVersionChange,
-    onVersionCreate,
-    onVersionDelete,
-    onVersionUpdate,
     onEditDataChange,
     validateField,
     onFieldVisibilityToggle,
@@ -770,65 +744,6 @@ export const ItemDetailView = React.memo(
     );
 
     // ==================
-    // VERSIONS PANEL
-    // ==================
-    const versionsPanel = (
-      <VersionsPanel title={t("item-detail:sections.versions")}>
-        <EntityVersionManager<IItemVersion, IItem, ItemFormSchema>
-          versions={versions}
-          currentVersion={currentVersion}
-          onVersionChange={onVersionChange}
-          onVersionCreate={onVersionCreate}
-          baseEntity={item}
-          i18nNamespace="item-detail"
-          renderVersionCard={({ version, isSelected, onClick }) => {
-            // Check if version has valid data
-            const hasValidData = !!version.itemData;
-
-            return (
-              <div className="relative">
-                <div
-                  className={
-                    !hasValidData ? "opacity-50 cursor-not-allowed" : ""
-                  }
-                >
-                  <VersionCard
-                    version={version}
-                    isSelected={isSelected}
-                    onClick={hasValidData ? onClick : () => {}}
-                    onDelete={onVersionDelete}
-                    onUpdate={onVersionUpdate}
-                  />
-                </div>
-                {!hasValidData && !version.isMain && (
-                  <div className="text-xs text-destructive mt-1 px-2">
-                    Dados corrompidos
-                  </div>
-                )}
-              </div>
-            );
-          }}
-          renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
-            <CreateVersionWithEntityDialog<IItem, ItemFormSchema>
-              open={open}
-              onClose={onClose}
-              onConfirm={onConfirm}
-              baseEntity={baseEntity}
-              i18nNamespace="item-detail"
-              renderEntityModal={({ open, onOpenChange, onConfirm }) => (
-                <CreateItemModal
-                  open={open}
-                  onClose={() => onOpenChange(false)}
-                  onConfirm={onConfirm}
-                />
-              )}
-            />
-          )}
-        />
-      </VersionsPanel>
-    );
-
-    // ==================
     // RENDER
     // ==================
     return (
@@ -858,21 +773,6 @@ export const ItemDetailView = React.memo(
               onCancel={onCancel}
               onDelete={onDeleteModalOpen}
               extraActions={[
-                {
-                  label: t("item-detail:header.notes"),
-                  icon: NotebookPen,
-                  onClick: () =>
-                    navigate({
-                      to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
-                      params: {
-                        dashboardId: item.bookId,
-                        entityType: "item",
-                        entityId: item.id,
-                      },
-                      search: { entityName: item.name },
-                    }),
-                  tooltip: t("item-detail:header.notes"),
-                },
                 {
                   label: t("item-detail:header.gallery"),
                   icon: Image,
@@ -923,7 +823,6 @@ export const ItemDetailView = React.memo(
               advancedSectionTitle={t("item-detail:sections.advanced_info")}
               advancedSectionOpen={advancedSectionOpen}
               onAdvancedSectionToggle={onAdvancedSectionToggle}
-              versionsPanel={versionsPanel}
               extraSections={[
                 // Chapter Metrics section (only visible in view mode)
                 ...(!isEditing
@@ -969,9 +868,6 @@ export const ItemDetailView = React.memo(
           isOpen={showDeleteModal}
           onClose={onDeleteModalClose}
           itemName={item.name}
-          currentVersion={currentVersion}
-          versionName={currentVersion?.name}
-          totalVersions={versions.length}
           onConfirmDelete={onConfirmDelete}
         />
       </div>

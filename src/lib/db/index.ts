@@ -99,22 +99,10 @@ async function runMigrations(database: Database): Promise<void> {
       past TEXT,
 
       -- Metadata
-      field_visibility TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
 
       UNIQUE(book_id, name)
-    );
-
-    -- VERSÕES DE PERSONAGENS
-    CREATE TABLE IF NOT EXISTS character_versions (
-      id TEXT PRIMARY KEY,
-      character_id TEXT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      is_main INTEGER DEFAULT 0,
-      character_data TEXT,
-      created_at INTEGER NOT NULL
     );
 
     -- RELACIONAMENTOS
@@ -159,20 +147,8 @@ async function runMigrations(database: Database): Promise<void> {
       usage_consequences TEXT,
 
       -- Metadata
-      field_visibility TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
-    );
-
-    -- VERSÕES DE ITENS
-    CREATE TABLE IF NOT EXISTS item_versions (
-      id TEXT PRIMARY KEY,
-      item_id TEXT NOT NULL REFERENCES items(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      is_main INTEGER DEFAULT 0,
-      item_data TEXT,
-      created_at INTEGER NOT NULL
     );
 
     -- GRUPOS DE RAÇAS
@@ -234,20 +210,8 @@ async function runMigrations(database: Database): Promise<void> {
       inspirations TEXT,
 
       -- Metadata
-      field_visibility TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
-    );
-
-    -- VERSÕES DE RAÇAS
-    CREATE TABLE IF NOT EXISTS race_versions (
-      id TEXT PRIMARY KEY,
-      race_id TEXT NOT NULL REFERENCES races(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      is_main INTEGER DEFAULT 0,
-      race_data TEXT,
-      created_at INTEGER NOT NULL
     );
 
     -- RELACIONAMENTOS ENTRE RAÇAS
@@ -317,17 +281,6 @@ async function runMigrations(database: Database): Promise<void> {
       inspirations TEXT,
 
       -- Metadata
-      created_at INTEGER NOT NULL
-    );
-
-    -- VERSÕES DE FACÇÕES
-    CREATE TABLE IF NOT EXISTS faction_versions (
-      id TEXT PRIMARY KEY,
-      faction_id TEXT NOT NULL REFERENCES factions(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      is_main INTEGER DEFAULT 0,
-      faction_data TEXT,
       created_at INTEGER NOT NULL
     );
 
@@ -443,63 +396,21 @@ async function runMigrations(database: Database): Promise<void> {
       FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
     );
 
-    -- VERSÕES DE REGIÕES
-    CREATE TABLE IF NOT EXISTS region_versions (
-      id TEXT PRIMARY KEY,
-      region_id TEXT NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      is_main INTEGER DEFAULT 0,
-      region_data TEXT,
-      created_at TEXT NOT NULL
-    );
-
-    -- LINHA DO TEMPO DE REGIÕES - ERAS
-    CREATE TABLE IF NOT EXISTS region_timeline_eras (
-      id TEXT PRIMARY KEY,
-      region_id TEXT NOT NULL REFERENCES region_versions(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      start_date TEXT NOT NULL,
-      end_date TEXT NOT NULL
-    );
-
-    -- LINHA DO TEMPO DE REGIÕES - EVENTOS
-    CREATE TABLE IF NOT EXISTS region_timeline_events (
-      id TEXT PRIMARY KEY,
-      era_id TEXT NOT NULL REFERENCES region_timeline_eras(id) ON DELETE CASCADE,
-      name TEXT NOT NULL,
-      description TEXT,
-      short_description TEXT,
-      reason TEXT,
-      outcome TEXT,
-      start_date TEXT NOT NULL,
-      end_date TEXT NOT NULL,
-      characters_involved TEXT,
-      factions_involved TEXT,
-      races_involved TEXT,
-      items_involved TEXT
-    );
-
     -- ÍNDICES
     CREATE INDEX IF NOT EXISTS idx_characters_book_id ON characters(book_id);
-    CREATE INDEX IF NOT EXISTS idx_character_versions_character_id ON character_versions(character_id);
     CREATE INDEX IF NOT EXISTS idx_relationships_character ON relationships(character_id);
     CREATE INDEX IF NOT EXISTS idx_relationships_related ON relationships(related_character_id);
     CREATE INDEX IF NOT EXISTS idx_family_character ON family_relations(character_id);
     CREATE INDEX IF NOT EXISTS idx_family_related ON family_relations(related_character_id);
     CREATE INDEX IF NOT EXISTS idx_books_last_opened ON books(last_opened_at DESC);
     CREATE INDEX IF NOT EXISTS idx_items_book_id ON items(book_id);
-    CREATE INDEX IF NOT EXISTS idx_item_versions_item_id ON item_versions(item_id);
     CREATE INDEX IF NOT EXISTS idx_race_groups_book_id ON race_groups(book_id);
     CREATE INDEX IF NOT EXISTS idx_race_groups_order ON race_groups(book_id, order_index);
     CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id);
     CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id);
-    CREATE INDEX IF NOT EXISTS idx_race_versions_race_id ON race_versions(race_id);
     CREATE INDEX IF NOT EXISTS idx_race_relationships_race ON race_relationships(race_id);
     CREATE INDEX IF NOT EXISTS idx_race_relationships_related ON race_relationships(related_race_id);
     CREATE INDEX IF NOT EXISTS idx_factions_book_id ON factions(book_id);
-    CREATE INDEX IF NOT EXISTS idx_faction_versions_faction_id ON faction_versions(faction_id);
     CREATE INDEX IF NOT EXISTS idx_plot_arcs_book_id ON plot_arcs(book_id);
     CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index);
     CREATE INDEX IF NOT EXISTS idx_plot_events_arc_id ON plot_events(arc_id);
@@ -519,21 +430,15 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_power_links_section ON power_character_links(section_id);
     CREATE INDEX IF NOT EXISTS idx_regions_book_id ON regions(book_id);
     CREATE INDEX IF NOT EXISTS idx_regions_parent_id ON regions(parent_id);
-    CREATE INDEX IF NOT EXISTS idx_region_versions_region_id ON region_versions(region_id);
-    CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id);
-    CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id);
 
     -- MAPAS DE REGIÕES
     CREATE TABLE IF NOT EXISTS region_maps (
       id TEXT PRIMARY KEY,
-      region_id TEXT NOT NULL,
-      version_id TEXT,
+      region_id TEXT NOT NULL UNIQUE,
       image_path TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
-      FOREIGN KEY (version_id) REFERENCES region_versions(id) ON DELETE CASCADE,
-      UNIQUE(region_id, version_id)
+      FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE
     );
 
     -- MARCADORES DE MAPAS DE REGIÕES
@@ -560,32 +465,6 @@ async function runMigrations(database: Database): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id);
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id);
     CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id);
-
-    -- NOTAS/ANOTAÇÕES
-    CREATE TABLE IF NOT EXISTS notes (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      content TEXT,
-      paper_mode TEXT DEFAULT 'light',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL
-    );
-
-    -- LINKS DE NOTAS PARA ENTIDADES
-    CREATE TABLE IF NOT EXISTS note_links (
-      id TEXT PRIMARY KEY,
-      note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-      entity_id TEXT NOT NULL,
-      entity_type TEXT NOT NULL,
-      entity_name TEXT,
-      book_id TEXT NOT NULL,
-      created_at INTEGER NOT NULL,
-      UNIQUE(note_id, entity_id, entity_type)
-    );
-
-    -- ÍNDICES PARA NOTAS
-    CREATE INDEX IF NOT EXISTS idx_note_links_note ON note_links(note_id);
-    CREATE INDEX IF NOT EXISTS idx_note_links_entity ON note_links(entity_id, entity_type);
 
     -- GALERIA (IMAGENS)
     CREATE TABLE IF NOT EXISTS gallery_items (
@@ -767,126 +646,6 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists or other error - safe to ignore
     }
 
-    // Add version_id column to region_maps if it doesn't exist
-    try {
-      await database.execute(
-        "ALTER TABLE region_maps ADD COLUMN version_id TEXT"
-      );
-    } catch (_error) {
-      // Column already exists or other error - safe to ignore
-    }
-
-    // Migrate region_maps table to support version_id with correct constraints
-    try {
-      // Check if we need to migrate by checking if the old constraint exists
-      const tableInfo = await database.select<Array<{ sql: string }>>(
-        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_maps'"
-      );
-
-      if (
-        tableInfo.length > 0 &&
-        tableInfo[0].sql.includes("region_id TEXT NOT NULL UNIQUE")
-      ) {
-        // Create new table with correct schema
-        await database.execute(`
-          CREATE TABLE region_maps_new (
-            id TEXT PRIMARY KEY,
-            region_id TEXT NOT NULL,
-            version_id TEXT,
-            image_path TEXT NOT NULL,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
-            FOREIGN KEY (version_id) REFERENCES region_versions(id) ON DELETE CASCADE,
-            UNIQUE(region_id, version_id)
-          )
-        `);
-
-        // Copy existing data (set version_id to NULL for existing maps)
-        await database.execute(`
-          INSERT INTO region_maps_new (id, region_id, version_id, image_path, created_at, updated_at)
-          SELECT id, region_id, NULL, image_path, created_at, updated_at
-          FROM region_maps
-        `);
-
-        // Drop old table
-        await database.execute("DROP TABLE region_maps");
-
-        // Rename new table
-        await database.execute(
-          "ALTER TABLE region_maps_new RENAME TO region_maps"
-        );
-
-        // Recreate index
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_maps_region_id ON region_maps(region_id)"
-        );
-      }
-    } catch (_error) {
-      // Migration error or already migrated - safe to ignore
-    }
-
-    // Migrate region_map_markers to link to specific maps (version-specific)
-    try {
-      const markersTableInfo = await database.select<Array<{ sql: string }>>(
-        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_map_markers'"
-      );
-
-      if (
-        markersTableInfo.length > 0 &&
-        !markersTableInfo[0].sql.includes("map_id")
-      ) {
-        // Create new table with map_id
-        await database.execute(`
-          CREATE TABLE region_map_markers_new (
-            id TEXT PRIMARY KEY,
-            map_id TEXT NOT NULL,
-            parent_region_id TEXT NOT NULL,
-            child_region_id TEXT NOT NULL,
-            position_x INTEGER NOT NULL,
-            position_y INTEGER NOT NULL,
-            color TEXT DEFAULT '#8b5cf6',
-            show_label INTEGER DEFAULT 1,
-            scale REAL DEFAULT 1.0,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL,
-            FOREIGN KEY (map_id) REFERENCES region_maps(id) ON DELETE CASCADE,
-            FOREIGN KEY (parent_region_id) REFERENCES regions(id) ON DELETE CASCADE,
-            FOREIGN KEY (child_region_id) REFERENCES regions(id) ON DELETE CASCADE,
-            UNIQUE(map_id, child_region_id)
-          )
-        `);
-
-        // Copy existing markers, linking them to main version maps (version_id = NULL)
-        await database.execute(`
-          INSERT INTO region_map_markers_new (id, map_id, parent_region_id, child_region_id, position_x, position_y, color, show_label, scale, created_at, updated_at)
-          SELECT m.id, rm.id, m.parent_region_id, m.child_region_id, m.position_x, m.position_y, m.color, m.show_label, 1.0, m.created_at, m.updated_at
-          FROM region_map_markers m
-          JOIN region_maps rm ON rm.region_id = m.parent_region_id AND rm.version_id IS NULL
-        `);
-
-        // Drop old table
-        await database.execute("DROP TABLE region_map_markers");
-
-        // Rename new table
-        await database.execute(
-          "ALTER TABLE region_map_markers_new RENAME TO region_map_markers"
-        );
-
-        // Recreate indexes
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_map ON region_map_markers(map_id)"
-        );
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_parent ON region_map_markers(parent_region_id)"
-        );
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_map_markers_child ON region_map_markers(child_region_id)"
-        );
-      }
-    } catch (_error) {
-      // Markers migration error or already migrated - safe to ignore
-    }
 
     // Add scale column to region_map_markers table
     try {
@@ -999,15 +758,7 @@ async function runMigrations(database: Database): Promise<void> {
       }
     }
 
-    // Add visibility configuration fields to regions table
-    try {
-      await database.execute(
-        "ALTER TABLE regions ADD COLUMN field_visibility TEXT"
-      );
-    } catch (_error) {
-      // Column already exists - safe to ignore
-    }
-
+    // Add section_visibility field to regions table
     try {
       await database.execute(
         "ALTER TABLE regions ADD COLUMN section_visibility TEXT"
@@ -1016,90 +767,6 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
-    // Migrate region_timeline_eras to reference region_versions instead of regions
-    try {
-      const timelineTableInfo = await database.select<Array<{ sql: string }>>(
-        "SELECT sql FROM sqlite_master WHERE type='table' AND name='region_timeline_eras'"
-      );
-
-      if (
-        timelineTableInfo.length > 0 &&
-        timelineTableInfo[0].sql.includes("REFERENCES regions(id)")
-      ) {
-        // Create new table with correct foreign key
-        await database.execute(`
-          CREATE TABLE region_timeline_eras_new (
-            id TEXT PRIMARY KEY,
-            region_id TEXT NOT NULL REFERENCES region_versions(id) ON DELETE CASCADE,
-            name TEXT NOT NULL,
-            description TEXT,
-            start_date TEXT NOT NULL,
-            end_date TEXT NOT NULL
-          )
-        `);
-
-        // Copy existing eras data - link to main version of each region
-        // We need to find the main version for each region_id in the old table
-        await database.execute(`
-          INSERT INTO region_timeline_eras_new (id, region_id, name, description, start_date, end_date)
-          SELECT e.id, v.id, e.name, e.description, e.start_date, e.end_date
-          FROM region_timeline_eras e
-          JOIN region_versions v ON v.region_id = e.region_id AND v.is_main = 1
-        `);
-
-        // Drop old table (events will be cascade deleted, so we need to handle them separately)
-        // First, backup events data
-        await database.execute(`
-          CREATE TABLE region_timeline_events_backup AS
-          SELECT * FROM region_timeline_events
-        `);
-
-        await database.execute("DROP TABLE region_timeline_eras");
-
-        // Rename new table
-        await database.execute(
-          "ALTER TABLE region_timeline_eras_new RENAME TO region_timeline_eras"
-        );
-
-        // Recreate events table (it was cascade deleted)
-        await database.execute(`
-          CREATE TABLE region_timeline_events (
-            id TEXT PRIMARY KEY,
-            era_id TEXT NOT NULL REFERENCES region_timeline_eras(id) ON DELETE CASCADE,
-            name TEXT NOT NULL,
-            description TEXT,
-            short_description TEXT,
-            reason TEXT,
-            outcome TEXT,
-            start_date TEXT NOT NULL,
-            end_date TEXT NOT NULL,
-            characters_involved TEXT,
-            factions_involved TEXT,
-            races_involved TEXT,
-            items_involved TEXT
-          )
-        `);
-
-        // Restore events data
-        await database.execute(`
-          INSERT INTO region_timeline_events
-          SELECT * FROM region_timeline_events_backup
-        `);
-
-        // Drop backup table
-        await database.execute("DROP TABLE region_timeline_events_backup");
-
-        // Recreate indexes
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_timeline_eras_region_id ON region_timeline_eras(region_id)"
-        );
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_region_timeline_events_era_id ON region_timeline_events(era_id)"
-        );
-      }
-    } catch (_error) {
-      // Timeline migration error or already migrated - safe to ignore
-    }
 
     // Add description column to race_relationships table
     try {
@@ -1108,92 +775,6 @@ async function runMigrations(database: Database): Promise<void> {
       );
     } catch (_error) {
       // Column already exists - safe to ignore
-    }
-
-    // Remove race_views column from races table (no longer needed)
-    try {
-      // Check if column exists before trying to remove it
-      const tableInfo = await database.select<Array<{ name: string }>>(
-        "PRAGMA table_info(races)"
-      );
-      const hasRaceViews = tableInfo.some((col) => col.name === "race_views");
-
-      if (hasRaceViews) {
-        // SQLite doesn't support DROP COLUMN directly, so we need to recreate the table
-        // Create a backup
-        await database.execute(`
-          CREATE TABLE races_backup AS SELECT * FROM races
-        `);
-
-        // Drop the old table
-        await database.execute("DROP TABLE races");
-
-        // Recreate without race_views column
-        await database.execute(`
-          CREATE TABLE races (
-            id TEXT PRIMARY KEY,
-            book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
-            group_id TEXT REFERENCES race_groups(id) ON DELETE SET NULL,
-            name TEXT NOT NULL,
-            domain TEXT NOT NULL,
-            summary TEXT NOT NULL,
-            image TEXT,
-            scientific_name TEXT,
-            alternative_names TEXT,
-            cultural_notes TEXT,
-            general_appearance TEXT,
-            life_expectancy TEXT,
-            average_height TEXT,
-            average_weight TEXT,
-            special_physical_characteristics TEXT,
-            habits TEXT,
-            reproductive_cycle TEXT,
-            other_reproductive_cycle_description TEXT,
-            diet TEXT,
-            elemental_diet TEXT,
-            communication TEXT,
-            other_communication TEXT,
-            moral_tendency TEXT,
-            social_organization TEXT,
-            habitat TEXT,
-            physical_capacity TEXT,
-            special_characteristics TEXT,
-            weaknesses TEXT,
-            story_motivation TEXT,
-            inspirations TEXT,
-            field_visibility TEXT,
-            created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL
-          )
-        `);
-
-        // Copy data back (excluding race_views)
-        await database.execute(`
-          INSERT INTO races SELECT
-            id, book_id, group_id, name, domain, summary, image, scientific_name,
-            alternative_names, cultural_notes, general_appearance, life_expectancy,
-            average_height, average_weight, special_physical_characteristics,
-            habits, reproductive_cycle, other_reproductive_cycle_description,
-            diet, elemental_diet, communication, other_communication,
-            moral_tendency, social_organization, habitat, physical_capacity,
-            special_characteristics, weaknesses, story_motivation, inspirations,
-            field_visibility, created_at, updated_at
-          FROM races_backup
-        `);
-
-        // Drop backup
-        await database.execute("DROP TABLE races_backup");
-
-        // Recreate indexes
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_races_book_id ON races(book_id)"
-        );
-        await database.execute(
-          "CREATE INDEX IF NOT EXISTS idx_races_group_id ON races(group_id)"
-        );
-      }
-    } catch (_error) {
-      // Error removing race_views column - safe to ignore
     }
 
     // Add symbols_and_secrets column to factions table (replacing important_symbols and treasures_and_secrets)
@@ -1281,39 +862,6 @@ async function runMigrations(database: Database): Promise<void> {
       await database.execute("ALTER TABLE books ADD COLUMN tabs_config TEXT");
     } catch (_error) {
       // Column already exists - safe to ignore
-    }
-
-    // Add book_id column to notes table
-    try {
-      // Check if column already exists
-      const notesTableInfo = await database.select<Array<{ name: string }>>(
-        "PRAGMA table_info(notes)"
-      );
-      const hasBookId = notesTableInfo.some((col) => col.name === "book_id");
-
-      if (!hasBookId) {
-        // Get all books
-        const books = await database.select<{ id: string }[]>(
-          "SELECT id FROM books"
-        );
-
-        // Add book_id column (allowing NULL temporarily)
-        await database.execute("ALTER TABLE notes ADD COLUMN book_id TEXT");
-
-        if (books.length > 0) {
-          // Assign all existing notes to the first book
-          const firstBookId = books[0].id;
-          await database.execute(
-            "UPDATE notes SET book_id = ? WHERE book_id IS NULL",
-            [firstBookId]
-          );
-        } else {
-          // No books found - delete orphan notes
-          await database.execute("DELETE FROM notes WHERE book_id IS NULL");
-        }
-      }
-    } catch (_error) {
-      // book_id column migration error - safe to ignore
     }
 
     // Add thumbnail_path column to gallery_items table

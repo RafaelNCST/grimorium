@@ -14,16 +14,6 @@ export interface IRaceRelationship {
   description?: string; // Optional description (max 200 characters)
 }
 
-export interface IRaceVersion {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  isMain: boolean;
-  raceData: IRace;
-  relationships?: IRaceRelationship[];
-}
-
 export interface IFieldVisibility {
   [key: string]: boolean;
 }

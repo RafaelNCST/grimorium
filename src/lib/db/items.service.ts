@@ -1,4 +1,4 @@
-import { DBItem, DBItemVersion } from "./types";
+import { DBItem } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
@@ -9,7 +9,6 @@ import {
 } from "./cleanup-helpers";
 import {
   safeParseStringArray,
-  safeParseFieldVisibility,
   safeParseUnknownObject,
 } from "./safe-json-parse";
 
@@ -32,18 +31,8 @@ export interface IItem {
   usageConsequences?: string;
   itemUsage?: string;
 
-  fieldVisibility?: Record<string, boolean>;
   createdAt?: string;
   updatedAt?: string;
-}
-
-export interface IItemVersion {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  isMain: boolean;
-  itemData: IItem;
 }
 
 function itemToDBItem(bookId: string, item: IItem): DBItem {
@@ -66,9 +55,6 @@ function itemToDBItem(bookId: string, item: IItem): DBItem {
     usage_requirements: item.usageRequirements,
     usage_consequences: item.usageConsequences,
     item_usage: item.itemUsage,
-    field_visibility: item.fieldVisibility
-      ? JSON.stringify(item.fieldVisibility)
-      : undefined,
     created_at: item.createdAt
       ? new Date(item.createdAt).getTime()
       : Date.now(),
@@ -96,7 +82,6 @@ function dbItemToItem(dbItem: DBItem): IItem {
     usageRequirements: dbItem.usage_requirements,
     usageConsequences: dbItem.usage_consequences,
     itemUsage: dbItem.item_usage,
-    fieldVisibility: safeParseFieldVisibility(dbItem.field_visibility),
     createdAt: new Date(dbItem.created_at).toISOString(),
     updatedAt: new Date(dbItem.updated_at).toISOString(),
   };
@@ -133,9 +118,9 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
       `INSERT INTO items (
         id, book_id, name, status, category, custom_category, basic_description, image,
         appearance, origin, alternative_names, story_rarity, narrative_purpose,
-        usage_requirements, usage_consequences, item_usage, field_visibility, created_at, updated_at
+        usage_requirements, usage_consequences, item_usage, created_at, updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
       )`,
       [
         dbItem.id,
@@ -154,7 +139,6 @@ export async function createItem(bookId: string, item: IItem): Promise<void> {
         dbItem.usage_requirements,
         dbItem.usage_consequences,
         dbItem.item_usage,
-        dbItem.field_visibility,
         dbItem.created_at,
         dbItem.updated_at,
       ]
@@ -199,8 +183,8 @@ export async function updateItem(
         basic_description = $5, image = $6, appearance = $7, origin = $8,
         alternative_names = $9, story_rarity = $10, narrative_purpose = $11,
         usage_requirements = $12, usage_consequences = $13, item_usage = $14,
-        field_visibility = $15, updated_at = $16
-      WHERE id = $17`,
+        updated_at = $15
+      WHERE id = $16`,
       [
         dbItem.name,
         dbItem.status,
@@ -216,7 +200,6 @@ export async function updateItem(
         dbItem.usage_requirements,
         dbItem.usage_consequences,
         dbItem.item_usage,
-        dbItem.field_visibility,
         dbItem.updated_at,
         id,
       ]
@@ -251,79 +234,3 @@ export async function deleteItem(id: string): Promise<void> {
   }, 'deleteItem');
 }
 
-export async function getItemVersions(itemId: string): Promise<IItemVersion[]> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const result = await db.select<DBItemVersion[]>(
-      "SELECT * FROM item_versions WHERE item_id = $1 ORDER BY created_at DESC",
-      [itemId]
-    );
-
-    return result.map((v) => ({
-      id: v.id,
-      name: v.name,
-      description: v.description,
-      createdAt: new Date(v.created_at).toISOString(),
-      isMain: v.is_main === 1,
-      itemData: safeParseUnknownObject(v.item_data) as IItem,
-    }));
-  }, 'getItemVersions');
-}
-
-export async function createItemVersion(
-  itemId: string,
-  version: IItemVersion
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-
-    await db.execute(
-      `INSERT INTO item_versions (
-        id, item_id, name, description, is_main, item_data, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        version.id,
-        itemId,
-        version.name,
-        version.description,
-        version.isMain ? 1 : 0,
-        JSON.stringify(version.itemData),
-        Date.now(),
-      ]
-    );
-  }, 'createItemVersion');
-}
-
-export async function deleteItemVersion(versionId: string): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute("DELETE FROM item_versions WHERE id = $1", [versionId]);
-  }, 'deleteItemVersion');
-}
-
-export async function updateItemVersion(
-  versionId: string,
-  name: string,
-  description?: string
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute(
-      "UPDATE item_versions SET name = $1, description = $2 WHERE id = $3",
-      [name, description, versionId]
-    );
-  }, 'updateItemVersion');
-}
-
-export async function updateItemVersionData(
-  versionId: string,
-  itemData: IItem
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute("UPDATE item_versions SET item_data = $1 WHERE id = $2", [
-      JSON.stringify(itemData),
-      versionId,
-    ]);
-  }, 'updateItemVersionData');
-}

@@ -3,11 +3,9 @@ import React, { useMemo } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 
-import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import { FormEntityMultiSelectAuto } from "@/components/forms/FormEntityMultiSelectAuto";
 import {
   type ICharacterFamily,
-  type IFieldVisibility,
 } from "@/types/character-types";
 
 interface ICharacter {
@@ -159,9 +157,7 @@ interface FamilySectionProps {
   currentCharacterId: string;
   bookId: string;
   isEditMode: boolean;
-  fieldVisibility: IFieldVisibility;
   onFamilyChange: (family: ICharacterFamily) => void;
-  onFieldVisibilityToggle: (fieldName: string) => void;
 }
 
 export const FamilySection = React.memo(
@@ -171,9 +167,7 @@ export const FamilySection = React.memo(
     currentCharacterId,
     bookId,
     isEditMode,
-    fieldVisibility,
     onFamilyChange,
-    onFieldVisibilityToggle,
   }: FamilySectionProps) => {
     const { t } = useTranslation("character-detail");
 
@@ -227,15 +221,7 @@ export const FamilySection = React.memo(
       const handleChange = fieldChangeHandlers[fieldName];
 
       return (
-        <FieldWithVisibilityToggle
-          key={fieldName}
-          fieldName={fieldName}
-          label={isEditMode ? t(labelKey) : ""}
-          isOptional
-          fieldVisibility={fieldVisibility}
-          isEditing={isEditMode}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
-        >
+        <div key={fieldName} className="space-y-2">
           {isEditMode ? (
             <FamilyFieldOptimized
               fieldName={fieldName}
@@ -308,7 +294,7 @@ export const FamilySection = React.memo(
               )}
             </div>
           )}
-        </FieldWithVisibilityToggle>
+        </div>
       );
     };
 

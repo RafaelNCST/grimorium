@@ -6,7 +6,6 @@ import {
   AlertCircle,
   Trash2,
   Clock,
-  NotebookPen,
   Image,
   Map as MapIcon,
 } from "lucide-react";
@@ -48,15 +47,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  EntityVersionManager,
-  CreateVersionWithEntityDialog,
-  VersionsPanel,
-} from "@/components/version-system";
-import {
-  type IRegionVersion,
-  type ITimelineEra,
-} from "@/lib/db/regions.service";
+import { type ITimelineEra } from "@/lib/db/regions.service";
 import { ScalePicker } from "@/pages/dashboard/tabs/world/components/scale-picker";
 import { REGION_SCALES_CONSTANT } from "@/pages/dashboard/tabs/world/constants/scale-colors";
 import {
@@ -65,7 +56,6 @@ import {
 } from "@/pages/dashboard/tabs/world/types/region-types";
 
 import { RegionTimeline } from "./components/region-timeline";
-import { VersionCard } from "./components/version-card";
 
 // Import the new EntityDetailLayout
 
@@ -74,8 +64,6 @@ interface RegionDetailViewProps {
   editData: IRegion;
   isEditing: boolean;
   hasChanges: boolean;
-  versions: IRegionVersion[];
-  currentVersion: IRegionVersion | null;
   showDeleteModal: boolean;
   isNavigationSidebarOpen: boolean;
   imagePreview: string;
@@ -111,18 +99,6 @@ interface RegionDetailViewProps {
   onDeleteModalOpen: () => void;
   onDeleteModalClose: () => void;
   onConfirmDelete: () => void;
-  onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (versionData: {
-    name: string;
-    description: string;
-    regionData: IRegionFormData;
-  }) => void;
-  onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (
-    versionId: string,
-    name: string,
-    description?: string
-  ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: unknown) => void;
   onAdvancedSectionToggle: () => void;
@@ -134,8 +110,6 @@ export function RegionDetailView({
   editData,
   isEditing,
   hasChanges,
-  versions,
-  currentVersion,
   showDeleteModal,
   isNavigationSidebarOpen,
   imagePreview,
@@ -167,10 +141,6 @@ export function RegionDetailView({
   onDeleteModalOpen,
   onDeleteModalClose,
   onConfirmDelete,
-  onVersionChange,
-  onVersionCreate,
-  onVersionDelete: _onVersionDelete,
-  onVersionUpdate: _onVersionUpdate,
   onImageFileChange: _onImageFileChange,
   onEditDataChange,
   onAdvancedSectionToggle,
@@ -1171,21 +1141,6 @@ export function RegionDetailView({
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
               {
-                label: t("region-detail:header.notes"),
-                icon: NotebookPen,
-                onClick: () =>
-                  navigate({
-                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
-                    params: {
-                      dashboardId: bookId,
-                      entityType: "region",
-                      entityId: region.id,
-                    },
-                    search: { entityName: region.name },
-                  }),
-                tooltip: t("region-detail:header.notes"),
-              },
-              {
                 label: t("region-detail:header.gallery"),
                 icon: Image,
                 onClick: () =>
@@ -1283,97 +1238,16 @@ export function RegionDetailView({
                   ]
                 : []),
             ]}
-            // Versions panel
-            versionsPanel={
-              <VersionsPanel title={t("region-detail:sections.versions")}>
-                <EntityVersionManager<IRegionVersion, IRegion, IRegionFormData>
-                  versions={versions}
-                  currentVersion={currentVersion}
-                  onVersionChange={onVersionChange}
-                  onVersionCreate={onVersionCreate}
-                  baseEntity={region}
-                  i18nNamespace="region-detail"
-                  renderVersionCard={({ version, isSelected, onClick }) => {
-                    // Check if version has valid data
-                    const hasValidData = !!version.regionData;
-
-                    return (
-                      <div className="relative">
-                        <div
-                          className={
-                            !hasValidData ? "opacity-50 cursor-not-allowed" : ""
-                          }
-                        >
-                          <VersionCard
-                            version={version}
-                            isSelected={isSelected}
-                            onClick={hasValidData ? onClick : () => {}}
-                          />
-                        </div>
-                        {!hasValidData && !version.isMain && (
-                          <div className="flex items-center justify-between mt-1 px-2">
-                            <div className="text-xs text-destructive">
-                              ⚠️ Dados corrompidos
-                            </div>
-                            <Button
-                              variant="ghost-destructive"
-                              size="sm"
-                              className="h-6 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onVersionDelete(version.id);
-                              }}
-                            >
-                              <Trash2 className="w-3 h-3 mr-1" />
-                              {t("common:actions.delete")}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }}
-                  renderCreateDialog={({
-                    open,
-                    onClose,
-                    onConfirm,
-                    baseEntity,
-                  }) => (
-                    <CreateVersionWithEntityDialog<IRegion, IRegionFormData>
-                      open={open}
-                      onClose={onClose}
-                      onConfirm={onConfirm}
-                      baseEntity={baseEntity}
-                      i18nNamespace="region-detail"
-                      renderEntityModal={({
-                        open,
-                        onOpenChange,
-                        onConfirm,
-                      }) => (
-                        <CreateRegionModal
-                          open={open}
-                          onOpenChange={onOpenChange}
-                          onConfirm={onConfirm}
-                          availableRegions={[]}
-                        />
-                      )}
-                    />
-                  )}
-                />
-              </VersionsPanel>
-            }
           />
         </div>
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <DeleteEntityModal<IRegionVersion>
+      <DeleteEntityModal
         isOpen={showDeleteModal}
         onClose={onDeleteModalClose}
         entityName={region.name}
         entityType="region"
-        currentVersion={currentVersion}
-        versionName={currentVersion?.name}
-        totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
         i18nNamespace="world"
       />

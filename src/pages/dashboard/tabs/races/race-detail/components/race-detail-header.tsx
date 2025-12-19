@@ -9,32 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { type IRace } from "@/pages/dashboard/tabs/races/types/race-types";
 
-import { type IRaceVersion } from "../types/race-detail-types";
-
 interface RaceDetailHeaderProps {
   race: IRace;
   editData: IRace;
   isEditing: boolean;
-  currentVersion: IRaceVersion | null;
-  versions: IRaceVersion[];
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
   onDeleteModalOpen: () => void;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
-  onVersionChange: (versionId: string) => void;
-  onVersionCreate: (data: {
-    name: string;
-    description: string;
-    raceData: IRace;
-  }) => void;
-  onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (
-    versionId: string,
-    name: string,
-    description?: string
-  ) => void;
   onImageFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onEditDataChange: (field: string, value: any) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;

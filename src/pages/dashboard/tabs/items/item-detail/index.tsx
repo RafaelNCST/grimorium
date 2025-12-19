@@ -11,14 +11,8 @@ import { type ItemFormSchema } from "@/components/modals/create-item-modal/hooks
 import {
   getItemById,
   getItemsByBookId,
-  getItemVersions,
-  createItemVersion,
-  deleteItemVersion,
-  updateItemVersion,
   updateItem,
-  updateItemVersionData,
   type IItem,
-  type IItemVersion,
 } from "@/lib/db/items.service";
 import { ItemSchema, ItemSchemaBase } from "@/lib/validation/item-schema";
 import { useItemsStore } from "@/stores/items-store";
@@ -81,10 +75,6 @@ export default function ItemDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
-  const [versions, setVersions] = useState<IItemVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<IItemVersion | null>(
-    null
-  );
   const [_isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
 
@@ -105,48 +95,6 @@ export default function ItemDetail() {
           setEditData(itemFromDB);
           setFieldVisibility(itemFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(itemFromDB.fieldVisibility || {});
-
-          // Carregar versões do banco de dados
-          const versionsFromDB = await getItemVersions(itemId);
-
-          // Check if main version exists
-          const hasMainVersion = versionsFromDB.some((v) => v.isMain);
-
-          if (!hasMainVersion) {
-            // Create main version if it doesn't exist
-            const mainVersion: IItemVersion = {
-              id: "main-version",
-              name: "Versão Principal",
-              description: "Versão principal do item",
-              createdAt: new Date().toISOString(),
-              isMain: true,
-              itemData: itemFromDB,
-            };
-
-            await createItemVersion(itemId, mainVersion);
-
-            // Add main version to the array
-            const allVersions = [mainVersion, ...versionsFromDB];
-            setVersions(allVersions);
-            setCurrentVersion(mainVersion);
-          } else {
-            // Main version exists, update it with fresh data
-            const updatedVersions = versionsFromDB.map((v) =>
-              v.isMain
-                ? {
-                    ...v,
-                    itemData: itemFromDB,
-                  }
-                : v
-            );
-            setVersions(updatedVersions);
-
-            // Set main version as current
-            const mainVersion = updatedVersions.find((v) => v.isMain);
-            if (mainVersion) {
-              setCurrentVersion(mainVersion);
-            }
-          }
 
           if (dashboardId) {
             const allItemsFromBook = await getItemsByBookId(dashboardId);
@@ -326,127 +274,6 @@ export default function ItemDetail() {
     return false;
   }, [item, editData, isEditing, fieldVisibility, originalFieldVisibility]);
 
-  const handleVersionChange = useCallback(
-    (versionId: string | null) => {
-      if (!versionId) return;
-
-      const version = versions.find((v) => v.id === versionId);
-      if (!version) return;
-
-      setCurrentVersion(version);
-      setItem(version.itemData);
-      setEditData(version.itemData);
-      setImagePreview(version.itemData.image || "");
-    },
-    [versions]
-  );
-
-  const handleVersionCreate = useCallback(
-    async (versionData: {
-      name: string;
-      description: string;
-      entityData: ItemFormSchema;
-    }) => {
-      try {
-        // Convert ItemFormSchema to complete IItem object
-        const itemData: IItem = {
-          id: item.id, // Use the current item's ID for the version
-          name: versionData.entityData.name,
-          status: versionData.entityData.status,
-          category: versionData.entityData.category,
-          customCategory: versionData.entityData.customCategory,
-          basicDescription: versionData.entityData.basicDescription,
-          image: versionData.entityData.image,
-          appearance: versionData.entityData.appearance,
-          origin: versionData.entityData.origin,
-          alternativeNames: versionData.entityData.alternativeNames,
-          storyRarity: versionData.entityData.storyRarity,
-          narrativePurpose: versionData.entityData.narrativePurpose,
-          usageRequirements: versionData.entityData.usageRequirements,
-          usageConsequences: versionData.entityData.usageConsequences,
-          itemUsage: versionData.entityData.itemUsage,
-          fieldVisibility: {}, // Default empty visibility
-          createdAt: new Date().toISOString(),
-        };
-
-        const newVersion: IItemVersion = {
-          id: `version-${Date.now()}`,
-          name: versionData.name,
-          description: versionData.description,
-          createdAt: new Date().toISOString(),
-          isMain: false,
-          itemData, // Use the complete converted object
-        };
-
-        // Salvar no banco de dados
-        await createItemVersion(itemId, newVersion);
-
-        // Atualizar o estado apenas se o save for bem-sucedido
-        setVersions((prev) => [...prev, newVersion]);
-      } catch (error) {
-        console.error("Error creating item version:", error);
-      }
-    },
-    [itemId, item.id]
-  );
-
-  const handleVersionDelete = useCallback(
-    async (versionId: string) => {
-      const versionToDelete = versions.find((v) => v.id === versionId);
-
-      // Não permitir deletar versão principal
-      if (versionToDelete?.isMain) {
-        return;
-      }
-
-      try {
-        // Deletar do banco de dados
-        await deleteItemVersion(versionId);
-
-        // Atualizar o estado apenas se o delete for bem-sucedido
-        const updatedVersions = versions.filter((v) => v.id !== versionId);
-
-        // Se a versão deletada for a atual, voltar para a principal
-        if (currentVersion?.id === versionId) {
-          const mainVersion = updatedVersions.find((v) => v.isMain);
-          if (mainVersion) {
-            setCurrentVersion(mainVersion);
-            setItem(mainVersion.itemData);
-            setEditData(mainVersion.itemData);
-            setImagePreview(mainVersion.itemData.image || "");
-          }
-        }
-
-        setVersions(updatedVersions);
-      } catch (error) {
-        console.error("Error deleting item version:", error);
-      }
-    },
-    [versions, currentVersion]
-  );
-
-  const handleVersionUpdate = useCallback(
-    async (versionId: string, name: string, description?: string) => {
-      try {
-        // Atualizar no banco de dados
-        await updateItemVersion(versionId, name, description);
-
-        // Atualizar o estado apenas se o update for bem-sucedido
-        const updatedVersions = versions.map((v) =>
-          v.id === versionId ? { ...v, name, description } : v
-        );
-        setVersions(updatedVersions);
-
-        if (currentVersion?.id === versionId) {
-          setCurrentVersion({ ...currentVersion, name, description });
-        }
-      } catch (error) {
-        console.error("Error updating item version:", error);
-      }
-    },
-    [versions, currentVersion]
-  );
-
   const handleSave = useCallback(async () => {
     try {
       // Validar TUDO com Zod
@@ -469,29 +296,10 @@ export default function ItemDetail() {
       const updatedItem = { ...editData, fieldVisibility };
       setItem(updatedItem);
 
-      // Atualizar dados na versão atual
-      const updatedVersions = versions.map((v) =>
-        v.id === currentVersion?.id
-          ? { ...v, itemData: updatedItem as IItem }
-          : v
-      );
-      setVersions(updatedVersions);
-
-      const activeVersion = updatedVersions.find(
-        (v) => v.id === currentVersion?.id
-      );
-      if (activeVersion) {
-        setCurrentVersion(activeVersion);
-      }
-
       // Salvar no banco de dados
-      if (currentVersion?.isMain) {
-        await updateItem(itemId, updatedItem);
-        // Atualizar cache do store para refletir mudanças na listagem
-        await updateItemInStore(itemId, updatedItem);
-      } else {
-        await updateItemVersionData(currentVersion.id, updatedItem);
-      }
+      await updateItem(itemId, updatedItem);
+      // Atualizar cache do store para refletir mudanças na listagem
+      await updateItemInStore(itemId, updatedItem);
 
       // Update original visibility to match saved state
       setOriginalFieldVisibility(fieldVisibility);
@@ -516,7 +324,7 @@ export default function ItemDetail() {
         console.error("Error saving item:", error);
       }
     }
-  }, [editData, fieldVisibility, versions, currentVersion, itemId, t]);
+  }, [editData, fieldVisibility, itemId, updateItemInStore, t]);
 
   const navigateToItemsTab = useCallback(() => {
     if (!dashboardId) return;
@@ -527,43 +335,14 @@ export default function ItemDetail() {
   }, [navigate, dashboardId]);
 
   const handleConfirmDelete = useCallback(async () => {
-    if (currentVersion && !currentVersion.isMain) {
-      const versionToDelete = versions.find((v) => v.id === currentVersion.id);
-
-      if (!versionToDelete) return;
-
-      const updatedVersions = versions.filter(
-        (v) => v.id !== currentVersion.id
-      );
-
-      const mainVersion = updatedVersions.find((v) => v.isMain);
-      if (mainVersion) {
-        setCurrentVersion(mainVersion);
-        setItem(mainVersion.itemData);
-        setEditData(mainVersion.itemData);
-        setImagePreview(mainVersion.itemData.image || "");
-      }
-
-      setVersions(updatedVersions);
-    } else {
-      try {
-        if (!dashboardId) return;
-        // Deletar do store (que também deleta do DB)
-        await deleteItemFromStore(dashboardId, itemId);
-        navigateToItemsTab();
-      } catch (error) {
-        console.error("Error deleting item:", error);
-      }
+    try {
+      if (!dashboardId) return;
+      await deleteItemFromStore(dashboardId, itemId);
+      navigateToItemsTab();
+    } catch (error) {
+      console.error("Error deleting item:", error);
     }
-  }, [
-    currentVersion,
-    versions,
-    navigateToItemsTab,
-    itemId,
-    dashboardId,
-    deleteItemFromStore,
-    t,
-  ]);
+  }, [navigateToItemsTab, itemId, dashboardId, deleteItemFromStore]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {
@@ -660,8 +439,6 @@ export default function ItemDetail() {
         item={item}
         editData={editData}
         isEditing={isEditing}
-        versions={versions}
-        currentVersion={currentVersion}
         showDeleteModal={showDeleteModal}
         isNavigationSidebarOpen={isNavigationSidebarOpen}
         allItems={allItems}
@@ -694,10 +471,6 @@ export default function ItemDetail() {
         onDeleteModalOpen={handleDeleteModalOpen}
         onDeleteModalClose={handleDeleteModalClose}
         onConfirmDelete={handleConfirmDelete}
-        onVersionChange={handleVersionChange}
-        onVersionCreate={handleVersionCreate}
-        onVersionDelete={handleVersionDelete}
-        onVersionUpdate={handleVersionUpdate}
         onEditDataChange={handleEditDataChange}
         validateField={validateField}
         onFieldVisibilityToggle={handleFieldVisibilityToggle}

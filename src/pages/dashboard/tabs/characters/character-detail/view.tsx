@@ -6,7 +6,6 @@ import {
   Calendar,
   Heart,
   Image,
-  NotebookPen,
   Trash2,
   User,
   Users,
@@ -15,7 +14,6 @@ import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
 import { CharacterNavigationSidebar } from "@/components/character-navigation-sidebar";
-import { FieldWithVisibilityToggle } from "@/components/detail-page/FieldWithVisibilityToggle";
 import {
   DisplayEntityList,
   DisplaySelectGrid,
@@ -51,24 +49,15 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  EntityVersionManager,
-  CreateVersionWithEntityDialog,
-  VersionsPanel,
-} from "@/components/version-system";
 import { EditPowerLinkModal } from "@/pages/dashboard/tabs/power-system/components/edit-power-link-modal";
 import { PowerLinkCard } from "@/pages/dashboard/tabs/power-system/components/power-link-card";
 import type { IPowerCharacterLink } from "@/pages/dashboard/tabs/power-system/types/power-system-types";
-import {
-  type ICharacterVersion,
-  type ICharacterFormData,
-} from "@/types/character-types";
+import { type ICharacterFormData } from "@/types/character-types";
 
 import { AlignmentMatrix } from "./components/alignment-matrix";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { FamilySection } from "./components/family-section";
 import { RelationshipsSection } from "./components/relationships-section";
-import { VersionCard } from "./components/version-card";
 import { type IAlignment } from "./constants/alignments-constant";
 import { type IRelationshipType } from "./constants/relationship-types-constant";
 
@@ -128,10 +117,6 @@ interface ICharacter {
   }>;
 }
 
-interface IFieldVisibility {
-  [key: string]: boolean;
-}
-
 interface ISectionVisibility {
   [key: string]: boolean;
 }
@@ -142,8 +127,6 @@ interface CharacterDetailViewProps {
   isEditing: boolean;
   hasChanges: boolean;
   bookId: string;
-  versions: ICharacterVersion[];
-  currentVersion: ICharacterVersion | null;
   showDeleteModal: boolean;
   isNavigationSidebarOpen: boolean;
   newQuality: string;
@@ -161,7 +144,6 @@ interface CharacterDetailViewProps {
   currentRole: ICharacterRole | undefined;
   currentAlignment: IAlignment | undefined;
   currentGender: IGenderModal | undefined;
-  fieldVisibility: IFieldVisibility;
   advancedSectionOpen: boolean;
   openSections: Record<string, boolean>;
   toggleSection: (sectionName: string) => void;
@@ -180,18 +162,6 @@ interface CharacterDetailViewProps {
   onDeleteModalOpen: () => void;
   onDeleteModalClose: () => void;
   onConfirmDelete: () => void;
-  onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (versionData: {
-    name: string;
-    description: string;
-    characterData: ICharacterFormData;
-  }) => void;
-  onVersionDelete: (versionId: string) => void;
-  onVersionUpdate: (
-    versionId: string,
-    name: string,
-    description?: string
-  ) => void;
   onImageFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onAgeChange: (increment: boolean) => void;
   onEditDataChange: (field: string, value: unknown) => void;
@@ -204,7 +174,6 @@ interface CharacterDetailViewProps {
   onRelationshipCharacterChange: (characterId: string) => void;
   onRelationshipTypeChange: (type: string) => void;
   onRelationshipIntensityChange: (intensity: number[]) => void;
-  onFieldVisibilityToggle: (field: string) => void;
   sectionVisibility: ISectionVisibility;
   onSectionVisibilityToggle: (section: string) => void;
   onAdvancedSectionToggle: () => void;
@@ -224,8 +193,6 @@ export function CharacterDetailView({
   isEditing,
   hasChanges,
   bookId,
-  versions,
-  currentVersion,
   showDeleteModal,
   isNavigationSidebarOpen,
   imagePreview,
@@ -237,7 +204,6 @@ export function CharacterDetailView({
   currentRole,
   currentAlignment: _currentAlignment,
   currentGender,
-  fieldVisibility,
   advancedSectionOpen,
   openSections,
   toggleSection,
@@ -256,12 +222,8 @@ export function CharacterDetailView({
   onDeleteModalOpen,
   onDeleteModalClose,
   onConfirmDelete,
-  onVersionChange,
-  onVersionCreate,
-  onVersionDelete,
   onImageFileChange,
   onEditDataChange,
-  onFieldVisibilityToggle,
   sectionVisibility,
   onSectionVisibilityToggle,
   onAdvancedSectionToggle,
@@ -621,67 +583,21 @@ export function CharacterDetailView({
     </div>
   );
 
-  // Helper function to check if all fields in a group are hidden
-  const areAllFieldsHidden = (fieldNames: string[]): boolean => {
-    if (isEditing) return false; // Never hide sections in edit mode
-    return fieldNames.every(
-      (fieldName) => fieldVisibility[fieldName] === false
-    );
-  };
-
-  // Define field groups for each mini-section
-  const appearanceFields = [
-    "height",
-    "weight",
-    "skinTone",
-    "hair",
-    "eyes",
-    "face",
-    "speciesAndRace",
-    "physicalType",
-    "distinguishingFeatures",
-  ];
-  const behaviorFields = [
-    "archetype",
-    "alignment",
-    "favoriteFood",
-    "favoriteMusic",
-    "personality",
-    "hobbies",
-    "dreamsAndGoals",
-    "fearsAndTraumas",
-  ];
-  const historyFields = ["birthPlace", "nicknames", "past"];
-
-  // Check if mini-sections should be hidden
-  const hideAppearanceSection = areAllFieldsHidden(appearanceFields);
-  const hideBehaviorSection = areAllFieldsHidden(behaviorFields);
-  const hideHistorySection = areAllFieldsHidden(historyFields);
-
-  // Check if entire advanced section should be hidden
-  const hideEntireAdvancedSection =
-    hideAppearanceSection && hideBehaviorSection && hideHistorySection;
-
   // Advanced Fields
-  const advancedFields = hideEntireAdvancedSection ? null : (
+  const advancedFields = (
     <>
       {/* Appearance Section */}
-      {!hideAppearanceSection && (
-        <div className="space-y-4">
-          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-            {t("character-detail:sections.appearance")}
-          </h4>
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("character-detail:sections.appearance")}
+        </h4>
 
           {/* Height and Weight */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FieldWithVisibilityToggle
-              fieldName="height"
-              label={t("character-detail:fields.height")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t("character-detail:fields.height")}
+              </Label>
               {isEditing ? (
                 <>
                   <Input
@@ -697,16 +613,12 @@ export function CharacterDetailView({
               ) : (
                 <DisplayText value={character.height} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
 
-            <FieldWithVisibilityToggle
-              fieldName="weight"
-              label={t("character-detail:fields.weight")}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t("character-detail:fields.weight")}
+              </Label>
               {isEditing ? (
                 <>
                   <Input
@@ -722,18 +634,14 @@ export function CharacterDetailView({
               ) : (
                 <DisplayText value={character.weight} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
           </div>
 
           {/* Skin Tone */}
-          <FieldWithVisibilityToggle
-            fieldName="skinTone"
-            label={t("character-detail:fields.skin_tone")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-primary">
+              {t("character-detail:fields.skin_tone")}
+            </Label>
             {isEditing ? (
               <>
                 <Input
@@ -749,19 +657,14 @@ export function CharacterDetailView({
             ) : (
               <DisplayText value={character.skinTone} />
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Hair, Eyes, Face */}
           {["hair", "eyes", "face"].map((field) => (
-            <FieldWithVisibilityToggle
-              key={field}
-              fieldName={field}
-              label={t(`character-detail:fields.${field}`)}
-              isOptional
-              fieldVisibility={fieldVisibility}
-              isEditing={isEditing}
-              onFieldVisibilityToggle={onFieldVisibilityToggle}
-            >
+            <div key={field} className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t(`character-detail:fields.${field}`)}
+              </Label>
               {isEditing ? (
                 <>
                   <Input
@@ -780,20 +683,11 @@ export function CharacterDetailView({
               ) : (
                 <DisplayText value={(character as any)[field]} />
               )}
-            </FieldWithVisibilityToggle>
+            </div>
           ))}
 
           {/* Species and Race */}
-          <FieldWithVisibilityToggle
-            fieldName="speciesAndRace"
-            label={
-              isEditing ? t("create-character:modal.species_and_race") : ""
-            }
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
             {isEditing ? (
               <FormEntityMultiSelectAuto
                 entityType="race"
@@ -829,17 +723,10 @@ export function CharacterDetailView({
                 onOpenChange={() => toggleSection("speciesAndRace")}
               />
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Physical Type */}
-          <FieldWithVisibilityToggle
-            fieldName="physicalType"
-            label={t("character-detail:fields.physical_type")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
             {isEditing ? (
               <FormSimpleGrid
                 value={editData.physicalType || ""}
@@ -849,22 +736,23 @@ export function CharacterDetailView({
                 options={physicalTypeOptions}
               />
             ) : (
-              <DisplaySimpleGrid
-                value={character.physicalType}
-                options={physicalTypeOptions}
-              />
+              <>
+                <Label className="text-sm font-medium text-primary">
+                  {t("character-detail:fields.physical_type")}
+                </Label>
+                <DisplaySimpleGrid
+                  value={character.physicalType}
+                  options={physicalTypeOptions}
+                />
+              </>
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Distinguishing Features */}
-          <FieldWithVisibilityToggle
-            fieldName="distinguishingFeatures"
-            label={t("character-detail:fields.distinguishing_features")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-primary">
+              {t("character-detail:fields.distinguishing_features")}
+            </Label>
             {isEditing ? (
               <>
                 <Textarea
@@ -888,31 +776,19 @@ export function CharacterDetailView({
             ) : (
               <DisplayTextarea value={character.distinguishingFeatures} />
             )}
-          </FieldWithVisibilityToggle>
-        </div>
-      )}
+          </div>
+      </div>
 
-      {/* Separator between Appearance and Behavior - only show if both sections are visible */}
-      {!hideAppearanceSection && !hideBehaviorSection && (
-        <Separator className="my-6" />
-      )}
+      <Separator className="my-6" />
 
       {/* Behavior Section */}
-      {!hideBehaviorSection && (
-        <div className="space-y-4">
-          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-            {t("character-detail:sections.behavior")}
-          </h4>
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("character-detail:sections.behavior")}
+        </h4>
 
           {/* Archetype */}
-          <FieldWithVisibilityToggle
-            fieldName="archetype"
-            label={t("character-detail:fields.archetype")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
             {isEditing ? (
               <FormSelectGrid
                 value={editData.archetype || ""}
@@ -922,43 +798,39 @@ export function CharacterDetailView({
                 options={archetypeOptions}
               />
             ) : (
-              <DisplaySelectGrid
-                value={character.archetype}
-                options={archetypeOptions}
-              />
+              <>
+                <Label className="text-sm font-medium text-primary">
+                  {t("character-detail:fields.archetype")}
+                </Label>
+                <DisplaySelectGrid
+                  value={character.archetype}
+                  options={archetypeOptions}
+                />
+              </>
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Alignment */}
-          <FieldWithVisibilityToggle
-            fieldName="alignment"
-            label={t("character-detail:fields.alignment")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-primary">
+              {t("character-detail:fields.alignment")}
+            </Label>
             <AlignmentMatrix
               value={isEditing ? editData.alignment : character.alignment}
               onChange={(value) => onEditDataChange("alignment", value)}
               isEditable={isEditing}
             />
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Favorite Food and Music */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {["favoriteFood", "favoriteMusic"].map((field) => (
-              <FieldWithVisibilityToggle
-                key={field}
-                fieldName={field}
-                label={t(
-                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                )}
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
+              <div key={field} className="space-y-2">
+                <Label className="text-sm font-medium text-primary">
+                  {t(
+                    `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                  )}
+                </Label>
                 {isEditing ? (
                   <>
                     <Input
@@ -976,24 +848,19 @@ export function CharacterDetailView({
                 ) : (
                   <DisplayText value={(character as any)[field]} />
                 )}
-              </FieldWithVisibilityToggle>
+              </div>
             ))}
           </div>
 
           {/* Personality, Hobbies, Dreams, Fears */}
           {["personality", "hobbies", "dreamsAndGoals", "fearsAndTraumas"].map(
             (field) => (
-              <FieldWithVisibilityToggle
-                key={field}
-                fieldName={field}
-                label={t(
-                  `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
-                )}
-                isOptional
-                fieldVisibility={fieldVisibility}
-                isEditing={isEditing}
-                onFieldVisibilityToggle={onFieldVisibilityToggle}
-              >
+              <div key={field} className="space-y-2">
+                <Label className="text-sm font-medium text-primary">
+                  {t(
+                    `character-detail:fields.${field.replace(/([A-Z])/g, "_$1").toLowerCase()}`
+                  )}
+                </Label>
                 {isEditing ? (
                   <>
                     <Textarea
@@ -1013,33 +880,21 @@ export function CharacterDetailView({
                 ) : (
                   <DisplayTextarea value={(character as any)[field]} />
                 )}
-              </FieldWithVisibilityToggle>
+              </div>
             )
           )}
-        </div>
-      )}
+      </div>
 
-      {/* Separator between Behavior and History - only show if both sections are visible */}
-      {!hideBehaviorSection && !hideHistorySection && (
-        <Separator className="my-6" />
-      )}
+      <Separator className="my-6" />
 
       {/* History Section */}
-      {!hideHistorySection && (
-        <div className="space-y-4">
-          <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
-            {t("character-detail:sections.locations_orgs")}
-          </h4>
+      <div className="space-y-4">
+        <h4 className="text-base font-bold text-foreground uppercase tracking-wide">
+          {t("character-detail:sections.locations_orgs")}
+        </h4>
 
           {/* Birth Place */}
-          <FieldWithVisibilityToggle
-            fieldName="birthPlace"
-            label={isEditing ? t("character-detail:fields.birth_place") : ""}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
             {isEditing ? (
               <FormEntityMultiSelectAuto
                 entityType="region"
@@ -1082,17 +937,10 @@ export function CharacterDetailView({
                 onOpenChange={() => toggleSection("birthPlace")}
               />
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Nicknames */}
-          <FieldWithVisibilityToggle
-            fieldName="nicknames"
-            label={isEditing ? t("character-detail:fields.nicknames") : ""}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
             {isEditing ? (
               <FormListInput
                 value={editData.nicknames || []}
@@ -1111,17 +959,13 @@ export function CharacterDetailView({
                 onOpenChange={() => toggleSection("nicknames")}
               />
             )}
-          </FieldWithVisibilityToggle>
+          </div>
 
           {/* Past */}
-          <FieldWithVisibilityToggle
-            fieldName="past"
-            label={t("character-detail:fields.past")}
-            isOptional
-            fieldVisibility={fieldVisibility}
-            isEditing={isEditing}
-            onFieldVisibilityToggle={onFieldVisibilityToggle}
-          >
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-primary">
+              {t("character-detail:fields.past")}
+            </Label>
             {isEditing ? (
               <>
                 <Textarea
@@ -1139,9 +983,8 @@ export function CharacterDetailView({
             ) : (
               <DisplayTextarea value={character.past} />
             )}
-          </FieldWithVisibilityToggle>
-        </div>
-      )}
+          </div>
+      </div>
     </>
   );
 
@@ -1240,9 +1083,7 @@ export function CharacterDetailView({
           currentCharacterId={character.id}
           bookId={bookId}
           isEditMode={isEditing}
-          fieldVisibility={fieldVisibility}
           onFamilyChange={(family) => onEditDataChange("family", family)}
-          onFieldVisibilityToggle={onFieldVisibilityToggle}
         />
       ),
       isCollapsible: true,
@@ -1342,74 +1183,6 @@ export function CharacterDetailView({
     });
   }
 
-  // Versions Panel
-  const versionsPanel = (
-    <VersionsPanel title={t("character-detail:sections.versions")}>
-      <EntityVersionManager<ICharacterVersion, ICharacter, ICharacterFormData>
-        versions={versions}
-        currentVersion={currentVersion}
-        onVersionChange={onVersionChange}
-        onVersionCreate={onVersionCreate}
-        baseEntity={character}
-        i18nNamespace="character-detail"
-        renderVersionCard={({ version, isSelected, onClick }) => {
-          // Check if version has valid data
-          const hasValidData = !!version.characterData;
-
-          return (
-            <div className="relative">
-              <div
-                className={!hasValidData ? "opacity-50 cursor-not-allowed" : ""}
-              >
-                <VersionCard
-                  version={version}
-                  isSelected={isSelected}
-                  onClick={hasValidData ? onClick : () => {}}
-                />
-              </div>
-              {!hasValidData && !version.isMain && (
-                <div className="flex items-center justify-between mt-1 px-2">
-                  <div className="text-xs text-destructive">
-                    ⚠️ Dados corrompidos
-                  </div>
-                  <Button
-                    variant="ghost-destructive"
-                    size="sm"
-                    className="h-6 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onVersionDelete(version.id);
-                    }}
-                  >
-                    <Trash2 className="w-3 h-3 mr-1" />
-                    Excluir
-                  </Button>
-                </div>
-              )}
-            </div>
-          );
-        }}
-        renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
-          <CreateVersionWithEntityDialog<ICharacter, ICharacterFormData>
-            open={open}
-            onClose={onClose}
-            onConfirm={onConfirm}
-            baseEntity={baseEntity}
-            i18nNamespace="character-detail"
-            renderEntityModal={({ open, onOpenChange, onConfirm }) => (
-              <CreateCharacterModal
-                open={open}
-                onClose={() => onOpenChange(false)}
-                onConfirm={onConfirm}
-                bookId={bookId}
-              />
-            )}
-          />
-        )}
-      />
-    </VersionsPanel>
-  );
-
   return (
     <div className="relative">
       <CharacterNavigationSidebar
@@ -1440,21 +1213,6 @@ export function CharacterDetailView({
             onDelete={onDeleteModalOpen}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
-              {
-                label: t("character-detail:header.notes"),
-                icon: NotebookPen,
-                onClick: () =>
-                  navigate({
-                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
-                    params: {
-                      dashboardId: bookId,
-                      entityType: "character",
-                      entityId: character.id,
-                    },
-                    search: { entityName: character.name },
-                  }),
-                tooltip: t("character-detail:header.notes"),
-              },
               {
                 label: t("character-detail:header.gallery"),
                 icon: Image,
@@ -1510,7 +1268,6 @@ export function CharacterDetailView({
             advancedSectionOpen={advancedSectionOpen}
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             extraSections={extraSections}
-            versionsPanel={versionsPanel}
           />
         </div>
       </div>
@@ -1520,9 +1277,6 @@ export function CharacterDetailView({
         isOpen={showDeleteModal}
         onClose={onDeleteModalClose}
         characterName={character.name}
-        currentVersion={currentVersion}
-        versionName={currentVersion?.name}
-        totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
       />
 

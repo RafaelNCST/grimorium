@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, NotebookPen, Image } from "lucide-react";
+import { Dna, Users, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -34,11 +34,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  VersionsPanel,
-  EntityVersionManager,
-  CreateVersionWithEntityDialog,
-} from "@/components/version-system";
 
 import { getDomainDisplayData } from "../helpers/domain-filter-config";
 
@@ -46,12 +41,10 @@ import { CommunicationDisplay } from "./components/communication-display";
 import { DeleteConfirmationDialog } from "./components/delete-confirmation-dialog";
 import { RaceNavigationSidebar } from "./components/race-navigation-sidebar";
 import { RaceRelationshipsSection } from "./components/race-relationships-section";
-import { RaceVersionCard } from "./components/race-version-card";
 
 import type {
   IRaceRelationship,
   IFieldVisibility,
-  IRaceVersion,
 } from "./types/race-detail-types";
 import type { IRace } from "../../types/race-types";
 
@@ -72,8 +65,6 @@ interface RaceDetailViewProps {
   hasRequiredFieldsEmpty: boolean;
   missingFields: string[];
   bookId: string;
-  versions: IRaceVersion[];
-  currentVersion: IRaceVersion | null;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -92,13 +83,6 @@ interface RaceDetailViewProps {
   validateField?: (field: string, value: any) => void;
   openSections: Record<string, boolean>;
   toggleSection: (sectionName: string) => void;
-  onVersionChange: (versionId: string | null) => void;
-  onVersionCreate: (data: {
-    name: string;
-    description: string;
-    raceData: IRace;
-  }) => void;
-  onVersionDelete: (versionId: string) => void;
 }
 
 // Helper component for empty state
@@ -125,8 +109,6 @@ export function RaceDetailView({
   hasRequiredFieldsEmpty,
   missingFields,
   bookId,
-  versions,
-  currentVersion,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -145,9 +127,6 @@ export function RaceDetailView({
   validateField,
   openSections: _openSections,
   toggleSection: _toggleSection,
-  onVersionChange,
-  onVersionCreate,
-  onVersionDelete: _onVersionDelete,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
@@ -1207,51 +1186,6 @@ export function RaceDetailView({
     </p>
   ) : undefined;
 
-  // Versions Panel
-  const versionsPanel = (
-    <VersionsPanel title={t("race-detail:sections.versions")}>
-      <EntityVersionManager<IRaceVersion, IRace, IRace>
-        versions={versions}
-        currentVersion={currentVersion}
-        onVersionChange={onVersionChange}
-        onVersionCreate={(data) => {
-          onVersionCreate({
-            name: data.name,
-            description: data.description,
-            raceData: data.entityData,
-          });
-        }}
-        baseEntity={race}
-        i18nNamespace="race-detail"
-        renderVersionCard={({ version, isSelected, onClick }) => (
-          <RaceVersionCard
-            version={version}
-            isSelected={isSelected}
-            onClick={onClick}
-          />
-        )}
-        renderCreateDialog={({ open, onClose, onConfirm, baseEntity }) => (
-          <CreateVersionWithEntityDialog<IRace, IRace>
-            open={open}
-            onClose={onClose}
-            onConfirm={onConfirm}
-            baseEntity={baseEntity}
-            i18nNamespace="race-detail"
-            renderEntityModal={({ open, onOpenChange, onConfirm }) => (
-              <CreateRaceModal
-                open={open}
-                onClose={() => onOpenChange(false)}
-                onConfirm={onConfirm}
-                availableRaces={allRaces}
-                bookId={bookId}
-              />
-            )}
-          />
-        )}
-      />
-    </VersionsPanel>
-  );
-
   return (
     <div className="relative">
       {/* Navigation Sidebar */}
@@ -1276,21 +1210,6 @@ export function RaceDetailView({
             editTooltip={t("common:tooltips.edit")}
             deleteTooltip={t("common:tooltips.delete")}
             extraActions={[
-              {
-                label: t("race-detail:buttons.notes"),
-                icon: NotebookPen,
-                onClick: () =>
-                  navigate({
-                    to: "/dashboard/$dashboardId/notes/entity/$entityType/$entityId",
-                    params: {
-                      dashboardId: bookId,
-                      entityType: "race",
-                      entityId: race.id,
-                    },
-                    search: { entityName: race.name },
-                  }),
-                tooltip: t("race-detail:buttons.notes"),
-              },
               {
                 label: t("race-detail:buttons.gallery"),
                 icon: Image,
@@ -1330,8 +1249,6 @@ export function RaceDetailView({
             onAdvancedSectionToggle={onAdvancedSectionToggle}
             // Extra sections
             extraSections={extraSections}
-            // Versions panel
-            versionsPanel={versionsPanel}
           />
         </div>
       </div>
@@ -1341,9 +1258,6 @@ export function RaceDetailView({
         isOpen={showDeleteModal}
         onClose={onDeleteModalClose}
         raceName={race.name}
-        currentVersion={currentVersion}
-        versionName={currentVersion?.name}
-        totalVersions={versions.length}
         onConfirmDelete={onConfirmDelete}
       />
     </div>

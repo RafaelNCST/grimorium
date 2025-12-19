@@ -2,14 +2,12 @@ import {
   ICharacter,
   ICharacterRelationship,
   ICharacterFamily,
-  ICharacterVersion,
 } from "@/types/character-types";
 
 import {
   DBCharacter,
   DBRelationship,
   DBFamilyRelation,
-  DBCharacterVersion,
 } from "./types";
 
 import { getDB } from "./index";
@@ -73,9 +71,6 @@ function characterToDBCharacter(
       ? JSON.stringify(character.nicknames)
       : JSON.stringify([]),
     past: character.past,
-    field_visibility: character.fieldVisibility
-      ? JSON.stringify(character.fieldVisibility)
-      : undefined,
     created_at: character.createdAt
       ? new Date(character.createdAt).getTime()
       : Date.now(),
@@ -119,9 +114,6 @@ function dbCharacterToCharacter(dbChar: DBCharacter): ICharacter {
     organization: dbChar.organization,
     nicknames: safeParseStringArray(dbChar.nicknames),
     past: dbChar.past,
-    fieldVisibility: dbChar.field_visibility
-      ? safeParseFieldVisibility(dbChar.field_visibility)
-      : undefined,
     createdAt: new Date(dbChar.created_at).toISOString(),
     updatedAt: new Date(dbChar.updated_at).toISOString(),
   };
@@ -165,11 +157,11 @@ export async function createCharacter(
         height, weight, skin_tone, skin_tone_color, physical_type, hair, eyes, face,
         distinguishing_features, species_and_race, archetype, personality, hobbies,
         dreams_and_goals, fears_and_traumas, favorite_food, favorite_music,
-        birth_place, affiliated_place, organization, nicknames, past, field_visibility,
+        birth_place, affiliated_place, organization, nicknames, past,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35
+        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34
       )`,
       [
         dbChar.id,
@@ -204,7 +196,6 @@ export async function createCharacter(
         dbChar.organization,
         dbChar.nicknames,
         dbChar.past,
-        dbChar.field_visibility,
         dbChar.created_at,
         dbChar.updated_at,
       ]
@@ -250,8 +241,8 @@ export async function updateCharacter(
         distinguishing_features = $17, species_and_race = $18, archetype = $19,
         personality = $20, hobbies = $21, dreams_and_goals = $22, fears_and_traumas = $23,
         favorite_food = $24, favorite_music = $25, birth_place = $26, affiliated_place = $27,
-        organization = $28, nicknames = $29, past = $30, field_visibility = $31, updated_at = $32
-      WHERE id = $33`,
+        organization = $28, nicknames = $29, past = $30, updated_at = $31
+      WHERE id = $32`,
       [
         dbChar.name,
         dbChar.age,
@@ -283,7 +274,6 @@ export async function updateCharacter(
         dbChar.organization,
         dbChar.nicknames,
         dbChar.past,
-        dbChar.field_visibility,
         dbChar.updated_at,
         id,
       ]
@@ -519,69 +509,3 @@ export async function saveCharacterFamily(
   }, 'saveCharacterFamily');
 }
 
-// Character Versions
-export async function getCharacterVersions(
-  characterId: string
-): Promise<ICharacterVersion[]> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    const result = await db.select<DBCharacterVersion[]>(
-      "SELECT * FROM character_versions WHERE character_id = $1 ORDER BY created_at DESC",
-      [characterId]
-    );
-
-    return result.map((v) => ({
-      id: v.id,
-      name: v.name,
-      description: v.description || "",
-      createdAt: new Date(v.created_at).toISOString(),
-      isMain: v.is_main === 1,
-      characterData: safeParseUnknownObject(v.character_data) as ICharacter,
-    }));
-  }, 'getCharacterVersions');
-}
-
-export async function createCharacterVersion(
-  characterId: string,
-  version: ICharacterVersion
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-
-    await db.execute(
-      `INSERT INTO character_versions (
-        id, character_id, name, description, is_main, character_data, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        version.id,
-        characterId,
-        version.name,
-        version.description,
-        version.isMain ? 1 : 0,
-        JSON.stringify(version.characterData),
-        Date.now(),
-      ]
-    );
-  }, 'createCharacterVersion');
-}
-
-export async function deleteCharacterVersion(versionId: string): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute("DELETE FROM character_versions WHERE id = $1", [versionId]);
-  }, 'deleteCharacterVersion');
-}
-
-export async function updateCharacterVersion(
-  versionId: string,
-  name: string,
-  description?: string
-): Promise<void> {
-  return safeDBOperation(async () => {
-    const db = await getDB();
-    await db.execute(
-      "UPDATE character_versions SET name = $1, description = $2 WHERE id = $3",
-      [name, description, versionId]
-    );
-  }, 'updateCharacterVersion');
-}

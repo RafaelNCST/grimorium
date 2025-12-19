@@ -28,7 +28,7 @@ import { getRacesByBookId } from "@/lib/db/races.service";
 import { getRegionsByBookId } from "@/lib/db/regions.service";
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/stores/book-store";
-import type { EntityType } from "@/types/note-types";
+import type { EntityType } from "@/types/gallery-types";
 
 interface EntityLink {
   id: string;
@@ -74,7 +74,8 @@ export function ManageEntityLinksModal({
   onLinksChange,
   bookId,
 }: ManageEntityLinksModalProps) {
-  const { t } = useTranslation("notes");
+  const { t } = useTranslation("gallery");
+  const { books } = useBookStore();
 
   const [activeTab, setActiveTab] = useState<EntityType>("character");
   const [searchTerm, setSearchTerm] = useState("");

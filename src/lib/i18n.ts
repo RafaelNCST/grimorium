@@ -30,8 +30,6 @@ import enInbox from "../../locales/en/inbox.json";
 import enItemDetail from "../../locales/en/item-detail.json";
 import enItems from "../../locales/en/items.json";
 import enLoading from "../../locales/en/loading.json";
-import enNoteDetail from "../../locales/en/note-detail.json";
-import enNotes from "../../locales/en/notes.json";
 import enOverview from "../../locales/en/overview.json";
 import enPlot from "../../locales/en/plot.json";
 import enPowerSystem from "../../locales/en/power-system.json";
@@ -72,8 +70,6 @@ import ptInbox from "../../locales/pt/inbox.json";
 import ptItemDetail from "../../locales/pt/item-detail.json";
 import ptItems from "../../locales/pt/items.json";
 import ptLoading from "../../locales/pt/loading.json";
-import ptNoteDetail from "../../locales/pt/note-detail.json";
-import ptNotes from "../../locales/pt/notes.json";
 import ptOverview from "../../locales/pt/overview.json";
 import ptPlot from "../../locales/pt/plot.json";
 import ptPowerSystem from "../../locales/pt/power-system.json";
@@ -117,8 +113,6 @@ const resources = {
     "item-detail": enItemDetail,
     items: enItems,
     loading: enLoading,
-    notes: enNotes,
-    "note-detail": enNoteDetail,
     overview: enOverview,
     plot: enPlot,
     "power-system": enPowerSystem,
@@ -161,8 +155,6 @@ const resources = {
     "item-detail": ptItemDetail,
     items: ptItems,
     loading: ptLoading,
-    notes: ptNotes,
-    "note-detail": ptNoteDetail,
     overview: ptOverview,
     plot: ptPlot,
     "power-system": ptPowerSystem,

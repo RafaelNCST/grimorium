@@ -438,12 +438,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
     });
   }, [navigate, bookId]);
 
-  const handleNavigateToNotes = useCallback(() => {
-    navigate({
-      to: "/notes",
-    });
-  }, [navigate]);
-
   const handleShowDeleteDialog = useCallback((show: boolean) => {
     setShowDeleteDialog(show);
   }, []);
@@ -502,7 +496,6 @@ export function BookDashboard({ bookId, onBack }: PropsDashboard) {
       onDeleteBook={handleDeleteBook}
       onNavigateToChapters={handleNavigateToChapters}
       onNavigateToGallery={handleNavigateToGallery}
-      onNavigateToNotes={handleNavigateToNotes}
       onShowDeleteDialog={handleShowDeleteDialog}
       onDeleteInputChange={handleDeleteInputChange}
       onDraftBookChange={handleDraftBookChange}
