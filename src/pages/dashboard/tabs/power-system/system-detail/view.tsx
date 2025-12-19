@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -231,6 +232,7 @@ export function PowerSystemDetailView({
 
   if (!currentPage && !isLoadingPages) {
     return (
+      <TooltipProvider>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
@@ -473,6 +475,7 @@ export function PowerSystemDetailView({
           systemName={system.name}
         />
       </div>
+      </TooltipProvider>
     );
   }
 
@@ -481,6 +484,7 @@ export function PowerSystemDetailView({
   // ============================================================================
 
   return (
+    <TooltipProvider>
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="border-b bg-card px-6 py-3 flex items-center justify-between gap-4 shrink-0">
@@ -748,5 +752,6 @@ export function PowerSystemDetailView({
       {/* Render children (for ManageLinksModal) */}
       {children}
     </div>
+    </TooltipProvider>
   );
 }

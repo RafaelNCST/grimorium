@@ -10,6 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import {
   type HeadingContent,
@@ -119,36 +124,54 @@ export function HeadingBlock({
             </Select>
 
             {/* Alignment buttons */}
-            <Button
-              type="button"
-              variant="ghost-active"
-              size="icon"
-              active={content.alignment === "left"}
-              onClick={() => onUpdate({ ...content, alignment: "left" })}
-              title={t("blocks.heading.alignment_left")}
-            >
-              <AlignLeft className="w-5 h-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost-active"
-              size="icon"
-              active={content.alignment === "center"}
-              onClick={() => onUpdate({ ...content, alignment: "center" })}
-              title={t("blocks.heading.alignment_center")}
-            >
-              <AlignCenter className="w-5 h-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost-active"
-              size="icon"
-              active={content.alignment === "right"}
-              onClick={() => onUpdate({ ...content, alignment: "right" })}
-              title={t("blocks.heading.alignment_right")}
-            >
-              <AlignRight className="w-5 h-5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="icon"
+                  active={content.alignment === "left"}
+                  onClick={() => onUpdate({ ...content, alignment: "left" })}
+                >
+                  <AlignLeft className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {t("blocks.heading.alignment_left")}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="icon"
+                  active={content.alignment === "center"}
+                  onClick={() => onUpdate({ ...content, alignment: "center" })}
+                >
+                  <AlignCenter className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {t("blocks.heading.alignment_center")}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="icon"
+                  active={content.alignment === "right"}
+                  onClick={() => onUpdate({ ...content, alignment: "right" })}
+                >
+                  <AlignRight className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {t("blocks.heading.alignment_right")}
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           <BlockReorderButtons

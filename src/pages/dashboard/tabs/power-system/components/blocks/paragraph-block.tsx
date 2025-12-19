@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -124,35 +123,28 @@ export function ParagraphBlock({
         <div className="flex items-center justify-between gap-2 mb-2">
           {/* Lock toggle control */}
           <div className="flex gap-2" data-no-drag="true">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost-active"
-                    size="icon"
-                    active={isLocked}
-                    onClick={handleToggleLock}
-                    title={
-                      isLocked
-                        ? t("blocks.paragraph.unlock_height")
-                        : t("blocks.paragraph.lock_height")
-                    }
-                  >
-                    {isLocked ? (
-                      <Lock className="w-5 h-5" />
-                    ) : (
-                      <LockOpen className="w-5 h-5" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isLocked
-                    ? t("blocks.paragraph.unlock_height")
-                    : t("blocks.paragraph.lock_height")}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost-active"
+                  size="icon"
+                  active={isLocked}
+                  onClick={handleToggleLock}
+                >
+                  {isLocked ? (
+                    <Lock className="w-5 h-5" />
+                  ) : (
+                    <LockOpen className="w-5 h-5" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isLocked
+                  ? t("blocks.paragraph.unlock_height")
+                  : t("blocks.paragraph.lock_height")}
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           <BlockReorderButtons

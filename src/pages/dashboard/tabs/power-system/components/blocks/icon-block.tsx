@@ -136,7 +136,6 @@ export function IconBlock({
               placeholder={t("blocks.icon.title_placeholder")}
               value={content.title}
               onChange={(e) => onUpdate({ ...content, title: e.target.value })}
-              required
             />
 
             <Textarea
@@ -148,7 +147,6 @@ export function IconBlock({
               }
               className="min-h-[80px] resize-none"
               rows={3}
-              required
             />
           </div>
         </div>
