@@ -2,7 +2,7 @@
   "modal": {
     "create_faction": "Criar Nova Facção",
     "description": "Crie uma nova facção para o seu livro",
-    "info_message": "Tudo pode ser editado mais tarde. Algumas seções especiais só podem ser adicionadas após a criação da facção",
+    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme necessário.",
     "basic_fields": "Campos Básicos",
     "advanced_fields": "Campos Avançados",
     "advanced_items": "Itens Avançados",

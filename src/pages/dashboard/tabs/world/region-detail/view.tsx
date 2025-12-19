@@ -259,13 +259,16 @@ export function RegionDetailView({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label className="text-primary">
+            <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
               {t("region-detail:fields.name")}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <Input
               value={editData.name}
-              onChange={(e) => onEditDataChange("name", e.target.value)}
+              onChange={(e) => {
+                onEditDataChange("name", e.target.value);
+                validateField("name", e.target.value);
+              }}
               onBlur={() => validateField("name", editData.name)}
               placeholder={t("world:create_region.name_placeholder")}
               maxLength={200}
@@ -315,25 +318,37 @@ export function RegionDetailView({
 
           {/* Scale Picker */}
           <div className="space-y-2">
-            <Label className="text-primary">
+            <Label className={`text-sm font-medium ${errors.scale ? "text-destructive" : "text-primary"}`}>
               {t("region-detail:fields.scale")}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <ScalePicker
               value={editData.scale}
-              onChange={(value) => onEditDataChange("scale", value)}
+              onChange={(value) => {
+                onEditDataChange("scale", value);
+                validateField("scale", value);
+              }}
             />
+            {errors.scale && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.scale}
+              </p>
+            )}
           </div>
 
           {/* Summary */}
           <div className="space-y-2">
-            <Label className="text-primary">
+            <Label className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}>
               {t("region-detail:fields.summary")}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <Textarea
               value={editData.summary || ""}
-              onChange={(e) => onEditDataChange("summary", e.target.value)}
+              onChange={(e) => {
+                onEditDataChange("summary", e.target.value);
+                validateField("summary", e.target.value);
+              }}
               onBlur={() => validateField("summary", editData.summary)}
               placeholder={t("world:create_region.summary_placeholder")}
               rows={4}
@@ -345,7 +360,10 @@ export function RegionDetailView({
               }
             />
             {errors.summary && (
-              <p className="text-xs text-destructive">{errors.summary}</p>
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.summary}
+              </p>
             )}
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{editData.summary?.length || 0}/500</span>
@@ -1171,6 +1189,13 @@ export function RegionDetailView({
             cancelLabel={t("region-detail:header.cancel")}
             hasChanges={hasChanges}
             hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
+            missingFields={missingFields}
+            fieldNames={{
+              name: t("region-detail:fields.name"),
+              scale: t("region-detail:fields.scale"),
+              summary: t("region-detail:fields.summary"),
+            }}
+            missingFieldsLabel={t("region-detail:validation.missing_fields")}
             validationMessage={validationMessage}
             // Content
             basicFields={renderBasicFields()}

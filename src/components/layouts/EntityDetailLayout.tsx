@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
+import { ValidationBanner } from "@/components/layouts/ValidationBanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -76,6 +77,9 @@ export interface EntityDetailLayoutProps {
   hasChanges?: boolean;
   hasRequiredFieldsEmpty?: boolean;
   validationMessage?: ReactNode;
+  missingFields?: string[];
+  fieldNames?: Record<string, string>;
+  missingFieldsLabel?: string;
 
   // Content
   basicFields: ReactNode;
@@ -132,6 +136,9 @@ export function EntityDetailLayout({
   hasChanges = false,
   hasRequiredFieldsEmpty = false,
   validationMessage,
+  missingFields = [],
+  fieldNames = {},
+  missingFieldsLabel = "Campos obrigatórios faltando",
 
   // Content
   basicFields,
@@ -205,7 +212,7 @@ export function EntityDetailLayout({
   }
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("relative flex flex-col", className)}>
       {/* Header */}
       <header className="fixed top-8 left-0 right-0 z-50 bg-background border-b shadow-sm py-3 px-4">
         <div className="flex items-center justify-between gap-4">
@@ -234,29 +241,22 @@ export function EntityDetailLayout({
           )}
 
           {/* Right side - Action buttons */}
-          <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
             {isEditMode ? (
               <>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={onCancel}>
-                    <X className="w-4 h-4 mr-2" />
-                    {cancelLabel}
-                  </Button>
-                  <Button
-                    variant="magical"
-                    className="animate-glow"
-                    onClick={onSave}
-                    disabled={!hasChanges || hasRequiredFieldsEmpty}
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {saveLabel}
-                  </Button>
-                </div>
-                {validationMessage && (
-                  <div className="text-xs text-destructive">
-                    {validationMessage}
-                  </div>
-                )}
+                <Button variant="secondary" onClick={onCancel}>
+                  <X className="w-4 h-4 mr-2" />
+                  {cancelLabel}
+                </Button>
+                <Button
+                  variant="magical"
+                  className="animate-glow"
+                  onClick={onSave}
+                  disabled={!hasChanges || hasRequiredFieldsEmpty}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {saveLabel}
+                </Button>
               </>
             ) : (
               <div className="flex gap-2">
@@ -316,6 +316,15 @@ export function EntityDetailLayout({
           </div>
         </div>
       </header>
+
+      {/* Validation Banner - Absolute below header */}
+      {isEditMode && hasRequiredFieldsEmpty && (
+        <ValidationBanner
+          missingFields={missingFields}
+          fieldNames={fieldNames}
+          missingFieldsLabel={missingFieldsLabel}
+        />
+      )}
 
       {/* Main content */}
       <div className="flex flex-1 gap-4 pt-14 pb-6">

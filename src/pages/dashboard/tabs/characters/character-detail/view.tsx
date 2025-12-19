@@ -356,7 +356,7 @@ export function CharacterDetailView({
             <div className="flex-1 space-y-4">
               {/* Name */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-primary">
+                <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
                   {t("character-detail:fields.name")}
                   <span className="text-destructive ml-1">*</span>
                 </Label>
@@ -384,7 +384,7 @@ export function CharacterDetailView({
               <div className="grid grid-cols-2 gap-4">
                 {/* Age */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-primary">
+                  <Label className={`text-sm font-medium ${errors.age ? "text-destructive" : "text-primary"}`}>
                     {t("character-detail:fields.age")}
                     <span className="text-destructive ml-1">*</span>
                   </Label>
@@ -399,7 +399,10 @@ export function CharacterDetailView({
                     required
                   />
                   {errors.age && (
-                    <p className="text-xs text-destructive">{errors.age}</p>
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {errors.age}
+                    </p>
                   )}
                   <div className="flex justify-end text-xs text-muted-foreground">
                     <span>{editData.age?.length || 0}/50</span>
@@ -408,13 +411,16 @@ export function CharacterDetailView({
 
                 {/* Gender */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-primary">
+                  <Label className={`text-sm font-medium ${errors.gender ? "text-destructive" : "text-primary"}`}>
                     {t("character-detail:fields.gender")}
                     <span className="text-destructive ml-1">*</span>
                   </Label>
                   <Select
                     value={editData.gender || ""}
-                    onValueChange={(value) => onEditDataChange("gender", value)}
+                    onValueChange={(value) => {
+                      onEditDataChange("gender", value);
+                      validateField("gender", value);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue
@@ -461,26 +467,34 @@ export function CharacterDetailView({
           {/* Status - Using FormSimpleGrid */}
           <FormSimpleGrid
             value={editData.status || ""}
-            onChange={(value) => onEditDataChange("status", value)}
+            onChange={(value) => {
+              onEditDataChange("status", value);
+              validateField("status", value);
+            }}
             label={t("character-detail:fields.status")}
             required
             options={statusOptions}
             columns={5}
+            error={errors.status}
           />
 
           {/* Role - Using FormSimpleGrid */}
           <FormSimpleGrid
             value={editData.role}
-            onChange={(value) => onEditDataChange("role", value)}
+            onChange={(value) => {
+              onEditDataChange("role", value);
+              validateField("role", value);
+            }}
             label={t("character-detail:fields.role")}
             required
             columns={5}
             options={roleOptions}
+            error={errors.role}
           />
 
           {/* Description */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-primary">
+            <Label className={`text-sm font-medium ${errors.description ? "text-destructive" : "text-primary"}`}>
               {t("character-detail:fields.description")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -499,7 +513,10 @@ export function CharacterDetailView({
               required
             />
             {errors.description && (
-              <p className="text-xs text-destructive">{errors.description}</p>
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.description}
+              </p>
             )}
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{editData.description?.length || 0}/500</span>
@@ -1235,33 +1252,16 @@ export function CharacterDetailView({
             cancelLabel={t("character-detail:header.cancel")}
             hasChanges={hasChanges}
             hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
-            validationMessage={
-              hasRequiredFieldsEmpty ? (
-                <p className="text-xs text-destructive">
-                  {missingFields.length > 0 ? (
-                    <>
-                      {t("character-detail:validation.missing_fields")}:{" "}
-                      {missingFields
-                        .map((field) => {
-                          const fieldNames: Record<string, string> = {
-                            name: t("character-detail:fields.name"),
-                            age: t("character-detail:fields.age"),
-                            role: t("character-detail:fields.role"),
-                            gender: t("character-detail:fields.gender"),
-                            description: t(
-                              "character-detail:fields.description"
-                            ),
-                          };
-                          return fieldNames[field] || field;
-                        })
-                        .join(", ")}
-                    </>
-                  ) : (
-                    t("character-detail:validation.fill_required_fields")
-                  )}
-                </p>
-              ) : undefined
-            }
+            missingFields={missingFields}
+            fieldNames={{
+              name: t("character-detail:fields.name"),
+              age: t("character-detail:fields.age"),
+              role: t("character-detail:fields.role"),
+              gender: t("character-detail:fields.gender"),
+              description: t("character-detail:fields.description"),
+              status: t("character-detail:fields.status"),
+            }}
+            missingFieldsLabel={t("character-detail:validation.missing_fields")}
             basicFields={basicFields}
             advancedFields={advancedFields}
             advancedSectionTitle={t("character-detail:sections.advanced_info")}

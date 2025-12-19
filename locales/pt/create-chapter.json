@@ -2,7 +2,7 @@
   "modal": {
     "title": "Criar Novo Capítulo",
     "description": "Preencha os campos básicos para criar seu capítulo",
-    "warning": "Tudo pode ser editado mais tarde. Você poderá adicionar mais detalhes após a criação do capítulo.",
+    "warning": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme necessário.",
     "basic_fields": "Informações Básicas",
     "number_label": "Número",
     "name_label": "Nome",

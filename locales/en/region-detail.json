@@ -112,5 +112,11 @@
     "winter_description": "Season of cold",
     "custom": "Other",
     "custom_description": "Custom season"
+  },
+  "validation": {
+    "name_required": "Name cannot be empty",
+    "scale_required": "Scale cannot be empty",
+    "summary_required": "Summary cannot be empty",
+    "missing_fields": "Missing required fields"
   }
 }

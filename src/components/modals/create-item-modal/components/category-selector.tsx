@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Edit2 } from "lucide-react";
+import { Edit2, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ export function CategorySelector({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-primary">
+      <label className={`text-sm font-medium ${error || customCategoryError ? "text-destructive" : "text-primary"}`}>
         {t("modal.category")} <span className="text-destructive ml-1">*</span>
       </label>
 
@@ -93,7 +93,7 @@ export function CategorySelector({
           />
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={handleBackToDropdown}
             title={t("modal.back_to_categories")}
@@ -109,9 +109,17 @@ export function CategorySelector({
         </div>
       )}
 
-      {error && <p className="text-sm text-destructive">{t(error)}</p>}
+      {error && (
+        <p className="text-sm text-destructive flex items-center gap-1">
+          <AlertCircle className="h-4 w-4" />
+          {t(error)}
+        </p>
+      )}
       {customCategoryError && (
-        <p className="text-sm text-destructive">{customCategoryError}</p>
+        <p className="text-sm text-destructive flex items-center gap-1">
+          <AlertCircle className="h-4 w-4" />
+          {customCategoryError}
+        </p>
       )}
     </div>
   );

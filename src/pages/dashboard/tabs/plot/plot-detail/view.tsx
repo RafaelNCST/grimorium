@@ -43,6 +43,7 @@ import { FormInput } from "@/components/forms/FormInput";
 import { FormSelectGrid } from "@/components/forms/FormSelectGrid";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
+import { ValidationBanner } from "@/components/layouts/ValidationBanner";
 import { EventModal } from "@/components/modals/create-plot-arc-modal/components/event-modal";
 import { StatusSelector } from "@/components/modals/create-plot-arc-modal/components/status-selector";
 import { ARC_SIZE_OPTIONS } from "@/components/modals/create-plot-arc-modal/constants/arc-size-options";
@@ -460,18 +461,6 @@ export function PlotArcDetailView({
                       {t("plot:header.save")}
                     </Button>
                   </div>
-                  {hasRequiredFieldsEmpty && (
-                    <p className="text-xs text-destructive">
-                      {missingFields.length > 0 && (
-                        <>
-                          {t("plot:validation.missing_fields")}:{" "}
-                          {missingFields
-                            .map((field) => t(`plot:fields.${field}`))
-                            .join(", ")}
-                        </>
-                      )}
-                    </p>
-                  )}
                 </>
               ) : (
                 <div className="flex gap-2">
@@ -530,6 +519,21 @@ export function PlotArcDetailView({
           </div>
         </header>
 
+        {/* ValidationBanner */}
+        {isEditing && hasRequiredFieldsEmpty && (
+          <ValidationBanner
+            missingFields={missingFields}
+            fieldNames={{
+              name: t("plot:fields.name"),
+              description: t("plot:fields.description"),
+              status: t("plot:fields.status"),
+              size: t("plot:fields.size"),
+              focus: t("plot:fields.focus"),
+            }}
+            missingFieldsLabel={t("plot:validation.missing_fields")}
+          />
+        )}
+
         {/* Spacer for fixed header */}
         <div className="h-[72px]" />
 
@@ -550,13 +554,16 @@ export function PlotArcDetailView({
                         "create-plot-arc:modal.arc_name_placeholder"
                       )}
                       value={editForm.name || ""}
-                      onChange={(e) => onEditFormChange("name", e.target.value)}
+                      onChange={(e) => {
+                        onEditFormChange("name", e.target.value);
+                        validateField("name", e.target.value);
+                      }}
                       onBlur={(e) => validateField("name", e.target.value)}
                       maxLength={200}
                       required
                       showCharCount
                       error={validationErrors.name}
-                      labelClassName="text-primary"
+                      labelClassName={validationErrors.name ? "text-destructive" : "text-primary"}
                     />
 
                     {/* Arc Summary */}
@@ -566,18 +573,20 @@ export function PlotArcDetailView({
                         "create-plot-arc:modal.arc_summary_placeholder"
                       )}
                       value={editForm.description || ""}
-                      onChange={(e) =>
-                        onEditFormChange("description", e.target.value)
-                      }
+                      onChange={(e) => {
+                        onEditFormChange("description", e.target.value);
+                        validateField("description", e.target.value);
+                      }}
                       onBlur={(e) =>
                         validateField("description", e.target.value)
                       }
                       maxLength={1000}
                       rows={4}
                       showCharCount
+                      required
                       showOptionalLabel={false}
                       error={validationErrors.description}
-                      labelClassName="text-primary"
+                      labelClassName={validationErrors.description ? "text-destructive" : "text-primary"}
                       className="resize-none"
                     />
 
@@ -588,23 +597,28 @@ export function PlotArcDetailView({
                         "create-plot-arc:modal.arc_focus_placeholder"
                       )}
                       value={editForm.focus || ""}
-                      onChange={(e) =>
-                        onEditFormChange("focus", e.target.value)
-                      }
+                      onChange={(e) => {
+                        onEditFormChange("focus", e.target.value);
+                        validateField("focus", e.target.value);
+                      }}
                       onBlur={(e) => validateField("focus", e.target.value)}
                       maxLength={500}
                       rows={3}
                       showCharCount
+                      required
                       showOptionalLabel={false}
                       error={validationErrors.focus}
-                      labelClassName="text-primary"
+                      labelClassName={validationErrors.focus ? "text-destructive" : "text-primary"}
                       className="resize-none"
                     />
 
                     {/* Status Selector */}
                     <StatusSelector
                       value={editForm.status as PlotArcStatus | ""}
-                      onChange={(value) => onEditFormChange("status", value)}
+                      onChange={(value) => {
+                        onEditFormChange("status", value);
+                        validateField("status", value);
+                      }}
                       hasCurrentArc={hasCurrentArc}
                       error={validationErrors.status}
                     />
@@ -612,9 +626,10 @@ export function PlotArcDetailView({
                     {/* Size Selector */}
                     <FormSelectGrid
                       value={editForm.size || ""}
-                      onChange={(value) =>
-                        onEditFormChange("size", value as PlotArcSize)
-                      }
+                      onChange={(value) => {
+                        onEditFormChange("size", value as PlotArcSize);
+                        validateField("size", value);
+                      }}
                       label={t("create-plot-arc:modal.arc_size")}
                       required
                       columns={2}

@@ -413,16 +413,19 @@ export function RaceDetail() {
         ) {
           setErrors((prev) => ({
             ...prev,
-            [field]: t("race-detail:validation.required"),
+            [field]: t(`race-detail:validation.${field}_required`),
           }));
+          return false;
         } else {
           setErrors((prev) => {
             const newErrors = { ...prev };
             delete newErrors[field];
             return newErrors;
           });
+          return true;
         }
       }
+      return true;
     },
     [t]
   );

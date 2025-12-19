@@ -28,10 +28,13 @@ export const CharacterSchema = z.object({
     .max(500, { message: "character-detail:validation.description_max_length" })
     .trim(),
 
+  status: z
+    .string()
+    .min(1, { message: "character-detail:validation.status_required" }),
+
   // Campos opcionais
   image: z.string().optional(),
   alignment: z.string().optional(),
-  status: z.string().optional(),
 
   // Appearance fields
   height: z

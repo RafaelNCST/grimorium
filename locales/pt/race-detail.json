@@ -190,7 +190,10 @@
   "validation": {
     "required": "Este campo é obrigatório",
     "missing_fields": "Campos obrigatórios não preenchidos",
-    "fill_required_fields": "Preencha todos os campos obrigatórios para salvar"
+    "fill_required_fields": "Preencha todos os campos obrigatórios para salvar",
+    "name_required": "Nome não pode estar vazio",
+    "domain_required": "Domínio não pode estar vazio",
+    "summary_required": "Resumo não pode estar vazio"
   },
   "delete": {
     "version": {

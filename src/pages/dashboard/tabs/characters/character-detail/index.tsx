@@ -182,12 +182,14 @@ export function CharacterDetail() {
         role: true,
         gender: true,
         description: true,
+        status: true,
       } as any).parse({
         name: editData.name,
         age: editData.age,
         role: editData.role,
         gender: editData.gender,
         description: editData.description,
+        status: editData.status,
       });
       return { hasRequiredFieldsEmpty: false, missingFields: [] };
     } catch (error) {

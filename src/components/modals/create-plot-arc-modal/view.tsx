@@ -59,7 +59,8 @@ export function CreatePlotArcModalView({
           header={{
             title: t("modal.create_arc"),
             icon: Sparkles,
-            description: t("modal.info_message"),
+            description: t("modal.description"),
+            warning: t("modal.info_message"),
           }}
           basicFieldsTitle={t("modal.basic_fields")}
           advancedFieldsTitle={t("modal.advanced_fields")}

@@ -88,13 +88,9 @@ export function CreateItemModalView({
           {...register("name")}
           placeholder={t("modal.name_placeholder")}
           maxLength={150}
-          className={errors.name ? "border-destructive" : ""}
         />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          {errors.name && (
-            <p className="text-destructive">{t(errors.name.message || "")}</p>
-          )}
-          <span className="ml-auto">{watchedValues.name?.length || 0}/150</span>
+        <div className="flex justify-end text-xs text-muted-foreground">
+          <span>{watchedValues.name?.length || 0}/150</span>
         </div>
       </div>
 
@@ -133,17 +129,10 @@ export function CreateItemModalView({
           placeholder={t("modal.basic_description_placeholder")}
           rows={4}
           maxLength={500}
-          className={`resize-none ${errors.basicDescription ? "border-destructive" : ""}`}
+          className="resize-none"
         />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          {errors.basicDescription && (
-            <p className="text-destructive">
-              {t(errors.basicDescription.message || "")}
-            </p>
-          )}
-          <span className="ml-auto">
-            {watchedValues.basicDescription?.length || 0}/500
-          </span>
+        <div className="flex justify-end text-xs text-muted-foreground">
+          <span>{watchedValues.basicDescription?.length || 0}/500</span>
         </div>
       </div>
     </div>

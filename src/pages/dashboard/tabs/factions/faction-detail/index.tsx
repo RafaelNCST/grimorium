@@ -68,21 +68,20 @@ export function FactionDetail() {
 
   // Função de validação de campo individual (onBlur)
   const validateField = useCallback(
-    (field: string, value: unknown) => {
+    (field: string, value: any) => {
       try {
         // Validar apenas este campo
-        const fieldSchema = FactionSchema.pick({ [field]: true } as Record<
-          string,
-          true
-        >);
+        const fieldSchema = FactionSchema.pick({ [field]: true } as any);
         fieldSchema.parse({ [field]: value });
 
-        // Se passou, limpar erro deste campo
+        // Se passou, remover erro
         setErrors((prev) => {
           const newErrors = { ...prev };
           delete newErrors[field];
           return newErrors;
         });
+
+        return true;
       } catch (error) {
         if (error instanceof z.ZodError) {
           // Traduzir a mensagem de erro
@@ -95,6 +94,7 @@ export function FactionDetail() {
             ...prev,
             [field]: translatedMessage,
           }));
+          return false;
         }
       }
     },
@@ -107,14 +107,12 @@ export function FactionDetail() {
 
     try {
       // Validar apenas campos obrigatórios
-      const requiredSchema = FactionSchema.pick({
+      FactionSchema.pick({
         name: true,
         summary: true,
         status: true,
         factionType: true,
-      });
-
-      requiredSchema.parse({
+      } as any).parse({
         name: editData.name,
         summary: editData.summary,
         status: editData.status,
@@ -221,16 +219,73 @@ export function FactionDetail() {
   );
 
   const handleSave = useCallback(async () => {
-    const updatedFaction = { ...editData };
-    setFaction(updatedFaction);
-
     try {
+      // Validar TUDO com Zod
+      const _validatedData = FactionSchema.parse({
+        name: editData.name,
+        summary: editData.summary,
+        status: editData.status,
+        factionType: editData.factionType,
+        governmentForm: editData.governmentForm,
+        economy: editData.economy,
+        symbolsAndSecrets: editData.symbolsAndSecrets,
+        factionMotto: editData.factionMotto,
+        uniformAndAesthetics: editData.uniformAndAesthetics,
+        foundationDate: editData.foundationDate,
+        foundationHistorySummary: editData.foundationHistorySummary,
+        organizationObjectives: editData.organizationObjectives,
+        narrativeImportance: editData.narrativeImportance,
+        inspirations: editData.inspirations,
+        alignment: editData.alignment,
+        rulesAndLaws: editData.rulesAndLaws,
+        mainResources: editData.mainResources,
+        currencies: editData.currencies,
+        dominatedAreas: editData.dominatedAreas,
+        mainBase: editData.mainBase,
+        areasOfInterest: editData.areasOfInterest,
+        traditionsAndRituals: editData.traditionsAndRituals,
+        beliefsAndValues: editData.beliefsAndValues,
+        languagesUsed: editData.languagesUsed,
+        races: editData.races,
+        founders: editData.founders,
+        influence: editData.influence,
+        publicReputation: editData.publicReputation,
+        militaryPower: editData.militaryPower,
+        politicalPower: editData.politicalPower,
+        culturalPower: editData.culturalPower,
+        economicPower: editData.economicPower,
+        timeline: editData.timeline,
+        hierarchy: editData.hierarchy,
+      });
+
+      const updatedFaction = { ...editData };
+      setFaction(updatedFaction);
+
       await updateFactionInStore(factionId, updatedFaction);
+
+      setErrors({}); // Limpar erros
       setIsEditing(false);
     } catch (error) {
-      console.error("Error saving faction:", error);
+      console.error("[handleSave] Error caught:", error);
+      if (error instanceof z.ZodError) {
+        console.error("[handleSave] Zod validation errors:", error.errors);
+        // Mapear erros para cada campo e traduzir
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const field = err.path[0] as string;
+          // Traduzir a mensagem de erro
+          const errorMessage = err.message;
+          const translatedMessage = errorMessage.startsWith("faction-detail:")
+            ? t(errorMessage)
+            : errorMessage;
+          newErrors[field] = translatedMessage;
+        });
+        setErrors(newErrors);
+      } else {
+        console.error("Error saving faction:", error);
+      }
     }
-  }, [editData, factionId, updateFactionInStore]);
+  }, [editData, factionId, updateFactionInStore, t]);
 
   const navigateToFactionsTab = useCallback(() => {
     if (!dashboardId) return;
@@ -304,10 +359,7 @@ export function FactionDetail() {
       if (errors[field]) {
         // Re-validate the field to clear error if value is now valid
         try {
-          const fieldSchema = FactionSchema.pick({ [field]: true } as Record<
-            string,
-            true
-          >);
+          const fieldSchema = FactionSchema.pick({ [field]: true } as any);
           fieldSchema.parse({ [field]: value });
           // If validation passes, clear the error
           setErrors((prev) => {

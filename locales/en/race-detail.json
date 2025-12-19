@@ -198,5 +198,13 @@
       "cancel": "Cancel",
       "confirm": "Delete"
     }
+  },
+  "validation": {
+    "required": "This field is required",
+    "missing_fields": "Missing required fields",
+    "fill_required_fields": "Fill in all required fields to save",
+    "name_required": "Name cannot be empty",
+    "domain_required": "Domain cannot be empty",
+    "summary_required": "Summary cannot be empty"
   }
 }

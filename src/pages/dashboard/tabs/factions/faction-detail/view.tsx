@@ -8,6 +8,7 @@ import {
   Users2,
   Settings,
   Image,
+  AlertCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -243,7 +244,7 @@ export function FactionDetailView({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-primary">
+            <Label htmlFor="name" className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
               {t("faction-detail:fields.name")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -257,43 +258,50 @@ export function FactionDetailView({
               required
               className={errors.name ? "border-destructive" : ""}
             />
-            <div className="flex justify-between text-xs">
-              {errors.name ? (
-                <span className="text-destructive">{errors.name}</span>
-              ) : (
-                <span />
-              )}
-              <span className="text-muted-foreground">
-                {editData.name?.length || 0}/200
-              </span>
+            {errors.name && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.name}
+              </p>
+            )}
+            <div className="flex justify-end text-xs text-muted-foreground">
+              <span>{editData.name?.length || 0}/200</span>
             </div>
           </div>
 
           {/* Status Picker */}
           <FormSimpleGrid
             value={editData.status || ""}
-            onChange={(value) => onEditDataChange("status", value)}
+            onChange={(value) => {
+              onEditDataChange("status", value);
+              validateField("status", value);
+            }}
             label={t("create-faction:modal.status")}
             required
             options={statusOptions}
             columns={5}
+            error={errors.status}
           />
 
           {/* Faction Type Picker */}
           <FormSelectGrid
             value={editData.factionType || ""}
-            onChange={(value) => onEditDataChange("factionType", value)}
+            onChange={(value) => {
+              onEditDataChange("factionType", value);
+              validateField("factionType", value);
+            }}
             label={t("create-faction:modal.faction_type")}
             required
             columns={4}
             options={translatedTypeOptions}
+            error={errors.factionType}
           />
 
           {/* Summary */}
           <div className="space-y-2">
             <Label
               htmlFor="summary"
-              className="text-sm font-medium text-primary"
+              className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}
             >
               {t("faction-detail:fields.summary")}
               <span className="text-destructive ml-1">*</span>
@@ -309,15 +317,14 @@ export function FactionDetailView({
               className={`resize-none ${errors.summary ? "border-destructive" : ""}`}
               required
             />
-            <div className="flex justify-between text-xs">
-              {errors.summary ? (
-                <span className="text-destructive">{errors.summary}</span>
-              ) : (
-                <span />
-              )}
-              <span className="text-muted-foreground">
-                {editData.summary?.length || 0}/500
-              </span>
+            {errors.summary && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.summary}
+              </p>
+            )}
+            <div className="flex justify-end text-xs text-muted-foreground">
+              <span>{editData.summary?.length || 0}/500</span>
             </div>
           </div>
         </>
@@ -1361,32 +1368,14 @@ export function FactionDetailView({
             cancelLabel={t("faction-detail:header.cancel")}
             hasChanges={hasChanges}
             hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
-            validationMessage={
-              hasRequiredFieldsEmpty && isEditing ? (
-                <p className="text-xs text-destructive">
-                  {missingFields.length > 0 ? (
-                    <>
-                      {t("faction-detail:validation.missing_fields")}:{" "}
-                      {missingFields
-                        .map((field) => {
-                          const fieldNames: Record<string, string> = {
-                            name: t("faction-detail:fields.name"),
-                            summary: t("faction-detail:fields.summary"),
-                            status: t("faction-detail:fields.status"),
-                            factionType: t(
-                              "faction-detail:fields.faction_type"
-                            ),
-                          };
-                          return fieldNames[field] || field;
-                        })
-                        .join(", ")}
-                    </>
-                  ) : (
-                    t("faction-detail:validation.fill_required_fields")
-                  )}
-                </p>
-              ) : undefined
-            }
+            missingFields={missingFields}
+            fieldNames={{
+              name: t("faction-detail:fields.name"),
+              summary: t("faction-detail:fields.summary"),
+              status: t("faction-detail:fields.status"),
+              factionType: t("faction-detail:fields.faction_type"),
+            }}
+            missingFieldsLabel={t("faction-detail:validation.missing_fields")}
             // Content
             basicFields={basicFields}
             advancedFields={advancedFields}

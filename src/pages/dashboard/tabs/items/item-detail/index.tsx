@@ -195,12 +195,23 @@ export default function ItemDetail() {
       basicDescription: true,
     }).safeParse(requiredFields);
 
-    if (result.success) {
-      return { hasRequiredFieldsEmpty: false, missingFields: [] };
+    let missing: string[] = [];
+
+    if (!result.success) {
+      missing = result.error.errors.map((e) => e.path[0] as string);
     }
 
-    const missing = result.error.errors.map((e) => e.path[0] as string);
-    return { hasRequiredFieldsEmpty: true, missingFields: missing };
+    // Verificar se categoria "outro" está sem customCategory preenchida
+    if (editData.category === "other" && !editData.customCategory?.trim()) {
+      if (!missing.includes("customCategory")) {
+        missing.push("customCategory");
+      }
+    }
+
+    return {
+      hasRequiredFieldsEmpty: missing.length > 0,
+      missingFields: missing
+    };
   }, [editData]);
 
   // Check if there are changes between item and editData

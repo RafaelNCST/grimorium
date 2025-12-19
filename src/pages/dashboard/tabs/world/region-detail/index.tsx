@@ -105,30 +105,39 @@ export function RegionDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Função de validação de campo individual (onBlur)
-  const validateField = useCallback((field: string, value: any) => {
-    try {
-      // Validar apenas este campo
-      const fieldSchema = RegionSchema.pick({ [field]: true } as any);
-      fieldSchema.parse({ [field]: value });
+  const validateField = useCallback(
+    (field: string, value: any) => {
+      try {
+        // Validar apenas este campo
+        const fieldSchema = RegionSchema.pick({ [field]: true } as any);
+        fieldSchema.parse({ [field]: value });
 
-      // Se passou, remover erro
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
+        // Se passou, remover erro
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
 
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: error.errors[0].message,
-        }));
-        return false;
+        return true;
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          // Traduzir a mensagem de erro
+          const errorMessage = error.errors[0].message;
+          const translatedMessage = errorMessage.startsWith("region-detail:")
+            ? t(errorMessage)
+            : errorMessage;
+
+          setErrors((prev) => ({
+            ...prev,
+            [field]: translatedMessage,
+          }));
+          return false;
+        }
       }
-    }
-  }, []);
+    },
+    [t]
+  );
 
   // Verificar se tem campos obrigatórios vazios e quais são
   const { hasRequiredFieldsEmpty, missingFields } = useMemo(() => {
@@ -573,11 +582,16 @@ export function RegionDetail() {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
         console.error("[handleSave] Zod validation errors:", error.errors);
-        // Mapear erros para cada campo
+        // Mapear erros para cada campo e traduzir
         const newErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
           const field = err.path[0] as string;
-          newErrors[field] = err.message;
+          // Traduzir a mensagem de erro
+          const errorMessage = err.message;
+          const translatedMessage = errorMessage.startsWith("region-detail:")
+            ? t(errorMessage)
+            : errorMessage;
+          newErrors[field] = translatedMessage;
         });
         setErrors(newErrors);
       } else {

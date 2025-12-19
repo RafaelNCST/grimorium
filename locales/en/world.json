@@ -33,7 +33,7 @@
   "create_region": {
     "title": "Create New Region",
     "edit_title": "Edit Region",
-    "warning": "Everything can be edited later. Some special sections can only be added after creating the region.",
+    "warning": "Everything can be edited later. Start with basic information and add details as needed.",
     "name_label": "Region Name",
     "name_placeholder": "Kingdom of Eldoria",
     "parent_label": "Parent Region",

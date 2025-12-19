@@ -5,15 +5,15 @@ export const RegionSchema = z.object({
   // Campos obrigatórios
   name: z
     .string()
-    .min(1, () => i18next.t("forms:validation.name_required"))
+    .min(1, "region-detail:validation.name_required")
     .max(200, "Nome deve ter no máximo 200 caracteres")
     .trim(),
 
-  scale: z.string().min(1, "Escala é obrigatória"),
+  scale: z.string().min(1, "region-detail:validation.scale_required"),
 
   summary: z
     .string()
-    .min(1, () => i18next.t("forms:validation.summary_required"))
+    .min(1, "region-detail:validation.summary_required")
     .max(500, () => i18next.t("forms:validation.summary_max_characters"))
     .trim(),
 

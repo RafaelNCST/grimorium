@@ -132,9 +132,6 @@ export function CreateFactionModalView({
                     maxLength={200}
                     required
                     showCharCount
-                    error={
-                      errors.name ? t(errors.name.message as string) : undefined
-                    }
                     value={watchedValues.name}
                     labelClassName="text-primary"
                   />
@@ -148,7 +145,6 @@ export function CreateFactionModalView({
                 label={t("modal.status")}
                 required
                 options={statusOptions}
-                error={errors.status?.message}
                 columns={5}
               />
 
@@ -160,7 +156,6 @@ export function CreateFactionModalView({
                 required
                 columns={4}
                 options={translatedTypeOptions}
-                error={errors.factionType?.message}
               />
 
               {/* Summary */}
@@ -172,11 +167,6 @@ export function CreateFactionModalView({
                 rows={8}
                 required
                 showCharCount
-                error={
-                  errors.summary
-                    ? t(errors.summary.message as string)
-                    : undefined
-                }
                 value={watchedValues.summary}
                 labelClassName="text-primary"
                 className="resize-none"

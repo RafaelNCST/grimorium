@@ -66,7 +66,12 @@
     "select_status": "Selecione um status",
     "select_size": "Selecione um tamanho",
     "fill_required_fields": "Preencha todos os campos obrigatórios",
-    "missing_fields": "Campos obrigatórios faltando"
+    "missing_fields": "Campos obrigatórios faltando",
+    "name_required": "Nome não pode estar vazio",
+    "description_required": "Resumo não pode estar vazio",
+    "status_required": "Status não pode estar vazio",
+    "size_required": "Tamanho não pode estar vazio",
+    "focus_required": "Foco não pode estar vazio"
   },
   "fields": {
     "name": "Nome",

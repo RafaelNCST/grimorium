@@ -2,7 +2,7 @@
   "modal": {
     "create_character": "Create New Character",
     "header_description": "Create a new character for your story",
-    "info_message": "Everything can be edited later. Some special sections can only be added after the character is created",
+    "info_message": "Everything can be edited later. Start with basic information and add details as needed.",
     "basic_fields": "Basic Fields",
     "advanced_items": "Advanced Items",
     "image": "Image",

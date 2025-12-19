@@ -252,13 +252,21 @@ export function PlotArcDetail() {
     (field: string, value: unknown) => {
       if (requiredFields.includes(field)) {
         if (!value || (typeof value === "string" && !value.trim())) {
+          // Use specific validation messages for each field
+          const validationKey = `plot:validation.${field}_required`;
           setValidationErrors((prev) => ({
             ...prev,
-            [field]: t("plot:validation.required_field"),
+            [field]: t(validationKey),
           }));
           return false;
         }
       }
+      // Clear validation error for this field if it passes
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
       return true;
     },
     [t]

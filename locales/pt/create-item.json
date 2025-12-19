@@ -2,7 +2,7 @@
   "modal": {
     "create_item": "Criar Novo Item",
     "description": "Adicione um novo item ao seu livro",
-    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história",
+    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme necessário.",
     "basic_fields": "Informações Básicas",
     "advanced_fields": "Informações Avançadas",
     "image": "Imagem",

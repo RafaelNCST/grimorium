@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, AlertCircle } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -229,7 +229,7 @@ export function FormSimpleGrid<T extends string = string>({
   return (
     <div className="space-y-2">
       {label && (
-        <Label className="text-sm font-medium text-primary">
+        <Label className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}>
           {label}
           {required && <span className="text-destructive ml-1">*</span>}
         </Label>
@@ -285,7 +285,12 @@ export function FormSimpleGrid<T extends string = string>({
         })}
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="text-sm text-destructive flex items-center gap-1">
+          <AlertCircle className="h-4 w-4" />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -211,7 +211,7 @@ export const ItemDetailView = React.memo(
             <div className="space-y-2">
               <Label
                 htmlFor="name"
-                className="text-sm font-medium text-primary"
+                className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}
               >
                 {t("create-item:modal.item_name")}{" "}
                 <span className="text-destructive ml-1">*</span>
@@ -219,30 +219,34 @@ export const ItemDetailView = React.memo(
               <Input
                 id="name"
                 value={editData.name}
-                onChange={(e) => onEditDataChange("name", e.target.value)}
+                onChange={(e) => {
+                  onEditDataChange("name", e.target.value);
+                  validateField("name", e.target.value);
+                }}
                 onBlur={() => validateField("name", editData.name)}
                 className={errors.name ? "border-destructive" : ""}
                 required
                 maxLength={150}
                 placeholder={t("create-item:modal.name_placeholder")}
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                {errors.name && (
-                  <p className="text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.name}
-                  </p>
-                )}
-                <span className="ml-auto">
-                  {editData.name?.length || 0}/150
-                </span>
+              {errors.name && (
+                <p className="text-sm text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.name}
+                </p>
+              )}
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.name?.length || 0}/150</span>
               </div>
             </div>
 
             {/* Status Picker */}
             <FormSimpleGrid
               value={editData.status || ""}
-              onChange={(value) => onEditDataChange("status", value)}
+              onChange={(value) => {
+                onEditDataChange("status", value);
+                validateField("status", value);
+              }}
               label={t("create-item:modal.item_status")}
               required
               options={statusOptions}
@@ -254,10 +258,14 @@ export const ItemDetailView = React.memo(
             <CategorySelector
               value={editData.category || ""}
               customCategory={editData.customCategory || ""}
-              onChange={(value) => onEditDataChange("category", value)}
-              onCustomCategoryChange={(value) =>
-                onEditDataChange("customCategory", value)
-              }
+              onChange={(value) => {
+                onEditDataChange("category", value);
+                validateField("category", value);
+              }}
+              onCustomCategoryChange={(value) => {
+                onEditDataChange("customCategory", value);
+                validateField("customCategory", value);
+              }}
               error={errors.category}
               customCategoryError={customCategoryError}
             />
@@ -266,7 +274,7 @@ export const ItemDetailView = React.memo(
             <div className="space-y-2">
               <Label
                 htmlFor="basicDescription"
-                className="text-sm font-medium text-primary"
+                className={`text-sm font-medium ${errors.basicDescription ? "text-destructive" : "text-primary"}`}
               >
                 {t("create-item:modal.basic_description")}{" "}
                 <span className="text-destructive ml-1">*</span>
@@ -274,9 +282,10 @@ export const ItemDetailView = React.memo(
               <Textarea
                 id="basicDescription"
                 value={editData.basicDescription}
-                onChange={(e) =>
-                  onEditDataChange("basicDescription", e.target.value)
-                }
+                onChange={(e) => {
+                  onEditDataChange("basicDescription", e.target.value);
+                  validateField("basicDescription", e.target.value);
+                }}
                 onBlur={() =>
                   validateField("basicDescription", editData.basicDescription)
                 }
@@ -290,16 +299,14 @@ export const ItemDetailView = React.memo(
                   "create-item:modal.basic_description_placeholder"
                 )}
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                {errors.basicDescription && (
-                  <p className="text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.basicDescription}
-                  </p>
-                )}
-                <span className="ml-auto">
-                  {editData.basicDescription?.length || 0}/500
-                </span>
+              {errors.basicDescription && (
+                <p className="text-sm text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.basicDescription}
+                </p>
+              )}
+              <div className="flex justify-end text-xs text-muted-foreground">
+                <span>{editData.basicDescription?.length || 0}/500</span>
               </div>
             </div>
           </div>
@@ -790,34 +797,15 @@ export const ItemDetailView = React.memo(
                 },
               ]}
               hasRequiredFieldsEmpty={!isValid}
-              validationMessage={
-                !isValid ? (
-                  <p className="text-xs text-destructive">
-                    {missingFields.length > 0 ? (
-                      <>
-                        {t("item-detail:missing_fields")}:{" "}
-                        {missingFields
-                          .map((field) => {
-                            const fieldNames: Record<string, string> = {
-                              name: t("item-detail:fields.name"),
-                              status: t("item-detail:fields.status"),
-                              category: t("item-detail:fields.category"),
-                              basicDescription: t(
-                                "item-detail:fields.basic_description"
-                              ),
-                            };
-                            return fieldNames[field] || field;
-                          })
-                          .join(", ")}
-                      </>
-                    ) : customCategoryError ? (
-                      customCategoryError
-                    ) : (
-                      t("item-detail:fill_required_fields")
-                    )}
-                  </p>
-                ) : undefined
-              }
+              missingFields={missingFields}
+              fieldNames={{
+                name: t("item-detail:fields.name"),
+                status: t("item-detail:fields.status"),
+                category: t("item-detail:fields.category"),
+                customCategory: t("item-detail:fields.category"),
+                basicDescription: t("item-detail:fields.basic_description"),
+              }}
+              missingFieldsLabel={t("item-detail:missing_fields")}
               basicFields={basicFields}
               advancedFields={advancedFields}
               advancedSectionTitle={t("item-detail:sections.advanced_info")}

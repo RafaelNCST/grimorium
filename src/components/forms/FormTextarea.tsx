@@ -1,4 +1,5 @@
 import * as React from "react";
+import { AlertCircle } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -86,7 +87,8 @@ export const FormTextarea = React.forwardRef<
           {...props}
         />
         {hasError && (
-          <p className="text-sm text-destructive" role="alert">
+          <p className="text-sm text-destructive flex items-center gap-1" role="alert">
+            <AlertCircle className="h-4 w-4" />
             {error}
           </p>
         )}

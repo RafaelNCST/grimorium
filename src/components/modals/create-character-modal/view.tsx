@@ -177,7 +177,6 @@ export function CreateCharacterModalView({
               {...register("name")}
               placeholder={t("modal.name_placeholder")}
               maxLength={100}
-              className={errors.name ? "border-destructive" : ""}
             />
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{watchedValues.name?.length || 0}/100</span>
@@ -197,7 +196,6 @@ export function CreateCharacterModalView({
                 {...register("age")}
                 placeholder={t("modal.age_placeholder")}
                 maxLength={50}
-                className={errors.age ? "border-destructive" : ""}
               />
               <div className="flex justify-end text-xs text-muted-foreground">
                 <span>{watchedValues.age?.length || 0}/50</span>
@@ -217,9 +215,8 @@ export function CreateCharacterModalView({
                 value={watchedValues.gender}
                 onValueChange={(value) => setValue("gender", value)}
               >
-                <SelectTrigger
-                  className={errors.gender ? "border-destructive" : ""}
-                >
+                <SelectTrigger>
+
                   <SelectValue placeholder={t("modal.gender_placeholder")} />
                 </SelectTrigger>
                 <SelectContent side="bottom">
@@ -256,7 +253,7 @@ export function CreateCharacterModalView({
           placeholder={t("modal.description_placeholder")}
           rows={4}
           maxLength={500}
-          className={`resize-none ${errors.description ? "border-destructive" : ""}`}
+          className="resize-none"
         />
         <div className="flex justify-end text-xs text-muted-foreground">
           <span>{watchedValues.description?.length || 0}/500</span>

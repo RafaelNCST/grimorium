@@ -2,7 +2,7 @@
   "modal": {
     "create_race": "Criar Nova Raça",
     "description": "Adicione uma nova raça ao seu mundo",
-    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme desenvolve sua história",
+    "info_message": "Tudo pode ser editado mais tarde. Comece com as informações básicas e adicione detalhes conforme necessário.",
     "advanced_items": "Campos Avançados",
 
     "image": "Imagem",

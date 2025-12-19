@@ -1,3 +1,4 @@
+import { AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -51,7 +52,7 @@ export function StatusSelector({
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium text-primary">
+      <Label className={`text-sm font-medium ${error ? "text-destructive" : "text-primary"}`}>
         {t("modal.arc_status")} <span className="text-destructive">*</span>
       </Label>
 
@@ -64,7 +65,12 @@ export function StatusSelector({
         label=""
         columns={2}
       />
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="text-sm text-destructive flex items-center gap-1">
+          <AlertCircle className="h-4 w-4" />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

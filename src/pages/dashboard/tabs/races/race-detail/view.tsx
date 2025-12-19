@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, Image } from "lucide-react";
+import { Dna, Users, Image, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -163,13 +163,16 @@ export function RaceDetailView({
           {/* Name and Scientific Name */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-primary">
+              <Label className={`text-sm font-medium ${errors.name ? "text-destructive" : "text-primary"}`}>
                 {t("race-detail:fields.name")}
                 <span className="text-destructive ml-1">*</span>
               </Label>
               <Input
                 value={editData.name}
-                onChange={(e) => onEditDataChange("name", e.target.value)}
+                onChange={(e) => {
+                  onEditDataChange("name", e.target.value);
+                  validateField?.("name", e.target.value);
+                }}
                 onBlur={() => validateField?.("name", editData.name)}
                 placeholder={t("create-race:modal.name_placeholder")}
                 maxLength={150}
@@ -177,7 +180,10 @@ export function RaceDetailView({
                 required
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name}</p>
+                <p className="text-sm text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.name}
+                </p>
               )}
               <div className="flex justify-end text-xs text-muted-foreground">
                 <span>{editData.name?.length || 0}/150</span>
@@ -207,7 +213,7 @@ export function RaceDetailView({
 
           {/* Domain */}
           <div className="space-y-2">
-            <Label className="text-primary">
+            <Label className={`text-sm font-medium ${errors.domain ? "text-destructive" : "text-primary"}`}>
               {t("race-detail:fields.domain")}
               <span className="text-destructive ml-1">*</span>
             </Label>
@@ -220,19 +226,25 @@ export function RaceDetailView({
               hideLabel
             />
             {errors.domain && (
-              <p className="text-sm text-destructive">{errors.domain}</p>
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.domain}
+              </p>
             )}
           </div>
 
           {/* Summary */}
           <div className="space-y-2">
-            <Label className="text-primary">
+            <Label className={`text-sm font-medium ${errors.summary ? "text-destructive" : "text-primary"}`}>
               {t("race-detail:fields.summary")}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <Textarea
               value={editData.summary || ""}
-              onChange={(e) => onEditDataChange("summary", e.target.value)}
+              onChange={(e) => {
+                onEditDataChange("summary", e.target.value);
+                validateField?.("summary", e.target.value);
+              }}
               onBlur={() => validateField?.("summary", editData.summary)}
               placeholder={t("create-race:modal.summary_placeholder")}
               rows={4}
@@ -245,7 +257,10 @@ export function RaceDetailView({
               required
             />
             {errors.summary && (
-              <p className="text-xs text-destructive">{errors.summary}</p>
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {errors.summary}
+              </p>
             )}
             <div className="flex justify-end text-xs text-muted-foreground">
               <span>{editData.summary?.length || 0}/500</span>
@@ -1163,28 +1178,12 @@ export function RaceDetailView({
       : []),
   ];
 
-  // Validation message
-  const validationMessage = hasRequiredFieldsEmpty ? (
-    <p className="text-xs text-destructive">
-      {missingFields.length > 0 ? (
-        <>
-          {t("race-detail:validation.missing_fields")}:{" "}
-          {missingFields
-            .map((field) => {
-              const fieldNames: Record<string, string> = {
-                name: t("race-detail:fields.name"),
-                domain: t("race-detail:fields.domain"),
-                summary: t("race-detail:fields.summary"),
-              };
-              return fieldNames[field] || field;
-            })
-            .join(", ")}
-        </>
-      ) : (
-        t("race-detail:validation.fill_required_fields")
-      )}
-    </p>
-  ) : undefined;
+  // Field names for missing fields display
+  const fieldNames: Record<string, string> = {
+    name: t("race-detail:fields.name"),
+    domain: t("race-detail:fields.domain"),
+    summary: t("race-detail:fields.summary"),
+  };
 
   return (
     <div className="relative">
@@ -1240,7 +1239,9 @@ export function RaceDetailView({
             cancelLabel={t("race-detail:buttons.cancel")}
             hasChanges={hasChanges}
             hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
-            validationMessage={validationMessage}
+            missingFields={missingFields}
+            fieldNames={fieldNames}
+            missingFieldsLabel={t("race-detail:validation.missing_fields")}
             // Content
             basicFields={basicFields}
             advancedFields={advancedFields}

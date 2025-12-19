@@ -133,6 +133,16 @@ export default {
             transform: "rotate(360deg)",
           },
         },
+        "slide-down-fade": {
+          from: {
+            opacity: "0",
+            transform: "translateY(-10px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -141,6 +151,7 @@ export default {
         "glow": "glow 2s ease-in-out infinite alternate",
         "shimmer": "shimmer 2s linear infinite",
         "spin-slow": "spin-slow 1.5s linear infinite",
+        "slide-down-fade": "slide-down-fade 0.3s ease-out",
       },
     },
   },

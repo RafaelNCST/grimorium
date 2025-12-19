@@ -91,9 +91,6 @@ export function CreateRaceModalView({
                   maxLength={150}
                   required
                   showCharCount
-                  error={
-                    errors.name ? t(errors.name.message as string) : undefined
-                  }
                   value={watchedValues.name}
                   labelClassName="text-primary"
                 />
@@ -104,11 +101,6 @@ export function CreateRaceModalView({
                   placeholder={t("modal.scientific_name_placeholder")}
                   maxLength={150}
                   showCharCount
-                  error={
-                    errors.scientificName
-                      ? t(errors.scientificName.message as string)
-                      : undefined
-                  }
                   value={watchedValues.scientificName}
                   labelClassName="text-primary"
                 />
@@ -118,7 +110,6 @@ export function CreateRaceModalView({
               <DomainPicker
                 value={watchedValues.domain || []}
                 onChange={(value) => setValue("domain", value)}
-                error={errors.domain?.message}
               />
 
               {/* Summary */}
@@ -130,11 +121,6 @@ export function CreateRaceModalView({
                 rows={4}
                 required
                 showCharCount
-                error={
-                  errors.summary
-                    ? t(errors.summary.message as string)
-                    : undefined
-                }
                 value={watchedValues.summary}
                 labelClassName="text-primary"
                 className="resize-none"
@@ -167,7 +153,6 @@ export function CreateRaceModalView({
                   rows={6}
                   showCharCount
                   showOptionalLabel={false}
-                  error={errors.culturalNotes?.message}
                   value={watchedValues.culturalNotes}
                   labelClassName="text-sm font-medium text-primary"
                   className="resize-none"

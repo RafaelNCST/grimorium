@@ -66,7 +66,12 @@
     "select_status": "Select a status",
     "select_size": "Select a size",
     "fill_required_fields": "Fill in all required fields",
-    "missing_fields": "Missing required fields"
+    "missing_fields": "Missing required fields",
+    "name_required": "Name cannot be empty",
+    "description_required": "Summary cannot be empty",
+    "status_required": "Status cannot be empty",
+    "size_required": "Size cannot be empty",
+    "focus_required": "Focus cannot be empty"
   },
   "fields": {
     "name": "Name",

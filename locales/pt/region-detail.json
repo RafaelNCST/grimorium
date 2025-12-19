@@ -112,5 +112,11 @@
     "winter_description": "Estação do frio",
     "custom": "Outra",
     "custom_description": "Estação personalizada"
+  },
+  "validation": {
+    "name_required": "Nome não pode estar vazio",
+    "scale_required": "Escala não pode estar vazia",
+    "summary_required": "Resumo não pode estar vazio",
+    "missing_fields": "Campos obrigatórios faltando"
   }
 }
