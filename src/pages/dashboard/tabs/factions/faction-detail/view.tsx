@@ -424,12 +424,12 @@ export function FactionDetailView({
                 <span>{editData.governmentForm?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.governmentForm ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.government_form")}
-              value={faction.governmentForm}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.government_form")}</Label>
+              <DisplayTextarea value={faction.governmentForm} />
+            </div>
+          )}
 
           {/* Rules and Laws */}
           {isEditing ? (
@@ -445,12 +445,12 @@ export function FactionDetailView({
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.rulesAndLaws && faction.rulesAndLaws.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.rules_and_laws")}
               items={faction.rulesAndLaws}
             />
-          ) : null}
+          )}
 
           {/* Main Resources */}
           {isEditing ? (
@@ -466,12 +466,12 @@ export function FactionDetailView({
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.mainResources && faction.mainResources.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.main_resources")}
               items={faction.mainResources}
             />
-          ) : null}
+          )}
 
           {/* Economy */}
           {isEditing ? (
@@ -491,12 +491,12 @@ export function FactionDetailView({
                 <span>{editData.economy?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.economy ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.economy")}
-              value={faction.economy}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.economy")}</Label>
+              <DisplayTextarea value={faction.economy} />
+            </div>
+          )}
 
           {/* Symbols and Secrets */}
           {isEditing ? (
@@ -520,12 +520,12 @@ export function FactionDetailView({
                 <span>{editData.symbolsAndSecrets?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.symbolsAndSecrets ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.symbols_and_secrets")}
-              value={faction.symbolsAndSecrets}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.symbols_and_secrets")}</Label>
+              <DisplayTextarea value={faction.symbolsAndSecrets} />
+            </div>
+          )}
 
           {/* Currencies */}
           {isEditing ? (
@@ -539,12 +539,12 @@ export function FactionDetailView({
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.currencies && faction.currencies.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.currencies")}
               items={faction.currencies}
             />
-          ) : null}
+          )}
         </div>
       )}
 
@@ -575,7 +575,7 @@ export function FactionDetailView({
               onChange={(value) => onEditDataChange("dominatedAreas", value)}
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.dominatedAreas && faction.dominatedAreas.length > 0 ? (
+          ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.dominated_areas")}
               entities={(() => {
@@ -586,7 +586,7 @@ export function FactionDetailView({
                 })) as DisplayEntityItem[];
               })()}
             />
-          ) : null}
+          )}
 
           {/* Main Base */}
           {isEditing ? (
@@ -605,7 +605,7 @@ export function FactionDetailView({
               labelClassName="text-sm font-medium text-primary"
               maxSelections={1}
             />
-          ) : faction.mainBase && faction.mainBase.length > 0 ? (
+          ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.main_base")}
               entities={(() => {
@@ -616,7 +616,7 @@ export function FactionDetailView({
                 })) as DisplayEntityItem[];
               })()}
             />
-          ) : null}
+          )}
 
           {/* Areas of Interest */}
           {isEditing ? (
@@ -636,7 +636,7 @@ export function FactionDetailView({
               onChange={(value) => onEditDataChange("areasOfInterest", value)}
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.areasOfInterest && faction.areasOfInterest.length > 0 ? (
+          ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.areas_of_interest")}
               entities={(() => {
@@ -647,7 +647,7 @@ export function FactionDetailView({
                 })) as DisplayEntityItem[];
               })()}
             />
-          ) : null}
+          )}
         </div>
       )}
 
@@ -684,12 +684,19 @@ export function FactionDetailView({
             </div>
           ) : faction.factionMotto ? (
             <div className="space-y-1">
-              <Label className="text-sm font-medium">{t("faction-detail:fields.faction_motto")}</Label>
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.faction_motto")}</Label>
               <p className="text-sm italic whitespace-pre-wrap">
                 &quot;{faction.factionMotto}&quot;
               </p>
             </div>
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.faction_motto")}</Label>
+              <p className="text-sm italic text-muted-foreground/60">
+                {t("common:no_data")}
+              </p>
+            </div>
+          )}
 
           {/* Traditions and Rituals */}
           {isEditing ? (
@@ -707,12 +714,12 @@ export function FactionDetailView({
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.traditionsAndRituals && faction.traditionsAndRituals.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.traditions_and_rituals")}
               items={faction.traditionsAndRituals}
             />
-          ) : null}
+          )}
 
           {/* Beliefs and Values */}
           {isEditing ? (
@@ -730,12 +737,12 @@ export function FactionDetailView({
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.beliefsAndValues && faction.beliefsAndValues.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.beliefs_and_values")}
               items={faction.beliefsAndValues}
             />
-          ) : null}
+          )}
 
           {/* Languages Used */}
           {isEditing ? (
@@ -751,12 +758,12 @@ export function FactionDetailView({
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.languagesUsed && faction.languagesUsed.length > 0 ? (
+          ) : (
             <DisplayStringList
               label={t("faction-detail:fields.languages_used")}
               items={faction.languagesUsed}
             />
-          ) : null}
+          )}
 
           {/* Uniform and Aesthetics */}
           {isEditing ? (
@@ -780,12 +787,12 @@ export function FactionDetailView({
                 <span>{editData.uniformAndAesthetics?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.uniformAndAesthetics ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.uniform_and_aesthetics")}
-              value={faction.uniformAndAesthetics}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.uniform_and_aesthetics")}</Label>
+              <DisplayTextarea value={faction.uniformAndAesthetics} />
+            </div>
+          )}
 
           {/* Races */}
           {isEditing ? (
@@ -801,7 +808,7 @@ export function FactionDetailView({
               onChange={(value) => onEditDataChange("races", value)}
               labelClassName="text-sm font-medium text-primary"
             />
-          ) : faction.races && faction.races.length > 0 ? (
+          ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.races")}
               entities={(() => {
@@ -814,7 +821,7 @@ export function FactionDetailView({
                 }) as DisplayEntityItem[];
               })()}
             />
-          ) : null}
+          )}
         </div>
       )}
 
@@ -847,12 +854,12 @@ export function FactionDetailView({
                 <span>{editData.foundationDate?.length || 0}/200</span>
               </div>
             </div>
-          ) : faction.foundationDate ? (
-            <DisplayText
-              label={t("faction-detail:fields.foundation_date")}
-              value={faction.foundationDate}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.foundation_date")}</Label>
+              <DisplayText value={faction.foundationDate} />
+            </div>
+          )}
 
           {/* Foundation History Summary */}
           {isEditing ? (
@@ -878,12 +885,12 @@ export function FactionDetailView({
                 </span>
               </div>
             </div>
-          ) : faction.foundationHistorySummary ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.foundation_history_summary")}
-              value={faction.foundationHistorySummary}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.foundation_history_summary")}</Label>
+              <DisplayTextarea value={faction.foundationHistorySummary} />
+            </div>
+          )}
 
           {/* Founders */}
           {isEditing ? (
@@ -904,7 +911,7 @@ export function FactionDetailView({
                 labelClassName="text-sm font-medium text-primary"
               />
             </div>
-          ) : faction.founders && faction.founders.length > 0 ? (
+          ) : (
             <DisplayEntityList
               label={t("faction-detail:fields.founders")}
               entities={(() => {
@@ -923,7 +930,7 @@ export function FactionDetailView({
                 }) as DisplayEntityItem[];
               })()}
             />
-          ) : null}
+          )}
 
           {/* Alignment - in History section like create modal */}
           <div className="space-y-2">
@@ -967,22 +974,27 @@ export function FactionDetailView({
                 columns={3}
               />
             </div>
-          ) : faction.influence ? (
-            <DisplaySelectGrid
-              value={faction.influence}
-              options={FACTION_INFLUENCE_OPTIONS.map((opt) => ({
-                ...opt,
-                label: t(`create-faction:${opt.label}`),
-                description: opt.description
-                  ? t(`create-faction:${opt.description}`)
-                  : undefined,
-              }))}
-              emptyTitle={t("faction-detail:empty_states.no_influence")}
-              emptyDescription={t(
-                "faction-detail:empty_states.no_influence_hint"
-              )}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.influence")}
+              </Label>
+              <DisplaySelectGrid
+                value={faction.influence}
+                options={FACTION_INFLUENCE_OPTIONS.map((opt) => ({
+                  ...opt,
+                  label: t(`create-faction:${opt.label}`),
+                  description: opt.description
+                    ? t(`create-faction:${opt.description}`)
+                    : undefined,
+                }))}
+                emptyTitle={t("faction-detail:empty_states.no_influence")}
+                emptyDescription={t(
+                  "faction-detail:empty_states.no_influence_hint"
+                )}
+              />
+            </div>
+          )}
 
           {/* Public Reputation */}
           {isEditing ? (
@@ -1005,22 +1017,27 @@ export function FactionDetailView({
                 columns={3}
               />
             </div>
-          ) : faction.publicReputation ? (
-            <DisplaySelectGrid
-              value={faction.publicReputation}
-              options={FACTION_REPUTATION_OPTIONS.map((opt) => ({
-                ...opt,
-                label: t(`create-faction:${opt.label}`),
-                description: opt.description
-                  ? t(`create-faction:${opt.description}`)
-                  : undefined,
-              }))}
-              emptyTitle={t("faction-detail:empty_states.no_reputation")}
-              emptyDescription={t(
-                "faction-detail:empty_states.no_reputation_hint"
-              )}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-primary">
+                {t("faction-detail:fields.public_reputation")}
+              </Label>
+              <DisplaySelectGrid
+                value={faction.publicReputation}
+                options={FACTION_REPUTATION_OPTIONS.map((opt) => ({
+                  ...opt,
+                  label: t(`create-faction:${opt.label}`),
+                  description: opt.description
+                    ? t(`create-faction:${opt.description}`)
+                    : undefined,
+                }))}
+                emptyTitle={t("faction-detail:empty_states.no_reputation")}
+                emptyDescription={t(
+                  "faction-detail:empty_states.no_reputation_hint"
+                )}
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -1057,12 +1074,12 @@ export function FactionDetailView({
                 </span>
               </div>
             </div>
-          ) : faction.organizationObjectives ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.organization_objectives")}
-              value={faction.organizationObjectives}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.organization_objectives")}</Label>
+              <DisplayTextarea value={faction.organizationObjectives} />
+            </div>
+          )}
 
           {/* Narrative Importance */}
           {isEditing ? (
@@ -1086,12 +1103,12 @@ export function FactionDetailView({
                 <span>{editData.narrativeImportance?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.narrativeImportance ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.narrative_importance")}
-              value={faction.narrativeImportance}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.narrative_importance")}</Label>
+              <DisplayTextarea value={faction.narrativeImportance} />
+            </div>
+          )}
 
           {/* Inspirations */}
           {isEditing ? (
@@ -1115,12 +1132,12 @@ export function FactionDetailView({
                 <span>{editData.inspirations?.length || 0}/500</span>
               </div>
             </div>
-          ) : faction.inspirations ? (
-            <DisplayTextarea
-              label={t("faction-detail:fields.inspirations")}
-              value={faction.inspirations}
-            />
-          ) : null}
+          ) : (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium text-primary">{t("faction-detail:fields.inspirations")}</Label>
+              <DisplayTextarea value={faction.inspirations} />
+            </div>
+          )}
 
           {/* Power Sliders - in Narrative section like create modal */}
           <div className="space-y-2">
