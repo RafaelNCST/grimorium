@@ -4,7 +4,7 @@ import { DBPlotArc, DBPlotEvent } from "./types";
 
 import { getDB } from "./index";
 import { safeDBOperation } from "./safe-db-operation";
-import { safeParseEntityRefs } from "./safe-json-parse";
+import { safeParseStringArray, safeParseFieldVisibility } from "./safe-json-parse";
 
 // Convert IPlotArc to DBPlotArc
 function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
@@ -18,20 +18,23 @@ function arcToDBPlotArc(bookId: string, arc: IPlotArc): DBPlotArc {
     progress: arc.progress,
     status: arc.status,
     order_index: arc.order,
-    important_characters: arc.importantCharacters
+    important_characters: arc.importantCharacters && arc.importantCharacters.length > 0
       ? JSON.stringify(arc.importantCharacters)
       : undefined,
-    important_factions: arc.importantFactions
+    important_factions: arc.importantFactions && arc.importantFactions.length > 0
       ? JSON.stringify(arc.importantFactions)
       : undefined,
-    important_items: arc.importantItems
+    important_items: arc.importantItems && arc.importantItems.length > 0
       ? JSON.stringify(arc.importantItems)
       : undefined,
-    important_regions: arc.importantRegions
+    important_regions: arc.importantRegions && arc.importantRegions.length > 0
       ? JSON.stringify(arc.importantRegions)
       : undefined,
     arc_message: arc.arcMessage,
     world_impact: arc.worldImpact,
+    field_visibility: arc.fieldVisibility
+      ? JSON.stringify(arc.fieldVisibility)
+      : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -49,12 +52,13 @@ function dbPlotArcToArc(dbArc: DBPlotArc, events: IPlotEvent[]): IPlotArc {
     status: dbArc.status as IPlotArc["status"],
     order: dbArc.order_index,
     events,
-    importantCharacters: safeParseEntityRefs(dbArc.important_characters),
-    importantFactions: safeParseEntityRefs(dbArc.important_factions),
-    importantItems: safeParseEntityRefs(dbArc.important_items),
-    importantRegions: safeParseEntityRefs(dbArc.important_regions),
+    importantCharacters: safeParseStringArray(dbArc.important_characters),
+    importantFactions: safeParseStringArray(dbArc.important_factions),
+    importantItems: safeParseStringArray(dbArc.important_items),
+    importantRegions: safeParseStringArray(dbArc.important_regions),
     arcMessage: dbArc.arc_message,
     worldImpact: dbArc.world_impact,
+    fieldVisibility: safeParseFieldVisibility(dbArc.field_visibility),
   };
 }
 
@@ -140,8 +144,8 @@ export async function createPlotArc(
       `INSERT INTO plot_arcs (
         id, book_id, name, size, focus, description, progress, status,
         order_index, important_characters, important_factions, important_items,
-        important_regions, arc_message, world_impact, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+        important_regions, arc_message, world_impact, field_visibility, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
       [
         dbArc.id,
         dbArc.book_id,
@@ -158,6 +162,7 @@ export async function createPlotArc(
         dbArc.important_regions,
         dbArc.arc_message,
         dbArc.world_impact,
+        dbArc.field_visibility,
         dbArc.created_at,
         dbArc.updated_at,
       ]
@@ -228,19 +233,19 @@ export async function updatePlotArc(
       importantCharacters:
         updates.importantCharacters !== undefined
           ? updates.importantCharacters
-          : safeParseEntityRefs(currentArc.important_characters),
+          : safeParseStringArray(currentArc.important_characters),
       importantFactions:
         updates.importantFactions !== undefined
           ? updates.importantFactions
-          : safeParseEntityRefs(currentArc.important_factions),
+          : safeParseStringArray(currentArc.important_factions),
       importantItems:
         updates.importantItems !== undefined
           ? updates.importantItems
-          : safeParseEntityRefs(currentArc.important_items),
+          : safeParseStringArray(currentArc.important_items),
       importantRegions:
         updates.importantRegions !== undefined
           ? updates.importantRegions
-          : safeParseEntityRefs(currentArc.important_regions),
+          : safeParseStringArray(currentArc.important_regions),
       arcMessage:
         updates.arcMessage !== undefined
           ? updates.arcMessage
@@ -249,6 +254,10 @@ export async function updatePlotArc(
         updates.worldImpact !== undefined
           ? updates.worldImpact
           : currentArc.world_impact,
+      fieldVisibility:
+        updates.fieldVisibility !== undefined
+          ? updates.fieldVisibility
+          : safeParseFieldVisibility(currentArc.field_visibility),
     };
 
     const dbArc = arcToDBPlotArc(currentArc.book_id, fullArc);
@@ -259,8 +268,8 @@ export async function updatePlotArc(
         name = $1, size = $2, focus = $3, description = $4, progress = $5,
         status = $6, order_index = $7, important_characters = $8,
         important_factions = $9, important_items = $10, important_regions = $11,
-        arc_message = $12, world_impact = $13, updated_at = $14
-      WHERE id = $15`,
+        arc_message = $12, world_impact = $13, field_visibility = $14, updated_at = $15
+      WHERE id = $16`,
       [
         dbArc.name,
         dbArc.size,
@@ -275,6 +284,7 @@ export async function updatePlotArc(
         dbArc.important_regions,
         dbArc.arc_message,
         dbArc.world_impact,
+        dbArc.field_visibility,
         dbArc.updated_at,
         arcId,
       ]

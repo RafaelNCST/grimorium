@@ -349,6 +349,14 @@ export function RegionDetail() {
           // Update refs
           sectionVisibilityRef.current = loadedSectionVisibility;
 
+          // Load timeline from the region data
+          const loadedTimeline = safeJsonParse<ITimelineEra[]>(
+            regionFromDB.timeline,
+            []
+          );
+          setTimeline(loadedTimeline);
+          setOriginalTimeline(loadedTimeline);
+
           // Load all regions from the same book
           if (dashboardId) {
             const allRegionsFromBook = await getRegionsByBookId(dashboardId);
@@ -570,6 +578,8 @@ export function RegionDetail() {
         inspirations: ensureJsonString(updatedRegion.inspirations),
         // Visibility preferences
         sectionVisibility: JSON.stringify(currentSectionVisibility),
+        // Timeline data
+        timeline: JSON.stringify(timeline),
       };
 
       // Update the region in database

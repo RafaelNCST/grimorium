@@ -100,6 +100,34 @@ CREATE TABLE IF NOT EXISTS regions (
   order_index INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL,
+
+  -- Environment fields
+  climate TEXT,
+  current_season TEXT,
+  custom_season_name TEXT,
+  general_description TEXT,
+  region_anomalies TEXT,
+
+  -- Information fields
+  resident_factions TEXT,
+  dominant_factions TEXT,
+  important_characters TEXT,
+  races_found TEXT,
+  items_found TEXT,
+
+  -- Narrative fields
+  narrative_purpose TEXT,
+  unique_characteristics TEXT,
+  political_importance TEXT,
+  religious_importance TEXT,
+  world_perception TEXT,
+  region_mysteries TEXT,
+  inspirations TEXT,
+
+  -- Metadata
+  section_visibility TEXT,
+  timeline TEXT,
+
   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
   FOREIGN KEY (parent_id) REFERENCES regions(id) ON DELETE SET NULL
 );
@@ -220,3 +248,42 @@ CREATE INDEX IF NOT EXISTS idx_gallery_items_order ON gallery_items(book_id, ord
 CREATE INDEX IF NOT EXISTS idx_gallery_links_item_id ON gallery_links(gallery_item_id);
 CREATE INDEX IF NOT EXISTS idx_gallery_links_entity ON gallery_links(entity_id, entity_type);
 CREATE INDEX IF NOT EXISTS idx_gallery_links_entity_type ON gallery_links(entity_type);
+
+-- ARCOS NARRATIVOS
+CREATE TABLE IF NOT EXISTS plot_arcs (
+  id TEXT PRIMARY KEY,
+  book_id TEXT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  size TEXT NOT NULL,
+  focus TEXT NOT NULL,
+  description TEXT NOT NULL,
+  progress REAL DEFAULT 0,
+  status TEXT NOT NULL,
+  order_index INTEGER NOT NULL DEFAULT 0,
+  important_characters TEXT,
+  important_factions TEXT,
+  important_items TEXT,
+  important_regions TEXT,
+  arc_message TEXT,
+  world_impact TEXT,
+  field_visibility TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- EVENTOS DO ARCO
+CREATE TABLE IF NOT EXISTS plot_events (
+  id TEXT PRIMARY KEY,
+  arc_id TEXT NOT NULL REFERENCES plot_arcs(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  completed INTEGER DEFAULT 0,
+  order_index INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL
+);
+
+-- ÍNDICES PARA ARCOS E EVENTOS
+CREATE INDEX IF NOT EXISTS idx_plot_arcs_book_id ON plot_arcs(book_id);
+CREATE INDEX IF NOT EXISTS idx_plot_arcs_order ON plot_arcs(book_id, order_index);
+CREATE INDEX IF NOT EXISTS idx_plot_events_arc_id ON plot_events(arc_id);
+CREATE INDEX IF NOT EXISTS idx_plot_events_order ON plot_events(arc_id, order_index);

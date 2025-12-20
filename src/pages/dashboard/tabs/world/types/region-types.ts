@@ -91,6 +91,10 @@ export interface IRegion {
   // Visibility configuration
   /** Section visibility configuration for special sections (timeline, map, etc.) */
   sectionVisibility?: string;
+
+  // Timeline data
+  /** Timeline data (JSON string) */
+  timeline?: string;
 }
 
 /**

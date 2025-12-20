@@ -14,12 +14,18 @@ interface PropsPlotArcChapterMetricsSection {
   bookId: string;
   plotArcId: string;
   onChapterClick: (chapterId: string) => void;
+  /** Callback when metrics are loaded */
+  onMetricsLoad?: (hasMetrics: boolean) => void;
+  /** If in edit mode, show InfoAlert instead of null */
+  isEditMode?: boolean;
 }
 
 export function PlotArcChapterMetricsSection({
   bookId,
   plotArcId,
   onChapterClick: _onChapterClick,
+  onMetricsLoad,
+  isEditMode = false,
 }: PropsPlotArcChapterMetricsSection) {
   const { t } = useTranslation("chapter-metrics");
 
@@ -30,6 +36,7 @@ export function PlotArcChapterMetricsSection({
     async function loadMetrics() {
       if (!bookId) {
         setIsLoading(false);
+        onMetricsLoad?.(false);
         return;
       }
 
@@ -37,15 +44,19 @@ export function PlotArcChapterMetricsSection({
         setIsLoading(true);
         const data = await getPlotArcChapterMetrics(bookId, plotArcId);
         setMetrics(data);
+        const hasMetrics = data && data.totalChapters > 0;
+        onMetricsLoad?.(hasMetrics);
       } catch (error) {
         console.error("Failed to load plot arc chapter metrics:", error);
         setMetrics(null);
+        onMetricsLoad?.(false);
       } finally {
         setIsLoading(false);
       }
     }
 
     loadMetrics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId, plotArcId]);
 
   if (!bookId) {
@@ -63,7 +74,9 @@ export function PlotArcChapterMetricsSection({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : !metrics || metrics.totalChapters === 0 ? (
-        <InfoAlert>{t("plot_section.no_chapters")}</InfoAlert>
+        isEditMode ? (
+          <InfoAlert>{t("plot_section.no_chapters")}</InfoAlert>
+        ) : null
       ) : (
         <div className="space-y-6">
           {/* Total Chapters - Highlighted */}

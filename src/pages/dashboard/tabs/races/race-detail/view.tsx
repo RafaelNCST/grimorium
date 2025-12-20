@@ -1153,7 +1153,7 @@ export function RaceDetailView({
       emptyDescription: t("race-detail:empty_states.no_relationships_hint"),
       addButtonLabel: t("race-detail:relationships.add_relationship"),
       onAddClick: () => setIsAddRelationshipDialogOpen(true),
-      blockedEntityName: t("race-detail:relationships.entity_name_plural"),
+      blockedEntityName: "races",
     },
     {
       id: "chapter-metrics",

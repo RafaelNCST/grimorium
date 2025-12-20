@@ -610,6 +610,33 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists or other error - safe to ignore
     }
 
+    // Add important_characters column to plot_arcs if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE plot_arcs ADD COLUMN important_characters TEXT"
+      );
+    } catch (_error) {
+      // Column already exists or other error - safe to ignore
+    }
+
+    // Add important_factions column to plot_arcs if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE plot_arcs ADD COLUMN important_factions TEXT"
+      );
+    } catch (_error) {
+      // Column already exists or other error - safe to ignore
+    }
+
+    // Add field_visibility column to plot_arcs if it doesn't exist
+    try {
+      await database.execute(
+        "ALTER TABLE plot_arcs ADD COLUMN field_visibility TEXT"
+      );
+    } catch (_error) {
+      // Column already exists or other error - safe to ignore
+    }
+
     // Add icon_image column to power_systems if it doesn't exist
     try {
       await database.execute(
@@ -767,6 +794,14 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add timeline field to regions table
+    try {
+      await database.execute(
+        "ALTER TABLE regions ADD COLUMN timeline TEXT"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
 
     // Add description column to race_relationships table
     try {

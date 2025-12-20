@@ -19,6 +19,7 @@
   },
   "plot_section": {
     "title": "Métricas de capítulo",
+    "empty_state_title": "Nenhum capítulo encontrado",
     "no_chapters": "Nenhum capítulo está vinculado a este arco de enredo.",
     "total_chapters": "Total de capítulos",
     "chapter_singular": "capítulo",

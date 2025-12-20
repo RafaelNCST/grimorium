@@ -19,6 +19,7 @@
   },
   "plot_section": {
     "title": "Chapter Metrics",
+    "empty_state_title": "No chapters found",
     "no_chapters": "No chapters are linked to this plot arc.",
     "total_chapters": "Total chapters",
     "chapter_singular": "chapter",

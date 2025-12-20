@@ -28,6 +28,7 @@ import {
   X,
   Check,
   RotateCcw,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -328,6 +329,9 @@ export function PlotArcDetailView({
   // Chapter Metrics Section state - managed locally in view (appropriate for this entity)
   const [chapterMetricsSectionOpen, setChapterMetricsSectionOpen] =
     useState(false);
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -680,7 +684,7 @@ export function PlotArcDetailView({
 
                     {/* Summary */}
                     <div>
-                      <Label className="text-sm font-medium text-muted-foreground">
+                      <Label className="text-sm font-medium text-primary">
                         {t("plot:fields.summary")}
                       </Label>
                       <p className="mt-1 text-foreground whitespace-pre-wrap">
@@ -690,7 +694,7 @@ export function PlotArcDetailView({
 
                     {/* Focus */}
                     <div>
-                      <Label className="text-sm font-medium text-muted-foreground">
+                      <Label className="text-sm font-medium text-primary">
                         {t("create-plot-arc:modal.arc_focus")}
                       </Label>
                       <p className="mt-1 text-foreground">{arc.focus}</p>
@@ -699,7 +703,7 @@ export function PlotArcDetailView({
                     {/* Progress */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">
+                        <span className="font-medium text-primary">
                           {t("plot:detail.progress")}
                         </span>
                         <span className="text-sm text-muted-foreground">
@@ -1024,14 +1028,23 @@ export function PlotArcDetailView({
               </CollapsibleSection>
             )}
 
-            {/* Chapter Metrics Section - Only visible in view mode */}
-            {!isEditing && (
+            {/* Chapter Metrics Section */}
+            {(isEditing || fieldVisibility["chapterMetrics"] !== false) && (
               <CollapsibleSection
                 title={t("chapter-metrics:plot_section.title")}
                 isOpen={chapterMetricsSectionOpen}
                 onToggle={() =>
                   setChapterMetricsSectionOpen(!chapterMetricsSectionOpen)
                 }
+                isEditMode={isEditing}
+                isVisible={fieldVisibility["chapterMetrics"] !== false}
+                onVisibilityToggle={() => onFieldVisibilityToggle("chapterMetrics")}
+                emptyState={
+                  !isEditing && hasChapterMetrics === false ? "empty-view" : null
+                }
+                emptyIcon={BookOpen}
+                emptyTitle={t("chapter-metrics:plot_section.empty_state_title")}
+                emptyDescription={t("chapter-metrics:plot_section.no_chapters")}
               >
                 <PlotArcChapterMetricsSection
                   bookId={bookId}
@@ -1039,6 +1052,8 @@ export function PlotArcDetailView({
                   onChapterClick={(chapterId) =>
                     (window.location.href = `/dashboard/chapters/${chapterId}`)
                   }
+                  onMetricsLoad={setHasChapterMetrics}
+                  isEditMode={isEditing}
                 />
               </CollapsibleSection>
             )}

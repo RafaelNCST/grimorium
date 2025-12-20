@@ -275,6 +275,7 @@ export interface DBPlotArc {
   important_regions?: string; // JSON array string
   arc_message?: string;
   world_impact?: string;
+  field_visibility?: string; // JSON object string
   created_at: number;
   updated_at: number;
 }
