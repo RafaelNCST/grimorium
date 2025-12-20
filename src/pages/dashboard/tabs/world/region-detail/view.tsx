@@ -8,6 +8,7 @@ import {
   Clock,
   Image,
   Map as MapIcon,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -88,6 +89,9 @@ interface RegionDetailViewProps {
   // Visibility
   sectionVisibility: ISectionVisibility;
   onSectionVisibilityToggle: (sectionName: string) => void;
+  // Chapter metrics
+  hasChapterMetrics: boolean | null;
+  setHasChapterMetrics: (value: boolean | null) => void;
   onBack: () => void;
   onViewMap: () => void;
   onNavigationSidebarToggle: () => void;
@@ -130,6 +134,8 @@ export function RegionDetailView({
   missingFields,
   sectionVisibility,
   onSectionVisibilityToggle,
+  hasChapterMetrics,
+  setHasChapterMetrics,
   onBack,
   onViewMap,
   onNavigationSidebarToggle,
@@ -248,7 +254,6 @@ export function RegionDetailView({
                 value={imagePreview}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("region-detail:fields.image")}
-                helperText="opcional"
                 height="h-[28rem]"
                 shape="rounded"
                 placeholderIcon={MapIcon}
@@ -423,7 +428,7 @@ export function RegionDetailView({
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">
             {region.summary || (
               <span className="italic text-muted-foreground/60">
-                Não especificado
+                {t("common:no_data")}
               </span>
             )}
           </p>
@@ -497,7 +502,7 @@ export function RegionDetailView({
                           season.value === "custom" && region.customSeasonName
                             ? region.customSeasonName
                             : t(`world:seasons.${season.value}`),
-                        description: season.description,
+                        description: t(season.description),
                         icon: season.icon,
                         backgroundColor:
                           season.value === "spring"
@@ -1238,30 +1243,34 @@ export function RegionDetailView({
                 addButtonLabel: t("empty-states:timeline.create_first_era"),
                 onAddClick: () => setIsCreateEraDialogOpen(true),
               },
-              // Chapter Metrics section (only visible in view mode)
-              ...(!isEditing
-                ? [
-                    {
-                      id: "chapter-metrics",
-                      title: t("chapter-metrics:entity_section.title"),
-                      content: (
-                        <EntityChapterMetricsSection
-                          bookId={bookId}
-                          entityId={region.id}
-                          entityType="region"
-                          onChapterClick={(chapterId) =>
-                            navigate({
-                              to: "/dashboard/$dashboardId/chapters/$chapterId",
-                              params: { dashboardId: bookId, chapterId },
-                            })
-                          }
-                        />
-                      ),
-                      isCollapsible: true,
-                      defaultOpen: false,
-                    },
-                  ]
-                : []),
+              // Chapter Metrics section
+              {
+                id: "chapter-metrics",
+                title: t("chapter-metrics:entity_section.title"),
+                content: (
+                  <EntityChapterMetricsSection
+                    bookId={bookId}
+                    entityId={region.id}
+                    entityType="region"
+                    isEditMode={isEditing}
+                    onMetricsLoad={setHasChapterMetrics}
+                    onChapterClick={(chapterId) =>
+                      navigate({
+                        to: "/dashboard/$dashboardId/chapters/$chapterId",
+                        params: { dashboardId: bookId, chapterId },
+                      })
+                    }
+                  />
+                ),
+                isCollapsible: true,
+                defaultOpen: false,
+                isVisible: sectionVisibility["chapter-metrics"] !== false,
+                onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
+                emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+                emptyIcon: BookOpen,
+                emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
+                emptyDescription: t("chapter-metrics:entity_section.no_mentions.region"),
+              },
             ]}
           />
         </div>

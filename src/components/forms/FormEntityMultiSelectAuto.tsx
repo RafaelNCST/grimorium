@@ -422,8 +422,25 @@ export function FormEntityMultiSelectAuto({
 
       {/* No options available */}
       {options.length === 0 ? (
-        <div className="h-[168px] flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20">
-          <p className="text-sm">{emptyText}</p>
+        <div className="h-[168px] flex flex-col items-center justify-center text-center text-muted-foreground border border-dashed border-border rounded-lg bg-muted/20 px-4">
+          <p className="text-sm font-medium mb-1">
+            {t(
+              entityType === "character" || entityType === "item"
+                ? `entity_empty_state.${entityType}.none_registered_m`
+                : `entity_empty_state.${entityType}.none_registered_f`
+            )}
+          </p>
+          <p className="text-xs">
+            {t(`entity_empty_state.${entityType}.go_to_tab`)}{" "}
+            <span className="font-semibold text-primary">
+              {t(`entity_empty_state.${entityType}.tab_name`)}
+            </span>{" "}
+            {t(
+              entityType === "character" || entityType === "item"
+                ? `entity_empty_state.${entityType}.to_create_m`
+                : `entity_empty_state.${entityType}.to_create_f`
+            )}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">

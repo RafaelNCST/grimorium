@@ -223,5 +223,19 @@
   },
   "sidebar": {
     "title": "Regions"
+  },
+  "marker_colors": {
+    "purple": "Purple",
+    "blue": "Blue",
+    "green": "Green",
+    "red": "Red",
+    "yellow": "Yellow",
+    "pink": "Pink",
+    "orange": "Orange",
+    "cyan": "Cyan",
+    "indigo": "Indigo",
+    "lime": "Lime",
+    "white": "White",
+    "black": "Black"
   }
 }

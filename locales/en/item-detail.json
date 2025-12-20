@@ -39,7 +39,10 @@
     "usage_requirements": "Usage Requirements",
     "usage_consequences": "Usage Consequences",
     "alternative_names": "Alternative Names",
-    "item_usage": "Item Usage"
+    "item_usage": "Item Usage",
+    "optional": "optional",
+    "also_known_as": "Also known as",
+    "no_data": "No data"
   },
   "placeholders": {
     "alternative_name": "Enter an alternative name...",

@@ -192,7 +192,7 @@ export function RegionSuperView({
                   season.value === "custom" && region.customSeasonName
                     ? region.customSeasonName
                     : t(`world:seasons.${season.value}`),
-                description: season.description,
+                description: t(season.description),
                 icon: season.icon,
                 backgroundColor:
                   season.value === "spring"

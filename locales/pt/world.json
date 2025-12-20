@@ -223,5 +223,19 @@
   },
   "sidebar": {
     "title": "Regiões"
+  },
+  "marker_colors": {
+    "purple": "Roxo",
+    "blue": "Azul",
+    "green": "Verde",
+    "red": "Vermelho",
+    "yellow": "Amarelo",
+    "pink": "Rosa",
+    "orange": "Laranja",
+    "cyan": "Ciano",
+    "indigo": "Índigo",
+    "lime": "Lima",
+    "white": "Branco",
+    "black": "Preto"
   }
 }

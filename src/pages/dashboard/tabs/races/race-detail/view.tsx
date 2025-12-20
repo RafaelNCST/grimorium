@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { Dna, Users, Image, AlertCircle } from "lucide-react";
+import { Dna, Users, Image, AlertCircle, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -83,6 +83,8 @@ interface RaceDetailViewProps {
   validateField?: (field: string, value: any) => void;
   openSections: Record<string, boolean>;
   toggleSection: (sectionName: string) => void;
+  hasChapterMetrics: boolean | null;
+  setHasChapterMetrics: (value: boolean | null) => void;
 }
 
 // Helper component for empty state
@@ -127,6 +129,8 @@ export function RaceDetailView({
   validateField,
   openSections: _openSections,
   toggleSection: _toggleSection,
+  hasChapterMetrics,
+  setHasChapterMetrics,
 }: RaceDetailViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { t } = useTranslation(["race-detail", "create-race"] as any);
@@ -151,7 +155,6 @@ export function RaceDetailView({
               value={imagePreview}
               onChange={(value) => onEditDataChange("image", value)}
               label={t("race-detail:fields.image")}
-              helperText="opcional"
               height="h-96"
               shape="rounded"
               imageFit="cover"
@@ -1152,30 +1155,33 @@ export function RaceDetailView({
       onAddClick: () => setIsAddRelationshipDialogOpen(true),
       blockedEntityName: t("race-detail:relationships.entity_name_plural"),
     },
-    // Chapter Metrics section (only visible in view mode)
-    ...(!isEditing
-      ? [
-          {
-            id: "chapter-metrics",
-            title: t("chapter-metrics:entity_section.title"),
-            content: (
-              <EntityChapterMetricsSection
-                bookId={bookId}
-                entityId={race.id}
-                entityType="race"
-                onChapterClick={(chapterId) =>
-                  navigate({
-                    to: "/dashboard/$dashboardId/chapters/$chapterId",
-                    params: { dashboardId: bookId, chapterId },
-                  })
-                }
-              />
-            ),
-            isCollapsible: true,
-            defaultOpen: false,
-          },
-        ]
-      : []),
+    {
+      id: "chapter-metrics",
+      title: t("chapter-metrics:entity_section.title"),
+      content: (
+        <EntityChapterMetricsSection
+          bookId={bookId}
+          entityId={race.id}
+          entityType="race"
+          isEditMode={isEditing}
+          onMetricsLoad={setHasChapterMetrics}
+          onChapterClick={(chapterId) =>
+            navigate({
+              to: "/dashboard/$dashboardId/chapters/$chapterId",
+              params: { dashboardId: bookId, chapterId },
+            })
+          }
+        />
+      ),
+      isCollapsible: true,
+      defaultOpen: false,
+      isVisible: sectionVisibility["chapter-metrics"] !== false,
+      onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
+      emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+      emptyIcon: BookOpen,
+      emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
+      emptyDescription: t("chapter-metrics:entity_section.no_mentions.race"),
+    },
   ];
 
   // Field names for missing fields display

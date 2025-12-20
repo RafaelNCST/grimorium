@@ -312,18 +312,12 @@ export function RegionTimeline({
     setShowEventModal(false);
   };
 
-  const getCharacterName = (id: string) =>
-    characters.find((c) => c.id === id)?.name ||
-    t("errors:not_found.character");
-
-  const getFactionName = (id: string) =>
-    factions.find((f) => f.id === id)?.name || t("errors:not_found.faction");
-
-  const getRaceName = (id: string) =>
-    races.find((r) => r.id === id)?.name || t("errors:not_found.race");
-
-  const getItemName = (id: string) =>
-    items.find((i) => i.id === id)?.name || t("errors:not_found.item");
+  // TODO: Implement proper entity name fetching
+  // For now, we display IDs as entity data is not available in this component
+  const getCharacterName = (id: string) => id;
+  const getFactionName = (id: string) => id;
+  const getRaceName = (id: string) => id;
+  const getItemName = (id: string) => id;
 
   // Detectar se há scroll no modal de criar era
   useEffect(() => {
@@ -785,7 +779,7 @@ export function RegionTimeline({
                     onChange={(e) =>
                       setNewEvent((prev) => ({ ...prev, name: e.target.value }))
                     }
-                    placeholder="A Grande Convergência"
+                    placeholder={t("forms:placeholders.region_event_name")}
                     maxLength={200}
                   />
                   <div className="flex justify-end text-xs text-muted-foreground">
@@ -879,7 +873,7 @@ export function RegionTimeline({
                           startDate: e.target.value,
                         }))
                       }
-                      placeholder="50 EP"
+                      placeholder={t("forms:placeholders.region_event_start_date")}
                       maxLength={50}
                     />
                     <div className="flex justify-end text-xs text-muted-foreground">
@@ -899,7 +893,7 @@ export function RegionTimeline({
                           endDate: e.target.value,
                         }))
                       }
-                      placeholder="52 EP"
+                      placeholder={t("forms:placeholders.region_event_end_date")}
                       maxLength={50}
                     />
                     <div className="flex justify-end text-xs text-muted-foreground">
@@ -1151,7 +1145,7 @@ export function RegionTimeline({
                   onChange={(e) =>
                     setNewEra((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="Era dos Primórdios"
+                  placeholder={t("forms:placeholders.region_era_name")}
                   maxLength={200}
                 />
               </div>
@@ -1175,7 +1169,7 @@ export function RegionTimeline({
                       description: e.target.value,
                     }))
                   }
-                  placeholder="Um tempo de trevas e descobertas, onde as primeiras civilizações começaram a surgir das cinzas do caos"
+                  placeholder={t("forms:placeholders.region_era_description")}
                   rows={2}
                   maxLength={500}
                   className="resize-none"
@@ -1202,7 +1196,7 @@ export function RegionTimeline({
                         startDate: e.target.value,
                       }))
                     }
-                    placeholder="0 EP"
+                    placeholder={t("forms:placeholders.region_era_start_date")}
                     maxLength={50}
                   />
                 </div>
@@ -1222,7 +1216,7 @@ export function RegionTimeline({
                     onChange={(e) =>
                       setNewEra((prev) => ({ ...prev, endDate: e.target.value }))
                     }
-                    placeholder="1000 EP"
+                    placeholder={t("forms:placeholders.region_era_end_date")}
                     maxLength={50}
                   />
                 </div>
@@ -1302,7 +1296,7 @@ export function RegionTimeline({
                 onChange={(e) =>
                   setNewEvent((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="A Grande Convergência"
+                placeholder={t("forms:placeholders.region_event_name")}
                 maxLength={200}
               />
               <div className="flex justify-end text-xs text-muted-foreground">
@@ -1324,7 +1318,7 @@ export function RegionTimeline({
                     description: e.target.value,
                   }))
                 }
-                placeholder="Durante três noites, o céu ficou vermelho e as cinco luas do planeta se alinharam pela primeira vez em mil anos. Portais se abriram trazendo criaturas de outros planos"
+                placeholder={t("forms:placeholders.region_event_description")}
                 rows={4}
                 maxLength={500}
                 className="resize-none"
@@ -1346,7 +1340,7 @@ export function RegionTimeline({
                   onChange={(e) =>
                     setNewEvent((prev) => ({ ...prev, reason: e.target.value }))
                   }
-                  placeholder="O ritual proibido realizado pelos magos do Conselho Cinzento rompeu o véu entre os planos"
+                  placeholder={t("forms:placeholders.region_event_reason")}
                   rows={2}
                   maxLength={500}
                   className="resize-none"
@@ -1369,7 +1363,7 @@ export function RegionTimeline({
                       outcome: e.target.value,
                     }))
                   }
-                  placeholder="Os heróis conseguiram fechar os portais, mas não antes de metade da cidade ser destruída"
+                  placeholder={t("forms:placeholders.region_event_outcome")}
                   rows={2}
                   maxLength={500}
                   className="resize-none"
@@ -1395,7 +1389,7 @@ export function RegionTimeline({
                       startDate: e.target.value,
                     }))
                   }
-                  placeholder="50 EP"
+                  placeholder={t("forms:placeholders.region_event_start_date")}
                   maxLength={50}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
@@ -1416,7 +1410,7 @@ export function RegionTimeline({
                       endDate: e.target.value,
                     }))
                   }
-                  placeholder="52 EP"
+                  placeholder={t("forms:placeholders.region_event_end_date")}
                   maxLength={50}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
@@ -1570,7 +1564,7 @@ export function RegionTimeline({
                     onChange={(e) =>
                       setEditEra((prev) => ({ ...prev, name: e.target.value }))
                     }
-                    placeholder="Era dos Primórdios"
+                    placeholder={t("forms:placeholders.region_era_name")}
                     maxLength={200}
                   />
                 </div>
@@ -1594,7 +1588,7 @@ export function RegionTimeline({
                         description: e.target.value,
                       }))
                     }
-                    placeholder="Um tempo de trevas e descobertas, onde as primeiras civilizações começaram a surgir das cinzas do caos"
+                    placeholder={t("forms:placeholders.region_era_description")}
                     rows={2}
                     maxLength={500}
                     className="resize-none"
@@ -1621,7 +1615,7 @@ export function RegionTimeline({
                           startDate: e.target.value,
                         }))
                       }
-                      placeholder="0 EP"
+                      placeholder={t("forms:placeholders.region_era_start_date")}
                       maxLength={50}
                     />
                   </div>
@@ -1641,7 +1635,7 @@ export function RegionTimeline({
                       onChange={(e) =>
                         setEditEra((prev) => ({ ...prev, endDate: e.target.value }))
                       }
-                      placeholder="1000 EP"
+                      placeholder={t("forms:placeholders.region_era_end_date")}
                       maxLength={50}
                     />
                   </div>

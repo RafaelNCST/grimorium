@@ -5,10 +5,46 @@
     "max_selections_reached": "Máximo de {{max}} seleção(ões) atingido",
     "all_options_selected": "Todas as opções foram selecionadas"
   },
+  "entity_empty_state": {
+    "character": {
+      "none_registered_m": "Nenhum personagem registrado",
+      "go_to_tab": "Vá para a aba",
+      "to_create_m": "para criar um",
+      "tab_name": "Personagens"
+    },
+    "faction": {
+      "none_registered_f": "Nenhuma facção registrada",
+      "go_to_tab": "Vá para a aba",
+      "to_create_f": "para criar uma",
+      "tab_name": "Facções"
+    },
+    "race": {
+      "none_registered_f": "Nenhuma raça registrada",
+      "go_to_tab": "Vá para a aba",
+      "to_create_f": "para criar uma",
+      "tab_name": "Raças"
+    },
+    "item": {
+      "none_registered_m": "Nenhum item registrado",
+      "go_to_tab": "Vá para a aba",
+      "to_create_m": "para criar um",
+      "tab_name": "Itens"
+    },
+    "region": {
+      "none_registered_f": "Nenhuma região registrada",
+      "go_to_tab": "Vá para a aba",
+      "to_create_f": "para criar uma",
+      "tab_name": "Mundo"
+    }
+  },
   "form_image": {
     "add_image": "Adicionar Imagem"
   },
   "empty_field": "Não especificado",
+  "loading": "Carregando...",
+  "no_data": "Sem dados",
+  "basic_info": "Informações Básicas",
+  "advanced_info": "Informações Avançadas",
   "tooltips": {
     "quick_navigation": "Navegação Rápida",
     "edit": "Editar",

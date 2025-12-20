@@ -9,6 +9,7 @@ import {
   Settings,
   Image,
   AlertCircle,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -80,6 +81,8 @@ interface FactionDetailViewProps {
   validateField: (field: string, value: unknown) => void;
   hasRequiredFieldsEmpty: boolean;
   missingFields: string[];
+  hasChapterMetrics: boolean | null;
+  setHasChapterMetrics: (value: boolean | null) => void;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -119,6 +122,8 @@ export function FactionDetailView({
   validateField,
   hasRequiredFieldsEmpty,
   missingFields,
+  hasChapterMetrics,
+  setHasChapterMetrics,
   onBack,
   onNavigationSidebarToggle,
   onNavigationSidebarClose,
@@ -138,6 +143,7 @@ export function FactionDetailView({
     "faction-detail",
     "create-faction",
     "empty-states",
+    "chapter-metrics",
   ]);
 
   // State for controlling dialogs from empty state buttons
@@ -232,7 +238,6 @@ export function FactionDetailView({
                 value={imagePreview}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("faction-detail:fields.image")}
-                helperText="opcional"
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"
@@ -402,7 +407,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.government_form")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.governmentForm || ""}
@@ -440,7 +444,6 @@ export function FactionDetailView({
               maxLength={200}
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.rulesAndLaws && faction.rulesAndLaws.length > 0 ? (
             <DisplayStringList
@@ -462,7 +465,6 @@ export function FactionDetailView({
               maxLength={50}
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.mainResources && faction.mainResources.length > 0 ? (
             <DisplayStringList
@@ -476,7 +478,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.economy")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.economy || ""}
@@ -502,7 +503,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.symbols_and_secrets")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.symbolsAndSecrets || ""}
@@ -538,7 +538,6 @@ export function FactionDetailView({
               maxLength={50}
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.currencies && faction.currencies.length > 0 ? (
             <DisplayStringList
@@ -575,7 +574,6 @@ export function FactionDetailView({
               value={editData.dominatedAreas || []}
               onChange={(value) => onEditDataChange("dominatedAreas", value)}
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.dominatedAreas && faction.dominatedAreas.length > 0 ? (
             <DisplayEntityList
@@ -606,7 +604,6 @@ export function FactionDetailView({
               onChange={(value) => onEditDataChange("mainBase", value)}
               labelClassName="text-sm font-medium text-primary"
               maxSelections={1}
-              optionalLabel="opcional"
             />
           ) : faction.mainBase && faction.mainBase.length > 0 ? (
             <DisplayEntityList
@@ -638,7 +635,6 @@ export function FactionDetailView({
               value={editData.areasOfInterest || []}
               onChange={(value) => onEditDataChange("areasOfInterest", value)}
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.areasOfInterest && faction.areasOfInterest.length > 0 ? (
             <DisplayEntityList
@@ -669,7 +665,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.faction_motto")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.factionMotto || ""}
@@ -711,7 +706,6 @@ export function FactionDetailView({
               maxLength={200}
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.traditionsAndRituals && faction.traditionsAndRituals.length > 0 ? (
             <DisplayStringList
@@ -735,7 +729,6 @@ export function FactionDetailView({
               maxLength={200}
               inputSize="large"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.beliefsAndValues && faction.beliefsAndValues.length > 0 ? (
             <DisplayStringList
@@ -757,7 +750,6 @@ export function FactionDetailView({
               maxLength={50}
               inputSize="small"
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.languagesUsed && faction.languagesUsed.length > 0 ? (
             <DisplayStringList
@@ -771,7 +763,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.uniform_and_aesthetics")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.uniformAndAesthetics || ""}
@@ -809,7 +800,6 @@ export function FactionDetailView({
               value={editData.races || []}
               onChange={(value) => onEditDataChange("races", value)}
               labelClassName="text-sm font-medium text-primary"
-              optionalLabel="opcional"
             />
           ) : faction.races && faction.races.length > 0 ? (
             <DisplayEntityList
@@ -842,7 +832,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.foundation_date")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Input
                 value={editData.foundationDate || ""}
@@ -859,7 +848,10 @@ export function FactionDetailView({
               </div>
             </div>
           ) : faction.foundationDate ? (
-            <DisplayText value={faction.foundationDate} />
+            <DisplayText
+              label={t("faction-detail:fields.foundation_date")}
+              value={faction.foundationDate}
+            />
           ) : null}
 
           {/* Foundation History Summary */}
@@ -867,7 +859,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.foundation_history_summary")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.foundationHistorySummary || ""}
@@ -888,7 +879,10 @@ export function FactionDetailView({
               </div>
             </div>
           ) : faction.foundationHistorySummary ? (
-            <DisplayTextarea value={faction.foundationHistorySummary} />
+            <DisplayTextarea
+              label={t("faction-detail:fields.foundation_history_summary")}
+              value={faction.foundationHistorySummary}
+            />
           ) : null}
 
           {/* Founders */}
@@ -896,7 +890,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.founders")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <FormEntityMultiSelectAuto
                 entityType="character"
@@ -936,7 +929,6 @@ export function FactionDetailView({
           <div className="space-y-2">
             <Label className="text-sm font-medium text-primary">
               {t("faction-detail:fields.alignment")}
-              <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
             </Label>
             <AlignmentMatrix
               value={isEditing ? editData.alignment : faction.alignment}
@@ -961,7 +953,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.influence")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <FormSelectGrid
                 value={editData.influence || ""}
@@ -998,7 +989,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.public_reputation")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <FormSelectGrid
                 value={editData.publicReputation || ""}
@@ -1048,7 +1038,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.organization_objectives")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.organizationObjectives || ""}
@@ -1069,7 +1058,10 @@ export function FactionDetailView({
               </div>
             </div>
           ) : faction.organizationObjectives ? (
-            <DisplayTextarea value={faction.organizationObjectives} />
+            <DisplayTextarea
+              label={t("faction-detail:fields.organization_objectives")}
+              value={faction.organizationObjectives}
+            />
           ) : null}
 
           {/* Narrative Importance */}
@@ -1077,7 +1069,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.narrative_importance")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.narrativeImportance || ""}
@@ -1096,7 +1087,10 @@ export function FactionDetailView({
               </div>
             </div>
           ) : faction.narrativeImportance ? (
-            <DisplayTextarea value={faction.narrativeImportance} />
+            <DisplayTextarea
+              label={t("faction-detail:fields.narrative_importance")}
+              value={faction.narrativeImportance}
+            />
           ) : null}
 
           {/* Inspirations */}
@@ -1104,7 +1098,6 @@ export function FactionDetailView({
             <div className="space-y-2">
               <Label className="text-sm font-medium text-primary">
                 {t("faction-detail:fields.inspirations")}
-                <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
               </Label>
               <Textarea
                 value={editData.inspirations || ""}
@@ -1123,14 +1116,16 @@ export function FactionDetailView({
               </div>
             </div>
           ) : faction.inspirations ? (
-            <DisplayTextarea value={faction.inspirations} />
+            <DisplayTextarea
+              label={t("faction-detail:fields.inspirations")}
+              value={faction.inspirations}
+            />
           ) : null}
 
           {/* Power Sliders - in Narrative section like create modal */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-primary">
               {t("faction-detail:fields.power")}
-              <span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
             </Label>
             {isEditing ? (
               <div className="space-y-4">
@@ -1287,27 +1282,35 @@ export function FactionDetailView({
   ];
 
   // Add Chapter Metrics section (always visible, not editable)
-  if (!isEditing) {
-    extraSections.push({
-      id: "chapter-metrics",
-      title: t("faction-detail:sections.chapter_metrics"),
-      content: (
-        <EntityChapterMetricsSection
-          bookId={bookId}
-          entityId={faction.id}
-          entityType="faction"
-          onChapterClick={(chapterId) =>
-            navigate({
-              to: "/dashboard/$dashboardId/chapters/$chapterId",
-              params: { dashboardId: bookId, chapterId },
-            })
-          }
-        />
-      ),
-      isCollapsible: true,
-      defaultOpen: false,
-    });
-  }
+  extraSections.push({
+    id: "chapter-metrics",
+    title: t("chapter-metrics:entity_section.title"),
+    content: (
+      <EntityChapterMetricsSection
+        bookId={bookId}
+        entityId={faction.id}
+        entityType="faction"
+        isEditMode={isEditing}
+        onChapterClick={(chapterId) =>
+          navigate({
+            to: "/dashboard/$dashboardId/chapters/$chapterId",
+            params: { dashboardId: bookId, chapterId },
+          })
+        }
+        onMetricsLoad={setHasChapterMetrics}
+      />
+    ),
+    isCollapsible: true,
+    defaultOpen: false,
+    isVisible: sectionVisibility["chapter-metrics"] !== false,
+    onVisibilityToggle: () =>
+      onSectionVisibilityChange("chapter-metrics", !sectionVisibility["chapter-metrics"]),
+    // Empty state (only for view mode - edit mode shows InfoAlert inside component)
+    emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+    emptyIcon: BookOpen,
+    emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
+    emptyDescription: t("chapter-metrics:entity_section.no_mentions.faction"),
+  });
 
   // ==================
   // RENDER

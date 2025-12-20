@@ -22,19 +22,19 @@ interface MultipleMarkersPanelProps {
   onLabelToggle: (showLabel: boolean) => void;
 }
 
-const MARKER_COLORS = [
-  { name: "Roxo", value: "#8b5cf6" },
-  { name: "Azul", value: "#3b82f6" },
-  { name: "Verde", value: "#10b981" },
-  { name: "Vermelho", value: "#ef4444" },
-  { name: "Amarelo", value: "#f59e0b" },
-  { name: "Rosa", value: "#ec4899" },
-  { name: "Laranja", value: "#f97316" },
-  { name: "Ciano", value: "#06b6d4" },
-  { name: "Índigo", value: "#6366f1" },
-  { name: "Lima", value: "#84cc16" },
-  { name: "Branco", value: "#ffffff" },
-  { name: "Preto", value: "#000000" },
+const getMarkerColors = (t: (key: string) => string) => [
+  { name: t("world:marker_colors.purple"), value: "#8b5cf6" },
+  { name: t("world:marker_colors.blue"), value: "#3b82f6" },
+  { name: t("world:marker_colors.green"), value: "#10b981" },
+  { name: t("world:marker_colors.red"), value: "#ef4444" },
+  { name: t("world:marker_colors.yellow"), value: "#f59e0b" },
+  { name: t("world:marker_colors.pink"), value: "#ec4899" },
+  { name: t("world:marker_colors.orange"), value: "#f97316" },
+  { name: t("world:marker_colors.cyan"), value: "#06b6d4" },
+  { name: t("world:marker_colors.indigo"), value: "#6366f1" },
+  { name: t("world:marker_colors.lime"), value: "#84cc16" },
+  { name: t("world:marker_colors.white"), value: "#ffffff" },
+  { name: t("world:marker_colors.black"), value: "#000000" },
 ];
 
 export function MultipleMarkersPanel({
@@ -95,7 +95,7 @@ export function MultipleMarkersPanel({
           {showColorPicker && (
             <TooltipProvider delayDuration={300}>
               <div className="grid grid-cols-6 gap-2 mt-2">
-                {MARKER_COLORS.map((color) => (
+                {getMarkerColors(t).map((color) => (
                   <Tooltip key={color.value}>
                     <TooltipTrigger asChild>
                       <button

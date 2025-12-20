@@ -16,7 +16,8 @@ export default function ItemTimeline() {
     eventType: "other",
   });
 
-  const itemName = useMemo(() => "Excalibur", []);
+  // TODO: Get item name from item data based on itemId
+  const itemName = useMemo(() => "", []);
 
   const handleBack = useCallback(() => {
     window.history.back();

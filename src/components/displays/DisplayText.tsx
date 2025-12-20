@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { cn } from "@/lib/utils";
 
 interface DisplayTextProps {
@@ -28,12 +30,14 @@ interface DisplayTextProps {
  * ```
  */
 export function DisplayText({ value, className }: DisplayTextProps) {
+  const { t } = useTranslation("common");
+
   // If no value, show empty state
   if (!value || value.trim() === "") {
     return (
-      <span className={cn("italic text-muted-foreground/60", className)}>
-        Sem dados
-      </span>
+      <p className={cn("text-sm italic text-muted-foreground/60", className)}>
+        {t("no_data")}
+      </p>
     );
   }
 

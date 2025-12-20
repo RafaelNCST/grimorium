@@ -324,6 +324,8 @@ export function PlotArcDetailView({
   const { t } = useTranslation(["plot", "create-plot-arc", "tooltips"]);
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<IPlotEvent | null>(null);
+
+  // Chapter Metrics Section state - managed locally in view (appropriate for this entity)
   const [chapterMetricsSectionOpen, setChapterMetricsSectionOpen] =
     useState(false);
 

@@ -68,6 +68,9 @@ export default function ItemDetail() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     alternativeNames: false,
   });
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -472,6 +475,7 @@ export default function ItemDetail() {
             : undefined
         }
         isValid={!hasRequiredFieldsEmpty && !isCustomCategoryInvalid}
+        hasChapterMetrics={hasChapterMetrics}
         onBack={handleBack}
         onNavigationSidebarToggle={handleNavigationSidebarToggle}
         onNavigationSidebarClose={handleNavigationSidebarClose}
@@ -487,6 +491,7 @@ export default function ItemDetail() {
         onFieldVisibilityToggle={handleFieldVisibilityToggle}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         toggleSection={toggleSection}
+        setHasChapterMetrics={setHasChapterMetrics}
       />
     </>
   );

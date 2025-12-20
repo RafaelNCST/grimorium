@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 
 import { type LucideIcon, Plus, Save, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 import { Button } from "@/components/ui/button";
@@ -53,9 +54,10 @@ export function EntityModal({
   footer,
   width = "w-full max-w-2xl",
   height = "max-h-[90vh]",
-  basicFieldsTitle = "Informações Básicas",
-  advancedFieldsTitle = "Informações Avançadas",
+  basicFieldsTitle,
+  advancedFieldsTitle,
 }: EntityModalProps) {
+  const { t } = useTranslation("common");
   const Icon = header.icon;
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
@@ -78,7 +80,7 @@ export function EntityModal({
           {/* Basic Fields Section */}
           <div className="space-y-6 mt-4 w-full max-w-full">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">
-              {basicFieldsTitle}
+              {basicFieldsTitle ?? t("basic_info")}
             </h3>
             {basicFields}
           </div>
@@ -87,7 +89,7 @@ export function EntityModal({
           {advancedFields && (
             <div className="mt-6 w-full max-w-full">
               <CollapsibleSection
-                title={advancedFieldsTitle}
+                title={advancedFieldsTitle ?? t("advanced_info")}
                 isOpen={isAdvancedOpen}
                 onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
               >

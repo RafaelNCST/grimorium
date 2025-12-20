@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Collapsible,
@@ -74,6 +75,7 @@ export function DisplayStringList({
   onOpenChange,
   className,
 }: DisplayStringListProps) {
+  const { t } = useTranslation("common");
   const hasItems = items && items.length > 0;
   const itemCount = items?.length || 0;
 
@@ -113,7 +115,7 @@ export function DisplayStringList({
             ))}
           </ul>
         ) : (
-          <span className="italic text-muted-foreground/60">Sem dados</span>
+          <span className="italic text-muted-foreground/60">{t("no_data")}</span>
         )}
       </CollapsibleContent>
     </Collapsible>

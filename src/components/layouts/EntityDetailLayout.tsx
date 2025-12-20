@@ -11,6 +11,7 @@ import {
   Menu,
   AlertCircle,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { CollapsibleSection } from "@/components/layouts/CollapsibleSection";
 import { ValidationBanner } from "@/components/layouts/ValidationBanner";
@@ -158,6 +159,7 @@ export function EntityDetailLayout({
   // Styling
   className,
 }: EntityDetailLayoutProps) {
+  const { t } = useTranslation("common");
   // State to track which extra sections are open - persisted in localStorage
   const [extraSectionsOpenState, setExtraSectionsOpenState] = React.useState<
     Record<string, boolean>
@@ -339,7 +341,7 @@ export function EntityDetailLayout({
             {/* Basic Information Card */}
             <Card className="card-magical">
               <CardHeader>
-                <CardTitle>Informações Básicas</CardTitle>
+                <CardTitle>{t("basic_info")}</CardTitle>
               </CardHeader>
               <CardContent>{basicFields}</CardContent>
             </Card>

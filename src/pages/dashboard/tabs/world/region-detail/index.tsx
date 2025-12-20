@@ -39,7 +39,7 @@ export function RegionDetail() {
   const fromMapVersionId = (search as { fromMapVersionId?: string })
     ?.fromMapVersionId;
   const navigate = useNavigate();
-  const { t } = useTranslation("region-detail");
+  const { t } = useTranslation(["region-detail", "common"]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -97,6 +97,11 @@ export function RegionDetail() {
     useState<ISectionVisibility>({});
   const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
+
+  // Chapter metrics state
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
 
   // Refs to always have the latest visibility values
   const sectionVisibilityRef = useRef<ISectionVisibility>({});
@@ -749,7 +754,7 @@ export function RegionDetail() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-muted-foreground">Carregando região...</p>
+          <p className="text-sm text-muted-foreground">{t("common:loading")}</p>
         </div>
       </div>
     );
@@ -786,6 +791,8 @@ export function RegionDetail() {
         hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
         missingFields={missingFields}
         sectionVisibility={sectionVisibility}
+        hasChapterMetrics={hasChapterMetrics}
+        setHasChapterMetrics={setHasChapterMetrics}
         onTimelineChange={handleTimelineChange}
         onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onBack={handleBack}

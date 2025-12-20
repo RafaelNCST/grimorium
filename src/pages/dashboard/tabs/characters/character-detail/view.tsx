@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
+  BookOpen,
   Calendar,
   Heart,
   Image,
@@ -241,6 +242,11 @@ export function CharacterDetailView({
   // State for controlling the add relationship dialog from the empty state button
   const [isAddRelationshipDialogOpen, setIsAddRelationshipDialogOpen] =
     useState(false);
+
+  // State for chapter metrics
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
 
   // Navigation for entity notes
   const navigate = useNavigate();
@@ -709,7 +715,7 @@ export function CharacterDetailView({
               <FormEntityMultiSelectAuto
                 entityType="race"
                 bookId={bookId}
-                label=""
+                label={t("create-character:modal.species_and_race")}
                 placeholder={t("create-character:modal.species_placeholder")}
                 noSelectionText={t(
                   "create-character:modal.no_species_selected"
@@ -748,7 +754,7 @@ export function CharacterDetailView({
               <FormSimpleGrid
                 value={editData.physicalType || ""}
                 onChange={(value) => onEditDataChange("physicalType", value)}
-                label=""
+                label={t("character-detail:fields.physical_type")}
                 columns={6}
                 options={physicalTypeOptions}
               />
@@ -810,7 +816,7 @@ export function CharacterDetailView({
               <FormSelectGrid
                 value={editData.archetype || ""}
                 onChange={(value) => onEditDataChange("archetype", value)}
-                label=""
+                label={t("character-detail:fields.archetype")}
                 columns={4}
                 options={archetypeOptions}
               />
@@ -916,7 +922,7 @@ export function CharacterDetailView({
               <FormEntityMultiSelectAuto
                 entityType="region"
                 bookId={bookId}
-                label=""
+                label={t("character-detail:fields.birth_place")}
                 placeholder={t(
                   "create-character:modal.birth_place_placeholder"
                 )}
@@ -962,7 +968,7 @@ export function CharacterDetailView({
               <FormListInput
                 value={editData.nicknames || []}
                 onChange={(value) => onEditDataChange("nicknames", value)}
-                label=""
+                label={t("character-detail:fields.nicknames")}
                 placeholder={t("create-character:modal.nickname_placeholder")}
                 buttonText={t("create-character:modal.add_nickname")}
                 inputSize="small"
@@ -1077,7 +1083,7 @@ export function CharacterDetailView({
       onAddClick: () => {
         setIsAddRelationshipDialogOpen(true);
       },
-      blockedEntityName: "personagens",
+      blockedEntityName: "characters",
     },
     {
       id: "family",
@@ -1147,7 +1153,7 @@ export function CharacterDetailView({
       emptyIcon: Heart,
       emptyTitle: tEmpty("relationships.no_family_relation_defined"),
       emptyDescription: tEmpty("relationships.use_edit_mode_to_add_family"),
-      blockedEntityName: "personagens",
+      blockedEntityName: "characters",
     },
   ];
 
@@ -1178,27 +1184,34 @@ export function CharacterDetailView({
   }
 
   // Add Chapter Metrics section (always visible, not editable)
-  if (!isEditing) {
-    extraSections.push({
-      id: "chapter-metrics",
-      title: t("chapter-metrics:entity_section.title"),
-      content: (
-        <EntityChapterMetricsSection
-          bookId={bookId}
-          entityId={character.id}
-          entityType="character"
-          onChapterClick={(chapterId) =>
-            navigate({
-              to: "/dashboard/$dashboardId/chapters/$chapterId",
-              params: { dashboardId: bookId, chapterId },
-            })
-          }
-        />
-      ),
-      isCollapsible: true,
-      defaultOpen: false,
-    });
-  }
+  extraSections.push({
+    id: "chapter-metrics",
+    title: t("chapter-metrics:entity_section.title"),
+    content: (
+      <EntityChapterMetricsSection
+        bookId={bookId}
+        entityId={character.id}
+        entityType="character"
+        isEditMode={isEditing}
+        onChapterClick={(chapterId) =>
+          navigate({
+            to: "/dashboard/$dashboardId/chapters/$chapterId",
+            params: { dashboardId: bookId, chapterId },
+          })
+        }
+        onMetricsLoad={setHasChapterMetrics}
+      />
+    ),
+    isCollapsible: true,
+    defaultOpen: false,
+    isVisible: sectionVisibility["chapter-metrics"] !== false,
+    onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
+    // Empty state (only for view mode - edit mode shows InfoAlert inside component)
+    emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+    emptyIcon: BookOpen,
+    emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
+    emptyDescription: t("chapter-metrics:entity_section.no_mentions.character"),
+  });
 
   return (
     <div className="relative">

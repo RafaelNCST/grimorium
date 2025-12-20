@@ -18,6 +18,10 @@ interface PropsEntityChapterMetricsSection {
   entityId: string;
   entityType: EntityType;
   onChapterClick: (chapterId: string) => void;
+  /** Callback when metrics are loaded */
+  onMetricsLoad?: (hasMetrics: boolean) => void;
+  /** If in edit mode, show InfoAlert instead of null */
+  isEditMode?: boolean;
 }
 
 export function EntityChapterMetricsSection({
@@ -25,6 +29,8 @@ export function EntityChapterMetricsSection({
   entityId,
   entityType,
   onChapterClick,
+  onMetricsLoad,
+  isEditMode = false,
 }: PropsEntityChapterMetricsSection) {
   const { t } = useTranslation("chapter-metrics");
 
@@ -35,6 +41,7 @@ export function EntityChapterMetricsSection({
     async function loadMetrics() {
       if (!bookId) {
         setIsLoading(false);
+        onMetricsLoad?.(false);
         return;
       }
 
@@ -46,15 +53,19 @@ export function EntityChapterMetricsSection({
           entityType
         );
         setMetrics(data);
+        const hasMetrics = data && data.totalMentions > 0;
+        onMetricsLoad?.(hasMetrics);
       } catch (error) {
         console.error("Failed to load chapter metrics:", error);
         setMetrics(null);
+        onMetricsLoad?.(false);
       } finally {
         setIsLoading(false);
       }
     }
 
     loadMetrics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId, entityId, entityType]);
 
   if (!bookId) {
@@ -68,7 +79,9 @@ export function EntityChapterMetricsSection({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
       ) : !metrics || metrics.totalMentions === 0 ? (
-        <InfoAlert>{t(`entity_section.no_mentions.${entityType}`)}</InfoAlert>
+        isEditMode ? (
+          <InfoAlert>{t(`entity_section.no_mentions.${entityType}`)}</InfoAlert>
+        ) : null
       ) : (
         <div className="space-y-6">
           {/* Total Mentions - Destacado */}

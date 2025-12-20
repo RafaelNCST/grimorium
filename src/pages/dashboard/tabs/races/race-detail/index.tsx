@@ -60,6 +60,11 @@ export function RaceDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
+  // Chapter metrics state
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(
+    null
+  );
+
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
@@ -444,7 +449,7 @@ export function RaceDetail() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <p className="text-lg text-muted-foreground">Carregando raça...</p>
+          <p className="text-lg text-muted-foreground">{t("common:loading")}</p>
         </div>
       </div>
     );
@@ -493,6 +498,8 @@ export function RaceDetail() {
         validateField={validateField}
         openSections={openSections}
         toggleSection={toggleSection}
+        hasChapterMetrics={hasChapterMetrics}
+        setHasChapterMetrics={setHasChapterMetrics}
       />
     </>
   );

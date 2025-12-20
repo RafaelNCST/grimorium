@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Collapsible,
@@ -95,6 +96,7 @@ export function DisplayEntityList({
   onOpenChange,
   className,
 }: DisplayEntityListProps) {
+  const { t } = useTranslation("common");
   const hasEntities = entities && entities.length > 0;
   const entityCount = entities?.length || 0;
 
@@ -124,7 +126,7 @@ export function DisplayEntityList({
       ))}
     </div>
   ) : (
-    <span className="italic text-muted-foreground/60">Sem dados</span>
+    <span className="italic text-muted-foreground/60">{t("no_data")}</span>
   );
 
   // Without label, render just the list

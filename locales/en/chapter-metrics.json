@@ -1,6 +1,7 @@
 {
   "entity_section": {
     "title": "Chapter Metrics",
+    "empty_state_title": "No mentions found",
     "no_mentions": {
       "character": "This character has not been mentioned in any chapter yet.",
       "region": "This region has not been mentioned in any chapter yet.",

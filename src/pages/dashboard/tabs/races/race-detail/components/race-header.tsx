@@ -40,7 +40,7 @@ export function RaceHeader({
   onDeleteModalOpen,
   onEditFormChange,
 }: PropsRaceHeader) {
-  const { t } = useTranslation(["common"]);
+  const { t } = useTranslation(["common", "race-detail", "create-race", "races"]);
 
   return (
     <div className="flex items-start justify-between">
@@ -48,16 +48,16 @@ export function RaceHeader({
         {isEditing ? (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Nome *</Label>
+              <Label htmlFor="name">{t("race-detail:fields.name")} *</Label>
               <Input
                 id="name"
                 value={editFormName}
                 onChange={(e) => onEditFormChange("name", e.target.value)}
-                placeholder="Nome da raça"
+                placeholder={t("create-race:name_placeholder")}
               />
             </div>
             <div>
-              <Label htmlFor="type">Tipo *</Label>
+              <Label htmlFor="type">{t("races:type.label")} *</Label>
               <Select
                 value={editFormType}
                 onValueChange={(value: RaceType) =>
@@ -65,14 +65,14 @@ export function RaceHeader({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
+                  <SelectValue placeholder={t("races:type.select_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Aquática">Aquática</SelectItem>
-                  <SelectItem value="Terrestre">Terrestre</SelectItem>
-                  <SelectItem value="Voadora">Voadora</SelectItem>
-                  <SelectItem value="Espacial">Espacial</SelectItem>
-                  <SelectItem value="Espiritual">Espiritual</SelectItem>
+                  <SelectItem value="Aquática">{t("races:types.aquatic.label")}</SelectItem>
+                  <SelectItem value="Terrestre">{t("races:types.terrestrial.label")}</SelectItem>
+                  <SelectItem value="Voadora">{t("races:types.flying.label")}</SelectItem>
+                  <SelectItem value="Espacial">{t("races:types.spatial.label")}</SelectItem>
+                  <SelectItem value="Espiritual">{t("races:types.ethereal.label")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -81,7 +81,7 @@ export function RaceHeader({
           <div>
             <CardTitle className="text-3xl mb-2">{race.name}</CardTitle>
             <CardDescription className="text-lg mb-4">
-              Espécie: {race.speciesName}
+              {t("race-detail:fields.species")}: {race.speciesName}
             </CardDescription>
             <Badge className={TYPE_COLORS_CONSTANT[race.type]}>
               {race.type}

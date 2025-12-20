@@ -287,18 +287,12 @@ export function FactionTimeline({
     setShowEventModal(false);
   };
 
-  const getCharacterName = (id: string) =>
-    characters.find((c) => c.id === id)?.name ||
-    t("timeline.character_not_found");
-
-  const getFactionName = (id: string) =>
-    factions.find((f) => f.id === id)?.name || t("timeline.faction_not_found");
-
-  const getRaceName = (id: string) =>
-    races.find((r) => r.id === id)?.name || t("timeline.race_not_found");
-
-  const getItemName = (id: string) =>
-    items.find((i) => i.id === id)?.name || t("timeline.item_not_found");
+  // TODO: Implement proper entity name fetching
+  // For now, we display IDs as entity data is not available in this component
+  const getCharacterName = (id: string) => id;
+  const getFactionName = (id: string) => id;
+  const getRaceName = (id: string) => id;
+  const getItemName = (id: string) => id;
 
   // Detectar se há scroll no modal de criar era
   useEffect(() => {

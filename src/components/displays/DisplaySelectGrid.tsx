@@ -1,4 +1,5 @@
 import { LucideIcon, Target } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
@@ -160,9 +161,10 @@ export function DisplaySelectGrid<T extends string = string>({
   value,
   options,
   className,
-  emptyTitle = "Sem dados",
+  emptyTitle,
   emptyDescription,
 }: DisplaySelectGridProps<T>) {
+  const { t } = useTranslation("common");
   // Find the matching option
   const selectedOption = value
     ? options.find((opt) => opt.value === value)
@@ -183,7 +185,7 @@ export function DisplaySelectGrid<T extends string = string>({
           <Target className="w-5 h-5 mt-0.5 flex-shrink-0 text-muted-foreground" />
           <div className="flex-1 min-w-0">
             <p className="font-medium text-sm text-muted-foreground">
-              {emptyTitle}
+              {emptyTitle ?? t("no_data")}
             </p>
             {emptyDescription && (
               <p className="text-xs mt-1 text-muted-foreground opacity-80">

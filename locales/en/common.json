@@ -5,10 +5,46 @@
     "max_selections_reached": "Maximum of {{max}} selection(s) reached",
     "all_options_selected": "All options have been selected"
   },
+  "entity_empty_state": {
+    "character": {
+      "none_registered_m": "No character registered",
+      "go_to_tab": "Go to the",
+      "to_create_m": "tab to create one",
+      "tab_name": "Characters"
+    },
+    "faction": {
+      "none_registered_f": "No faction registered",
+      "go_to_tab": "Go to the",
+      "to_create_f": "tab to create one",
+      "tab_name": "Factions"
+    },
+    "race": {
+      "none_registered_f": "No race registered",
+      "go_to_tab": "Go to the",
+      "to_create_f": "tab to create one",
+      "tab_name": "Races"
+    },
+    "item": {
+      "none_registered_m": "No item registered",
+      "go_to_tab": "Go to the",
+      "to_create_m": "tab to create one",
+      "tab_name": "Items"
+    },
+    "region": {
+      "none_registered_f": "No region registered",
+      "go_to_tab": "Go to the",
+      "to_create_f": "tab to create one",
+      "tab_name": "World"
+    }
+  },
   "form_image": {
     "add_image": "Add Image"
   },
   "empty_field": "Not specified",
+  "loading": "Loading...",
+  "no_data": "No data",
+  "basic_info": "Basic Information",
+  "advanced_info": "Advanced Information",
   "tooltips": {
     "quick_navigation": "Quick Navigation",
     "edit": "Edit",

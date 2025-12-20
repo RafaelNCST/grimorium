@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Info, Package, Image } from "lucide-react";
+import { AlertCircle, BookOpen, Info, Package, Image } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { EntityChapterMetricsSection } from "@/components/chapter-metrics/EntityChapterMetricsSection";
@@ -81,6 +81,7 @@ interface ItemDetailViewProps {
   openSections: Record<string, boolean>;
   customCategoryError?: string;
   isValid: boolean;
+  hasChapterMetrics: boolean | null;
   onBack: () => void;
   onNavigationSidebarToggle: () => void;
   onNavigationSidebarClose: () => void;
@@ -96,6 +97,7 @@ interface ItemDetailViewProps {
   onFieldVisibilityToggle: (field: string) => void;
   onAdvancedSectionToggle: () => void;
   toggleSection: (sectionName: string) => void;
+  setHasChapterMetrics: (value: boolean | null) => void;
 }
 
 export const ItemDetailView = React.memo(
@@ -118,6 +120,7 @@ export const ItemDetailView = React.memo(
     openSections: _openSections,
     customCategoryError,
     isValid,
+    hasChapterMetrics,
     onBack,
     onNavigationSidebarToggle,
     onNavigationSidebarClose,
@@ -133,6 +136,7 @@ export const ItemDetailView = React.memo(
     onFieldVisibilityToggle,
     onAdvancedSectionToggle,
     toggleSection: _toggleSection,
+    setHasChapterMetrics,
   }: ItemDetailViewProps) => {
     const { t } = useTranslation(["item-detail", "create-item"]);
 
@@ -198,7 +202,7 @@ export const ItemDetailView = React.memo(
                 value={editData.image || ""}
                 onChange={(value) => onEditDataChange("image", value)}
                 label={t("create-item:modal.image")}
-                helperText="opcional"
+                helperText={t("item-detail:fields.optional")}
                 height="h-96"
                 shape="rounded"
                 imageFit="cover"
@@ -368,7 +372,7 @@ export const ItemDetailView = React.memo(
               {/* Alternative names */}
               {item.alternativeNames && item.alternativeNames.length > 0 && (
                 <p className="text-xs text-muted-foreground select-text">
-                  Também conhecido como: {item.alternativeNames.join(", ")}
+                  {t("item-detail:fields.also_known_as")}: {item.alternativeNames.join(", ")}
                 </p>
               )}
             </div>
@@ -512,7 +516,7 @@ export const ItemDetailView = React.memo(
                 </div>
               ) : (
                 <span className="italic text-muted-foreground/60">
-                  Sem dados
+                  {t("item-detail:fields.no_data")}
                 </span>
               )}
             </FieldWithVisibilityToggle>
@@ -812,30 +816,32 @@ export const ItemDetailView = React.memo(
               advancedSectionOpen={advancedSectionOpen}
               onAdvancedSectionToggle={onAdvancedSectionToggle}
               extraSections={[
-                // Chapter Metrics section (only visible in view mode)
-                ...(!isEditing
-                  ? [
-                      {
-                        id: "chapter-metrics",
-                        title: t("chapter-metrics:entity_section.title"),
-                        content: (
-                          <EntityChapterMetricsSection
-                            bookId={item.bookId}
-                            entityId={item.id}
-                            entityType="item"
-                            onChapterClick={(chapterId) =>
-                              navigate({
-                                to: "/dashboard/$dashboardId/chapters/$chapterId",
-                                params: { dashboardId: item.bookId, chapterId },
-                              })
-                            }
-                          />
-                        ),
-                        isCollapsible: true,
-                        defaultOpen: false,
-                      },
-                    ]
-                  : []),
+                {
+                  id: "chapter-metrics",
+                  title: t("chapter-metrics:entity_section.title"),
+                  content: (
+                    <EntityChapterMetricsSection
+                      bookId={item.bookId}
+                      entityId={item.id}
+                      entityType="item"
+                      isEditMode={isEditing}
+                      onMetricsLoad={setHasChapterMetrics}
+                      onChapterClick={(chapterId) =>
+                        navigate({
+                          to: "/dashboard/$dashboardId/chapters/$chapterId",
+                          params: { dashboardId: item.bookId, chapterId },
+                        })
+                      }
+                    />
+                  ),
+                  isCollapsible: true,
+                  defaultOpen: false,
+                  isVisible: true,
+                  emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
+                  emptyIcon: BookOpen,
+                  emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),
+                  emptyDescription: t("chapter-metrics:entity_section.no_mentions.item"),
+                },
               ]}
               showMenuButton
               onMenuToggle={onNavigationSidebarToggle}

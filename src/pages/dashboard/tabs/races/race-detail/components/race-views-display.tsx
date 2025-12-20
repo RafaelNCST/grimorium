@@ -37,7 +37,7 @@ export function RaceViewsDisplay({
   bookId,
   currentRaceId,
 }: RaceViewsDisplayProps) {
-  const { t } = useTranslation("race-detail");
+  const { t } = useTranslation(["race-detail", "common"]);
 
   const availableRaces = allRaces.map((race) => ({
     id: race.id,
@@ -137,7 +137,7 @@ export function RaceViewsDisplay({
             })}
           </div>
         ) : (
-          <span className="italic text-muted-foreground/60">Sem dados</span>
+          <span className="italic text-muted-foreground/60">{t("common:no_data")}</span>
         )}
       </CollapsibleContent>
     </Collapsible>

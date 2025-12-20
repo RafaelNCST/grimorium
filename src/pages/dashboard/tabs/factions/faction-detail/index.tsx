@@ -56,6 +56,7 @@ export function FactionDetail() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(null);
   const [uiState, setUiState] = useState<IFactionUIState>({
     advancedSectionOpen: false,
     sectionVisibility: { timeline: true, hierarchy: true },
@@ -516,6 +517,8 @@ export function FactionDetail() {
         validateField={validateField}
         hasRequiredFieldsEmpty={hasRequiredFieldsEmpty}
         missingFields={missingFields}
+        hasChapterMetrics={hasChapterMetrics}
+        setHasChapterMetrics={setHasChapterMetrics}
         onBack={handleBack}
         onEdit={handleEdit}
         onSave={handleSave}

@@ -101,7 +101,12 @@ export function CharacterDetail() {
   const [relationshipIntensity, setRelationshipIntensity] = useState([50]);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [sectionVisibility, setSectionVisibility] =
-    useState<ISectionVisibility>({});
+    useState<ISectionVisibility>(() => {
+      const stored = localStorage.getItem(
+        `characterDetailSectionVisibility_${characterId}`
+      );
+      return stored ? JSON.parse(stored) : {};
+    });
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("characterDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -134,6 +139,14 @@ export function CharacterDetail() {
       JSON.stringify(advancedSectionOpen)
     );
   }, [advancedSectionOpen]);
+
+  // Save section visibility state to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      `characterDetailSectionVisibility_${characterId}`,
+      JSON.stringify(sectionVisibility)
+    );
+  }, [sectionVisibility, characterId]);
 
   // Função de validação de campo individual (onBlur)
   const validateField = useCallback(

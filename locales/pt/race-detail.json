@@ -29,6 +29,7 @@
   "fields": {
     "image": "Imagem",
     "name": "Nome",
+    "species": "Raça",
     "scientific_name": "Nome Científico",
     "domain": "Domínio",
     "summary": "Resumo",

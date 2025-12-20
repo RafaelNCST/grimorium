@@ -39,7 +39,10 @@
     "usage_requirements": "Requisitos de Uso",
     "usage_consequences": "Consequências de Uso",
     "alternative_names": "Nomes Alternativos",
-    "item_usage": "Uso do Item"
+    "item_usage": "Uso do Item",
+    "optional": "opcional",
+    "also_known_as": "Também conhecido como",
+    "no_data": "Sem dados"
   },
   "placeholders": {
     "alternative_name": "A Lâmina do Crepúsculo, Espada dos Reis",

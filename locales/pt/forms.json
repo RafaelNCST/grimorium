@@ -50,9 +50,16 @@
     "item_event_description": "Descreva o que aconteceu neste momento...",
     "item_event_location": "Ex: Camelot, Forjas Celestiais...",
     "item_event_character": "Ex: Rei Arthur, Merlim...",
+    "region_event_name": "A Grande Convergência",
     "region_event_description": "Durante três noites, o céu ficou vermelho...",
     "region_event_reason": "O ritual proibido realizado pelos magos...",
-    "region_event_outcome": "Os heróis conseguiram fechar os portais..."
+    "region_event_outcome": "Os heróis conseguiram fechar os portais...",
+    "region_event_start_date": "50 EP",
+    "region_event_end_date": "52 EP",
+    "region_era_name": "Era dos Primórdios",
+    "region_era_description": "Um tempo de trevas e descobertas, onde as primeiras civilizações começaram a surgir das cinzas do caos",
+    "region_era_start_date": "0 EP",
+    "region_era_end_date": "1000 EP"
   },
   "buttons": {
     "cancel": "Cancelar",

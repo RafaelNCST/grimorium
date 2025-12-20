@@ -69,9 +69,16 @@
     "item_event_description": "Describe what happened at this moment...",
     "item_event_location": "E.g.: Camelot, Celestial Forges...",
     "item_event_character": "E.g.: King Arthur, Merlin...",
+    "region_event_name": "The Great Convergence",
     "region_event_description": "For three nights, the sky turned red...",
     "region_event_reason": "The forbidden ritual performed by wizards...",
-    "region_event_outcome": "The heroes managed to close the portals..."
+    "region_event_outcome": "The heroes managed to close the portals...",
+    "region_event_start_date": "50 EP",
+    "region_event_end_date": "52 EP",
+    "region_era_name": "Primordial Age",
+    "region_era_description": "A time of darkness and discoveries, where the first civilizations began to emerge from the ashes of chaos",
+    "region_era_start_date": "0 EP",
+    "region_era_end_date": "1000 EP"
   },
   "event_types": {
     "creation": "Creation",
