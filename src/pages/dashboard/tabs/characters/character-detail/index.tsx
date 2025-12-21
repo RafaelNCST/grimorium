@@ -93,7 +93,7 @@ export function CharacterDetail() {
   const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] =
     useState(false);
   const [newQuality, setNewQuality] = useState("");
-  const [_imageFile, _setImageFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedRelationshipCharacter, setSelectedRelationshipCharacter] =
     useState("");
@@ -129,7 +129,7 @@ export function CharacterDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Original states for comparison
-  const [originalSectionVisibility, _setOriginalSectionVisibility] =
+  const [originalSectionVisibility, setOriginalSectionVisibility] =
     useState<ISectionVisibility>({});
 
   // Save advanced section state to localStorage
@@ -373,6 +373,9 @@ export function CharacterDetail() {
           // Set regions and races from the same book
           setRegions(regionsFromDB);
           setRaces(racesFromDB);
+
+          // Initialize original section visibility with current state
+          setOriginalSectionVisibility(sectionVisibility);
         }
       } catch (error) {
         // Don't log errors or show toasts if component is unmounted
@@ -479,6 +482,8 @@ export function CharacterDetail() {
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
+      // Update original section visibility after successful save
+      setOriginalSectionVisibility(sectionVisibility);
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -731,7 +736,9 @@ export function CharacterDetail() {
   const handleEdit = useCallback(() => {
     setIsEditing(true);
     setIsNavigationSidebarOpen(false);
-  }, []);
+    // Capture current section visibility state when entering edit mode
+    setOriginalSectionVisibility(sectionVisibility);
+  }, [sectionVisibility]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);

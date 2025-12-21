@@ -64,8 +64,29 @@ export function PlotArcDetail() {
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
 
   // Section state
-  const [eventChainSectionOpen, setEventChainSectionOpen] = useState(true);
-  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
+  const [eventChainSectionOpen, setEventChainSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("plotDetailEventChainSectionOpen");
+    return stored ? JSON.parse(stored) : true;
+  });
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
+    const stored = localStorage.getItem("plotDetailAdvancedSectionOpen");
+    return stored ? JSON.parse(stored) : false;
+  });
+
+  // Save section states to localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "plotDetailEventChainSectionOpen",
+      JSON.stringify(eventChainSectionOpen)
+    );
+  }, [eventChainSectionOpen]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "plotDetailAdvancedSectionOpen",
+      JSON.stringify(advancedSectionOpen)
+    );
+  }, [advancedSectionOpen]);
 
   // Field visibility state
   const [fieldVisibility, setFieldVisibility] = useState<

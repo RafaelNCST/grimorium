@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -61,6 +61,8 @@ export default function ItemDetail() {
     useState(false);
   const [isNavigationSidebarOpen, setIsNavigationSidebarOpen] = useState(false);
   const [fieldVisibility, setFieldVisibility] = useState<IFieldVisibility>({});
+  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
+  const sectionVisibilityRef = useRef<Record<string, boolean>>(sectionVisibility);
   const [advancedSectionOpen, setAdvancedSectionOpen] = useState(() => {
     const stored = localStorage.getItem("itemDetailAdvancedSectionOpen");
     return stored ? JSON.parse(stored) : false;
@@ -78,8 +80,15 @@ export default function ItemDetail() {
   // Original states for comparison
   const [originalFieldVisibility, setOriginalFieldVisibility] =
     useState<IFieldVisibility>({});
+  const [originalSectionVisibility, setOriginalSectionVisibility] =
+    useState<Record<string, boolean>>({});
   const [_isLoading, setIsLoading] = useState(true);
   const [allItems, setAllItems] = useState<IItem[]>([]);
+
+  // Keep ref synced with state
+  useEffect(() => {
+    sectionVisibilityRef.current = sectionVisibility;
+  }, [sectionVisibility]);
 
   // Save advanced section state to localStorage
   useEffect(() => {
@@ -98,6 +107,11 @@ export default function ItemDetail() {
           setEditData(itemFromDB);
           setFieldVisibility(itemFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(itemFromDB.fieldVisibility || {});
+
+          const loadedSectionVisibility = itemFromDB.sectionVisibility || {};
+          setSectionVisibility(loadedSectionVisibility);
+          setOriginalSectionVisibility(loadedSectionVisibility);
+          sectionVisibilityRef.current = loadedSectionVisibility;
 
           if (dashboardId) {
             const allItemsFromBook = await getItemsByBookId(dashboardId);
@@ -285,8 +299,23 @@ export default function ItemDetail() {
     if (!arraysEqual(item.alternativeNames, editData.alternativeNames))
       return true;
 
+    // Check if section visibility has changed
+    if (
+      JSON.stringify(sectionVisibility) !==
+      JSON.stringify(originalSectionVisibility)
+    )
+      return true;
+
     return false;
-  }, [item, editData, isEditing, fieldVisibility, originalFieldVisibility]);
+  }, [
+    item,
+    editData,
+    isEditing,
+    fieldVisibility,
+    originalFieldVisibility,
+    sectionVisibility,
+    originalSectionVisibility,
+  ]);
 
   const handleSave = useCallback(async () => {
     try {
@@ -307,7 +336,14 @@ export default function ItemDetail() {
         alternativeNames: editData.alternativeNames,
       });
 
-      const updatedItem = { ...editData, fieldVisibility };
+      // Use ref to get the most recent sectionVisibility (setState is async)
+      const currentSectionVisibility = sectionVisibilityRef.current;
+
+      const updatedItem = {
+        ...editData,
+        fieldVisibility,
+        sectionVisibility: currentSectionVisibility,
+      };
       setItem(updatedItem);
 
       // Salvar no banco de dados
@@ -317,6 +353,7 @@ export default function ItemDetail() {
 
       // Update original visibility to match saved state
       setOriginalFieldVisibility(fieldVisibility);
+      setOriginalSectionVisibility(currentSectionVisibility);
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
@@ -367,17 +404,19 @@ export default function ItemDetail() {
     // If no changes, cancel immediately
     setEditData(item);
     setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
-  }, [item, originalFieldVisibility, hasChanges]);
+  }, [item, originalFieldVisibility, originalSectionVisibility, hasChanges]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData(item);
     setFieldVisibility(originalFieldVisibility);
+    setSectionVisibility(originalSectionVisibility);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [item, originalFieldVisibility]);
+  }, [item, originalFieldVisibility, originalSectionVisibility]);
 
   const handleBack = useCallback(() => {
     navigateToItemsTab();
@@ -403,9 +442,10 @@ export default function ItemDetail() {
   );
 
   const handleEdit = useCallback(() => {
+    setOriginalSectionVisibility(sectionVisibility);
     setIsEditing(true);
     setIsNavigationSidebarOpen(false);
-  }, []);
+  }, [sectionVisibility]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);
@@ -428,6 +468,13 @@ export default function ItemDetail() {
         [field]: !currentValue,
       };
     });
+  }, []);
+
+  const handleSectionVisibilityToggle = useCallback((sectionId: string) => {
+    setSectionVisibility((prev) => ({
+      ...prev,
+      [sectionId]: prev[sectionId] === false ? true : false,
+    }));
   }, []);
 
   const handleAdvancedSectionToggle = useCallback(() => {
@@ -489,6 +536,8 @@ export default function ItemDetail() {
         onEditDataChange={handleEditDataChange}
         validateField={validateField}
         onFieldVisibilityToggle={handleFieldVisibilityToggle}
+        sectionVisibility={sectionVisibility}
+        onSectionVisibilityToggle={handleSectionVisibilityToggle}
         onAdvancedSectionToggle={handleAdvancedSectionToggle}
         toggleSection={toggleSection}
         setHasChapterMetrics={setHasChapterMetrics}

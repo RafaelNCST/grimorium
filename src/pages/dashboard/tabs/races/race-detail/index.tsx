@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -75,6 +75,14 @@ export function RaceDetail() {
     IRaceRelationship[]
   >([]);
 
+  // Ref to keep sectionVisibility always up-to-date (fixes async setState issue)
+  const sectionVisibilityRef = useRef<Record<string, boolean>>(sectionVisibility);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    sectionVisibilityRef.current = sectionVisibility;
+  }, [sectionVisibility]);
+
   useEffect(() => {
     const loadRace = async () => {
       try {
@@ -86,6 +94,11 @@ export function RaceDetail() {
           setImagePreview(raceFromDB.image || "");
           setFieldVisibility(raceFromDB.fieldVisibility || {});
           setOriginalFieldVisibility(raceFromDB.fieldVisibility || {});
+
+          const loadedSectionVisibility = raceFromDB.sectionVisibility || {};
+          setSectionVisibility(loadedSectionVisibility);
+          setOriginalSectionVisibility(loadedSectionVisibility);
+          sectionVisibilityRef.current = loadedSectionVisibility;
 
           // Load relationships
           const rels = await getRaceRelationships(raceId);
@@ -250,9 +263,13 @@ export function RaceDetail() {
     }
 
     try {
+      // Use ref to get the most recent sectionVisibility (setState is async)
+      const currentSectionVisibility = sectionVisibilityRef.current;
+
       const updatedRace: IRace = {
         ...editData,
         fieldVisibility,
+        sectionVisibility: currentSectionVisibility,
       };
 
       // Update race and save relationships
@@ -261,7 +278,7 @@ export function RaceDetail() {
 
       setRace(updatedRace);
       setOriginalFieldVisibility(fieldVisibility);
-      setOriginalSectionVisibility(sectionVisibility);
+      setOriginalSectionVisibility(currentSectionVisibility);
       setOriginalRelationships(relationships);
       setErrors({});
       setIsEditing(false);
@@ -271,7 +288,6 @@ export function RaceDetail() {
   }, [
     editData,
     fieldVisibility,
-    sectionVisibility,
     relationships,
     raceId,
     updateRaceInCache,
@@ -281,7 +297,11 @@ export function RaceDetail() {
   const handleEdit = useCallback(() => {
     setEditData(race);
     setIsEditing(true);
-  }, [race]);
+    // Capture current visibility states when entering edit mode
+    setOriginalFieldVisibility(fieldVisibility);
+    setOriginalSectionVisibility(sectionVisibility);
+    setOriginalRelationships(relationships);
+  }, [race, fieldVisibility, sectionVisibility, relationships]);
 
   const handleCancel = useCallback(() => {
     if (hasChanges) {

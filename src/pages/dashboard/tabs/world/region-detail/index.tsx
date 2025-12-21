@@ -724,7 +724,10 @@ export function RegionDetail() {
   const handleEdit = useCallback(() => {
     setIsEditing(true);
     setIsNavigationSidebarOpen(false);
-  }, []);
+    // Capture current states when entering edit mode
+    setOriginalSectionVisibility(sectionVisibility);
+    setOriginalTimeline(timeline);
+  }, [sectionVisibility, timeline]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);

@@ -55,6 +55,12 @@ function raceToDBRace(bookId: string, race: IRace): DBRace {
     weaknesses: race.weaknesses,
     story_motivation: race.storyMotivation,
     inspirations: race.inspirations,
+    field_visibility: race.fieldVisibility
+      ? JSON.stringify(race.fieldVisibility)
+      : undefined,
+    section_visibility: race.sectionVisibility
+      ? JSON.stringify(race.sectionVisibility)
+      : undefined,
     created_at: Date.now(),
     updated_at: Date.now(),
   };
@@ -98,6 +104,12 @@ function dbRaceToRace(dbRace: DBRace): IRace {
     weaknesses: dbRace.weaknesses,
     storyMotivation: dbRace.story_motivation,
     inspirations: dbRace.inspirations,
+    fieldVisibility: dbRace.field_visibility
+      ? safeParseUnknownObject(dbRace.field_visibility)
+      : undefined,
+    sectionVisibility: dbRace.section_visibility
+      ? safeParseUnknownObject(dbRace.section_visibility)
+      : undefined,
     speciesId: "", // Legacy field, kept for backwards compatibility
   };
 }
@@ -139,11 +151,12 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         other_communication, moral_tendency, social_organization, habitat,
         physical_capacity, special_characteristics, weaknesses,
         story_motivation, inspirations,
+        field_visibility, section_visibility,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
         $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-        $29, $30, $31, $32
+        $29, $30, $31, $32, $33, $34
       )`,
       [
         dbRace.id,
@@ -176,6 +189,8 @@ export async function createRace(bookId: string, race: IRace): Promise<void> {
         dbRace.weaknesses,
         dbRace.story_motivation,
         dbRace.inspirations,
+        dbRace.field_visibility,
+        dbRace.section_visibility,
         dbRace.created_at,
         dbRace.updated_at,
       ]
@@ -224,8 +239,9 @@ export async function updateRace(
         communication = $19, other_communication = $20, moral_tendency = $21, social_organization = $22,
         habitat = $23, physical_capacity = $24, special_characteristics = $25,
         weaknesses = $26, story_motivation = $27, inspirations = $28,
-        updated_at = $29
-      WHERE id = $30`,
+        field_visibility = $29, section_visibility = $30,
+        updated_at = $31
+      WHERE id = $32`,
       [
         dbRace.group_id,
         dbRace.name,
@@ -255,6 +271,8 @@ export async function updateRace(
         dbRace.weaknesses,
         dbRace.story_motivation,
         dbRace.inspirations,
+        dbRace.field_visibility,
+        dbRace.section_visibility,
         dbRace.updated_at,
         id,
       ]

@@ -7,11 +7,7 @@ import { getCharactersByBookId } from "@/lib/db/characters.service";
 import { getFactionsByBookId } from "@/lib/db/factions.service";
 import { getItemsByBookId } from "@/lib/db/items.service";
 import { getRacesByBookId } from "@/lib/db/races.service";
-import {
-  getRegionsByBookId,
-  createRegion,
-  getRegionHierarchy,
-} from "@/lib/db/regions.service";
+import { useRegionsStore } from "@/stores/regions-store";
 import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
 import {
@@ -26,14 +22,26 @@ interface WorldTabProps {
   bookId: string;
 }
 
+const EMPTY_ARRAY: IRegion[] = [];
+const EMPTY_HIERARCHY: IRegionWithChildren[] = [];
+
 export function WorldTab({ bookId }: WorldTabProps) {
   const navigate = useNavigate();
 
-  const [regions, setRegions] = useState<IRegion[]>([]);
-  const [hierarchy, setHierarchy] = useState<IRegionWithChildren[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showHierarchyModal, setShowHierarchyModal] = useState(false);
+
+  // Use store to manage regions - optimized selectors
+  const regions = useRegionsStore(
+    (state) => state.cache[bookId]?.regions ?? EMPTY_ARRAY
+  );
+  const hierarchy = useRegionsStore(
+    (state) => state.cache[bookId]?.hierarchy ?? EMPTY_HIERARCHY
+  );
+
+  // Separate store functions
+  const fetchRegions = useRegionsStore((state) => state.fetchRegions);
+  const addRegion = useRegionsStore((state) => state.addRegion);
 
   // Data for multi-select dropdowns
   const [characters, setCharacters] = useState<
@@ -45,42 +53,35 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const [races, setRaces] = useState<Array<{ id: string; name: string }>>([]);
   const [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
 
-  // Load regions and related data from database
-  const loadRegions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [
-        regionsData,
-        hierarchyData,
-        charactersData,
-        factionsData,
-        racesData,
-        itemsData,
-      ] = await Promise.all([
-        getRegionsByBookId(bookId),
-        getRegionHierarchy(bookId),
-        getCharactersByBookId(bookId),
-        getFactionsByBookId(bookId),
-        getRacesByBookId(bookId),
-        getItemsByBookId(bookId),
-      ]);
-      setRegions(regionsData);
-      setHierarchy(hierarchyData);
-      setCharacters(charactersData.map((c) => ({ id: c.id, name: c.name })));
-      setFactions(factionsData.map((f) => ({ id: f.id, name: f.name })));
-      setRaces(racesData.map((r) => ({ id: r.id, name: r.name })));
-      setItems(itemsData.map((i) => ({ id: i.id, name: i.name })));
-    } catch (error) {
-      console.error("Failed to load regions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [bookId]);
-
-  // Initial load
+  // Load regions from cache or database on mount
   useEffect(() => {
-    loadRegions();
-  }, [loadRegions]);
+    fetchRegions(bookId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId]); // Only bookId as dependency
+
+  // Load related data for dropdowns
+  useEffect(() => {
+    const loadRelatedData = async () => {
+      try {
+        const [charactersData, factionsData, racesData, itemsData] =
+          await Promise.all([
+            getCharactersByBookId(bookId),
+            getFactionsByBookId(bookId),
+            getRacesByBookId(bookId),
+            getItemsByBookId(bookId),
+          ]);
+
+        setCharacters(charactersData.map((c) => ({ id: c.id, name: c.name })));
+        setFactions(factionsData.map((f) => ({ id: f.id, name: f.name })));
+        setRaces(racesData.map((r) => ({ id: r.id, name: r.name })));
+        setItems(itemsData.map((i) => ({ id: i.id, name: i.name })));
+      } catch (error) {
+        console.error("Failed to load related data:", error);
+      }
+    };
+
+    loadRelatedData();
+  }, [bookId]);
 
   // Use entity filters hook
   const {
@@ -151,41 +152,47 @@ export function WorldTab({ bookId }: WorldTabProps) {
   const handleCreateRegion = useCallback(
     async (data: IRegionFormData) => {
       try {
-        await createRegion({
+        const newRegion: IRegion = {
+          id: crypto.randomUUID(),
           bookId,
           name: data.name,
           parentId: data.parentId,
           scale: data.scale,
           summary: data.summary,
           image: data.image,
+          orderIndex: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           // Environment fields
           climate: data.climate,
           currentSeason: data.currentSeason,
           customSeasonName: data.customSeasonName,
           generalDescription: data.generalDescription,
-          regionAnomalies: arrayToJson(data.regionAnomalies),
+          regionAnomalies: data.regionAnomalies,
           // Information fields
-          residentFactions: arrayToJson(data.residentFactions),
-          dominantFactions: arrayToJson(data.dominantFactions),
-          importantCharacters: arrayToJson(data.importantCharacters),
-          racesFound: arrayToJson(data.racesFound),
-          itemsFound: arrayToJson(data.itemsFound),
+          residentFactions: data.residentFactions,
+          dominantFactions: data.dominantFactions,
+          importantCharacters: data.importantCharacters,
+          racesFound: data.racesFound,
+          itemsFound: data.itemsFound,
           // Narrative fields
           narrativePurpose: data.narrativePurpose,
           uniqueCharacteristics: data.uniqueCharacteristics,
           politicalImportance: data.politicalImportance,
           religiousImportance: data.religiousImportance,
           worldPerception: data.worldPerception,
-          inspirations: arrayToJson(data.inspirations),
-        });
+          regionMysteries: data.regionMysteries,
+          inspirations: data.inspirations,
+        };
 
+        // Add to store (which also saves to DB)
+        await addRegion(bookId, newRegion);
         setShowCreateModal(false);
-        loadRegions();
       } catch (error: any) {
         console.error("Failed to create region:", error);
       }
     },
-    [bookId, loadRegions]
+    [bookId, addRegion]
   );
 
   // Handle region card click - navigate to region detail
@@ -199,13 +206,18 @@ export function WorldTab({ bookId }: WorldTabProps) {
     [navigate, bookId]
   );
 
+  // Handle refresh regions
+  const handleRefreshRegions = useCallback(() => {
+    fetchRegions(bookId, true); // forceRefresh = true
+  }, [fetchRegions, bookId]);
+
   return (
     <WorldView
       bookId={bookId}
       regions={filteredRegions}
       allRegions={regions}
       hierarchy={hierarchy}
-      isLoading={isLoading}
+      isLoading={false}
       searchQuery={searchQuery}
       selectedScales={selectedScales}
       scaleStats={scaleStats}
@@ -222,7 +234,7 @@ export function WorldTab({ bookId }: WorldTabProps) {
       onRegionClick={handleRegionClick}
       onShowCreateModal={setShowCreateModal}
       onShowHierarchyModal={setShowHierarchyModal}
-      onRefreshRegions={loadRegions}
+      onRefreshRegions={handleRefreshRegions}
     />
   );
 }

@@ -77,6 +77,7 @@ interface ItemDetailViewProps {
   missingFields: string[];
   errors: Record<string, string>;
   fieldVisibility: IFieldVisibility;
+  sectionVisibility: Record<string, boolean>;
   advancedSectionOpen: boolean;
   openSections: Record<string, boolean>;
   customCategoryError?: string;
@@ -95,6 +96,7 @@ interface ItemDetailViewProps {
   onEditDataChange: (field: string, value: unknown) => void;
   validateField: (field: string, value: any) => void;
   onFieldVisibilityToggle: (field: string) => void;
+  onSectionVisibilityToggle: (sectionId: string) => void;
   onAdvancedSectionToggle: () => void;
   toggleSection: (sectionName: string) => void;
   setHasChapterMetrics: (value: boolean | null) => void;
@@ -116,6 +118,7 @@ export const ItemDetailView = React.memo(
     missingFields,
     errors,
     fieldVisibility,
+    sectionVisibility,
     advancedSectionOpen,
     openSections: _openSections,
     customCategoryError,
@@ -134,6 +137,7 @@ export const ItemDetailView = React.memo(
     onEditDataChange,
     validateField,
     onFieldVisibilityToggle,
+    onSectionVisibilityToggle,
     onAdvancedSectionToggle,
     toggleSection: _toggleSection,
     setHasChapterMetrics,
@@ -836,7 +840,8 @@ export const ItemDetailView = React.memo(
                   ),
                   isCollapsible: true,
                   defaultOpen: false,
-                  isVisible: true,
+                  isVisible: sectionVisibility["chapter-metrics"] !== false,
+                  onVisibilityToggle: () => onSectionVisibilityToggle("chapter-metrics"),
                   emptyState: !isEditing && hasChapterMetrics === false ? "empty-view" : null,
                   emptyIcon: BookOpen,
                   emptyTitle: t("chapter-metrics:entity_section.empty_state_title"),

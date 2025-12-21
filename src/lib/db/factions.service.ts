@@ -102,7 +102,12 @@ function factionToDBFaction(bookId: string, faction: IFaction): DBFaction {
       : undefined,
 
     // UI State
-    ui_state: faction.uiState ? JSON.stringify(faction.uiState) : undefined,
+    ui_state: faction.uiState ? (() => {
+      const stringified = JSON.stringify(faction.uiState);
+      console.log('[factionToDBFaction] faction.uiState:', faction.uiState);
+      console.log('[factionToDBFaction] stringified ui_state:', stringified);
+      return stringified;
+    })() : undefined,
 
     // Metadata
     created_at: faction.createdAt
@@ -200,7 +205,12 @@ function dbFactionToFaction(dbFaction: DBFaction): IFaction {
 
     // UI State
     uiState: dbFaction.ui_state
-      ? safeParseUnknownObject(dbFaction.ui_state)
+      ? (() => {
+          console.log('[dbFactionToFaction] dbFaction.ui_state (RAW):', dbFaction.ui_state);
+          const parsed = safeParseUnknownObject(dbFaction.ui_state);
+          console.log('[dbFactionToFaction] parsed uiState:', parsed);
+          return parsed;
+        })()
       : undefined,
 
     // Metadata

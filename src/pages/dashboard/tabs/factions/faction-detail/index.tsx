@@ -57,7 +57,14 @@ export function FactionDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [hasChapterMetrics, setHasChapterMetrics] = useState<boolean | null>(null);
-  const [uiState, setUiState] = useState<IFactionUIState>({
+  const [uiState, setUiState] = useState<IFactionUIState>(() => {
+    const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
+    return {
+      advancedSectionOpen: stored ? JSON.parse(stored) : false,
+      sectionVisibility: { timeline: true, hierarchy: true },
+    };
+  });
+  const [originalUiState, setOriginalUiState] = useState<IFactionUIState>({
     advancedSectionOpen: false,
     sectionVisibility: { timeline: true, hierarchy: true },
   });
@@ -66,6 +73,20 @@ export function FactionDetail() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uiStateRef = useRef<IFactionUIState>(uiState);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    uiStateRef.current = uiState;
+  }, [uiState]);
+
+  // Save advanced section state to localStorage (UI preference, not data)
+  useEffect(() => {
+    localStorage.setItem(
+      "factionDetailAdvancedSectionOpen",
+      JSON.stringify(uiState.advancedSectionOpen)
+    );
+  }, [uiState.advancedSectionOpen]);
 
   // Função de validação de campo individual (onBlur)
   const validateField = useCallback(
@@ -132,8 +153,19 @@ export function FactionDetail() {
   // Check if there are changes between faction and editData
   const hasChanges = useMemo(() => {
     if (!isEditing) return false;
-    return JSON.stringify(faction) !== JSON.stringify(editData);
-  }, [isEditing, faction, editData]);
+
+    // Exclude uiState from data comparison to avoid duplicate checks
+    const { uiState: _factionUiState, ...factionData } = faction;
+    const { uiState: _editDataUiState, ...editDataData } = editData;
+
+    // Check if data has changed (excluding uiState)
+    const dataChanged = JSON.stringify(factionData) !== JSON.stringify(editDataData);
+
+    // Check if UI state has changed (section visibility)
+    const uiStateChanged = JSON.stringify(uiState.sectionVisibility) !== JSON.stringify(originalUiState.sectionVisibility);
+
+    return dataChanged || uiStateChanged;
+  }, [isEditing, faction, editData, uiState.sectionVisibility, originalUiState.sectionVisibility]);
 
   // Load faction from database
   useEffect(() => {
@@ -145,17 +177,21 @@ export function FactionDetail() {
           setEditData(factionFromDB);
           setImagePreview(factionFromDB.image || "");
 
-          // Load UI state from database
-          if (factionFromDB.uiState) {
-            setUiState({
-              advancedSectionOpen:
-                factionFromDB.uiState.advancedSectionOpen ?? false,
-              sectionVisibility: factionFromDB.uiState.sectionVisibility ?? {
-                timeline: true,
-                hierarchy: true,
-              },
-            });
-          }
+          // Load section visibility from database (olhinho - per faction)
+          // But keep advancedSectionOpen from localStorage (setinha - global preference)
+          const stored = localStorage.getItem("factionDetailAdvancedSectionOpen");
+          const loadedUiState = {
+            advancedSectionOpen: stored ? JSON.parse(stored) : false,
+            sectionVisibility: factionFromDB.uiState?.sectionVisibility ?? {
+              timeline: true,
+              hierarchy: true,
+            },
+          };
+          setUiState(loadedUiState);
+          setOriginalUiState(loadedUiState);
+
+          console.log('[Faction Load] factionFromDB.uiState:', factionFromDB.uiState);
+          console.log('[Faction Load] loadedUiState:', loadedUiState);
         }
       } catch (error) {
         console.error("Error loading faction:", error);
@@ -259,13 +295,20 @@ export function FactionDetail() {
         hierarchy: editData.hierarchy,
       });
 
-      const updatedFaction = { ...editData };
+      // Use ref to get the most recent uiState (setUiState is async)
+      const currentUiState = uiStateRef.current;
+      const updatedFaction = { ...editData, uiState: currentUiState };
       setFaction(updatedFaction);
+
+      console.log('[Faction Save] currentUiState from ref:', currentUiState);
+      console.log('[Faction Save] updatedFaction.uiState:', updatedFaction.uiState);
 
       await updateFactionInStore(factionId, updatedFaction);
 
       setErrors({}); // Limpar erros
       setIsEditing(false);
+      // Update original UI state after successful save (use ref for most recent value)
+      setOriginalUiState(currentUiState);
     } catch (error) {
       console.error("[handleSave] Error caught:", error);
       if (error instanceof z.ZodError) {
@@ -315,17 +358,19 @@ export function FactionDetail() {
     // If no changes, cancel immediately
     setEditData({ ...faction });
     setImagePreview(faction.image || "");
+    setUiState(originalUiState);
     setErrors({});
     setIsEditing(false);
-  }, [faction, hasChanges]);
+  }, [faction, hasChanges, originalUiState]);
 
   const handleConfirmCancel = useCallback(() => {
     setEditData({ ...faction });
     setImagePreview(faction.image || "");
+    setUiState(originalUiState);
     setErrors({});
     setIsEditing(false);
     setShowUnsavedChangesDialog(false);
-  }, [faction]);
+  }, [faction, originalUiState]);
 
   const handleBack = useCallback(() => {
     navigateToFactionsTab();
@@ -334,7 +379,9 @@ export function FactionDetail() {
   const handleEdit = useCallback(() => {
     setIsEditing(true);
     setIsNavigationOpen(false);
-  }, []);
+    // Capture current UI state when entering edit mode
+    setOriginalUiState(uiState);
+  }, [uiState]);
 
   const handleDeleteModalOpen = useCallback(() => {
     setShowDeleteModal(true);
@@ -397,24 +444,20 @@ export function FactionDetail() {
     []
   );
 
-  const handleAdvancedSectionToggle = useCallback(async () => {
+  const handleAdvancedSectionToggle = useCallback(() => {
     const newUiState = {
       ...uiState,
       advancedSectionOpen: !uiState.advancedSectionOpen,
     };
     setUiState(newUiState);
-
-    // Persist UI state to database
-    try {
-      await updateFactionInStore(factionId, { uiState: newUiState });
-    } catch (error) {
-      console.error("Error saving UI state:", error);
-    }
-  }, [uiState, factionId, updateFactionInStore]);
+  }, [uiState]);
 
 
   const handleSectionVisibilityChange = useCallback(
-    async (sectionName: string, isVisible: boolean) => {
+    (sectionName: string, isVisible: boolean) => {
+      console.log('[handleSectionVisibilityChange] sectionName:', sectionName, 'isVisible:', isVisible);
+      console.log('[handleSectionVisibilityChange] current uiState:', uiState);
+
       const newUiState = {
         ...uiState,
         sectionVisibility: {
@@ -422,16 +465,11 @@ export function FactionDetail() {
           [sectionName]: isVisible,
         },
       };
-      setUiState(newUiState);
 
-      // Persist UI state to database
-      try {
-        await updateFactionInStore(factionId, { uiState: newUiState });
-      } catch (error) {
-        console.error("Error saving UI state:", error);
-      }
+      console.log('[handleSectionVisibilityChange] newUiState:', newUiState);
+      setUiState(newUiState);
     },
-    [uiState, factionId, updateFactionInStore]
+    [uiState]
   );
 
 

@@ -146,6 +146,9 @@ async function runMigrations(database: Database): Promise<void> {
       usage_requirements TEXT,
       usage_consequences TEXT,
 
+      -- UI State
+      section_visibility TEXT,
+
       -- Metadata
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
@@ -208,6 +211,10 @@ async function runMigrations(database: Database): Promise<void> {
       -- Narrative
       story_motivation TEXT,
       inspirations TEXT,
+
+      -- UI State
+      field_visibility TEXT,
+      section_visibility TEXT,
 
       -- Metadata
       created_at INTEGER NOT NULL,
@@ -724,9 +731,34 @@ async function runMigrations(database: Database): Promise<void> {
       // Column already exists - safe to ignore
     }
 
+    // Add field_visibility column to races table
+    try {
+      await database.execute(
+        "ALTER TABLE races ADD COLUMN field_visibility TEXT"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add section_visibility column to races table
+    try {
+      await database.execute(
+        "ALTER TABLE races ADD COLUMN section_visibility TEXT"
+      );
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
     // Add item_usage column to items table
     try {
       await database.execute("ALTER TABLE items ADD COLUMN item_usage TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add section_visibility column to items table
+    try {
+      await database.execute("ALTER TABLE items ADD COLUMN section_visibility TEXT");
     } catch (_error) {
       // Column already exists - safe to ignore
     }

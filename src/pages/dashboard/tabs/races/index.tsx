@@ -4,7 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import type { RaceFormSchema } from "@/components/modals/create-race-modal/hooks/use-race-validation";
 import { useEntityFilters } from "@/hooks/use-entity-filters";
-import { createRace, getRacesByBookId } from "@/lib/db/races.service";
+import { useRacesStore } from "@/stores/races-store";
 import { calculateEntityStats } from "@/utils/calculate-entity-stats";
 
 import { IRace, DomainType } from "./types/race-types";
@@ -14,29 +14,27 @@ interface PropsSpeciesTab {
   bookId: string;
 }
 
+const EMPTY_ARRAY: IRace[] = [];
+
 export function SpeciesTab({ bookId }: PropsSpeciesTab) {
   const navigate = useNavigate();
 
-  const [races, setRaces] = useState<IRace[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isCreateRaceOpen, setIsCreateRaceOpen] = useState(false);
 
-  // Load races from database
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const loadedRaces = await getRacesByBookId(bookId);
-        setRaces(loadedRaces);
-      } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Use store to manage races - optimized selectors
+  const races = useRacesStore(
+    (state) => state.cache[bookId]?.races ?? EMPTY_ARRAY
+  );
 
-    loadData();
-  }, [bookId]);
+  // Separate store functions
+  const fetchRaces = useRacesStore((state) => state.fetchRaces);
+  const addRace = useRacesStore((state) => state.addRace);
+
+  // Load races from cache or database on mount
+  useEffect(() => {
+    fetchRaces(bookId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookId]); // Only bookId as dependency
 
   // Prepare all races for availableRaces prop (race views)
   const availableRaces = useMemo(
@@ -125,10 +123,8 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
           speciesId: "",
         };
 
-        await createRace(bookId, newRace);
-
-        // Update local state
-        setRaces([newRace, ...races]);
+        // Add to store (which also saves to DB)
+        await addRace(bookId, newRace);
 
         setIsCreateRaceOpen(false);
       } catch (error) {
@@ -171,7 +167,7 @@ export function SpeciesTab({ bookId }: PropsSpeciesTab) {
       bookId={bookId}
       races={filteredRaces}
       allRaces={races}
-      isLoading={isLoading}
+      isLoading={false}
       isCreateRaceOpen={isCreateRaceOpen}
       domainStats={domainStats}
       availableRaces={availableRaces}

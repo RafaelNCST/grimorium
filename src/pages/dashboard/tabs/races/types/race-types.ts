@@ -59,6 +59,10 @@ export interface IRace {
   storyMotivation?: string;
   inspirations?: string;
 
+  // UI State (optional)
+  fieldVisibility?: Record<string, boolean>;
+  sectionVisibility?: Record<string, boolean>;
+
   // Legacy field for backwards compatibility
   speciesId: string;
 }

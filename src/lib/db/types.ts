@@ -120,6 +120,9 @@ export interface DBItem {
   usage_consequences?: string;
   item_usage?: string;
 
+  // UI State
+  section_visibility?: string; // JSON object string
+
   created_at: number;
   updated_at: number;
 }
@@ -179,6 +182,10 @@ export interface DBRace {
   // Narrative
   story_motivation?: string;
   inspirations?: string;
+
+  // UI State
+  field_visibility?: string; // JSON object string
+  section_visibility?: string; // JSON object string
 
   // Metadata
   created_at: number;
