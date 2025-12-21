@@ -170,6 +170,7 @@ export function CreateFactionModalView({
                 value={watchedValues.summary}
                 labelClassName="text-primary"
                 className="resize-none"
+                title=""
               />
             </div>
           }

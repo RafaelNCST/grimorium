@@ -239,6 +239,7 @@ export function CreateSystemModal({
                       showCharCount
                       value={systemName}
                       labelClassName="text-primary"
+                      title=""
                     />
                   </div>
                 </div>

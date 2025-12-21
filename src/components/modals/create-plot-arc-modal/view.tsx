@@ -90,6 +90,7 @@ export function CreatePlotArcModalView({
                 value={watchedValues.description}
                 labelClassName="text-primary"
                 className="resize-none"
+                title=""
               />
 
               {/* Arc Focus */}
@@ -104,6 +105,7 @@ export function CreatePlotArcModalView({
                 value={watchedValues.focus}
                 labelClassName="text-primary"
                 className="resize-none"
+                title=""
               />
 
               {/* Status Selector */}

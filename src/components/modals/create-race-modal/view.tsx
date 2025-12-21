@@ -93,6 +93,7 @@ export function CreateRaceModalView({
                   showCharCount
                   value={watchedValues.name}
                   labelClassName="text-primary"
+                  title=""
                 />
 
                 <FormInput
@@ -124,6 +125,7 @@ export function CreateRaceModalView({
                 value={watchedValues.summary}
                 labelClassName="text-primary"
                 className="resize-none"
+                title=""
               />
             </div>
           }
