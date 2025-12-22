@@ -111,6 +111,24 @@
       "privacy_guarantee_title": "Privacy guarantee:",
       "privacy_guarantee_description": "We never collect the content of your books, characters, chapters, or any personally identifiable information. Only aggregated and anonymous usage data."
     },
+    "storage": {
+      "title": "Local Storage",
+      "description": "See where your data is stored and how much space it's using",
+      "size_label": "Total Data Size",
+      "size_description": "Disk space used by all your books, characters, chapters, images, and settings",
+      "location_label": "Data Location",
+      "copy_path": "Copy Path",
+      "copied": "Copied!",
+      "open_folder": "Open in Explorer",
+      "cleanup_label": "Clean Orphaned Files",
+      "cleanup_description": "Remove image and map files that are no longer being used in the app",
+      "cleanup_button": "Run Cleanup",
+      "cleaning": "Cleaning...",
+      "cleanup_success": "{{count}} orphaned file(s) successfully removed",
+      "cleanup_error": "Error cleaning files ({{count}} error(s))",
+      "duplicates_fixed": "{{count}} region(s) with duplicate maps fixed ({{maps}} old map(s) removed)",
+      "nothing_to_clean": "No orphaned files found. All clean!"
+    },
     "backup": {
       "title": "Backup and Restore",
       "description": "Protect your data by exporting a complete backup",

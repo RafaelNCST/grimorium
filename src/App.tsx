@@ -7,6 +7,7 @@ import { InboxInitializer } from "@/components/inbox-initializer";
 import { DatabaseErrorModal } from "@/components/modals/database-error-modal";
 import { SplashScreen } from "@/components/splash-screen";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAutomaticCleanup } from "@/hooks/useAutomaticCleanup";
 import { useErrorModalStore } from "@/stores/error-modal-store";
 
 // Import the generated route tree
@@ -25,6 +26,9 @@ declare module "@tanstack/react-router" {
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const { isOpen, errorType, hideError } = useErrorModalStore();
+
+  // Run automatic cleanup on app initialization
+  useAutomaticCleanup();
 
   if (showSplash) {
     return <SplashScreen onLoadingComplete={() => setShowSplash(false)} />;

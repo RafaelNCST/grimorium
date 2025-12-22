@@ -4,7 +4,8 @@
  * Backup, restauração, limpeza de dados, privacidade e coleta de dados
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 import {
   Download,
@@ -15,6 +16,9 @@ import {
   FileText,
   BarChart3,
   Info,
+  HardDrive,
+  FolderOpen,
+  Copy,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -39,6 +43,57 @@ export function DataSection() {
   const [isImporting, setIsImporting] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [allowUsageData, setAllowUsageData] = useState(false);
+  const [dataPath, setDataPath] = useState<string>("");
+  const [dataSize, setDataSize] = useState<number>(0);
+  const [isLoadingStorage, setIsLoadingStorage] = useState(true);
+  const [copiedPath, setCopiedPath] = useState(false);
+
+  // Load storage information on mount
+  useEffect(() => {
+    const loadStorageInfo = async () => {
+      try {
+        setIsLoadingStorage(true);
+        const [path, size] = await Promise.all([
+          invoke<string>("get_app_data_path"),
+          invoke<number>("get_app_data_size"),
+        ]);
+        setDataPath(path);
+        setDataSize(size);
+      } catch (error) {
+        console.error("Failed to load storage info:", error);
+      } finally {
+        setIsLoadingStorage(false);
+      }
+    };
+
+    loadStorageInfo();
+  }, []);
+
+  const handleOpenDataFolder = async () => {
+    try {
+      await invoke("open_data_folder");
+    } catch (error) {
+      console.error("Failed to open data folder:", error);
+    }
+  };
+
+  const handleCopyPath = async () => {
+    try {
+      await navigator.clipboard.writeText(dataPath);
+      setCopiedPath(true);
+      setTimeout(() => setCopiedPath(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy path:", error);
+    }
+  };
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  };
 
   const handleExportBackup = async () => {
     setIsExporting(true);
@@ -124,6 +179,94 @@ export function DataSection() {
               </div>
               <div className="text-xs text-muted-foreground">
                 {t("data.legal.terms_of_use_description")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Local Storage */}
+      <Separator />
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-base font-semibold mb-1">
+            {t("data.storage.title")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("data.storage.description")}
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
+          {/* Storage Size */}
+          <div className="flex items-start gap-3">
+            <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
+              <HardDrive className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-semibold">
+                  {t("data.storage.size_label")}
+                </span>
+                <span className="text-sm font-mono bg-muted px-2 py-1 rounded">
+                  {isLoadingStorage ? (
+                    <div className="w-16 h-4 animate-pulse bg-muted-foreground/20 rounded" />
+                  ) : (
+                    formatBytes(dataSize)
+                  )}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("data.storage.size_description")}
+              </p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Data Path */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 flex-shrink-0">
+                <FolderOpen className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold mb-1">
+                  {t("data.storage.location_label")}
+                </div>
+                <div className="rounded-md bg-muted/70 border p-2 mb-2">
+                  {isLoadingStorage ? (
+                    <div className="w-full h-4 animate-pulse bg-muted-foreground/20 rounded" />
+                  ) : (
+                    <p className="text-xs font-mono text-muted-foreground break-all">
+                      {dataPath}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleCopyPath}
+                    disabled={isLoadingStorage || !dataPath}
+                  >
+                    <Copy className="w-3.5 h-3.5 mr-1.5" />
+                    {copiedPath
+                      ? t("data.storage.copied")
+                      : t("data.storage.copy_path")}
+                  </Button>
+                  <Button
+                    variant="magical"
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleOpenDataFolder}
+                    disabled={isLoadingStorage}
+                  >
+                    <FolderOpen className="w-3.5 h-3.5 mr-1.5" />
+                    {t("data.storage.open_folder")}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

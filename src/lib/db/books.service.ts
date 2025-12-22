@@ -217,6 +217,21 @@ export async function updateBook(
 export async function deleteBook(id: string): Promise<void> {
   return safeDBOperation(async () => {
     const db = await getDB();
+
+    // Delete all region map files before CASCADE deletion
+    const regions = await db.select<{ id: string }[]>(
+      "SELECT id FROM regions WHERE book_id = $1",
+      [id]
+    );
+
+    if (regions && regions.length > 0) {
+      const { deleteMap } = await import("./region-maps.service");
+      for (const region of regions) {
+        await deleteMap(region.id);
+      }
+    }
+
+    // Now delete the book (CASCADE will handle all database records)
     await db.execute("DELETE FROM books WHERE id = $1", [id]);
   }, 'deleteBook');
 }

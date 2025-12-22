@@ -379,7 +379,11 @@ export async function deleteRegion(id: string): Promise<void> {
     // 6. Remove from factions.areas_of_interest
     await removeFromJSONArray("factions", "areas_of_interest", id);
 
-    // 7. Finally, delete the region (CASCADE will handle versions, maps, markers)
+    // 7. Delete associated map files from disk
+    const { deleteMap } = await import("./region-maps.service");
+    await deleteMap(id);
+
+    // 8. Finally, delete the region (CASCADE will handle versions and markers)
     // Child regions will have parent_id SET NULL automatically
     await db.execute("DELETE FROM regions WHERE id = $1", [id]);
   }, 'deleteRegion');

@@ -111,6 +111,24 @@
       "privacy_guarantee_title": "Garantia de privacidade:",
       "privacy_guarantee_description": "Nunca coletamos o conteúdo dos seus livros, personagens, capítulos ou qualquer informação pessoal identificável. Apenas dados agregados e anônimos de uso."
     },
+    "storage": {
+      "title": "Armazenamento Local",
+      "description": "Veja onde seus dados estão armazenados e quanto espaço estão ocupando",
+      "size_label": "Tamanho Total dos Dados",
+      "size_description": "Espaço em disco ocupado por todos os seus livros, personagens, capítulos, imagens e configurações",
+      "location_label": "Localização dos Dados",
+      "copy_path": "Copiar Caminho",
+      "copied": "Copiado!",
+      "open_folder": "Abrir no Explorador",
+      "cleanup_label": "Limpar Arquivos Órfãos",
+      "cleanup_description": "Remove arquivos de imagens e mapas que não estão mais sendo usados no aplicativo",
+      "cleanup_button": "Executar Limpeza",
+      "cleaning": "Limpando...",
+      "cleanup_success": "{{count}} arquivo(s) órfão(s) removido(s) com sucesso",
+      "cleanup_error": "Erro ao limpar arquivos ({{count}} erro(s))",
+      "duplicates_fixed": "{{count}} região(ões) com mapas duplicados corrigida(s) ({{maps}} mapa(s) antigo(s) removido(s))",
+      "nothing_to_clean": "Nenhum arquivo órfão encontrado. Tudo limpo!"
+    },
     "backup": {
       "title": "Backup e Restauração",
       "description": "Proteja seus dados exportando um backup completo",
