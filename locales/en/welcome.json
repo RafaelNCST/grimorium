@@ -1,0 +1,19 @@
+{
+  "title": "Welcome to Grimorium",
+  "description": "Your ultimate companion for creative writing and story management",
+  "features": {
+    "writing": {
+      "title": "Focused Writing",
+      "description": "Clean and intuitive environment to bring your ideas to life"
+    },
+    "management": {
+      "title": "Complete Management",
+      "description": "Organize characters, worlds, chapters and more in one place"
+    },
+    "creative": {
+      "title": "Creative Tools",
+      "description": "Powerful features to build and expand your narrative universe"
+    }
+  },
+  "get_started": "Get Started"
+}

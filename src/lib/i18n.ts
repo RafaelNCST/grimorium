@@ -40,6 +40,7 @@ import enSettings from "../../locales/en/settings.json";
 import enTooltips from "../../locales/en/tooltips.json";
 import enUpgrade from "../../locales/en/upgrade.json";
 import enWarningsSettings from "../../locales/en/warnings-settings.json";
+import enWelcome from "../../locales/en/welcome.json";
 import enWorld from "../../locales/en/world.json";
 import ptAdvancedSettings from "../../locales/pt/advanced-settings.json";
 import ptChapterCard from "../../locales/pt/chapter-card.json";
@@ -80,6 +81,7 @@ import ptSettings from "../../locales/pt/settings.json";
 import ptTooltips from "../../locales/pt/tooltips.json";
 import ptUpgrade from "../../locales/pt/upgrade.json";
 import ptWarningsSettings from "../../locales/pt/warnings-settings.json";
+import ptWelcome from "../../locales/pt/welcome.json";
 import ptWorld from "../../locales/pt/world.json";
 
 const resources = {
@@ -123,6 +125,7 @@ const resources = {
     tooltips: enTooltips,
     upgrade: enUpgrade,
     "warnings-settings": enWarningsSettings,
+    welcome: enWelcome,
     world: enWorld,
   },
   pt: {
@@ -165,6 +168,7 @@ const resources = {
     tooltips: ptTooltips,
     upgrade: ptUpgrade,
     "warnings-settings": ptWarningsSettings,
+    welcome: ptWelcome,
     world: ptWorld,
   },
 };

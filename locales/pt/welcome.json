@@ -1,0 +1,19 @@
+{
+  "title": "Bem-vindo ao Grimorium",
+  "description": "Seu companheiro definitivo para escrita criativa e gerenciamento de histórias",
+  "features": {
+    "writing": {
+      "title": "Escrita Focada",
+      "description": "Ambiente limpo e intuitivo para dar vida às suas ideias"
+    },
+    "management": {
+      "title": "Gerenciamento Completo",
+      "description": "Organize personagens, mundos, capítulos e muito mais em um só lugar"
+    },
+    "creative": {
+      "title": "Ferramentas Criativas",
+      "description": "Recursos poderosos para construir e expandir seu universo narrativo"
+    }
+  },
+  "get_started": "Começar"
+}
