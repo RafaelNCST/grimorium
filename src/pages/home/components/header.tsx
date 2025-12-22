@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -38,8 +39,17 @@ export function Header({
 }: HeaderProps) {
   const { t, i18n } = useTranslation("home");
   const { user } = useUserAccountStore();
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   const formattedLastEditedDate = formatDate(lastEditedDate, i18n.language);
+
+  useEffect(() => {
+    const hasAnimated = sessionStorage.getItem("home-header-animated");
+    if (!hasAnimated) {
+      setShouldAnimate(true);
+      sessionStorage.setItem("home-header-animated", "true");
+    }
+  }, []);
 
   return (
     <div className="relative h-80 overflow-hidden rounded-xl mx-6 my-6">
@@ -51,7 +61,9 @@ export function Header({
 
       <div className="relative h-full flex items-center justify-between px-8">
         <div className="text-white">
-          <h1 className="text-4xl font-bold mb-4 animate-fade-in-up">
+          <h1
+            className={`text-4xl font-bold mb-4 ${shouldAnimate ? "animate-fade-in-up" : ""}`}
+          >
             {t("header.title_first_part")}
             <br />
             <span className="bg-gradient-to-r from-primary-glow to-accent bg-clip-text text-transparent">
@@ -59,7 +71,9 @@ export function Header({
               {user?.displayName && `, ${user.displayName}`}
             </span>
           </h1>
-          <div className="animate-fade-in-up space-y-1">
+          <div
+            className={`space-y-1 ${shouldAnimate ? "animate-fade-in-up" : ""}`}
+          >
             <p className="text-lg">
               <span
                 className={`font-bold ${getColorClass(daysSinceLastChapter)}`}
@@ -83,7 +97,7 @@ export function Header({
             variant="magical"
             size="lg"
             onClick={onOpenCreateModal}
-            className="animate-glow"
+            className={shouldAnimate ? "animate-glow" : ""}
           >
             <Plus className="w-5 h-5 mr-2" />
             {t("header.button_create_book")}
