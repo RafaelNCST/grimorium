@@ -15,6 +15,10 @@ export function calculateTotalByType(
     academic: 0,
     royalty: 0,
     mercenary: 0,
+    kingdom: 0,
+    empire: 0,
+    country: 0,
+    divine: 0,
   };
 
   factions.forEach((faction) => {

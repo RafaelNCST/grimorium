@@ -17,7 +17,11 @@ export type FactionType =
   | "revolutionary"
   | "academic"
   | "royalty"
-  | "mercenary";
+  | "mercenary"
+  | "kingdom"
+  | "empire"
+  | "country"
+  | "divine";
 
 export type FactionInfluence =
   | "nonexistent"

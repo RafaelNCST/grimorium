@@ -155,7 +155,15 @@
     "royalty": "Realeza",
     "royalty_desc": "Nobreza real",
     "mercenary": "Mercenária",
-    "mercenary_desc": "Trabalho pago"
+    "mercenary_desc": "Trabalho pago",
+    "kingdom": "Reino",
+    "kingdom_desc": "Monarquia territorial",
+    "empire": "Império",
+    "empire_desc": "Grande poder expansionista",
+    "country": "País",
+    "country_desc": "Nação soberana",
+    "divine": "Divino",
+    "divine_desc": "Governado por deuses"
   },
   "influence": {
     "nonexistent": "Inexistente",

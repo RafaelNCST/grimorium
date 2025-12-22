@@ -155,7 +155,15 @@
     "royalty": "Royalty",
     "royalty_desc": "Royal nobility",
     "mercenary": "Mercenary",
-    "mercenary_desc": "Paid work"
+    "mercenary_desc": "Paid work",
+    "kingdom": "Kingdom",
+    "kingdom_desc": "Territorial monarchy",
+    "empire": "Empire",
+    "empire_desc": "Expansionist great power",
+    "country": "Country",
+    "country_desc": "Sovereign nation",
+    "divine": "Divine",
+    "divine_desc": "Ruled by gods"
   },
   "influence": {
     "nonexistent": "Nonexistent",

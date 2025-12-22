@@ -24,6 +24,10 @@ export interface FactionFilterStats {
   academic: number;
   royalty: number;
   mercenary: number;
+  kingdom: number;
+  empire: number;
+  country: number;
+  divine: number;
 }
 
 // Map status values to their hover/active colors
@@ -122,6 +126,26 @@ const TYPE_COLOR_MAP: Record<
     inactiveClasses:
       "bg-slate-500/10 border-slate-500/30 text-slate-600 dark:text-slate-400 hover:!bg-slate-500 hover:!text-black hover:!border-slate-500",
     activeClasses: "!bg-slate-500 !text-black !border-slate-500",
+  },
+  kingdom: {
+    inactiveClasses:
+      "bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400 hover:!bg-violet-500 hover:!text-black hover:!border-violet-500",
+    activeClasses: "!bg-violet-500 !text-black !border-violet-500",
+  },
+  empire: {
+    inactiveClasses:
+      "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400 hover:!bg-rose-500 hover:!text-black hover:!border-rose-500",
+    activeClasses: "!bg-rose-500 !text-black !border-rose-500",
+  },
+  country: {
+    inactiveClasses:
+      "bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400 hover:!bg-sky-500 hover:!text-black hover:!border-sky-500",
+    activeClasses: "!bg-sky-500 !text-black !border-sky-500",
+  },
+  divine: {
+    inactiveClasses:
+      "bg-fuchsia-500/10 border-fuchsia-500/30 text-fuchsia-600 dark:text-fuchsia-400 hover:!bg-fuchsia-500 hover:!text-black hover:!border-fuchsia-500",
+    activeClasses: "!bg-fuchsia-500 !text-black !border-fuchsia-500",
   },
 };
 
