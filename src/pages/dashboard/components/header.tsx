@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 
 import {
   Edit2,
@@ -117,6 +117,8 @@ export function Header({
   const { t: tCommon } = useTranslation("common");
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const synopsisRef = useRef<HTMLParagraphElement>(null);
+  const [isSynopsisTruncated, setIsSynopsisTruncated] = useState(false);
 
   // Genres with unique IDs for stable keys
   const genresWithIds = useMemo(
@@ -124,12 +126,16 @@ export function Header({
     [book.genre]
   );
 
-  // Check if synopsis is longer than 3 lines
-  const isSynopsisLong = (text: string) => {
-    if (!text) return false;
-    const lines = text.split("\n").length;
-    return lines > 3 || text.length > 200;
-  };
+  // Check if synopsis is actually being truncated
+  useEffect(() => {
+    if (synopsisRef.current && book.synopsis && !showFullSynopsis) {
+      const element = synopsisRef.current;
+      // Check if the content is being clipped
+      setIsSynopsisTruncated(element.scrollHeight > element.clientHeight);
+    } else {
+      setIsSynopsisTruncated(false);
+    }
+  }, [book.synopsis, showFullSynopsis]);
 
   // Check if form is valid
   const isFormValid = useMemo(() => {
@@ -149,7 +155,7 @@ export function Header({
     return (
       draftBook.title !== book.title ||
       draftBook.status !== book.status ||
-      draftBook.storySummary !== book.storySummary ||
+      draftBook.synopsis !== book.synopsis ||
       draftBook.coverImage !== book.coverImage ||
       JSON.stringify(sortedDraftGenres) !== JSON.stringify(sortedBookGenres)
     );
@@ -303,10 +309,10 @@ export function Header({
           <FormTextarea
             label={t("modal.book_synopsis")}
             name="synopsis"
-            value={draftBook?.storySummary || ""}
+            value={draftBook?.synopsis || ""}
             onChange={(e) =>
               onDraftBookChange({
-                storySummary: e.target.value,
+                synopsis: e.target.value,
               })
             }
             placeholder={t("modal.synopsis_placeholder")}
@@ -386,18 +392,17 @@ export function Header({
             </div>
 
             {/* Synopsis */}
-            {book.storySummary ? (
+            {book.synopsis ? (
               <div className="mb-3">
                 <p
+                  ref={synopsisRef}
                   className={`text-muted-foreground leading-relaxed select-text ${
-                    !showFullSynopsis && isSynopsisLong(book.storySummary)
-                      ? "line-clamp-3"
-                      : ""
+                    !showFullSynopsis ? "line-clamp-3" : ""
                   }`}
                 >
-                  {book.storySummary}
+                  {book.synopsis}
                 </p>
-                {isSynopsisLong(book.storySummary) && (
+                {(isSynopsisTruncated || showFullSynopsis) && (
                   <button
                     onClick={() => setShowFullSynopsis(!showFullSynopsis)}
                     className="text-primary hover:underline text-sm mt-1"

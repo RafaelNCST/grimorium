@@ -29,6 +29,7 @@ async function runMigrations(database: Database): Promise<void> {
       status TEXT DEFAULT 'draft',
       word_count_goal INTEGER,
       current_word_count INTEGER DEFAULT 0,
+      synopsis TEXT,
       author_summary TEXT,
       story_summary TEXT,
       current_arc TEXT,
@@ -927,6 +928,13 @@ async function runMigrations(database: Database): Promise<void> {
     // Add tabs_config column to books table for dashboard customization
     try {
       await database.execute("ALTER TABLE books ADD COLUMN tabs_config TEXT");
+    } catch (_error) {
+      // Column already exists - safe to ignore
+    }
+
+    // Add synopsis column to books table
+    try {
+      await database.execute("ALTER TABLE books ADD COLUMN synopsis TEXT");
     } catch (_error) {
       // Column already exists - safe to ignore
     }

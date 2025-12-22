@@ -13,6 +13,7 @@ export interface Book {
   createdAt: number;
   status: BookStatus;
   currentArc?: string;
+  synopsis?: string;
   authorSummary?: string;
   storySummary?: string;
 }

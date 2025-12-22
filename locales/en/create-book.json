@@ -11,6 +11,8 @@
     "title_required": "Title is required",
     "book_synopsis": "Book Synopsis",
     "synopsis_placeholder": "A brief description of the story for presentation to readers...",
+    "story_summary": "Story Summary",
+    "story_summary_placeholder": "A clean and commercial summary of the story...",
     "optional": "Optional",
     "book_genre": "Book Genre",
     "genre_required": "At least one genre is required",

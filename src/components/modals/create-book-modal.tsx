@@ -39,6 +39,7 @@ export interface IBookFormData {
   status: BookStatus;
   cover?: string;
   synopsis?: string;
+  storySummary?: string;
   authorSummary?: string;
 }
 
@@ -63,6 +64,7 @@ export function CreateBookModal({
     status: "planning",
     cover: "",
     synopsis: "",
+    storySummary: "",
     authorSummary: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -109,6 +111,7 @@ export function CreateBookModal({
       status: "planning",
       cover: "",
       synopsis: "",
+      storySummary: "",
       authorSummary: "",
     });
     setErrors({});
@@ -241,6 +244,22 @@ export function CreateBookModal({
                 setFormData({ ...formData, synopsis: e.target.value })
               }
               placeholder={t("modal.synopsis_placeholder")}
+              rows={4}
+              maxLength={1000}
+              showCharCount
+              className="resize-none"
+              labelClassName="text-primary"
+            />
+
+            {/* Story Summary */}
+            <FormTextarea
+              label={t("modal.story_summary")}
+              name="storySummary"
+              value={formData.storySummary}
+              onChange={(e) =>
+                setFormData({ ...formData, storySummary: e.target.value })
+              }
+              placeholder={t("modal.story_summary_placeholder")}
               rows={4}
               maxLength={1000}
               showCharCount

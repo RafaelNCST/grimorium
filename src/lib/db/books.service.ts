@@ -26,6 +26,7 @@ function bookToDBBook(book: Book, tabsConfig?: string): DBBook {
     status: book.status,
     word_count_goal: undefined,
     current_word_count: 0,
+    synopsis: book.synopsis,
     author_summary: book.authorSummary,
     story_summary: book.storySummary,
     current_arc: book.currentArc,
@@ -61,6 +62,7 @@ function dbBookToBook(dbBook: DBBook): Book {
     createdAt: dbBook.created_at,
     status: dbBook.status as Book["status"],
     currentArc: dbBook.current_arc,
+    synopsis: dbBook.synopsis,
     authorSummary: dbBook.author_summary,
     storySummary: dbBook.story_summary,
   };
@@ -100,13 +102,13 @@ export async function createBook(
     await db.execute(
       `INSERT INTO books (
         id, title, subtitle, description, cover_image_path, genre, visual_style,
-        status, word_count_goal, current_word_count, author_summary, story_summary,
+        status, word_count_goal, current_word_count, synopsis, author_summary, story_summary,
         current_arc, chapters, created_at, updated_at, last_opened_at,
         words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
         completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config, tabs_config
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
-        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
+        $19, $20, $21, $22, $23, $24, $25, $26, $27, $28
       )`,
       [
         dbBook.id,
@@ -119,6 +121,7 @@ export async function createBook(
         dbBook.status,
         dbBook.word_count_goal,
         dbBook.current_word_count,
+        dbBook.synopsis,
         dbBook.author_summary,
         dbBook.story_summary,
         dbBook.current_arc,
@@ -181,6 +184,10 @@ export async function updateBook(
     if (updates.currentArc !== undefined) {
       fields.push(`current_arc = $${paramIndex++}`);
       values.push(updates.currentArc);
+    }
+    if (updates.synopsis !== undefined) {
+      fields.push(`synopsis = $${paramIndex++}`);
+      values.push(updates.synopsis);
     }
     if (updates.authorSummary !== undefined) {
       fields.push(`author_summary = $${paramIndex++}`);
@@ -256,6 +263,8 @@ export interface OverviewData {
     title: string;
     visible: boolean;
   }>;
+  authorSummary?: string;
+  storySummary?: string;
 }
 
 export async function updateOverviewData(
@@ -330,7 +339,8 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
     const db = await getDB();
     const result = await db.select<DBBook[]>(
       `SELECT words_per_day, chapters_per_week, estimated_arcs, estimated_chapters,
-       completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config
+       completed_arcs, current_arc_progress, sticky_notes, checklist_items, sections_config,
+       author_summary, story_summary
        FROM books WHERE id = $1`,
       [bookId]
     );
@@ -385,6 +395,16 @@ export async function getOverviewData(bookId: string): Promise<OverviewData> {
       sectionsConfigSchema,
       []
     );
+
+    // Parse author summary
+    if (row.author_summary !== undefined && row.author_summary !== null) {
+      overviewData.authorSummary = row.author_summary;
+    }
+
+    // Parse story summary
+    if (row.story_summary !== undefined && row.story_summary !== null) {
+      overviewData.storySummary = row.story_summary;
+    }
 
     return overviewData;
   }, 'getOverviewData');

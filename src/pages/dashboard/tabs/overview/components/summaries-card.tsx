@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { Edit2, Eye, EyeOff } from "lucide-react";
+import { Edit2, Eye, EyeOff, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { DisplayTextarea } from "@/components/displays";
@@ -169,7 +169,11 @@ export function SummariesCard({
             onClick={() => onEditingSummariesChange(!isEditingSummaries)}
             className="h-7 w-7"
           >
-            <Edit2 className="w-4 h-4" />
+            {isEditingSummaries ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <Edit2 className="w-4 h-4" />
+            )}
           </Button>
         )}
       </CardHeader>

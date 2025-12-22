@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS books (
   status TEXT DEFAULT 'draft',
   word_count_goal INTEGER,
   current_word_count INTEGER DEFAULT 0,
+  synopsis TEXT,
   author_summary TEXT,
   story_summary TEXT,
   current_arc TEXT,

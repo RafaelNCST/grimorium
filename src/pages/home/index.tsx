@@ -113,7 +113,8 @@ export function HomePage() {
         lastModified: now,
         createdAt: now,
         status: "planning" as const,
-        storySummary: bookData.synopsis || "",
+        synopsis: bookData.synopsis || "",
+        storySummary: bookData.storySummary || "",
         authorSummary: bookData.authorSummary || "",
       };
 

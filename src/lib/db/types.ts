@@ -11,6 +11,7 @@ export interface DBBook {
   status: string;
   word_count_goal?: number;
   current_word_count: number;
+  synopsis?: string;
   author_summary?: string;
   story_summary?: string;
   current_arc?: string;

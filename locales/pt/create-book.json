@@ -11,6 +11,8 @@
     "title_required": "Título é obrigatório",
     "book_synopsis": "Sinopse do Livro",
     "synopsis_placeholder": "Em um mundo onde a magia foi proibida há séculos, uma jovem descobre que possui poderes ancestrais. Agora ela deve fugir do império que caça os últimos magos enquanto busca a verdade sobre seu passado",
+    "story_summary": "Resumo da História",
+    "story_summary_placeholder": "Em um mundo onde a magia foi proibida há séculos, uma jovem descobre que possui poderes ancestrais. Agora ela deve fugir do império que caça os últimos magos enquanto busca a verdade sobre seu passado",
     "optional": "Opcional",
     "book_genre": "Gênero do Livro",
     "genre_required": "Pelo menos um gênero é obrigatório",
